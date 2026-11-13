@@ -779,9 +779,10 @@ A Ruleset may also mark what the model is shown, without changing what the engin
 input schema's `x-sylvia-gm-exposure` lists conditions (a spell castable now or present in saved
 state, or a saved entity field). A tool whose conditions all fail is left out of `list_tools`. A
 `spell` input's `x-sylvia-gm-spell-scope` narrows the shown choices to spells that tool can run. A
-Ruleset declares these only where the tool would be refused or have no effect otherwise. They are
-presentation only: the canonical catalog, call admission and schema validation are unchanged, and
-an unknown condition shows the tool (`agent/_tool_exposure.py`).
+Ruleset declares these only where the tool would be refused or have no effect otherwise. The
+canonical catalog, engine admission and schema validation are unchanged, so player and panel
+actions behave as before; the GM's MCP adapter refuses an unlisted tool as unavailable, as for any
+tool outside the listed surface. An unknown condition shows the tool (`agent/_tool_exposure.py`).
 
 An application **TURN** remains the durable envelope defined in §8. A **GM inference step** is one
 provider request within that envelope, including a continuation after a TOOL RESULT. MCP discovery

@@ -80,6 +80,14 @@ def _castable(state: Mapping[str, Any], participants: Mapping[str, Any]) -> froz
     return frozenset(found)
 
 
+def _append(row: dict[str, Any]) -> None:
+    """Write each audited use as it happens, so an interrupted run still reports."""
+    target = os.environ.get("SYLVIA_GM_EXPOSURE_AUDIT")
+    if target:
+        with open(f"{target}.jsonl", "a", encoding="utf-8") as stream:
+            stream.write(json.dumps(row) + "\n")
+
+
 def pytest_configure(config: pytest.Config) -> None:
     from sylvia_gm.application import package_runtime
 
@@ -100,6 +108,7 @@ def pytest_configure(config: pytest.Config) -> None:
             outcome = mechanic(context)
             _used[name] += 1
             node = os.environ.get("PYTEST_CURRENT_TEST", "")
+            checked = len(_violations)
             if name in exposure:
                 shown = ExposureContext(
                     state,
@@ -116,6 +125,7 @@ def pytest_configure(config: pytest.Config) -> None:
                     _violations.append(
                         {"tool": name, "test": node, "kind": "out_of_scope", "spell": spell}
                     )
+            _append({"tool": name, "test": node, "ok": len(_violations) == checked})
             return outcome
 
         return audited

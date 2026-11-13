@@ -2,8 +2,9 @@
 
 A Ruleset may annotate a tool's input schema with ``x-sylvia-gm-exposure``. The annotation lists
 conditions, any one of which makes the tool relevant now. A tool whose conditions all fail is
-left out of the model's tool list. This is presentation only: the authority catalog, admission and
-schema validation are unchanged, so a call is never refused because of this annotation.
+left out of the model's tool list. The authority catalog, engine admission and schema validation
+are unchanged, so player and panel actions are unaffected. The GM's MCP adapter only accepts
+listed tools, so the GM cannot call a hidden tool, exactly as for any other unlisted tool.
 
 A Ruleset should only declare a condition when the tool cannot succeed or has no effect without
 it. Conditions are deliberately simple and Ruleset-neutral:

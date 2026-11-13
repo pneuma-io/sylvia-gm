@@ -111,15 +111,19 @@ EXPOSURE: dict[str, dict[str, object]] = {
     },
     # Class features.
     "use_srd_second_wind": {
-        "any_of": [_field("resources.second_wind", "gte1")],
+        "any_of": [_field("fighter_level", "gte1")],
         "reason": (
-            "Pre-condition: actor_state.resources.second_wind >= 1 "
-            "('no remaining Second Wind use')."
+            "Pre-condition: actor_state.fighter_level >= 1 ('no authoritative Fighter level'). "
+            "Every character saves a second_wind resource, so the level identifies a Fighter; "
+            "an exhausted Fighter still gets the engine's 'no remaining use' refusal."
         ),
     },
     "use_monk_wholeness_of_body": {
-        "any_of": [_field("resources.wholeness_of_body", "gte1")],
-        "reason": "Pre-condition: actor_state.resources.wholeness_of_body >= 1.",
+        "any_of": [_field("resources.wholeness_of_body", "not_null")],
+        "reason": (
+            "Pre-condition: actor_state.resources.wholeness_of_body >= 1. Shown while the "
+            "resource exists, so an exhausted Monk gets the engine's refusal."
+        ),
     },
     # Active effects of SRD Lite spells.
     "attack_srd_altered_natural_weapon": {
@@ -284,16 +288,27 @@ EXPOSURE: dict[str, dict[str, object]] = {
 }
 
 
-def _scope_spells(entry: dict[str, object], definitions: dict[str, object]) -> list[str]:
+def _scope_spells(
+    entry: dict[str, object], definitions: dict[str, object], declared: list[str]
+) -> list[str]:
+    """Keep every declared choice except implemented spells this tool always refuses.
+
+    Spells outside SRD Lite stay, so a creature that lists one still receives the engine's
+    explicit "excluded" refusal instead of a schema error.
+    """
     implemented = set(definitions["srd_lite_implemented"])
-    if "spells" in entry:
-        return sorted(set(entry["spells"]) & implemented)  # type: ignore[arg-type]
-    times = set(entry["casting_times"])  # type: ignore[arg-type]
     spells = definitions["spells"]
+    if "spells" in entry:
+        accepted = set(entry["spells"])  # type: ignore[arg-type]
+    else:
+        times = set(entry["casting_times"])  # type: ignore[arg-type]
+        accepted = {
+            spell
+            for spell in implemented
+            if isinstance(spells.get(spell), dict) and spells[spell].get("casting_time") in times
+        }
     return sorted(
-        spell
-        for spell in implemented
-        if isinstance(spells.get(spell), dict) and spells[spell].get("casting_time") in times
+        spell for spell in declared if spell not in implemented or spell in accepted
     )
 
 
@@ -314,7 +329,9 @@ def annotate(record: dict, definitions: dict) -> dict[str, int]:
         spell = tools[name]["input_schema"]["properties"]["spell"]
         if spell.get("x-sylvia-gm-castable-spells") is not True:
             raise ValueError(f"{name} has no castable spell choice to scope")
-        spell["x-sylvia-gm-spell-scope"] = _scope_spells(entry, definitions)
+        aliases = spell.get("x-sylvia-gm-value-aliases", {})
+        declared = [value for value in spell["enum"] if value not in aliases]
+        spell["x-sylvia-gm-spell-scope"] = _scope_spells(entry, definitions, declared)
     for name, entry in EXPOSURE.items():
         tools[name]["input_schema"]["x-sylvia-gm-exposure"] = {"any_of": entry["any_of"]}
     return {"spell_scopes": len(SPELL_SCOPES), "conditioned_tools": len(EXPOSURE)}

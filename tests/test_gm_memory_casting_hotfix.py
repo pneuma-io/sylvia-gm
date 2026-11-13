@@ -874,11 +874,6 @@ class DefectGM(CaptureGM):
             {"target": "hero", "resource": "action_surge", "amount": 1},
             "rejected",
         ),
-        (
-            "record_srd_contingency_world_fact",
-            {"caster_state": "hero", "fact_tag": "bell_rang"},
-            "action_committed",
-        ),
     ],
 )
 def test_named_ruleset_failures_use_safe_refusal_or_valid_noop(
@@ -922,6 +917,18 @@ def test_out_of_roster_spell_refusal_tells_the_gm_what_it_can_cast(lite_save, tm
     }
     assert after.state == before.state
     assert after.revision == before.revision
+
+
+def test_outside_lite_fact_tool_is_hidden_from_the_gm_but_kept_by_authority(lite_save, tmp_path):
+    """Contingency is outside SRD Lite, so recording its world fact can have no effect."""
+    database = tmp_path / "hidden-contingency.sqlite3"
+    shutil.copyfile(lite_save, database)
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        request = play(owner, CaptureGM(), campaign="casting", turn="casting-turn")
+        catalog = {tool.name for tool in owner.catalog("casting")}
+    names = [tool["function"]["name"] for tool in request["tools"]]
+    assert not any(name.endswith("_record_srd_contingency_world_fact") for name in names)
+    assert "record_srd_contingency_world_fact" in catalog
 
 
 def test_advertised_healing_flow_corrects_once_and_commits_exact_effects(lite_save, tmp_path):

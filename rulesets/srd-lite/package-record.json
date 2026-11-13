@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "b41c6e718eeb8867daffc2faff562aae7380deddaf231f38ff071eaf4728e58b",
+  "content_sha256": "2b7d9d29b599d25ae92fe321bedb63dc4273c5ac941b70b81cae71fdb8d1a9a9",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -47544,7 +47544,7 @@
           "any_of": [
             {
               "entity_field": "resources.wholeness_of_body",
-              "op": "gte1"
+              "op": "not_null"
             }
           ]
         }
@@ -47803,7 +47803,7 @@
         "x-sylvia-gm-exposure": {
           "any_of": [
             {
-              "entity_field": "resources.second_wind",
+              "entity_field": "fighter_level",
               "op": "gte1"
             }
           ]
