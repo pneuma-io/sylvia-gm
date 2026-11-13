@@ -1077,6 +1077,17 @@ def test_real_td_saved_retry_freezes_queue_range_after_commit_and_reopen(
             provider_factory=retry_adapter.for_turn,
         )
         assert controlled_result_ids(retry_provider.calls[0][0]) == original_ids
+        facts_text = next(
+            str(row["content"])
+            for row in retry_provider.calls[0][0]
+            if str(row.get("content", "")).startswith("SYLVIA_GM_EXACT_NARRATION_FACTS")
+        )
+        # Saved round facts and the canonical queue receipt describe the queue exactly once.
+        assert [
+            [action["action_id"] for action in fact["committed_actions"]]
+            for fact in json.loads(facts_text.split("\n")[1])
+            if fact["tool"] == "execute_action_sequence"
+        ] == [original_ids]
         assert not any(
             row["function"]["name"].endswith("_execute_action_sequence")
             for row in retry_provider.calls[0][1]

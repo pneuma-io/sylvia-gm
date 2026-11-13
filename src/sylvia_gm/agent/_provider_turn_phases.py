@@ -95,6 +95,7 @@ from ._provider_session import (
     _require_checked_campaign_file_narration,
     _resolve_provider_tool_alias,
     _saved_action_sequence_results,
+    _saved_round_narration_facts,
     _ToolCallAssembly,
     _unsupported_response_speaker_ids,
     _validated_raw_response_blocks,
@@ -2214,6 +2215,13 @@ def reconcile_tool_batch(
                     JsonValue,
                     _plain_json(tool_messages),
                 ),
+                # Model results omit engine context; a resumed turn restores these exact
+                # facts instead. This field is evidence only and is never sent as history.
+                **(
+                    {"narration_facts": cast(JsonValue, _plain_json(round_narration_facts))}
+                    if round_narration_facts
+                    else {}
+                ),
             },
         )
     provider_input.control.progress.update("working")
@@ -2427,12 +2435,24 @@ def prepare_turn_recovery(
         else None
     )
     state.saved_sequence_results = _saved_action_sequence_results(provider_input, self._owner)
-    state.pending_narration_facts = [
+    # The live rounds saved their exact facts with their tool results, in commit order.
+    state.pending_narration_facts = _saved_round_narration_facts(
+        provider_input, state.basis_message_id
+    )
+    narrated_queue_actions: set[object] = {
+        action.get("action_id")
+        for fact in state.pending_narration_facts
+        for action in cast(Sequence[Mapping[str, object]], fact.get("committed_actions", ()))
+    }
+    # A queue receipt saved without its round's facts is still read canonically, after them.
+    state.pending_narration_facts.extend(
         facts
         for result in state.saved_sequence_results
-        if (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
+        if not set(cast(Sequence[str], result.get("committed_action_ids", ())))
+        <= narrated_queue_actions
+        and (facts := _action_sequence_narration_facts(self._owner, state.campaign_id, result))
         is not None
-    ]
+    )
     state.obligations.provisional_tool_prose_pending = False
     state.obligations.player_intent_pending = False
     state.committed_action_ids = {

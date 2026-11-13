@@ -1468,6 +1468,32 @@ def _saved_action_sequence_results(
     return tuple(results)
 
 
+def _saved_round_narration_facts(
+    provider_input: SessionProviderInput, basis_message_id: str | None,
+) -> list[dict[str, object]]:
+    """Restore the exact facts the live rounds of this saved GM input committed.
+
+    Saved model-facing results omit engine context, so the facts each round built from
+    the full receipts are kept beside them. Nothing is executed or rerolled here.
+    """
+
+    if provider_input.session.role is not WriterRole.DM or basis_message_id is None:
+        return []
+    facts: list[dict[str, object]] = []
+    for message in provider_input.history.messages:
+        if (message.kind is not SessionMessageKind.EVIDENCE
+                or message.content.get("kind") != "provider_tool_results"
+                or message.content.get("basis_message_id") != basis_message_id):
+            continue
+        saved = message.content.get("narration_facts", ())
+        if isinstance(saved, Sequence) and not isinstance(saved, (str, bytes, bytearray)):
+            facts.extend(
+                cast(dict[str, object], _plain_json(item))
+                for item in saved if isinstance(item, Mapping)
+            )
+    return facts
+
+
 def _action_sequence_narration_facts(
     owner: AuthorityOwner, campaign_id: str, result: Mapping[str, object],
 ) -> dict[str, object] | None:
