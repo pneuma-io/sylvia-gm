@@ -12,6 +12,7 @@ from scripts.inventory_inherited_artwork import inherited_artwork_subjects
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.bundled_character_art import (
     bundled_character_image,
+    bundled_plan_visuals,
     bundled_source_visuals,
 )
 from sylvia_gm.application.bundled_packages import _rift_drafts
@@ -53,6 +54,20 @@ def test_prepared_bundles_match_starter_data_package_payloads_and_frozen_invento
         if entry["id"].startswith("srd-starter-"):
             source = next(row for row in starters if row["participant"]["name"] == entry["name"])
             assert source["visuals"] == visuals
+        elif entry["id"].startswith("severed-plan-"):
+            for source in entry["sources"]:
+                assert "package_id" not in source
+                plan = json.loads(
+                    (ROOT / "campaign-plans" / source["plan_id"] / "plan.json").read_bytes()
+                )
+                assert bundled_plan_visuals(
+                    plan, source["path"], subject_name=source["subject_name"],
+                    campaign_setting_ids=frozenset({source["campaign_setting_id"]}),
+                ) == visuals
+                assert bundled_plan_visuals(
+                    plan, source["path"], subject_name=source["subject_name"],
+                    campaign_setting_ids=frozenset({"another-setting"}),
+                ) is None
         elif entry["id"].startswith("siren-protocol-"):
             # Siren is an independently delivered Setting; its exact file descriptors bind art.
             for source in entry["sources"]:
