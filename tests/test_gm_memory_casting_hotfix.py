@@ -37,6 +37,7 @@ from sylvia_gm.provider._base import ProviderStreamChunk
 from sylvia_gm.runtime._runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ToolDef
+from tests.gm_context_contract import current_state, unsealed
 from tests.qa_attached_request import request_attached
 from tests.test_alpha_f4_generic_sessions import _campaign
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
@@ -661,10 +662,10 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
     fresh = next(
         m
         for m in request["messages"]
-        if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        if unsealed(m.get("content")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
     )
     assert "golden-bell" in json.dumps(
-        json.loads(fresh["content"].split("\n", 1)[1])["PLAYER_KNOWN"]
+        json.loads(unsealed(fresh["content"]).split("\n", 1)[1])["PLAYER_KNOWN"]
     )
     # SRD Lite 0.3.24 exposure: 154 tools and 420,975 bytes became 93 tools and 263,655
     # bytes for this Cleric. Catch a return of the hidden follow-up and casting tools.
@@ -783,14 +784,9 @@ class HealingGM(CaptureGM):
             if t["function"]["name"].endswith("_cast_spell_outside_combat")
         )
         schema = cast["parameters"]
-        fresh = next(
-            m
-            for m in messages
-            if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
-        )
-        state = json.loads(fresh["content"].split("\n", 1)[1])["campaign_state"][
-            "ruleset_owned_values"
-        ]
+        current = current_state(messages)
+        assert current is not None, "the request carries no campaign state"
+        state = current["campaign_state"]["ruleset_owned_values"]
         actor = schema["properties"]["caster"]["enum"][0]
         entity = state[f"{SRD}.entities"][actor]
         if self.arguments is None:
@@ -1287,9 +1283,9 @@ def test_saved_memory_reaches_actual_provider_after_reopen_without_history_answe
         fresh = next(
             m
             for m in request["messages"]
-            if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+            if unsealed(m.get("content")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
         )
-        body = json.loads(fresh["content"].split("\n", 1)[1])
+        body = json.loads(unsealed(fresh["content"]).split("\n", 1)[1])
         remaining = json.dumps([m for m in request["messages"] if m is not fresh])
         assert "juniper" not in remaining and "north bell rings" not in remaining
         assert body["campaign"]["revision"] == revision
@@ -1385,18 +1381,18 @@ def test_real_transport_restores_current_act_progress_and_secret_audiences(tmp_p
     fresh = next(
         m
         for m in messages
-        if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        if unsealed(m.get("content")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
     )
-    body = json.loads(fresh["content"].split("\n", 1)[1])
+    body = json.loads(unsealed(fresh["content"]).split("\n", 1)[1])
     assert body["campaign_state"]["current_scene"]["act_id"] == "act-2"
     assert body["campaign_state"]["plan_progress"][0]["status"] == "resolved"
     assert body["campaign_state"]["reveals"]["mentor-knew"] == ["player"]
     preparation = next(
         m
         for m in messages
-        if str(m.get("content", "")).startswith("SYLVIA_GM_CAMPAIGN_PREPARATION")
+        if unsealed(m.get("content")).startswith("SYLVIA_GM_CAMPAIGN_PREPARATION")
     )
-    prepared = json.loads(preparation["content"].split("\n", 1)[1])
+    prepared = json.loads(unsealed(preparation["content"]).split("\n", 1)[1])
     assert prepared["campaign_plan_preparation"]["prepared_acts"][0]["id"] == "act-2"
     assert "mentor-knew" in body["PLAYER_KNOWN"]["revealed_secret_ids"]
     assert "rift-is-one-way" not in body["PLAYER_KNOWN"]["revealed_secret_ids"]
