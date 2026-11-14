@@ -13137,8 +13137,9 @@ def test_anthropic_stream_preserves_tool_identity_and_argument_index() -> None:
 
 
 def test_anthropic_single_required_tool_choice_names_the_only_operation() -> None:
+    # A model that accepts forcing and temperature; current models get neither.
     request = AnthropicMessagesTransport().format_request(
-        "claude-test",
+        "claude-sonnet-4-6",
         [{"role": "user", "content": "Advance the required engine transition."}],
         [
             {
@@ -13161,7 +13162,7 @@ def test_anthropic_single_required_tool_choice_names_the_only_operation() -> Non
 
 def test_anthropic_multiple_required_tool_choices_preserve_model_choice() -> None:
     request = AnthropicMessagesTransport().format_request(
-        "claude-test",
+        "claude-sonnet-4-6",
         [{"role": "user", "content": "Choose the required engine transition."}],
         [
             {
