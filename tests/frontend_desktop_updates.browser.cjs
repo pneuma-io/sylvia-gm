@@ -10,7 +10,7 @@ test('pending restart preparation cannot be dismissed as Not now', async () => {
   const markup = fs.readFileSync(path.join(frontend, 'app.html'), 'utf8')
     .match(/<section\b[^>]*\bid="desktop-updates"[^>]*>[\s\S]*?<\/section>/)?.[0];
   assert.ok(markup, 'Use the complete shipped update section');
-  const browser = await chromium.launch({ channel: 'msedge', headless: true, chromiumSandbox: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true, chromiumSandbox: true });
   try {
     const page = await browser.newPage();
     await page.route('**/*', async route => {

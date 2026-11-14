@@ -11,6 +11,7 @@ import os
 import queue
 import shutil
 import subprocess
+import sys
 import threading
 import time
 from collections.abc import Callable, Iterator
@@ -213,6 +214,9 @@ class CodexConnection:
             "-c",
             'web_search="disabled"',
         ]
+        creationflags = 0
+        if sys.platform == "win32":
+            creationflags = subprocess.CREATE_NO_WINDOW
         try:
             process = subprocess.Popen(
                 command,
@@ -224,7 +228,7 @@ class CodexConnection:
                 text=True,
                 encoding="utf-8",
                 bufsize=1,
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+                creationflags=creationflags,
             )
         except OSError:
             raise CodexConnectionError("The Codex runtime could not be started.") from None

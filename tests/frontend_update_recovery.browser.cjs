@@ -8,7 +8,7 @@ const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 
 for (const retry of [false, true]) {
   test(`recovery renders only valid data choices: ${retry ? 'ambiguous retry' : 'initial restore'}`, async () => {
-    const browser = await chromium.launch({ channel: 'msedge', headless: true, chromiumSandbox: true });
+    const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true, chromiumSandbox: true });
     try {
       const page = await browser.newPage();
       const calls = [];

@@ -20,6 +20,7 @@ instance that decides to attach as a client never opens the database.
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO
@@ -54,7 +55,7 @@ def _probe_lock_file(lock_path: Path) -> tuple[bool, str]:
         probe.flush()
     probe.seek(0)
     try:
-        if os.name == "nt":
+        if sys.platform == "win32":
             import msvcrt
 
             msvcrt.locking(probe.fileno(), msvcrt.LK_NBLCK, 1)
@@ -62,11 +63,11 @@ def _probe_lock_file(lock_path: Path) -> tuple[bool, str]:
         else:
             import fcntl
 
-            fcntl.flock(  # type: ignore[attr-defined]
+            fcntl.flock(
                 probe.fileno(),
-                fcntl.LOCK_EX | fcntl.LOCK_NB,  # type: ignore[attr-defined]
+                fcntl.LOCK_EX | fcntl.LOCK_NB,
             )
-            fcntl.flock(probe.fileno(), fcntl.LOCK_UN)  # type: ignore[attr-defined]
+            fcntl.flock(probe.fileno(), fcntl.LOCK_UN)
     except OSError:
         probe.close()
         return True, "owner lock is held by a live process"

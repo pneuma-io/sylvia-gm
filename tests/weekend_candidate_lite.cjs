@@ -8,7 +8,7 @@ const origin = process.env.SYLVIA_TEST_WEBUI_ORIGIN;
 const privateMode = process.env.SYLVIA_TEST_WEBUI_PRIVATE === '1';
 
 test('actual Lite panels, Settings, separate drafts and reopen at desktop and phone sizes', async () => {
-  const browser = await chromium.launch({ headless: true, channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || 'msedge' });
+  const browser = await chromium.launch({ headless: true, channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
   try {
     for (const viewport of [{ width: 1600, height: 1000 }, { width: 390, height: 844 }]) {
       const context = await browser.newContext({ viewport });
