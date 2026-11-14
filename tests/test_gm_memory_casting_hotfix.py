@@ -893,6 +893,29 @@ def test_named_ruleset_failures_use_safe_refusal_or_valid_noop(
     assert after.state[f"{SRD}.entities"]["hero"]["resources"]["spell_slot_1"] == 2
 
 
+def test_out_of_roster_spell_refusal_tells_the_gm_what_it_can_cast(lite_save, tmp_path):
+    database = tmp_path / "out-of-roster.sqlite3"
+    shutil.copyfile(lite_save, database)
+    provider = DefectGM("cast_spell_outside_combat", {"caster_state": "hero", "spell": "wish"})
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.snapshot("casting")
+        play(owner, provider, campaign="casting", turn="casting-turn")
+        after = owner.snapshot("casting")
+    # The receipt is the exact tool result content the GM model received.
+    receipt = provider.receipt
+    assert (receipt["status"], receipt["code"]) == ("rejected", "spell_unavailable"), receipt
+    assert "not part of this Ruleset's castable spells" in receipt["reason"]
+    assert receipt["state_changed"] is False
+    spell_issue = next(i for i in receipt["validation"]["issues"] if i["path"] == "spell")
+    assert spell_issue["kind"] == "invalid_enum_value"
+    assert set(spell_issue["allowed_values"]) == {
+        "guidance", "sacred_flame", "light", "bless", "cure_wounds", "guiding_bolt",
+        "healing_word", "spare_the_dying", "mending", "command",
+    }
+    assert after.state == before.state
+    assert after.revision == before.revision
+
+
 def test_advertised_healing_flow_corrects_once_and_commits_exact_effects(lite_save, tmp_path):
     database = tmp_path / "healing.sqlite3"
     shutil.copyfile(lite_save, database)
