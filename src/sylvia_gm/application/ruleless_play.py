@@ -101,8 +101,12 @@ _MECHANICS_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     (
         "a request to make a check",
         re.compile(
-            r"\b(?:make|attempt|give\s+me)\s+(?:a|an)\s+(?:[a-z]+\s+){0,2}"
-            r"(?:check|save)\b",
+            # Only a bare, skill-named or difficulty-named check or save is a rules
+            # request; "make a quick check of the windows" or "make a save of your
+            # progress" is ordinary prose.
+            r"\b(?:make|attempt|give\s+me)\s+(?:a|an)\s+"
+            r"(?:(?:" + _SKILL_WORDS + r"|difficult|hard|easy|opposed|contested|group|flat)\s+)?"
+            r"(?:check|save|saving\s+throw)\b(?!\s+(?:of|on|in|over|for)\b)",
             re.IGNORECASE,
         ),
     ),

@@ -52,6 +52,9 @@ _KEY_REPLY = (
         ("Roll initiative! Combat round one begins.", ("a request to roll", "turn order")),
         ("You attack with advantage.", ("a mechanical advantage",)),
         ("You gain 50 XP and level up.", ("an action economy term",)),
+        ("Make a check to see whether you notice the door.", ("a request to make a check",)),
+        ("Attempt a difficult save against the poison.", ("a request to make a check",)),
+        ("Give me a Dexterity save.", ("a check or saving throw", "a request to make a check")),
     ],
 )
 def test_mechanical_language_is_named(text: str, expected: tuple[str, ...]) -> None:
@@ -68,6 +71,10 @@ def test_mechanical_language_is_named(text: str, expected: tuple[str, ...]) -> N
         "She tells you the history of the lighthouse and checks the lamp oil.",
         "He rolls up his sleeves and makes a careful study of the lock.",
         "A dozen gulls wheel overhead; the 3 fishermen haul in their nets.",
+        "You make a quick check of the windows before settling in for the night.",
+        "Make a save of your progress before you sail.",
+        "She makes a check on the horses, then a careful check for loose shutters.",
+        "You make a quick check to see whether the door is locked.",
     ],
 )
 def test_ordinary_fiction_is_not_mechanics(text: str) -> None:
