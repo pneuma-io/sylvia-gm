@@ -1444,7 +1444,9 @@ the ledger resets. Builder and participant requests do not use it.
   stands even when canonical assembly later renders the same message differently. Host records
   follow new conversation: *latest-wins* records (campaign preparation, relevant Character Files,
   player control results) only when their content changed; *event* records unless an identical
-  record of that label is still the journal tail. Nothing is removed or rewritten. The positional
+  record of that label is still the journal tail, or the record has stayed in canonical assembly
+  unchanged since it was journaled (an engine transition result kept for the turn is one record,
+  not a new event after each tool exchange). Nothing is removed or rewritten. The positional
   `SYLVIA_GM_CURRENT_PLAYER_MESSAGE` control is replaced by the ledger contract's rule that the
   current input is the latest unsealed user message.
 - **Fresh epoch layout:** campaign preparation (and any continuation note), then history, then other
