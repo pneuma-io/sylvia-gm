@@ -171,7 +171,9 @@ def _stale_same_version_rift_archive() -> bytes:
 
 def test_genuine_rift_plan_binds_ruleset_and_severed_lands() -> None:
     authority = _retained_plan_authority()
-    assert authority.ruleset.version == "0.3.15"
+    # The retained Rift snapshot must contain exactly the Lite package this build ships.
+    assert authority.ruleset.package_id == "sylvia.srd-lite.bg3"
+    assert authority.ruleset == bundled_rift_authority().ruleset
     assert authority.setting.version == "1.0.0-alpha.2.naming.1"
     admitted = admit_package_archive(io.BytesIO((PLAN_ROOT / "setting.sylvia-gm-package").read_bytes()))
     assert [entry.package_id for entry in admitted.package_lock.entries] == [

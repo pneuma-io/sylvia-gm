@@ -1,6 +1,6 @@
 [package]
 name = "sylvia-gm"
-version = "0.3.0-alpha.4"
+version = "0.4.0-alpha.1"
 description = "Sylvia GM Desktop Application"
 authors = ["Daniel Young"]
 license-file = "../LICENSE"

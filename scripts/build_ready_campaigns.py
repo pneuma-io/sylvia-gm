@@ -21,6 +21,7 @@ from sylvia_gm.infrastructure.package_archive import admit_package_archive
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "src/sylvia_gm/campaign/ready-campaigns.json"
+LITE = "sylvia.srd-lite.bg3"
 PARTIES = {
     "a-debt-in-iron": (("tavin-bell", 1), ("cleric", 1)),
     "last-cart-through": (("fighter", 2), ("cleric", 2)),
@@ -138,6 +139,13 @@ def prepare() -> bytes:
                 "party": characters,
             }
         )
+    rulesets = {
+        (row["bindings"]["ruleset"]["id"], row["bindings"]["ruleset"]["version"])
+        for row in campaigns
+    }
+    if len(rulesets) != 1 or next(iter(rulesets))[0] != LITE:
+        raise SystemExit(f"Prepared campaigns must share one SRD Lite binding: {sorted(rulesets)}")
+    lite_version = next(iter(rulesets))[1]
     payload = {
         "format_version": 1,
         "provenance": {
@@ -148,7 +156,10 @@ def prepare() -> bytes:
                 "Existing SRD starters and Tavin Bell; independent prepared role/level editions."
             ),
             "starter_source_sha256": hashlib.sha256(starters_path.read_bytes()).hexdigest(),
-            "rules": "Contained SRD Lite 0.3.15; retained SRD 5.2.1 class and creation references.",
+            "rules": (
+                f"Contained SRD Lite {lite_version}; "
+                "retained SRD 5.2.1 class and creation references."
+            ),
             "notices": [
                 "LICENSING-STATUS.md",
                 "campaign-settings/severed-lands/ATTRIBUTION.md",

@@ -41,7 +41,9 @@ def test_every_public_lite_plan_selects_current_exact_mechanics(tmp_path):
         runtime = source.read(f"packages/{NS}/runtime/ruleset.yaml")
         spells = source.read(f"packages/{NS}/content/spell-status-inventory.json")
     assert len(json.loads(spells)["spells"]) == 117
-    assert primary["version"] == "0.3.15"
+    # The bundled Plans must bind the Lite version this build ships, not an earlier one.
+    rift = bundled_plan("rift-awakening").plan.payload["bindings"]["ruleset"]
+    assert (rift["id"], rift["version"]) == (NS, primary["version"])
     surface = next(row for row in primary["ui_surfaces"] if row["id"] == MAP)
     assert "occupied_space" in surface["source"]["fields"]
     public = read_plan_catalogue(bundled_plans_root())
