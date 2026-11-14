@@ -45,6 +45,10 @@ identical card again (same content hash) lets it continue.
 In the dialog, an unconfirmed send says so and is resent under the same identity. A chat changed in
 another window, or whose card was removed, is reloaded with the typed text kept.
 
+Closing the dialog while a reply is pending keeps that operation active. Reopening shows the same
+chat and draft, with sending and chat selection locked until the reply finishes. Reopening never
+starts a competing catalog load or releases the pending operation's lock.
+
 ## Not included yet
 
 Deleting or renaming chats, regenerating or editing replies, alternative greetings, lore

@@ -333,6 +333,8 @@
     async function open() {
       if (!dialog.open) dialog.showModal();
       layout();
+      // Reopening shows the in-flight operation; only that operation may release its lock.
+      if (busy) { lock(); return; }
       status('Loading characters…');
       busy = true; lock();
       try {

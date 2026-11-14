@@ -81,6 +81,49 @@ async function openApp(browser,viewport){
 
 const texts=page=>page.locator('#character-chat-log .cc-message p').allInnerTexts();
 
+test('closing and reopening during a reply keeps its selection and draft locked until completion',async()=>{
+ const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ try{
+  const {page,errors}=await openApp(browser,{width:1280,height:860});
+  await page.locator('#home-character-chat-btn').click();
+  await page.locator('#character-chat-user-name').fill('Bee');
+  await page.locator('#character-chat-start').click();
+  await page.waitForFunction(()=>document.querySelectorAll('#character-chat-log .cc-message').length===1);
+  const chatB=await page.evaluate(()=>[...window.chatStore.keys()][0]);
+  await page.locator('#character-chat-user-name').fill('Aye');
+  await page.locator('#character-chat-start').click();
+  await page.waitForFunction(()=>window.chatStore.size===2 && document.getElementById('character-chat-log').innerText.includes('Aye'));
+  const chatA=await page.evaluate(()=>[...window.chatStore.keys()][1]);
+  await page.evaluate(()=>{window.holdReply=true;});
+  await page.locator('#character-chat-input').fill('Pending message for A');
+  await page.locator('#character-chat-input').press('Enter');
+  await page.waitForFunction(()=>typeof window.releaseReply==='function');
+  await page.locator('#character-chat-close').click();
+  await page.locator('#home-character-chat-btn').click();
+  await page.waitForFunction(()=>document.getElementById('character-chat-dialog').open &&
+   document.getElementById('character-chat-status').textContent!=='Loading characters…');
+  assert.equal(await page.locator('#character-chat-input').isDisabled(),true,'reopening must not release the pending send lock');
+  assert.equal(await page.locator(`.cc-saved-chat[data-chat-id="${chatB}"]`).isDisabled(),true);
+  assert.equal(await page.locator('#character-chat-start').isDisabled(),true);
+  assert.equal(await page.locator('#character-chat-input').inputValue(),'Pending message for A');
+  assert.equal(await page.locator(`.cc-saved-chat[data-chat-id="${chatA}"]`).getAttribute('aria-current'),'true');
+  assert.equal(await page.locator('#character-chat-typing').isVisible(),true);
+  await page.evaluate(()=>{window.holdReply=false;window.releaseReply();});
+  await page.waitForFunction(()=>document.querySelectorAll('#character-chat-log .cc-message').length===3);
+  await page.locator(`.cc-saved-chat[data-chat-id="${chatB}"]`).click();
+  await page.waitForFunction(()=>document.getElementById('character-chat-log').innerText.includes('Bee'));
+  await page.locator('#character-chat-input').fill('Draft for B');
+  await page.locator('#character-chat-close').click();
+  await page.locator('#home-character-chat-btn').click();
+  await page.waitForFunction(()=>document.getElementById('character-chat-status').textContent!=='Loading characters…');
+  assert.equal(await page.locator(`.cc-saved-chat[data-chat-id="${chatB}"]`).getAttribute('aria-current'),'true');
+  assert.equal(await page.locator('#character-chat-input').inputValue(),'Draft for B');
+  assert.deepEqual(await page.evaluate(()=>[...window.chatStore.values()].map(chat=>chat.messages.length)),[1,3]);
+  assert.equal(await page.evaluate(()=>window.calls.filter(call=>call[0]==='send').length),1);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+
 test('pick a card, talk in character, survive a failed send, then reopen the saved chat',async()=>{
  const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
  const shots=process.env.SYLVIA_QA_SCREENSHOTS;if(shots)fs.mkdirSync(shots,{recursive:true});
