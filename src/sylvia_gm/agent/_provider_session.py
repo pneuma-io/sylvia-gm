@@ -14,6 +14,7 @@ import json
 import queue
 import re
 import uuid
+import weakref
 from collections.abc import AsyncIterator, Awaitable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
@@ -1553,6 +1554,12 @@ def _public_action_result(action_id: str | None, result: object) -> object:
     return _plain_json(result)
 
 
+#: Context ledgers by owner object (see ProviderSessionAdapter._ledger_store).
+_SHARED_LEDGERS: weakref.WeakKeyDictionary[Any, dict[str, ContextLedger]] = (
+    weakref.WeakKeyDictionary()
+)
+
+
 class ProviderSessionAdapter:
     """Run one configured provider through rules-neutral canonical session events."""
 
@@ -2263,7 +2270,8 @@ class ProviderSessionAdapter:
         transport = getattr(getattr(provider, "model_info", None), "transport", None)
         # Stand-in owners without the session append path keep the journal in memory only.
         persistent = callable(getattr(self._owner, "append_agent_message", None))
-        ledger = self._context_ledgers.get(session_id)
+        ledgers = self._ledger_store()
+        ledger = ledgers.get(session_id)
         if ledger is None or ledger.context_owner != owner or ledger.transport != transport:
             previous = ledger
             ledger = ContextLedger(session_id=session_id, context_owner=owner,
@@ -2271,7 +2279,7 @@ class ProviderSessionAdapter:
             if previous is not None:
                 # A different owner or transport is a new epoch; keep the reset visible.
                 ledger.state = previous.state
-            self._context_ledgers[session_id] = ledger
+            ledgers[session_id] = ledger
         context_id = self._gm_request_context_id(provider_input)
 
         def saved_records() -> list[Mapping[str, object]]:
@@ -2295,13 +2303,15 @@ class ProviderSessionAdapter:
             projected: list[dict[str, object]], tools: list[dict[str, object]] | None,
         ) -> list[dict[str, Any]]:
             return ledger.plan(projected, request_context_id=context_id,
-                               history_records=saved_records, tools=tools).wire
+                               history_records=saved_records, tools=tools,
+                               check_saved_tip=False).wire
 
         async def finalize(
             projected: list[dict[str, object]], tools: list[dict[str, object]] | None,
         ) -> list[dict[str, object]]:
             frame = ledger.plan(projected, request_context_id=context_id,
-                                history_records=saved_records, tools=tools)
+                                history_records=saved_records, tools=tools,
+                                check_saved_tip=False)
             if frame.record is not None and persistent:
                 # Durable before the request leaves: replay after a restart rehydrates the
                 # same journal, with native continuation still attached by reference.
@@ -2314,6 +2324,18 @@ class ProviderSessionAdapter:
             )
 
         return finalize, measure
+
+    def _ledger_store(self) -> dict[str, ContextLedger]:
+        """One ledger per session for each owner, shared by every adapter that owner runs.
+
+        A Retry or a later turn may use a new adapter; sharing the ledger keeps one writer for
+        the journal, so saved evidence is read only when a journal starts (for example after
+        an owner restart), not on every request.
+        """
+        try:
+            return _SHARED_LEDGERS.setdefault(self._owner, {})
+        except TypeError:  # an owner that cannot be weakly referenced (test stand-ins)
+            return self._context_ledgers
 
     def _gm_request_context_id(self, provider_input: SessionProviderInput) -> str:
         session = provider_input.session

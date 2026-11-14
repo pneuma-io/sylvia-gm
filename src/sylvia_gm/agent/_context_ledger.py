@@ -665,12 +665,18 @@ class ContextLedger:
         request_context_id: str,
         history_records: Callable[[], Sequence[Mapping[str, Any]]] = tuple,
         tools: Sequence[Mapping[str, Any]] | None = None,
+        check_saved_tip: bool = True,
     ) -> WireFrame:
-        """Compute the next request without changing the ledger (also used for size planning)."""
+        """Compute the next request without changing the ledger (also used for size planning).
+
+        With ``check_saved_tip`` the in-memory journal is used only while the newest saved
+        record is on its chain. A caller that is the only writer for the session (one shared
+        ledger per owner) passes False and reads saved evidence only to start a journal.
+        """
         epoch = self.epoch_for(request_context_id, canonical)
         reset: str | None = None
         current = self.state
-        if current is not None and current.epoch == epoch:
+        if current is not None and current.epoch == epoch and check_saved_tip:
             # Another adapter for this session (a Retry, a later turn) may have journaled
             # since: continue in memory only while the newest saved record is on this chain.
             records = history_records()
