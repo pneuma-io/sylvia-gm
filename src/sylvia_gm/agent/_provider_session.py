@@ -2299,19 +2299,31 @@ class ProviderSessionAdapter:
                 and message.content.get("kind") == JOURNAL_KIND
             ]
 
+        # Size planning and the send plan the same request; keep the measured frame so the
+        # send reuses it when nothing changed in between (same list, journal and tools).
+        measured: dict[str, Any] = {}
+
         def measure(
             projected: list[dict[str, object]], tools: list[dict[str, object]] | None,
         ) -> list[dict[str, Any]]:
-            return ledger.plan(projected, request_context_id=context_id,
-                               history_records=saved_records, tools=tools,
-                               check_saved_tip=False).wire
+            frame = ledger.plan(projected, request_context_id=context_id,
+                                history_records=saved_records, tools=tools,
+                                check_saved_tip=False)
+            measured.update(projected=projected, state=ledger.state, tools=tools, frame=frame)
+            return frame.wire
 
         async def finalize(
             projected: list[dict[str, object]], tools: list[dict[str, object]] | None,
         ) -> list[dict[str, object]]:
-            frame = ledger.plan(projected, request_context_id=context_id,
-                                history_records=saved_records, tools=tools,
-                                check_saved_tip=False)
+            reusable = (
+                measured.get("projected") is projected
+                and measured.get("state") is ledger.state
+                and measured.get("tools") == tools
+            )
+            frame = measured["frame"] if reusable else ledger.plan(
+                projected, request_context_id=context_id, history_records=saved_records,
+                tools=tools, check_saved_tip=False)
+            measured.clear()
             if frame.record is not None and persistent:
                 # Durable before the request leaves: replay after a restart rehydrates the
                 # same journal, with native continuation still attached by reference.

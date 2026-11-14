@@ -26,7 +26,7 @@ import hashlib
 import json
 import os
 import uuid
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
 from typing import Any
@@ -240,20 +240,28 @@ def split_narration_facts(content: str) -> tuple[bool, list[Any], str] | None:
 
 
 def narration_facts_given(messages: Sequence[Mapping[str, Any]], seal: str) -> list[Any]:
-    """The narration facts the model has been given since the last player message."""
+    """The narration facts the model has been given since the last player message.
+
+    Scans back only to the last player message (a new turn), or to the last full list.
+    """
     prefix = seal_prefix(seal)
-    given: list[Any] = []
-    for message in messages:
+    records: list[tuple[bool, list[Any]]] = []
+    for message in reversed(messages):
         content = str(message.get("content", ""))
         if message.get("role") == "user" and not content.startswith(prefix):
-            given = []  # a player message starts a new turn
+            break  # a player message starts a new turn
+        if NARRATION_FACTS_LABEL not in content[:96]:
             continue
         if content.startswith(prefix):
             content = content[len(prefix):]
         parsed = split_narration_facts(content)
         if parsed is not None:
-            added, facts, _tail = parsed
-            given = [*given, *facts] if added else list(facts)
+            records.append((parsed[0], parsed[1]))
+            if not parsed[0]:
+                break  # a full list replaces everything before it
+    given: list[Any] = []
+    for added, facts in reversed(records):
+        given = [*given, *facts] if added else list(facts)
     return given
 
 
@@ -738,18 +746,32 @@ class ContextLedger:
         fresh_layout = base_count == 0
         appended: list[dict[str, Any]] = []
 
+        def newest_first() -> Iterator[dict[str, Any]]:
+            yield from reversed(appended)
+            yield from reversed(state.entries)
+
         def trailing_hosts() -> list[dict[str, Any]]:
             trail: list[dict[str, Any]] = []
-            for entry in reversed([*state.entries, *appended]):
+            for entry in newest_first():
                 if entry.get("c") == "conversation":
                     break
                 trail.append(entry)
             return trail
 
         def last_of_label(label: str) -> dict[str, Any] | None:
-            return next(
-                (e for e in reversed([*state.entries, *appended]) if e.get("l") == label), None
-            )
+            return next((e for e in newest_first() if e.get("l") == label), None)
+
+        def last_entry() -> dict[str, Any] | None:
+            return next(newest_first(), None)
+
+        def messages_since_last_player() -> list[Mapping[str, Any]]:
+            recent: list[Mapping[str, Any]] = []
+            for entry in newest_first():
+                recent.append(entry["m"])
+                if entry.get("c") == "conversation" and entry["m"].get("role") == "user":
+                    break
+            recent.reverse()
+            return recent
 
         journaled_hosts = {e.get("h") for e in state.entries if e.get("c") != "conversation"}
         present: set[tuple[str, str]] = set()
@@ -764,8 +786,7 @@ class ContextLedger:
                 # The turn's facts list grows each round. When it extends what the model was
                 # given since the last player message, journal only the added facts.
                 parsed = split_narration_facts(content)
-                given = narration_facts_given(
-                    [entry["m"] for entry in [*state.entries, *appended]], self.seal)
+                given = narration_facts_given(messages_since_last_player(), self.seal)
                 if parsed is not None and not parsed[0] and given:
                     _added, facts, tail = parsed
                     if facts[: len(given)] == given:
@@ -781,8 +802,9 @@ class ContextLedger:
                 # A record that stayed in canonical assembly unchanged since it was journaled
                 # (an engine transition result kept in the turn, a continuation note) is the
                 # same record, not a new event: it is not repeated after each tool exchange.
-                ends_with_assistant = bool(state.entries or appended) and (
-                    [*state.entries, *appended][-1]["m"].get("role") == "assistant")
+                newest = last_entry()
+                ends_with_assistant = newest is not None and (
+                    newest["m"].get("role") == "assistant")
                 if ((label, digest) in state.present and digest in journaled_hosts
                         and not ends_with_assistant):
                     return
