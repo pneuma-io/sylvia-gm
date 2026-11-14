@@ -389,11 +389,12 @@ class Case:
 
     def reject(self, tool, parameters, match=None):
         before = self.snapshot()
-        with pytest.raises((MechanicsRejected, CommandRejected), match=match):
+        with pytest.raises((MechanicsRejected, CommandRejected), match=match) as rejected:
             self.execute(self.command(tool, parameters))
         after = self.snapshot()
         assert after.revision == before.revision and after.state == before.state
         assert after.participants == before.participants
+        return rejected.value
 
     def start(self, second_actor="guard"):
         self.act(
@@ -484,7 +485,13 @@ def test_exact_roster_identity_and_pending_states(cases):
     assert len(SELECTED) == 117
     prefix = "packages/" + VARIANT_ID + "/content/"
     with zipfile.ZipFile(BytesIO(bundled_srd_archive())) as package:
-        assert json.loads(package.read(prefix + "spell-catalogue.json")) == json.loads(json.dumps(catalogue))
+        shipped = json.loads(package.read(prefix + "spell-catalogue.json"))
+        generated = json.loads(json.dumps(catalogue))
+        # The stale version stamp is its own known defect below; every other field is exact.
+        assert shipped.keys() == generated.keys()
+        assert {k: v for k, v in shipped.items() if k != "variant_version"} == {
+            k: v for k, v in generated.items() if k != "variant_version"
+        }
         assert prefix + "normal-roster.txt" not in package.namelist()
         assert prefix + "roster-crosswalk.csv" not in package.namelist()
         assert not any(name.startswith("historical/") for name in package.namelist())
@@ -504,6 +511,23 @@ def test_exact_roster_identity_and_pending_states(cases):
     assert exact_lock.sha256 == exact_input["content_sha256"]
     assert "wotc.srd.5.2.1" not in {row.package_id for row in case.snapshot().package_lock.entries}
     assert case.record["participant_artifacts"][0]["schema_id"].startswith(VARIANT_ID + ".")
+
+
+def test_shipped_spell_catalogue_stamps_the_shipped_lite_version():
+    """The bundled spell catalogue's version stamp names the Lite version that ships it."""
+    from io import BytesIO
+
+    from sylvia_gm.application.bundled_packages import bundled_srd_archive
+
+    with zipfile.ZipFile(BytesIO(bundled_srd_archive())) as package:
+        record = next(
+            row for row in json.loads(package.read("manifest.json"))["packages"]
+            if row["id"] == VARIANT_ID
+        )
+        catalogue = package.read("packages/" + VARIANT_ID + "/content/spell-catalogue.json")
+        shipped = json.loads(catalogue)
+    assert record["version"] == build_catalogue()["variant_version"]
+    assert shipped["variant_version"] == record["version"]
 
 
 @pytest.mark.parametrize("spell,slot", [("bless", 1), ("cloud_of_daggers", 2)])
@@ -528,7 +552,19 @@ def test_ordinary_out_of_roster_requests_do_not_spend(cases, tool, spell, messag
     case = cases("bless")
     if tool == "cast_spell":
         case.start()
-    case.reject(tool, case.parameters | {"spell": spell}, match=message)
+    # The matched text is the refusal reason the GM receives; reject() proves nothing changed.
+    refusal = case.reject(tool, case.parameters | {"spell": spell}, match=message)
+    if tool == "cast_spell":
+        assert refusal.code == "ruleset_precondition_failed"
+        return
+    # These tools declare a castable-spell enum, so the reason comes from that schema check
+    # and lists only what this campaign can cast now, not a truncated package roster.
+    assert refusal.code == "spell_unavailable"
+    assert "not part of this Ruleset" in str(refusal)
+    assert refusal.field_paths == ("spell",)
+    assert [(i.path, i.kind, i.allowed_values) for i in refusal.validation_issues] == [
+        ("spell", "invalid_enum_value", ("bless",))
+    ]
 
 
 def test_excluded_preparation_npc_and_imported_recast_do_not_mutate(cases):
@@ -562,7 +598,16 @@ def test_excluded_preparation_npc_and_imported_recast_do_not_mutate(cases):
             "spells": [{"spell": "wish", "uses_per_day": 1}],
         },
     )
-    case.reject("use_srd_sunbeam", {"caster_state": "hero"}, match="pending or excluded")
+    # Lite 0.3.17 retired this permanently refused stub, so the GM is never offered it and
+    # a direct call cannot reach it; reject() still proves the imported recast changes nothing.
+    assert "use_srd_sunbeam" not in {
+        tool.name for tool in StatelessMcpMechanics(case.owner).list_tools("lite")
+    }
+    unavailable = case.reject(
+        "use_srd_sunbeam", {"caster_state": "hero"}, match="unavailable from the canonical catalog"
+    )
+    assert unavailable.code == "mcp_tool_unavailable"
+    assert case.entities()["hero"]["concentration_spell_id"] == "sunbeam"
 
 
 def test_bless_upcast_real_attack_and_save_retry_reopen_removal(cases):
