@@ -623,3 +623,22 @@ def test_a_record_that_stays_in_canonical_is_not_repeated_after_each_exchange() 
     back = _step(ledger, _canonical(*dialogue, *exchange(9), _user("u2", "b"),
                                     extra=(control,)))
     assert "SYLVIA_GM_DECISION_REQUEST" in [e.get("l") for e in back.appended]
+
+
+@pytest.mark.parametrize("transport", ["anthropic_messages", "claude_code"])
+def test_a_messages_request_never_ends_on_an_assistant_turn(transport) -> None:
+    """A repeated correction after a new assistant turn is re-sent; else a continue record."""
+    ledger = _ledger(transport)
+    correction = {"role": "system",
+                  "content": "SYLVIA_GM_CURRENT_ACTION_RESPONSE_CORRECTION (control): again"}
+    dialogue = [_user("u1", "a"), {"role": "assistant", "content": "draft one"}]
+    _step(ledger, _canonical(*dialogue, extra=(correction,)))
+    dialogue.append({"role": "assistant", "content": "draft two"})
+    second = _step(ledger, _canonical(*dialogue, extra=(correction,)))
+    assert second.wire[-1]["role"] == "user"
+    assert "SYLVIA_GM_CURRENT_ACTION_RESPONSE_CORRECTION" in second.wire[-1]["content"]
+    # With no host record to follow it, a sealed continue record closes the request.
+    dialogue.append({"role": "assistant", "content": "draft three"})
+    third = _step(ledger, _canonical(*dialogue))
+    assert third.wire[-1]["role"] == "user"
+    assert third.wire[-1]["content"].startswith(SEAL + CONTINUE_LABEL)

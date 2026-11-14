@@ -720,7 +720,10 @@ class ContextLedger:
                 # A record that stayed in canonical assembly unchanged since it was journaled
                 # (an engine transition result kept in the turn, a continuation note) is the
                 # same record, not a new event: it is not repeated after each tool exchange.
-                if (label, digest) in state.present and digest in journaled_hosts:
+                ends_with_assistant = bool(state.entries or appended) and (
+                    [*state.entries, *appended][-1]["m"].get("role") == "assistant")
+                if ((label, digest) in state.present and digest in journaled_hosts
+                        and not ends_with_assistant):
                     return
                 cls = "event"
             appended.append({"m": self._host_message(message, content), "c": cls,
@@ -747,9 +750,14 @@ class ContextLedger:
             add_host(message)
         if state_messages:
             self._append_state(state, appended, str(state_messages[-1].get("content", "")))
-        if self.transport == "claude_code":
-            tail = [*state.entries, *appended]
-            if tail and tail[-1]["m"].get("role") != "user":
+        # Never end a Messages request on an assistant turn: current Claude models reject it as
+        # a prefill. claude_code also needs a user turn after a tool result for its stdin
+        # prompt. A sealed continue record (journaled like any other) closes the tail.
+        tail = [*state.entries, *appended]
+        last_role = tail[-1]["m"].get("role") if tail else None
+        if (self.transport == "claude_code" and tail and last_role != "user") or (
+            self.transport == "anthropic_messages" and last_role == "assistant"
+        ):
                 appended.append({
                     "m": {"role": "user", "content": seal_prefix(self.seal) + _CONTINUE_TEXT},
                     "c": "event", "l": CONTINUE_LABEL, "h": _sha(_CONTINUE_TEXT),

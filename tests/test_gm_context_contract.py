@@ -143,13 +143,68 @@ class Table:
         return self.harness.request(uuid.uuid4().hex, method, params)
 
     def attached(self, method: str, params: dict[str, Any], attempt: str) -> Any:
-        from tests.qa_attached_request import request_attached
+        """Send with the frontend's attachment heartbeats; return the request's own result.
 
+        The same handshake as tests/qa_attached_request.py: the first heartbeat goes out at
+        once and every renewal carries the attachment generation the owner returned. Unlike
+        that helper it does not fail a completed request because no heartbeat happened to be
+        acknowledged (a timing race under machine load): the owner's reply decides.
+        """
+        import threading
+
+        identity = uuid.uuid4().hex
+        stopped = threading.Event()
+        lock = threading.Lock()
+        beats: list[str] = []
+        generation: list[int] = []
+        self.harness.send(identity, {"method": method, "params": params})
+
+        def renew() -> None:
+            while not stopped.is_set():
+                with lock:
+                    beat = f"{identity}-heartbeat-{len(beats)}"
+                    beats.append(beat)
+                    payload: dict[str, Any] = {"campaign_id": self.campaign,
+                                               "attempt_id": attempt}
+                    if generation:
+                        payload["attachment_generation"] = generation[-1]
+                self.harness.send(beat, {"method": "stream_heartbeat", "params": payload})
+                stopped.wait(2.0)
+
+        def accept(reply: dict[str, Any]) -> None:
+            if reply.get("ok"):
+                with lock:
+                    generation.append(int(reply["result"]["attachment_generation"]))
+
+        worker = threading.Thread(target=renew, daemon=True)
+        worker.start()
+        target = None
+        seen: set[str] = set()
+        prefix = identity + "-heartbeat-"
         try:
-            return request_attached(self.harness, uuid.uuid4().hex, method, params,
-                                    campaign_id=self.campaign, attempt_id=attempt)
-        except AssertionError as error:
-            return {"interruption": {"error": str(error)[:2000]}}
+            while target is None:
+                incoming = self.harness._read_stream()
+                if incoming["id"] == identity:
+                    target = incoming
+                elif str(incoming["id"]).startswith(prefix):
+                    seen.add(incoming["id"])
+                    accept(incoming)
+                else:
+                    self.harness._pending_replies[incoming["id"]] = incoming
+        finally:
+            stopped.set()
+            worker.join(timeout=5)
+            with lock:
+                outstanding = set(beats)
+            while not outstanding <= seen:
+                incoming = self.harness._read_stream()
+                if str(incoming["id"]).startswith(prefix):
+                    seen.add(incoming["id"])
+                else:
+                    self.harness._pending_replies[incoming["id"]] = incoming
+        if not target["ok"]:
+            return {"interruption": {"error": str(target.get("error"))[:2000]}}
+        return target["result"]
 
     def submit(self, text: str) -> tuple[Any, str]:
         basis = self.request("display_snapshot", {"campaign_id": self.campaign})
@@ -551,3 +606,97 @@ def test_provider_hooks_see_the_ledger_observation_for_each_request(played):
         assert seen["context_mode"] == "ledger"
         assert {"epoch", "generation", "reset", "system_prefix_sha256", "tools_sha256",
                 "tool_count", "appended_bytes", "base_count"} <= set(seen)
+
+
+
+def _run_adapter_scenario(name: str, value: Any, monkeypatch, tmp_path) -> tuple[list[Any], Any]:
+    """Run one test_alpha_f4_provider_session_adapter scenario in ledger mode; record frames."""
+    import inspect
+
+    import tests.test_alpha_f4_provider_session_adapter as scenarios
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    recorder = LedgerRecorder().install(monkeypatch)
+    function = getattr(scenarios, name)
+    fixtures = {"monkeypatch": monkeypatch, "tmp_path": tmp_path}
+    arguments = {parameter: fixtures.get(parameter, value)
+                 for parameter in inspect.signature(function).parameters}
+    raised: BaseException | None = None
+    try:
+        function(**arguments)
+    except (AssertionError, StopIteration, IndexError) as error:
+        raised = error
+    return recorder.stop(), raised
+
+
+def _correction_cases() -> list[Any]:
+    import tests.test_alpha_f4_provider_session_adapter as scenarios
+
+    leaked = next(mark.args[1] for mark in scenarios.
+                  test_private_deliberation_in_content_is_repaired_before_talk.pytestmark
+                  if mark.name == "parametrize")
+    return [
+        pytest.param("test_changed_player_action_never_releases_an_exact_previous_gm_response",
+                     None, "SYLVIA_GM_CURRENT_ACTION_RESPONSE_CORRECTION",
+                     id="repeated-response"),
+        *(pytest.param("test_private_deliberation_in_content_is_repaired_before_talk", text,
+                       "SYLVIA_GM_PRIVATE_DELIBERATION_CORRECTION",
+                       id=f"private-deliberation-{index}")
+          for index, text in enumerate(leaked)),
+    ]
+
+
+@pytest.mark.parametrize("transport", ["anthropic_messages", "claude_code"])
+@pytest.mark.parametrize(("name", "value", "label"), _correction_cases())
+def test_corrections_never_change_the_claude_system_or_end_on_an_assistant_turn(
+    name, value, label, transport, monkeypatch, tmp_path,
+):
+    """PR 53 findings on the lifting Claude routes, closed by the ledger.
+
+    (a) An in-turn system message never changes the top-level system after the first request
+    of an epoch: it becomes a sealed user-role host record. (b) No request ends on an
+    assistant turn, which current Claude models reject as a prefill: the correction follows
+    the assistant turn it corrects.
+    """
+    from sylvia_gm.agent._context_ledger import STABLE_KEY, tag_of
+    from sylvia_gm.provider._anthropic import AnthropicMessagesTransport
+    from sylvia_gm.provider._claude import prepare_request
+    from tests.gm_context_contract import provider_messages
+
+    frames, raised = _run_adapter_scenario(name, value, monkeypatch, tmp_path)
+    assert raised is None, raised
+    # The scenario really sends the correction as an in-turn system message.
+    assert any(m.get("role") == "system" and not tag_of(m, STABLE_KEY)
+               and str(m.get("content", "")).startswith(label)
+               for frame in frames for m in frame.canonical)
+    route = replay(frames, transport)
+    seal = seal_prefix_for(route[0].session_id)
+    corrections = [e for f in route for e in f.appended if e.get("l") == label]
+    assert corrections and all(e["m"]["role"] == "user" and e["m"]["content"].startswith(seal)
+                               for e in corrections)
+    systems = []
+    for frame in route:
+        messages = provider_messages(frame.wire)
+        if transport == "anthropic_messages":
+            request = AnthropicMessagesTransport().format_request("claude-opus-5-5", messages,
+                                                                  None, True)
+            systems.append((frame.epoch, frame.generation, request.get("system")))
+            assert request["messages"][-1]["role"] == "user", request["messages"][-1]
+        else:
+            system, _records, prompt, _tools = prepare_request(messages, None, "model",
+                                                               tmp_path)
+            systems.append((frame.epoch, frame.generation, system))
+            assert prompt["message"]["role"] == "user"
+            # The runtime never has to invent its own continuation prompt.
+            assert "SYLVIA_GM_RUNTIME_CONTINUE" not in json.dumps(prompt)
+    for (epoch, generation, system), (next_epoch, next_generation, next_system) in zip(
+        systems, systems[1:], strict=False
+    ):
+        if (epoch, generation) == (next_epoch, next_generation):
+            assert next_system == system
+
+
+def seal_prefix_for(session_id: str) -> str:
+    from sylvia_gm.agent._context_ledger import host_seal, seal_prefix
+
+    return seal_prefix(host_seal(session_id))
