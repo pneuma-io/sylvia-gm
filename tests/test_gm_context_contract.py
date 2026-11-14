@@ -472,8 +472,17 @@ def test_journal_records_are_saved_and_redacted_on_the_owner_protocol(played):
     assert "SYLVIA_GM" not in json.dumps(projected)
 
 
-def test_party_combat_rounds_extend_on_every_route(tmp_path, monkeypatch):
+@pytest.fixture(scope="module")
+def party_combat(tmp_path_factory):
     """Combat start, NPC and player rounds, an ending and recovery in one GM turn."""
+    patch = pytest.MonkeyPatch()
+    try:
+        yield _party_combat_frames(tmp_path_factory.mktemp("party-combat"), patch)
+    finally:
+        patch.undo()
+
+
+def _party_combat_frames(tmp_path, monkeypatch) -> list[Any]:
     from sylvia_gm.application.authority import AuthorityOwner
     from tests.qa_attached_request import request_attached
     from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
@@ -513,6 +522,11 @@ def test_party_combat_rounds_extend_on_every_route(tmp_path, monkeypatch):
     assert combat["encounter_active"] is False and combat["last_end_reason"] == "fighting_stopped"
     frames = [f for f in recorder.stop() if f.session_id == session]
     _dump_frames("party-combat", frames)
+    return frames
+
+
+def test_party_combat_rounds_extend_on_every_route(party_combat):
+    frames = party_combat
     assert len(frames) >= 8
     for transport in (None, *TRANSPORTS):
         route_frames = frames if transport is None else replay(frames, transport)
@@ -700,3 +714,34 @@ def seal_prefix_for(session_id: str) -> str:
     from sylvia_gm.agent._context_ledger import host_seal, seal_prefix
 
     return seal_prefix(host_seal(session_id))
+
+
+
+def test_narration_facts_reconstruct_the_canonical_pending_facts_in_party_combat(
+    party_combat,
+):
+    """Q2: the facts the model was given for the turn equal the canonical pending facts."""
+    from sylvia_gm.agent._context_ledger import (
+        NARRATION_FACTS_LABEL,
+        host_seal,
+        narration_facts_given,
+        split_narration_facts,
+    )
+
+    frames = party_combat
+    checked = 0
+    for transport in (None, "anthropic_messages", "chat_completions"):
+        route = frames if transport is None else replay(frames, transport)
+        for frame in route:
+            canonical = [m for m in frame.canonical
+                         if str(m.get("content", "")).startswith(NARRATION_FACTS_LABEL + " ")]
+            if not canonical:
+                continue
+            parsed = split_narration_facts(str(canonical[-1]["content"]))
+            assert parsed is not None
+            assert narration_facts_given(frame.wire, host_seal(frame.session_id)) == parsed[1]
+            checked += 1
+    assert checked >= 6
+    added = [e for f in frames for e in f.appended if e.get("l") == NARRATION_FACTS_LABEL
+             and "these add to the facts already given" in str(e["m"]["content"])]
+    assert added, "no request extended the turn's facts"

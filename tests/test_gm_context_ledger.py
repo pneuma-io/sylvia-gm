@@ -642,3 +642,45 @@ def test_a_messages_request_never_ends_on_an_assistant_turn(transport) -> None:
     third = _step(ledger, _canonical(*dialogue))
     assert third.wire[-1]["role"] == "user"
     assert third.wire[-1]["content"].startswith(SEAL + CONTINUE_LABEL)
+
+
+def _facts_record(facts: list) -> dict:
+    return {"role": "system", "content": "SYLVIA_GM_EXACT_NARRATION_FACTS (committed mechanics "
+            "and application-owned continuation control):\n"
+            + json.dumps(facts, sort_keys=True, separators=(",", ":"))
+            + "\nContinue this same GM turn from these committed results."}
+
+
+def test_a_growing_narration_facts_list_journals_only_the_added_facts() -> None:
+    from sylvia_gm.agent._context_ledger import narration_facts_given
+
+    ledger = _ledger("anthropic_messages")
+    one, two, three = {"tool": "a", "n": 1}, {"tool": "b", "n": 2}, {"tool": "c", "n": 3}
+
+    def call(index: int) -> list[dict]:
+        return [{"role": "assistant", "content": None, "tool_calls": [{
+            "id": f"c{index}", "type": "function", "function": {"name": "x", "arguments": "{}"}}]},
+            {"role": "tool", "tool_call_id": f"c{index}", "content": "{}"}]
+
+    dialogue = [_user("u1", "attack"), *call(1)]
+    first = _step(ledger, _canonical(*dialogue, extra=(_facts_record([one]),)))
+    assert '[{"n":1,"tool":"a"}]' in first.wire[-1]["content"]
+    dialogue += call(2)
+    second = _step(ledger, _canonical(*dialogue, extra=(_facts_record([one, two]),)))
+    record = second.appended[-1]["m"]["content"]
+    assert "these add to the facts already given since the last narration" in record
+    assert '"tool":"a"' not in record and '"tool":"b"' in record
+    assert record.endswith("Continue this same GM turn from these committed results.")
+    assert narration_facts_given(second.wire, host_seal("s1")) == [one, two]
+    # Not an extension (changed or cleared): the full list again.
+    dialogue += call(3)
+    third = _step(ledger, _canonical(*dialogue, extra=(_facts_record([two, three]),)))
+    assert "these add to" not in third.appended[-1]["m"]["content"]
+    assert narration_facts_given(third.wire, host_seal("s1")) == [two, three]
+    # A new player message starts a new turn: its first list is sent whole.
+    dialogue.append(_user("u2", "again"))
+    dialogue += call(4)
+    fourth = _step(ledger, _canonical(*dialogue, extra=(_facts_record([three]),)))
+    assert "these add to" not in fourth.appended[-1]["m"]["content"]
+    assert narration_facts_given(fourth.wire, host_seal("s1")) == [three]
+    assert "SYLVIA_GM_EXACT_NARRATION_FACTS record that says it adds" in ledger_contract("x" * 12)

@@ -371,3 +371,36 @@ def frame_from_json(row: dict[str, Any]) -> Recorded:
         tags = message.pop(TAGS_FIELD, None) or {}
         canonical.append(tagged(message, **tags) if tags else message)
     return Recorded(**{**row, "canonical": canonical})
+
+
+
+def narration_facts_record(messages: Sequence[dict[str, Any]]) -> str:
+    """The narration-facts record a request conveys, in the canonical (full-list) form.
+
+    Legacy requests carry one record; ledger requests may carry the turn's first list and then
+    records that add to it. Raises StopIteration when the request carries none, like the
+    ``next(...)`` lookups it replaces.
+    """
+    from sylvia_gm.agent._context_ledger import (
+        _FACTS_HEADER,
+        _json,
+        split_narration_facts,
+    )
+
+    given: list[Any] = []
+    tail: str | None = None
+    for message in messages:
+        raw = str(message.get("content", ""))
+        content = unsealed(raw)
+        if message.get("role") == "user" and content == raw and not content.startswith(
+            "SYLVIA_"
+        ):
+            given, tail = [], None  # a player message starts a new turn
+            continue
+        parsed = split_narration_facts(content)
+        if parsed is not None:
+            added, facts, tail = parsed
+            given = [*given, *facts] if added else list(facts)
+    if tail is None:
+        raise StopIteration
+    return _FACTS_HEADER + _json(given) + tail
