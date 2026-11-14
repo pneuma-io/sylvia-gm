@@ -1,0 +1,41 @@
+{
+  "source": "Hash-bound existing independent source/history retention inventory, not the denied canonical family",
+  "files": [
+    {
+      "path": "tests/srd_full/srd_revised_native_fixture.py",
+      "original_export": "successor-source-10/capsule/source/tests/srd_revised_native_fixture.py",
+      "original_sha256": "58b720e947c2330d5c59315127a4f30e3a70fe66d924750210d462f6e3f880be",
+      "adapted_sha256": "97c1eae464535d49e5ed8b61470676517890e138e53d10ed623d7eee0d423093",
+      "adaptations": "Full test namespace; repository depth; current shared archive helper. Native fixture input defaults remain inside the checkout and may be set explicitly by SRD_REVISED_CANDIDATE/SRD_REVISED_ROSTER."
+    },
+    {
+      "path": "tests/srd_full/srd_revised_addition_classes.py",
+      "original_export": "successor-source-10/capsule/source/tests/srd_revised_addition_classes.py",
+      "original_sha256": "53ad9bbfffe503a7121d18b3647fce7be46b109dd3362c534b13a7aa90a7a887",
+      "adapted_sha256": "0315ead63e90d9e72b2e22b7e2c4169d2c36d30823985e802e8aa9f886c8b181",
+      "adaptations": "Full test namespace; repository depth; current shared archive helper. Native fixture input defaults remain inside the checkout and may be set explicitly by SRD_REVISED_CANDIDATE/SRD_REVISED_ROSTER."
+    },
+    {
+      "path": "tests/srd_full/test_srd_revised_foresight.py",
+      "original_export": "successor-source-10/capsule/source/tests/test_srd_revised_foresight.py",
+      "original_sha256": "31cc718c7dcf77d9c7b728883026e79e2ccdaf42dd3838cc149b501a2353279a",
+      "adapted_sha256": "a158f5dadca2f8d8a83b399efaad470ca685fae3451e7cc4ae660ba1e18ff527",
+      "adaptations": "Full test namespace; repository depth; current shared archive helper. Native fixture input defaults remain inside the checkout and may be set explicitly by SRD_REVISED_CANDIDATE/SRD_REVISED_ROSTER."
+    },
+    {
+      "path": "tests/srd_full/test_srd_revised_information.py",
+      "original_export": "successor-source-10/capsule/source/tests/test_srd_revised_information.py",
+      "original_sha256": "21d63211cca5b5394d940854bdb43cc42b1da573c965b88ff3157107f75fe434",
+      "adapted_sha256": "8ea19dd9294bc7160e6bbecf6e52f8d3fb9626ffdbac26b15285bebb6ed3ef99",
+      "adaptations": "Full test namespace; repository depth; current shared archive helper. Native fixture input defaults remain inside the checkout and may be set explicitly by SRD_REVISED_CANDIDATE/SRD_REVISED_ROSTER."
+    },
+    {
+      "path": "tests/srd_full/srd_revised_foresight_classes.py",
+      "original_export": "successor-source-10/capsule/source/tests/srd_revised_foresight_classes.py",
+      "original_sha256": "24bbfadf3861f2dc154701491ad71c1688422195230161bde9b44dfbd33d20bf",
+      "adapted_sha256": "85bd3297ab6fe819d7c92ed20ce0e644b56cfb775f91ce334f21770b11babb03",
+      "adaptations": "Full test namespace; repository depth; current shared archive helper. Native fixture input defaults remain inside the checkout and may be set explicitly by SRD_REVISED_CANDIDATE/SRD_REVISED_ROSTER."
+    }
+  ],
+  "qualification": "Imported symbols and local module targets checked separately. Historical fixture data and playable legacy cases are not qualified."
+}

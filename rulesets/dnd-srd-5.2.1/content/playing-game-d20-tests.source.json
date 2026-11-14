@@ -1,0 +1,43 @@
+{
+  "authority_id": "wotc.srd.5.2.1.pdf",
+  "source_unit_id": "srd.5.2.1.pages-6-8.d20-tests",
+  "pages": [6, 8],
+  "section_path": [
+    "Playing the Game",
+    "D20 Tests"
+  ],
+  "derivation": "Normalized transcription of the cited official PDF passages; line-wrap hyphenation and table layout are removed.",
+  "claim_status": "PARTIAL_MECHANICAL_MAPPING",
+  "fragments": [
+    {
+      "id": "resolution",
+      "page": 6,
+      "derived_text": "When the outcome of an action is uncertain, the game uses a d20 roll to determine success or failure. These rolls are called D20 Tests, and they come in three kinds: ability checks, saving throws, and attack rolls. Resolve a D20 Test by rolling 1d20 (using the higher of two d20s with Advantage or the lower with Disadvantage), adding the relevant ability modifier, Proficiency Bonus if relevant, and circumstantial bonuses or penalties, then comparing the total to a target number. The test succeeds when the total equals or exceeds the target number. Ability checks and saving throws use a Difficulty Class (DC); attack rolls use Armor Class (AC).",
+      "derived_text_sha256": "4a66f8dccfebc31a3e44c032a21c95f32c67d69b055591cc4e43191640c82da2"
+    },
+    {
+      "id": "saving-throw-opt-out",
+      "page": 7,
+      "derived_text": "A saving throw represents an attempt to evade or resist a threat. You do not normally choose to make a save; you make one because a character or monster is at risk. If you do not want to resist the effect, you can choose to fail the save without rolling.",
+      "derived_text_sha256": "5991e1f45796954b84a2d65a6c4a1a77380e930c7c3dbc481bd8acf43ec7d365"
+    },
+    {
+      "id": "attack-natural-20-1",
+      "page": 7,
+      "derived_text": "If you roll a 20 on the d20 (called a “natural 20”) for an attack roll, the attack hits regardless of any modifiers or the target's AC. This is called a Critical Hit (see “Combat” later in “Playing the Game”). If you roll a 1 on the d20 (a “natural 1”) for an attack roll, the attack misses regardless of any modifiers or the target's AC.",
+      "derived_text_sha256": "2aa3c803c3a855523f9b00b32a13e57c57edcef1e1a281ad4c96d519ded9d9b9"
+    },
+    {
+      "id": "advantage-disadvantage",
+      "page": 8,
+      "derived_text": "With Advantage or Disadvantage, roll a second d20. Use the higher roll for Advantage and the lower for Disadvantage. Multiple sources of Advantage do not add more dice, and multiple sources of Disadvantage do not add more dice. If a roll has both Advantage and Disadvantage, it has neither, even when one side has more sources.",
+      "derived_text_sha256": "ca9fca89d2cff84efb66c1fc67606bececdee2aaa5d2d454df2b66420eb83814"
+    },
+    {
+      "id": "proficiency-nonstacking",
+      "page": 8,
+      "derived_text": "A Proficiency Bonus cannot be added to a die roll or another number more than once. When a Proficiency Bonus is multiplied or divided before being added, it can be multiplied only once and divided only once.",
+      "derived_text_sha256": "3cba4899a1899f05285059cc48ad43e463b6de9705befd1c9bf017b8632d11e1"
+    }
+  ]
+}

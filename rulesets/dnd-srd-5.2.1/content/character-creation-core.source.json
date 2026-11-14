@@ -1,0 +1,68 @@
+{
+  "authority_id": "wotc.srd.5.2.1.pdf",
+  "source_unit_id": "srd.5.2.1.character-creation.d20-basis",
+  "pages": [19, 27],
+  "section_path": [
+    "Character Creation"
+  ],
+  "derivation": "Normalized transcription of cited official PDF passages and tables; line-wrap hyphenation and table layout are removed.",
+  "claim_status": "PARTIAL_MECHANICAL_MAPPING",
+  "fragments": [
+    {
+      "id": "level-record",
+      "page": 19,
+      "section_path": [
+        "Character Creation",
+        "Step 1: Choose Class",
+        "Write Your Level"
+      ],
+      "derived_text": "Write your character's level on your character sheet. Typically, a character starts at level 1 and advances in level by adventuring and gaining Experience Points (XP). Your GM might start you at a higher level.",
+      "derived_text_sha256": "a81f2025c9b76aa239843694df532ffa60b4e52d6de16ddfea39ecb13499de5e"
+    },
+    {
+      "id": "ability-scores-and-modifiers",
+      "page": 21,
+      "section_path": [
+        "Character Creation",
+        "Step 3: Ability Scores",
+        "Determine Ability Modifiers"
+      ],
+      "derived_text": "Once you have generated six scores, assign them to Strength, Dexterity, Constitution, Intelligence, Wisdom, and Charisma. Determine ability modifiers using this table: score 3 gives -4; 4–5 gives -3; 6–7 gives -2; 8–9 gives -1; 10–11 gives +0; 12–13 gives +1; 14–15 gives +2; 16–17 gives +3; 18–19 gives +4; and 20 gives +5.",
+      "derived_text_sha256": "6f6a4d95b1c467706b3c84f6a3fe31f68662b6d9f57089014493d4f732bcfe47"
+    },
+    {
+      "id": "character-advancement-proficiency",
+      "page": 23,
+      "section_path": [
+        "Character Creation",
+        "Level Advancement",
+        "Character Advancement"
+      ],
+      "derived_text": "The Character Advancement table gives this Proficiency Bonus by character level: levels 1–4 +2; 5–8 +3; 9–12 +4; 13–16 +5; and 17–20 +6.",
+      "derived_text_sha256": "b7f62563d74423d346f47b8cb990eac745a137f70fb1674fb9ddeb52130c9c67"
+    },
+    {
+      "id": "total-level-proficiency",
+      "page": 25,
+      "section_path": [
+        "Character Creation",
+        "Multiclassing",
+        "Proficiency Bonus"
+      ],
+      "derived_text": "Your Proficiency Bonus is based on your total character level, not your level in a particular class. For example, a level 3 Fighter / level 2 Rogue has the Proficiency Bonus of a level 5 character, which is +3.",
+      "derived_text_sha256": "451f8c6cc4bb2f6dfc4e96f20ca613320e27642e2876c2ae30888eab09024078"
+    }
+  ],
+  "not_yet_mapped": [
+    "complete class and subclass features",
+    "background traits, origin feats, and proficiencies",
+    "species traits",
+    "languages",
+    "ability-score generation and background adjustment admission",
+    "alignment",
+    "derived saving throws, skills, Passive Perception, Hit Points, Hit Dice, Initiative, Armor Class, attacks, and spellcasting",
+    "Experience Point advancement and level-up mutations",
+    "multiclass prerequisites, class-feature composition, and spell-slot composition",
+    "starting equipment and trinkets"
+  ]
+}

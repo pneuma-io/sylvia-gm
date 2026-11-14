@@ -1,0 +1,1656 @@
+{
+  "key": "state",
+  "required": true,
+  "references": [],
+  "schema": {
+    "type": "object",
+    "properties": {
+      "advancement": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "fixed",
+              "milestone",
+              "xp"
+            ]
+          },
+          "starting_level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "maximum_level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "recipients": {
+            "type": "string",
+            "enum": [
+              "whole_party",
+              "per_character"
+            ]
+          },
+          "timing": {
+            "type": "string",
+            "minLength": 1,
+            "description": "When earned advancement takes effect."
+          },
+          "allocation": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Who receives each award and how XP is divided, if applicable."
+          },
+          "milestones": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Stable award identity; use letters, digits, underscores or hyphens."
+                },
+                "trigger": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Concrete event that earns the award."
+                },
+                "target_level": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 20
+                },
+                "alternative_outcomes": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "How failure or alternative outcomes affect the award."
+                }
+              },
+              "required": [
+                "id",
+                "trigger",
+                "target_level",
+                "alternative_outcomes"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 100
+          },
+          "xp_award_sources": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Retained creature/stat-block and other award sources."
+          },
+          "xp_threshold_source": {
+            "type": "string",
+            "enum": [
+              "srd_5_2_1_character_advancement"
+            ]
+          }
+        },
+        "required": [
+          "method",
+          "starting_level",
+          "maximum_level",
+          "recipients",
+          "timing",
+          "allocation"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "enum": [
+                    "milestone"
+                  ]
+                }
+              },
+              "required": [
+                "method"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Stable award identity; use letters, digits, underscores or hyphens."
+                      },
+                      "trigger": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Concrete event that earns the award."
+                      },
+                      "target_level": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20
+                      },
+                      "alternative_outcomes": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "How failure or alternative outcomes affect the award."
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "trigger",
+                      "target_level",
+                      "alternative_outcomes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1,
+                  "maxItems": 100
+                }
+              },
+              "required": [
+                "milestones"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "enum": [
+                    "xp"
+                  ]
+                }
+              },
+              "required": [
+                "method"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "xp_award_sources": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Retained creature/stat-block and other award sources."
+                },
+                "xp_threshold_source": {
+                  "type": "string",
+                  "enum": [
+                    "srd_5_2_1_character_advancement"
+                  ]
+                }
+              },
+              "required": [
+                "xp_award_sources",
+                "xp_threshold_source"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    1
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    2
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 2
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    3
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 3
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    4
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 4
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    5
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 5
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    6
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 6
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    7
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 7
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    8
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 8
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    9
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 9
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    10
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 10
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    11
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 11
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    12
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 12
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    13
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 13
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    14
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 14
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    15
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 15
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    16
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 16
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    17
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 17
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    18
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 18
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    19
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 19
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "starting_level": {
+                  "type": "integer",
+                  "enum": [
+                    20
+                  ]
+                }
+              },
+              "required": [
+                "starting_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "minimum": 20
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    1
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    2
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 2
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    3
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 3
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    4
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 4
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    5
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 5
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    6
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 6
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    7
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 7
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    8
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 8
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    9
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 9
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    10
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 10
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    11
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 11
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    12
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 12
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    13
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 13
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    14
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 14
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    15
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 15
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    16
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 16
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    17
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 17
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    18
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 18
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    19
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 19
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          },
+          {
+            "type": "object",
+            "if": {
+              "type": "object",
+              "properties": {
+                "maximum_level": {
+                  "type": "integer",
+                  "enum": [
+                    20
+                  ]
+                }
+              },
+              "required": [
+                "maximum_level"
+              ],
+              "additionalProperties": true
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "target_level": {
+                        "type": "integer",
+                        "maximum": 20
+                      }
+                    },
+                    "required": [
+                      "target_level"
+                    ],
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "required": [],
+              "additionalProperties": true
+            }
+          }
+        ]
+      }
+    },
+    "required": [
+      "advancement"
+    ],
+    "additionalProperties": true
+  }
+}
