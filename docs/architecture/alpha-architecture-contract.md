@@ -1449,6 +1449,10 @@ the ledger resets. Builder and participant requests do not use it.
   not a new event after each tool exchange). Nothing is removed or rewritten. The positional
   `SYLVIA_GM_CURRENT_PLAYER_MESSAGE` control is replaced by the ledger contract's rule that the
   current input is the latest unsealed user message.
+- **Narration facts.** `SYLVIA_GM_EXACT_NARRATION_FACTS` repeats every earlier fact of the
+  turn each round; when the list extends what was given since the last player message, only
+  the added facts are journaled, worded as adding to the facts already given. A list that is
+  not an extension is sent whole. The ledger contract explains the reading.
 - **Fresh epoch layout:** campaign preparation (and any continuation note), then history, then other
   records, then the campaign-state keyframe last.
 - **Campaign state.** `SYLVIA_GM_FRESH_CAMPAIGN_STATE` is sent whole as a keyframe at the start of
