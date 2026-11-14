@@ -11,6 +11,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 import time as _time
 from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
@@ -50,6 +51,66 @@ from sylvia_gm.provider._hooks import HookContext
 from sylvia_gm.provider._retry_after import retry_after_seconds
 
 logger = logging.getLogger(__name__)
+
+# Claude models known to accept a forced tool_choice ({"type": "any"} / {"type": "tool"}) and
+# `temperature` on anthropic-version 2023-06-01. Checked 2026-11-14 against Anthropic's model
+# migration, tool-use and thinking/effort documentation (platform.claude.com):
+# - Forced tool_choice returns HTTP 400 on Claude Fable 5.1 / 5.2, Mythos 5.1 / 5.2, Opus 5.5
+#   and Sonnet 5.5. Fable 5, Opus 5 and earlier, Sonnet 5 and earlier and Haiku 5.5 accept it.
+# - Any temperature returns HTTP 400 on Fable 5 / 5.1 / 5.2, Mythos, Opus 5.5 / 5 / 4.8 / 4.7
+#   and Sonnet 5; Sonnet 5.5 and Haiku 5.5 reject any value except the default.
+# Every other claude-* id, including models released after this table, gets neither, so a new
+# model costs at most a missing-call correction round instead of a hard 400. Non-Claude models
+# on this transport (MiniMax and other compatible endpoints) keep both unchanged.
+_CLAUDE_FORCED_TOOL_CHOICE = frozenset(
+    {
+        "claude-fable-5",
+        "claude-opus-5",
+        "claude-opus-4-8",
+        "claude-opus-4-7",
+        "claude-opus-4-6",
+        "claude-opus-4-5",
+        "claude-opus-4-1",
+        "claude-opus-4",
+        "claude-sonnet-5",
+        "claude-sonnet-4-6",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4",
+        "claude-haiku-5-5",
+        "claude-haiku-4-5",
+    }
+)
+_CLAUDE_TEMPERATURE = frozenset(
+    {
+        "claude-opus-4-6",
+        "claude-opus-4-5",
+        "claude-opus-4-1",
+        "claude-opus-4",
+        "claude-sonnet-4-6",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4",
+        "claude-haiku-4-5",
+    }
+)
+_DATED_SUFFIX = re.compile(r"[-@]\d{8}$")
+
+
+def _claude_model_id(model_id: str) -> str | None:
+    """Return the bare Claude id (provider prefix and date suffix removed), or None."""
+    bare = _DATED_SUFFIX.sub("", model_id.strip().casefold().rsplit("/", 1)[-1])
+    return bare if bare.startswith("claude-") else None
+
+
+def accepts_forced_tool_choice(model_id: str) -> bool:
+    """Whether this wire model may be sent tool_choice "any" or a named tool."""
+    claude_id = _claude_model_id(model_id)
+    return claude_id is None or claude_id in _CLAUDE_FORCED_TOOL_CHOICE
+
+
+def accepts_temperature(model_id: str) -> bool:
+    """Whether this wire model may be sent a non-default temperature."""
+    claude_id = _claude_model_id(model_id)
+    return claude_id is None or claude_id in _CLAUDE_TEMPERATURE
 
 
 def _content_block_dict(block: Any) -> dict[str, Any]:
@@ -230,7 +291,7 @@ class AnthropicMessagesTransport(ProviderTransport):
             "max_tokens": kwargs.get("max_tokens", 4096),
             "stream": stream,
         }
-        if "temperature" in kwargs:
+        if "temperature" in kwargs and accepts_temperature(model_id):
             request["temperature"] = kwargs["temperature"]
         if "extra_headers" in kwargs:
             request["extra_headers"] = kwargs["extra_headers"]
@@ -259,7 +320,9 @@ class AnthropicMessagesTransport(ProviderTransport):
                     }
                 )
             request["tools"] = anthropic_tools
-            if kwargs.get("tool_choice") == "required":
+            # Without forcing, the API default "auto" applies and the session's
+            # missing-required-call correction recovers a prose reply.
+            if kwargs.get("tool_choice") == "required" and accepts_forced_tool_choice(model_id):
                 request["tool_choice"] = (
                     {"type": "tool", "name": anthropic_tools[0]["name"]}
                     if len(anthropic_tools) == 1

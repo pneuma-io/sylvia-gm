@@ -1243,6 +1243,64 @@ def test_cancellation_during_inference_discards_the_proposal(isolated_game):
     assert owner.snapshot("tokens").revision == 0
 
 
+class ProseFirstActorProvider(IsolatedFlowProvider):
+    """Claude Opus 5.5 cannot be forced to call a tool, so it may first answer in prose."""
+
+    def __init__(self, prose_rounds):
+        super().__init__("anthropic_messages", "claude-opus-5-5")
+        self.prose_rounds = prose_rounds
+        self.requests = []
+
+    async def generate_stream(self, messages, tools=None, timeout=120, **kwargs):
+        self.requests.append(
+            self.transport.format_request(
+                self.model_info.wire_model_id, messages, tools, True, **kwargs
+            )
+        )
+        if len(self.requests) <= self.prose_rounds:
+            yield ProviderStreamChunk(
+                content="Seat A ponders the tokens.",
+                anthropic_content=[{"type": "text", "text": "Seat A ponders the tokens."}],
+                finish_reason="stop",
+            )
+            return
+        assert messages[-1]["content"].startswith("SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION")
+        async for chunk in super().generate_stream(messages[:-1], tools, timeout, **kwargs):
+            yield chunk
+
+
+def test_actor_prose_without_a_call_gets_one_correction(isolated_game):
+    owner, session, _ = isolated_game
+    provider = ProseFirstActorProvider(prose_rounds=1)
+    events, _ = actor_events(owner, session, provider)
+    try:
+        event = next(events)
+        owner.execute_action(event.action_command)
+        list(events)
+    finally:
+        events.close()
+
+    assert owner.snapshot("tokens").revision == 1
+    first, second = provider.requests
+    assert "tool_choice" not in first and "temperature" not in first
+    assert second["messages"][-1]["role"] == "user"
+    assert second["messages"][-1]["content"].startswith("SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION")
+    assert "Seat A ponders" not in json.dumps(second)
+
+
+def test_actor_prose_after_its_correction_is_rejected(isolated_game):
+    owner, session, _ = isolated_game
+    provider = ProseFirstActorProvider(prose_rounds=2)
+    events, _ = actor_events(owner, session, provider)
+    try:
+        with pytest.raises(AuthorityError, match="must propose one offered action"):
+            list(events)
+    finally:
+        events.close()
+    assert owner.snapshot("tokens").revision == 0
+    assert len(provider.requests) == 2
+
+
 def test_binding_rejects_wrong_turn_provider_and_stopped_session(isolated_game):
     owner, session, _ = isolated_game
     request = owner.actor_decision_request("tokens", turn_id="turn")

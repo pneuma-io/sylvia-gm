@@ -1577,6 +1577,8 @@ def validate_provider_model(
                     "functionCallingConfig": {"mode": "ANY", "allowedFunctionNames": [tool_name]}},
                 }
             elif selected_transport == "anthropic_messages":
+                from sylvia_gm.provider._anthropic import accepts_forced_tool_choice
+
                 route = "/messages"
                 payload = {
                     "model": upstream_model_id,
@@ -1587,7 +1589,8 @@ def validate_provider_model(
                         }
                     ],
                     "stream": True,
-                    "max_tokens": 128,
+                    # Newer Claude models always think first, and thinking counts here.
+                    "max_tokens": 1024,
                     "tools": [
                         {
                             "name": tool_name,
@@ -1599,8 +1602,9 @@ def validate_provider_model(
                             },
                         }
                     ],
-                    "tool_choice": {"type": "tool", "name": tool_name},
                 }
+                if accepts_forced_tool_choice(upstream_model_id):
+                    payload["tool_choice"] = {"type": "tool", "name": tool_name}
             else:
                 route = "/chat/completions"
                 payload = {

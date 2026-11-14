@@ -310,21 +310,8 @@ def test_dm_respects_the_configured_output_allowance(
 
 
 def test_anthropic_single_required_tool_transaction_uses_zero_temperature() -> None:
-    provider = _ScriptedProvider([[ProviderStreamChunk(content="{}", finish_reason="stop")]])
-    provider.model_info = ModelInfo(
-        id="opencode_go/minimax-m3",
-        name="MiniMax M3",
-        provider_name="OpenCode Go",
-        provider_key="opencode_go",
-        provider_mode="byok",
-        transport="anthropic_messages",
-        provider_model_id="minimax-m3",
-    )
-    adapter = ProviderSessionAdapter(
-        cast(AuthorityOwner, object()),
-        provider,
-        owner_id="owner-minimax-required-tool",
-    )
+    """A sole required Anthropic tool asks for temperature 0 and a forced call; the wire
+    request carries each only where the model accepts it (never on current Claude models)."""
     tools = [
         {
             "type": "function",
@@ -335,24 +322,46 @@ def test_anthropic_single_required_tool_transaction_uses_zero_temperature() -> N
             },
         }
     ]
-
-    tuple(
-        adapter._stream_round(  # noqa: SLF001
-            [],
-            tools,
-            control=ProviderControl(),
-            tool_choice="required",
+    forced = {"type": "tool", "name": "update_campaign_file"}
+    for wire_model, thinking, wire_temperature, wire_choice in (
+        ("minimax-m3", {"thinking": {"type": "adaptive"}}, 0, forced),
+        ("claude-sonnet-4-6", {}, 0, forced),
+        ("claude-haiku-5-5", {}, None, forced),
+        ("claude-opus-5-5", {}, None, None),
+    ):
+        provider = _ScriptedProvider([[ProviderStreamChunk(content="{}", finish_reason="stop")]])
+        provider.model_info = ModelInfo(
+            id="synthetic/" + wire_model,
+            name=wire_model,
+            provider_name="Synthetic",
+            provider_key="synthetic",
+            provider_mode="byok",
+            transport="anthropic_messages",
+            provider_model_id=wire_model,
         )
-    )
+        adapter = ProviderSessionAdapter(
+            cast(AuthorityOwner, object()),
+            provider,
+            owner_id="owner-anthropic-required-tool",
+        )
 
-    assert provider.request_kwargs == [
-        {
-            "max_tokens": 4096,
-            "thinking": {"type": "adaptive"},
-            "tool_choice": "required",
-            "temperature": 0,
-        }
-    ]
+        tuple(
+            adapter._stream_round(  # noqa: SLF001
+                [],
+                tools,
+                control=ProviderControl(),
+                tool_choice="required",
+            )
+        )
+
+        assert provider.request_kwargs == [
+            {"max_tokens": 4096, **thinking, "tool_choice": "required", "temperature": 0}
+        ]
+        wire = AnthropicMessagesTransport().format_request(
+            wire_model, [], tools, True, **provider.request_kwargs[0]
+        )
+        assert wire.get("temperature") == wire_temperature, wire_model
+        assert wire.get("tool_choice") == wire_choice, wire_model
 
 
 def test_provider_tool_alias_resolution_stays_within_the_current_catalog() -> None:
@@ -13128,8 +13137,9 @@ def test_anthropic_stream_preserves_tool_identity_and_argument_index() -> None:
 
 
 def test_anthropic_single_required_tool_choice_names_the_only_operation() -> None:
+    # A model that accepts forcing and temperature; current models get neither.
     request = AnthropicMessagesTransport().format_request(
-        "claude-test",
+        "claude-sonnet-4-6",
         [{"role": "user", "content": "Advance the required engine transition."}],
         [
             {
@@ -13152,7 +13162,7 @@ def test_anthropic_single_required_tool_choice_names_the_only_operation() -> Non
 
 def test_anthropic_multiple_required_tool_choices_preserve_model_choice() -> None:
     request = AnthropicMessagesTransport().format_request(
-        "claude-test",
+        "claude-sonnet-4-6",
         [{"role": "user", "content": "Choose the required engine transition."}],
         [
             {

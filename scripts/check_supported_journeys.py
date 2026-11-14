@@ -356,6 +356,7 @@ PYTHON_JOURNEYS = {
         "tests/test_private_provider_records.py",
         'tests/test_alpha_07_model_guidance.py',
         'tests/test_alpha_09_provider_management.py',
+        'tests/test_anthropic_current_models.py',
         'tests/test_automatic_model_defaults.py',
         'tests/test_chat_model_defaults.py',
         'tests/test_chatgpt_auth_lifecycle.py',

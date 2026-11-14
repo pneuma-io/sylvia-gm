@@ -142,54 +142,73 @@ def run_actor_decision(
                 "turn_id": request.turn_id,
             }
         )
-    calls: dict[int, dict[str, str]] = {}
-    text, reasoning = [], []
-    native, metadata = None, None
-    attempt_id = "actor-attempt-" + uuid.uuid4().hex
-    response_id = "actor-response-" + uuid.uuid4().hex
-    complete = False
-    try:
-        for order, chunk in enumerate(
-            stream(
-                messages,
-                tools,
-                control=provider_input.control,
-                provider_override=working,
-                tool_choice="required",
-            )
-        ):
-            text.append(chunk.content or "")
-            reasoning.append(chunk.reasoning_content or "")
-            if chunk.reasoning_content:
-                owner.append_private_provider_record(
-                    ProviderPrivateRecord(
-                        session.session_id,
-                        attempt_id,
-                        response_id,
-                        request.turn_id,
-                        provider_input.basis_message_id or request.decision_id,
-                        order,
-                        session.provider_id,
-                        session.model_id,
-                        "thinking",
-                        chunk.reasoning_content,
-                    )
+    # Models that cannot be forced to call a tool may answer in prose; that reply is discarded
+    # and the model is asked once more. The correction stays in the saved exchange so replayed
+    # native reasoning always follows the history it was produced against.
+    exchange: list[dict[str, Any]] = [messages[-1]]
+    for correction_round in range(2):
+        calls: dict[int, dict[str, str]] = {}
+        text, reasoning = [], []
+        native, metadata = None, None
+        attempt_id = "actor-attempt-" + uuid.uuid4().hex
+        response_id = "actor-response-" + uuid.uuid4().hex
+        complete = False
+        try:
+            for order, chunk in enumerate(
+                stream(
+                    messages,
+                    tools,
+                    control=provider_input.control,
+                    provider_override=working,
+                    tool_choice="required",
                 )
-            if chunk.anthropic_content is not None:
-                native = chunk.anthropic_content
-            if chunk.chat_completion_metadata is not None:
-                metadata = chunk.chat_completion_metadata
-            if chunk.tool_call_delta is not None:
-                index, call_id, name, arguments = parse_tool_call_delta(chunk.tool_call_delta)
-                call = calls.setdefault(index, {"id": "", "name": "", "arguments": ""})
-                call["id"] += call_id
-                call["name"] += name
-                call["arguments"] += arguments
-        complete = not provider_input.control.cancelled
-    finally:
-        owner.finish_private_provider_attempt(session.session_id, attempt_id, completed=complete)
-    if provider_input.control.cancelled:
-        raise CommandRejected("Isolated participant decision was cancelled")
+            ):
+                text.append(chunk.content or "")
+                reasoning.append(chunk.reasoning_content or "")
+                if chunk.reasoning_content:
+                    owner.append_private_provider_record(
+                        ProviderPrivateRecord(
+                            session.session_id,
+                            attempt_id,
+                            response_id,
+                            request.turn_id,
+                            provider_input.basis_message_id or request.decision_id,
+                            order,
+                            session.provider_id,
+                            session.model_id,
+                            "thinking",
+                            chunk.reasoning_content,
+                        )
+                    )
+                if chunk.anthropic_content is not None:
+                    native = chunk.anthropic_content
+                if chunk.chat_completion_metadata is not None:
+                    metadata = chunk.chat_completion_metadata
+                if chunk.tool_call_delta is not None:
+                    index, call_id, name, arguments = parse_tool_call_delta(chunk.tool_call_delta)
+                    call = calls.setdefault(index, {"id": "", "name": "", "arguments": ""})
+                    call["id"] += call_id
+                    call["name"] += name
+                    call["arguments"] += arguments
+            complete = not provider_input.control.cancelled
+        finally:
+            owner.finish_private_provider_attempt(
+                session.session_id, attempt_id, completed=complete
+            )
+        if provider_input.control.cancelled:
+            raise CommandRejected("Isolated participant decision was cancelled")
+        if calls or correction_round:
+            break
+        correction = {
+            "role": "user",
+            "content": (
+                "SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION (application control): the reply "
+                "contained no select_actor_action call and was discarded. Call "
+                "select_actor_action with exactly one currently offered action_id."
+            ),
+        }
+        exchange.append(correction)
+        messages = [*messages, correction]
     if compatibility != _compatibility(provider):
         raise CommandRejected("Isolated participant provider changed")
     if len(calls) != 1:
@@ -245,7 +264,7 @@ def run_actor_decision(
             if not isinstance(public, Mapping):
                 raise CommandRejected("Isolated participant action has no published public result")
             completed = [
-                messages[-1],
+                *exchange,
                 assistant,
                 {
                     "role": "tool",
