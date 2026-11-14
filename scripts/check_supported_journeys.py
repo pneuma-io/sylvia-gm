@@ -396,6 +396,7 @@ PYTHON_JOURNEYS = {
         'tests/test_bundled_catalog_reuse.py',
         'tests/test_bundled_metadata_reuse.py',
         'tests/test_bundled_srd_identity.py',
+        'tests/test_prepared_campaigns_current.py',
     ],
     "release-integrity": [
         "tests/test_known_test_defects.py",
