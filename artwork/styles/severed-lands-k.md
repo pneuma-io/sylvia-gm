@@ -12,7 +12,7 @@ constraint for replacement catalogue art.
   use this exact image for drawing and painted finish, and for Marla's identity.
 
 The four starting designs have prepared body/sheet/portrait bundles linked below. Catalogue
-coverage continues for Plan casts and inherited creatures. Siren Protocol has its separate supplied references.
+references are prepared for all reviewed Plan casts; inherited-creature coverage continues. Siren Protocol has its separate supplied references.
 
 ## Rendering brief
 
@@ -842,3 +842,16 @@ Lysa, Orl, Vennic, Cal Moss, Dera Flint and Fen Lark complete the reviewed Plan-
 | Cal Moss | [Body](../assets/characters/c976f704ededce26d3999a4c9ccdb633c3946a780a93cb2c6a91d6efdcac6308.png) | [Sheet](../assets/characters/6fdc757ec2184f5df581f792ccffd3da29914b47fe52f95f9a3e9e5d4752057c.png) | [Portrait](../assets/characters/a7ccf1fdeb5d65ec878237825b32eff3e4bcc6579b41e8b1cb85b15c5f6e7f31.png) |
 | Dera Flint | [Body](../assets/characters/0ff7298e4258484fc2a7e705f2237aaa68bde1ae2dcfa75df622624e23e3506f.png) | [Sheet](../assets/characters/d82c018c4d9ba8353c7dcb7cf85809ffd3c3729d9c258d8c978ea4414de5771c.png) | [Portrait](../assets/characters/b85955e18a119baa27e8249ee21d6220a1ce792554c51285556cd67d6b74e087.png) |
 | Fen Lark | [Body](../assets/characters/7760f8a3dbc456b8173a0180821963d30e6a2046c7a09b5122f8a6d287dc81b4.png) | [Sheet](../assets/characters/8a542be1459015728d7d8ae6b9897b7f6140e481439ff456f349bcfd24445f7c.png) | [Portrait](../assets/characters/29837e1f1e21f859e9e262a2b5ff2f4977121962d53a78eda7b9467e369c334f.png) |
+
+### Prepared inherited Aboleth and adult dragon references
+
+The inherited Aboleth and adult Black, Blue, Brass, Bronze and Copper dragons have distinct complete references under the current style. Aboleth retains four tentacles; each dragon retains four legs plus two wings and a distinct head silhouette. Nested surface growth supplies the Rift influence without added powers. Exact admitted source and Severed Lands bindings apply; mechanics and unsupported execution clauses are unchanged. These are editable defaults; individual owner sign-off is not claimed.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Aboleth | [Body](../assets/characters/41497a0e973139dc86b56897dba814d16e82dd6e1e043a55b8697b725003f055.png) | [Sheet](../assets/characters/00e0503b8a537d8ddb4f8bcfc1f80bffb48ed66b3038795d03f2b637585a30d8.png) | [Portrait](../assets/characters/a45b06eb20ec4de0f0aff51e5c9f5d353c58e77c38988ab7e60fb160122b3637.png) |
+| Adult Black Dragon | [Body](../assets/characters/112f49ee033d4ed004fb0b3b5322af8749539773ad4167bf5aed69c2c7146041.png) | [Sheet](../assets/characters/9526e4943046d56fad6d0ba2659881c095a51f2d1c6dd4c1cbb56805aef1f55d.png) | [Portrait](../assets/characters/39803a2b17b85694150bcdad6cd73db1e974b3ac06fe5676e0908fbf9a4d9d49.png) |
+| Adult Blue Dragon | [Body](../assets/characters/b941b1a2b22cf3386ff0ae79eef907812deb13dbe8da20d8f81c2dbb0390f65f.png) | [Sheet](../assets/characters/10c4533be23208a1958feb7a7153dfe19bddb968a1ab29bdc7ae74cd3397643a.png) | [Portrait](../assets/characters/ec1d7cc6dc087d6ecaaf873c7b94f6653f10a9ca32f6f5dae3f30a80d6248557.png) |
+| Adult Brass Dragon | [Body](../assets/characters/f107076d74e13de1a04f4e143658090cef1f8a02e9c22b32fcd71f380ede21ab.png) | [Sheet](../assets/characters/779705de0677fdb2bca509709d4ebda10a2be07f96f5b7c47fe18ba103c6baba.png) | [Portrait](../assets/characters/bd02e0f8e7e882e256ba10da7bbdbd417dae7279009f0ebd331983bca4dce329.png) |
+| Adult Bronze Dragon | [Body](../assets/characters/e9619b6acd117e922f0e5689af9e20eddcf0af9ec46a3f1f0813cbd260e1717d.png) | [Sheet](../assets/characters/ba03b02775d0c2ec5455d04ebb230be39699278073d6ec4185a34f03a03d0ccb.png) | [Portrait](../assets/characters/c33c36000725eed5ea61ceb7fe25e29a768e7228613655b71b365ee4eeb7fdbf.png) |
+| Adult Copper Dragon | [Body](../assets/characters/93de5fa3b64720d24bc0754c193c90b9d9065d91f398ec55a1740bad7cbc4558.png) | [Sheet](../assets/characters/a557cfb2f051202f56a7a2b50d164434869d74b9d467cc99df5373026f1158b5.png) | [Portrait](../assets/characters/03017a2eb5d93da9bfe8f266373d1a43f3e0fe7b6c116db0d2cc104800f49a7b.png) |
