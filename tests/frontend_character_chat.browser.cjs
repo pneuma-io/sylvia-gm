@@ -62,7 +62,8 @@ async function openApp(browser,viewport){
    },
    send_character_chat_message:async command=>{
     calls.push(['send',copy(command)]);
-    await new Promise(resolve=>setTimeout(resolve,150));
+    if(window.holdReply)await new Promise(resolve=>{window.releaseReply=resolve;});
+    else await new Promise(resolve=>setTimeout(resolve,150));
     if(window.failNext){window.failNext=false;throw Object.assign(new Error('The selected provider timed out while responding'),{code:'provider_error'});}
     const chat=chats.get(command.chat_id);
     if(applied.has(command.operation_id))return copy(chat);
@@ -106,11 +107,14 @@ test('pick a card, talk in character, survive a failed send, then reopen the sav
   assert.deepEqual(await texts(page),['looks up from a ledger Hello, Mira.']);
   assert.equal(await page.locator('#character-chat-log .cc-character em').innerText(),'looks up from a ledger');
 
+  // Keep this reply pending until the writing-state assertions have observed it.
+  await page.evaluate(()=>{window.holdReply=true;});
   await page.locator('#character-chat-input').fill('Hi there');
   await page.locator('#character-chat-input').press('Enter');
   await page.waitForFunction(()=>!document.getElementById('character-chat-typing').hidden);
   assert.equal(await page.locator('#character-chat-typing').innerText(),'Vela is writing…');
   assert.equal(await page.locator('#character-chat-send').isDisabled(),true);
+  await page.evaluate(()=>{window.holdReply=false;window.releaseReply();});
   await page.waitForFunction(()=>document.querySelectorAll('#character-chat-log .cc-message').length===3);
   assert.deepEqual((await texts(page)).slice(1),['Hi there','You said "Hi there". taps the ledger']);
   assert.equal(await page.locator('#character-chat-input').inputValue(),'');
