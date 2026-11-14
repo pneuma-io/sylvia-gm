@@ -14,6 +14,17 @@ the branches meet. Their desktop/native, merge and release qualifications contin
 
 ## 1. Current work
 
+**14 November 2026: character chat, No Ruleset Plans and browser windows.** Work item
+`f68c1a9b-ad17-4728-a8ef-854e99e804e5` combines the delivered character-chat, rule-less
+play and floating-panel changes, including the later structured No Ruleset Campaign
+Plan delta. No Ruleset Plans retain authored world entities, objectives, secrets and
+Plan Progress through the ordinary owner and persistence paths. Character chat stays
+separate from campaigns; browser windows retain the native detached-panel path.
+Focused source checks and a real-WebUI journey with a synthetic provider qualify this
+PR. Independent review, acceptance and merge remain with Fluff; installed/native-input,
+genuine-provider and release acceptance are separate and unselected. Artwork PR #34,
+SylviaBench, Trigger Discipline and Media work remain outside this integration.
+
 **12 November 2026: casting contracts and refusals.** The owner selected the casting,
 refusal and Ruleset-guide follow-up in its own isolated checkout from main `ecfb8cf`.
 PR33 and PR36 are merged; their caster filling, spell enums/normalization, memory,
