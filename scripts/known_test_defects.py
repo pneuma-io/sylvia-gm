@@ -102,11 +102,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'Damage the real concentrating caster with the admitted area action and inspect its actual result-card concentration rows.',
         category='suspected retained contract discrepancy',
     ),
-    'tests/test_public_lite_descendants.py::test_every_public_lite_plan_selects_current_exact_mechanics': KnownDefect(
-        'Bundled public Plans retain an older same-version Ruleset closure than current source',
-        "Compare each bundled Plan's exact Ruleset closure with the current public Lite package and its selected mechanics.",
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_srd_lite_defense_boundaries.py::test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens[False]': KnownDefect(
         'The actual Guiding Bolt attack lacks retained target-AC evidence for the Shield boundary',
         'Cast Guiding Bolt against the admitted Wizard, inspect the saved scalar attack, then attempt the selected Shield/decline and reopen continuation.',
