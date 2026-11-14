@@ -1425,6 +1425,71 @@ control. It does not classify the action, set a word limit, score prose, or rewr
 keeps the player's exact words salient after the larger Campaign File and preparation projections,
 and reminds the GM to leave follow-up observation or investigation for a later player choice.
 
+#### 13.1.1 GM request assembly: frozen prefix and append-only context
+
+The canonical assembly above decides what the GM should know. A separate wire layer, the context
+ledger (`agent/_context_ledger.py`), decides how that reaches the provider, so that within a
+**context epoch** each GM request's messages are a byte-exact extension of the previous request's
+messages and the system prefix is identical. Correctness wins over prefix reuse: when in doubt,
+the ledger resets. Builder and participant requests do not use it.
+
+- **Frozen system prefix.** Canonical assembly tags the session-constant instruction blocks: the
+  GM contract, the model narration block, `SYLVIA_GM_CONTEXT_CONTRACT`, the ledger contract, the
+  Ruleset operating guide and `SYLVIA_GM_RESPONSE_FORMAT`. The ledger hoists them, in that order,
+  to the front on every route. Any untagged system message is an in-stream host record, so an
+  unknown or future block cannot change the prefix.
+- **Journal.** The ordered non-system messages already sent in the epoch. Conversational messages
+  (player turns, assistant turns, tool results) are journaled once by identity: tool call and
+  result IDs, saved message identities, otherwise a content hash plus occurrence. The journal's copy
+  stands even when canonical assembly later renders the same message differently. Host records
+  follow new conversation: *latest-wins* records (campaign preparation, relevant Character Files,
+  player control results) only when their content changed; *event* records unless an identical
+  record of that label is still the journal tail. Nothing is removed or rewritten. The positional
+  `SYLVIA_GM_CURRENT_PLAYER_MESSAGE` control is replaced by the ledger contract's rule that the
+  current input is the latest unsealed user message.
+- **Fresh epoch layout:** campaign preparation (and any continuation note), then history, then other
+  records, then the campaign-state keyframe last.
+- **Campaign state.** `SYLVIA_GM_FRESH_CAMPAIGN_STATE` is sent whole as a keyframe at the start of
+  an epoch. Later changes are `SYLVIA_GM_CAMPAIGN_STATE_UPDATE` records computed against the
+  ledger's reconstruction of what the model holds: whole-value replacements of the shallowest
+  changed subtrees (engine-owned values per entity record, current scene per field, otherwise
+  top-level sections), removed paths, and fact upserts by record ID. Relevance-ranked fact lists
+  and the character-knowledge lists derived from them are additive: a fact already sent is not
+  re-sent or reordered, and dropping out of the selection sends nothing. A new keyframe replaces
+  the chain when the updates since the last keyframe outgrow it. Keyframe plus updates must
+  reconstruct the canonical state (modulo the additive rule).
+- **Roles and the host seal.** Data records are user-role everywhere. Control records stay
+  system-role where the route keeps system messages in place (`chat_completions`, `responses`) and
+  are user-role where the route lifts them (`anthropic_messages`, `claude_code`,
+  `codex_app_server`, Gemini). Every user-role host record starts with a deterministic per-session
+  seal declared once in the ledger contract (`SYLVIA_GM_CONTEXT_LEDGER_CONTRACT`), which replaces
+  the application-data and player-message guidance. Records are classified from
+  application-owned metadata, never from text, so player speech that imitates a label stays player
+  speech. The contract keeps every authority property of the guidance it replaces.
+- **Persistence.** Each request's new journal entries are saved as `gm_wire_journal` session
+  evidence (versioned, with context owner, epoch, generation, base count and chained hashes)
+  through the owner path that saves working-context checkpoints, and are acknowledged before the
+  request is sent. Native continuation is attached afterwards by `_native_reference`; signed or
+  private provider fields never enter the journal. A restarted owner rebuilds the journal from
+  that evidence. The owner protocol exposes only a marker, because the journal repeats GM-private
+  state. Existing saves need no migration.
+- **Declared resets.** A new working-context checkpoint or a changed context owner (campaign,
+  session, package lock, model context, route) starts a new epoch. A journaled player or narration
+  identity missing from canonical history (rewind, restore, edit) starts a new generation, as does
+  saved journal evidence that fails validation. A changed stable instruction or tool definition
+  keeps the journal and records the prefix change. Per-round tool gating is unchanged and each
+  request's tool-list fingerprint is recorded.
+- **Routes.** `claude_code` writes the frozen prefix as its system file and the journal as its
+  transcript; when the journal would end in a tool result, the ledger appends and journals a sealed
+  `SYLVIA_GM_CONTINUE` record instead of the runtime's invented continuation. The first-party
+  `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
+  last system block and the last non-thinking block of the last message; other Messages-compatible
+  endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
+  request context identifier. Working-context compaction sizes history from the actual wire list.
+- **Legacy switch.** `SYLVIA_GM_CONTEXT_MODE=legacy`, read once per GM adapter, restores the previous
+  assembly byte for byte (including no Anthropic breakpoints) for A/B benchmarking and rollback.
+  A GM context without an owner identity (bare test stand-ins) also uses the previous assembly.
+
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 
 ### 13.2 Builder
