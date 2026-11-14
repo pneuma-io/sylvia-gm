@@ -603,6 +603,13 @@ class AnthropicProvider(Provider):
         self._timeout_config = timeout_config or TimeoutConfig()
         self._default_headers = dict(default_headers or {})
         self._transport = AnthropicMessagesTransport()
+        from sylvia_gm.agent._context_ledger import LEDGER_MODE, context_mode
+
+        # First-party Anthropic only: other Messages-compatible endpoints are left untouched.
+        # The legacy context switch also restores the previous request without breakpoints.
+        self._cache_breakpoints = (
+            model_info.provider_key == "anthropic" and context_mode() == LEDGER_MODE
+        )
         self._consecutive_connection_errors = 0
         self._closed = False
 
@@ -690,7 +697,7 @@ class AnthropicProvider(Provider):
         request_options.pop("_retry_attempt", None)
         max_tokens = request_options.pop("max_tokens", self._max_tokens)
         request_options.pop("max_output_tokens", None)
-        return self._transport.format_request(
+        return self._format(
             model_id=self._model_info.wire_model_id,
             messages=messages,
             tools=tools,
@@ -698,6 +705,10 @@ class AnthropicProvider(Provider):
             max_tokens=max_tokens,
             **request_options,
         )
+
+    def _format(self, **arguments: Any) -> dict[str, Any]:
+        request = self._transport.format_request(**arguments)
+        return with_cache_breakpoints(request) if self._cache_breakpoints else request
 
     # ── Hook context helpers ──────────────────────────────────────
 
@@ -779,7 +790,7 @@ class AnthropicProvider(Provider):
             if isinstance(raw_retry_attempt, int) and not isinstance(raw_retry_attempt, bool)
             else 0
         )
-        request_dict = self._transport.format_request(
+        request_dict = self._format(
             model_id=self._model_info.wire_model_id,
             messages=messages,
             tools=tools,
@@ -878,7 +889,7 @@ class AnthropicProvider(Provider):
             if isinstance(raw_retry_attempt, int) and not isinstance(raw_retry_attempt, bool)
             else 0
         )
-        request_dict = self._transport.format_request(
+        request_dict = self._format(
             model_id=self._model_info.wire_model_id,
             messages=messages,
             tools=tools,
@@ -1033,6 +1044,55 @@ class AnthropicProvider(Provider):
             return
         self._closed = True
         await self._client.close()
+
+
+_EPHEMERAL = {"type": "ephemeral"}
+_THINKING_BLOCKS = frozenset({"thinking", "redacted_thinking"})
+
+
+def with_cache_breakpoints(request: dict[str, Any]) -> dict[str, Any]:
+    """Mark the reusable prefix for the first-party Messages API prompt cache.
+
+    Breakpoints go on the last tool definition, the last system block and the last
+    non-thinking block of the last message. Thinking blocks never carry one. The request is
+    copied; native continuation blocks are not modified in place.
+    """
+    marked = dict(request)
+    tools = marked.get("tools")
+    if isinstance(tools, list) and tools:
+        tools = [dict(tool) for tool in tools]
+        tools[-1]["cache_control"] = dict(_EPHEMERAL)
+        marked["tools"] = tools
+    system = marked.get("system")
+    if isinstance(system, str) and system:
+        marked["system"] = [{"type": "text", "text": system, "cache_control": dict(_EPHEMERAL)}]
+    elif isinstance(system, list) and system and isinstance(system[-1], dict):
+        blocks = [dict(block) if isinstance(block, dict) else block for block in system]
+        blocks[-1]["cache_control"] = dict(_EPHEMERAL)
+        marked["system"] = blocks
+    messages = marked.get("messages")
+    if isinstance(messages, list) and messages:
+        # Every text message uses the block form, so a message serializes the same way
+        # whether or not it is the one carrying the moving breakpoint.
+        messages = [
+            {**message, "content": [{"type": "text", "text": message["content"]}]}
+            if isinstance(message, dict) and isinstance(message.get("content"), str)
+            and message["content"] else message
+            for message in messages
+        ]
+        last = messages[-1]
+        if isinstance(last, dict) and isinstance(last.get("content"), list):
+            last = dict(last)
+            blocks = [dict(block) if isinstance(block, dict) else block
+                      for block in last["content"]]
+            for block in reversed(blocks):
+                if isinstance(block, dict) and block.get("type") not in _THINKING_BLOCKS:
+                    block["cache_control"] = dict(_EPHEMERAL)
+                    break
+            last["content"] = blocks
+            messages[-1] = last
+        marked["messages"] = messages
+    return marked
 
 
 def _captured_error() -> Exception:

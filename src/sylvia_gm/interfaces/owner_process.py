@@ -888,6 +888,11 @@ def _json_value(value: Any) -> Any:
                     "checkpoint_id": value.get("checkpoint_id"),
                     "covered_exchanges": value.get("covered_exchanges"),
                     "text": "Context compacted · saved conversation is kept"}
+        if value.get("kind") == "gm_wire_journal":
+            # The GM wire journal repeats GM-private state and records; only a marker leaves.
+            from sylvia_gm.agent._context_ledger import journal_marker
+
+            return {key: _json_value(item) for key, item in journal_marker(value).items()}
         return {str(key): _json_value(item) for key, item in value.items()}
     if isinstance(value, Set):
         projected = [_json_value(item) for item in value]

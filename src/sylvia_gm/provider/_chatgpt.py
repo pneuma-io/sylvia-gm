@@ -57,6 +57,45 @@ _USAGE_SETTLE_SECONDS = 0.3
 _USAGE_REPORT_SECONDS = 1.0
 
 
+def app_server_request(
+    model_id: str,
+    messages: list[dict[str, Any]],
+    tools: list[dict[str, Any]] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    """Project messages into App Server dynamic tools, injected items and base instructions."""
+    converted = ResponsesTransport().format_request(model_id, messages, tools, True)
+    dynamic = [
+        {
+            "type": "function",
+            "name": tool["name"],
+            "description": tool["description"],
+            "inputSchema": tool["parameters"],
+        }
+        for tool in converted.get("tools", [])
+    ]
+    items = []
+    system_instructions: list[str] = []
+    for original in converted["input"]:
+        item = dict(original)
+        # App Server excludes injected system messages; its dedicated field owns them.
+        if item.get("role") == "system":
+            system_instructions.append(item["content"])
+            continue
+        if item.get("type") == "function_call":
+            item["namespace"] = "sylvia"
+        if "role" in item:
+            role = item["role"]
+            item["type"] = "message"
+            item["content"] = [
+                {
+                    "type": "output_text" if role == "assistant" else "input_text",
+                    "text": item["content"],
+                }
+            ]
+        items.append(item)
+    return dynamic, items, system_instructions
+
+
 class ChatGPTProvider(Provider):
     """Adapt one runtime generation to Sylvia's existing streaming provider interface."""
 
@@ -245,42 +284,10 @@ class ChatGPTProvider(Provider):
     ) -> AsyncIterator[ProviderStreamChunk]:
         async with self._lock:
             timing = LifecycleTiming()
-            converted = ResponsesTransport().format_request(
-                self.model_info.wire_model_id,
-                messages,
-                tools,
-                True,
+            dynamic, items, system_instructions = app_server_request(
+                self.model_info.wire_model_id, messages, tools,
             )
-            dynamic = [
-                {
-                    "type": "function",
-                    "name": tool["name"],
-                    "description": tool["description"],
-                    "inputSchema": tool["parameters"],
-                }
-                for tool in converted.get("tools", [])
-            ]
             allowed = frozenset(tool["name"] for tool in dynamic)
-            items = []
-            system_instructions: list[str] = []
-            for original in converted["input"]:
-                item = dict(original)
-                # App Server excludes injected system messages; its dedicated field owns them.
-                if item.get("role") == "system":
-                    system_instructions.append(item["content"])
-                    continue
-                if item.get("type") == "function_call":
-                    item["namespace"] = "sylvia"
-                if "role" in item:
-                    role = item["role"]
-                    item["type"] = "message"
-                    item["content"] = [
-                        {
-                            "type": "output_text" if role == "assistant" else "input_text",
-                            "text": item["content"],
-                        }
-                    ]
-                items.append(item)
             connection = self._connection_factory(
                 self.home,
                 self._executable,

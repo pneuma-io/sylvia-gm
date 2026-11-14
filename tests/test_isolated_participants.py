@@ -766,12 +766,18 @@ def test_participant_tool_contract_stays_identical_when_current_offers_change(is
     assert second_messages[1] == first_messages[-1]
 
 
+_STATE_RECORD = "SYLVIA_GM_FRESH_CAMPAIGN_STATE (application-owned"
+
+
+@pytest.mark.parametrize("context_mode", ["ledger", "legacy"])
 def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructions(
-    isolated_game, tmp_path,
+    isolated_game, tmp_path, monkeypatch, context_mode,
 ):
+    from sylvia_gm.agent._context_ledger import UPDATE_LABEL, host_seal, seal_prefix
     from sylvia_gm.provider._chatgpt import ChatGPTProvider
     from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
 
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     owner, session, _ = isolated_game
     captured = []
 
@@ -801,16 +807,33 @@ def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructio
     assert json.dumps(starts[0]["dynamicTools"], sort_keys=True) == json.dumps(
         starts[1]["dynamicTools"], sort_keys=True)
     assert starts[0]["baseInstructions"] == starts[1]["baseInstructions"]
-    assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in starts[0]["baseInstructions"]
-    for items in injected:
-        assert items[-1]["content"][0]["text"].startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
-        assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
-        assert "HAND_SENTINEL" not in json.dumps(items)
+    if context_mode == "legacy":
+        assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in starts[0]["baseInstructions"]
+        for items in injected:
+            assert items[-1]["content"][0]["text"].startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+            assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
+            assert "HAND_SENTINEL" not in json.dumps(items)
+    else:
+        # The ledger contract names the record labels; the state record itself never enters
+        # the base instructions. The keyframe follows history, then the second request only
+        # appends: the committed choice arrives as a sealed state update.
+        seal = seal_prefix(host_seal(session.session_id))
+        assert _STATE_RECORD not in starts[0]["baseInstructions"]
+        assert injected[0][-1]["content"][0]["text"].startswith(
+            seal + "SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        assert injected[1][: len(injected[0])] == injected[0]
+        assert injected[1][-1]["content"][0]["text"].startswith(seal + UPDATE_LABEL)
+        for items in injected:
+            assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
+            assert "HAND_SENTINEL" not in json.dumps(items)
     assert injected[0][-1] != injected[1][-1]
 
 
+@pytest.mark.parametrize("context_mode", ["ledger", "legacy"])
 @pytest.mark.parametrize("route", ["chatgpt", "openrouter"])
-def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tmp_path, route):
+def test_real_serializers_interleave_owned_contexts_and_reopen(
+    isolated_game, tmp_path, route, monkeypatch, context_mode,
+):
     """Capture actual App Server RPC or SDK HTTP JSON, with no external inference."""
     import httpx
 
@@ -818,6 +841,7 @@ def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tm
     from sylvia_gm.provider._openai_compat import OpenAICompatProvider
     from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
 
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     owner, session, database = isolated_game
     frames = []
 
@@ -948,7 +972,12 @@ def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tm
     else:
         assert frames[0]["baseInstructions"] == frames[4]["baseInstructions"]
         assert frames[1]["baseInstructions"] == frames[5]["baseInstructions"]
-        assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in frames[4]["baseInstructions"]
+        if context_mode == "legacy":
+            assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in frames[4]["baseInstructions"]
+        else:
+            assert _STATE_RECORD not in frames[4]["baseInstructions"]
+            # The later GM request extends the first one.
+            assert frames[4]["messages"][: len(frames[0]["messages"])] == frames[0]["messages"]
     assert "a:1" in json.dumps(frames[5]) and "a:5" in json.dumps(frames[5])
 
 

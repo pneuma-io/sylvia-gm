@@ -47,6 +47,31 @@ HOST_RECORD_KEY = "_host_record"
 LEDGER_ENTRY_KEY = "_ledger_entry"
 MARKER_KEYS = frozenset({STABLE_KEY, LEDGER_KEY, HOST_RECORD_KEY, LEDGER_ENTRY_KEY})
 
+
+class Tagged(dict):  # type: ignore[type-arg]
+    """A canonical message whose ledger tags are attributes, so it still equals the plain message.
+
+    Canonical assembly and its tests see exactly the previous message dicts; only the ledger
+    reads the tags. A tag may also be given as a key (``{STABLE_KEY: True}``) in hand-built lists.
+    """
+
+    def __init__(self, message: Any = (), tags: Mapping[str, Any] | None = None) -> None:
+        # Generic copies (``type(m)(items)``, as dataclasses.asdict makes) keep working.
+        super().__init__(message)
+        existing = getattr(message, "ledger_tags", None)
+        self.ledger_tags = {**(existing if isinstance(existing, dict) else {}), **(tags or {})}
+
+
+def tagged(message: Mapping[str, Any], **tags: Any) -> Tagged:
+    return Tagged(message, tags)
+
+
+def tag_of(message: Mapping[str, Any], name: str) -> Any:
+    tags = getattr(message, "ledger_tags", None)
+    if isinstance(tags, dict) and name in tags:
+        return tags[name]
+    return message.get(name)
+
 # Private per-exchange provider fields. They belong to the owner's private continuation store
 # and are reattached from ``_native_reference``; the journal never persists them.
 _NATIVE_FIELDS = frozenset(
@@ -161,9 +186,9 @@ def _label(content: str) -> str:
 def is_host_record(message: Mapping[str, Any]) -> bool:
     """Host records are application-created; player speech is never classified by its text."""
     if message.get("role") == "system":
-        return not message.get(STABLE_KEY)
+        return not tag_of(message, STABLE_KEY)
     return message.get("role") == "user" and bool(
-        message.get("_application_data") or message.get(HOST_RECORD_KEY)
+        message.get("_application_data") or tag_of(message, HOST_RECORD_KEY)
     )
 
 
@@ -176,8 +201,8 @@ def _is_data_record(message: Mapping[str, Any]) -> bool:
 
 def _wire_message(message: Mapping[str, Any]) -> dict[str, Any]:
     """The persistent journal form of a conversational message (native data by reference)."""
-    tagged = message.get(LEDGER_ENTRY_KEY)
-    source = tagged if isinstance(tagged, Mapping) else message
+    entry = tag_of(message, LEDGER_ENTRY_KEY)
+    source = entry if isinstance(entry, Mapping) else message
     return {
         str(key): copy.deepcopy(value)
         for key, value in source.items()
@@ -204,7 +229,7 @@ def conversation_keys(messages: Sequence[Mapping[str, Any]]) -> list[str]:
         if message.get("role") == "tool" and isinstance(message.get("tool_call_id"), str):
             keys.append("result:" + str(message["tool_call_id"]))
             continue
-        tag = message.get(LEDGER_KEY)
+        tag = tag_of(message, LEDGER_KEY)
         if isinstance(tag, str) and tag:
             keys.append(tag)
             continue
@@ -447,10 +472,27 @@ class JournalState:
     view: dict[str, Any] | None = None
     keyframe_bytes: int = 0
     update_bytes: int = 0
+    #: Chain head after each journal length, to recognise saved records on this chain.
+    heads: dict[int, str] = field(default_factory=dict)
 
     @classmethod
     def fresh(cls, epoch: str, generation: int) -> JournalState:
-        return cls(epoch=epoch, generation=generation, head=_genesis(epoch, generation))
+        head = _genesis(epoch, generation)
+        return cls(epoch=epoch, generation=generation, head=head, heads={0: head})
+
+
+def saved_tip(records: Sequence[Mapping[str, Any]], epoch: str) -> tuple[int, int, str] | None:
+    """(generation, journal length, head) of the newest saved record for *epoch*."""
+    rows = [r for r in records if isinstance(r, Mapping) and r.get("kind") == JOURNAL_KIND
+            and r.get("epoch") == epoch and isinstance(r.get("generation"), int)]
+    if not rows:
+        return None
+    latest = max(int(r["generation"]) for r in rows)
+    last = [r for r in rows if r["generation"] == latest][-1]
+    entries = last.get("entries")
+    count = int(last.get("base_count") or 0) + (len(entries) if isinstance(entries, Sequence)
+                                                 else 0)
+    return latest, count, str(last.get("head"))
 
 
 def load_journal(
@@ -492,6 +534,7 @@ def load_journal(
             break
         state.entries.extend(dict(entry) for entry in entries)
         state.head = str(record["head"])
+        state.heads[len(state.entries)] = state.head
         state.keyframe_bytes = int(record.get("keyframe_bytes", state.keyframe_bytes) or 0)
         state.update_bytes = int(record.get("update_bytes", state.update_bytes) or 0)
     if not valid:
@@ -579,19 +622,49 @@ class ContextLedger:
         """Compute the next request without changing the ledger (also used for size planning)."""
         epoch = self.epoch_for(request_context_id, canonical)
         reset: str | None = None
-        if self.state is not None and self.state.epoch == epoch:
+        current = self.state
+        if current is not None and current.epoch == epoch:
+            # Another adapter for this session (a Retry, a later turn) may have journaled
+            # since: continue in memory only while the newest saved record is on this chain.
+            records = history_records()
+            tip = saved_tip(records, epoch)
+            if tip is not None and (
+                tip[0] != current.generation or current.heads.get(tip[1]) != tip[2]
+            ):
+                current = None
+                state, reset = load_journal(
+                    records, epoch=epoch, context_owner=self.context_owner, seal=self.seal
+                )
+        if current is not None and current.epoch == epoch:
             # Entries are immutable once journaled and the view is replaced, never mutated.
-            state = replace(self.state, entries=list(self.state.entries))
+            state = replace(current, entries=list(current.entries), heads=dict(current.heads))
+        elif self.state is not None and self.state.epoch == epoch:
+            pass  # reloaded from saved evidence above
         else:
             state, reset = load_journal(
                 history_records(), epoch=epoch, context_owner=self.context_owner, seal=self.seal
             )
             if self.state is not None and reset is None:
                 reset = "epoch_changed"
-        stable = [dict(m) for m in canonical if m.get("role") == "system" and m.get(STABLE_KEY)]
+            elif reset is None and not state.entries:
+                # No saved journal for this epoch: a full send, whether first or after a
+                # restart whose evidence is unavailable. Recorded, never an error.
+                reset = "journal_started"
+        stable = [dict(m) for m in canonical
+                  if m.get("role") == "system" and tag_of(m, STABLE_KEY)]
+        # The ledger contract follows the leading fixed blocks (GM contract, narration block,
+        # context contract) and precedes the Ruleset guide and response format.
+        lead = 0
+        for message in canonical:
+            if not (message.get("role") == "system" and tag_of(message, STABLE_KEY)):
+                break
+            lead += 1
+        contract = {"role": "system", "content": ledger_contract(self.seal)}
+        if not any(m.get("content") == contract["content"] for m in stable):
+            stable.insert(lead, contract)
         rest = [
             m for m in canonical
-            if not (m.get("role") == "system" and m.get(STABLE_KEY))
+            if not (m.get("role") == "system" and tag_of(m, STABLE_KEY))
             and not (m.get("role") == "system"
                      and str(m.get("content", "")).startswith(DROPPED_CONTROL_PREFIXES))
         ]
@@ -673,6 +746,7 @@ class ContextLedger:
         previous_head = state.head
         state.entries.extend(appended)
         state.head = _chain(previous_head, appended)
+        state.heads[len(state.entries)] = state.head
         appended_bytes = sum(len(_json(entry["m"]).encode("utf-8")) for entry in appended)
         record = None
         if appended or reset is not None:

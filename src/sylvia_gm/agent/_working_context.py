@@ -198,6 +198,8 @@ class WorkingContextProvider(Provider):
         record_owner: Mapping[str, object] | None = None,
         request_context_id: str | None = None,
         pin_first_user: bool = True,
+        finalize_request: Callable | None = None,
+        measure_wire: Callable | None = None,
     ) -> None:
         super().__init__()
         self._provider = provider
@@ -213,6 +215,10 @@ class WorkingContextProvider(Provider):
         self.history_retrieval_enabled = False
         self.request_context_id = request_context_id
         self._pin_first_user = pin_first_user
+        # Ledger mode: build (and durably journal) the actual wire list before each send, and
+        # size history from that list rather than from the canonical projection.
+        self._finalize_request = finalize_request
+        self._measure_wire = measure_wire
         self._token_estimator = token_estimator(provider)
 
     def _estimate(self, value: object) -> int:
@@ -314,7 +320,14 @@ class WorkingContextProvider(Provider):
                 "exchange are too large. Saved work is intact; use a larger context model or "
                 "a bounded source read."
             )
-        history_tokens = self._estimate([m for m in projected if m not in fixed])
+        if self._measure_wire is not None and self.model_info is not None:
+            # The journal keeps superseded records, so the wire can outgrow the projection.
+            wire_history = [m for m in self._measure_wire(projected, tools)
+                            if m.get("role") != "system"]
+            fixed_history = [m for m in fixed if m.get("role") != "system"]
+            history_tokens = max(0, self._estimate(wire_history) - self._estimate(fixed_history))
+        else:
+            history_tokens = self._estimate([m for m in projected if m not in fixed])
         remaining = max(256, input_budget - fixed_tokens)
         threshold = int(remaining * 0.70)
         target = int(remaining * 0.42)
@@ -525,15 +538,20 @@ class WorkingContextProvider(Provider):
             return [*(tools or []), HISTORY_TOOL]
         return tools
 
+    async def _wire(self, projected, tools):
+        """The provider message list; ledger mode journals it durably before it is sent."""
+        request_tools = self._request_tools(tools)
+        if self._finalize_request is not None:
+            return await self._finalize_request(projected, request_tools)
+        return self._prepare_continuation(projected, bool(request_tools))
+
     async def generate(self, messages, tools=None, stream=False, timeout=60.0, **options):
         options.update(self._context_options())
         projected = await self.prepare(messages, tools, **options)
         for attempt in range(4):
             try:
                 response = await self._provider.generate(
-                    strip_data_markers(
-                        self._prepare_continuation(projected, bool(self._request_tools(tools)))
-                    ),
+                    strip_data_markers(await self._wire(projected, tools)),
                     tools=self._request_tools(tools), timeout=timeout, **options
                 )
                 if response.finish_reason == "context_length":
@@ -555,9 +573,7 @@ class WorkingContextProvider(Provider):
             emitted = False
             try:
                 stream = self._provider.generate_stream(
-                    strip_data_markers(
-                        self._prepare_continuation(projected, bool(self._request_tools(tools)))
-                    ),
+                    strip_data_markers(await self._wire(projected, tools)),
                     tools=self._request_tools(tools), timeout=timeout, **options
                 )
                 if inspect.isawaitable(stream):

@@ -471,3 +471,121 @@ def test_character_knowledge_is_merged_additively() -> None:
     assert target["GM_PRIVATE_CURRENT"]["character_knowledge"] == {
         "npc-1": ["campaign_state/r1", "campaign_state/r2"]}
     assert state_covers(apply_state_update(old, state_update(old, new)), new)
+
+
+def test_tags_are_attributes_so_canonical_messages_compare_unchanged() -> None:
+    from sylvia_gm.agent._context_ledger import Tagged, tag_of, tagged
+
+    plain = {"role": "user", "content": "Hello"}
+    marked = tagged(plain, **{LEDGER_KEY: "user:u1"})
+    assert isinstance(marked, Tagged) and marked == plain and dict(marked) == plain
+    assert tag_of(marked, LEDGER_KEY) == "user:u1" and tag_of(plain, LEDGER_KEY) is None
+    assert json.loads(json.dumps(marked)) == plain
+    assert tag_of(copy.deepcopy(marked), LEDGER_KEY) == "user:u1"
+    assert type(marked)(marked.items()) == plain  # generic copies such as dataclasses.asdict
+    # Tags accumulate when a tagged message is tagged again.
+    again = tagged(marked, **{STABLE_KEY: True})
+    assert tag_of(again, LEDGER_KEY) == "user:u1" and tag_of(again, STABLE_KEY) is True
+
+
+def test_ledger_inserts_its_contract_after_the_leading_fixed_blocks() -> None:
+    from sylvia_gm.agent._context_ledger import tagged
+
+    ledger = _ledger()
+    canonical = [
+        tagged({"role": "system", "content": "GM CONTRACT"}, **{STABLE_KEY: True}),
+        tagged({"role": "system", "content": "NARRATION BLOCK"}, **{STABLE_KEY: True}),
+        {"role": "system", "content": "SYLVIA_GM_CAMPAIGN_PREPARATION (data):\n{}"},
+        tagged({"role": "user", "content": "Hi"}, **{LEDGER_KEY: "user:u1"}),
+        tagged({"role": "system", "content": "SYLVIA_GM_RULESET_OPERATING_GUIDE x"},
+               **{STABLE_KEY: True}),
+    ]
+    frame = ledger.plan(canonical, request_context_id=CONTEXT)
+    prefix = [m["content"] for m in frame.wire if m["role"] == "system"]
+    assert prefix == ["GM CONTRACT", "NARRATION BLOCK", ledger_contract(host_seal("s1")),
+                      "SYLVIA_GM_RULESET_OPERATING_GUIDE x"]
+    assert frame.reset == "journal_started"
+
+
+def test_first_party_anthropic_breakpoints_mark_tools_system_and_last_block() -> None:
+    from sylvia_gm.provider._anthropic import with_cache_breakpoints
+
+    request = {
+        "system": "fixed",
+        "tools": [{"name": "a"}, {"name": "b"}],
+        "messages": [
+            {"role": "user", "content": "one"},
+            {"role": "assistant", "content": [{"type": "thinking", "thinking": "t"},
+                                              {"type": "text", "text": "two"}]},
+            {"role": "user", "content": "three"},
+        ],
+    }
+    marked = with_cache_breakpoints(request)
+    ephemeral = {"type": "ephemeral"}
+    assert marked["tools"][-1]["cache_control"] == ephemeral
+    assert "cache_control" not in marked["tools"][0]
+    assert marked["system"] == [{"type": "text", "text": "fixed", "cache_control": ephemeral}]
+    assert marked["messages"][0]["content"] == [{"type": "text", "text": "one"}]
+    assert marked["messages"][-1]["content"] == [
+        {"type": "text", "text": "three", "cache_control": ephemeral}]
+    assert request["messages"][-1]["content"] == "three"  # the input is not modified
+    # A thinking block never carries the breakpoint.
+    tail = with_cache_breakpoints({"messages": [{"role": "assistant", "content": [
+        {"type": "text", "text": "x"}, {"type": "thinking", "thinking": "t"}]}]})
+    blocks = tail["messages"][-1]["content"]
+    assert blocks[0]["cache_control"] == ephemeral and "cache_control" not in blocks[1]
+
+
+@pytest.mark.parametrize(("provider_key", "mode", "expected"), [
+    ("anthropic", "ledger", True), ("anthropic", "legacy", False), ("minimax", "ledger", False),
+])
+def test_breakpoints_only_on_the_first_party_route_in_ledger_mode(
+    monkeypatch, provider_key, mode, expected,
+) -> None:
+    pytest.importorskip("anthropic")
+    from sylvia_gm.provider._anthropic import AnthropicProvider
+    from sylvia_gm.provider._base import ModelInfo
+    from sylvia_gm.provider._credentials import Credential, CredentialPool
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", mode)
+    provider = AnthropicProvider(
+        base_url="https://fixture.invalid",
+        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),
+        model_info=ModelInfo(id="fixture", name="Fixture", provider_key=provider_key,
+                             provider_name="Fixture", provider_mode="byok",
+                             transport="anthropic_messages"),
+    )
+    request = provider.provider_request_representation(
+        [{"role": "system", "content": "fixed"}, {"role": "user", "content": "hi"}],
+        [{"type": "function", "function": {"name": "t", "description": "", "parameters": {}}}],
+        {},
+    )
+    assert ("cache_control" in json.dumps(request)) is expected
+
+
+def test_a_second_adapter_for_the_session_never_forks_the_saved_chain() -> None:
+    """A Retry or later turn may journal through another adapter; the first one then reloads."""
+    saved: list[dict] = []
+
+    def step(ledger: ContextLedger, *dialogue: dict):
+        frame = ledger.plan(_canonical(*dialogue), request_context_id=CONTEXT,
+                            history_records=lambda: _history(saved))
+        if frame.record is not None:
+            saved.append(frame.record)
+        ledger.commit(frame)
+        return frame
+
+    first, second = _ledger(), _ledger()
+    turn = [_user("u1", "a")]
+    one = step(first, *turn)
+    turn.append(_user("u2", "b"))
+    two = step(second, *turn)
+    assert two.reset is None and two.base_count == len(one.state.entries)
+    turn.append(_user("u3", "c"))
+    three = step(first, *turn)
+    # The first adapter was behind the saved journal: it reloads and continues the chain.
+    assert three.reset is None and three.base_count == len(two.state.entries)
+    assert three.wire[: len(two.wire)] == two.wire
+    restarted, reason = load_journal(_history(saved), epoch=three.state.epoch,
+                                     context_owner=OWNER, seal=host_seal("s1"))
+    assert reason is None and restarted.entries == three.state.entries
