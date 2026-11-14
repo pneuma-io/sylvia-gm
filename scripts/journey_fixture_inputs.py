@@ -36,6 +36,7 @@ def prepare_candidate(environment, root, output):
         temporary = Path(stream.name)
     child = dict(environment)
     child["PYTHONPATH"] = os.pathsep.join([str(root / "src"), str(root)])
+    child.update(PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
     program = (
         "from pathlib import Path; import sys; "
         "from sylvia_gm.application.bundled_packages import bundled_srd_archive; "

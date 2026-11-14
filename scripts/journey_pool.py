@@ -115,6 +115,8 @@ def run_balanced_gate(
     environment = dict(os.environ)
     environment.pop("PYTEST_ADDOPTS", None)
     environment["PYTHONUNBUFFERED"] = "1"
+    # Child text I/O must not depend on the machine's code page or UTF-8 mode.
+    environment.update(PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
     environment["PYTHONPATH"] = os.pathsep.join(
         [str(root / "src"), str(root), environment.get("PYTHONPATH", "")]
     )
