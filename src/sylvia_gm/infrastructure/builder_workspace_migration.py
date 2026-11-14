@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import stat
+import sys
 import tempfile
 from pathlib import Path, PureWindowsPath
 
@@ -77,11 +78,14 @@ def retain_legacy_workspace(storage_root: Path, *, campaign_id: str, session_id:
         for ancestor in (path, *path.parents):
             if ancestor == root:
                 break
-            if ancestor.exists() and (
-                ancestor.lstat().st_file_attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT
-                if hasattr(ancestor.lstat(), "st_file_attributes")
-                else ancestor.is_symlink()
-            ):
+            if not ancestor.exists():
+                continue
+            if sys.platform == "win32":
+                flags = ancestor.lstat().st_file_attributes
+                linked = bool(flags & stat.FILE_ATTRIBUTE_REPARSE_POINT)
+            else:
+                linked = ancestor.is_symlink()
+            if linked:
                 raise CommandRejected(
                     "Builder workspace migration cannot follow linked directories"
                 )

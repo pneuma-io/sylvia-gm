@@ -69,6 +69,10 @@ class WindowsHandles:
         self._kernel.CloseHandle.restype = wintypes.BOOL
 
     def identity(self, handle: int) -> tuple[int, int]:
+        if sys.platform != "win32":
+            raise UpdateError(
+                "unsupported_platform", "This updater process barrier requires Windows."
+            )
         values = [self._types.FILETIME() for _ in range(4)]
         pid = int(self._kernel.GetProcessId(handle))
         if not pid or not self._kernel.GetProcessTimes(
@@ -81,6 +85,10 @@ class WindowsHandles:
         return pid, birth
 
     def exited(self, handle: int) -> bool:
+        if sys.platform != "win32":
+            raise UpdateError(
+                "unsupported_platform", "This updater process barrier requires Windows."
+            )
         result = int(self._kernel.WaitForSingleObject(handle, 0))
         if result not in (0, 258):
             raise UpdateError(
@@ -89,6 +97,10 @@ class WindowsHandles:
         return result == 0
 
     def close(self, handle: int) -> None:
+        if sys.platform != "win32":
+            raise UpdateError(
+                "unsupported_platform", "This updater process barrier requires Windows."
+            )
         if not self._kernel.CloseHandle(handle):
             raise UpdateError(
                 "process_handle_close_failed", "An owned process handle could not be released."

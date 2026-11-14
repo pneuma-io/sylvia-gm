@@ -119,7 +119,7 @@ async function openShell(browser) {
 }
 
 test('model menu fits the composer with both sidebars at narrow desktop widths', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.evaluate(() => window.settingsTest.closeSettings());
@@ -251,7 +251,7 @@ test('automatic model limits preserve overrides and reset for a different identi
 });
 
 test('service setup guidance and discovery failures preserve form values and saved choices', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.evaluate(() => {
@@ -451,7 +451,7 @@ test('first use and contextual session feedback remain visible without the statu
 });
 
 test('character limits count emoji like the owner and preserve oversized input for correction', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page } = await openShell(browser);
     const result = await page.evaluate(() => {
@@ -488,7 +488,7 @@ test('character limits count emoji like the owner and preserve oversized input f
 });
 
 test('unavailable saved models never appear as a configured default for the current chat', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     const missing = { provider_id: 'removed-service', model_id: 'removed-service/saved-model' };
@@ -523,7 +523,7 @@ test('unavailable saved models never appear as a configured default for the curr
 
 
 test('invalid manual limits identify their field and preserve automatic blanks', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.locator('[data-edit-model="alpha"]').click();
@@ -561,7 +561,7 @@ test('invalid manual limits identify their field and preserve automatic blanks',
 
 
 test('current and legacy Lite package choices show SRD Lite without changing their identities', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.evaluate(async () => {
@@ -596,7 +596,7 @@ test('current and legacy Lite package choices show SRD Lite without changing the
 
 
 test('saved character choices retain exact bindings while displaying the friendly Lite name', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     const result = await page.evaluate(() => {
