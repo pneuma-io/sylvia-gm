@@ -872,3 +872,16 @@ Adult Gold, Green, Red, Silver and White dragons and inherited Allosaurus have c
 ### Adult dragon front-view anatomy corrections
 
 The adult Black and Brass default sheets now match their selected four-legged bodies. The extra inner rear-leg silhouettes in their earlier front panels are removed. Blue, Bronze and Copper passed the focused enlarged review without an edit. Body masters, portraits, saved framing, source bindings and mechanics are unchanged. Earlier immutable sheet files remain available for existing saved references.
+
+### Prepared first six ancient dragon references
+
+Ancient Black, Blue, Brass, Bronze, Copper and Gold dragons have full references, multiview studies and face portraits in the accepted style. These Gargantuan defaults preserve four legs plus two wings; Gold has two fine cheek barbels. Nested scale growth supplies the Rift influence. Exact source and Severed Lands bindings apply; mechanics and unsupported execution remain unchanged. These are prepared editable defaults, without individual owner sign-off.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Ancient Black Dragon | [Body](../assets/characters/66b93a8e421c15adef77d1c0e1ff6c60871d8b068f8fd0f437b32e3901d37da0.png) | [Sheet](../assets/characters/cc84c827a43056f643c339b29d13b1651cf166a0c468b81a54d07508176314f2.png) | [Portrait](../assets/characters/4f04b8be57ad2a50eec80c82b2eb1d7c589b8196341e00a5b35c11cdf981a68b.png) |
+| Ancient Blue Dragon | [Body](../assets/characters/cfec03223d5bc2f72c28753e57ffb9a0a490c71b5cc29b299719993997bc5e26.png) | [Sheet](../assets/characters/f543ad39854fc7ee3b475d9be3792673fd75095f6170342578b0a899925727b7.png) | [Portrait](../assets/characters/591c48bb139f536644ba7fcc2c5dc935da0df1b825edd865f7925267ba3f5dc8.png) |
+| Ancient Brass Dragon | [Body](../assets/characters/691ffc60e1ac7bbbbdf699519bde5393cdcc6ffbd8365f65490eb2dbd607d103.png) | [Sheet](../assets/characters/5b7d27099e2f93a9fb22d81af1088e3b483f4a1ee7f3a4cc49bd6389041002d4.png) | [Portrait](../assets/characters/00bdafb459891a4a2311ef31a1ac59558efca6865ab42ede3b787276c9afb202.png) |
+| Ancient Bronze Dragon | [Body](../assets/characters/83af1f1d5ad42ea9756a5099946d29770b28f69218533b1cf3c752a9d0462b66.png) | [Sheet](../assets/characters/1b29f83a5f0d1abad9fc0ac6e66d581223b24dfdb608d519d8b0085e53429cf3.png) | [Portrait](../assets/characters/874e431609466bb936c03883380e733ab93d14455753dc8cf739dd10729b1913.png) |
+| Ancient Copper Dragon | [Body](../assets/characters/4688f0b0feb416e05593b888d7eaeba0a23c45951d407d962a197e90ed57764a.png) | [Sheet](../assets/characters/b8e67553ba122f5a5379b5ebece8572ddd0a8d71619ec879e937f97a1c04c641.png) | [Portrait](../assets/characters/081d38c26406470f20e6f8459e6a7af4dba5a9d1228d99c324708fd7ca425a68.png) |
+| Ancient Gold Dragon | [Body](../assets/characters/a9cc4dcb2ba41f28907033be8f67a043e9b40a5d604921ada2a7337883d7a534.png) | [Sheet](../assets/characters/d3ab1d168822b469ae79a5aecedc8c1d0aebfcb4bee8fc225c945c65ae74abce.png) | [Portrait](../assets/characters/6fe999ebcceda913252621856c9fdba7a872a1e4374a6f92643cb54e6040150b.png) |
