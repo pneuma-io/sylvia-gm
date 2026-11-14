@@ -399,6 +399,26 @@ def test_linux_unsafe_key_file_is_refused_and_left_unchanged(tmp_path, key_state
 
 
 @linux_only
+def test_linux_interrupted_key_creation_is_finished_by_the_next_protect(key_state):
+    folder, key = key_state
+    envelope = protection.protect_credentials("synthetic-key", {})
+    secret = key.read_bytes()
+    # A creation killed after publishing the key leaves its temporary as a second link.
+    leftover = folder / ".credential-key-0123456789abcdef.tmp"
+    os.link(key, leftover)
+    unrelated = folder / "credential-key.bak"
+    unrelated.write_bytes(b"not a temporary")
+    with pytest.raises(ConfigError, match="Re-enter"):
+        protection.unprotect_credentials(envelope)
+    assert os.path.lexists(leftover)
+    protection.protect_credentials("synthetic-key", {})
+    assert sorted(os.listdir(folder)) == ["credential-key", "credential-key.bak"]
+    assert key.read_bytes() == secret and os.lstat(key).st_nlink == 1
+    assert unrelated.read_bytes() == b"not a temporary"
+    assert protection.unprotect_credentials(envelope)[0] == "synthetic-key"
+
+
+@linux_only
 @pytest.mark.parametrize("unsafe", ["group-writable", "other-writable", "symlink"])
 def test_linux_unsafe_key_folder_is_refused(tmp_path, key_state, unsafe):
     folder, key = key_state

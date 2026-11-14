@@ -11,6 +11,7 @@ import base64
 import ctypes
 import json
 import os
+import re
 import sys
 from collections.abc import Mapping
 from contextlib import suppress
@@ -79,6 +80,7 @@ if sys.platform == "linux":
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
     _KEY_FILE_NAME = "credential-key"
+    _TEMPORARY_NAME = re.compile(r"\.credential-key-[0-9a-f]{16}\.tmp")
     _KEY_BYTES = 32
     _NONCE_BYTES = 12
     _TAG_BYTES = 16
@@ -182,6 +184,19 @@ if sys.platform == "linux":
                 os.unlink(temporary, dir_fd=folder)
         os.fsync(folder)
 
+    def _remove_interrupted_temporaries(folder: int) -> None:
+        """Under the exclusive lock, clear temporaries left by a creation that was killed.
+
+        A kill between publishing the key and removing its temporary leaves the key
+        with two links, which every read refuses. No creation can be in progress while
+        this lock is held, and only the owner can write to the folder, so a name of
+        our temporary form is always a leftover. The key itself is never touched.
+        """
+        for name in os.listdir(folder):
+            if _TEMPORARY_NAME.fullmatch(name):
+                with suppress(OSError):
+                    os.unlink(name, dir_fd=folder)
+
     def _user_key(*, create: bool) -> bytes:
         """Read the current user's key; only protection may create a missing one.
 
@@ -191,6 +206,8 @@ if sys.platform == "linux":
         folder = _open_key_folder(create=create)
         try:
             fcntl.flock(folder, fcntl.LOCK_EX if create else fcntl.LOCK_SH)
+            if create:
+                _remove_interrupted_temporaries(folder)
             try:
                 return _read_key(folder)
             except FileNotFoundError:
