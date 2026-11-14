@@ -7,7 +7,6 @@ closed file through one final Win32 namespace replacement.
 
 from __future__ import annotations
 
-import ctypes
 import hashlib
 import json
 import math
@@ -3187,25 +3186,3 @@ def stage_campaign_archive(path: Path) -> Iterator[StagedCampaignArchive]:
                     primary.supplemental_codes = tuple(  # type: ignore[attr-defined]
                         dict.fromkeys((*supplemental, "portable_recovery_cleanup_incomplete"))
                     )
-
-
-_MOVEFILE_REPLACE_EXISTING = 0x00000001
-_MOVEFILE_WRITE_THROUGH = 0x00000008
-
-
-def _move_file_ex(source: Path, destination: Path, flags: int) -> bool:
-    kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-    move: Any = kernel32.MoveFileExW
-    move.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32]
-    move.restype = ctypes.c_int
-    return bool(move(os.fspath(source), os.fspath(destination), flags))
-
-
-def move_export_file(source: Path, destination: Path) -> bool:
-    """Perform the final same-volume write-through replacement and nothing afterward."""
-
-    return _move_file_ex(
-        source,
-        destination,
-        _MOVEFILE_REPLACE_EXISTING | _MOVEFILE_WRITE_THROUGH,
-    )

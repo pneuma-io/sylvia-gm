@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import ctypes
 import hashlib
 import io
 import json
-import msvcrt
 import os
 import secrets
 import sqlite3
@@ -135,6 +133,7 @@ from sylvia_gm.infrastructure import (
     builder_workspace_migration,
     campaign_archive,
     private_records_archive,
+    safe_file,
     sqlite_builder_launch,
     sqlite_campaign,
     sqlite_continuity,
@@ -170,32 +169,6 @@ _CAMPAIGN_SCHEMA_VERSION = 12
 _APPLICATION_OWNER_GATE = object()
 _UNBOUND_CAMPAIGN_LOCK_HASH = "unbound"
 
-_MOVEFILE_REPLACE_EXISTING = 0x00000001
-_MOVEFILE_WRITE_THROUGH = 0x00000008
-_DRIVE_FIXED = 3
-_FILE_ATTRIBUTE_REPARSE_POINT = 0x00000400
-_FILE_ATTRIBUTE_OFFLINE = 0x00001000
-_FILE_ATTRIBUTE_RECALL_ON_OPEN = 0x00040000
-_FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS = 0x00400000
-_UNSUPPORTED_BACKUP_ATTRIBUTES = (
-    _FILE_ATTRIBUTE_REPARSE_POINT
-    | _FILE_ATTRIBUTE_OFFLINE
-    | _FILE_ATTRIBUTE_RECALL_ON_OPEN
-    | _FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS
-)
-_INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF
-_INVALID_HANDLE_VALUE = int(ctypes.c_void_p(-1).value or -1)
-_GENERIC_READ = 0x80000000
-_GENERIC_WRITE = 0x40000000
-_DELETE_ACCESS = 0x00010000
-_FILE_READ_ATTRIBUTES = 0x00000080
-_FILE_SHARE_READ = 0x00000001
-_FILE_SHARE_WRITE = 0x00000002
-_FILE_SHARE_DELETE = 0x00000004
-_OPEN_EXISTING = 3
-_FILE_ATTRIBUTE_NORMAL = 0x00000080
-_FILE_FLAG_OPEN_REPARSE_POINT = 0x00200000
-_FILE_DISPOSITION_INFO = 4
 _BACKUP_PAGES_PER_STEP = 16
 _BACKUP_TEMP_ATTEMPTS = 128
 
@@ -258,6 +231,10 @@ class _ExportFailure(CommandRejected):
 
 class _PublicationAcknowledgementLostError(Exception):
     """The namespace call raised, so publication may already be complete."""
+
+
+class _PublicationDurabilityUncertainError(Exception):
+    """The replacement happened but its directory entry could not be made durable."""
 
 
 class _VerifiedPackageBlobReadReceipt(PackageBlobReadReceipt):
@@ -1565,14 +1542,20 @@ class SQLiteAuthorityStore:
             )
             self._run_export_stage("move_file_ex")
             try:
-                published = campaign_archive.move_export_file(claimed.path, envelope.target)
+                publication = self._publish_backup_file(
+                    claimed.path, envelope.target, envelope.parent_identity
+                )
             except BaseException:
                 raise _PublicationAcknowledgementLostError from None
-            if not published:
+            if publication is safe_file.Publication.DURABILITY_UNCERTAIN:
+                raise _PublicationDurabilityUncertainError
+            if publication is not safe_file.Publication.PUBLISHED:
                 raise _ExportFailure("portable_export_move_file_ex_failed")
             return result
         except _PublicationAcknowledgementLostError:
             raise _ExportFailure("portable_export_move_file_ex_failed") from None
+        except _PublicationDurabilityUncertainError:
+            raise _ExportFailure("portable_export_publication_durability_uncertain") from None
         except BaseException as error:
             failure = self._as_export_failure(error)
             cleanup_incomplete = False
@@ -1592,8 +1575,6 @@ class SQLiteAuthorityStore:
         envelope: _BackupEnvelope,
     ) -> None:
         handle = self._open_backup_identity_handle(claimed.path)
-        if handle == _INVALID_HANDLE_VALUE:
-            raise OSError("identity handle unavailable")
         try:
             self._validate_claimed_backup_temporary(claimed, handle, envelope)
         finally:
@@ -2193,13 +2174,9 @@ class SQLiteAuthorityStore:
     def _validate_export_target_lexical(self, target: Path) -> None:
         """Reject unsupported namespaces without touching SQLite or the filesystem."""
 
-        if os.name != "nt" or not isinstance(target, Path):
-            raise _ExportFailure("portable_export_destination_unsupported")
-        raw = os.fspath(target)
-        if raw.startswith(("\\\\", "//", "\\?\\", "\\.\\")):
-            raise _ExportFailure("portable_export_destination_unsupported")
-        normalized = self._lexical_backup_path(target)
-        if ":" in normalized.name:
+        if not isinstance(target, Path) or not safe_file.files.lexical_export_target_supported(
+            target
+        ):
             raise _ExportFailure("portable_export_destination_unsupported")
 
     def _validate_export_envelope(
@@ -2212,21 +2189,14 @@ class SQLiteAuthorityStore:
         self._validate_export_target_lexical(target)
         normalized = self._lexical_backup_path(target)
         volume_root = normalized.anchor
-        drive_type = self._backup_drive_type(volume_root)
-        drive_codes = {
-            0: "portable_export_destination_unknown",
-            2: "portable_export_destination_removable",
-            4: "portable_export_destination_remote",
-        }
-        if drive_type in drive_codes:
-            raise _ExportFailure(drive_codes[drive_type])
-        if drive_type != _DRIVE_FIXED:
-            raise _ExportFailure("portable_export_destination_unsupported")
+        volume_refusal = self._backup_volume_admission(normalized)
+        if volume_refusal is not None:
+            raise _ExportFailure(f"portable_export_destination_{volume_refusal}")
         parent = normalized.parent
         parent_attributes = self._backup_file_attributes(parent)
         if parent_attributes is None:
             raise _ExportFailure("portable_export_destination_parent")
-        if parent_attributes & _FILE_ATTRIBUTE_REPARSE_POINT:
+        if safe_file.files.attributes_are_link(parent_attributes):
             raise _ExportFailure("portable_export_destination_reparse")
         if not stat.S_ISDIR(self._backup_stat(parent).st_mode):
             raise _ExportFailure("portable_export_destination_parent")
@@ -2241,7 +2211,7 @@ class SQLiteAuthorityStore:
         attributes = self._backup_file_attributes(normalized)
         target_identity: tuple[int, int] | None = None
         if attributes is not None:
-            if attributes & _FILE_ATTRIBUTE_REPARSE_POINT:
+            if safe_file.files.attributes_are_link(attributes):
                 raise _ExportFailure("portable_export_destination_reparse")
             target_stat = self._backup_lstat(normalized)
             if stat.S_ISDIR(target_stat.st_mode):
@@ -2319,7 +2289,11 @@ class SQLiteAuthorityStore:
         self.backup_database(target)
 
     def backup_database(self, target: Path) -> None:
-        """Durably publish one coherent online copy in the supported Windows envelope.
+        """Durably publish one coherent online copy in the supported local envelope.
+
+        ``safe_file`` supplies the platform primitives: Windows fixed disks, or
+        Linux ext4/xfs/btrfs. A Linux replacement whose directory sync fails is
+        reported as ``backup_publication_durability_uncertain``.
 
         For the complete call lifetime, the caller must exclusively manage the admitted
         local target directory.  No independent process may open writable, replace,
@@ -2364,13 +2338,20 @@ class SQLiteAuthorityStore:
                 self._owned_backup_artifacts(claimed.path)[1:],
                 phase="final_envelope",
             )
-            flags = _MOVEFILE_REPLACE_EXISTING | _MOVEFILE_WRITE_THROUGH
             phase = "content_seal_close"
             if not self._close_backup_handle(seal_handle):
                 raise _BackupFailure("content_seal_close", "failed")
             seal_handle = None
             phase = "publication"
-            if not self._move_backup_file(claimed.path, envelope.target, flags):
+            publication = self._publish_backup_file(
+                claimed.path, envelope.target, envelope.parent_identity
+            )
+            if publication is safe_file.Publication.DURABILITY_UNCERTAIN:
+                # The renamed copy is the only artifact now; nothing may be claimed
+                # about the old destination and callers such as migration must stop.
+                claimed = None
+                raise _BackupFailure("publication", "durability_uncertain")
+            if publication is not safe_file.Publication.PUBLISHED:
                 raise _BackupFailure("publication", "replace_failed")
             return
         except BaseException as error:
@@ -2770,14 +2751,13 @@ class SQLiteAuthorityStore:
         expected: _BackupEnvelope | None = None,
         temporary: Path | None = None,
     ) -> _BackupEnvelope:
-        if os.name != "nt" or not isinstance(target, Path):
+        if not isinstance(target, Path) or not safe_file.files.lexical_backup_target_supported(
+            target
+        ):
             raise _BackupFailure("target_envelope", "unsupported")
         normalized = self._lexical_backup_path(target)
-        text = os.fspath(normalized)
-        if text.startswith(("\\\\", "//")) or ":" in normalized.name:
-            raise _BackupFailure("target_envelope", "unsupported")
         volume_root = normalized.anchor
-        if not volume_root or self._backup_drive_type(volume_root) != _DRIVE_FIXED:
+        if self._backup_volume_admission(normalized) is not None:
             raise _BackupFailure("target_envelope", "volume_unsupported")
         parent = normalized.parent
         parent_attributes = self._backup_file_attributes(parent)
@@ -2858,19 +2838,13 @@ class SQLiteAuthorityStore:
         )
 
     def _validate_backup_ancestors(self, parent: Path) -> None:
-        current = parent
-        while True:
-            attributes = self._backup_file_attributes(current)
-            if attributes is None:
-                raise _BackupFailure("target_envelope", "ancestor_missing")
-            self._require_supported_backup_attributes(attributes)
-            if current.parent == current:
-                return
-            current = current.parent
+        refusal = safe_file.files.ancestors_admission(parent)
+        if refusal is not None:
+            raise _BackupFailure("target_envelope", refusal)
 
     @staticmethod
     def _require_supported_backup_attributes(attributes: int) -> None:
-        if attributes & _UNSUPPORTED_BACKUP_ATTRIBUTES:
+        if not safe_file.files.attributes_supported(attributes):
             raise _BackupFailure("target_envelope", "attributes_unsupported")
 
     def _claim_backup_temporary(self, envelope: _BackupEnvelope) -> _ClaimedBackupTemporary:
@@ -2901,7 +2875,7 @@ class SQLiteAuthorityStore:
                         raise _BackupFailure("temporary_claim", "parent_identity_drift")
                     if self._backup_path_key(Path(candidate.anchor)) != envelope.volume_root:
                         raise _BackupFailure("temporary_claim", "volume_drift")
-                    if identity == self._backup_path_win32_identity(self._database_path):
+                    if identity == self._backup_path_handle_identity(self._database_path):
                         raise _BackupFailure("temporary_claim", "source_alias")
                 except _BackupFailure:
                     raise
@@ -2911,8 +2885,6 @@ class SQLiteAuthorityStore:
                     guard_handle = self._open_backup_write_guard(candidate)
                 except BaseException:
                     raise _BackupFailure("write_guard_open", "failed") from None
-                if guard_handle == _INVALID_HANDLE_VALUE:
-                    raise _BackupFailure("write_guard_open", "failed")
                 try:
                     guard_identity = self._backup_handle_identity(guard_handle)
                 except BaseException:
@@ -2944,10 +2916,8 @@ class SQLiteAuthorityStore:
                         descriptor_closed = False
                     if not descriptor_closed:
                         cleanup_codes.append("backup_cleanup_claim_descriptor_close_failed")
-                if (
-                    guard_handle is not None
-                    and guard_handle != _INVALID_HANDLE_VALUE
-                    and not self._close_backup_handle_safely(guard_handle)
+                if guard_handle is not None and not self._close_backup_handle_safely(
+                    guard_handle
                 ):
                     cleanup_codes.append("backup_cleanup_write_guard_close_failed")
                 if identity is None or attributes is None:
@@ -2959,7 +2929,7 @@ class SQLiteAuthorityStore:
                         parent_identity=envelope.parent_identity,
                         volume_root=envelope.volume_root,
                         attributes=attributes,
-                        write_guard_handle=_INVALID_HANDLE_VALUE,
+                        write_guard_handle=-1,
                     )
                     cleanup_codes.extend(self._cleanup_owned_backup(partial))
                 if cleanup_codes:
@@ -2973,37 +2943,23 @@ class SQLiteAuthorityStore:
 
     @staticmethod
     def _exclusive_create_backup_temp(candidate: Path) -> int:
-        flags = os.O_CREAT | os.O_EXCL | os.O_RDWR
-        if hasattr(os, "O_BINARY"):
-            flags |= os.O_BINARY
-        return os.open(candidate, flags, 0o600)
+        return safe_file.files.create_exclusive(candidate)
 
     @staticmethod
     def _close_backup_descriptor(descriptor: int) -> bool:
         os.close(descriptor)
         return True
 
-    def _backup_descriptor_identity(self, descriptor: int) -> tuple[int, int]:
-        return self._backup_handle_identity(int(msvcrt.get_osfhandle(descriptor)))
+    @staticmethod
+    def _backup_descriptor_identity(descriptor: int) -> tuple[int, int]:
+        return safe_file.files.descriptor_identity(descriptor)
 
     @staticmethod
     def _backup_handle_identity(handle: int) -> tuple[int, int]:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        get_information: Any = kernel32.GetFileInformationByHandle
-        get_information.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
-        get_information.restype = ctypes.c_int
-        information = ctypes.create_string_buffer(52)
-        if not get_information(ctypes.c_void_p(handle), information):
-            raise OSError(ctypes.get_last_error())
-        volume_serial = int(ctypes.c_uint32.from_buffer(information, 28).value)
-        file_index_high = int(ctypes.c_uint32.from_buffer(information, 44).value)
-        file_index_low = int(ctypes.c_uint32.from_buffer(information, 48).value)
-        return volume_serial, (file_index_high << 32) | file_index_low
+        return safe_file.files.handle_identity(handle)
 
-    def _backup_path_win32_identity(self, path: Path) -> tuple[int, int]:
+    def _backup_path_handle_identity(self, path: Path) -> tuple[int, int]:
         handle = self._open_backup_identity_handle(path)
-        if handle == _INVALID_HANDLE_VALUE:
-            raise OSError(ctypes.get_last_error())
         failure: BaseException | None = None
         identity: tuple[int, int] | None = None
         try:
@@ -3019,60 +2975,24 @@ class SQLiteAuthorityStore:
         return identity
 
     @staticmethod
-    def _create_backup_file_handle(path: Path, access: int, share: int) -> int:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        create_file: Any = kernel32.CreateFileW
-        create_file.argtypes = [
-            ctypes.c_wchar_p,
-            ctypes.c_uint32,
-            ctypes.c_uint32,
-            ctypes.c_void_p,
-            ctypes.c_uint32,
-            ctypes.c_uint32,
-            ctypes.c_void_p,
-        ]
-        create_file.restype = ctypes.c_void_p
-        handle = create_file(
-            os.fspath(path),
-            access,
-            share,
-            None,
-            _OPEN_EXISTING,
-            _FILE_ATTRIBUTE_NORMAL | _FILE_FLAG_OPEN_REPARSE_POINT,
-            None,
-        )
-        return int(handle) if handle is not None else int(_INVALID_HANDLE_VALUE)
+    def _open_backup_write_guard(path: Path) -> int:
+        return safe_file.files.open_write_guard(path)
 
-    @classmethod
-    def _open_backup_write_guard(cls, path: Path) -> int:
-        return cls._create_backup_file_handle(
-            path,
-            _FILE_READ_ATTRIBUTES,
-            _FILE_SHARE_READ | _FILE_SHARE_WRITE,
-        )
+    @staticmethod
+    def _open_backup_content_seal(path: Path) -> int:
+        return safe_file.files.open_content_seal(path)
 
-    @classmethod
-    def _open_backup_content_seal(cls, path: Path) -> int:
-        return cls._create_backup_file_handle(
-            path,
-            _GENERIC_READ | _GENERIC_WRITE,
-            _FILE_SHARE_READ,
-        )
-
-    @classmethod
-    def _open_backup_identity_handle(cls, path: Path) -> int:
-        return cls._create_backup_file_handle(
-            path,
-            _FILE_READ_ATTRIBUTES,
-            _FILE_SHARE_READ | _FILE_SHARE_WRITE | _FILE_SHARE_DELETE,
-        )
+    @staticmethod
+    def _open_backup_identity_handle(path: Path) -> int:
+        return safe_file.files.open_identity_handle(path)
 
     def _acquire_backup_content_seal(self, claimed: _ClaimedBackupTemporary) -> int:
         handle: int | None = None
         try:
-            handle = self._open_backup_content_seal(claimed.path)
-            if handle == _INVALID_HANDLE_VALUE:
-                raise _BackupFailure("content_seal_open", "failed")
+            try:
+                handle = self._open_backup_content_seal(claimed.path)
+            except BaseException:
+                raise _BackupFailure("content_seal_open", "failed") from None
             try:
                 identity = self._backup_handle_identity(handle)
             except BaseException:
@@ -3082,11 +3002,7 @@ class SQLiteAuthorityStore:
             return handle
         except BaseException as error:
             failure = self._as_backup_failure(error, "content_seal")
-            if (
-                handle is not None
-                and handle != _INVALID_HANDLE_VALUE
-                and not self._close_backup_handle_safely(handle)
-            ):
+            if handle is not None and not self._close_backup_handle_safely(handle):
                 failure = failure.with_supplemental("backup_cleanup_content_seal_close_failed")
             raise failure from None
 
@@ -3100,7 +3016,7 @@ class SQLiteAuthorityStore:
             seal_identity = self._backup_handle_identity(seal_handle)
             if seal_identity != claimed.identity:
                 raise _BackupFailure("final_envelope", "temporary_identity_drift")
-            path_identity = self._backup_path_win32_identity(claimed.path)
+            path_identity = self._backup_path_handle_identity(claimed.path)
             if path_identity != claimed.identity or path_identity != seal_identity:
                 raise _BackupFailure("final_envelope", "temporary_identity_drift")
             attributes = self._backup_file_attributes(claimed.path)
@@ -3182,9 +3098,11 @@ class SQLiteAuthorityStore:
         try:
             try:
                 handle = self._open_backup_cleanup_handle(claimed.path)
+            except FileNotFoundError:
+                pass
             except BaseException:
                 codes.append("backup_cleanup_main_identity_failed")
-            if handle is not None and handle != _INVALID_HANDLE_VALUE:
+            if handle is not None:
                 try:
                     identity = self._backup_handle_identity(handle)
                 except BaseException:
@@ -3196,19 +3114,15 @@ class SQLiteAuthorityStore:
                         identity_matched = True
                         try:
                             self._before_backup_main_cleanup_disposition(claimed.path)
-                            disposition_requested = self._delete_backup_handle(handle)
+                            disposition_requested = self._delete_backup_handle(
+                                handle, claimed.path
+                            )
                         except BaseException:
                             disposition_requested = False
                         if not disposition_requested:
                             codes.append("backup_cleanup_main_disposition_failed")
-            elif handle == _INVALID_HANDLE_VALUE and ctypes.get_last_error() not in {2, 3}:
-                codes.append("backup_cleanup_main_identity_failed")
         finally:
-            if (
-                handle is not None
-                and handle != _INVALID_HANDLE_VALUE
-                and not self._close_backup_handle_safely(handle)
-            ):
+            if handle is not None and not self._close_backup_handle_safely(handle):
                 codes.append("backup_cleanup_main_close_failed")
         if identity_matched and disposition_requested:
             try:
@@ -3219,34 +3133,13 @@ class SQLiteAuthorityStore:
                 codes.append("backup_cleanup_main_absence_failed")
         return tuple(codes)
 
-    @classmethod
-    def _open_backup_cleanup_handle(cls, path: Path) -> int:
-        return cls._create_backup_file_handle(
-            path,
-            _DELETE_ACCESS | _FILE_READ_ATTRIBUTES,
-            _FILE_SHARE_READ | _FILE_SHARE_WRITE | _FILE_SHARE_DELETE,
-        )
+    @staticmethod
+    def _open_backup_cleanup_handle(path: Path) -> int:
+        return safe_file.files.open_cleanup_handle(path)
 
     @staticmethod
-    def _delete_backup_handle(handle: int) -> bool:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        set_information: Any = kernel32.SetFileInformationByHandle
-        set_information.argtypes = [
-            ctypes.c_void_p,
-            ctypes.c_int,
-            ctypes.c_void_p,
-            ctypes.c_uint32,
-        ]
-        set_information.restype = ctypes.c_int
-        delete_file = ctypes.c_int(1)
-        return bool(
-            set_information(
-                ctypes.c_void_p(handle),
-                _FILE_DISPOSITION_INFO,
-                ctypes.byref(delete_file),
-                ctypes.sizeof(delete_file),
-            )
-        )
+    def _delete_backup_handle(handle: int, path: Path) -> bool:
+        return safe_file.files.delete_by_handle(handle, path)
 
     def _before_backup_main_cleanup_disposition(self, _path: Path) -> None:
         """Deterministic seam after identity proof and before handle-bound disposition."""
@@ -3297,50 +3190,30 @@ class SQLiteAuthorityStore:
         return int(value.st_dev), int(value.st_ino)
 
     @staticmethod
-    def _backup_drive_type(volume_root: str) -> int:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        get_drive_type: Any = kernel32.GetDriveTypeW
-        get_drive_type.argtypes = [ctypes.c_wchar_p]
-        get_drive_type.restype = ctypes.c_uint
-        return int(get_drive_type(volume_root))
+    def _backup_volume_admission(target: Path) -> str | None:
+        return safe_file.files.volume_admission(target)
 
     @staticmethod
     def _backup_file_attributes(path: Path) -> int | None:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        get_attributes: Any = kernel32.GetFileAttributesW
-        get_attributes.argtypes = [ctypes.c_wchar_p]
-        get_attributes.restype = ctypes.c_uint32
-        attributes = int(get_attributes(os.fspath(path)))
-        if attributes == _INVALID_FILE_ATTRIBUTES:
-            error = ctypes.get_last_error()
-            if error in {2, 3}:
-                return None
-            raise OSError(error)
-        return attributes
+        return safe_file.files.entry_attributes(path)
 
     @staticmethod
     def _flush_backup_handle(handle: int) -> bool:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        flush: Any = kernel32.FlushFileBuffers
-        flush.argtypes = [ctypes.c_void_p]
-        flush.restype = ctypes.c_int
-        return bool(flush(ctypes.c_void_p(handle)))
+        return safe_file.files.flush_handle(handle)
 
     @staticmethod
     def _close_backup_handle(handle: int) -> bool:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        close: Any = kernel32.CloseHandle
-        close.argtypes = [ctypes.c_void_p]
-        close.restype = ctypes.c_int
-        return bool(close(ctypes.c_void_p(handle)))
+        return safe_file.files.close_handle(handle)
 
     @staticmethod
-    def _move_backup_file(source: Path, target: Path, flags: int) -> bool:
-        kernel32: Any = ctypes.WinDLL("kernel32", use_last_error=True)
-        move: Any = kernel32.MoveFileExW
-        move.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_uint32]
-        move.restype = ctypes.c_int
-        return bool(move(os.fspath(source), os.fspath(target), flags))
+    def _publish_backup_file(
+        source: Path,
+        target: Path,
+        parent_identity: tuple[int, int],
+    ) -> safe_file.Publication:
+        return safe_file.files.publish_replace(
+            source, target, parent_identity=parent_identity
+        )
 
     @staticmethod
     def _as_backup_failure(error: BaseException, phase: str) -> _BackupFailure:
