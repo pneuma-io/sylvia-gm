@@ -231,7 +231,7 @@ def test_latest_wins_records_are_resent_only_when_changed() -> None:
     assert "prep-v2" in changed.appended[0]["m"]["content"]
 
 
-def test_event_records_repeat_only_after_new_conversation() -> None:
+def test_event_records_repeat_only_after_leaving_canonical_assembly() -> None:
     ledger = _ledger()
     control = {"role": "system", "content": "SYLVIA_GM_DECISION_REQUEST (trusted): decide"}
     _step(ledger, _canonical(_user("u1", "a"), extra=(control,)))
@@ -240,8 +240,14 @@ def test_event_records_repeat_only_after_new_conversation() -> None:
     call = {"role": "assistant", "content": None, "tool_calls": [
         {"id": "c1", "type": "function", "function": {"name": "x", "arguments": "{}"}}]}
     result = {"role": "tool", "tool_call_id": "c1", "content": "{}"}
-    after = _step(ledger, _canonical(_user("u1", "a"), call, result, extra=(control,)))
-    assert [e["c"] for e in after.appended] == ["conversation", "conversation", "event"]
+    # Still present and unchanged after the exchange: the same record, not repeated.
+    kept = _step(ledger, _canonical(_user("u1", "a"), call, result, extra=(control,)))
+    assert [e["c"] for e in kept.appended] == ["conversation", "conversation"]
+    # Gone for a request, then issued again: a new event after new conversation.
+    _step(ledger, _canonical(_user("u1", "a"), call, result))
+    again = _step(ledger, _canonical(_user("u1", "a"), call, result, _user("u2", "b"),
+                                     extra=(control,)))
+    assert [e["c"] for e in again.appended] == ["conversation", "event"]
 
 
 def test_dropped_positional_player_control_never_reaches_the_wire() -> None:
@@ -292,7 +298,7 @@ def test_state_updates_are_small_and_reconstruct_the_canonical_state() -> None:
     assert body["campaign_revision"] == 2
     assert {tuple(item["path"]) for item in body["set"]} == {
         ("campaign", "revision"),
-        ("campaign_state", "ruleset_owned_values", "entities", "pc-1"),
+        ("campaign_state", "ruleset_owned_values", "entities", "pc-1", "hp"),
     }
     assert state_covers(frame.state.view, _state(2, hp=4))
     assert reconstruct_state(frame.state.entries, host_seal("s1")) == _state(2, hp=4)
@@ -589,3 +595,31 @@ def test_a_second_adapter_for_the_session_never_forks_the_saved_chain() -> None:
     restarted, reason = load_journal(_history(saved), epoch=three.state.epoch,
                                      context_owner=OWNER, seal=host_seal("s1"))
     assert reason is None and restarted.entries == three.state.entries
+
+
+def test_a_record_that_stays_in_canonical_is_not_repeated_after_each_exchange() -> None:
+    ledger = _ledger()
+    kept = {"role": "system", "content": "SYLVIA_GM_AUTOMATIC_ENGINE_TRANSITION_RESULT (x):\n{}"}
+    control = {"role": "system", "content": "SYLVIA_GM_DECISION_REQUEST (trusted): decide"}
+
+    def exchange(index: int) -> list[dict]:
+        return [
+            {"role": "assistant", "content": None, "tool_calls": [{
+                "id": f"c{index}", "type": "function",
+                "function": {"name": "x", "arguments": "{}"}}]},
+            {"role": "tool", "tool_call_id": f"c{index}", "content": "{}"},
+        ]
+
+    dialogue = [_user("u1", "a"), kept]
+    _step(ledger, _canonical(*dialogue, extra=(control,)))
+    for index in range(1, 4):
+        dialogue[2:2] = exchange(index)
+        frame = _step(ledger, _canonical(*dialogue, extra=(control,)))
+        labels = [e.get("l") for e in frame.appended if e["c"] != "conversation"]
+        assert "SYLVIA_GM_AUTOMATIC_ENGINE_TRANSITION_RESULT" not in labels
+        assert "SYLVIA_GM_DECISION_REQUEST" not in labels
+    # A record that left canonical assembly and comes back is a new event again.
+    _step(ledger, _canonical(*dialogue, *exchange(9)))
+    back = _step(ledger, _canonical(*dialogue, *exchange(9), _user("u2", "b"),
+                                    extra=(control,)))
+    assert "SYLVIA_GM_DECISION_REQUEST" in [e.get("l") for e in back.appended]

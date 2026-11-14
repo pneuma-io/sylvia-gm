@@ -108,12 +108,13 @@ _CONTINUE_TEXT = (
 )
 
 #: Campaign-state replacement granularity. A changed subtree is replaced whole once its path
-#: reaches this depth (path length). Chosen from the offline measurement (SPEC 5.4/5.5): the
-#: engine-owned values hold per-entity records, so replacing one entity (depth 4) keeps a
-#: typical mechanics commit small without splitting records into fragments a model must join.
+#: reaches this depth (path length). Chosen from the offline measurement (SPEC 5.4/5.5):
+#: engine-owned values are replaced per entity field (``.../<entities>/<id>/<field>``, depth 5),
+#: which in a scripted party combat halved update bytes against whole entities (depth 4) and
+#: needed fewer keyframes; elsewhere per top-level section (depth 2), scene per field.
 DEFAULT_REPLACE_DEPTH = 2
 SUBTREE_REPLACE_DEPTH: dict[tuple[str, ...], int] = {
-    ("campaign_state", "ruleset_owned_values"): 4,
+    ("campaign_state", "ruleset_owned_values"): 5,
     ("campaign_state", "current_scene"): 3,
 }
 #: Relevance-ranked fact lists: upserted by record id, never reordered or withdrawn.
@@ -474,6 +475,8 @@ class JournalState:
     update_bytes: int = 0
     #: Chain head after each journal length, to recognise saved records on this chain.
     heads: dict[int, str] = field(default_factory=dict)
+    #: (label, digest) of the host records in the previous request's canonical list.
+    present: frozenset[tuple[str, str]] = frozenset()
 
     @classmethod
     def fresh(cls, epoch: str, generation: int) -> JournalState:
@@ -698,10 +701,14 @@ class ContextLedger:
                 (e for e in reversed([*state.entries, *appended]) if e.get("l") == label), None
             )
 
+        journaled_hosts = {e.get("h") for e in state.entries if e.get("c") != "conversation"}
+        present: set[tuple[str, str]] = set()
+
         def add_host(message: Mapping[str, Any]) -> None:
             content = str(message.get("content", ""))
             label = _label(content)
             digest = _sha(content)
+            present.add((label, digest))
             if label in LATEST_WINS_LABELS:
                 previous = last_of_label(label)
                 if previous is not None and previous.get("h") == digest:
@@ -709,6 +716,11 @@ class ContextLedger:
                 cls = "latest"
             else:
                 if any(e.get("l") == label and e.get("h") == digest for e in trailing_hosts()):
+                    return
+                # A record that stayed in canonical assembly unchanged since it was journaled
+                # (an engine transition result kept in the turn, a continuation note) is the
+                # same record, not a new event: it is not repeated after each tool exchange.
+                if (label, digest) in state.present and digest in journaled_hosts:
                     return
                 cls = "event"
             appended.append({"m": self._host_message(message, content), "c": cls,
@@ -747,6 +759,7 @@ class ContextLedger:
         state.entries.extend(appended)
         state.head = _chain(previous_head, appended)
         state.heads[len(state.entries)] = state.head
+        state.present = frozenset(present)
         appended_bytes = sum(len(_json(entry["m"]).encode("utf-8")) for entry in appended)
         record = None
         if appended or reset is not None:

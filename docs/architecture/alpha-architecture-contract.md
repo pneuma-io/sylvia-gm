@@ -1452,7 +1452,7 @@ the ledger resets. Builder and participant requests do not use it.
 - **Campaign state.** `SYLVIA_GM_FRESH_CAMPAIGN_STATE` is sent whole as a keyframe at the start of
   an epoch. Later changes are `SYLVIA_GM_CAMPAIGN_STATE_UPDATE` records computed against the
   ledger's reconstruction of what the model holds: whole-value replacements of the shallowest
-  changed subtrees (engine-owned values per entity record, current scene per field, otherwise
+  changed subtrees (engine-owned values per entity field, current scene per field, otherwise
   top-level sections), removed paths, and fact upserts by record ID. Relevance-ranked fact lists
   and the character-knowledge lists derived from them are additive: a fact already sent is not
   re-sent or reordered, and dropping out of the selection sends nothing. A new keyframe replaces
