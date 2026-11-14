@@ -62,11 +62,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'Create the actual Rift owner, commit its opening, prepare the carried weapon through the declared control, then request combat; the scripted provider cannot find Riftwolf in the real request. Context-versus-fixture attribution remains open.',
         category='unresolved context or fixture discrepancy',
     ),
-    'tests/test_alpha_manual_campaign_plan.py::test_creation_catalog_keeps_current_bundle_over_stale_equal_version_closure': KnownDefect(
-        'The creation catalog prefers an older same-version bundled Plan closure to current source',
-        'Present current source and its stale equal-version bundled Plan closure, then inspect which Ruleset identity the campaign creation catalog selects.',
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
         "The Builder's advertised Plan example fails its declared content schema",
         'Build the advertised Plan example against its retained synthetic source Setting, then validate before saving its inherited copies.',
