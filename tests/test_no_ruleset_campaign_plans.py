@@ -273,15 +273,20 @@ class _PlanAndPlayModel(_ScriptedProvider):
 
     def _builder_call(self, messages: list[dict[str, Any]]) -> dict[str, Any] | None:
         index, _player = self._latest_user(messages)
-        written = sum(1 for message in messages[index + 1:] if message.get("role") == "tool")
-        files = (
-            ("campaign-plan.json", json.dumps(no_ruleset_plan(), indent=2)),
-            ("campaign-plan.md", PLAN_MARKDOWN),
-        )
-        if written >= len(files):
-            return None
-        path, content = files[written]
-        return {"name": "write_file", "arguments": {"path": path, "content": content}}
+        results = [message for message in messages[index + 1:] if message.get("role") == "tool"]
+        if not results:
+            return {"name": "write_file", "arguments": {
+                "path": "campaign-plan.json", "content": json.dumps(no_ruleset_plan(), indent=2),
+            }}
+        if len(results) == 1:
+            return {"name": "read_file", "arguments": {"path": "campaign-plan.md"}}
+        if len(results) == 2:
+            observed = json.loads(str(results[-1]["content"]))
+            return {"name": "write_file", "arguments": {
+                "path": "campaign-plan.md", "content": PLAN_MARKDOWN,
+                "expected_version": observed["version"],
+            }}
+        return None
 
     def _gm_payload(self, messages: list[dict[str, Any]]) -> dict[str, Any]:
         _index, player = self._latest_user(messages)
@@ -428,6 +433,7 @@ def test_no_ruleset_structured_plan_journey_survives_save_and_reopen(tmp_path: P
         assert json.loads((workspace / "campaign-plan.json").read_text("utf-8"))["bindings"] == {
             "ruleset": None, "campaign_setting": None, "package_closure_sha256": EMPTY_CLOSURE,
         }
+        assert (workspace / "campaign-plan.md").read_text("utf-8") == PLAN_MARKDOWN
         # Bind: finalize validates and admits the structured Plan for the empty closure.
         finalized = harness.request("finalize", "finalize_campaign_construction", {
             "campaign_id": campaign_id,

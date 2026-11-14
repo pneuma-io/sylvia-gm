@@ -53,6 +53,13 @@ _COMMANDS = (
         _handler('campaigns', 'handle_delete_reusable_library_entry'),
         True, True,
     ),
+    Command(
+        'character_chat', _handler('character_chat', 'handle_character_chat'), True, True,
+    ),
+    Command(
+        'send_character_chat_message',
+        _handler('character_chat', 'handle_send_character_chat_message'), True, True,
+    ),
     Command('builder_chat_index', _handler('builder', 'handle_builder_chat_index'), True, True),
     Command('start_import_repair', _handler('builder', 'handle_start_import_repair'), True, True),
     Command('create_builder_chat', _handler('builder', 'handle_create_builder_chat'), True, True),

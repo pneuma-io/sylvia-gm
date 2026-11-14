@@ -2741,6 +2741,57 @@ async fn customize_ready_campaign(window: WebviewWindow, command: Value) -> Resu
 }
 
 #[tauri::command]
+#[allow(clippy::too_many_arguments)]
+async fn character_chat(
+    window: WebviewWindow,
+    action: String,
+    chat_id: Option<String>,
+    operation_id: Option<String>,
+    artifact_id: Option<String>,
+    expected_content_sha256: Option<String>,
+    provider_id: Option<String>,
+    model_id: Option<String>,
+    user_name: Option<String>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "character_chat",
+        json!({
+            "action": action,
+            "chat_id": chat_id,
+            "operation_id": operation_id,
+            "artifact_id": artifact_id,
+            "expected_content_sha256": expected_content_sha256,
+            "provider_id": provider_id,
+            "model_id": model_id,
+            "user_name": user_name,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn send_character_chat_message(
+    window: WebviewWindow,
+    chat_id: String,
+    operation_id: String,
+    text: String,
+    expected_message_count: i64,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "send_character_chat_message",
+        json!({
+            "chat_id": chat_id,
+            "operation_id": operation_id,
+            "text": text,
+            "expected_message_count": expected_message_count,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn start_guided_campaign(
     window: WebviewWindow,
     _state: State<'_, OwnerBridge>,
@@ -3603,6 +3654,8 @@ pub fn run() {
             ready_campaign_catalog,
             start_ready_campaign,
             customize_ready_campaign,
+            character_chat,
+            send_character_chat_message,
             start_guided_campaign,
             create_guided_campaign_draft,
             advance_guided_campaign_draft,

@@ -694,6 +694,7 @@ const SylviaGMFrontend = (() => {
   let settingsReturnFocus = null;
   let tutorials = null;
   let readyCampaigns = null;
+  let characterChat = null;
   let chatStart = null;
 
   // Keep every provider turn's renderer-owned lifecycle under its session identity.
@@ -889,6 +890,15 @@ const SylviaGMFrontend = (() => {
       ready_campaign_catalog: () => invoke('ready_campaign_catalog'),
       start_ready_campaign: command => invoke('start_ready_campaign', { command }),
       customize_ready_campaign: command => invoke('customize_ready_campaign', { command }),
+      character_chat: command => invoke('character_chat', {
+        action: command.action, chatId: command.chat_id, operationId: command.operation_id,
+        artifactId: command.artifact_id, expectedContentSha256: command.expected_content_sha256,
+        providerId: command.provider_id, modelId: command.model_id, userName: command.user_name,
+      }),
+      send_character_chat_message: command => invoke('send_character_chat_message', {
+        chatId: command.chat_id, operationId: command.operation_id, text: command.text,
+        expectedMessageCount: command.expected_message_count,
+      }),
       campaign_creation_catalog: (includeParticipants = true) => invoke(
         'campaign_creation_catalog', { includeParticipants }
       ),
@@ -1738,6 +1748,15 @@ const SylviaGMFrontend = (() => {
       },
     });
     $('home-ready-campaign-btn').addEventListener('click', () => { void readyCampaigns?.open(); });
+    // Character chat is created on first use, so startup does no extra work.
+    $('home-character-chat-btn')?.addEventListener('click', () => {
+      characterChat ||= window.SylviaCharacterChat?.create({
+        document, uuid: () => crypto.randomUUID(), bridge: () => state.bridge,
+        models: () => state.modelChoices, defaultModel: defaultModelChoice,
+        error: friendlyCommandError,
+      }) || null;
+      void characterChat?.open();
+    });
     $('home-build-btn').addEventListener('click', () => { void startBuilderChat(); });
     $('campaign-sequel-btn').addEventListener('click', () => { void openCampaignSequel(); });
     $('campaign-sequel-preview').addEventListener('click', () => { void previewCampaignSequel(); });
