@@ -70,6 +70,23 @@ def test_fixture_keeps_initial_footing_and_admits_the_npc_speaker(experiment):
     )
 
 
+def test_opening_lets_the_player_agree_and_answers_the_pack_check(experiment):
+    _output, rows = experiment
+    talks = rows[0].observations["before"]["talks"]
+    assert not any("you agree" in talk.lower() for talk in talks)
+    proposal = next(i for i, talk in enumerate(talks) if "blue lantern" in talk.lower())
+    fall = next(i for i, talk in enumerate(talks) if "ledge gives way" in talk)
+    assert fall < proposal
+    assert "holy symbol" in talks[-1] and "15 gold pieces" in talks[-1]
+
+
+def test_scripted_summary_never_repeats_the_narration():
+    from sylviabench.fixtures import settle
+
+    with pytest.raises(ValueError, match="must not repeat"):
+        settle("The courier waits.", "The courier waits.")
+
+
 def test_every_check_rejects_a_mutation_of_the_real_owner_observation(experiment):
     from sylviabench.controls import verify_controls
 

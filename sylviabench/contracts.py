@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 Category = Literal["rules", "memory", "fair_play", "story"]
 Status = Literal["pass", "fail", "not_evaluated", "not_applicable"]
-PROTOCOL = "sylviabench-gameplay-v2.2"
+PROTOCOL = "sylviabench-gameplay-v2.3"
 Outcome = Literal["pass", "fail", "incomplete", "error"]
 FailureCause = Literal[
     "gm_behavior", "scripted_driver", "sylvia_bug", "service_failure", "benchmark_fault", "unknown"

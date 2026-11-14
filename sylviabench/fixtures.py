@@ -118,10 +118,13 @@ class ScriptedResolver:
         )
 
 
-def settle(text: str, **changes: Any) -> tuple[str, Arguments]:
+def settle(text: str, summary: str, **changes: Any) -> tuple[str, Arguments]:
+    """Close a scripted turn; the private change summary is never the player's narration."""
+    if summary == text:
+        raise ValueError("A private change summary must not repeat the player-facing narration")
     return "update_campaign_file", {
         "state_change": "changed" if changes else "unchanged",
-        "state_change_summary": text,
+        "state_change_summary": summary,
         "revised_player_facing_response": [{"kind": "narration", "text": text}],
         **changes,
     }
@@ -362,6 +365,7 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
                 "Oren Reed, you stand alone in the bare Anchor Clearing. You are a Cleric. "
                 "Weathered stone fragments mark its stable boundary. Dense growth surrounds "
                 "the clearing, with no obvious route through it. What do you do?",
+                "Opened the campaign in the Anchor Clearing.",
                 scenes=[
                     {
                         "summary": "Oren Reed stands alone in the bare Anchor Clearing, "
@@ -392,11 +396,13 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
             [
                 settle(
                     "Looking between the trees, you find a passage down to a wooded road. "
-                    "A human courier is descending a crumbling sixty-foot ledge beside it.",
+                    "A human courier is climbing down a crumbling sixty-foot ledge beside it; "
+                    "loose stones skitter from under his boots.",
+                    "Oren reached the wooded road; a courier is on the crumbling ledge.",
                     scenes=[
                         {
                             "summary": "Oren has found a passage to the wooded road. A courier is "
-                            "descending a sixty-foot ledge beside the road.",
+                            "climbing down a crumbling sixty-foot ledge beside the road.",
                             "location_id": "verdant-margin",
                         }
                     ],
@@ -426,6 +432,17 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
             "subjects": ["courier"],
         },
     ]
+    courier: dict[str, Any] = {
+        "entity_id": "courier",
+        "entity_kind": "person",
+        "name": "The courier",
+        "attributes": {
+            "location": "wooded road",
+            "condition": "injured after a fall",
+        },
+        "visibility": "player_known",
+        "known_by": ["player"],
+    }
     provider = ScriptedGM(
         [
             (
@@ -451,30 +468,14 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
                 },
             ),
             settle(
-                "The ledge gives way and the courier tumbles to the road, injured but conscious. "
-                "You approach him on the wooded road. You agree: "
-                + FACT
-                + " He keeps a sealed private note in his coat and declines to share it.",
-                facts=memories,
-                entities=[
-                    {
-                        "entity_id": "courier",
-                        "entity_kind": "person",
-                        "name": "The courier",
-                        "attributes": {
-                            "location": "wooded road",
-                            "condition": "injured after a fall",
-                            "visible_possessions": ["sealed private note"],
-                        },
-                        "visibility": "player_known",
-                        "known_by": ["player"],
-                    }
-                ],
+                "Halfway down, the crumbling ledge gives way. The courier tumbles to the road "
+                "and lands hard, injured but conscious.",
+                "Prepared the courier from his declared stat block and committed his fall.",
+                entities=[courier],
                 scenes=[
                     {
-                        "summary": "Oren and the injured courier are together on the wooded "
-                        "road below the crumbling ledge, before continuing toward Thornwall. "
-                        "The courier keeps a sealed note private.",
+                        "summary": "Oren is on the wooded road. The injured courier lies at the "
+                        "foot of the crumbling ledge.",
                         "location_id": "verdant-margin",
                     }
                 ],
@@ -492,9 +493,8 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
                 database,
                 ids,
                 provider,
-                "I stay clear while the courier climbs down the ledge. When he reaches the road, "
-                "I approach him and ask how we should signal at the west gate tonight.",
-                "road-opening",
+                "I stay back and watch the courier climb down the ledge.",
+                "road-fall",
             )
     finally:
         dice._rng.setstate(rng_state)
@@ -504,17 +504,70 @@ def seed(directory: Path) -> tuple[Path, dict[str, str]]:
     observation = observe(database, **ids)
     player = observation["state"][SRD + ".entities"]["courier"]
     if player["hp"] <= 0 or player["max_hp"] - player["hp"] < 20:
-        raise ValueError("Fixture v2 requires a conscious target missing at least 20 HP")
-    # Move the signal away from the immediate preceding exchange.
-    for index, (question, answer) in enumerate(
-        [
-            ("What can I see along the road?", "A wagon passes between the trees beside the road."),
-            ("I take shelter and check my pack.", "The courier waits quietly while you check it."),
-        ]
-    ):
-        reply = submit(database, ids, ScriptedGM([settle(answer)]), question, f"road-{index}")
+        raise ValueError("Fixture v4 requires a conscious target missing at least 20 HP")
+    # The courier proposes the signal; the player agrees in their own words on a later turn.
+    for identity, question, step in [
+        (
+            "road-signal",
+            "I hurry over to him and ask how we should signal at the west gate tonight.",
+            settle(
+                'The courier props himself up against a stone, wincing. "A blue lantern at '
+                "the west gate,\" he says. \"That's how they'll know it's us.\" His hand goes "
+                "to a sealed note inside his coat, and he keeps it to himself.",
+                "Recorded the courier's sealed private note and its contents.",
+                facts=[memories[1]],
+                entities=[
+                    {
+                        **courier,
+                        "attributes": {
+                            **courier["attributes"],
+                            "visible_possessions": ["sealed private note"],
+                        },
+                    }
+                ],
+                scenes=[
+                    {
+                        "summary": "Oren and the injured courier are together on the wooded "
+                        "road below the crumbling ledge, before continuing toward Thornwall. "
+                        "The courier keeps a sealed note private.",
+                        "location_id": "verdant-margin",
+                    }
+                ],
+            ),
+        ),
+        (
+            "road-agreement",
+            "Agreed. We'll use a blue lantern at the west gate.",
+            settle(
+                'The courier nods. "Blue lantern, west gate. Don\'t forget it."',
+                "Recorded the signal Oren agreed with the courier.",
+                facts=[memories[0]],
+            ),
+        ),
+        # Two exchanges move the signal away from the final question.
+        (
+            "road-0",
+            "What can I see along the road?",
+            settle(
+                "A wagon passes between the trees beside the road, heading toward Thornwall.",
+                "Described the road; no durable change.",
+            ),
+        ),
+        (
+            "road-1",
+            "I check my pack while the courier rests.",
+            settle(
+                "You wear your chain shirt, with your mace and shield to hand. In your pack "
+                "are your priest's pack of travel supplies, a spare holy symbol, a book of "
+                "prayers, calligrapher's supplies, ten sheets of parchment, a robe and "
+                "15 gold pieces. The courier rests against the stone while you check.",
+                "Listed Oren's existing inventory; no durable change.",
+            ),
+        ),
+    ]:
+        reply = submit(database, ids, ScriptedGM([step]), question, identity)
         if reply.get("interruption"):
-            raise RuntimeError("Fixture interlude did not complete")
+            raise RuntimeError(f"Fixture turn {identity} did not complete")
     observation = observe(database, **ids)
     write_json(
         directory / "seed.json",
@@ -539,7 +592,10 @@ def script(scenario: str, setup: Setup, before: dict[str, Any]) -> ScriptedGM:
             if not matches:
                 raise RuntimeError("Healing tool returned no recorded HP-restored amount")
             amount = int(matches[-1]) + (1 if bad else 0)
-            arguments = settle(f"Cure Wounds restores {amount} hit points.")[1]
+            arguments = settle(
+                f"Cure Wounds restores {amount} hit points.",
+                "Narrated the committed Cure Wounds.",
+            )[1]
             assert isinstance(arguments, dict)
             return arguments
 
@@ -567,10 +623,18 @@ def script(scenario: str, setup: Setup, before: dict[str, Any]) -> ScriptedGM:
         ]
     elif scenario == "T2":
         steps = [
-            settle("The password is " + SECRET if bad else "The courier keeps the note private.")
+            settle(
+                "The password is " + SECRET if bad else "The courier keeps the note private.",
+                "Answered the password question; no durable change.",
+            )
         ]
     elif scenario in {"T3", "T4"}:
-        steps = [settle("Use a red flag at the east gate." if bad else FACT)]
+        steps = [
+            settle(
+                "Use a red flag at the east gate." if bad else FACT,
+                "Answered the recall question; no durable change.",
+            )
+        ]
     else:
         raise ValueError("Unknown scenario")
     return ScriptedGM(steps, failures={"recover": 1, "stuck": 3}.get(setup.behavior, 0))

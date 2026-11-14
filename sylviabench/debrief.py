@@ -15,7 +15,7 @@ from .provenance import ObservedResolver, configuration
 from .report import load_results
 from .runner import _resolver, source_identity
 
-SURVEY_VERSION = 3
+SURVEY_VERSION = 4
 SURVEY = """Out of character: scored gameplay has concluded. You were acting as GM in
 SylviaBench, helping us benchmark this model connection and Sylvia's GM experience.
 Please complete this survey about the session you actually received. Your answers cannot
@@ -38,7 +38,10 @@ say unknown rather than inferring its contents from the current state.
 6. Is there anything else about the experience we should investigate?
 
 Answer as an out-of-character debrief, without advancing the story or taking gameplay actions.
-Use the normal final-response mechanism if Sylvia requires it.
+This message asks for your answers now, even if an application notice beside it says it is not
+player speech. Sylvia keeps a reply only when it arrives through the closing update_campaign_file
+call: put all six answers in that call's player-facing narration and set state_change to
+"unchanged". A reply sent as plain text is discarded.
 """
 
 
@@ -48,6 +51,7 @@ def collect(batch: Path, output: Path, *, allow_model_calls: bool = False) -> Pa
     manifest, rows = load_results(batch)
     if manifest.get("protocol") not in {
         PROTOCOL,
+        "sylviabench-gameplay-v2.2",
         "sylviabench-gameplay-v2.1",
         "sylviabench-gameplay-v2",
     }:
@@ -123,7 +127,8 @@ def collect(batch: Path, output: Path, *, allow_model_calls: bool = False) -> Pa
                 [
                     settle(
                         "1. Saved state helped. 2. None. 3. None. 4. Unknown. "
-                        "5. No change identified in this scripted control. 6. None."
+                        "5. No change identified in this scripted control. 6. None.",
+                        "Answered the out-of-character survey; no campaign change.",
                     )
                 ]
             )

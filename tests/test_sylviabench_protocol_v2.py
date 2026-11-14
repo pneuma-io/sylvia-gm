@@ -255,7 +255,7 @@ def test_batch_rotates_order_and_pauses_before_using_another_setup(tmp_path, mon
         connection.commit()
     source = {"application_sha256": "app", "framework_sha256": "frame", "commit": "source"}
     descriptor = {
-        "recipe_version": 3,
+        "recipe_version": 4,
         "sha256": "pack",
         "ids": {"campaign": "campaign", "session": "session"},
         "observation": {},

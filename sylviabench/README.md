@@ -1,4 +1,4 @@
-# SylviaBench gameplay protocol v2.2
+# SylviaBench gameplay protocol v2.3
 
 This developer-only runner drives Sylvia's real owner without an app window. It is outside
 `src/` and is excluded from the installed application. The Builder benchmark remains parked.
@@ -9,6 +9,12 @@ follow-ups remain separate. This framework does not qualify them or native deskt
 Protocol v2.2 adds reviewed failure causes, retries a run that a usage limit interrupted and
 stops unrelated numbers from unscoring a healing turn. Records made under v2.1 stay readable.
 They are never resumed or pooled with v2.2 batches.
+
+Protocol v2.3 requires the recipe-v4 opening. The player watches the courier fall, asks about the
+signal, hears the courier propose it and agrees in a separate message. Scripted replies keep a
+private change summary separate from the player's narration, and the pack check is answered.
+Survey v4 tells the GM plainly to answer through the closing Campaign File call. Earlier batches
+stay readable, are never pooled with v2.3 batches, and remain eligible for the survey.
 
 ## Run and verify offline
 
@@ -29,12 +35,14 @@ wrong target, secret disclosure in saved state, lost audience and missing compac
 
 ## The challenge
 
-The recipe-v3 pack uses the bundled level-one Cleric and a neutral campaign, The west road.
+The recipe-v4 pack uses the bundled level-one Cleric and a neutral campaign, The west road.
 The normal campaign-start command preserves the accepted standing-in-the-clearing footing.
-Exploration then establishes a road and courier, his sealed private note, and a player-known lantern
-signal. A declared synthetic NPC stat block gives the courier 40 maximum HP. A seeded fall
-committed through the real tool removes 21 HP. Two intervening exchanges separate the signal
-from the final question. Facts use the actual player audience. The held mace and shield follow
+Exploration then establishes a road and a courier climbing a crumbling ledge. While the player
+watches, a seeded fall committed through the real tool removes 21 of the courier's 40 HP (a
+declared synthetic NPC stat block). The player then asks about the signal; the courier proposes the
+blue lantern and keeps his sealed note private, and the player agrees in a separate message. Two
+intervening exchanges, including an answered pack check, separate the signal from the final
+question. Facts use the actual player audience. The held mace and shield follow
 Sylvia's approved rule: a free hand is unnecessary; verbal and material rules remain in force.
 
 | Scenario | Check |
@@ -62,7 +70,7 @@ full prompts across providers, or force a common summary onto a compaction test.
 A private setup file uses the existing `SetupFile` schema. Each model setup selects exact
 `provider_id`, `model_id` and `owner_config`, with any explicit reasoning override recorded.
 Use new setup IDs for protocol-v2 experiments. Source records bind actual application/framework
-bytes, the benchmark commit and product base. Earlier fixture recipes cannot run under v2.2. Original
+bytes, the benchmark commit and product base. Earlier fixture recipes cannot run under v2.3. Original
 pilot records and grades are never rewritten or pooled with these new identities.
 
 ```powershell
@@ -127,9 +135,11 @@ python -m sylviabench debrief ../Results/models-v2 --output ../Debriefs/models-v
 
 The entire scored batch must be complete and closed first, with exactly the same Sylvia application/content bytes.
 Survey versions may change independently of gameplay, with both source identities recorded.
-Survey v3 marks prior scripted history as inherited, identifies the tested player messages,
+Survey v4 marks prior scripted history as inherited, identifies the tested player messages,
 and labels the survey's fresh state as post-gameplay rather than evidence of earlier input;
-models must distinguish their own decisions from inherited context. `debrief` seals the result-file hashes, copies each completed run's save into a separate directory,
+models must distinguish their own decisions from inherited context. It also tells the GM to
+put its answers in the narration of the closing Campaign File call, because Sylvia discards a
+plain-text reply. `debrief` seals the result-file hashes, copies each completed run's save into a separate directory,
 and submits the same neutral survey through the same GM path and model configuration. The saved
 history and compaction checkpoints remain available. It reveals SylviaBench and asks what helped,
 what confused or blocked the GM, what was unclear or missing, what was hard to find/retain, what
