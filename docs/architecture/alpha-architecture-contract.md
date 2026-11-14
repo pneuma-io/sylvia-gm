@@ -1184,7 +1184,12 @@ and the [dedicated copy's setup and isolation](../research/claude-dedicated-inst
 remain separate from genuine-account and installed-app qualification.
 
 Saved API keys and private request headers use current-user Windows DPAPI at the owner-local
-configuration boundary. A versioned protected envelope reuses atomic settings replacement;
+configuration boundary. On Linux, which is not yet a supported player platform, they use an
+AES-256-GCM envelope under a per-user key file kept in the state folder, outside the data folder.
+That protects against the settings file being copied on its own, not against another program
+running as the same user or a copy of the whole home folder from an unencrypted disk. Each
+platform opens only its own envelope kind. A versioned protected envelope reuses atomic settings
+replacement;
 decryption is confined to owner memory for provider operations. Legacy plaintext migration builds
 and protects the replacement before publication, retains recoverable source settings on failure,
 and introduces no plaintext fallback or migration backup. Protection/decryption/version failures
