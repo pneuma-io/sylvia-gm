@@ -78,7 +78,8 @@ def validate_no_ruleset_world(plan: Mapping[str, object]) -> frozenset[str]:
         name = state.get("name")
         if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:
             raise ValueError(f"No Ruleset Plan entity {identity} needs a name")
-        if state.get("visibility", "gm_private") not in {"player_known", "gm_private"}:
+        visibility = state.get("visibility", "gm_private")
+        if not isinstance(visibility, str) or visibility not in {"player_known", "gm_private"}:
             raise ValueError(f"No Ruleset Plan entity {identity} visibility is invalid")
         known_by = state.get("known_by", [])
         if not isinstance(known_by, Sequence) or isinstance(known_by, (str, bytes, bytearray)):
