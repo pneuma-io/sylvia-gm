@@ -19,6 +19,12 @@ os.environ.setdefault(
 )
 # Match the normal runner: optional evidence archival is an explicit selection.
 os.environ.setdefault("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "0")
+if sys.platform == "linux":
+    # Saved-credential tests and the owner processes they start must never read or
+    # create the real user's credential key, so always replace any inherited value.
+    _fixture_root = Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"])
+    _fixture_root.mkdir(parents=True, exist_ok=True)
+    os.environ["XDG_STATE_HOME"] = tempfile.mkdtemp(prefix="xdg-state-", dir=_fixture_root)
 if "SRD_LITE_CANDIDATE" not in os.environ:
     from scripts.journey_fixture_inputs import prepare_candidate
 
