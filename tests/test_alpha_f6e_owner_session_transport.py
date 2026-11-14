@@ -3978,7 +3978,11 @@ def test_stop_overtakes_pending_owner_submission_and_cancels_provider(tmp_path: 
         harness.close()
 
 
-def test_owner_manual_retry_reuses_action_and_resettles_campaign_file(tmp_path: Path) -> None:
+@pytest.mark.parametrize("context_mode", ["ledger", "legacy"])
+def test_owner_manual_retry_reuses_action_and_resettles_campaign_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, context_mode: str,
+) -> None:
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     provider = _FailThenRetryProvider()
     harness = _OwnerHarness(tmp_path / "authority.sqlite3", provider)
     try:
@@ -4049,10 +4053,22 @@ def test_owner_manual_retry_reuses_action_and_resettles_campaign_file(tmp_path: 
             for name in retry_tool_names
         )
         retry_messages = json.dumps(provider.calls[1][0])
-        assert [message for message in provider.calls[1][0] if message["role"] == "user"] == [
-            {"role": "user", "content": "Continue."},
-        ]
-        assert "SYLVIA_GM_CURRENT_PLAYER_MESSAGE" in retry_messages
+        if context_mode == "legacy":
+            assert [message for message in provider.calls[1][0]
+                    if message["role"] == "user"] == [{"role": "user", "content": "Continue."}]
+            assert "SYLVIA_GM_CURRENT_PLAYER_MESSAGE" in retry_messages
+        else:
+            # Ledger mode: host records are sealed user-role records; the player's exact
+            # input is the only unsealed user message, and the ledger contract replaces the
+            # positional current-message control.
+            from tests.gm_context_contract import unsealed
+
+            player = [message for message in provider.calls[1][0]
+                      if message["role"] == "user"
+                      and unsealed(message["content"]) == message["content"]]
+            assert player == [{"role": "user", "content": "Continue."}]
+            assert "SYLVIA_GM_CONTEXT_LEDGER_CONTRACT" in retry_messages
+            assert "SYLVIA_GM_CURRENT_PLAYER_MESSAGE" not in retry_messages
         assert "Transport Plan retry" in retry_messages
         assert "Campaign State is the GM-screen ledger" in retry_messages
         assert "SYLVIA_GM_CANONICAL_RETRY_DATA" not in retry_messages

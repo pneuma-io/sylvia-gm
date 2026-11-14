@@ -291,11 +291,15 @@ def test_same_batch_prose_and_tool_results_restore_checkpoint_without_repeating_
         )
 
 
+@pytest.mark.parametrize("context_mode", ["legacy", "ledger"])
 @pytest.mark.parametrize("provider_key", ["chatgpt_subscription", "openrouter", "local"])
 @pytest.mark.parametrize("input_kind", ["typed", "panel", "resume"])
 def test_gm_compaction_preserves_current_state_and_enforced_output(
-    tmp_path, provider_key, input_kind,
+    tmp_path, provider_key, input_kind, context_mode, monkeypatch,
 ):
+    # The hand-built request below has no ledger tags, so it pins the previous projection
+    # under the legacy switch; ledger mode checks the mode-independent compaction outcome.
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     from sylvia_gm.agent._provider_session import ProviderSessionAdapter
     from sylvia_gm.agent._session_loop import ProviderControl, SessionProviderInput
     from sylvia_gm.application.authority import CampaignCreate
@@ -372,6 +376,22 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(
             )
         assert owner.snapshot("campaign") == before
         compacted = provider.requests[-1][0]
+        if context_mode == "ledger":
+            from tests.gm_context_contract import unsealed
+
+            rendered = [unsealed(m.get("content")) for m in compacted]
+            assert any(text.startswith("SYLVIA_CONTINUATION_NOTE ") for text in rendered)
+            assert messages[-1]["content"] in rendered
+            # Append-only: an earlier record stays in history; the newer one comes later and
+            # supersedes it (the ledger contract says so).
+            newest = rendered.index("FRESH STATE: authoritative AP=2")
+            assert all(index < newest for index, text in enumerate(rendered) if "AP=4" in text)
+            assert provider.requests[-1][2]["max_tokens"] == 4096
+            assert provider.requests[-1][1][0]["function"]["name"] == "read_session_history"
+            saved = owner.session_context("gm")
+            assert "villain is secret" not in json.dumps(_json_value(saved))
+            assert any(m.content.get("kind") == CHECKPOINT_KIND for m in saved.messages)
+            return
         assert messages[1] not in compacted
         assert messages[-1] in compacted
         markers = [m for m in compacted if str(m.get("content", "")).startswith(
