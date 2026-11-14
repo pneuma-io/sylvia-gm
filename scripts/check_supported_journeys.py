@@ -72,6 +72,8 @@ PYTHON_JOURNEYS = {
         "tests/test_migrated_plan_lifecycle.py",
         "tests/test_riichi_quick_test_plan.py",
         "tests/test_no_rules_interview.py",
+        "tests/test_ruleless_play.py",
+        "tests/test_no_ruleset_campaign_plans.py",
         'tests/test_campaign_catalog_invalid_entries.py',
         'tests/test_campaign_chooser_previews.py',
         'tests/test_campaign_endings.py',

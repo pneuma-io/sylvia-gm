@@ -271,12 +271,19 @@ CAMPAIGN_PLAN_SCHEMA: dict[str, object] = {
             "required": ["ruleset", "campaign_setting", "package_closure_sha256"],
             "properties": {
                 "ruleset": {
-                    "$ref": "#/$defs/packageBinding",
-                    "description": "Exact Ruleset copy contained through the selected Setting.",
+                    "oneOf": [{"$ref": "#/$defs/packageBinding"}, {"type": "null"}],
+                    "description": (
+                        "Exact Ruleset copy contained through the selected Setting, or null "
+                        "with a null campaign_setting for a No Ruleset Plan."
+                    ),
                 },
                 "campaign_setting": {
-                    "$ref": "#/$defs/packageBinding",
-                    "description": "Exact Campaign Setting copy contained by this Plan.",
+                    "oneOf": [{"$ref": "#/$defs/packageBinding"}, {"type": "null"}],
+                    "description": (
+                        "Exact Campaign Setting copy contained by this Plan, or null for a "
+                        "No Ruleset Plan whose initial_state.entities are its world, "
+                        "referenced as entities/<id>."
+                    ),
                 },
                 "package_closure_sha256": {
                     "$ref": "#/$defs/sha256",

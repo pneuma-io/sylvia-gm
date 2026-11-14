@@ -388,13 +388,17 @@ def validate_campaign_plan(
     payload: object,
     *,
     readable_markdown: str,
-    expected_ruleset: PackageBinding,
-    expected_setting: PackageBinding,
+    expected_ruleset: PackageBinding | None,
+    expected_setting: PackageBinding | None,
     expected_closure_sha256: str,
     setting_paths: frozenset[str],
     setting_knowledge_ids: frozenset[str] = frozenset(),
 ) -> ValidatedCampaignPlan:
-    """Validate one closed plan and return canonical deterministic publication data."""
+    """Validate one closed plan and return canonical deterministic publication data.
+
+    With no expected Ruleset and Setting, the plan must be a No Ruleset Plan whose own
+    world entities replace Setting paths (see ``sylvia_gm.domain.no_ruleset_plan``).
+    """
 
     plan = _object(payload, "Campaign Plan")
     required_plan_fields = {
@@ -456,14 +460,22 @@ def validate_campaign_plan(
         "Campaign Plan bindings",
         path="$.bindings",
     )
-    ruleset = _package_binding(bindings["ruleset"], "Ruleset binding")
-    setting = _package_binding(bindings["campaign_setting"], "Campaign Setting binding")
+    no_ruleset = expected_ruleset is None and expected_setting is None
+    if no_ruleset:
+        from sylvia_gm.domain.no_ruleset_plan import is_no_ruleset_plan, validate_no_ruleset_world
+
+        if not is_no_ruleset_plan(plan):
+            raise ValueError("Campaign Plan package bindings do not match the admitted closure")
+        setting_paths = validate_no_ruleset_world(plan)
+        ruleset_id = ""
+    else:
+        ruleset = _package_binding(bindings["ruleset"], "Ruleset binding")
+        setting = _package_binding(bindings["campaign_setting"], "Campaign Setting binding")
+        if ruleset != expected_ruleset or setting != expected_setting:
+            raise ValueError("Campaign Plan package bindings do not match the admitted closure")
+        ruleset_id = ruleset.package_id
     closure = _text(bindings["package_closure_sha256"], "Package closure hash", maximum=64)
-    if (
-        ruleset != expected_ruleset
-        or setting != expected_setting
-        or closure != expected_closure_sha256
-    ):
+    if closure != expected_closure_sha256:
         raise ValueError("Campaign Plan package bindings do not match the admitted closure")
 
     party = parse_starting_party_policy(plan["starting_party"])
@@ -482,7 +494,7 @@ def validate_campaign_plan(
         path="$.initial_state",
     )
     if "party_placements" in initial_state:
-        _validate_party_placements(initial_state["party_placements"], ruleset.package_id)
+        _validate_party_placements(initial_state["party_placements"], ruleset_id)
     mechanics = initial_state.get("mechanics", ())
     if (
         not isinstance(mechanics, Sequence)
@@ -496,8 +508,8 @@ def validate_campaign_plan(
         _exact(state, {"namespace", "key", "value"}, "Initial mechanical state entry")
         value = StateValue(state["namespace"], state["key"], state["value"])
         if not (
-            value.namespace == ruleset.package_id
-            or value.namespace.startswith(ruleset.package_id + ".")
+            value.namespace == ruleset_id
+            or value.namespace.startswith(ruleset_id + ".")
         ):
             raise ValueError("Initial mechanical state must belong to the Plan's Ruleset")
         if not canonical_payload_is_safe({value.namespace: {value.key: value.value}}):
