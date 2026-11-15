@@ -537,6 +537,70 @@ def _party_combat_frames(tmp_path, monkeypatch) -> list[Any]:
     return frames
 
 
+def test_combat_turn_is_sized_from_the_wire_with_200k(party_combat):
+    """F1: compaction planning counts each sent record once.
+
+    The recorded combat turn runs through a real ledger with prepare()'s measure hook, as the
+    GM adapter wires it, against a 200,000-token model (8,192 output tokens). Ledger mode may
+    compact only where the real wire's history is over the threshold.
+    """
+    import asyncio
+
+    from sylvia_gm.agent._context_ledger import ContextLedger
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+    from sylvia_gm.provider._base import Provider
+    from tests.gm_context_contract import provider_messages
+
+    class CompactingError(Exception):
+        pass
+
+    class Model:
+        context_window, transport, max_output_tokens = 200_000, "chat_completions", 8192
+        provider_key, wire_model_id, id = "local", "m", "local/m"
+
+    class Summarizer(Provider):
+        def __init__(self):
+            super().__init__()
+            self.model_info = Model()
+
+        async def generate(self, *args, **kwargs):
+            raise CompactingError()
+
+        async def generate_stream(self, *args, **kwargs):
+            raise CompactingError()
+
+        async def close(self):
+            pass
+
+    frames = party_combat
+    ledger = ContextLedger(session_id=frames[0].session_id,
+                           context_owner=frames[0].context_owner, transport="chat_completions")
+    decisions = []
+    for frame in frames:
+        def measure(projected, tools, frame=frame):
+            return provider_messages(ledger.plan(projected, request_context_id=frame.context_id,
+                                                 check_saved_tip=False).wire)
+
+        working = WorkingContextProvider(Summarizer(), save=lambda record: None,
+                                         measure_wire=measure)
+        legacy = WorkingContextProvider(Summarizer(), save=lambda record: None)
+        terms = working.budget_terms(frame.canonical, None, {})
+        wire = measure(frame.canonical, None)
+        # Every sent message is counted once: fixed plus history is the wire, not more.
+        assert terms["fixed_tokens"] + terms["history_tokens"] <= working._estimate(wire) * 1.02
+        for name, provider in (("legacy", legacy), ("ledger", working)):
+            try:
+                asyncio.run(provider.prepare(frame.canonical, None))
+            except CompactingError:
+                decisions.append((name, "compact"))
+                if name == "ledger":
+                    assert terms["history_tokens"] >= terms["threshold"], terms
+        planned = ledger.plan(frame.canonical, request_context_id=frame.context_id,
+                              check_saved_tip=False)
+        ledger.commit(planned)
+    assert ("legacy", "compact") not in decisions
+
+
 def test_party_combat_rounds_extend_on_every_route(party_combat):
     frames = party_combat
     assert len(frames) >= 8

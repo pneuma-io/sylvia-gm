@@ -305,32 +305,51 @@ class WorkingContextProvider(Provider):
         input_budget = max(256, capacity - reserve - max(1024, capacity // 10))
         return capacity, input_budget
 
+    def budget_terms(self, projected, tools, options: Mapping[str, Any]) -> dict[str, int]:
+        """The sizes the compaction decision uses, each counted once.
+
+        Legacy mode sizes the canonical projection: fixed = pinned and fixed groups plus tools,
+        history = the rest. Ledger mode sizes what is actually sent: fixed = the wire's frozen
+        system prefix, the fixed conversational groups and tools; history = every other wire
+        message (the journal keeps superseded records, so it can outgrow the projection).
+        """
+        capacity, input_budget = self._budgets(options)
+        fixed = self._fixed_messages(projected)
+        request_tools = self._request_tools(tools)
+        if self._measure_wire is not None and self.model_info is not None:
+            wire = self._measure_wire(projected, tools)
+            lead = 0
+            while lead < len(wire) and wire[lead].get("role") == "system":
+                lead += 1
+            fixed_conversation = [m for m in fixed if m.get("role") != "system"]
+            fixed_tokens = self._estimate([wire[:lead], fixed_conversation, request_tools])
+            history_tokens = max(
+                0, self._estimate(wire[lead:]) - self._estimate(fixed_conversation))
+        else:
+            fixed_tokens = self._estimate([fixed, request_tools])
+            history_tokens = self._estimate([m for m in projected if m not in fixed])
+        remaining = max(256, input_budget - fixed_tokens)
+        return {"capacity": capacity, "input_budget": input_budget,
+                "fixed_tokens": fixed_tokens, "history_tokens": history_tokens,
+                "threshold": int(remaining * 0.70), "target": int(remaining * 0.42)}
+
     async def prepare(self, messages, tools=None, *, force=False, **options):
         self._check_cancelled()
         self._source = messages
         projected = self.project(messages)
         capacity, input_budget = self._budgets(options)
         fixed = self._fixed_messages(projected)
-        fixed_tokens = self._estimate([fixed, self._request_tools(tools)])
+        terms = self.budget_terms(projected, tools, options)
         # Fixed instructions and schemas consume space, but cannot be improved by summarising.
         # Apply the compaction threshold to the remaining history allowance.
-        if self.model_info is not None and fixed_tokens >= input_budget:
+        if self.model_info is not None and terms["fixed_tokens"] >= input_budget:
             raise TokenLimitError(
                 "Context cannot be shortened further: instructions, tools or the latest "
                 "exchange are too large. Saved work is intact; use a larger context model or "
                 "a bounded source read."
             )
-        if self._measure_wire is not None and self.model_info is not None:
-            # The journal keeps superseded records, so the wire can outgrow the projection.
-            wire_history = [m for m in self._measure_wire(projected, tools)
-                            if m.get("role") != "system"]
-            fixed_history = [m for m in fixed if m.get("role") != "system"]
-            history_tokens = max(0, self._estimate(wire_history) - self._estimate(fixed_history))
-        else:
-            history_tokens = self._estimate([m for m in projected if m not in fixed])
-        remaining = max(256, input_budget - fixed_tokens)
-        threshold = int(remaining * 0.70)
-        target = int(remaining * 0.42)
+        history_tokens, threshold, target = (
+            terms["history_tokens"], terms["threshold"], terms["target"])
         if not force and (
             self.model_info is None or history_tokens < threshold
         ):
