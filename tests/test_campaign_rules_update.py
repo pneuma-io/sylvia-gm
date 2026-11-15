@@ -1,5 +1,6 @@
 """Explicit adoption keeps existing campaigns and reusable source snapshots intact."""
 
+from copy import deepcopy
 from dataclasses import replace
 
 import pytest
@@ -10,6 +11,7 @@ from sylvia_gm.application.authority import (
     CampaignCreate,
     CatalogTool,
 )
+from sylvia_gm.application.campaign_rules_update import _compare
 from sylvia_gm.domain.authority import (
     MechanicOutcome,
     Participant,
@@ -19,7 +21,7 @@ from sylvia_gm.domain.authority import (
     thaw_json_value,
 )
 from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, StaleRevision
-from sylvia_gm.domain.package_library import content_root_for_record
+from sylvia_gm.domain.package_library import content_root_for_record, manifest_from_record
 from tests.test_alpha_f3_package_publication import _clockwork, _install, _surface
 
 
@@ -582,3 +584,71 @@ def test_removed_runtime_record_is_a_conflict_without_state_changes(tmp_path):
         with pytest.raises(CommandRejected):
             adopt(owner, preview)
         assert owner.snapshot("runtime") == before
+
+
+OBJECT_SOURCE = {
+    "kind": "object",
+    "fields": {
+        "counter": {"kind": "state", "namespace": "clockwork", "key": "counter"},
+        "progress": {"kind": "state", "namespace": "clockwork", "key": "progress"},
+    },
+}
+
+
+def _panel_manifest(version, change=None):
+    def edit(record, _files):
+        surface = record["ui_surfaces"][0]
+        surface["source"] = deepcopy(OBJECT_SOURCE)
+        if change:
+            change(surface)
+
+    record, _ = package(version, panel=False, change=edit)
+    return manifest_from_record(record)
+
+
+def _add_field(surface):
+    surface["source"]["fields"]["label"] = {"kind": "literal", "value": {"unit": "ticks"}}
+
+
+def _keyed_values(surface):
+    surface["source"] = {
+        "kind": "keyed_values",
+        "entries": [
+            {
+                "key": {"kind": "state", "namespace": "clockwork", "key": "label"},
+                "value": OBJECT_SOURCE["fields"]["counter"],
+            }
+        ],
+    }
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        lambda s: s["source"]["fields"].pop("progress"),
+        lambda s: s["source"]["fields"]["progress"].update(key="counter"),
+        _keyed_values,
+        lambda s: (_add_field(s), s.update(renderer="unit_list")),
+        lambda s: (_add_field(s), s.update(title="Renamed")),
+        lambda s: (_add_field(s), s.update(allowed_placements=["docked"])),
+    ],
+    ids=[
+        "removed-field", "changed-field", "changed-kind", "renderer", "title",
+        "narrowed-placement",
+    ],
+)
+def test_panel_source_change_other_than_added_fields_stays_a_conflict(change):
+    conflicts = []
+    reviewed = _compare(
+        _panel_manifest("1"), _panel_manifest("2", change), lambda *c: conflicts.append(c)
+    )
+    assert reviewed == []
+    assert [path for path, _ in conflicts] == ["synthetic.clockwork.panels.clockwork.panel"]
+
+
+def test_panel_that_only_adds_source_fields_is_a_reviewed_change():
+    conflicts = []
+    reviewed = _compare(
+        _panel_manifest("1"), _panel_manifest("2", _add_field), lambda *c: conflicts.append(c)
+    )
+    assert (reviewed, conflicts) == (["added_panel_data"], [])

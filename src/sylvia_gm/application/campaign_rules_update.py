@@ -420,6 +420,27 @@ def _tool_input_change(prior: ToolDeclaration, incoming: ToolDeclaration) -> str
     return "changed_input_choices" if choices_changed else "changed_model_guidance"
 
 
+def _panel_source_adds_fields(prior: object, incoming: object) -> bool:
+    """Accept an object source that keeps every earlier field exactly and only adds fields.
+
+    Saved panel arrangements store panel identities and placements, never the source shape,
+    so an added field leaves every existing view and binding intact.
+    """
+    before, after = thaw_json_value(prior), thaw_json_value(incoming)
+    if not isinstance(before, dict) or not isinstance(after, dict):
+        return False
+    if {k: v for k, v in before.items() if k != "fields"} != {
+        k: v for k, v in after.items() if k != "fields"
+    }:
+        return False
+    old_fields, new_fields = before.get("fields"), after.get("fields")
+    return (
+        isinstance(old_fields, dict)
+        and isinstance(new_fields, dict)
+        and all(name in new_fields and new_fields[name] == v for name, v in old_fields.items())
+    )
+
+
 def _compare(
     old: PackageManifest,
     new: PackageManifest,
@@ -471,21 +492,20 @@ def _compare(
     for surface in old.ui_surfaces:
         other = incoming.get(surface.identity)
         if (
-            other is None
-            or (
-                surface.title,
-                surface.renderer,
-                surface.source,
-                surface.actions,
-                surface.capability,
-            )
-            != (other.title, other.renderer, other.source, other.actions, other.capability)
-            or not set(surface.allowed_placements) <= set(other.allowed_placements)
+            other is not None
+            and (surface.title, surface.renderer, surface.actions, surface.capability)
+            == (other.title, other.renderer, other.actions, other.capability)
+            and set(surface.allowed_placements) <= set(other.allowed_placements)
         ):
-            report(
-                f"{path}.panels.{surface.identity}",
-                "An existing panel is removed or its saved view/binding becomes incompatible.",
-            )
+            if surface.source == other.source:
+                continue
+            if _panel_source_adds_fields(surface.source, other.source):
+                reviewed.append("added_panel_data")
+                continue
+        report(
+            f"{path}.panels.{surface.identity}",
+            "An existing panel is removed or its saved view/binding becomes incompatible.",
+        )
     prior_ids = {s.identity for s in old.ui_surfaces}
     if any(s.renderer == "inventory" for s in old.ui_surfaces) != any(
         s.renderer == "inventory" for s in new.ui_surfaces
@@ -707,6 +727,8 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
         review_notice += "Action input guidance is updated. "
     if any(c.get("retired_unavailable_actions") for c in tool_changes):
         review_notice += "Actions that always refused are removed. "
+    if any(c.get("added_panel_data") for c in tool_changes):
+        review_notice += "Panels show additional information. "
     result = {
         "campaign_id": campaign_id,
         "campaign_name": snapshot.display_name,
