@@ -106,5 +106,8 @@ This mechanism never sweeps older builds, another live invocation, user database
 Final Windows checks must cover installed/portable coexistence, same-dataset refusal,
 save/reopen, portable folder movement and updates, required notice delivery, and credential
 re-entry after moving to another Windows account. DPAPI protects credentials for the current
-user; folder portability does not make credentials portable. Use selected synthetic data,
+user; folder portability does not make credentials portable. Linux is not a supported player
+platform yet; there, saved credentials are sealed with a per-user key file outside the data
+folder, which guards a settings file copied on its own but not a whole-home copy from
+an unencrypted disk or another program running as the same user. Use selected synthetic data,
 never record credentials, and keep genuine-provider and final native-input results separate.
