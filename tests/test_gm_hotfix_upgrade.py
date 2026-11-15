@@ -267,7 +267,25 @@ def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
         assert reopened.snapshot("casting") == after
 
 
-@pytest.mark.parametrize("origin", ["alpha4", "integration"])
+PUBLISHED_LITE = {
+    "alpha4": ("0.3.15", "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a"),
+    "alpha5": ("0.3.21", "075c294aa916c25b598d2f02f299bf437b352dfce38d0c3bd2efa3e5a1cab143"),
+    "integration": ("0.3.15", "dd42e6239820558385c316b7e5aacefa2e9b26b457175815570b1faeec2c04eb"),
+}
+
+
+def _projected_lite_panels(owner):
+    """Project the panels whose sources gained fields over a campaign saved without them."""
+    panels = {s["id"]: s for s in owner.campaign_panels("casting")["surfaces"]}
+    for identity in ("dnd-party", "dnd-encounter", "dnd-character"):
+        assert "unavailable_reason" not in panels[identity]["data"], identity
+        assert panels[identity]["data"]["spell_categories"]["bless"] == "enchantment"
+    # The saved campaign has no initiative order yet; the new field projects as empty.
+    assert panels["dnd-encounter"]["data"]["order_values"] == {}
+    return panels
+
+
+@pytest.mark.parametrize("origin", ["alpha4", "alpha5", "integration"])
 def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state(tmp_path, origin):
     database = tmp_path / "alpha4.sqlite3"
     archive = (Path(__file__).parent / f"fixtures/{origin}-lite.sylvia-gm-package").read_bytes()
@@ -319,13 +337,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         before = owner.snapshot("casting")
         old_lock = owner.current_package_lock("casting")
         primary = next(p for p in old_lock.package_lock.entries if p.package_id == SRD)
-        assert primary.version == "0.3.15"
-        expected = (
-            "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a"
-            if origin == "alpha4"
-            else "dd42e6239820558385c316b7e5aacefa2e9b26b457175815570b1faeec2c04eb"
-        )
-        assert primary.sha256 == expected
+        assert (primary.version, primary.sha256) == PUBLISHED_LITE[origin]
         if origin == "integration":
             # Packaged startup installs bare Rulesets; Setting descendants are offered lazily.
             owner.install_package_archive(io.BytesIO(current_archive), install_id="startup-current")
@@ -333,16 +345,12 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert options["candidates"], options
         candidate = options["candidates"][0]["candidate_id"]
         preview = owner.preview_campaign_rules_update("casting", candidate)
-        if origin == "alpha4" and current_version != "0.3.21":
-            assert not preview["compatible"]
-            assert any(".panels." in c["path"] for c in preview["conflicts"])
-            with pytest.raises(CommandRejected, match="conflicts"):
-                adopt(owner, preview)
-            assert owner.snapshot("casting") == before
-            assert owner.current_package_lock("casting") == old_lock
-            return
         assert preview["compatible"], preview["conflicts"]
         assert preview["tool_changes"]
+        if origin != "integration":
+            # Published panels only gained source fields; they are a reviewed change.
+            assert any(c.get("added_panel_data") == 3 for c in preview["tool_changes"])
+            assert "Panels show additional information." in preview["recovery"]
         assert owner.current_package_lock("casting") == old_lock
         assert owner.snapshot("casting") == before
         receipt = adopt(owner, preview, "adopt-hotfix")
@@ -353,6 +361,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert after.revision == before.revision + 1
         assert owner.package_lock_lineage("casting")[0] == old_lock
         assert adopt(owner, preview, "adopt-hotfix").replayed
+        _projected_lite_panels(owner)
         owner.open_turn("casting", "after-upgrade")
         provider = HealingGM()
         play(
@@ -370,3 +379,4 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert receipt.resulting_revision == after.revision
     with AuthorityOwner.open(database, "hotfix-owner") as owner:
         assert owner.snapshot("casting") == saved
+        _projected_lite_panels(owner)
