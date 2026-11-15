@@ -756,14 +756,38 @@ class TestRendererSecretless:
                     f"Secret pattern '{pattern}' found in {path.name}"
                 )
 
+    # Reviewed text that shows a web address to the player; the renderer never loads it.
+    # The host opens the address itself. Any other remote address in app.* fails until
+    # it is reviewed and listed here as the exact statement that displays it.
+    VISIBLE_TEXT_URLS = {
+        "app.js": (
+            "status.textContent = 'Could not open your browser. "
+            "Visit https://code.claude.com/docs/en/legal-and-compliance';",
+        ),
+    }
+
     def test_no_remote_content_loading(self) -> None:
-        """The renderer never loads remote content (no http/https src)."""
+        """The renderer never loads remote content; it names only reviewed visible-text URLs."""
 
         for path in FRONTEND_DIR.glob("app.*"):
-            content = path.read_text(encoding="utf-8").lower()
-            # The bridge name and local asset references are allowed; remote URLs are not.
-            assert "http://" not in content or "__sylviabridge" in content
-            assert "https://" not in content
+            content = path.read_text(encoding="utf-8")
+            for statement in self.VISIBLE_TEXT_URLS.get(path.name, ()):
+                assert content.count(statement) == 1, (
+                    f"Reviewed visible-text URL changed or moved in {path.name}: {statement}"
+                )
+                content = content.replace(statement, "")
+            content = content.lower()
+            for scheme in ("http://", "https://", "ws://", "wss://"):
+                assert scheme not in content, f"Unreviewed remote address in {path.name}"
+            # The renderer reaches the host only through the bridge, never the network.
+            for loader in ("xmlhttprequest", "websocket", "eventsource", "sendbeacon"):
+                assert loader not in content, f"Network API {loader} in {path.name}"
+            assert not re.search(r"\bfetch\s*\(|\bimport\s*[(\"'`{*]", content), path.name
+            # Protocol-relative addresses load remotely without naming a scheme.
+            assert not re.search(
+                r"""(?:src|href|action|srcset)\s*=\s*["'`]?\s*//|url\(\s*["']?\s*//""",
+                content,
+            ), f"Protocol-relative remote address in {path.name}"
 
     def test_no_dnd_ttrpg_assumptions_in_frontend(self) -> None:
         """No D&D/TTRPG iconography or assumptions in the canonical frontend."""

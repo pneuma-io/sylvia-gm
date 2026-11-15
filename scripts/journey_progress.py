@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from contextlib import contextmanager
 from functools import wraps
@@ -53,13 +54,18 @@ def timed(name):
     return decorate
 
 
+def emit(text):
+    """Print a receipt; a console that cannot encode it gets escapes, never an aborted session."""
+    encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+    print(text.encode(encoding, "backslashreplace").decode(encoding), flush=True)
+
+
 def pytest_runtest_logstart(nodeid, location):
     global _current_case
     _current_case = nodeid
-    print(
+    emit(
         "\nJOURNEY "
-        + json.dumps({"event": "start", "case": nodeid, "monotonic": time.monotonic()}),
-        flush=True,
+        + json.dumps({"event": "start", "case": nodeid, "monotonic": time.monotonic()})
     )
 
 
@@ -73,6 +79,6 @@ def pytest_runtest_logreport(report):
     }
     record(row)
     if report.when == "teardown" or report.failed or report.skipped:
-        print("\nJOURNEY " + json.dumps(row), flush=True)
+        emit("\nJOURNEY " + json.dumps(row))
     if report.failed:
-        print(str(report.longrepr), flush=True)
+        emit(str(report.longrepr))

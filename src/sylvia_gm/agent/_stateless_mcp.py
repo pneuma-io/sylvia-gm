@@ -16,7 +16,7 @@ import re
 import threading
 import uuid
 from collections.abc import Coroutine, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, TypeVar, cast
 
 from mcp import types
@@ -374,6 +374,52 @@ def _castable_spell_ids(snapshot: CampaignDisplaySnapshot) -> frozenset[str]:
             if isinstance(prepared, Sequence) and not isinstance(prepared, (str, bytes)):
                 choices.update(value for value in prepared if isinstance(value, str))
     return frozenset(choices)
+
+
+def _castable_spell_refusal(
+    error: MechanicsRejected,
+    schema: Mapping[str, object],
+    castable_spell_ids: frozenset[str],
+) -> MechanicsRejected:
+    """Name a spell outside a package's castable choices instead of a bare enum mismatch.
+
+    Its allowed values are the castable spells the model's tool schema offers, so the GM
+    is not shown a truncated list of every spell the package declares.
+    """
+
+    properties = schema.get("properties")
+    if not isinstance(properties, Mapping):
+        return error
+    issues: list[MechanicsValidationIssue] = []
+    matched = False
+    for issue in error.validation_issues:
+        child = properties.get(issue.path)
+        enum = child.get("enum") if isinstance(child, Mapping) else None
+        if (
+            issue.kind == "invalid_enum_value"
+            and isinstance(child, Mapping)
+            and child.get("x-sylvia-gm-castable-spells") is True
+            and isinstance(enum, Sequence)
+            and not isinstance(enum, (str, bytes, bytearray))
+        ):
+            issue = replace(
+                issue,
+                allowed_values=tuple(
+                    value for value in enum
+                    if isinstance(value, str) and value in castable_spell_ids
+                ),
+            )
+            matched = True
+        issues.append(issue)
+    if not matched:
+        return error
+    return MechanicsRejected(
+        str(error),
+        code="spell_unavailable",
+        field_paths=error.field_paths,
+        validation_issues=tuple(issues),
+        state_changed=error.state_changed,
+    )
 
 
 def _narrative_input_schema(
@@ -1207,6 +1253,12 @@ def _safe_error(error: AuthorityError) -> types.CallToolResult:
         "wrong_writer": "The current session is not allowed to perform this operation.",
         "idempotency_conflict": "The operation identity conflicts with an earlier request.",
         "mcp_tool_unavailable": "The selected operation is no longer available.",
+        "spell_unavailable": (
+            "This spell is not part of this Ruleset's castable spells: it is excluded or not "
+            "yet available. validation.issues allowed_values lists the spells castable in this "
+            "campaign now. Choose one of those, or tell the player this spell is unavailable; "
+            "do not retry it."
+        ),
         "campaign_knowledge_limit_invalid": (
             "Search parameter 'limit' must be an integer from 1 to 8. Retry with limit=5."
         ),
@@ -1932,7 +1984,20 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                 parameters=cast(SafePayload, arguments),
                 initiating_session_id=_meta_optional_text(meta, "initiating_session_id"),
             )
-            action_receipt = owner.execute_action(command)
+            try:
+                action_receipt = owner.execute_action(command)
+            except MechanicsRejected as error:
+                if not any(i.kind == "invalid_enum_value" for i in error.validation_issues):
+                    raise
+                visible, _boundary = owner.model_context_snapshot(campaign_id)
+                refusal = _castable_spell_refusal(
+                    error,
+                    cast(Mapping[str, object], _plain_json(current_tools[0].input_schema)),
+                    _castable_spell_ids(visible),
+                )
+                if refusal is error:
+                    raise
+                raise refusal from error
             action_payload: dict[str, Any]
             if isinstance(action_receipt, AwaitingChoiceReceipt):
                 action_payload = {

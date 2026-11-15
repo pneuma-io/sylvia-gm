@@ -878,6 +878,8 @@ def _run(
     )
     child_environment.pop("PYTEST_ADDOPTS", None)
     child_environment["PYTHONUNBUFFERED"] = "1"
+    # Child text I/O must not depend on the machine's code page or UTF-8 mode.
+    child_environment.update(PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
     child_environment["SYLVIA_QA_FIXTURE_ROOT"] = str(destination.resolve())
     child_environment["SYLVIA_RUNTIME_CACHE_DIR"] = str(destination.resolve() / "runtime-cache")
     # Keep archive spools and browser profiles in this run's owned data volume.
@@ -1011,6 +1013,10 @@ def _run_guarded(
 def main() -> int:
     """The default is the complete change gate; selections are explicitly partial checks."""
     global PYTHON_JOURNEYS, UI_JOURNEY
+    # Failure logs are echoed here; a non-UTF-8 console shows escapes instead of crashing.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="backslashreplace")
     names = [*PYTHON_JOURNEYS, "ui-controls"]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(

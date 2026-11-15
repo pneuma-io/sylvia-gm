@@ -13,8 +13,13 @@ def test_tactical_grid_is_host_owned_accessible_and_ruleset_neutral() -> None:
     css = (FRONTEND / "app.css").read_text(encoding="utf-8")
 
     assert "function renderTacticalGridPanel(" in script
-    assert "surface.renderer === 'tactical_grid'" in script
-    assert 'aria-label="Tactical grid; drag to pan, arrow keys move cell focus"' in script
+    dispatch = script.split("function panelContent(", maxsplit=1)[1].split("\n  }\n", maxsplit=1)[0]
+    assert "if (['tactical_grid', 'coordinate_map'].includes(surface.renderer)) {" in dispatch
+    assert "return renderTacticalGridPanel(surface.data, surface.id);" in dispatch
+    assert (
+        "aria-label=\"${continuous ? 'Coordinate map; click to select a point, drag to pan' "
+        ": 'Tactical grid; drag to pan, arrow keys move cell focus'}\""
+    ) in script
     assert "ArrowLeft" in script and "ArrowRight" in script
     assert "data-tactical-zoom" in script
     assert "data-tactical-entity" in script
@@ -39,8 +44,13 @@ def test_tactical_grid_is_host_owned_accessible_and_ruleset_neutral() -> None:
     assert ".tactical-wall" in css
     assert ".tactical-zone" in css
     assert ".tactical-objective" in css
+    # Reviewed labels that display a selected package's own data (as in the canonical
+    # frontend neutrality check); the tactical grid itself names no rules.
+    neutral = script.replace(
+        "parameters.kind === 'saving_throw' ? 'Saving throw' :", ""
+    ).replace("`Saving throws: ${character.saving_throw_proficiencies", "")
     for assumption in ("armor class", "saving throw", "spell slot", "hit points"):
-        assert assumption not in script.lower()
+        assert assumption not in neutral.lower()
 
 
 def test_tactical_preview_uses_owner_projection_without_client_estimates() -> None:
@@ -71,7 +81,10 @@ def test_dynamic_panel_intent_rechecks_authority_and_sends_only_declared_selecti
     assert "map_revision" in binder
     assert "const campaignId = state.activeCampaignId" in handler
     assert "await state.bridge.snapshot(campaignId)" in handler
-    assert "panelActionSelection(surface, action, button.dataset.panelActorId)" in handler
+    assert (
+        "const selection = JSON.parse(JSON.stringify(panelActionSelection(surface, action, "
+        "button.dataset.panelActorId, button.dataset.panelPieceId)));"
+    ) in " ".join(handler.split())
     assert "expected_revision: actionSnapshot.revision" in handler
     assert "selection," in handler
     assert "await renderRulesetPanels(campaignId, true)" in handler

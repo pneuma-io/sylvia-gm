@@ -9,8 +9,9 @@ from pathlib import Path
 def test_actual_ending_renderer_retains_ordinary_labels_and_hides_unearned_acts(tmp_path):
     source = Path(__file__).resolve().parents[1]
     output = Path(os.environ.get('SRD_LITE_RESULT_DIRECTORY', str(tmp_path))) / 'ending-renderer.json'
+    # Node is a documented test prerequisite on PATH; it is not always in Program Files.
     node = shutil.which('node')
-    assert node, 'Node.js was not found on PATH; install Node or add it to PATH to run this test.'
+    assert node, 'Node.js is required on PATH for the ending renderer check'
     run = subprocess.run([node,
         str(source / 'tests/fixtures/test-ending-renderer.cjs'),
         str(source / 'src-tauri/frontend/app.js'), str(output)],

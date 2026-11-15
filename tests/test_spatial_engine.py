@@ -354,18 +354,22 @@ def test_supercover_traversal_is_exact_and_versioned(
 ])
 def test_ray_ending_on_a_negative_axis_corner_completes(origin, destination, cells):
     # A child process bounds the authentic query even if grid traversal regresses to a hang.
+    # Interpreter start-up and imports can take many seconds on a loaded machine, so the
+    # process limit is generous and only the query itself (about 10 ms) is timed.
     program = (
-        "import json,sys; from sylvia_gm.spatial import SpatialEngine; "
-        "scene,query=json.load(sys.stdin); "
-        "print(json.dumps(SpatialEngine(scene).query(query).as_payload()))"
+        "import json,sys,time; from sylvia_gm.spatial import SpatialEngine; "
+        "scene,query=json.load(sys.stdin); started=time.perf_counter(); "
+        "payload=SpatialEngine(scene).query(query).as_payload(); "
+        "print(json.dumps([payload, time.perf_counter()-started]))"
     )
     result = subprocess.run(
         [sys.executable, "-c", program], input=json.dumps([_scene(), _ray(origin, destination)]),
-        text=True, capture_output=True, check=True, timeout=3,
+        text=True, capture_output=True, check=True, timeout=120,
     )
-    payload = json.loads(result.stdout)
+    payload, query_seconds = json.loads(result.stdout)
     assert payload["cells"] == cells
     assert payload["intersections"] == []
+    assert query_seconds < 2
 
 
 def test_corner_ties_and_simultaneous_intersections_have_stable_order() -> None:
