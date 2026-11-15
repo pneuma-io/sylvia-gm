@@ -32,7 +32,8 @@ readonly WARN_DISK_GB=40
 readonly FULL_RUN_DISK_GB=25
 readonly WARN_MEMORY_GB=8
 readonly SMOKE_TEST="tests/test_command_registry.py"
-readonly REQUIRED_PACKAGES=(git curl ca-certificates xz-utils)
+# libportaudio2 is the audio library the dictation checks load; the rest fetch and unpack tools.
+readonly REQUIRED_PACKAGES=(git curl ca-certificates xz-utils libportaudio2)
 readonly STEP_COUNT=11
 
 CHECKOUT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"

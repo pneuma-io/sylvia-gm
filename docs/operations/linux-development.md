@@ -34,7 +34,7 @@ the top of the script.
 
 | What | Where |
 |---|---|
-| git, curl, ca-certificates, xz-utils, if missing | System, with `sudo apt-get install --no-install-recommends` |
+| git, curl, ca-certificates, xz-utils and libportaudio2 (the audio library the dictation checks load), if missing | System, with `sudo apt-get install --no-install-recommends` |
 | uv, unless a new enough uv is on `PATH` | `~/.local/bin` |
 | Python and the project environment (`dev` and `dictation` extras) | uv's Python folder in your home; `.venv` in the checkout |
 | Node.js, unless a new enough Node.js is on `PATH` | `~/.local/share/sylvia-gm-dev`, after checking the archive against the official SHA-256 list |
@@ -53,9 +53,11 @@ Other modes:
 - `--full-run` sets up, then runs the complete check run and prints its time and result.
 
 One check also needs a published Claude Code binary to copy, which the script reports but does
-not install. Set `SYLVIA_TEST_CLAUDE_CODE` to its path or install it at `~/.local/bin/claude`;
-the prerequisite list in [Run the checks](local-checks-and-release.md#run-the-checks) explains
-why.
+not install. Anthropic's installer for Claude Code puts it at `~/.local/bin/claude`, where the
+check looks; otherwise set `SYLVIA_TEST_CLAUDE_CODE` to its path. No sign-in is needed: the
+check runs the copy against a local scripted server. Without the binary that case skips and
+the complete run fails. The prerequisite list in
+[Run the checks](local-checks-and-release.md#run-the-checks) explains why.
 
 ## Run the checks
 

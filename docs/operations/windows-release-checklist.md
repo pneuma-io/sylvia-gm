@@ -13,9 +13,10 @@ checkout, within the current work item.
 
 These cases only run on Windows:
 
-- the cases marked `runs_on("win32", ...)`, in `tests/test_claude_native_protocol.py`,
-  `tests/test_desktop_update_helper_pipe.py`, `tests/test_desktop_update_installed_launch.py`,
-  `tests/test_desktop_update_processes.py` and `tests/test_desktop_update_progress.py`;
+- the cases marked `runs_on("win32", ...)`: the release packaging, NSIS installer, updater,
+  update signing and code-signature checks. List them with
+  `git grep -n "runs_on(\"win32\"" -- tests`; a Linux run reports each one by exact ID as a
+  platform exclusion in its `summary.json`;
 - the Windows branches of other tests, such as the Microsoft Edge browser channel in the browser
   tests, the junction fallback for directory links and the Windows saved-credential protection in
   `tests/test_protected_provider_settings.py`.
@@ -134,7 +135,17 @@ movement and updates, notice delivery, and credential re-entry under another Win
 
 Commands or a qualified runner for this pass: Not documented in this repository.
 
-## 6. Record
+## 6. Publish
+
+Publishing needs the owner's release approval from step 5. Follow
+[Versions, tags and channel](local-checks-and-release.md#versions-tags-and-channel) for the
+version, the tag and the file names. While the declared channel is `alpha`, publish the GitHub
+release as a Pre-release, even when the tag is plain (`v0.4.1`): the Pre-release mark is what
+places a plain tag in the alpha channel for the updater.
+
+A fuller publishing procedure: Not documented in this repository.
+
+## 7. Record
 
 As [Read and retain the result](local-checks-and-release.md#read-and-retain-the-result) and
 [From checked source to a release](local-checks-and-release.md#from-checked-source-to-a-release)
