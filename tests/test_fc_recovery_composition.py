@@ -13,7 +13,7 @@ import pytest
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.provider._base import ProviderResponse
-from tests.qa_attached_request import request_attached
+from tests.qa_attached_request import request_attached, send_attached
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
 from tests.test_builder_library import LibraryProvider
 from tests.test_fc_campaign_journey import SRD, _CombatProvider
@@ -172,13 +172,13 @@ def _continue_campaign(tmp_path, monkeypatch, boundary):
         patched.setattr(AuthorityOwner, "_complete_narration_attempt", interrupt_publication)
         harness = _OwnerHarness(database, provider)
         try:
-            harness.send("closing", {"method": "submit_session_input", "params": {
+            # Renew the attachment so a slow machine cannot expire it before the rejection.
+            failed = send_attached(harness, "closing", "submit_session_input", {
                 "session_id": session, "turn_id": turn,
                 "attempt_id": "closing-interrupted", "message_id": "closing-one-input",
                 "expected_revision": before_close.revision,
                 "user_text": "Complete the earned escort and closing events.",
-            }})
-            failed = harness.read()
+            }, campaign_id=campaign, attempt_id="closing-interrupted")
             assert failed["ok"] is False, failed
             assert failed["error"]["code"] == "command_rejected", failed
         finally:
