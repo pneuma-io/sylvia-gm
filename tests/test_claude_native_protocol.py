@@ -232,7 +232,9 @@ async def test_sylvias_copy_returns_tools_replays_results_and_leaves_the_person_
         assert "".join(c.content for c in chunks) == "The door opens."
         assert chunks[-1].finish_reason == "stop"
         assert len(requests) == 2 and not errors
-        assert not list(home.glob("turn-*"))
+        # The cwd is one fixed, empty folder; each step's private files are removed.
+        assert list((home / "workspace").iterdir()) == []
+        assert list((home / "steps").iterdir()) == []
         # Settings and sessions belong to Sylvia's profile; the person's home stays untouched.
         assert (home / "profile" / ".claude.json").is_file()
         assert [p for p in person.rglob("*") if p.is_file()] == []

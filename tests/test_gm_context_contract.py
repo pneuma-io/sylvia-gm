@@ -373,6 +373,18 @@ def test_each_request_extends_the_previous_one_on_every_route(played, transport)
         frames_for_route, route = replay(frames, transport), transport
     result = check_extension(frames_for_route, route)
     assert result["pairs"] >= 12, result
+    if route == "claude_code":
+        # The checked view is Claude Code's transcript plus stdin prompt: Sylvia's fillers
+        # after tool results and the CLI's context records replayed after their prompt.
+        from sylvia_gm.provider._claude_native import FILLER_TEXT
+
+        assert all(frame.native is not None for frame in frames_for_route)
+        views = [serialize(route, f.wire, native=f.native)[1] for f in frames_for_route]
+        replayed = [json.loads(item)["attachment"]["type"] for v in views for item in v
+                    if item.startswith('{"attachment"')]
+        assert {"environment", "model", "date"} <= set(replayed)
+        assert any(FILLER_TEXT in item for v in views for item in v)
+        assert not any("SYLVIA_GM_RUNTIME_CONTINUE" in item for v in views for item in v)
     marks = played["marks"]
     resets = dict(result["resets"])
     # Exactly two declared resets, both expected here:
@@ -697,8 +709,11 @@ def test_corrections_never_change_the_claude_system_or_end_on_an_assistant_turn(
             systems.append((frame.epoch, frame.generation, request.get("system")))
             assert request["messages"][-1]["role"] == "user", request["messages"][-1]
         else:
+            # The ledger's native route: the transcript Claude Code is given in ledger mode.
+            assert frame.native is not None
             system, _records, prompt, _tools = prepare_request(messages, None, "model",
-                                                               tmp_path)
+                                                               tmp_path, frame.native)
+            assert "isSynthetic" not in prompt
             systems.append((frame.epoch, frame.generation, system))
             assert prompt["message"]["role"] == "user"
             # The runtime never has to invent its own continuation prompt.

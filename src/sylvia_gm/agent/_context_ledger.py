@@ -17,6 +17,11 @@ previous one byte for byte:
 
 The journal is persisted as ``gm_wire_journal`` session evidence before each request is sent and
 rebuilt from that evidence after an owner restart. Builder sessions never use it.
+
+On the ``claude_code`` route the context records Claude Code writes itself (environment, model,
+date) are saved as ``gm_native_records`` evidence for the request that produced them and replayed
+in every later transcript of the same journal generation. When they are unknown, the next
+request on that route starts a new generation.
 """
 
 from __future__ import annotations
@@ -39,6 +44,9 @@ LEDGER_MODE = "ledger"
 
 JOURNAL_KIND = "gm_wire_journal"
 JOURNAL_VERSION = 1
+NATIVE_KIND = "gm_native_records"
+NATIVE_VERSION = 1
+NATIVE_STATUSES = frozenset({"collected", "unknown"})
 
 # Canonical-message tags. They never reach a provider (``strip_data_markers`` removes them).
 STABLE_KEY = "_stable_instruction"
@@ -529,6 +537,9 @@ class JournalState:
     heads: dict[int, str] = field(default_factory=dict)
     #: (label, digest) of the host records in the previous request's canonical list.
     present: frozenset[tuple[str, str]] = frozenset()
+    #: claude_code only: journal length that ended a request -> the CLI's records for it
+    #: (``{"status": "collected" | "unknown", "records": [...]}``).
+    native: dict[int, dict[str, Any]] = field(default_factory=dict)
 
     @classmethod
     def fresh(cls, epoch: str, generation: int) -> JournalState:
@@ -594,8 +605,75 @@ def load_journal(
         state.update_bytes = int(record.get("update_bytes", state.update_bytes) or 0)
     if not valid:
         return JournalState.fresh(epoch, latest + 1), "journal_invalid"
+    for record in records:
+        # Saved Claude Code context records count only for a request on this exact chain.
+        if (
+            isinstance(record, Mapping)
+            and record.get("kind") == NATIVE_KIND
+            and record.get("version") == NATIVE_VERSION
+            and record.get("epoch") == epoch
+            and record.get("generation") == state.generation
+            and (owner is None or plain(record.get("context_owner")) == owner)
+            and isinstance(record.get("boundary"), int)
+            and state.heads.get(record["boundary"]) == record.get("head")
+            and record.get("status") in NATIVE_STATUSES
+            and isinstance(record.get("records"), Sequence)
+        ):
+            state.native[int(record["boundary"])] = {
+                "status": record["status"], "records": plain(record["records"]),
+            }
     state.view = reconstruct_state(state.entries, seal)
     return state, None
+
+
+def native_gap(state: JournalState, end: int) -> bool:
+    """Would a transcript ending at journal length ``end`` replay unknown CLI records?
+
+    The first request of a generation always leaves records (Claude Code announces its
+    environment), so a missing first entry means they were lost, for example in a crash.
+    """
+    replayed = sorted(k for k in state.heads if 0 < k < end)
+    if not replayed:
+        return False
+    if replayed[0] not in state.native:
+        return True
+    return any(state.native.get(k, {}).get("status") == "unknown" for k in replayed)
+
+
+def native_inputs(state: JournalState) -> tuple[tuple[int, ...], dict[int, list[Any]]]:
+    """Boundaries of earlier requests and their collected CLI records, for the transcript."""
+    end = len(state.entries)
+    boundaries = tuple(sorted(k for k in state.heads if 0 < k < end))
+    records = {
+        k: list(v.get("records") or ()) for k, v in state.native.items()
+        if k in boundaries and v.get("status") == "collected"
+    }
+    return boundaries, records
+
+
+def native_record(
+    state: JournalState,
+    *,
+    context_owner: Mapping[str, Any] | None,
+    boundary: int,
+    status: str,
+    reason: str | None,
+    records: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Session evidence for what one request's Claude Code session file contained."""
+    return {
+        "kind": NATIVE_KIND,
+        "version": NATIVE_VERSION,
+        "native_record_id": uuid.uuid4().hex,
+        **({"context_owner": plain(context_owner)} if context_owner is not None else {}),
+        "epoch": state.epoch,
+        "generation": state.generation,
+        "boundary": boundary,
+        "head": state.heads.get(boundary),
+        "status": status,
+        "reason": reason,
+        "records": [plain(r) for r in records],
+    }
 
 
 @dataclass
@@ -674,6 +752,7 @@ class ContextLedger:
         history_records: Callable[[], Sequence[Mapping[str, Any]]] = tuple,
         tools: Sequence[Mapping[str, Any]] | None = None,
         check_saved_tip: bool = True,
+        _native_reset: bool = False,
     ) -> WireFrame:
         """Compute the next request without changing the ledger (also used for size planning).
 
@@ -698,7 +777,8 @@ class ContextLedger:
                 )
         if current is not None and current.epoch == epoch:
             # Entries are immutable once journaled and the view is replaced, never mutated.
-            state = replace(current, entries=list(current.entries), heads=dict(current.heads))
+            state = replace(current, entries=list(current.entries), heads=dict(current.heads),
+                            native=dict(current.native))
         elif self.state is not None and self.state.epoch == epoch:
             pass  # reloaded from saved evidence above
         else:
@@ -742,6 +822,12 @@ class ContextLedger:
             state = JournalState.fresh(epoch, state.generation + 1)
             journaled = set()
             reset = "identity_missing"
+        if _native_reset:
+            # Claude Code's own context records for an earlier request are unknown: replaying
+            # the journal without them would not be what the CLI saw. Send everything again.
+            state = JournalState.fresh(epoch, state.generation + 1)
+            journaled = set()
+            reset = "native_records_unknown"
         base_count = len(state.entries)
         fresh_layout = base_count == 0
         appended: list[dict[str, Any]] = []
@@ -845,6 +931,13 @@ class ContextLedger:
                     "m": {"role": "user", "content": seal_prefix(self.seal) + _CONTINUE_TEXT},
                     "c": "event", "l": CONTINUE_LABEL, "h": _sha(_CONTINUE_TEXT),
                 })
+        if (
+            self.transport == "claude_code" and not _native_reset
+            and native_gap(state, base_count + len(appended))
+        ):
+            return self.plan(canonical, request_context_id=request_context_id,
+                             history_records=history_records, tools=tools,
+                             check_saved_tip=check_saved_tip, _native_reset=True)
         prefix = _prefix_fingerprint(stable)
         previous_head = state.head
         state.entries.extend(appended)
@@ -936,6 +1029,19 @@ class ContextLedger:
         """Adopt a planned frame after its journal record was acknowledged."""
         self.state = frame.state
         self.prefix_sha256 = frame.prefix_sha256
+
+
+def native_marker(value: Mapping[str, Any]) -> dict[str, Any]:
+    """The only part of a native-records record that may leave the owner."""
+    return {
+        "kind": NATIVE_KIND,
+        "native_record_id": value.get("native_record_id"),
+        "epoch": value.get("epoch"),
+        "generation": value.get("generation"),
+        "boundary": value.get("boundary"),
+        "status": value.get("status"),
+        "record_count": len(value.get("records", ()) or ()),
+    }
 
 
 def journal_marker(value: Mapping[str, Any]) -> dict[str, Any]:

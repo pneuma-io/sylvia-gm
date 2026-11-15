@@ -115,6 +115,19 @@ class Connection:
         self.closed = True
 
 
+def step_folder(arguments):
+    """The per-step folder holding the system and transcript files (never the cwd)."""
+    return Path(arguments[arguments.index("--system-prompt-file") + 1]).parent
+
+
+def assert_step_removed(connection, tmp_path):
+    """The cwd is one fixed, empty folder; the step's private files are gone."""
+    assert connection.workspace == tmp_path / "runtime" / "workspace"
+    assert list(connection.workspace.iterdir()) == []
+    assert connection.step.parent == tmp_path / "runtime" / "steps"
+    assert not connection.step.exists()
+
+
 def provider(tmp_path, monkeypatch, events):
     connection = Connection(events)
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
@@ -123,6 +136,7 @@ def provider(tmp_path, monkeypatch, events):
     def factory(executable, workspace, arguments, environment):
         connection.arguments = arguments
         connection.workspace = workspace
+        connection.step = step_folder(arguments)
         connection.environment = environment
         return connection
 
@@ -254,7 +268,7 @@ def test_stream_returns_one_admitted_tool_only_after_child_collection(tmp_path, 
         "--safe-mode" in connection.arguments and "--no-session-persistence" in connection.arguments
     )
     assert connection.arguments[connection.arguments.index("--tools") + 1] == ""
-    assert not connection.workspace.exists()
+    assert_step_removed(connection, tmp_path)
 
 
 @pytest.mark.parametrize("name,arguments", [("Bash", {}), ("inspect", {"target": "wrong"})])
@@ -372,7 +386,8 @@ def test_runtime_eof_and_timeout_close_ephemeral_state(tmp_path, monkeypatch):
         adapter, connection = provider(tmp_path, monkeypatch, events)
         with pytest.raises(error):
             asyncio.run(adapter.generate([{"role": "user", "content": "Check"}]))
-        assert connection.closed and not connection.workspace.exists()
+        assert connection.closed
+        assert_step_removed(connection, tmp_path)
 
 
 def test_environment_selects_sylvias_profile_and_no_tokens_or_harness_overrides(
@@ -562,7 +577,10 @@ def test_cancelling_a_waiting_native_stream_collects_the_child(tmp_path, monkeyp
 
     asyncio.run(cancel())
     assert connections[0]._process.poll() is not None
-    assert not list((tmp_path / "runtime").iterdir())
+    # Only the fixed empty cwd and the empty step parent remain; no step files outlive it.
+    runtime = tmp_path / "runtime"
+    assert sorted(p.name for p in runtime.iterdir()) == ["steps", "workspace"]
+    assert [p for p in runtime.rglob("*") if p.is_file()] == []
 
 
 def test_setup_saves_separate_runtime_and_resolves_after_reopen(tmp_path, monkeypatch):
@@ -716,7 +734,7 @@ def test_game_tool_commit_survives_interruption_and_reopen(tmp_path, monkeypatch
                 ]
             )
             self.workspace = args[1]
-            history = self.workspace / "history.jsonl"
+            history = step_folder(args[2]) / "history.jsonl"
             self.records = [json.loads(line) for line in history.read_text().splitlines()]
             connections.append(self)
 

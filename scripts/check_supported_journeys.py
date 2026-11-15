@@ -403,6 +403,7 @@ PYTHON_JOURNEYS = {
         'tests/test_claude_install.py',
         'tests/test_claude_native_protocol.py',
         'tests/test_claude_runtime.py',
+        'tests/test_claude_native_route.py',
     ],
     "bundled-content": [
         "tests/test_plan_snapshot_cache.py",

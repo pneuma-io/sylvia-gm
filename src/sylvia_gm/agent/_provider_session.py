@@ -26,9 +26,13 @@ from sylvia_gm.agent._context_ledger import (
     JOURNAL_KIND,
     LEDGER_KEY,
     LEDGER_MODE,
+    NATIVE_KIND,
     STABLE_KEY,
     ContextLedger,
+    WireFrame,
     context_mode,
+    native_inputs,
+    native_record,
     tagged,
 )
 from sylvia_gm.agent._inference_identity import inference_context_id
@@ -68,6 +72,7 @@ from sylvia_gm.domain.authority import (
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk
+from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
 
 from ._provider_turn_decisions import (
     _actor_decision_can_be_requested,
@@ -2296,7 +2301,7 @@ class ProviderSessionAdapter:
                                 else getattr(provider_input.history, "messages", ()))
                 if message.kind is SessionMessageKind.EVIDENCE
                 and isinstance(message.content, Mapping)
-                and message.content.get("kind") == JOURNAL_KIND
+                and message.content.get("kind") in {JOURNAL_KIND, NATIVE_KIND}
             ]
 
         # Size planning and the send plan the same request; keep the measured frame so the
@@ -2330,12 +2335,46 @@ class ProviderSessionAdapter:
                 await bridge.save(frame.record)
             ledger.commit(frame)
             CURRENT_WIRE_FRAME.set(frame.observation)
+            if transport == "claude_code":
+                CURRENT_NATIVE_ROUTE.set(
+                    self._claude_native_route(ledger, frame, bridge, persistent))
             return self._attach_native_continuation(
                 cast(list[dict[str, object]], frame.wire), provider_input,
                 has_tools=bool(tools),
             )
 
         return finalize, measure
+
+    @staticmethod
+    def _claude_native_route(
+        ledger: ContextLedger, frame: WireFrame, bridge: Any, persistent: bool,
+    ) -> NativeRoute:
+        """Claude Code's transcript inputs: earlier request boundaries and the CLI's records.
+
+        The callback keeps what this step's session file contained, in memory for the next
+        request and as session evidence when there is anything to keep.
+        """
+        state = frame.state
+        boundaries, saved = native_inputs(state)
+        boundary = len(state.entries)
+
+        async def on_collected(result: NativeCollection) -> None:
+            payload = native_record(
+                state, context_owner=ledger.context_owner, boundary=boundary,
+                status=result.status, reason=result.reason, records=result.records,
+            )
+            if ledger.state is state:
+                state.native[boundary] = {"status": result.status, "records": payload["records"]}
+            if persistent:
+                await bridge.save(payload)
+
+        return NativeRoute(
+            stable_count=len(frame.wire) - boundary,
+            entry_count=boundary,
+            boundaries=boundaries,
+            native_records=saved,
+            on_collected=on_collected,
+        )
 
     def _ledger_store(self) -> dict[str, ContextLedger]:
         """One ledger per session for each owner, shared by every adapter that owner runs.
@@ -3801,6 +3840,8 @@ class ProviderSessionAdapter:
                             message_id=(
                                 f"wire-journal-{pending.payload['journal_record_id']}"
                                 if pending.payload.get("kind") == JOURNAL_KIND
+                                else f"claude-native-{pending.payload['native_record_id']}"
+                                if pending.payload.get("kind") == NATIVE_KIND
                                 else f"context-{pending.payload['checkpoint_id']}"
                             ),
                             kind=SessionMessageKind.EVIDENCE,

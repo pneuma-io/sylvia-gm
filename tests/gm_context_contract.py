@@ -22,12 +22,18 @@ from sylvia_gm.agent._context_ledger import (
     STATE_LABEL,
     UPDATE_LABEL,
     ContextLedger,
+    JournalState,
     host_seal,
     ledger_contract,
+    native_inputs,
     seal_prefix,
     state_covers,
 )
 from sylvia_gm.agent._request_data import strip_data_markers
+from sylvia_gm.provider._claude_native import NativeRoute, collect
+
+#: Claude Code session files from offline captures (see fixtures/claude-native/README.md).
+NATIVE_FIXTURES = Path(__file__).parent / "fixtures" / "claude-native"
 
 TRANSPORTS = ("anthropic_messages", "claude_code", "codex_app_server", "chat_completions",
               "responses")
@@ -48,6 +54,29 @@ class Recorded:
     wire: list[dict[str, Any]]
     view: dict[str, Any] | None
     observation: dict[str, Any] = field(default_factory=dict)
+    #: claude_code only: the native route the provider builds its transcript from.
+    native: NativeRoute | None = None
+
+
+def native_route(state: JournalState, wire: Sequence[dict[str, Any]]) -> NativeRoute:
+    """The route the GM adapter hands Claude Code for this committed journal state."""
+    boundaries, records = native_inputs(state)
+    return NativeRoute(stable_count=len(wire) - len(state.entries),
+                       entry_count=len(state.entries), boundaries=boundaries,
+                       native_records=records)
+
+
+def first_step_records() -> list[dict[str, Any]]:
+    """The context records Claude Code wrote after a first prompt, as collection copies them."""
+    result = collect(NATIVE_FIXTURES / "first-step.jsonl", "SENTINEL_H1_USER hello")
+    assert result.status == "collected" and len(result.records) == 3, result
+    return [dict(record) for record in result.records]
+
+
+def simulate_collection(state: JournalState, route: NativeRoute) -> None:
+    """What the provider reports after a step: the CLI's records on a generation's first step."""
+    if route.first_step:
+        state.native[route.entry_count] = {"status": "collected", "records": first_step_records()}
 
 
 class LedgerRecorder:
@@ -91,6 +120,8 @@ class LedgerRecorder:
                 wire=copy.deepcopy(frame.wire),
                 view=copy.deepcopy(frame.state.view),
                 observation=dict(frame.observation),
+                native=(native_route(frame.state, frame.wire)
+                        if ledger.transport == "claude_code" else None),
             ))
 
         self._originals = (original_plan, original_commit)
@@ -121,8 +152,13 @@ def _without_cache_control(value: Any) -> Any:
 
 
 def serialize(transport: str, wire: Sequence[dict[str, Any]],
-              tools: list[dict[str, Any]] | None = None) -> tuple[str, list[str]]:
-    """(system prefix, ordered message bytes) exactly as the route would send them."""
+              tools: list[dict[str, Any]] | None = None,
+              native: NativeRoute | None = None) -> tuple[str, list[str]]:
+    """(system prefix, ordered message bytes) exactly as the route would send them.
+
+    For ``claude_code`` with the ledger's native route this is the transcript plus the stdin
+    prompt, including Sylvia's fillers and the CLI context records it replays.
+    """
     messages = provider_messages(wire)
     if transport == "anthropic_messages":
         from sylvia_gm.provider._anthropic import (
@@ -137,13 +173,17 @@ def serialize(transport: str, wire: Sequence[dict[str, Any]],
     if transport == "claude_code":
         from sylvia_gm.provider._claude import prepare_request
 
-        system, records, prompt, _tools = prepare_request(messages, tools, "model", Path("."))
+        system, records, prompt, _tools = prepare_request(messages, tools, "model", Path("."),
+                                                          native)
         sequence = []
         for record in records:
-            native = dict(record["message"])
+            if record["type"] == "attachment":
+                sequence.append(_dump({k: record[k] for k in ("attachment", "rendered")}))
+                continue
+            message = dict(record["message"])
             # Per-request native transcript ids are disposable wrappers, not message content.
-            native.pop("id", None)
-            sequence.append(_dump(native))
+            message.pop("id", None)
+            sequence.append(_dump(message))
         sequence.append(_dump(prompt["message"]))
         return system, sequence
     if transport == "codex_app_server":
@@ -178,12 +218,17 @@ def replay(frames: Iterable[Recorded], transport: str) -> list[Recorded]:
             session_id=frame.session_id, context_owner=frame.context_owner, transport=transport))
         planned = ledger.plan(frame.canonical, request_context_id=frame.context_id)
         ledger.commit(planned)
+        route = None
+        if transport == "claude_code":
+            route = native_route(planned.state, planned.wire)
+            simulate_collection(planned.state, route)
         replayed.append(Recorded(
             session_id=frame.session_id, context_owner=frame.context_owner, transport=transport,
             context_id=frame.context_id, canonical=frame.canonical, epoch=planned.state.epoch,
             generation=planned.state.generation, reset=planned.reset,
             base_count=planned.base_count, appended=planned.appended, wire=planned.wire,
             view=copy.deepcopy(planned.state.view), observation=planned.observation,
+            native=route,
         ))
     return replayed
 
@@ -199,7 +244,7 @@ def check_extension(frames: Sequence[Recorded], transport: str) -> dict[str, Any
     resets: list[tuple[int, str]] = []
     pairs = 0
     for index, frame in enumerate(frames):
-        rendered = serialize(transport, frame.wire)
+        rendered = serialize(transport, frame.wire, native=frame.native)
         before = previous.get(frame.session_id)
         if before is not None:
             last, (system, sequence) = before
@@ -288,13 +333,13 @@ def growth(frames: Sequence[Recorded], transport: str) -> dict[str, Any]:
     rows = []
     previous: dict[str, tuple[Recorded, int, int]] = {}
     for frame in frames:
-        system, sequence = serialize(transport, frame.wire)
+        system, sequence = serialize(transport, frame.wire, native=frame.native)
         total = len(system.encode()) + sum(len(item.encode()) for item in sequence)
         before = previous.get(frame.session_id)
         repeated = 0
         if before is not None:
             last, last_total, _ = before
-            last_system, last_sequence = serialize(transport, last.wire)
+            last_system, last_sequence = serialize(transport, last.wire, native=last.native)
             if system == last_system:
                 repeated = len(system.encode())
                 for old, new in zip(last_sequence, sequence, strict=False):
@@ -312,7 +357,8 @@ def growth(frames: Sequence[Recorded], transport: str) -> dict[str, Any]:
 
 __all__ = [
     "TRANSPORTS", "LedgerRecorder", "Recorded", "check_authority", "check_extension",
-    "check_freshness", "growth", "ledger_module", "replay", "serialize",
+    "check_freshness", "first_step_records", "growth", "ledger_module", "native_route",
+    "replay", "serialize", "simulate_collection",
 ]
 
 
@@ -355,6 +401,12 @@ def frame_to_json(frame: Recorded) -> dict[str, Any]:
     import dataclasses
 
     row = dataclasses.asdict(frame)
+    if frame.native is not None:
+        row["native"] = {"stable_count": frame.native.stable_count,
+                         "entry_count": frame.native.entry_count,
+                         "boundaries": list(frame.native.boundaries),
+                         "native_records": {str(k): list(v) for k, v in
+                                            frame.native.native_records.items()}}
     row["canonical"] = [
         {**dict(message), TAGS_FIELD: dict(getattr(message, "ledger_tags", {}) or {})}
         for message in frame.canonical
@@ -370,7 +422,14 @@ def frame_from_json(row: dict[str, Any]) -> Recorded:
         message = dict(message)
         tags = message.pop(TAGS_FIELD, None) or {}
         canonical.append(tagged(message, **tags) if tags else message)
-    return Recorded(**{**row, "canonical": canonical})
+    native = row.get("native")
+    if isinstance(native, dict):
+        native = NativeRoute(stable_count=native["stable_count"],
+                             entry_count=native["entry_count"],
+                             boundaries=tuple(native["boundaries"]),
+                             native_records={int(k): v for k, v in
+                                             native["native_records"].items()})
+    return Recorded(**{**row, "canonical": canonical, "native": native})
 
 
 

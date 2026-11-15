@@ -893,6 +893,11 @@ def _json_value(value: Any) -> Any:
             from sylvia_gm.agent._context_ledger import journal_marker
 
             return {key: _json_value(item) for key, item in journal_marker(value).items()}
+        if value.get("kind") == "gm_native_records":
+            # Claude Code's copied context records stay with the owner like the journal.
+            from sylvia_gm.agent._context_ledger import native_marker
+
+            return {key: _json_value(item) for key, item in native_marker(value).items()}
         return {str(key): _json_value(item) for key, item in value.items()}
     if isinstance(value, Set):
         projected = [_json_value(item) for item in value]
