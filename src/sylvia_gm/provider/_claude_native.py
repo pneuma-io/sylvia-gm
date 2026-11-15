@@ -125,6 +125,61 @@ def sweep(config: Path, steps: Path, active: set[str]) -> int:
     return count
 
 
+def _rows(path: Path) -> list[dict[str, Any]]:
+    rows = []
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return []
+    for line in lines:
+        try:
+            row = json.loads(line)
+        except ValueError:
+            continue  # a line the CLI is still writing
+        if isinstance(row, dict):
+            rows.append(row)
+    return rows
+
+
+def wait_for_flush(config: Path, session_id: str, prompt_content: Any, limit: float = 2.0) -> bool:
+    """Before the step's process is closed, let the CLI finish writing this step's records.
+
+    Claude Code writes the prompt and its context records before it sends the request, then
+    its request bookkeeping (``api-request*``). Closing the process at a tool call can lose
+    writes still queued, so wait until that bookkeeping follows the prompt record, or the file
+    stops growing, for at most ``limit`` seconds. True when the records are complete.
+    """
+    deadline = time.monotonic() + limit
+    last_size, quiet_since = -1, time.monotonic()
+    while True:
+        files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
+        if files:
+            rows = _rows(files[0])
+            prompt = next(
+                (
+                    i
+                    for i in range(len(rows) - 1, -1, -1)
+                    if rows[i].get("type") == "user"
+                    and isinstance(rows[i].get("message"), dict)
+                    and rows[i]["message"].get("content") == prompt_content
+                ),
+                None,
+            )
+            if prompt is not None:
+                if any(
+                    str(row.get("type", "")).startswith("api-request") for row in rows[prompt + 1 :]
+                ):
+                    return True
+                size = files[0].stat().st_size if files[0].exists() else -1
+                if size != last_size:
+                    last_size, quiet_since = size, time.monotonic()
+                elif time.monotonic() - quiet_since >= 0.25:
+                    return True
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.02)
+
+
 def collect(session_file: Path | None, prompt_content: Any) -> NativeCollection:
     """Copy the CLI's rendered context records that follow this step's prompt record.
 

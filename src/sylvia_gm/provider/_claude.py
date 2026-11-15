@@ -34,6 +34,7 @@ from sylvia_gm.provider._claude_native import (
     delete_session,
     session_files,
     sweep,
+    wait_for_flush,
 )
 from sylvia_gm.provider._claude_runtime import (
     ClaudeConnection,
@@ -562,6 +563,7 @@ class ClaudeProvider(Provider):
                                 )
                                 # Reaching the actual MCP call means native permissions admitted it.
                                 # No result is sent to Claude and no game action runs in this child.
+                                await self._await_flush(route, config, session_id, prompt)
                                 await self._close_owned(connection)
                                 await self._collect(route, config, session_id, prompt)
                                 response.tool_calls = [call]
@@ -711,6 +713,8 @@ class ClaudeProvider(Provider):
                             raise RateLimitError(
                                 "Claude reports that this account has reached its usage limit."
                             )
+                    if not response.tool_calls:
+                        await self._await_flush(route, config, session_id, prompt)
                     await self._close_owned(connection)
                     if not response.tool_calls:
                         await self._collect(route, config, session_id, prompt)
@@ -743,6 +747,16 @@ class ClaudeProvider(Provider):
                 shutil.rmtree(step, ignore_errors=True)
                 with _ACTIVE_LOCK:
                     active.discard(session_id)
+
+    @staticmethod
+    async def _await_flush(
+        route: NativeRoute | None, config: Path, session_id: str, prompt: dict[str, Any]
+    ) -> None:
+        """Let the CLI finish writing this step's records before its process is closed."""
+        if route is not None:
+            await asyncio.to_thread(
+                wait_for_flush, config, session_id, prompt["message"]["content"]
+            )
 
     async def _collect(
         self, route: NativeRoute | None, config: Path, session_id: str, prompt: dict[str, Any]

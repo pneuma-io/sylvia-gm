@@ -265,7 +265,7 @@ def chain() -> list[tuple[str, list[dict[str, Any]], bool]]:
     ]
 
 
-def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch):
+def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, caplog):
     fake = FakeMessages()
     home = tmp_path / "claude-runtime"
     person = tmp_path / "person"
@@ -322,7 +322,12 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch):
                               "status": native["status"],
                               "types": [r["attachment"]["type"] for r in native["records"]]},
                           "body": bodies[-1]})
-            assert frame.reset in (None, "journal_started"), (name, frame.reset)
+            unknown = [r.getMessage() for r in caplog.records
+                       if "context records are unknown" in r.getMessage()]
+            steps[-1]["unknown"] = unknown
+            caplog.clear()
+            assert frame.reset in (None, "journal_started"), (name, frame.reset, steps[-2:])
+            assert not unknown, (name, unknown)
         assert fake.offsite == []
         statuses = [s["native"]["status"] for s in steps if s["native"]]
         assert statuses and all(status == "collected" for status in statuses), steps

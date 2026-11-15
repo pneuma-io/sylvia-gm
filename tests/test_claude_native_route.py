@@ -42,6 +42,7 @@ from sylvia_gm.provider._claude_native import (
     NativeRoute,
     collect,
     sweep,
+    wait_for_flush,
 )
 from sylvia_gm.provider._exceptions import ProviderError, ProviderTimeoutError
 from tests.gm_context_contract import (
@@ -383,6 +384,39 @@ def test_collection_reports_unknown_instead_of_failing(tmp_path):
     assert collect(broken, "x").reason == "session_file_unreadable"
     assert collect(NATIVE_FIXTURES / "first-step.jsonl", "never sent").reason == (
         "prompt_record_missing")
+
+
+def test_the_cli_may_finish_writing_its_records_before_it_is_closed(tmp_path):
+    """Closing at a tool call must not lose the prompt and context records still queued."""
+    import time
+
+    config = tmp_path / "profile"
+    session = "cccccccc-0000-4000-8000-000000000003"
+    folder = config / "projects" / "C--runtime-workspace"
+    folder.mkdir(parents=True)
+    path = folder / f"{session}.jsonl"
+    prompt = [{"type": "text", "text": "SENTINEL roll"}]
+    rows = [{"type": "user", "message": {"role": "user", "content": prompt}},
+            {"type": "attachment", "attachment": {"type": "date", "date": "2026-11-15"},
+             "rendered": [{"content": "date"}]},
+            {"type": "api-request", "id": "r1"}]
+
+    def writer():
+        time.sleep(0.2)
+        path.write_text(json.dumps(rows[0]) + "\n" + '{"type": "attach', encoding="utf-8")
+        time.sleep(0.2)
+        path.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+
+    thread = threading.Thread(target=writer)
+    thread.start()
+    assert wait_for_flush(config, session, prompt, limit=5.0) is True
+    thread.join()
+    assert collect(path, prompt).records[0]["attachment"]["type"] == "date"
+    # Nothing written at all: give up within the limit; collection then reports unknown.
+    started = time.monotonic()
+    assert wait_for_flush(config, "dddddddd-0000-4000-8000-000000000004", prompt,
+                          limit=0.2) is False
+    assert time.monotonic() - started < 2
 
 
 def test_sweep_removes_leftover_session_files_and_step_folders_only(tmp_path):
