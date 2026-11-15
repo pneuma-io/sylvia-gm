@@ -215,6 +215,17 @@ class _BackupFailure(CommandRejected):
         )
 
 
+#: Session evidence that a portable or private campaign export carries only as a stub
+#: ``{"kind": <kind>, "omitted_from_export": true}``. ``gm_wire_journal`` repeats GM-private
+#: state (a few hundred KB per combat turn) and is rebuilt from canonical history;
+#: ``gm_native_records`` are Claude Code's own context records, which name Sylvia's runtime
+#: folder under the person's profile path and the OS version. The row and its sequence stay, so
+#: the archive's session chronology and integrity checks are unchanged. Readers treat a stub as
+#: no record: after recovery the next GM request starts a journal and ``claude_code`` collects
+#: the CLI's records again. Full database backups keep the real content.
+_EXPORT_STUBBED_EVIDENCE_KINDS = frozenset({"gm_native_records", "gm_wire_journal"})
+
+
 class _ExportFailure(CommandRejected):
     """Path-free portable-export failure with deterministic cleanup diagnostics."""
 
@@ -2137,8 +2148,17 @@ class SQLiteAuthorityStore:
                         )
                     except (TypeError, ValueError, json.JSONDecodeError):
                         raise _ExportFailure("portable_export_capture_read_failed") from None
-                    if isinstance(content, dict) and "source_locator" in content:
+                    rewritten = False
+                    if (
+                        isinstance(content, dict)
+                        and content.get("kind") in _EXPORT_STUBBED_EVIDENCE_KINDS
+                    ):
+                        content = {"kind": content["kind"], "omitted_from_export": True}
+                        rewritten = True
+                    elif isinstance(content, dict) and "source_locator" in content:
                         content["source_locator"] = None
+                        rewritten = True
+                    if rewritten:
                         materialized["content_json"] = json.dumps(
                             content,
                             sort_keys=True,

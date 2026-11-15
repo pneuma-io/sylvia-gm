@@ -958,3 +958,110 @@ def test_an_incomplete_flush_reports_the_records_unknown(runtime, monkeypatch):
         "status": "unknown", "records": []}
     assert_nothing_private_left(home)
 
+
+def test_exports_stub_cli_records_and_the_wire_journal(tmp_path, monkeypatch):
+    """Review N8: a portable or private export keeps both machine-local evidence kinds only as
+    stubs; recovery opens and the next GM turn starts a journal and collects the CLI's records
+    again."""
+    import dataclasses
+    import re
+    import zipfile
+
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.domain.session import SessionMessageKind
+    from tests.test_fc_campaign_journey import _start_campaign
+    from tests.test_gm_context_contract import Table
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
+    ScriptedCLI.instances, ScriptedCLI.date_change = [], False
+
+    class ToolListCLI(ScriptedCLI):
+        """Answers the tool listing, then replies."""
+
+        def __init__(self, *args):
+            ScriptedCLI.scripts = [[{"type": "control_request", "request_id": "list",
+                                     "request": {"subtype": "mcp_message",
+                                                 "server_name": "sylvia", "message": {
+                                                     "jsonrpc": "2.0", "id": 1,
+                                                     "method": "tools/list"}}}]]
+            super().__init__(*args)
+
+        def write(self, event):
+            super().write(event)
+            tools = (event.get("response", {}).get("response", {}).get("mcp_response", {})
+                     .get("result", {}).get("tools"))
+            if tools is not None:
+                self.events = iter(text_reply("The road is quiet."))
+
+    def evidence(database: Path, session: str) -> list:
+        with AuthorityOwner.open(database, "inspect") as owner:
+            messages = owner.session_context(session).messages
+        return [m.content for m in messages if m.kind is SessionMessageKind.EVIDENCE
+                and isinstance(m.content, Mapping)
+                and m.content.get("kind") in {NATIVE_KIND, JOURNAL_KIND}]
+
+    database, recovered = tmp_path / "campaign.sqlite3", tmp_path / "recovered.sqlite3"
+    home = tmp_path / "runtime"
+    # A real bundled campaign's instructions and tools need a realistic context window.
+    model = dataclasses.replace(claude_model(), context_window=1_000_000)
+    campaign, session, _turn = _start_campaign(database, "the-long-way-round")
+    table = Table(database, ClaudeProvider(home, model, connection_factory=ToolListCLI),
+                  campaign, session)
+    try:
+        table.submit("I look around.")
+    finally:
+        table.close()
+    saved = evidence(database, session)
+    assert {NATIVE_KIND, JOURNAL_KIND} <= {r["kind"] for r in saved}
+    private_heads = [r["head"].encode() for r in saved if r["kind"] == JOURNAL_KIND]
+    with AuthorityOwner.open(database, "exporter") as owner:
+        # Exports need the current schema; a no-op rename migrates it, as the export tests do.
+        snap = owner.snapshot(campaign)
+        owner.rename_campaign(operation_id="schema", campaign_id=campaign,
+                              display_name=snap.display_name, expected_revision=snap.revision)
+        for name, private in (("portable.zip", False), ("private.zip", True)):
+            owner.export_campaign(operation_id="export-" + name, campaign_id=campaign,
+                                  target=tmp_path / name, include_thinking=private)
+    # The local database is never touched.
+    assert evidence(database, session) == saved
+    for name in ("portable.zip", "private.zip"):
+        with zipfile.ZipFile(tmp_path / name) as archive:
+            data = b"".join(archive.read(member) for member in archive.namelist())
+        assert b"journal_record_id" not in data and b"native_record_id" not in data, name
+        assert not any(head in data for head in private_heads), name
+        # The CLI's environment record names its working directory and the OS version.
+        assert b"SylviaRuntime" not in data and b"osVersion" not in data, name
+        assert b"I look around." in data  # the session itself travels
+    with AuthorityOwner.open(recovered, "recovery") as owner:
+        owner.recover_campaign(recovery_id="recover", source=tmp_path / "portable.zip")
+    stubs = evidence(recovered, session)
+    # Every row is kept, in order, as a stub.
+    assert [dict(r) for r in stubs] == [
+        {"kind": r["kind"], "omitted_from_export": True} for r in saved]
+
+    def next_turn(path: Path) -> tuple[str, int]:
+        """Play the same next turn; its outcome and how many CLI steps it took."""
+        ScriptedCLI.instances = []
+        table = Table(path, ClaudeProvider(home, model, connection_factory=ToolListCLI),
+                      campaign, session)
+        try:
+            reply, _identity = table.submit("I keep looking.")
+        finally:
+            table.close()
+        error = str((reply or {}).get("interruption", {}).get("error", ""))
+        code = re.search(r"'code': '([a-z_]+)'", error)
+        return (code.group(1) if code else "completed"), len(ScriptedCLI.instances)
+
+    # The recovered campaign plays its next turn exactly as the never-exported one does. (With
+    # a prose-only CLI this campaign's second turn ends on its required-tool rule, in both.)
+    outcome = next_turn(recovered)
+    assert outcome == next_turn(database) and outcome[1] >= 1
+    after = evidence(recovered, session)[len(stubs):]
+    journals = [r for r in after if r["kind"] == JOURNAL_KIND]
+    assert journals and journals[0]["reset"] == "journal_started"
+    # The CLI's records were collected again on the recovered campaign's first step.
+    assert any(r["kind"] == NATIVE_KIND and r["status"] == "collected" for r in after)
+    assert_nothing_private_left(home)
+

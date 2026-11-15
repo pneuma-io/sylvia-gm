@@ -12,6 +12,7 @@ from sylvia_gm.agent._context_ledger import (
     CONTINUE_LABEL,
     JOURNAL_KIND,
     LEDGER_KEY,
+    NATIVE_KIND,
     STABLE_KEY,
     STATE_LABEL,
     UPDATE_LABEL,
@@ -19,9 +20,12 @@ from sylvia_gm.agent._context_ledger import (
     apply_state_update,
     context_mode,
     host_seal,
+    journal_marker,
     ledger_contract,
     load_journal,
+    native_marker,
     reconstruct_state,
+    saved_tip,
     seal_prefix,
     state_covers,
     state_target,
@@ -429,6 +433,38 @@ def test_journal_persists_and_rebuilds_identically_after_restart() -> None:
     assert set(record) >= {"kind", "version", "epoch", "generation", "base_count",
                            "previous_head", "head", "entries", "context_owner",
                            "prefix_sha256", "tools_sha256", "tool_count"}
+
+
+def test_export_stubs_are_no_record_for_every_reader() -> None:
+    """Review N8: an exported campaign carries both kinds only as stubs; they never count."""
+    stubs = [{"kind": JOURNAL_KIND, "omitted_from_export": True},
+             {"kind": NATIVE_KIND, "omitted_from_export": True}]
+    ledger = _ledger()
+    dialogue = [_user("u1", "a"), _user("u2", "b")]
+    epoch = _step(ledger, _canonical(*dialogue, state=_state(1))).state.epoch
+    # Only stubs (a recovered export): a journal starts, never ``journal_invalid``.
+    assert saved_tip(stubs, epoch) is None
+    loaded, reason = load_journal(stubs, epoch=epoch, context_owner=OWNER, seal=host_seal("s1"))
+    assert reason is None and loaded.entries == [] and loaded.generation == 0
+    assert loaded.native == {}
+    recovered = _ledger()
+    frame = recovered.plan(_canonical(*dialogue, state=_state(1)), request_context_id=CONTEXT,
+                           history_records=lambda: _history(stubs))
+    assert frame.reset == "journal_started" and frame.state.generation == 0
+    # Stubs before the records saved after recovery leave the saved chain valid.
+    later = _history(stubs + [frame.record])
+    assert saved_tip(later, epoch)[1] == len(frame.state.entries)
+    reloaded, reason = load_journal(later, epoch=epoch, context_owner=OWNER,
+                                    seal=host_seal("s1"))
+    assert reason is None and reloaded.entries == frame.state.entries
+    # A stub that also carried a real-looking body is still not a record.
+    disguised = {**frame.record, "omitted_from_export": True}
+    assert saved_tip([disguised], epoch) is None
+    assert load_journal([disguised], epoch=epoch, context_owner=OWNER,
+                        seal=host_seal("s1")) == (loaded, None)
+    # The owner protocol's markers never raise on a stub and say what it is.
+    assert journal_marker(stubs[0]) == stubs[0]
+    assert native_marker(stubs[1]) == stubs[1]
 
 
 @pytest.mark.parametrize("damage", ["head", "version", "owner", "gap"])

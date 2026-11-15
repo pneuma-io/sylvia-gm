@@ -22,6 +22,9 @@ On the ``claude_code`` route the context records Claude Code writes itself (envi
 date) are saved as ``gm_native_records`` evidence for the request that produced them and replayed
 in every later transcript of the same journal generation. When they are unknown, the next
 request on that route starts a new generation.
+
+A campaign export carries both kinds only as ``{"kind": ..., "omitted_from_export": true}``
+stubs; every reader here treats a stub as no record.
 """
 
 from __future__ import annotations
@@ -709,6 +712,12 @@ def reconstruct_state(entries: Sequence[Mapping[str, Any]], seal: str) -> dict[s
 # ── Journal ───────────────────────────────────────────────────────────────────────────────
 
 
+def _saved(record: Any, kind: str) -> bool:
+    """Is *record* saved evidence of *kind*, not an export stub that stands for none?"""
+    return (isinstance(record, Mapping) and record.get("kind") == kind
+            and record.get("omitted_from_export") is not True)
+
+
 def _genesis(epoch: str, generation: int) -> str:
     return _sha(f"{JOURNAL_KIND}/v{JOURNAL_VERSION}|{epoch}|{generation}")
 
@@ -768,7 +777,7 @@ class JournalState:
 
 def saved_tip(records: Sequence[Mapping[str, Any]], epoch: str) -> tuple[int, int, str] | None:
     """(generation, journal length, head) of the newest saved record for *epoch*."""
-    rows = [r for r in records if isinstance(r, Mapping) and r.get("kind") == JOURNAL_KIND
+    rows = [r for r in records if _saved(r, JOURNAL_KIND)
             and r.get("epoch") == epoch and isinstance(r.get("generation"), int)]
     if not rows:
         return None
@@ -793,8 +802,7 @@ def load_journal(
     """
     rows = [
         plain(record) for record in records
-        if isinstance(record, Mapping) and record.get("kind") == JOURNAL_KIND
-        and record.get("epoch") == epoch
+        if _saved(record, JOURNAL_KIND) and record.get("epoch") == epoch
     ]
     owner = plain(context_owner) if context_owner is not None else None
     if not rows:
@@ -832,8 +840,7 @@ def load_journal(
     for record in records:
         # Saved Claude Code context records count only for a request on this exact chain.
         if (
-            isinstance(record, Mapping)
-            and record.get("kind") == NATIVE_KIND
+            _saved(record, NATIVE_KIND)
             and record.get("version") == NATIVE_VERSION
             and record.get("epoch") == epoch
             and record.get("generation") == state.generation
@@ -1369,8 +1376,17 @@ class ContextLedger:
         self._pending_strip = None
 
 
+def _stub_marker(value: Mapping[str, Any]) -> dict[str, Any] | None:
+    if value.get("omitted_from_export") is True:
+        return {"kind": value.get("kind"), "omitted_from_export": True}
+    return None
+
+
 def native_marker(value: Mapping[str, Any]) -> dict[str, Any]:
     """The only part of a native-records record that may leave the owner."""
+    stub = _stub_marker(value)
+    if stub is not None:
+        return stub
     return {
         "kind": NATIVE_KIND,
         "native_record_id": value.get("native_record_id"),
@@ -1384,6 +1400,9 @@ def native_marker(value: Mapping[str, Any]) -> dict[str, Any]:
 
 def journal_marker(value: Mapping[str, Any]) -> dict[str, Any]:
     """The only part of a journal record that may leave the owner (it holds GM-private data)."""
+    stub = _stub_marker(value)
+    if stub is not None:
+        return stub
     return {
         "kind": JOURNAL_KIND,
         "journal_record_id": value.get("journal_record_id"),

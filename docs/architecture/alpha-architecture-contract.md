@@ -1501,7 +1501,12 @@ the ledger resets. Builder and participant requests do not use it.
   private provider fields never enter the journal. A restarted owner rebuilds the journal from
   that evidence. On `claude_code` the context records Claude Code writes itself are saved as
   `gm_native_records` evidence for the request that produced them. The owner protocol exposes only
-  a marker for both kinds, because they repeat GM-private state. Existing saves need no migration.
+  a marker for both kinds, because they repeat GM-private state. A portable or private campaign
+  export keeps every row of both kinds and its sequence but writes its content as the stub
+  `{"kind": <kind>, "omitted_from_export": true}`; every reader treats a stub as no record, so
+  after recovery the next GM request starts a journal (`journal_started`) and `claude_code`
+  collects the CLI's records again. Full database backups keep the content. Existing saves need
+  no migration.
   A GM context without a declared owner identity uses the fallback owner
   `{kind: gm, campaign_id, session_id}`; an owner that cannot append session evidence (bare test
   stand-ins) keeps the journal in memory only.
@@ -1851,7 +1856,8 @@ A Draft and a campaign in play use the same `.sylvia-gm-campaign` archive. It co
 
 Saved thinking is an optional, explicitly selected export component under §9.2; full database
 backups retain it. An export that omits reasoning must not pretend missing provider-native
-continuation is present or fabricate a Thinking record on import.
+continuation is present or fabricate a Thinking record on import. GM wire journals and Claude
+Code's own context records travel only as stubs (§13.1.1).
 
 Startup/recovery validates database integrity, schema version, Campaign/Interview revision
 relationships, session-message references, incomplete TURN/action status, canonical ordering, and
