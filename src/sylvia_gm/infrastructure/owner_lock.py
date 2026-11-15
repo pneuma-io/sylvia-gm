@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 from typing import BinaryIO
 
@@ -36,32 +37,32 @@ class DatabaseOwnerLock:
         self._closed = False
 
     def _lock(self) -> None:
-        if os.name == "nt":
+        if sys.platform == "win32":
             import msvcrt
 
             msvcrt.locking(self._file.fileno(), msvcrt.LK_NBLCK, 1)
             return
         import fcntl
 
-        fcntl.flock(  # type: ignore[attr-defined]
+        fcntl.flock(
             self._file.fileno(),
-            fcntl.LOCK_EX | fcntl.LOCK_NB,  # type: ignore[attr-defined]
+            fcntl.LOCK_EX | fcntl.LOCK_NB,
         )
 
     def close(self) -> None:
         if self._closed:
             return
         self._file.seek(0)
-        if os.name == "nt":
+        if sys.platform == "win32":
             import msvcrt
 
             msvcrt.locking(self._file.fileno(), msvcrt.LK_UNLCK, 1)
         else:
             import fcntl
 
-            fcntl.flock(  # type: ignore[attr-defined]
+            fcntl.flock(
                 self._file.fileno(),
-                fcntl.LOCK_UN,  # type: ignore[attr-defined]
+                fcntl.LOCK_UN,
             )
         self._file.close()
         self._closed = True

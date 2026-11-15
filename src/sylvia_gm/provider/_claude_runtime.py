@@ -13,6 +13,7 @@ import os
 import queue
 import re
 import subprocess
+import sys
 import threading
 from contextlib import suppress
 from pathlib import Path
@@ -81,7 +82,9 @@ def native_environment(home: Path) -> dict[str, str]:
 
 def process_options() -> dict[str, Any]:
     """Hide owned console children on Windows without selecting an interactive shell."""
-    return {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}
+    if sys.platform == "win32":
+        return {"creationflags": subprocess.CREATE_NO_WINDOW}
+    return {}
 
 
 def native_auth_command(executable: Path, action: str) -> list[str]:

@@ -82,7 +82,7 @@ async function openApp(browser,viewport){
 const texts=page=>page.locator('#character-chat-log .cc-message p').allInnerTexts();
 
 test('closing and reopening during a reply keeps its selection and draft locked until completion',async()=>{
- const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const browser=await chromium.launch({headless:true,channel:process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined),args:['--disable-gpu']});
  try{
   const {page,errors}=await openApp(browser,{width:1280,height:860});
   await page.locator('#home-character-chat-btn').click();
@@ -125,7 +125,7 @@ test('closing and reopening during a reply keeps its selection and draft locked 
 });
 
 test('pick a card, talk in character, survive a failed send, then reopen the saved chat',async()=>{
- const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const browser=await chromium.launch({headless:true,channel:process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined),args:['--disable-gpu']});
  const shots=process.env.SYLVIA_QA_SCREENSHOTS;if(shots)fs.mkdirSync(shots,{recursive:true});
  try{
   const {page,errors}=await openApp(browser,{width:1280,height:860});
@@ -197,7 +197,7 @@ test('pick a card, talk in character, survive a failed send, then reopen the sav
 });
 
 test('narrow windows switch between the list and the chat, and a removed card is read-only',async()=>{
- const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const browser=await chromium.launch({headless:true,channel:process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined),args:['--disable-gpu']});
  const shots=process.env.SYLVIA_QA_SCREENSHOTS;
  try{
   const {page,errors}=await openApp(browser,{width:390,height:780});
@@ -225,7 +225,7 @@ test('narrow windows switch between the list and the chat, and a removed card is
 
 
 test('lost replies, another window, a removed card and a stale card list all recover without losing text',async()=>{
- const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const browser=await chromium.launch({headless:true,channel:process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined),args:['--disable-gpu']});
  const shots=process.env.SYLVIA_QA_SCREENSHOTS;
  try{
   const {page,errors}=await openApp(browser,{width:1280,height:860});

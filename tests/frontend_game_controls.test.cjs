@@ -42,7 +42,7 @@ test('An admitted action without a declared preview makes the cost gap explicit'
 
 test('coordinate Tab entry retains Map tools and focus only in the same campaign, session and panel', async () => {
   const { chromium } = require('playwright');
-  const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--disable-gpu'] });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true, args: ['--disable-gpu'] });
   try {
     const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
     const errors = [];

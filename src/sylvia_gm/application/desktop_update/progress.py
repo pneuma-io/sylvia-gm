@@ -192,6 +192,8 @@ class ProgressWindow:
 
 def _dialog_types() -> tuple[Any, Any, Any]:
     """Commctrl task-dialog structures use one-byte packing, including on x64."""
+    if sys.platform != "win32":
+        raise UpdateError("unsupported_platform", "Update presentation requires Windows.")
     import ctypes as c
 
     callback = c.WINFUNCTYPE(
@@ -240,6 +242,8 @@ def _dialog_types() -> tuple[Any, Any, Any]:
 
 
 def _windows_dialog(state: ProgressWindow) -> None:
+    if sys.platform != "win32":
+        raise UpdateError("unsupported_platform", "Update presentation requires Windows.")
     import ctypes as c
 
     config_type, button_type, callback_type = _dialog_types()

@@ -41,6 +41,8 @@ def _no_progress(_phase: str) -> None:
 
 
 def probe_owner(executable: Path) -> object:
+    if sys.platform != "win32":
+        raise UpdateError("unsupported_platform", "The update helper requires Windows.")
     with (
         system_child_libraries(),
         subprocess.Popen(
@@ -64,6 +66,8 @@ def probe_owner(executable: Path) -> object:
 
 
 def launch_app(executable: Path, arguments: tuple[str, ...]) -> Child:
+    if sys.platform != "win32":
+        raise UpdateError("unsupported_platform", "The update helper requires Windows.")
     with system_child_libraries():
         return subprocess.Popen(
             [str(executable), *arguments],

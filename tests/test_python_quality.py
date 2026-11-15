@@ -8,10 +8,20 @@ from pathlib import Path
 import pytest
 
 
-@pytest.mark.parametrize("module,arguments", [("ruff", ("check", "src")), ("mypy", ("src",))])
+# Type-check both supported platforms on every machine, so platform-only code is always checked.
+@pytest.mark.parametrize(
+    "module,arguments",
+    [
+        ("ruff", ("check", "src")),
+        ("mypy", ("src", "--platform", "win32")),
+        ("mypy", ("src", "--platform", "linux")),
+    ],
+    ids=["ruff", "mypy-win32", "mypy-linux"],
+)
 def test_python_quality(module, arguments, tmp_path):
     environment = dict(os.environ)
     environment["RUFF_CACHE_DIR"] = str(tmp_path / "ruff")
+    # tmp_path is unique per case, so each platform run gets its own mypy cache.
     environment["MYPY_CACHE_DIR"] = str(tmp_path / "mypy")
     result = subprocess.run(
         [sys.executable, "-m", module, *arguments],
