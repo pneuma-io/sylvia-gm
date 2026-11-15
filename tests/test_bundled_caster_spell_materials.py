@@ -14,19 +14,21 @@ RECORD_SUPPLIES = "Record the carried material supplies before casting this spel
 NOT_CARRIED = "The selected Material supply is not carried"
 
 # Rightful refusals from shipped starting equipment, by class and spell. SRD 5.2.1 Magic
-# Initiate grants no Spellcasting Focus, and these casters carry neither a Component Pouch
-# nor the component itself, so the GM must record an acquired component first.
+# Initiate grants no Spellcasting Focus, so a caster carries the unpriced component itself
+# for such a spell (moss for Light, lodestones for Mending, dirt for Longstrider). Only a
+# priced, consumed component the character does not own stays refused.
 EXPECTED_REFUSALS = {
-    ("bard", "light"): "Magic Initiate spell; no Component Pouch or firefly/moss carried",
-    ("cleric", "mending"): "Magic Initiate spell; no Component Pouch or lodestones carried",
-    ("druid", "light"): "Magic Initiate spell; no Component Pouch or firefly/moss carried",
-    ("druid", "mending"): "Magic Initiate spell; no Component Pouch or lodestones carried",
-    ("wizard", "mending"): "Magic Initiate spell; no Component Pouch or lodestones carried",
-    ("wizard", "longstrider"): "Magic Initiate spell; no Component Pouch or dirt carried",
     ("warlock", "protection_from_evil_and_good"): (
         "consumes Holy Water worth 25+ GP, which is not starting equipment"
     ),
 }
+
+# Mending takes 1 minute, so it goes through the longer-casting tools.
+LONGER_CASTINGS = {"mending"}
+BEGIN_PARAMETERS = (
+    "spell", "caster", "caster_state", "slot_resource", "verbal_component_available",
+    "material_component_available", "material_item_ids",
+)
 
 EXTRA_PARAMETERS = {
     "bless": {"targets": ["guard", "other"]},
@@ -75,7 +77,7 @@ def _bundled_casters():
 CASES = _bundled_casters()
 
 
-def _cast_from(participant, starting_state, spell, *, supplies=True):
+def _cast_from(participant, starting_state, spell, *, supplies=True, begin=False):
     """Cast with the character's own data over the shared spell fixture's scene and targets."""
     state, data, parameters = _spell_case(spell)
     data.update(deepcopy(participant))
@@ -89,6 +91,12 @@ def _cast_from(participant, starting_state, spell, *, supplies=True):
     parameters.update(EXTRA_PARAMETERS.get(spell, {}))
     if spell == "light":
         state[f"{SRD}.state"]["spatial_scene"]["entities"].append(deepcopy(TORCH))
+    if begin:
+        state[f"{SRD}.combat"].update(
+            encounter_active=False, turn_active=False, active_actor=None, phase="exploration",
+        )
+        parameters = {key: parameters[key] for key in BEGIN_PARAMETERS}
+        return _run("begin_srd_spell_cast", state, participant_data=data, **parameters)
     return _run("cast_spell", state, participant_data=data, **parameters)
 
 
@@ -116,5 +124,11 @@ def test_prepared_material_spell_is_not_refused_for_missing_supplies(
     if refusal:
         with pytest.raises(RulesetPreconditionRejected, match=NOT_CARRIED):
             _cast_from(participant, starting_state, spell)
+    elif spell in LONGER_CASTINGS:
+        # A casting longer than one action is begun, not resolved at once; beginning it is
+        # where its Material supply is checked.
+        with pytest.raises(RulesetPreconditionRejected, match=RECORD_SUPPLIES):
+            _cast_from(participant, starting_state, spell, supplies=False, begin=True)
+        _cast_from(participant, starting_state, spell, begin=True)
     else:
         assert _cast_from(participant, starting_state, spell).result["status"] == "committed"
