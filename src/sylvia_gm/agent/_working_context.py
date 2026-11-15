@@ -6,6 +6,7 @@ import asyncio
 import hashlib
 import inspect
 import json
+import logging
 import queue
 import re
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
@@ -18,11 +19,14 @@ from sylvia_gm.agent._request_data import strip_data_markers
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, closing_provider_stream
 from sylvia_gm.provider._exceptions import (
     ContextCompactionError,
+    InvalidRequestError,
     InvalidResponseError,
     ProviderOutputLimitError,
     TokenLimitError,
 )
 from sylvia_gm.provider._token_estimate import token_estimator
+
+logger = logging.getLogger(__name__)
 
 CHECKPOINT_KIND = "working_context_checkpoint"
 _SUMMARY_LIMIT = 12_000
@@ -201,6 +205,7 @@ class WorkingContextProvider(Provider):
         finalize_request: Callable | None = None,
         measure_wire: Callable | None = None,
         rebase_wire: Callable[[], None] | None = None,
+        strip_thinking: Callable[[], None] | None = None,
     ) -> None:
         super().__init__()
         self._provider = provider
@@ -221,6 +226,7 @@ class WorkingContextProvider(Provider):
         self._finalize_request = finalize_request
         self._measure_wire = measure_wire
         self._rebase_wire = rebase_wire
+        self._strip_thinking = strip_thinking
         self._token_estimator = token_estimator(provider)
 
     def _estimate(self, value: object) -> int:
@@ -586,9 +592,23 @@ class WorkingContextProvider(Provider):
             return await self._finalize_request(projected, request_tools)
         return self._prepare_continuation(projected, bool(request_tools))
 
+    def _retry_without_thinking(self, error: BaseException, stripped: bool) -> bool:
+        """Claude rejected a replayed thinking block: strip every one and retry once."""
+        from sylvia_gm.provider._anthropic import rejects_replayed_thinking
+
+        if (stripped or self._strip_thinking is None
+                or getattr(self.model_info, "transport", None) != "anthropic_messages"
+                or not rejects_replayed_thinking(error)):
+            return False
+        logger.warning("Claude rejected a replayed thinking block; retrying once with every "
+                       "earlier thinking block stripped.")
+        self._strip_thinking()
+        return True
+
     async def generate(self, messages, tools=None, stream=False, timeout=60.0, **options):
         options.update(self._context_options())
         projected = await self.prepare(messages, tools, **options)
+        stripped = False
         for attempt in range(4):
             try:
                 response = await self._provider.generate(
@@ -604,12 +624,17 @@ class WorkingContextProvider(Provider):
                 if attempt == 3:
                     raise
                 projected = await self.prepare(messages, tools, force=True, **options)
+            except InvalidRequestError as error:
+                if not self._retry_without_thinking(error, stripped):
+                    raise
+                stripped = True
 
     async def generate_stream(
         self, messages, tools=None, timeout=120.0, **options
     ) -> AsyncIterator[ProviderStreamChunk]:
         options.update(self._context_options())
         projected = await self.prepare(messages, tools, **options)
+        stripped = False
         for attempt in range(4):
             emitted = False
             try:
@@ -637,6 +662,10 @@ class WorkingContextProvider(Provider):
                 if emitted or attempt == 3:
                     raise
                 projected = await self.prepare(messages, tools, force=True, **options)
+            except InvalidRequestError as error:
+                if emitted or not self._retry_without_thinking(error, stripped):
+                    raise
+                stripped = True
 
     async def close(self) -> None:
         """The session resolver owns the wrapped provider's lifetime."""

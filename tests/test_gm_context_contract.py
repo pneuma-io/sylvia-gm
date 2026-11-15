@@ -387,9 +387,188 @@ def test_first_player_turn_extends_the_opening_request(opened):
     assert first.wire[: len(opening.wire)] == opening.wire
     for transport in (None, *TRANSPORTS):
         route = frames if transport is None else replay(frames, transport)
-        result = check_extension(route, transport or "chat_completions")
+        result = check_extension(route, transport or "chat_completions", "opening")
         assert [reason for _index, reason in result["resets"]] == [], (transport, result)
+        assert result["pairs_with_tools"] <= result["pairs"]
         assert result["pairs"] == len(frames) - 1, (transport, result)
+
+
+class ThinkingGM(ContractGM):
+    """A scripted Claude Messages GM: each tool call carries signed native thinking.
+
+    ``model_info`` makes the working context run its real sizing (``measure_wire`` and frame
+    reuse). ``drop_after`` removes one unused tool from every request after that call
+    number is served (a per-round tool-list change); ``reject_on`` answers those call numbers
+    with the documented 400 for a replayed thinking block.
+    """
+
+    def __init__(self, model: str, *, drop_after: int | None = None,
+                 reject_on: tuple[int, ...] = ()) -> None:
+        from sylvia_gm.provider._base import ModelInfo
+
+        super().__init__()
+        self.model_info = ModelInfo(
+            id=f"anthropic/{model}", name=model, provider_name="Anthropic",
+            provider_key="anthropic", provider_mode="byok", transport="anthropic_messages",
+            provider_model_id=model, context_window=1_000_000, max_output_tokens=8192)
+        self.drop_after, self.reject_on = drop_after, set(reject_on)
+        self.dropped: str | None = None
+        self.native: dict[str, list[dict[str, Any]]] = {}
+
+    async def generate_stream(self, messages: Any, tools: Any = None, **kwargs: Any) -> Any:
+        if self._summary(messages) and not tools:
+            yield ProviderStreamChunk(content=NOTE, finish_reason="stop")
+            return
+        self.calls.append({"messages": json.loads(json.dumps(messages)),
+                           "tools": [t["function"]["name"] for t in tools or []]})
+        number = len(self.calls)
+        if number in self.reject_on:
+            from sylvia_gm.provider._exceptions import InvalidRequestError
+
+            raise InvalidRequestError(
+                "Error code: 400 - messages.1.content.0: Invalid `signature` in `thinking` block")
+        if self.drop_after is not None and number >= self.drop_after and self.dropped is None:
+            used = {kind for kind, _ in self.steps}
+            self.dropped = next(t["function"]["name"] for t in reversed(tools or [])
+                                if not any(t["function"]["name"].endswith(u) for u in used))
+        kind, arguments = self.steps[self.position]
+        self.position += 1
+        names = [t["function"]["name"] for t in tools or []
+                 if t["function"]["name"] == kind or t["function"]["name"].endswith("_" + kind)]
+        assert len(names) == 1, (kind, names)
+        call_id = f"toolu-{self._prefix}-{self.position}"
+        blocks = [{"type": "thinking", "thinking": f"PRIVATE REASONING {self.position}",
+                   "signature": f"signature-{self.position}"},
+                  {"type": "tool_use", "id": call_id, "name": names[0], "input": arguments}]
+        self.native[call_id] = blocks
+        yield ProviderStreamChunk(tool_call_delta={
+            "index": 0, "id": call_id,
+            "function": {"name": names[0], "arguments": json.dumps(arguments)},
+        }, finish_reason="tool_calls", anthropic_content=blocks)
+
+
+def _replayed(call: dict[str, Any]) -> dict[str, list[str]]:
+    """Per assistant tool call in one request: the native block types it carried."""
+    seen = {}
+    for message in call["messages"]:
+        blocks = message.get("anthropic_content")
+        if message.get("role") == "assistant" and isinstance(blocks, list):
+            call_id = next(b["id"] for b in blocks if b.get("type") == "tool_use")
+            seen[call_id] = [b["type"] for b in blocks]
+    return seen
+
+
+@pytest.fixture(scope="module")
+def started_campaign(tmp_path_factory):
+    """One finalized campaign, copied for each thinking scenario."""
+    from sylvia_gm.application.authority import AuthorityOwner
+    from tests.test_fc_campaign_journey import _start_campaign
+
+    database = tmp_path_factory.mktemp("thinking-base") / "base.sqlite3"
+    campaign, session, _turn = _start_campaign(database, "the-long-way-round")
+    with AuthorityOwner.open(database, "thinking-ids") as owner:
+        player = next(p.participant_id for p in owner.snapshot(campaign).participants
+                      if p.data.get("party_role") == "player_character")
+    return database, campaign, session, player
+
+
+def _thinking_run(started_campaign, tmp_path, monkeypatch, gm, *, restart: bool = False):
+    import shutil
+
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    base, campaign, session, player = started_campaign
+    database = tmp_path / "thinking.sqlite3"
+    shutil.copyfile(base, database)
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    original = WorkingContextProvider._request_tools
+
+    def request_tools(self, tools):
+        selected = original(self, tools)
+        if gm.dropped is None or not selected:
+            return selected
+        return [t for t in selected if t["function"]["name"] != gm.dropped]
+
+    monkeypatch.setattr(WorkingContextProvider, "_request_tools", request_tools)
+    recorder = LedgerRecorder().install(monkeypatch)
+    gm.steps.extend([_check(player, "perception"), _check(player, "stealth"),
+                     settle("You slip past unseen."), settle("The road is quiet.")])
+    table = Table(database, gm, campaign, session)
+    try:
+        first, _identity = table.submit("I look around, then sneak forward.")
+        if restart:
+            table.close()
+            table = Table(database, gm, campaign, session)
+        second, _identity = table.submit("I keep going.")
+    finally:
+        table.close()
+    return [first, second], recorder.stop()
+
+
+def test_claude_thinking_replays_byte_for_byte_while_tools_are_unchanged(
+    started_campaign, tmp_path, monkeypatch,
+):
+    """F14: the real owner reattaches signed native blocks across tool rounds."""
+    gm = ThinkingGM("claude-fable-5-2")
+    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
+    assert all(r.get("interruption") is None for r in replies), replies
+    calls = gm.calls
+    assert len(calls) == 4 and len({tuple(c["tools"]) for c in calls}) == 1
+    first_call = next(iter(gm.native))
+    for call in calls[1:]:
+        replayed = next(m["anthropic_content"] for m in call["messages"]
+                        if m.get("role") == "assistant" and m.get("anthropic_content")
+                        and m["anthropic_content"][-1]["id"] == first_call)
+        assert json.dumps(replayed) == json.dumps(gm.native[first_call])
+    assert all(f.observation["thinking_floor"] == 0 for f in frames)
+
+
+@pytest.mark.parametrize("restart", [False, True], ids=["same-owner", "after-restart"])
+def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
+    started_campaign, tmp_path, monkeypatch, restart,
+):
+    """F2 proactive: Fable 5.2 binds thinking to the tool set on every account."""
+    gm = ThinkingGM("claude-fable-5-2", drop_after=2)
+    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
+    assert all(r.get("interruption") is None for r in replies), replies
+    one, two, _three = list(gm.native)[:3]
+    calls = [_replayed(call) for call in gm.calls]
+    assert calls[1][one] == ["thinking", "tool_use"]
+    # Request 3 has a changed tool list: the turn journaled before it loses its thinking;
+    # the turn new in this request keeps it. It stays stripped on every later request.
+    assert calls[2][one] == ["tool_use"] and calls[2][two] == ["thinking", "tool_use"]
+    assert calls[3][one] == ["tool_use"]
+    moved = [f for f in frames if f.observation.get("thinking_strip")]
+    assert [f.observation["thinking_strip"] for f in moved] == ["tools_changed"]
+    assert frames[-1].observation["thinking_floor"] == moved[0].observation["thinking_floor"] > 0
+    assert frames[-1].reset is None
+
+
+def test_other_models_keep_thinking_until_the_service_rejects_it_then_retry_once(
+    started_campaign, tmp_path, monkeypatch,
+):
+    """F2 reactive: a documented 400 strips every replayed block and retries once."""
+    gm = ThinkingGM("claude-opus-5-5", drop_after=2, reject_on=(3,))
+    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
+    assert all(r.get("interruption") is None for r in replies), replies
+    one, two = list(gm.native)[:2]
+    calls = [_replayed(call) for call in gm.calls]
+    assert calls[2][one] == ["thinking", "tool_use"]  # changed tools, kept: not enforced
+    # The retry (call 4) and every later request carry no thinking from earlier turns.
+    assert calls[3][one] == ["tool_use"] and calls[3][two] == ["tool_use"]
+    assert all(blocks == ["tool_use"] for call in calls[4:] for key, blocks in call.items()
+               if key in {one, two})
+    assert len(gm.calls) == 5
+    assert [f.observation.get("thinking_strip") for f in frames
+            if f.observation.get("thinking_strip")] == ["thinking_rejected"]
+
+
+def test_a_second_thinking_rejection_surfaces(started_campaign, tmp_path, monkeypatch):
+    gm = ThinkingGM("claude-opus-5-5", reject_on=(2, 3))
+    replies, _frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
+    assert replies[0].get("interruption") is not None
+    # The first turn made its request, the retry, and nothing more; it surfaced.
+    assert sum("I keep going." not in json.dumps(c["messages"]) for c in gm.calls) == 3
 
 
 def _session_frames(played: dict[str, Any]) -> list[Any]:
@@ -433,7 +612,9 @@ def test_each_request_extends_the_previous_one_on_every_route(played, transport)
         frames_for_route, route = frames, "chat_completions"
     else:
         frames_for_route, route = replay(frames, transport), transport
-    result = check_extension(frames_for_route, route)
+    result = check_extension(frames_for_route, route,
+                             "played" if transport is not None else "played-recorded")
+    assert result["pairs_with_tools"] <= result["pairs"]
     assert result["pairs"] >= 12, result
     if route == "claude_code":
         # The checked view is Claude Code's transcript plus stdin prompt: Sylvia's fillers
@@ -675,7 +856,8 @@ def test_party_combat_rounds_extend_on_every_route(party_combat):
     assert len(frames) >= 8
     for transport in (None, *TRANSPORTS):
         route_frames = frames if transport is None else replay(frames, transport)
-        result = check_extension(route_frames, transport or "chat_completions")
+        result = check_extension(route_frames, transport or "chat_completions",
+                                 "party-combat" if transport else "party-combat-recorded")
         assert result["pairs"] == len(frames) - 1 - len(result["resets"]), result
         assert not result["resets"], result
     assert check_freshness(frames) >= len(frames) - 1
@@ -748,7 +930,7 @@ def test_pinned_adapter_scenarios_keep_the_wire_invariant_in_ledger_mode(
         return
     for transport in (None, *TRANSPORTS):
         route = frames if transport is None else replay(frames, transport)
-        result = check_extension(route, transport or "chat_completions")
+        result = check_extension(route, transport or "chat_completions", f"pinned:{name}")
         assert all(reason in {"identity_missing", "epoch_changed", "journal_started"}
                    for _index, reason in result["resets"]), result
     check_authority(frames)

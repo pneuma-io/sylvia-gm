@@ -113,6 +113,37 @@ def accepts_temperature(model_id: str) -> bool:
     return claude_id is None or claude_id in _CLAUDE_TEMPERATURE
 
 
+# Preserved thinking, from Anthropic's documentation as restated in the review decisions of
+# 2026-11-15 (not checked against the live service): a thinking block is bound to the
+# top-level system, the tool set (full definitions, order-insensitive) and every earlier
+# message. Replaying one after any of those changed is HTTP 400 where the binding is enforced:
+# every account on these models; on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 only accounts
+# created from 31 August 2026, which Sylvia cannot know, so those rely on the reactive strip.
+_CLAUDE_THINKING_BINDING_EVERY_ACCOUNT = frozenset({"claude-fable-5-2", "claude-mythos-5-2"})
+
+
+def binds_thinking_for_every_account(model_id: str) -> bool:
+    """Whether every account on this wire model rejects a thinking block replayed after the
+    system prompt or tool set changed."""
+    return _claude_model_id(model_id) in _CLAUDE_THINKING_BINDING_EVERY_ACCOUNT
+
+
+def rejects_replayed_thinking(error: BaseException) -> bool:
+    """A 400 that names a thinking block's signature as invalid or bound elsewhere.
+
+    Matched narrowly on the documented wording (``Invalid `signature` in `thinking` block``,
+    a signature bound to a different conversation); never matched against a live response.
+    """
+    if not isinstance(error, InvalidRequestError):
+        return False
+    text = str(error).casefold()
+    return (
+        "signature" in text
+        and "thinking" in text
+        and ("invalid" in text or "different" in text or "does not match" in text)
+    )
+
+
 def _content_block_dict(block: Any) -> dict[str, Any]:
     """Copy native blocks without rebuilding or losing signatures and provider fields."""
     if isinstance(block, dict):

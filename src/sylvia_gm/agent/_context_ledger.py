@@ -543,6 +543,12 @@ class JournalState:
     #: claude_code only: journal length that ended a request -> the CLI's records for it
     #: (``{"status": "collected" | "unknown", "records": [...]}``).
     native: dict[int, dict[str, Any]] = field(default_factory=dict)
+    #: anthropic_messages only: assistant turns at a journal index below this get no thinking
+    #: or redacted-thinking blocks reattached. Moves only forward within a generation.
+    thinking_floor: int = 0
+    #: The previous request's system-prefix and tool-set fingerprints in this generation.
+    last_prefix: str | None = None
+    last_toolset: str | None = None
 
     @classmethod
     def fresh(cls, epoch: str, generation: int) -> JournalState:
@@ -606,6 +612,11 @@ def load_journal(
         state.heads[len(state.entries)] = state.head
         state.keyframe_bytes = int(record.get("keyframe_bytes", state.keyframe_bytes) or 0)
         state.update_bytes = int(record.get("update_bytes", state.update_bytes) or 0)
+        floor = record.get("thinking_floor")
+        if isinstance(floor, int) and not isinstance(floor, bool):
+            state.thinking_floor = max(state.thinking_floor, floor)
+        state.last_prefix = record.get("prefix_sha256") or state.last_prefix
+        state.last_toolset = record.get("toolset_sha256") or state.last_toolset
     if not valid:
         return JournalState.fresh(epoch, latest + 1), "journal_invalid"
     for record in records:
@@ -707,6 +718,21 @@ def _tools_fingerprint(tools: Sequence[Mapping[str, Any]] | None) -> str:
     return _sha(json.dumps(list(tools or []), ensure_ascii=False, separators=(",", ":")))
 
 
+def _tool_name(tool: Mapping[str, Any]) -> str:
+    function = tool.get("function")
+    return str((function if isinstance(function, Mapping) else tool).get("name", ""))
+
+
+def toolset_fingerprint(tools: Sequence[Mapping[str, Any]] | None) -> str:
+    """The tool set as full definitions, order-insensitive (sorted by name).
+
+    Claude binds a thinking block to the set of tools, so reordering is not a change but an
+    added, removed or reworded tool is. ``tools_sha256`` stays order-sensitive for observation.
+    """
+    ordered = sorted((plain(tool) for tool in tools or ()), key=lambda t: (_tool_name(t), _json(t)))
+    return _sha(_json(ordered))
+
+
 class ContextLedger:
     """Reconcile canonical GM requests into an append-only wire journal for one session."""
 
@@ -725,6 +751,13 @@ class ContextLedger:
         self.prefix_sha256: str | None = None
         #: A declared reset requested for the next frame of this epoch (``journal_rebased``).
         self._pending_reset: tuple[str, str] | None = None
+        #: The epoch whose next request strips every replayed thinking block (after a 400).
+        self._pending_strip: str | None = None
+
+    def request_thinking_strip(self) -> None:
+        """The service rejected a replayed thinking block: strip all of them from now on."""
+        if self.state is not None:
+            self._pending_strip = self.state.epoch
 
     def request_rebase(self) -> None:
         """Restart the journal from canonical history on the next request of this epoch.
@@ -766,6 +799,7 @@ class ContextLedger:
         history_records: Callable[[], Sequence[Mapping[str, Any]]] = tuple,
         tools: Sequence[Mapping[str, Any]] | None = None,
         check_saved_tip: bool = True,
+        thinking_enforced: bool = False,
         _native_reset: bool = False,
     ) -> WireFrame:
         """Compute the next request without changing the ledger (also used for size planning).
@@ -956,7 +990,8 @@ class ContextLedger:
         ):
             return self.plan(canonical, request_context_id=request_context_id,
                              history_records=history_records, tools=tools,
-                             check_saved_tip=check_saved_tip, _native_reset=True)
+                             check_saved_tip=check_saved_tip,
+                             thinking_enforced=thinking_enforced, _native_reset=True)
         prefix = _prefix_fingerprint(stable)
         previous_head = state.head
         state.entries.extend(appended)
@@ -964,8 +999,25 @@ class ContextLedger:
         state.heads[len(state.entries)] = state.head
         state.present = frozenset(present)
         appended_bytes = sum(len(_json(entry["m"]).encode("utf-8")) for entry in appended)
+        toolset = toolset_fingerprint(tools)
+        floor_before = state.thinking_floor
+        thinking_strip = None
+        if self.transport == "anthropic_messages":
+            # Claude binds each thinking block to the system prompt, the tool set and every
+            # earlier message; replaying one after a change is rejected on enforced accounts.
+            if self._pending_strip == epoch:
+                state.thinking_floor = len(state.entries)
+                thinking_strip = "thinking_rejected"
+            elif thinking_enforced and state.last_prefix is not None and (
+                state.last_prefix != prefix or state.last_toolset != toolset
+            ):
+                state.thinking_floor = max(state.thinking_floor, base_count)
+                thinking_strip = ("prefix_changed" if state.last_prefix != prefix
+                                  else "tools_changed")
+            state.last_prefix, state.last_toolset = prefix, toolset
+        floor_moved = state.thinking_floor != floor_before
         record = None
-        if appended or reset is not None:
+        if appended or reset is not None or floor_moved:
             record = {
                 "kind": JOURNAL_KIND,
                 "version": JOURNAL_VERSION,
@@ -985,6 +1037,9 @@ class ContextLedger:
                 "update_bytes": state.update_bytes,
                 "reset": reset,
                 "prefix_changed": self.prefix_sha256 is not None and self.prefix_sha256 != prefix,
+                "toolset_sha256": toolset,
+                "thinking_floor": state.thinking_floor,
+                **({"thinking_strip": thinking_strip} if floor_moved else {}),
             }
         wire = [
             {key: value for key, value in m.items() if key not in MARKER_KEYS
@@ -1004,6 +1059,9 @@ class ContextLedger:
             "prefix_changed": self.prefix_sha256 is not None and self.prefix_sha256 != prefix,
             "tools_sha256": _tools_fingerprint(tools),
             "tool_count": len(tools or []),
+            "toolset_sha256": toolset,
+            "thinking_floor": state.thinking_floor,
+            "thinking_strip": thinking_strip if floor_moved else None,
         }
         return WireFrame(wire, state, record, appended, base_count, prefix, reset, observation)
 
@@ -1050,6 +1108,7 @@ class ContextLedger:
         self.prefix_sha256 = frame.prefix_sha256
         # A requested reset applies once: to this frame, or never once the epoch moved on.
         self._pending_reset = None
+        self._pending_strip = None
 
 
 def native_marker(value: Mapping[str, Any]) -> dict[str, Any]:

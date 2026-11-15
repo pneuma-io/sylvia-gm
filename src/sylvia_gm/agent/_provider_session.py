@@ -2268,7 +2268,7 @@ class ProviderSessionAdapter:
 
     def _ledger_hooks(
         self, provider_input: SessionProviderInput, provider: Provider, bridge: Any,
-    ) -> tuple[Any, Any, Any]:
+    ) -> tuple[Any, Any, Any, Any]:
         """Bind the session's ledger to one provider round: plan, journal, then send."""
         session_id = provider_input.session.session_id
         owner = self._ledger_owner(provider_input)
@@ -2286,6 +2286,12 @@ class ProviderSessionAdapter:
                 ledger.state = previous.state
             ledgers[session_id] = ledger
         context_id = self._gm_request_context_id(provider_input)
+        # Claude Messages: on models where every account binds thinking to the system prompt
+        # and tool set, a change moves the journal's thinking floor before it is replayed.
+        from sylvia_gm.provider._anthropic import binds_thinking_for_every_account
+
+        thinking_enforced = transport == "anthropic_messages" and binds_thinking_for_every_account(
+            str(getattr(getattr(provider, "model_info", None), "wire_model_id", "") or ""))
 
         def saved_records() -> list[Mapping[str, object]]:
             # Read the owner's saved session, not this request's history view: a Retry's view
@@ -2313,7 +2319,7 @@ class ProviderSessionAdapter:
         ) -> list[dict[str, Any]]:
             frame = ledger.plan(projected, request_context_id=context_id,
                                 history_records=saved_records, tools=tools,
-                                check_saved_tip=False)
+                                check_saved_tip=False, thinking_enforced=thinking_enforced)
             measured.update(projected=projected, state=ledger.state, tools=tools, frame=frame)
             return frame.wire
 
@@ -2327,7 +2333,7 @@ class ProviderSessionAdapter:
             )
             frame = measured["frame"] if reusable else ledger.plan(
                 projected, request_context_id=context_id, history_records=saved_records,
-                tools=tools, check_saved_tip=False)
+                tools=tools, check_saved_tip=False, thinking_enforced=thinking_enforced)
             measured.clear()
             if frame.record is not None and persistent:
                 # Durable before the request leaves: replay after a restart rehydrates the
@@ -2341,6 +2347,8 @@ class ProviderSessionAdapter:
             return self._attach_native_continuation(
                 cast(list[dict[str, object]], frame.wire), provider_input,
                 has_tools=bool(tools),
+                thinking_before=len(frame.wire) - len(frame.state.entries)
+                + frame.state.thinking_floor,
             )
 
         def rebase() -> None:
@@ -2348,7 +2356,12 @@ class ProviderSessionAdapter:
             ledger.request_rebase()
             measured.clear()
 
-        return finalize, measure, rebase
+        def strip_thinking() -> None:
+            # The service rejected a replayed thinking block: strip all of them, once.
+            ledger.request_thinking_strip()
+            measured.clear()
+
+        return finalize, measure, rebase, strip_thinking
 
     @staticmethod
     def _claude_native_route(
@@ -3625,9 +3638,14 @@ class ProviderSessionAdapter:
 
     def _attach_native_continuation(
         self, messages: list[dict[str, object]], provider_input: SessionProviderInput,
-        *, has_tools: bool = True,
+        *, has_tools: bool = True, thinking_before: int = 0,
     ) -> list[dict[str, object]]:
-        """Attach private data only to exchanges retained in the selected provider request."""
+        """Attach private data only to exchanges retained in the selected provider request.
+
+        ``thinking_before`` (the context ledger's thinking floor, as a wire index): Claude
+        assistant turns before it get their native blocks without thinking or redacted
+        thinking; text and tool calls stay.
+        """
         from sylvia_gm.agent._native_continuation import (
             attach_chat_metadata,
             requires_reasoning_with_tools,
@@ -3637,7 +3655,7 @@ class ProviderSessionAdapter:
             getattr(self._provider, "model_info", None), has_tools=has_tools,
         )
         prepared = []
-        for original in messages:
+        for position, original in enumerate(messages):
             message = dict(original)
             message.pop("_context_owner", None)
             if not resend_reasoning:
@@ -3723,6 +3741,12 @@ class ProviderSessionAdapter:
                             "Saved native tool continuation does not match this exchange",
                             code="provider_native_continuation_mismatch",
                         )
+                    if position < thinking_before and isinstance(blocks, list):
+                        blocks = [
+                            block for block in blocks
+                            if not (isinstance(block, Mapping) and block.get("type") in {
+                                "thinking", "redacted_thinking"})
+                        ]
                     message = {**message, "anthropic_content": blocks}
             prepared.append(message)
         return prepared
@@ -3751,9 +3775,9 @@ class ProviderSessionAdapter:
                        else [m.content for m in provider_input.history.messages])
             # Keep all conversation and checkpoints, but bind callbacks to this request's control.
             bridge = CheckpointBridge()
-            finalize_request, measure_wire, rebase_wire = (
+            finalize_request, measure_wire, rebase_wire, strip_thinking = (
                 self._ledger_hooks(provider_input, provider, bridge)
-                if self._ledger_active(provider_input) else (None, None, None)
+                if self._ledger_active(provider_input) else (None, None, None, None)
             )
             working = WorkingContextProvider(
                 provider, records=records, record_owner=self._gm_context_owner(provider_input),
@@ -3769,6 +3793,7 @@ class ProviderSessionAdapter:
                 finalize_request=finalize_request,
                 measure_wire=measure_wire,
                 rebase_wire=rebase_wire,
+                strip_thinking=strip_thinking,
             )
             self._working_contexts[session_id] = (working, bridge)
             provider = working

@@ -56,6 +56,8 @@ class Recorded:
     observation: dict[str, Any] = field(default_factory=dict)
     #: claude_code only: the native route the provider builds its transcript from.
     native: NativeRoute | None = None
+    #: The request's tool definitions as the ledger received them.
+    tools: list[dict[str, Any]] | None = None
 
 
 def native_route(state: JournalState, wire: Sequence[dict[str, Any]]) -> NativeRoute:
@@ -102,6 +104,7 @@ class LedgerRecorder:
             frame = original_plan(ledger, canonical, **options)
             frame._contract_canonical = copy.deepcopy(list(canonical))  # type: ignore[attr-defined]
             frame._contract_context = options["request_context_id"]  # type: ignore[attr-defined]
+            frame._contract_tools = copy.deepcopy(options.get("tools"))  # type: ignore[attr-defined]
             return frame
 
         def commit(ledger: ContextLedger, frame: Any) -> None:
@@ -122,6 +125,7 @@ class LedgerRecorder:
                 observation=dict(frame.observation),
                 native=(native_route(frame.state, frame.wire)
                         if ledger.transport == "claude_code" else None),
+                tools=frame._contract_tools,
             ))
 
         self._originals = (original_plan, original_commit)
@@ -151,6 +155,19 @@ def _without_cache_control(value: Any) -> Any:
     return value
 
 
+def serialize_tools(transport: str, tools: list[dict[str, Any]] | None) -> str:
+    """The tool definitions as the route sends them (they precede ``system`` on Claude)."""
+    if transport in {"anthropic_messages", "claude_code"}:
+        from sylvia_gm.provider._anthropic import AnthropicMessagesTransport
+
+        rendered = AnthropicMessagesTransport().format_request(
+            "model", [{"role": "user", "content": "x"}], tools, True).get("tools", [])
+        if transport == "claude_code":  # the CLI sends its tools sorted by name
+            rendered = sorted(rendered, key=lambda tool: tool["name"])
+        return _dump(rendered)
+    return _dump(tools or [])
+
+
 def serialize(transport: str, wire: Sequence[dict[str, Any]],
               tools: list[dict[str, Any]] | None = None,
               native: NativeRoute | None = None) -> tuple[str, list[str]]:
@@ -166,6 +183,7 @@ def serialize(transport: str, wire: Sequence[dict[str, Any]],
             with_cache_breakpoints,
         )
 
+        # Native continuation (``anthropic_content``) in the list is kept, as on the wire.
         request = AnthropicMessagesTransport().format_request("model", messages, tools, True)
         # First-party Anthropic adds breakpoints; they mark the prefix and are not content.
         request = _without_cache_control(with_cache_breakpoints(request))
@@ -216,7 +234,8 @@ def replay(frames: Iterable[Recorded], transport: str) -> list[Recorded]:
     for frame in list(frames):
         ledger = ledgers.setdefault(frame.session_id, ContextLedger(
             session_id=frame.session_id, context_owner=frame.context_owner, transport=transport))
-        planned = ledger.plan(frame.canonical, request_context_id=frame.context_id)
+        planned = ledger.plan(frame.canonical, request_context_id=frame.context_id,
+                              tools=frame.tools)
         ledger.commit(planned)
         route = None
         if transport == "claude_code":
@@ -228,7 +247,7 @@ def replay(frames: Iterable[Recorded], transport: str) -> list[Recorded]:
             generation=planned.state.generation, reset=planned.reset,
             base_count=planned.base_count, appended=planned.appended, wire=planned.wire,
             view=copy.deepcopy(planned.state.view), observation=planned.observation,
-            native=route,
+            native=route, tools=frame.tools,
         ))
     return replayed
 
@@ -238,11 +257,17 @@ def _note(canonical: Sequence[dict[str, Any]]) -> str | None:
                  if str(m.get("content", "")).startswith("SYLVIA_CONTINUATION_NOTE ")), None)
 
 
-def check_extension(frames: Sequence[Recorded], transport: str) -> dict[str, Any]:
-    """Assert the wire invariant on consecutive same-epoch requests; return reset statistics."""
+def check_extension(frames: Sequence[Recorded], transport: str,
+                    scenario: str | None = None) -> dict[str, Any]:
+    """Assert the wire invariant on consecutive same-epoch requests; return reset statistics.
+
+    ``pairs`` counts requests whose system prefix and messages extend the previous request
+    (the ledger's invariant). ``pairs_with_tools`` counts those whose serialized tool list is
+    also identical, which a provider prefix cache needs on routes that render tools first.
+    """
     previous: dict[str, tuple[Recorded, tuple[str, list[str]]]] = {}
     resets: list[tuple[int, str]] = []
-    pairs = 0
+    pairs = pairs_with_tools = 0
     for index, frame in enumerate(frames):
         rendered = serialize(transport, frame.wire, native=frame.native)
         before = previous.get(frame.session_id)
@@ -251,6 +276,8 @@ def check_extension(frames: Sequence[Recorded], transport: str) -> dict[str, Any
             fresh = frame.base_count == 0 and frame.reset is not None
             if (frame.epoch, frame.generation) == (last.epoch, last.generation) and not fresh:
                 pairs += 1
+                pairs_with_tools += (serialize_tools(transport, frame.tools)
+                                     == serialize_tools(transport, last.tools))
                 assert rendered[0] == system, (transport, index, "system prefix changed")
                 assert rendered[1][: len(sequence)] == sequence, (
                     transport, index, "request does not extend the previous one",
@@ -271,7 +298,27 @@ def check_extension(frames: Sequence[Recorded], transport: str) -> dict[str, Any
                                       "journal_started", "journal_rebased"}, (
                         transport, index, reason)
         previous[frame.session_id] = (frame, rendered)
-    return {"pairs": pairs, "resets": resets}
+    result = {"pairs": pairs, "pairs_with_tools": pairs_with_tools, "resets": resets}
+    report_counts(scenario, transport, len(frames), result)
+    return result
+
+
+def report_counts(scenario: str | None, transport: str, requests: int,
+                  result: dict[str, Any]) -> None:
+    """With ``SYLVIA_GM_CONTRACT_DUMP`` set, keep the per-scenario extension counts."""
+    import os
+
+    target = os.environ.get("SYLVIA_GM_CONTRACT_DUMP")
+    if not target or scenario is None:
+        return
+    path = Path(target) / "extend-counts.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({
+            "scenario": scenario, "transport": transport, "requests": requests,
+            "extend": result["pairs"], "extend_with_tools": result["pairs_with_tools"],
+            "resets": [reason for _index, reason in result["resets"]],
+        }) + "\n")
 
 
 def _first_difference(before: list[str], after: list[str]) -> Any:
@@ -359,7 +406,7 @@ def growth(frames: Sequence[Recorded], transport: str) -> dict[str, Any]:
 __all__ = [
     "TRANSPORTS", "LedgerRecorder", "Recorded", "check_authority", "check_extension",
     "check_freshness", "first_step_records", "growth", "ledger_module", "native_route",
-    "replay", "serialize", "simulate_collection",
+    "replay", "serialize", "serialize_tools", "simulate_collection",
 ]
 
 
