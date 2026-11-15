@@ -6,6 +6,8 @@ import threading
 from collections.abc import Callable
 from pathlib import Path
 
+from sylvia_gm import __release_channel__
+
 from .discovery import discover, retain_current_manifest
 from .manifest import (
     MANIFEST_LIMIT,
@@ -129,7 +131,7 @@ class UpdateController:
                 "phase": self._phase,
                 "operation_id": self._identity,
                 "current_version": self.current.text,
-                "channel": self.current.channel,
+                "channel": __release_channel__,
                 "target": self.target,
                 "distribution": self.distribution,
                 "source": "Official pneuma-io/sylvia-gm GitHub releases",

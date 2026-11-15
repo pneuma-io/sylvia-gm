@@ -178,6 +178,51 @@ def test_signed_protocol_rejects_ineligible_identity(field, value, code):
     assert caught.value.code == code
 
 
+def plain_manifest_fixture(version="0.4.1", distribution="portable"):
+    signed = manifest_fixture(distribution)
+    suffix = "-portable.zip" if distribution == "portable" else "-setup.exe"
+    signed.update(version=version, owner_version=version, minimum_app_version="0.4.0-alpha.1")
+    signed["artifact"]["url"] = (
+        f"https://github.com/pneuma-io/sylvia-gm/releases/download/v{version}/"
+        f"sylvia-gm-{version}-windows-x86_64{suffix}"
+    )
+    return signed
+
+
+def test_plain_version_orders_after_its_alpha_releases():
+    assert Version.parse("0.4.0-alpha.1") < Version.parse("0.4.0") < Version.parse("0.4.1")
+    assert Version.parse("0.4.1-alpha.9") < Version.parse("0.4.1")
+
+
+def test_plain_version_on_the_declared_channel_is_accepted_from_an_alpha_build():
+    result = parse_manifest(
+        envelope(plain_manifest_fixture()),
+        current=Version.parse("0.4.0-alpha.1"),
+        target="windows-x86_64",
+        distribution="portable",
+        verify=accept_stub,
+    )
+    assert result.version.text == "0.4.1" and result.channel == "alpha"
+
+
+@pytest.mark.parametrize(
+    "version,channel",
+    [("0.4.1", "stable"), ("0.4.1", "beta"), ("0.4.1-beta.1", "alpha")],
+)
+def test_signed_channel_and_version_prerelease_must_match_the_declared_channel(version, channel):
+    signed = plain_manifest_fixture(version)
+    signed["channel"] = channel
+    with pytest.raises(UpdateError) as caught:
+        parse_manifest(
+            envelope(signed),
+            current=Version.parse("0.4.0-alpha.1"),
+            target="windows-x86_64",
+            distribution="portable",
+            verify=accept_stub,
+        )
+    assert caught.value.code == "wrong_channel"
+
+
 @pytest.mark.parametrize(
     "value",
     [

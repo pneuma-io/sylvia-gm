@@ -23,10 +23,12 @@ from scripts.build_windows_prerelease import (
     discover_installer_artifacts,
 )
 
+from sylvia_gm import release_artifact
 from sylvia_gm.release_artifact import (
     DEPENDENCY_NOTICES_PATH,
     DEPENDENCY_NOTICES_SOURCE,
     PRERELEASE_VERSION,
+    RELEASE_CHANNEL,
     WINDOWS_INSTALLER_VERSION,
     ReleaseArtifact,
     ReleaseArtifactError,
@@ -35,6 +37,7 @@ from sylvia_gm.release_artifact import (
     read_dependency_notices,
     validate_version_sources,
     verify_release_layout,
+    windows_installer_version,
 )
 
 ROOT = Path(__file__).parents[1]
@@ -121,6 +124,159 @@ def test_alpha_09_prerelease_version_is_exact_host_displayed_and_unsigned() -> N
     assert "info.version" in js
     assert 'env!("CARGO_PKG_VERSION")' in rust
     assert "fn application_info(" in rust
+
+
+@pytest.mark.parametrize(
+    "version,installer,uv_form",
+    [
+        ("0.4.1", "0.4.1", "0.4.1"),
+        ("10.0.0", "10.0.0", "10.0.0"),
+        ("0.4.0-alpha.1", "0.4.0-1", "0.4.0a1"),
+        ("0.4.1-alpha.12", "0.4.1-12", "0.4.1a12"),
+    ],
+)
+def test_release_version_accepts_plain_and_earlier_alpha_forms(
+    version: str, installer: str, uv_form: str
+) -> None:
+    assert windows_installer_version(version) == installer
+    assert release_artifact._uv_normalized_version(version) == uv_form
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "0.4",
+        "v0.4.1",
+        "01.4.1",
+        "0.4.01",
+        "0.4.1-1",
+        "0.4.1-alpha",
+        "0.4.1-alpha.0",
+        "0.4.1-alpha.01",
+        "0.4.1-beta.1",
+        "0.4.1-rc.1",
+        "0.4.1+build",
+    ],
+)
+def test_release_version_rejects_every_other_form(version: str) -> None:
+    with pytest.raises(ReleaseArtifactError, match="not X.Y.Z"):
+        windows_installer_version(version)
+
+
+def test_release_channel_is_declared_and_a_version_prerelease_must_agree() -> None:
+    assert RELEASE_CHANNEL == "alpha"
+    assert release_artifact._PRODUCT["channel"] == RELEASE_CHANNEL
+    rust = (ROOT / "src-tauri/src/lib.rs").read_bytes()
+    assert release_artifact._rust_release_channel(rust) == RELEASE_CHANNEL
+    assert release_artifact._require_release_version("0.4.1", channel="beta")
+    with pytest.raises(ReleaseArtifactError, match="does not match the channel"):
+        release_artifact._require_release_version("0.4.0-alpha.1", channel="beta")
+    for channel in ("", "Alpha", "al pha", "alpha\n"):
+        with pytest.raises(ReleaseArtifactError, match="channel name"):
+            release_artifact._require_release_version("0.4.1", channel=channel)
+
+
+def _write_version_sources(
+    root: Path, version: str, uv_version: str, rust_channel_lines: str
+) -> Path:
+    (root / "src-tauri/src").mkdir(parents=True)
+    package = f'name = "sylvia-gm"\nversion = "{version}"\n'
+    (root / "pyproject.toml").write_text("[project]\n" + package, encoding="utf-8")
+    (root / "src-tauri/Cargo.toml").write_text("[package]\n" + package, encoding="utf-8")
+    (root / "src-tauri/Cargo.lock").write_text("[[package]]\n" + package, encoding="utf-8")
+    (root / "uv.lock").write_text(
+        f'[[package]]\nname = "sylvia-gm"\nversion = "{uv_version}"\n', encoding="utf-8"
+    )
+    (root / "src-tauri/tauri.conf.json").write_text(
+        json.dumps({"version": version}), encoding="utf-8"
+    )
+    (root / "src-tauri/src/lib.rs").write_bytes(
+        ("fn first() {}\r\n" + rust_channel_lines + "fn last() {}\r\n").encode("utf-8")
+    )
+    return root
+
+
+@pytest.mark.parametrize(
+    "version,uv_version",
+    [("0.4.1", "0.4.1"), ("0.4.0-alpha.1", "0.4.0a1"), ("0.4.0-alpha.1", "0.4.0-alpha.1")],
+)
+def test_version_sources_validate_plain_and_alpha_forms_with_one_declared_channel(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, version: str, uv_version: str
+) -> None:
+    monkeypatch.setattr(release_artifact, "PRERELEASE_VERSION", version)
+    monkeypatch.setattr(
+        release_artifact, "WINDOWS_INSTALLER_VERSION", windows_installer_version(version)
+    )
+    declared = 'const RELEASE_CHANNEL: &str = "alpha";\r\n'
+    root = _write_version_sources(tmp_path / "same", version, uv_version, declared)
+    assert validate_version_sources(root) == version
+
+    for name, lines, message in [
+        ("beta", 'const RELEASE_CHANNEL: &str = "beta";\r\n', "different release channels"),
+        ("missing", "", "missing or ambiguous"),
+        ("twice", declared + declared, "missing or ambiguous"),
+    ]:
+        other = _write_version_sources(tmp_path / name, version, uv_version, lines)
+        with pytest.raises(ReleaseArtifactError, match=message):
+            validate_version_sources(other)
+    mismatch = _write_version_sources(tmp_path / "uv", version, "0.4.2", declared)
+    with pytest.raises(ReleaseArtifactError, match="uv.lock"):
+        validate_version_sources(mismatch)
+
+
+def test_plain_version_release_layout_and_file_names_verify(
+    tmp_path: Path,
+    synthetic_notices: dict[str, object],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    version = "0.4.1"
+    product = {
+        **release_artifact._PRODUCT,
+        "version": version,
+        "windows_installer_version": version,
+    }
+    monkeypatch.setattr(release_artifact, "PRERELEASE_VERSION", version)
+    monkeypatch.setattr(release_artifact, "WINDOWS_INSTALLER_VERSION", version)
+    monkeypatch.setattr(release_artifact, "_PRODUCT", product)
+    nsis = tmp_path / f"Sylvia GM_{version}_x64-setup.exe"
+    portable = tmp_path / f"sylvia-gm-{version}-windows-x86_64-portable.zip"
+    nsis.write_bytes(b"synthetic-nsis-installer")
+    portable.write_bytes(b"synthetic-portable-zip")
+    output = tmp_path / f"sylvia-gm-{version}-windows-x86_64"
+    manifest = assemble_release_layout(
+        **synthetic_notices,
+        output=output,
+        artifacts=(
+            ReleaseArtifact(source=nsis, kind="nsis-installer"),
+            ReleaseArtifact(source=portable, kind="portable-exe-zip"),
+        ),
+        provenance={
+            "source_commit": "a" * 40,
+            "source_tree": "b" * 40,
+            "source_timestamp_utc": "2026-11-15T00:00:00Z",
+        },
+        toolchain={
+            "cargo": "cargo 1.97.0",
+            "mcp": "2.0.0",
+            "pyinstaller": "6.22.0",
+            "python": "Python 3.12.11",
+            "rustc": "rustc 1.97.0",
+            "tauri_cli": "tauri-cli 2.8.0",
+            "uv": "uv 0.11.6",
+        },
+        qualification={"windows_10": "pending", "windows_11": "pending"},
+        license_path=ROOT / "LICENSE",
+        version=version,
+    )
+    assert manifest["product"] == {**product, "channel": "alpha"}
+    assert [item["name"] for item in manifest["artifacts"]] == [nsis.name, portable.name]
+    assert verify_release_layout(output) == manifest
+
+    monkeypatch.setattr(windows_builder, "PRERELEASE_VERSION", version)
+    arguments = windows_builder._parser(tmp_path).parse_args(
+        ["--forbidden-name-file", "names.txt", "--dependency-notices-sha256", "0" * 64]
+    )
+    assert arguments.output.name == f"sylvia-gm-{version}-windows-x86_64"
 
 
 def test_alpha_09_release_layout_is_canonical_hash_exact_and_self_verifying(
@@ -259,8 +415,10 @@ def test_alpha_09_release_layout_fails_closed_on_unsafe_or_incoherent_input(
         "license_path": ROOT / "LICENSE",
     }
 
-    with pytest.raises(ReleaseArtifactError, match="prerelease version"):
+    with pytest.raises(ReleaseArtifactError, match="version does not match"):
         assemble_release_layout(**base, version="0.3.0")
+    with pytest.raises(ReleaseArtifactError, match="not X.Y.Z"):
+        assemble_release_layout(**base, version="0.3.0-rc.1")
     with pytest.raises(ReleaseArtifactError, match="artifact kind"):
         assemble_release_layout(
             **{
