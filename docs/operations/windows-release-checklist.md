@@ -29,8 +29,6 @@ $checks = '..\checks'
 $env:PYTHONDONTWRITEBYTECODE=1
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD=$null
 $env:SRD_LITE_CANDIDATE=$null
-# Keep temporary folders only for failed tests (the runner reads this setting).
-$env:SYLVIA_RETAIN_SUCCESSFUL_FIXTURES=0
 .venv/Scripts/python.exe scripts/select_checks.py --full --output "$checks\full-selection.json"
 .venv/Scripts/python.exe scripts/check_supported_journeys.py --selection-manifest "$checks\full-selection.json" --jobs 2 --case-workers 1 --scheduler case --output-dir "$checks\full"
 ```
