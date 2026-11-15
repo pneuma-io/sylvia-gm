@@ -330,6 +330,68 @@ def played(tmp_path_factory):
         patch.undo()
 
 
+def run_opening(table: Table) -> Any:
+    """The campaign opening as the frontend starts it after Ready to Begin."""
+    import hashlib
+
+    basis = table.request("display_snapshot", {"campaign_id": table.campaign})
+    turn = next(k for k, s in basis["turns"].items() if s == "open")
+    suffix = hashlib.sha256(table.campaign.encode("utf-8")).hexdigest()[:24]
+    return table.attached("start_dm_session", {
+        "campaign_id": table.campaign, "session_id": table.session, "turn_id": turn,
+    }, f"attempt-campaign-start-{suffix}")
+
+
+@pytest.fixture(scope="module")
+def opened(tmp_path_factory):
+    """A real opening turn (Ready to Begin) followed by the first player turn."""
+    from tests.test_fc_campaign_journey import _start_campaign
+
+    patch = pytest.MonkeyPatch()
+    try:
+        patch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+        recorder = LedgerRecorder().install(patch)
+        database = tmp_path_factory.mktemp("opening") / "opening.sqlite3"
+        campaign, session, _turn = _start_campaign(database, "the-long-way-round")
+        gm = ContractGM()
+        table = Table(database, gm, campaign, session)
+        try:
+            gm.steps.append(settle("The road opens before you."))
+            opening = run_opening(table)
+            opening_frames = len(recorder.frames)
+            gm.steps.append(settle("You walk on toward the bridge."))
+            first, _identity = table.submit("I walk on.")
+            gm.steps.append(settle("The bridge creaks."))
+            second, _identity = table.submit("I cross carefully.")
+        finally:
+            table.close()
+        frames = [f for f in recorder.stop() if f.session_id == session]
+    finally:
+        patch.undo()
+    return {"frames": frames, "opening_frames": opening_frames, "gm": gm,
+            "replies": {"opening": opening, "first": first, "second": second}}
+
+
+def test_first_player_turn_extends_the_opening_request(opened):
+    """F5: the opening's Ready to Begin input stays journaled; no reset on the first turn."""
+    replies = opened["replies"]
+    assert all((reply or {}).get("interruption") is None for reply in replies.values()), replies
+    frames = opened["frames"]
+    count = opened["opening_frames"]
+    assert count >= 1 and len(frames) > count
+    opening, first = frames[count - 1], frames[count]
+    assert any(m.get("content") == "Ready to Begin" for m in opening.wire)
+    assert not any(m.get("content") == "Ready to Begin" for m in first.canonical)
+    assert first.reset is None, first.reset
+    assert (first.epoch, first.generation) == (opening.epoch, opening.generation)
+    assert first.wire[: len(opening.wire)] == opening.wire
+    for transport in (None, *TRANSPORTS):
+        route = frames if transport is None else replay(frames, transport)
+        result = check_extension(route, transport or "chat_completions")
+        assert [reason for _index, reason in result["resets"]] == [], (transport, result)
+        assert result["pairs"] == len(frames) - 1, (transport, result)
+
+
 def _session_frames(played: dict[str, Any]) -> list[Any]:
     return [f for f in played["frames"] if f.session_id == played["ids"]["session"]]
 

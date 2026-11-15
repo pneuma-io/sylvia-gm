@@ -104,7 +104,10 @@ LATEST_WINS_LABELS = frozenset(
 #: contract states the same rule in an order-independent way.
 DROPPED_CONTROL_PREFIXES = ("SYLVIA_GM_CURRENT_PLAYER_MESSAGE ",)
 #: Identities whose disappearance from canonical history means a rewind, restore or edit.
-IDENTITY_PREFIXES = ("user:", "talk:", "narration:", "steering:", "ready:")
+#: Journaled conversation identities whose absence from canonical history means a rewind.
+#: ``ready:`` (the opening's Ready to Begin input) is not one: canonical assembly shows it only
+#: on the opening request, and the journal keeps the message it sent.
+IDENTITY_PREFIXES = ("user:", "talk:", "narration:", "steering:")
 
 NARRATION_FACTS_LABEL = "SYLVIA_GM_EXACT_NARRATION_FACTS"
 _FACTS_HEADER = (
