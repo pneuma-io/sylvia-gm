@@ -536,13 +536,16 @@ def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
     gm = ThinkingGM("claude-fable-5-2", drop_after=2)
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
     assert all(r.get("interruption") is None for r in replies), replies
-    one, two, _three = list(gm.native)[:3]
+    one, two, three = list(gm.native)[:3]
     calls = [_replayed(call) for call in gm.calls]
     assert calls[1][one] == ["thinking", "tool_use"]
-    # Request 3 has a changed tool list: the turn journaled before it loses its thinking;
-    # the turn new in this request keeps it. It stays stripped on every later request.
-    assert calls[2][one] == ["tool_use"] and calls[2][two] == ["thinking", "tool_use"]
-    assert calls[3][one] == ["tool_use"]
+    # Request 3 has a changed tool list: every assistant turn in it, including the one new in
+    # this request (produced under the previous tools), loses its thinking, and stays stripped.
+    assert calls[2][one] == ["tool_use"] and calls[2][two] == ["tool_use"]
+    assert calls[3][one] == ["tool_use"] and calls[3][two] == ["tool_use"]
+    # The turn produced in response to request 3 is bound to the new tools, which do not change
+    # between requests 3 and 4: request 4 replays its thinking.
+    assert calls[3][three] == ["thinking", "tool_use"]
     moved = [f for f in frames if f.observation.get("thinking_strip")]
     assert [f.observation["thinking_strip"] for f in moved] == ["tools_changed"]
     assert frames[-1].observation["thinking_floor"] == moved[0].observation["thinking_floor"] > 0

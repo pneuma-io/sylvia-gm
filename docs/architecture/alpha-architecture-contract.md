@@ -1519,8 +1519,11 @@ the ledger resets. Builder and participant requests do not use it.
   redacted-thinking blocks. It only moves forward within a generation, is saved in the journal
   record that moves it and is restored on load. On models where every account enforces the
   binding (Fable 5.2, Mythos 5.2) a changed system prefix or tool set moves it to the journal
-  length before the request's new entries. On every model, a 400 naming a thinking signature
-  moves it to the full journal length and the request is retried once.
+  length after the request's new entries, so every assistant turn in that request is stripped
+  (each was produced under the previous system and tools); thinking returned in response to
+  that request is journaled above the floor and replayed while the fingerprints stay the same.
+  On every model, a 400 naming a thinking signature moves it to the full journal length and the
+  request is retried once.
 - **Routes.** `claude_code` writes the frozen prefix as its system file (LF bytes) and a native
   projection of the journal as its transcript, run from one fixed, empty working directory: each
   earlier request's prompt group is one list-content user record followed by the context records

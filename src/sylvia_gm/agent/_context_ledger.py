@@ -1132,7 +1132,10 @@ class ContextLedger:
             elif thinking_enforced and state.last_prefix is not None and (
                 state.last_prefix != prefix or state.last_toolset != toolset
             ):
-                state.thinking_floor = max(state.thinking_floor, base_count)
+                # Every assistant turn in this request, including the one the previous request
+                # produced, is bound to the previous system and tools: strip them all. Thinking
+                # in the response to this request is journaled later, above the floor.
+                state.thinking_floor = len(state.entries)
                 thinking_strip = ("prefix_changed" if state.last_prefix != prefix
                                   else "tools_changed")
             state.last_prefix, state.last_toolset = prefix, toolset
