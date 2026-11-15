@@ -812,6 +812,7 @@
     "tests.test_srd_lite_foundation::test_ordinary_out_of_roster_requests_do_not_spend[wish-excluded-begin_srd_spell_action]": 15.691,
     "tests.test_srd_lite_foundation::test_ordinary_out_of_roster_requests_do_not_spend[wish-excluded-cast_spell]": 18.965,
     "tests.test_srd_lite_foundation::test_ordinary_out_of_roster_requests_do_not_spend[wish-excluded-cast_spell_outside_combat]": 15.64,
+    "tests.test_srd_lite_foundation::test_shipped_spell_catalogue_stamps_the_shipped_lite_version": 0.64,
     "tests.test_srd_lite_foundation::test_true_strike_can_damage_a_dying_character_and_replay_exactly": 38.177,
     "tests.test_srd_lite_foundation::test_true_strike_native_does_not_grant_ally_attack_advantage": 24.969,
     "tests.test_srd_lite_foundation::test_true_strike_native_immediate_attack_hit_or_miss_retry_and_no_future_buff[1000]": 47.332,

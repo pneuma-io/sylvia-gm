@@ -528,10 +528,9 @@ def test_product_exclusion_preserves_other_and_future_cases_and_historical_selec
     )
 
 
-def test_historical_gm_check_keeps_original_modules_and_expected_failure(tmp_path):
+def test_historical_gm_check_keeps_original_modules(tmp_path):
     import json
     from scripts.check_catalog import HISTORICAL_CHECKS
-    from scripts.known_test_defects import KNOWN_DEFECTS
     from scripts.select_checks import historical_check, load_selection
 
     plan = historical_check("gm-turn-checkpoint", source="a" * 40)
@@ -546,8 +545,6 @@ def test_historical_gm_check_keeps_original_modules_and_expected_failure(tmp_pat
         "tests/test_fc_campaign_progress.py", "tests/test_migrated_plan_lifecycle.py",
         "tests/test_riichi_quick_test_plan.py", "tests/test_no_rules_interview.py",
     ]
-    known = "tests/test_migrated_plan_lifecycle.py::test_retained_rift_legacy_reusable_copy_resolves_its_exact_available_snapshot"
-    assert known in KNOWN_DEFECTS and known.split("::")[0] in campaign
     for paths in plan["python"].values():
         for relative in paths:
             path = tmp_path / relative

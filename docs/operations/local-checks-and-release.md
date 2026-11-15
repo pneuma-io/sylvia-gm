@@ -34,6 +34,10 @@ Use PowerShell in the checkout after `uv sync --locked --all-extras`. For JavaSc
 checks, install the locked dependencies once with `npm ci --prefix tests --ignore-scripts`.
 Choose a fresh output directory beside the checkout, within the current work item.
 
+The runner starts its child Python processes with `PYTHONUTF8=1` and `PYTHONIOENCODING=utf-8`,
+so results do not depend on the machine's console encoding. A direct `pytest` run on a machine
+without UTF-8 mode (a default Windows install) may need `$env:PYTHONUTF8=1` first.
+
 By default, pytest and the runner materialize the current public Lite source into the
 run's own `inputs` directory. The committed legacy package stays available for explicit
 compatibility checks. Set `SRD_LITE_CANDIDATE` only to deliberately select another input;

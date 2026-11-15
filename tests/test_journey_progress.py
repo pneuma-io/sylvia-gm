@@ -92,3 +92,50 @@ def test_worker_progress_does_not_read_environment_inside_guarded_case(tmp_path,
         ))
     assert json.loads(target.read_text())["case"] == "synthetic::guarded"
     assert json.loads(fixture_target.read_text())["case"] == "synthetic::guarded"
+
+
+def test_failure_receipt_survives_a_console_that_cannot_encode_its_message(monkeypatch):
+    import io
+    import sys
+    from types import SimpleNamespace
+
+    console = io.BytesIO()
+    monkeypatch.setattr(sys, "stdout", io.TextIOWrapper(console, encoding="cp1252"))
+    monkeypatch.setitem(journey_progress._TIMING_PATHS, "SYLVIA_JOURNEY_TIMINGS", None)
+    journey_progress.pytest_runtest_logreport(SimpleNamespace(
+        nodeid="synthetic::arrow", when="call", duration=0.1, outcome="failed",
+        failed=True, skipped=False, longrepr="expected cell A → B",
+    ))
+    sys.stdout.flush()
+    assert b"expected cell A \\u2192 B" in console.getvalue()
+
+
+def test_pool_reports_a_non_cp1252_failure_from_a_parent_without_utf8_mode(tmp_path, monkeypatch):
+    import xml.etree.ElementTree as ET
+
+    from scripts import journey_pool
+
+    root = tmp_path / "source"
+    (root / "scripts").mkdir(parents=True)
+    (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    tests = root / "tests"
+    tests.mkdir()
+    (tests / "__init__.py").write_text("")
+    (tests / "test_arrow.py").write_text(
+        "def test_arrow():\n"
+        "    assert False, 'intentional negative control: A \\u2192 B'\n"
+    )
+    destination = tmp_path / "evidence"
+    destination.mkdir()
+    monkeypatch.delenv("PYTHONUTF8", raising=False)
+    monkeypatch.delenv("PYTHONIOENCODING", raising=False)
+    monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
+    results = journey_pool.run_balanced_gate(
+        root, destination, {"arrow": ["tests/test_arrow.py"]}, ["arrow"], 1, 0.0, None,
+    )
+    assert not results["arrow"][0]
+    log = (destination / "shared-shard-0.log").read_text(encoding="utf-8")
+    assert "INTERNALERROR" not in log
+    assert "A → B" in log
+    cases = list(ET.parse(destination / "arrow.xml").iter("testcase"))
+    assert len(cases) == 1 and cases[0].find("failure") is not None
