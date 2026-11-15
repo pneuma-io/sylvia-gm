@@ -3451,12 +3451,22 @@ def test_no_rules_dm_receives_plan_without_builder_file_or_ruleset_tools(
             and str(message.get("content", "")).strip() in {"Begin the story", "Begin."}
             for message in start_messages
         )
-        assert any(
-            message.get("role") == "system"
-            and "application-owned, not player speech" in str(message.get("content", ""))
+        from sylvia_gm.agent._context_ledger import LEGACY_MODE, context_mode
+
+        lifecycle = [
+            message for message in start_messages
+            if "application-owned, not player speech" in str(message.get("content", ""))
             and "campaign_start" in str(message.get("content", ""))
-            for message in start_messages
-        )
+        ]
+        if context_mode() == LEGACY_MODE:
+            assert any(message.get("role") == "system" for message in lifecycle)
+        else:
+            # The context ledger sends application data as sealed user-role host records.
+            assert lifecycle and all(
+                message.get("role") == "user"
+                and str(message["content"]).startswith("[host-seal ")
+                for message in lifecycle
+            )
 
         result = harness.request(
             "submit-dm-plan-tools",
