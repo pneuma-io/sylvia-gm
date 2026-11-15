@@ -403,7 +403,7 @@ class ThinkingGM(ContractGM):
     """
 
     def __init__(self, model: str, *, drop_after: int | None = None,
-                 reject_on: tuple[int, ...] = ()) -> None:
+                 reject_on: tuple[int, ...] = (), rebase_after: int | None = None) -> None:
         from sylvia_gm.provider._base import ModelInfo
 
         super().__init__()
@@ -412,6 +412,9 @@ class ThinkingGM(ContractGM):
             provider_key="anthropic", provider_mode="byok", transport="anthropic_messages",
             provider_model_id=model, context_window=1_000_000, max_output_tokens=8192)
         self.drop_after, self.reject_on = drop_after, set(reject_on)
+        #: After serving this call number, ask the session's ledger for a rebase (as compaction
+        #: planning does), so the next request starts a new generation mid-turn.
+        self.rebase_after = rebase_after
         self.dropped: str | None = None
         self.native: dict[str, list[dict[str, Any]]] = {}
 
@@ -441,6 +444,12 @@ class ThinkingGM(ContractGM):
                    "signature": f"signature-{self.position}"},
                   {"type": "tool_use", "id": call_id, "name": names[0], "input": arguments}]
         self.native[call_id] = blocks
+        if self.rebase_after == number:
+            from sylvia_gm.agent._provider_session import _SHARED_LEDGERS
+
+            for ledgers in list(_SHARED_LEDGERS.values()):
+                for ledger in ledgers.values():
+                    ledger.request_rebase()
         yield ProviderStreamChunk(tool_call_delta={
             "index": 0, "id": call_id,
             "function": {"name": names[0], "arguments": json.dumps(arguments)},
@@ -521,7 +530,10 @@ def test_claude_thinking_replays_byte_for_byte_while_tools_are_unchanged(
                         if m.get("role") == "assistant" and m.get("anthropic_content")
                         and m["anthropic_content"][-1]["id"] == first_call)
         assert json.dumps(replayed) == json.dumps(gm.native[first_call])
-    assert all(f.observation["thinking_floor"] == 0 for f in frames)
+    # On this every-account-enforced model the first request starts a generation (N2), so the
+    # floor sits at the end of its entries and never moves again while nothing changes.
+    floors = {f.observation["thinking_floor"] for f in frames}
+    assert len(floors) == 1 and frames[0].observation["thinking_strip"] == "new_generation"
     # F11: with model_info the working context sizes each request with measure_wire, and the
     # send reuses the measured frame: one plan per request, not two.
     assert len(frames) == len(calls)
@@ -547,9 +559,46 @@ def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
     # between requests 3 and 4: request 4 replays its thinking.
     assert calls[3][three] == ["thinking", "tool_use"]
     moved = [f for f in frames if f.observation.get("thinking_strip")]
-    assert [f.observation["thinking_strip"] for f in moved] == ["tools_changed"]
+    assert [f.observation["thinking_strip"] for f in moved] == ["new_generation", "tools_changed"]
+    moved = moved[1:]
     assert frames[-1].observation["thinking_floor"] == moved[0].observation["thinking_floor"] > 0
     assert frames[-1].reset is None
+
+
+@pytest.mark.parametrize("restart", [False, True], ids=["same-owner", "after-restart"])
+def test_a_mid_turn_rebase_strips_every_carried_over_thinking_block(
+    started_campaign, tmp_path, monkeypatch, restart,
+):
+    """Review N2: the first frame of a new generation strips every carried-over turn."""
+    gm = ThinkingGM("claude-fable-5-2", rebase_after=2)
+    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
+    assert all(r.get("interruption") is None for r in replies), replies
+    one, two, three = list(gm.native)[:3]
+    calls = [_replayed(call) for call in gm.calls]
+    assert calls[1][one] == ["thinking", "tool_use"]
+    rebased = next(i for i, f in enumerate(frames) if f.reset == "journal_rebased")
+    assert frames[rebased].observation["thinking_strip"] == "new_generation"
+    # Request 3 is the first of the new generation: both carried-over turns lose their thinking.
+    assert calls[2][one] == ["tool_use"] and calls[2][two] == ["tool_use"]
+    # The response to request 3 keeps its thinking on the next request, also after a restart.
+    assert calls[3][one] == ["tool_use"] and calls[3][two] == ["tool_use"]
+    assert calls[3][three] == ["thinking", "tool_use"]
+
+
+def test_a_mid_turn_rebase_keeps_thinking_on_other_models_until_a_rejection(
+    started_campaign, tmp_path, monkeypatch,
+):
+    """Review N2: on models not enforced for every account the reactive rule covers a reset."""
+    gm = ThinkingGM("claude-opus-5-5", rebase_after=2, reject_on=(3,))
+    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
+    assert all(r.get("interruption") is None for r in replies), replies
+    one, two = list(gm.native)[:2]
+    calls = [_replayed(call) for call in gm.calls]
+    assert calls[2][one] == ["thinking", "tool_use"]  # rebased, not enforced: kept
+    assert calls[3][one] == ["tool_use"] and calls[3][two] == ["tool_use"]  # the one retry
+    assert any(f.reset == "journal_rebased" for f in frames)
+    assert [f.observation.get("thinking_strip") for f in frames
+            if f.observation.get("thinking_strip")] == ["thinking_rejected"]
 
 
 def test_other_models_keep_thinking_until_the_service_rejects_it_then_retry_once(

@@ -1129,6 +1129,14 @@ class ContextLedger:
             if self._pending_strip == epoch:
                 state.thinking_floor = len(state.entries)
                 thinking_strip = "thinking_rejected"
+            elif thinking_enforced and base_count == 0 and state.entries:
+                # The first frame of a new generation or epoch (rebase, rewind, invalid or
+                # unloadable journal, compaction, owner or transport change) re-sends history in
+                # a new layout: every carried-over turn's thinking was produced after a
+                # different message list. Thinking in the response to this request is
+                # journaled above the floor and replayed as usual.
+                state.thinking_floor = len(state.entries)
+                thinking_strip = "new_generation"
             elif thinking_enforced and state.last_prefix is not None and (
                 state.last_prefix != prefix or state.last_toolset != toolset
             ):

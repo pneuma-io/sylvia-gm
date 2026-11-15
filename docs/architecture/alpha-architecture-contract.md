@@ -1526,6 +1526,10 @@ the ledger resets. Builder and participant requests do not use it.
   length after the request's new entries, so every assistant turn in that request is stripped
   (each was produced under the previous system and tools); thinking returned in response to
   that request is journaled above the floor and replayed while the fingerprints stay the same.
+  On those models the first frame of any new generation or epoch (a rebase, rewind, invalid or
+  unloadable journal, compaction, owner or transport change) also moves it to the end of that
+  frame's entries: the new layout re-sends history after a different message list, so no
+  carried-over turn keeps its thinking.
   On every model, a 400 naming a thinking signature moves it to the full journal length and the
   request is retried once.
 - **Routes.** `claude_code` writes the frozen prefix as its system file (LF bytes) and a native
