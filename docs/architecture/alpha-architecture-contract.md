@@ -1546,7 +1546,12 @@ the ledger resets. Builder and participant requests do not use it.
   earlier request's prompt group is one list-content user record followed by the context records
   Claude Code wrote after it (collected with a fresh `--session-id`, then deleted with its session
   file on every path), and a `No response requested.` assistant record precedes any prompt group
-  that follows a user record. The stdin prompt is the request's own prompt group. The first-party
+  that follows a user record. The stdin prompt is the request's own prompt group. The system and
+  transcript files live in a per-step folder under the runtime home that is removed after the
+  step. Before each step the runtime first retries this process's own failed deletions, whatever
+  their age, then sweeps other leftover session files and step folders that have been unchanged
+  for 15 minutes and that no step in this process is running; it never sweeps or deletes outside
+  Sylvia's runtime home. The first-party
   `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
   last system block and the last non-thinking block of the last message; other Messages-compatible
   endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
