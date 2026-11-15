@@ -12,7 +12,7 @@ constraint for replacement catalogue art.
   use this exact image for drawing and painted finish, and for Marla's identity.
 
 The four starting designs have prepared body/sheet/portrait bundles linked below. Catalogue
-references are prepared for all reviewed Plan casts; inherited-creature coverage continues. Siren Protocol has its separate supplied references.
+references are prepared for all reviewed Plan casts; all 330 reviewed inherited creatures now have current-style references. Siren Protocol has its separate supplied references.
 
 ## Rendering brief
 
@@ -1353,3 +1353,13 @@ Young Blue, Brass, Bronze, Copper, Gold and Green Dragons have complete referenc
 | Young Copper Dragon | [Body](../assets/characters/0adef9c033160347430c072a6835eea7282d3e518c08f74ba6454dd0b5309f01.png) | [Sheet](../assets/characters/f2f1b9960656c7c1ce29d3de1af820b73db0e5a9ef13f770442d0eb81098947f.png) | [Portrait](../assets/characters/e2eb8d78f82289b93307c4a0ab5cbecf7c74c1b8fd6fd23a9576c3b44ac2faab.png) |
 | Young Gold Dragon | [Body](../assets/characters/3b99b94290ac4f1a41f733dcea605c0b6093ff24ea4776c666f6ad4494a0a37d.png) | [Sheet](../assets/characters/dfbc67332028a8b50740aa6c8d5c2503dda5fce640729c901f8030ef4de5049b.png) | [Portrait](../assets/characters/d0b24634dfb13d6325c6669307b67ce8d5ce9896717e9100d5999941cbb5c8f6.png) |
 | Young Green Dragon | [Body](../assets/characters/cb9c16ea4a6e2ae200512c45aca2322ef8e6c52a964f054e1ee11a386b2e09f7.png) | [Sheet](../assets/characters/70463992cf1d86993e221949a86f8e48f99750d54cd83a7d56da3ceed64da7fe.png) | [Portrait](../assets/characters/ef527bade92567ac198d9ef42a27125f8fae23e66269545734b70b7d30050308.png) |
+
+### Final prepared inherited young dragons: Red, Silver and White
+
+Young Red, Silver and White Dragons complete the reviewed inherited catalogue with full references, multiview studies and reusable portraits. Each retains four legs, two independent back wings and one tail, with selected youthful proportions. Red paired horns/frills, Silver paired horns/cheek fins/low crest and White hornless swept-back crest are editable defaults. Source types, movement, immunities, breath/conditional Paralyzing Breath and Ice Walk clauses, false execution states and unsupported source limitations remain unchanged. No active breath/aura or new form-execution qualification; no individual owner sign-off.
+
+| Character | Full body | Multiview | Portrait |
+|---|---|---|---|
+| Young Red Dragon | [Body](../assets/characters/bd3726605bf5e4f43ad32a9465b454196410c9aafb61cbbb4501b772c4c6f413.png) | [Sheet](../assets/characters/853c36cd916cdabfdf1233823809c19ebc2ab20018da1be17c06c43c0d260312.png) | [Portrait](../assets/characters/6701bf884b9809cde3a56ced064b8ca69f788b6756e7e5eb2d50113b5f4fe757.png) |
+| Young Silver Dragon | [Body](../assets/characters/fd708e5996b3d295427a84da574aaef7ff8c04194f9b421d0e74fca4a4e28eac.png) | [Sheet](../assets/characters/d5c0f91d13a521448037eb51dccf00114aa47c559ad7f9773d3cd845242342c1.png) | [Portrait](../assets/characters/0b9073834fcf910e6e069d9ec114bdd7849f53f1b059a391d9695b2acee35970.png) |
+| Young White Dragon | [Body](../assets/characters/e10cb419dddc3b652afb7f35ff6b4b3675a79a651352585d39436e2bfe067506.png) | [Sheet](../assets/characters/c82b6ee30aa104dd43114f40ab6b83cba44d2678d207125279485016defd40ca.png) | [Portrait](../assets/characters/60e4280a2907ef0a8688a8fedc88bebc1f4061ed104034dcdb663ba04335abce.png) |
