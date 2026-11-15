@@ -6,12 +6,15 @@ Campaign File validation, retry checkpoints, export and recovery use the product
 
 from __future__ import annotations
 
+import dataclasses
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
 
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.errors import CommandRejected
+from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import ProviderResponse
 from tests.qa_attached_request import request_attached, send_attached
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
@@ -32,6 +35,21 @@ def _checkpoint(owner, campaign, session):
     )
 
 
+#: Evidence that an export carries only as a stub (contract 13.1.1); the row and its sequence stay.
+_EXPORT_STUBBED = frozenset({"gm_wire_journal", "gm_native_records"})
+
+
+def _as_exported(view):
+    """A session context or history page as a recovered export holds it."""
+    return dataclasses.replace(view, messages=tuple(
+        dataclasses.replace(message, content={"kind": message.content["kind"],
+                                              "omitted_from_export": True})
+        if message.kind is SessionMessageKind.EVIDENCE and isinstance(message.content, Mapping)
+        and message.content.get("kind") in _EXPORT_STUBBED else message
+        for message in view.messages
+    ))
+
+
 def _assert_recovered(owner, campaign, session, saved):
     snapshot, context, page, projection = saved
     restored = owner.snapshot(campaign)
@@ -42,8 +60,10 @@ def _assert_recovered(owner, campaign, session, saved):
     assert restored.continuity == snapshot.continuity, "Recovered progress changed"
     assert restored.package_lock == snapshot.package_lock
     assert restored.revision == snapshot.revision
-    assert owner.session_context(session) == context, "Recovered transcript/checkpoints changed"
-    assert owner.session_history_page(session) == page, "Recovered closing events changed"
+    assert owner.session_context(session) == _as_exported(context), (
+        "Recovered transcript/checkpoints changed")
+    assert owner.session_history_page(session) == _as_exported(page), (
+        "Recovered closing events changed")
     assert owner.player_projection(campaign) == projection
 
 
