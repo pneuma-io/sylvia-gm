@@ -3,7 +3,7 @@
   "provenance": {
     "adventures": "Existing bundled Severed Lands Campaign Plans; story preparation unchanged.",
     "characters": "Existing SRD starters and Tavin Bell; independent prepared role/level editions.",
-    "starter_source_sha256": "fbf9da650afe2fd8e3044496e78d35f74184a5cd0340c355ebe4119ab594f803",
+    "starter_source_sha256": "6933f8b384cea96a508e1a685d874ca5f43afab9a4fb945328e18d5955d9edd5",
     "rules": "Contained SRD Lite 0.3.23; retained SRD 5.2.1 class and creation references.",
     "notices": [
       "LICENSING-STATUS.md",
@@ -172,6 +172,18 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -228,7 +240,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+          "content_sha256": "c7218992401e01792bba426ebefbb268119957959844322e2adfe2be5f159715"
         }
       ]
     },
@@ -613,6 +625,18 @@
                 "spell_slot_1": 3,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -669,7 +693,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+          "content_sha256": "51716898a2fd7149d3662369760305630d97bd6c93f034c9dc5c57b73fad4180"
         }
       ]
     },
@@ -1246,6 +1270,18 @@
                 "spell_slot_1": 3,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1302,7 +1338,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+          "content_sha256": "51716898a2fd7149d3662369760305630d97bd6c93f034c9dc5c57b73fad4180"
         }
       ]
     },
@@ -1464,6 +1500,16 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [],
+                  "id": "lute",
+                  "inventory_item": "lute",
+                  "kind": "musical_instrument",
+                  "quantity": 1,
+                  "value_cp": 3500
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1516,7 +1562,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "2e7af37fe3a43d6c4f058ddccbae9b09a4c71a5a28b46ea53a2dd025ac708093"
+          "content_sha256": "0f2e2c0ea84bce07e9ee57a4ab51f0ecfda0674ee52ed2ee93e4d63438608e22"
         },
         {
           "role": "companion",
@@ -1838,6 +1884,18 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1894,7 +1952,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+          "content_sha256": "c7218992401e01792bba426ebefbb268119957959844322e2adfe2be5f159715"
         }
       ]
     }

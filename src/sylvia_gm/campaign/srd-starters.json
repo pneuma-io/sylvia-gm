@@ -236,6 +236,16 @@
         "light",
         "healing_word"
       ],
+      "spell_materials": [
+        {
+          "id": "lute",
+          "inventory_item": "lute",
+          "kind": "musical_instrument",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 3500
+        }
+      ],
       "resources": {
         "hit_die": 1,
         "spell_slot_1": 2,
@@ -385,6 +395,18 @@
         "spare_the_dying",
         "mending",
         "command"
+      ],
+      "spell_materials": [
+        {
+          "id": "holy_symbol",
+          "inventory_item": "holy_symbol",
+          "kind": "holy_symbol",
+          "components": [
+            "bless.1"
+          ],
+          "quantity": 1,
+          "value_cp": 500
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -548,6 +570,16 @@
         "light",
         "mending",
         "healing_word"
+      ],
+      "spell_materials": [
+        {
+          "id": "druidic_focus",
+          "inventory_item": "quarterstaff",
+          "kind": "druidic_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 500
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -944,6 +976,18 @@
         "bless",
         "cure_wounds"
       ],
+      "spell_materials": [
+        {
+          "id": "holy_symbol",
+          "inventory_item": "holy_symbol",
+          "kind": "holy_symbol",
+          "components": [
+            "bless.1"
+          ],
+          "quantity": 1,
+          "value_cp": 500
+        }
+      ],
       "resources": {
         "hit_die": 1,
         "spell_slot_1": 2,
@@ -1101,6 +1145,16 @@
         "cure_wounds",
         "longstrider",
         "hunters_mark"
+      ],
+      "spell_materials": [
+        {
+          "id": "druidic_focus",
+          "inventory_item": "druidic_focus",
+          "kind": "druidic_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 100
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -1383,6 +1437,16 @@
         "spare_the_dying",
         "healing_word"
       ],
+      "spell_materials": [
+        {
+          "id": "arcane_focus",
+          "inventory_item": "arcane_focus",
+          "kind": "arcane_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 1000
+        }
+      ],
       "resources": {
         "hit_die": 1,
         "spell_slot_1": 2,
@@ -1524,6 +1588,16 @@
         "guidance",
         "spare_the_dying",
         "healing_word"
+      ],
+      "spell_materials": [
+        {
+          "id": "arcane_focus",
+          "inventory_item": "arcane_focus",
+          "kind": "arcane_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 2000
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -1676,6 +1750,16 @@
         "mending",
         "shocking_grasp",
         "longstrider"
+      ],
+      "spell_materials": [
+        {
+          "id": "arcane_focus",
+          "inventory_item": "quarterstaff",
+          "kind": "arcane_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 500
+        }
       ],
       "resources": {
         "hit_die": 1,
