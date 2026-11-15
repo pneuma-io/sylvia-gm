@@ -32,6 +32,7 @@ from sylvia_gm.provider._claude_native import (
     NativeRoute,
     collect,
     delete_session,
+    remove_debug_logs,
     remove_step_folder,
     session_files,
     sweep,
@@ -128,29 +129,29 @@ def prepare_request(
     records = []
     for message in history:
         identity = str(uuid.uuid4())
-        native = dict(message)
-        if native["role"] == "assistant":
-            native.update(
+        entry = dict(message)
+        if entry["role"] == "assistant":
+            entry.update(
                 {
                     "id": "msg_" + uuid.uuid4().hex,
                     "type": "message",
                     "model": model_id,
                     "stop_reason": "tool_use"
-                    if any(block.get("type") == "tool_use" for block in native["content"])
+                    if any(block.get("type") == "tool_use" for block in entry["content"])
                     else "end_turn",
                     "stop_sequence": None,
                 }
             )
         records.append(
             {
-                "type": native["role"],
+                "type": entry["role"],
                 "uuid": identity,
                 "parentUuid": parent,
                 "sessionId": session,
                 "isSidechain": False,
                 "cwd": str(workspace),
                 "timestamp": datetime.now(UTC).isoformat(),
-                "message": native,
+                "message": entry,
             }
         )
         parent = identity
@@ -386,6 +387,8 @@ class ClaudeProvider(Provider):
             steps.mkdir(exist_ok=True)
             environment = native_environment(self.home)
             config = Path(environment.get("CLAUDE_CONFIG_DIR") or self.home / "profile")
+            cache = Path(environment["XDG_CACHE_HOME"]) if environment.get(
+                "XDG_CACHE_HOME") else None
             session_id = str(uuid.uuid4())
             step = steps / session_id
             with _ACTIVE_LOCK:
@@ -748,6 +751,8 @@ class ClaudeProvider(Provider):
                 delete_session(config, session_id, self.home)
                 if step.exists():
                     remove_step_folder(step, self.home)
+                # The CLI's MCP debug log (tool names, session ID, working folder path).
+                remove_debug_logs(cache, self.home)
                 with _ACTIVE_LOCK:
                     active.discard(session_id)
 

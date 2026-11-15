@@ -1556,7 +1556,9 @@ the ledger resets. Builder and participant requests do not use it.
   step. Before each step the runtime first retries this process's own failed deletions, whatever
   their age, then sweeps other leftover session files and step folders that have been unchanged
   for 15 minutes and that no step in this process is running; it never sweeps or deletes outside
-  Sylvia's runtime home. The first-party
+  Sylvia's runtime home. Off Windows, where the runtime's cache folder is inside the runtime
+  home, Claude Code's MCP debug logs (tool names, a session ID and the working folder path)
+  are removed after every step as well. The first-party
   `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
   last system block and the last non-thinking block of the last message; other Messages-compatible
   endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its

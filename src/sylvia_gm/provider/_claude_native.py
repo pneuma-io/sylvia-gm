@@ -185,6 +185,26 @@ def delete_session(config: Path, session_id: str, home: Path) -> bool:
     return removed
 
 
+def remove_debug_logs(cache: Path | None, home: Path) -> int:
+    """Remove Claude Code's MCP debug logs kept under Sylvia's runtime home.
+
+    Off Windows the runtime's cache folder is inside the runtime home, and the CLI writes one
+    log per step under ``<cache>/claude-cli-nodejs/<working folder>/mcp-logs-*/``: the names
+    of the tools it called, a session ID and the working folder's path. Nothing reads them and
+    they are never trimmed, so they go with the step's other records. Only inside the runtime
+    home; on Windows the CLI's cache is the person's own and is left alone.
+    """
+    if cache is None or not inside(cache, home):
+        return 0
+    root = cache / "claude-cli-nodejs"
+    count = 0
+    if root.is_dir():
+        for folder in root.glob("*/mcp-logs-*"):
+            if folder.is_dir() and not folder.is_symlink() and inside(folder, home):
+                count += int(_remove(folder))
+    return count
+
+
 def sweep(
     config: Path, steps: Path, active: set[str], home: Path, *, now: float | None = None
 ) -> int:

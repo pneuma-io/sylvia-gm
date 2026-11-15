@@ -388,7 +388,7 @@ def slim_transition_result(
             del slimmed["current_entities"]
     result = slimmed.get("result")
     context = result.get("context") if isinstance(result, Mapping) else None
-    if isinstance(context, Mapping):
+    if isinstance(result, Mapping) and isinstance(context, Mapping):
         context = dict(context)
         for key, ident in (("actor", "_actor_id"), ("completed_actor", "_completed_actor_id")):
             entity_id = context.get(ident)
@@ -398,6 +398,8 @@ def slim_transition_result(
         for key, ident in (("lasting_state", "_lasting_state_id"),
                            ("time_stop_state", "_time_stop_state_id")):
             name = context.get(ident)
+            # The suffix only finds the candidate namespace; the copy is removed because the
+            # state record holds exactly the same value, never because the names match.
             if key in context and isinstance(name, str) and any(
                 str(namespace).endswith("." + name) and value == context[key]
                 for namespace, value in namespaces.items()

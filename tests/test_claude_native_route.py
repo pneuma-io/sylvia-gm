@@ -1065,3 +1065,41 @@ def test_exports_stub_cli_records_and_the_wire_journal(tmp_path, monkeypatch):
     assert any(r["kind"] == NATIVE_KIND and r["status"] == "collected" for r in after)
     assert_nothing_private_left(home)
 
+
+def test_mcp_debug_logs_inside_the_runtime_home_go_with_each_step(runtime, monkeypatch, tmp_path):
+    """Off Windows Claude Code logs each step's tool names under the runtime's cache folder."""
+    from sylvia_gm.provider._claude_native import remove_debug_logs
+
+    provider, home, _hook = runtime
+    real_environment = _claude.native_environment
+
+    def off_windows(runtime_home):
+        return {**real_environment(runtime_home), "XDG_CACHE_HOME": str(runtime_home / "cache")}
+
+    monkeypatch.setattr(_claude, "native_environment", off_windows)
+
+    def plant(cache: Path) -> Path:
+        folder = cache / "claude-cli-nodejs" / "-runtime-workspace" / "mcp-logs-sylvia"
+        folder.mkdir(parents=True, exist_ok=True)
+        (folder / "2026-11-16T00-00-00.jsonl").write_text(
+            '{"debug":"Calling MCP tool: roll","cwd":"/home/someone/runtime/workspace"}\n',
+            encoding="utf-8")
+        return folder
+
+    chain = Chain()
+    # A completed step, then a failed one: the log is gone after both.
+    log = plant(home / "cache")
+    kept = home / "cache" / "claude-cli-nodejs" / "-runtime-workspace" / "other.txt"
+    kept.write_text("not a debug log", encoding="utf-8")
+    run_step(provider, chain, chain_canonicals()[0][1], text_reply("The door creaks."))
+    assert not log.exists() and kept.exists()
+    log = plant(home / "cache")
+    failure = [{"type": "result", "subtype": "error_during_execution", "is_error": True,
+                "api_error_status": 500}]
+    with pytest.raises(ProviderError):
+        run_step(provider, chain, chain_canonicals()[1][1], failure)
+    assert not log.exists() and kept.exists()
+    # A cache folder outside the runtime home (a person's own) is never touched.
+    outside = plant(tmp_path / "person" / "cache")
+    assert remove_debug_logs(tmp_path / "person" / "cache", home) == 0 and outside.exists()
+    assert remove_debug_logs(None, home) == 0
