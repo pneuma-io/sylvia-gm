@@ -176,6 +176,9 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
                 ui.update(UI_JOURNEY)
                 groups.setdefault("tutorial-assets", []).append("tests/test_tutorial_assets.py")
                 reason = "Tutorial artwork: provenance, packaged crops and rendered lessons"
+            elif path == "scripts/setup_linux_dev.sh":
+                groups.setdefault("linux-dev-setup", []).append("tests/test_linux_dev_setup.py")
+                reason = "Linux development setup script: stored form and read-only modes"
             elif path.startswith("src-tauri/frontend/"):
                 ui.update(UI_JOURNEY)
                 reason = "Shipped frontend: JavaScript invariants and rendered browser journeys"

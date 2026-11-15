@@ -211,7 +211,7 @@ def test_real_source_entry_rejects_unconfigured_helper_without_owner_or_database
         capture_output=True,
         cwd=tmp_path,
         env=environment,
-        creationflags=subprocess.CREATE_NO_WINDOW,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         timeout=15,
     )
     assert result.returncode == 2 and result.stderr == b""
@@ -219,6 +219,7 @@ def test_real_source_entry_rejects_unconfigured_helper_without_owner_or_database
     assert list(tmp_path.iterdir()) == []
 
 
+@pytest.mark.runs_on("win32", reason="Windows PATH semantics")
 def test_child_environment_uses_public_reset_without_persistent_change(monkeypatch):
     monkeypatch.setattr(runtime.sys, "_MEIPASS", "C:/inert-extraction", raising=False)
     monkeypatch.setenv("PATH", "C:/normal-tools;C:/inert-extraction/bin;C:/other-tools")

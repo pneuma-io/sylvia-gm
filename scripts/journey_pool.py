@@ -25,6 +25,26 @@ else:
     from scripts.known_test_defects import accepted_case
     from scripts.platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 
+RETAIN_VARIABLE = "SYLVIA_RETAIN_SUCCESSFUL_FIXTURES"
+
+
+def retain_successful_fixtures(environment):
+    """Whether passed tests keep their scratch; the answer is written back for the children.
+
+    Keeping it is the explicit choice ``1``. Unset or ``0`` removes a passed test's scratch,
+    because a full run would otherwise keep tens of gigabytes. Failed tests always keep theirs.
+    """
+    value = environment.get(RETAIN_VARIABLE) or "0"
+    if value not in ("0", "1"):
+        raise ValueError(f"{RETAIN_VARIABLE} must be 0 or 1, not {value!r}")
+    environment[RETAIN_VARIABLE] = value
+    return value == "1"
+
+
+def retention_arguments(retain):
+    """pytest options that remove a passed test's tmp_path and keep a failed test's."""
+    return [] if retain else ["-o", "tmp_path_retention_policy=failed"]
+
 
 def case_key(nodeid):
     unparameterized, bracket, parameters = nodeid.partition("[")
@@ -115,6 +135,7 @@ def run_balanced_gate(
 ):
     """All collected cases execute once. Only mutable data is isolated per worker."""
     environment = dict(os.environ)
+    retain = retain_successful_fixtures(environment)
     environment.pop("PYTEST_ADDOPTS", None)
     environment["PYTHONUNBUFFERED"] = "1"
     # Child text I/O must not depend on the machine's code page or UTF-8 mode.
@@ -211,8 +232,7 @@ def run_balanced_gate(
             {
                 "workers": count,
                 "scheduler": scheduler,
-                "retain_successful_fixtures": environment.get("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES")
-                != "0",
+                "retain_successful_fixtures": retain,
                 "estimated_seconds": loads,
                 "tasks": buckets,
                 "qualification_deadline_seconds": None if deadline is None else deadline - started,
@@ -242,10 +262,9 @@ def run_balanced_gate(
             f"cache_dir={destination / 'pytest-cache' / str(index)}",
             f"--junitxml={xml}",
             f"--basetemp={data}",
+            *retention_arguments(retain),
             *[nodeid for _, nodeid in bucket],
         ]
-        if environment.get("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES") == "0":
-            args.extend(["-o", "tmp_path_retention_policy=failed"])
         argument_file = prefix.with_suffix(".arguments.json")
         argument_file.write_text(json.dumps(args), encoding="utf-8")
         launcher = (

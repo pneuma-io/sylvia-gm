@@ -639,6 +639,7 @@ def test_alpha_09_nsis_qualification_is_isolated_manifest_bound_and_removes_inst
     assert len(commands) == 2
 
 
+@pytest.mark.runs_on("win32", reason="Windows NSIS installer qualification")
 def test_alpha_09_nsis_qualification_refuses_existing_install_or_registration(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -861,6 +862,7 @@ def test_alpha_09_installed_owner_backup_reopens_and_recovers_cross_root(
     assert not (tmp_path / "selected-recovery.sylvia-gm-campaign").exists()
 
 
+@pytest.mark.runs_on("win32", reason="Windows NSIS installer qualification")
 def test_alpha_09_nsis_qualification_cleans_a_rejected_partial_install(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -934,6 +936,7 @@ def test_alpha_09_nsis_qualification_cleans_a_rejected_partial_install(
     ]
 
 
+@pytest.mark.runs_on("win32", reason="Windows NSIS installer qualification")
 def test_alpha_09_nsis_qualification_rejects_uninstaller_residue(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

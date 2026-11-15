@@ -324,7 +324,7 @@ for (const viewport of [{ width: 1400, height: 900 }, { width: 960, height: 640 
   });
 }
 
-test('reopening Settings after a failed save starts Models at its top with the failure in view', async () => {
+test('reopening Settings after a failed save shows the failure, scrolling Models only if it must', async () => {
   const browser = await chromium.launch();
   try {
     const { page, errors } = await openShell(browser, { width: 960, height: 640 });
@@ -334,9 +334,18 @@ test('reopening Settings after a failed save starts Models at its top with the f
       const content = document.querySelector('.settings-content');
       const notice = document.getElementById('models-action-status').getBoundingClientRect();
       const pane = content.getBoundingClientRect();
-      return { scrollTop: content.scrollTop, noticeInView: notice.top >= pane.top && notice.bottom <= pane.bottom };
+      // Whole pixels: a scroll offset is a whole number, so a notice scrolled flush to the pane's edge can
+      // overhang it by a fraction of a pixel.
+      const [top, bottom, paneTop, paneBottom] = [notice.top, notice.bottom, pane.top, pane.bottom].map(Math.round);
+      return { scrollTop: content.scrollTop, noticeInView: top >= paneTop && bottom <= paneBottom,
+        // Whether the notice would be inside the pane with the tab at its top, and its distance from the pane's edge now.
+        fitsAtTop: Math.round(notice.bottom + content.scrollTop) <= paneBottom, gapBelow: paneBottom - bottom };
     });
-    assert.deepEqual(view, { scrollTop: 0, noticeInView: true });
+    assert.equal(view.noticeInView, true, JSON.stringify(view));
+    // Models stays at its top whenever the notice fits there. Fonts that wrap the section above it push the
+    // notice lower; then Settings scrolls, and no further than showing the notice needs.
+    if (view.fitsAtTop) assert.equal(view.scrollTop, 0, JSON.stringify(view));
+    else assert.ok(view.scrollTop > 0 && view.gapBelow >= 0 && view.gapBelow <= 24, JSON.stringify(view));
     assert.match(result.notice, /settings file/);
     assert.deepEqual(errors, []);
   } finally {

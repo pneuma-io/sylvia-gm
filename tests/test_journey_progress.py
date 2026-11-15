@@ -20,14 +20,19 @@ def test_timing_keeps_original_result_exception_and_records_real_phase(tmp_path,
     assert all(row["seconds"] >= 0 for row in rows)
 
 
+@pytest.mark.parametrize("setting", [None, "0"], ids=["default", "explicit-remove"])
 def test_optional_scenario_retention_does_not_change_or_remove_closed_database(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, setting
 ):
     from tests.lite_fixture_archive import archive_closed_database
 
     database = tmp_path / "closed.sqlite3"
     database.write_bytes(b"unchanged closed synthetic fixture")
-    monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "0")
+    # Archival is the explicit choice 1; unset behaves the same as 0.
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", setting)
     archive_closed_database(database, tmp_path)
     assert database.read_bytes() == b"unchanged closed synthetic fixture"
     assert not list(tmp_path.glob("*.parts.json"))

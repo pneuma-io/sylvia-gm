@@ -40,7 +40,8 @@ def test_owner_identity_entry_returns_only_public_metadata_without_owner_startup
     assert value["version"] == __version__
     assert value["storage_compatibility"] == 1
     assert value["component"] == "owner"
-    assert value["target"] == "windows-x86_64"
+    # The owner names the platform it actually runs on; only Windows has published updates.
+    assert value["target"] == {"win32": "windows-x86_64", "linux": "linux-x86_64"}[sys.platform]
     assert list(tmp_path.iterdir()) == []
 
 

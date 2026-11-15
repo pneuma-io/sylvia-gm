@@ -619,6 +619,58 @@ def test_platform_excluded_case_is_not_required_or_run_but_an_ordinary_skip_stil
     }]
 
 
+@pytest.mark.parametrize("case_workers", [1, 2], ids=["one-process", "parallel"])
+@pytest.mark.parametrize(
+    ("setting", "retained"),
+    [(None, False), ("0", False), ("1", True)],
+    ids=["default", "explicit-remove", "explicit-keep"],
+)
+def test_runner_removes_passed_scratch_unless_asked_to_keep_it(
+    gate, tmp_path, monkeypatch, case_workers, setting, retained,
+):
+    root = tmp_path / "checkout"
+    _marked_checkout(
+        root,
+        "def test_pass(tmp_path):\n"
+        "    (tmp_path / 'success.sqlite3').write_bytes(b'disposable successful case')\n"
+        "def test_failure(tmp_path):\n"
+        "    (tmp_path / 'failed.sqlite3').write_bytes(b'preserve failed evidence')\n"
+        "    assert False, 'intentional negative runner control'\n",
+    )
+    monkeypatch.delenv("PYTEST_ADDOPTS", raising=False)
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", setting)
+    monkeypatch.setattr(gate, "ROOT", root)
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": ["tests/test_marked.py"]})
+    output = tmp_path / "runner"
+    output.mkdir()
+    passed, _ = gate._run("gm-turn", output, case_workers=case_workers)
+    assert passed is False, "The intentional failure fails the group"
+    kept = list((output / "attempts").rglob("success.sqlite3"))
+    assert len(kept) == (1 if retained else 0)
+    failed = list((output / "attempts").rglob("failed.sqlite3"))
+    assert len(failed) == 1 and failed[0].read_bytes() == b"preserve failed evidence"
+
+
+def test_runner_refuses_an_unknown_retention_setting_before_any_check(
+    gate, tmp_path, monkeypatch, capsys,
+):
+    import sys
+
+    monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "yes")
+    output = tmp_path / "runner"
+    monkeypatch.setattr(sys, "argv", [
+        "check_supported_journeys.py", "--journey", "gm-turn", "--output-dir", str(output),
+    ])
+    with pytest.raises(SystemExit) as stopped:
+        gate.main()
+    assert stopped.value.code == 2
+    assert "must be 0 or 1" in capsys.readouterr().err
+    assert not output.exists()
+
+
 @pytest.mark.parametrize("record", ["missing", "stale", "malformed", "uncollected"])
 def test_group_fails_when_collection_did_not_record_its_platform_exclusions(
     gate, tmp_path, monkeypatch, record,

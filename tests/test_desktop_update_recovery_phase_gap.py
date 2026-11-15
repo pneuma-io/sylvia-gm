@@ -20,6 +20,7 @@ from tests.test_desktop_update_recovery import old_identity
 from tests.test_desktop_update_recovery_service import service_fixture
 
 
+@pytest.mark.runs_on("win32", reason="Windows update release target")
 @pytest.mark.parametrize("choice", [KEEP_DATA, RESTORE_CONFIRMATION])
 def test_failed_phase_save_requires_fresh_reviewed_intent_and_full_retry_ack(
     tmp_path, monkeypatch, choice,

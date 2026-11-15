@@ -54,7 +54,10 @@ def registration(target: Path, **changes: str) -> runner.UninstallRegistration:
         "exact",
         "quoted-arguments",
         "trailing-separator",
-        "case-and-slashes",
+        pytest.param(
+            "case-and-slashes",
+            marks=pytest.mark.runs_on("win32", reason="Windows case-insensitive paths"),
+        ),
         "sibling-location",
         "foreign-uninstaller",
         "command-wrapper",

@@ -59,7 +59,8 @@ async def test_sylvias_copy_returns_tools_replays_results_and_leaves_the_person_
     monkeypatch.setenv("LOCALAPPDATA", str(person / "AppData" / "Local"))
     copied = home / "install" / _claude_runtime.MINIMUM_VERSION_TEXT
     copied.mkdir(parents=True)
-    shutil.copyfile(source, copied / _claude_runtime.executable_name())
+    # Copy the permission bits too: off Windows the copy must stay executable.
+    shutil.copy(source, copied / _claude_runtime.executable_name())
     executable = _claude_runtime.find_runtime(home)
     assert executable == copied / _claude_runtime.executable_name()
     requests: list[dict[str, Any]] = []
