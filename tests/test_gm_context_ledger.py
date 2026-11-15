@@ -436,7 +436,7 @@ def test_journal_persists_and_rebuilds_identically_after_restart() -> None:
 
 
 def test_export_stubs_are_no_record_for_every_reader() -> None:
-    """Review N8: an exported campaign carries both kinds only as stubs; they never count."""
+    """An exported campaign carries both kinds only as stubs; they never count."""
     stubs = [{"kind": JOURNAL_KIND, "omitted_from_export": True},
              {"kind": NATIVE_KIND, "omitted_from_export": True}]
     ledger = _ledger()
@@ -770,7 +770,7 @@ def _files(step: int) -> dict:
             "data, not player speech):\n" + json.dumps({"step": step, "notes": "n" * 6000})}
 
 
-#: Real GM requests always carry tools; every compaction test passes them (review N1).
+#: Real GM requests always carry tools; every compaction test passes them.
 _TOOLS = [{"type": "function", "function": {
     "name": f"tool_{index}", "description": "An engine operation. " * 20,
     "parameters": {"type": "object", "properties": {"x": {"type": "string"}}}}}
@@ -847,7 +847,7 @@ def test_superseded_records_over_budget_rebase_the_journal_instead_of_compacting
 
 
 def test_ledger_mode_compacts_exactly_when_legacy_does() -> None:
-    """Review N1: compaction is decided from canonical terms, as on main, in both modes."""
+    """Compaction is decided from canonical terms, as on main, in both modes."""
     for turns in (4, 12, 30):
         ledger = _ledger()
         dialogue = []
@@ -905,7 +905,7 @@ def test_a_retired_fact_is_removed_by_record_id_and_a_ranked_out_one_stays() -> 
     base = {"campaign": {"revision": 1}, "PLAYER_KNOWN": {"current_facts": [
         {"record_id": "f1", "text": "door is locked"}]}}
     nxt = {"campaign": {"revision": 2}, "PLAYER_KNOWN": {"current_facts": []}}
-    # The reviewer's r1b case 1: the record left the active set.
+    # The record left the active set.
     update = state_update(base, nxt, _active())
     assert update["facts"] == [{"path": ["PLAYER_KNOWN", "current_facts"], "remove": ["f1"]}]
     assert apply_state_update(base, update)["PLAYER_KNOWN"]["current_facts"] == []
@@ -1107,7 +1107,7 @@ def test_journaled_host_records_leave_out_covered_snapshots_and_dedupe_on_canoni
 
 
 def test_a_changed_tool_set_is_saved_even_when_nothing_is_appended() -> None:
-    """Review N6: after a restart the next request compares with the tools last sent."""
+    """After a restart the next request compares with the tools last sent."""
     from sylvia_gm.agent._context_ledger import toolset_fingerprint
 
     first_tools, second_tools = _TOOLS[:6], _TOOLS[:5]

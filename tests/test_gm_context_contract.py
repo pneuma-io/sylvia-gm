@@ -569,7 +569,7 @@ def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
 def test_a_mid_turn_rebase_strips_every_carried_over_thinking_block(
     started_campaign, tmp_path, monkeypatch, restart,
 ):
-    """Review N2: the first frame of a new generation strips every carried-over turn."""
+    """The first frame of a new generation strips every carried-over turn."""
     gm = ThinkingGM("claude-fable-5-2", rebase_after=2)
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
     assert all(r.get("interruption") is None for r in replies), replies
@@ -588,7 +588,7 @@ def test_a_mid_turn_rebase_strips_every_carried_over_thinking_block(
 def test_a_mid_turn_rebase_keeps_thinking_on_other_models_until_a_rejection(
     started_campaign, tmp_path, monkeypatch,
 ):
-    """Review N2: on models not enforced for every account the reactive rule covers a reset."""
+    """On models not enforced for every account the reactive rule covers a reset."""
     gm = ThinkingGM("claude-opus-5-5", rebase_after=2, reject_on=(3,))
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
     assert all(r.get("interruption") is None for r in replies), replies
@@ -841,7 +841,7 @@ def _combat_decisions(frames: list[Any], window: int, *, fresh: bool = False) ->
     """Per request: legacy's and ledger mode's compaction decision, and any rebase.
 
     The recorded turn runs through a real ledger with prepare()'s measure and rebase hooks as
-    the GM adapter wires them, passing each request's real tools (review N1). With ``fresh``
+    the GM adapter wires them, passing each request's real tools. With ``fresh``
     every request is planned on a new ledger, so nothing superseded is in its journal.
     """
     import asyncio
@@ -927,7 +927,7 @@ def _combat_decisions(frames: list[Any], window: int, *, fresh: bool = False) ->
 
 @pytest.mark.parametrize("fresh", [False, True], ids=["journal", "fresh-journal"])
 def test_combat_turn_compacts_exactly_when_legacy_does_with_real_tools(party_combat, fresh):
-    """Review N1: on a 200,000-token model ledger mode compacts on a request if and only if
+    """On a 200,000-token model ledger mode compacts on a request if and only if
     legacy does; the wire decides only a rebase, and a fresh journal never rebases."""
     rows = _combat_decisions(party_combat, 200_000, fresh=fresh)
     assert [r["ledger"] for r in rows] == [r["legacy"] for r in rows], rows
@@ -1148,7 +1148,7 @@ def _correction_cases() -> list[Any]:
 def test_corrections_never_change_the_claude_system_or_end_on_an_assistant_turn(
     name, value, label, transport, monkeypatch, tmp_path,
 ):
-    """PR 53 findings on the lifting Claude routes, closed by the ledger.
+    """Two Claude Messages rules on the lifting routes, kept by the ledger.
 
     (a) An in-turn system message never changes the top-level system after the first request
     of an epoch: it becomes a sealed user-role host record. (b) No request ends on an

@@ -921,7 +921,7 @@ class WireFrame:
     observation: dict[str, Any]
 
 
-#: The latest frame planned in this task, for SylviaBench provenance (read-only observation).
+#: The latest frame planned in this task, for benchmark provenance (read-only observation).
 CURRENT_WIRE_FRAME: ContextVar[dict[str, Any] | None] = ContextVar(
     "sylvia_gm_current_wire_frame", default=None
 )

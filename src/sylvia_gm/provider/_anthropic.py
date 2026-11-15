@@ -113,8 +113,8 @@ def accepts_temperature(model_id: str) -> bool:
     return claude_id is None or claude_id in _CLAUDE_TEMPERATURE
 
 
-# Preserved thinking, from Anthropic's documentation as restated in the review decisions of
-# 2026-11-15 (not checked against the live service): a thinking block is bound to the
+# Preserved thinking, from Anthropic's documentation as read on 2026-11-15 (not checked
+# against the live service): a thinking block is bound to the
 # top-level system, the tool set (full definitions, order-insensitive) and every earlier
 # message. Replaying one after any of those changed is HTTP 400 where the binding is enforced:
 # every account on these models; on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 only accounts

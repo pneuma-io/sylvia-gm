@@ -922,7 +922,7 @@ def test_gm_turn_saves_cli_records_once_and_replays_them(tmp_path, monkeypatch):
 
 
 def test_a_failed_deletion_is_retried_next_step_without_waiting(runtime, monkeypatch):
-    """Review N4: this process's own leftovers are retried at once, whatever their age."""
+    """This process's own leftovers are retried at once, whatever their age."""
     from sylvia_gm.provider import _claude_native
 
     provider, home, _hook = runtime
@@ -947,7 +947,7 @@ def test_a_failed_deletion_is_retried_next_step_without_waiting(runtime, monkeyp
 
 
 def test_an_incomplete_flush_reports_the_records_unknown(runtime, monkeypatch):
-    """Review N5: a flush wait that did not complete never reports "collected"."""
+    """A flush wait that did not complete never reports "collected"."""
     provider, home, _hook = runtime
     monkeypatch.setattr(_claude, "wait_for_flush", lambda *args, **kwargs: False)
     chain = Chain()
@@ -960,7 +960,7 @@ def test_an_incomplete_flush_reports_the_records_unknown(runtime, monkeypatch):
 
 
 def test_exports_stub_cli_records_and_the_wire_journal(tmp_path, monkeypatch):
-    """Review N8: a portable or private export keeps both machine-local evidence kinds only as
+    """A portable or private export keeps both machine-local evidence kinds only as
     stubs; recovery opens and the next GM turn starts a journal and collects the CLI's records
     again."""
     import dataclasses
