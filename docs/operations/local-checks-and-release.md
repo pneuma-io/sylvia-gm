@@ -28,11 +28,40 @@ campaign group. Its original count was 430; future collection can grow. It inclu
 retained milestone-label test that is explicitly excluded from product qualification.
 Exclusions are reported by exact test ID and reason, separately from passes and skips.
 
+Some cases can only run on one platform. Mark them `@pytest.mark.runs_on("linux", reason="...")`
+(or several platforms, such as `runs_on("win32", "linux", reason="...")`); the names are
+`sys.platform` values, and only `win32` and `linux` are accepted. A marker without a platform,
+with an unknown platform or without a reason stops collection. On any other platform a direct
+`pytest` run shows the case as skipped with "Runs only on linux: ...", and the runner reports it
+as a platform exclusion: not required, not run, and listed by exact test ID and reason in
+`summary.json` (`kind` is `platform`; the historical exclusion above is `historical`). Do not use
+`pytest.mark.skipif` for this: in the gate a skip always fails, and a check rejects it under `tests/`.
+
 ## Run the checks
 
 Use PowerShell in the checkout after `uv sync --locked --all-extras`. For JavaScript/browser
 checks, install the locked dependencies once with `npm ci --prefix tests --ignore-scripts`.
 Choose a fresh output directory beside the checkout, within the current work item.
+
+A few checks need something the machine provides. Without it the case skips while it runs,
+and because a skip is never a pass the run fails. That is a missing prerequisite, not a
+platform exclusion, so provide it and run again:
+
+- Node.js on `PATH`, for the browser group (`ui-controls`). Without it the runner fails that
+  group with "Node.js is required".
+- bash, for `tests/test_docs_index.py`. On Windows the test uses
+  `%ProgramFiles%\Git\bin\bash.exe` when it exists, so `PATH` cannot select the retired WSL
+  launcher; otherwise it uses `bash` on `PATH`.
+- A published Claude Code binary, for both cases in `tests/test_claude_native_protocol.py`.
+  Set `SYLVIA_TEST_CLAUDE_CODE` to the executable's path, or install it at
+  `~/.local/bin/claude.exe` (`~/.local/bin/claude` on Linux). The test copies it; Sylvia itself
+  never looks there.
+- Directory links in the temporary folder, for the outside-root cases in
+  `tests/test_fc01_release_exclusions.py` and `tests/test_ready_campaigns.py`. They try a
+  directory symlink, then on Windows a junction (`mklink /J`, which needs no extra privilege),
+  and skip only when both fail.
+- A tmpfs `/dev/shm` (as `/proc/self/mountinfo` reports it), for the Linux case
+  `tests/test_safe_file_adapter.py::test_linux_refuses_tmpfs_destinations`.
 
 The runner starts its child Python processes with `PYTHONUTF8=1` and `PYTHONIOENCODING=utf-8`,
 so results do not depend on the machine's console encoding. A direct `pytest` run on a machine
@@ -92,6 +121,9 @@ missing cases and duplicate coverage; file inventory alone does not prove case c
 Recorded defects execute as strict expected failures and appear separately from passes.
 An unexpected pass, unexpected skip, missing case or changed source fails the run. A known
 failure does not establish that the affected feature works. Preserve its reproduction and limits.
+Cases excluded by platform are counted in `excluded_case_counts` and printed as "Excluded by
+platform"; they were not run on this machine, so record them with the checks not run and check
+them on their own platform.
 
 Timing-sensitive tests should synchronize on events or use controlled clocks. For example,
 cancellation starts after provider admission; stream-timeout tests distinguish inactivity from

@@ -27,15 +27,14 @@ from sylvia_gm.domain.authority import WriterRole
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionRecord
 
-NATIVE = sys.platform in {"win32", "linux"}
 LINUX_LABEL = "linux-user-key-file"
 WINDOWS_LABEL = "windows-dpapi-user"
 FOREIGN_LABEL = WINDOWS_LABEL if sys.platform == "linux" else LINUX_LABEL
-requires_native = pytest.mark.skipif(
-    not NATIVE, reason="Requires Windows DPAPI or the Linux user key file"
+requires_native = pytest.mark.runs_on(
+    "win32", "linux", reason="Requires Windows DPAPI or the Linux user key file"
 )
-linux_only = pytest.mark.skipif(
-    sys.platform != "linux", reason="Linux user key-file protection exists only on Linux"
+linux_only = pytest.mark.runs_on(
+    "linux", reason="Linux user key-file protection exists only on Linux"
 )
 
 

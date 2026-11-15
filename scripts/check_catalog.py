@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+if __package__:
+    from .platform_exclusions import platform_reason
+else:
+    from platform_exclusions import platform_reason
+
 
 HISTORICAL_CHECKS = {
     # The original stage7 checkpoint: whole modules, not a permanent case-count cap.
@@ -35,13 +40,30 @@ PRODUCT_CASE_EXCLUSIONS = {
 }
 
 
-def qualification_cases(nodeids, *, include_historical=False):
-    """Keep every collected behavioral case; report deliberate historical exclusions."""
+def qualification_cases(nodeids, *, include_historical=False, platform_exclusions=()):
+    """Keep every collected behavioral case; report deliberate exclusions by exact ID.
+
+    ``platform_exclusions`` are the collection's ``runs_on`` cases for other platforms. They
+    cannot run here, so they are excluded from every kind of qualification, historical too.
+    """
+    platform ={entry["nodeid"]: entry for entry in platform_exclusions}
+    unknown = sorted(set(platform) - set(nodeids))
+    if unknown:
+        raise ValueError(f"Platform exclusions name cases that were not collected: {unknown}")
     required, excluded = [], []
     for nodeid in nodeids:
+        if nodeid in platform:
+            entry = platform[nodeid]
+            excluded.append({
+                "nodeid": nodeid,
+                "reason": platform_reason(entry["platforms"], entry["reason"]),
+                "kind": "platform",
+                "platforms": list(entry["platforms"]),
+            })
+            continue
         reason = None if include_historical else PRODUCT_CASE_EXCLUSIONS.get(nodeid)
         if reason is None:
             required.append(nodeid)
         else:
-            excluded.append({"nodeid": nodeid, "reason": reason})
+            excluded.append({"nodeid": nodeid, "reason": reason, "kind": "historical"})
     return required, excluded

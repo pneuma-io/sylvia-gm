@@ -522,7 +522,9 @@ def test_product_exclusion_preserves_other_and_future_cases_and_historical_selec
     future = "tests/test_alpha_f4_generic_sessions.py::test_future_behavior[new-parameter]"
     required, excluded = qualification_cases([existing, historical, future])
     assert required == [existing, future]
-    assert excluded == [{"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical]}]
+    assert excluded == [
+        {"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical], "kind": "historical"},
+    ]
     assert qualification_cases([existing, historical, future], include_historical=True) == (
         [existing, historical, future], [],
     )
@@ -666,3 +668,28 @@ def test_real_gm_request_contracts_are_unique_in_a_combined_affected_diff(module
     owners = [(group, item) for group, items in plan["python"].items()
               for item in items if item.split("::")[0] == module]
     assert owners == [("gm-request-contracts", module)]
+
+
+def test_platform_cases_are_excluded_by_exact_id_from_product_and_historical_runs():
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    behavior = "tests/test_safe_file_adapter.py::test_behavior"
+    linux = "tests/test_safe_file_adapter.py::test_linux_semantics[case]"
+    recorded = [{"nodeid": linux, "platforms": ["linux"], "reason": "Linux descriptor semantics"}]
+    platform = {
+        "nodeid": linux,
+        "reason": "Runs only on linux: Linux descriptor semantics",
+        "kind": "platform",
+        "platforms": ["linux"],
+    }
+    assert qualification_cases(
+        [behavior, linux, historical], platform_exclusions=recorded,
+    ) == ([behavior], [
+        platform,
+        {"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical], "kind": "historical"},
+    ])
+    assert qualification_cases(
+        [behavior, linux, historical], include_historical=True, platform_exclusions=recorded,
+    ) == ([behavior, historical], [platform])
+    with pytest.raises(ValueError, match="not collected"):
+        qualification_cases([behavior], platform_exclusions=recorded)
