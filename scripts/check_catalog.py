@@ -46,7 +46,7 @@ def qualification_cases(nodeids, *, include_historical=False, platform_exclusion
     ``platform_exclusions`` are the collection's ``runs_on`` cases for other platforms. They
     cannot run here, so they are excluded from every kind of qualification, historical too.
     """
-    platform ={entry["nodeid"]: entry for entry in platform_exclusions}
+    platform = {entry["nodeid"]: entry for entry in platform_exclusions}
     unknown = sorted(set(platform) - set(nodeids))
     if unknown:
         raise ValueError(f"Platform exclusions name cases that were not collected: {unknown}")
