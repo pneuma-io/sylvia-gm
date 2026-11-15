@@ -392,8 +392,9 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(
             rendered = [unsealed(m.get("content")) for m in compacted]
             assert any(text.startswith("SYLVIA_CONTINUATION_NOTE ") for text in rendered)
             assert messages[-1]["content"] in rendered
-            # Append-only: an earlier record stays in history; the newer one comes later and
-            # supersedes it (the ledger contract says so).
+            # Append-only: an earlier record stays in history and the newer one comes later.
+            # (This hand-built label is an event record, which accumulates; only the state
+            # keyframe and the latest-wins labels supersede earlier records.)
             newest = rendered.index("FRESH STATE: authoritative AP=2")
             assert all(index < newest for index, text in enumerate(rendered) if "AP=4" in text)
             assert provider.requests[-1][2]["max_tokens"] == 4096
