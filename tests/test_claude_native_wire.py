@@ -1,6 +1,7 @@
 """Opt-in wire check: Sylvia's real ClaudeProvider and a real Claude Code binary, offline.
 
-Skipped unless ``SYLVIA_TEST_CLAUDE_WIRE_BINARY`` names a ``claude`` binary. The binary runs
+Skipped unless ``SYLVIA_TEST_CLAUDE_WIRE_BINARY`` names a ``claude`` binary; it is run by hand
+and is a declared product-case exclusion (``scripts/check_catalog.py``). The binary runs
 against a local fake Messages endpoint (also its HTTP(S) proxy, so any other host is refused
 and recorded) with a throwaway config directory and a dummy key. No real service is contacted
 and no real credential is used. ``SYLVIA_TEST_CLAUDE_WIRE_REPORT`` optionally names a JSON file
@@ -47,10 +48,6 @@ from tests.test_claude_native_route import (
 )
 
 BINARY = os.environ.get("SYLVIA_TEST_CLAUDE_WIRE_BINARY")
-pytestmark = pytest.mark.skipif(
-    not BINARY or not Path(BINARY).is_file(),
-    reason="SYLVIA_TEST_CLAUDE_WIRE_BINARY does not name a Claude Code binary",
-)
 DUMMY_KEY = "sk-ant-api03-OFFLINE-WIRE-TEST-DUMMY-KEY-NOT-A-CREDENTIAL-0000000000000000-AA"
 
 
@@ -266,6 +263,10 @@ def chain() -> list[tuple[str, list[dict[str, Any]], bool]]:
 
 
 def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, caplog):
+    # Opt-in prerequisite, run by hand. The case is a declared product-case exclusion in
+    # scripts/check_catalog.py, so the gate never requires it.
+    if not BINARY or not Path(BINARY).is_file():
+        pytest.skip("SYLVIA_TEST_CLAUDE_WIRE_BINARY does not name a Claude Code binary")
     fake = FakeMessages()
     home = tmp_path / "claude-runtime"
     person = tmp_path / "person"
