@@ -1363,6 +1363,27 @@ def materialize_player_action_previewer(
     return preview
 
 
+_SAFE_REFERENCE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}")
+
+
+def _unknown_reference_reason(references: Sequence[str]) -> str:
+    """Explain, in bounded model-safe text, that a chosen ID has no saved game state."""
+    named = [
+        reference for reference in references
+        if isinstance(reference, str) and _SAFE_REFERENCE_ID.fullmatch(reference)
+    ][:3]
+    if named and len(named) == len(references):
+        subject = ", ".join(f"'{reference}'" for reference in named)
+        opening = f"This campaign has no saved game statistics for {subject}."
+    else:
+        opening = "This campaign has no saved game statistics for a chosen target."
+    return (
+        f"{opening} This action only works on creatures and objects in the campaign's "
+        "game state. Choose one that is listed there, add the missing one first if a "
+        "tool for that is offered, or narrate the outcome without this action."
+    )
+
+
 def materialize_package_mechanic(
     *,
     package_id: str,
@@ -1526,6 +1547,12 @@ def materialize_package_mechanic(
         if not result.success:
             if result.failure_kind == "precondition" and result.error is not None:
                 raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
+            if result.failure_kind == "parameter_validation" and result.unknown_references:
+                # The model chose a target the campaign holds no game state for (a named
+                # bystander, say). That is a refusal it can act on, not a Ruleset defect.
+                raise RulesetPreconditionRejected(
+                    _unknown_reference_reason(result.unknown_references)
+                )
             raise PackageRuntimeError("Package mechanic execution failed") from RuntimeError(
                 result.error or "Unknown Ruleset execution failure"
             )

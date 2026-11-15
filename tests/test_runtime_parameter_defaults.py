@@ -75,3 +75,44 @@ def test_integer_parameters_reject_booleans_before_effects_in_public_and_nested_
     else:
         assert "integer" in result.error
         assert not bridge.mutations()
+
+
+def test_unknown_entity_and_participant_ids_are_reported_as_unknown_references():
+    bridge = AuthorityMemoryStateBridge("example.test", {"example.test.entities": {"hero": {}}})
+    tool = ToolDef(name="aim", parameters=[
+        ToolParameter("actor", "string", resolve="entity"),
+        ToolParameter("target", "string", resolve="entity"),
+        ToolParameter("others", "entity_id_list", resolve="entity_list", required=False),
+    ])
+    result = execute_tool(
+        "aim", {"actor": "hero", "target": "mira", "others": ["hero", "tam", "mira"]},
+        {"aim": tool}, bridge, {}, {},
+    )
+    assert not result.success
+    assert result.failure_kind == "parameter_validation"
+    assert result.unknown_references == ("mira", "tam")
+    assert not bridge.mutations()
+
+    wrong_type = execute_tool("aim", {"actor": "hero", "target": 3}, {"aim": tool}, bridge, {}, {})
+    assert wrong_type.failure_kind == "parameter_validation"
+    assert wrong_type.unknown_references == ()
+
+
+@pytest.mark.parametrize("references,named", [
+    (("mira",), "'mira'"),
+    (("mira", "tam"), "'mira', 'tam'"),
+    (("mira1", "tam2", "oz3", "kel4"), None),
+    (("line\nbreak",), None),
+    (("x" * 65,), None),
+])
+def test_unknown_reference_refusal_is_bounded_and_names_only_plain_ids(references, named):
+    from sylvia_gm.application.package_runtime import _unknown_reference_reason
+    from sylvia_gm.domain.errors import RulesetPreconditionRejected
+
+    reason = _unknown_reference_reason(references)
+    assert RulesetPreconditionRejected(reason).safe_reason == reason
+    if named:
+        assert f"no saved game statistics for {named}." in reason
+    else:
+        assert "no saved game statistics for a chosen target." in reason
+        assert not any(reference in reason for reference in references)
