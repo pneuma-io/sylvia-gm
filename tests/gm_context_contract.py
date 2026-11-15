@@ -87,6 +87,8 @@ class LedgerRecorder:
     def __init__(self) -> None:
         self.frames: list[Recorded] = []
         self._originals: tuple[Any, Any] | None = None
+        #: Every plan() call, including size planning (measure) and recursions.
+        self.plans = 0
 
     def stop(self) -> list[Recorded]:
         """Restore the unpatched ledger (replays must not be recorded) and return the frames."""
@@ -101,6 +103,7 @@ class LedgerRecorder:
         recorder = self
 
         def plan(ledger: ContextLedger, canonical: Any, **options: Any) -> Any:
+            recorder.plans += 1
             frame = original_plan(ledger, canonical, **options)
             frame._contract_canonical = copy.deepcopy(list(canonical))  # type: ignore[attr-defined]
             frame._contract_context = options["request_context_id"]  # type: ignore[attr-defined]

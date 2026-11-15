@@ -491,6 +491,7 @@ def _thinking_run(started_campaign, tmp_path, monkeypatch, gm, *, restart: bool 
 
     monkeypatch.setattr(WorkingContextProvider, "_request_tools", request_tools)
     recorder = LedgerRecorder().install(monkeypatch)
+    gm.recorder = recorder
     gm.steps.extend([_check(player, "perception"), _check(player, "stealth"),
                      settle("You slip past unseen."), settle("The road is quiet.")])
     table = Table(database, gm, campaign, session)
@@ -521,6 +522,10 @@ def test_claude_thinking_replays_byte_for_byte_while_tools_are_unchanged(
                         and m["anthropic_content"][-1]["id"] == first_call)
         assert json.dumps(replayed) == json.dumps(gm.native[first_call])
     assert all(f.observation["thinking_floor"] == 0 for f in frames)
+    # F11: with model_info the working context sizes each request with measure_wire, and the
+    # send reuses the measured frame: one plan per request, not two.
+    assert len(frames) == len(calls)
+    assert gm.recorder.plans < 2 * len(frames), (gm.recorder.plans, len(frames))
 
 
 @pytest.mark.parametrize("restart", [False, True], ids=["same-owner", "after-restart"])
