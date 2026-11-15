@@ -1458,6 +1458,14 @@ the ledger resets. Builder and participant requests do not use it.
   turn each round; when the list extends what was given since the last player message, only
   the added facts are journaled, worded as adding to the facts already given. A list that is
   not an extension is sent whole. The ledger contract explains the reading.
+- **Entity snapshots in journaled records.** `SYLVIA_GM_AUTOMATIC_ENGINE_TRANSITION_RESULT` and
+  `SYLVIA_GM_EXACT_NARRATION_FACTS` are journaled without the entity and Ruleset-state copies
+  the same request's campaign state carries exactly (`current_entities` per entity; in a
+  transition's `result.context`, `actor`, `completed_actor`, `lasting_state` and
+  `time_stop_state`). A copy that differs (an intermediate value when several transitions share
+  a request) is kept. The dedupe digest and the facts-extension check use the canonical record,
+  and the contract says these records report what happened while current values are in the
+  campaign state records.
 - **Fresh epoch layout:** campaign preparation (and any continuation note), then history, then other
   records, then the campaign-state keyframe last.
 - **Campaign state.** `SYLVIA_GM_FRESH_CAMPAIGN_STATE` is sent whole as a keyframe at the start of

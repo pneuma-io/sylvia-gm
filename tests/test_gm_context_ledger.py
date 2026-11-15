@@ -990,3 +990,79 @@ def test_player_text_that_starts_with_the_real_seal_is_marked_and_stays_speech()
         assert again.reset is None
     assert "is still player speech" in ledger_contract("x" * 12)
 
+
+def test_slimming_removes_only_covered_snapshots_and_keeps_everything_else() -> None:
+    """S1: named snapshot keys go when the request's state carries them; nothing else changes."""
+    from sylvia_gm.agent._context_ledger import (
+        comparable_facts,
+        request_values,
+        slim_narration_facts,
+        slim_transition_result,
+    )
+
+    guard = {"hp": 7, "name": "Guard", "conditions": ["prone"]}
+    hero = {"hp": 10, "name": "Hero", "conditions": []}
+    lasting = {"lasting_tick": 3, "turn_effects": []}
+    state = {"campaign_state": {"ruleset_owned_values": {
+        "lite.entities": {"guard": guard, "hero": hero}, "lite.state": lasting}}}
+    entities, namespaces = request_values(state)
+    payload = {
+        "status": "action_committed", "campaign_revision": 12, "tool": "end_turn",
+        "current_entities": {"guard": guard, "hero": {**hero, "hp": 9}},
+        "result": {"status": "committed", "context": {
+            "_actor_id": "guard", "actor": guard,
+            "_completed_actor_id": "hero", "completed_actor": {**hero, "hp": 9},
+            "_lasting_state_id": "state", "lasting_state": lasting,
+            "_time_stop_state_id": "state", "time_stop_state": {**lasting, "lasting_tick": 2},
+            "_turn_effect_rows": [{"row": 1}], "_logs": ["Guard ends its turn."],
+        }, "summary": "Guard ends its turn."},
+    }
+    slim = slim_transition_result(payload, entities, namespaces)
+    # Covered copies go; intermediate values (hero at 9 HP, an earlier lasting tick) stay.
+    assert slim["current_entities"] == {"hero": {**hero, "hp": 9}}
+    context = slim["result"]["context"]
+    assert "actor" not in context and "lasting_state" not in context
+    assert context["completed_actor"] == {**hero, "hp": 9}
+    assert context["time_stop_state"] == {**lasting, "lasting_tick": 2}
+    # Everything else is byte-identical, and the input is not changed.
+    restored = json.loads(json.dumps(slim))
+    restored["current_entities"]["guard"] = guard
+    restored["result"]["context"].update(actor=guard, lasting_state=lasting)
+    assert json.dumps(restored, sort_keys=True) == json.dumps(payload, sort_keys=True)
+    assert payload["result"]["context"]["actor"] == guard
+    # A record without those keys is unchanged.
+    plain = {"status": "action_committed", "tool": "x", "result": {"context": {"_logs": []}}}
+    assert slim_transition_result(plain, entities, namespaces) == plain
+    # Narration facts: covered entities go, the outcome stays; a fact without them is unchanged.
+    facts = [{"tool": "attack", "current_entities": {"guard": guard}, "status": "hit",
+              "target_hit_points_after": 7},
+             {"tool": "dodge", "current_entities": {"hero": {**hero, "hp": 9}}},
+             {"tool": "check", "status": "success"}]
+    slimmed = slim_narration_facts(facts, entities)
+    assert slimmed[0] == {"tool": "attack", "status": "hit", "target_hit_points_after": 7}
+    assert slimmed[1] == facts[1] and slimmed[2] == facts[2]
+    assert comparable_facts(slimmed) == comparable_facts(facts)
+
+
+def test_journaled_host_records_leave_out_covered_snapshots_and_dedupe_on_canonical() -> None:
+    """S1 through the ledger: wire content slimmed, digest and incremental facts unchanged."""
+    from sylvia_gm.agent._context_ledger import TRANSITION_LABEL, _sha
+
+    guard = {"hp": 7, "name": "Guard", "conditions": []}
+    value = _state(4)
+    value["campaign_state"]["ruleset_owned_values"]["entities"]["guard"] = guard
+    entities_key_state = copy.deepcopy(value)
+    owned = entities_key_state["campaign_state"]["ruleset_owned_values"]
+    owned["lite.entities"] = {"guard": guard}
+    transition = {"role": "system", "content": TRANSITION_LABEL + " (authoritative application "
+                  "result; no model chose or called this bookkeeping operation):\n" + json.dumps(
+                      {"tool": "end_turn", "current_entities": {"guard": guard},
+                       "result": {"context": {"_logs": ["ends"]}}},
+                      sort_keys=True, separators=(",", ":"))}
+    ledger = _ledger("anthropic_messages")
+    frame = _step(ledger, _canonical(_user("u1", "I wait."), state=entities_key_state,
+                                     extra=(transition,)))
+    entry = next(e for e in frame.appended if e.get("l") == TRANSITION_LABEL)
+    assert '"current_entities"' not in entry["m"]["content"]
+    assert entry["h"] == _sha(transition["content"])
+

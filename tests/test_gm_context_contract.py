@@ -943,6 +943,70 @@ def test_combat_turn_compacts_exactly_when_legacy_does_with_real_tools(party_com
     assert not any(a["rebased"] and b["rebased"] for a, b in zip(rows, rows[1:], strict=False))
 
 
+def test_slimmed_snapshots_are_covered_by_the_campaign_state_of_their_request(party_combat):
+    """S1: every entity field or namespace a journaled host record left out is exactly what the
+    reconstructed campaign state holds after that request's update."""
+    import hashlib
+
+    from sylvia_gm.agent._context_ledger import (
+        NARRATION_FACTS_LABEL,
+        TRANSITION_LABEL,
+        host_seal,
+        request_values,
+        seal_prefix,
+        split_narration_facts,
+    )
+
+    def removed_from(canonical: dict, journaled: dict, path: str = "") -> list[tuple[str, Any]]:
+        gone = []
+        for key, value in canonical.items():
+            if key not in journaled:
+                gone.append((path + key, value))
+            elif isinstance(value, dict) and isinstance(journaled[key], dict):
+                gone.extend(removed_from(value, journaled[key], path + key + "."))
+        return gone
+
+    checked = 0
+    for frame in party_combat:
+        seal = seal_prefix(host_seal(frame.session_id))
+        entities, namespaces = request_values(frame.view)
+        by_digest = {hashlib.sha256(str(m.get("content", "")).encode()).hexdigest(): m
+                     for m in frame.canonical}
+        for entry in frame.appended:
+            if entry.get("l") not in {TRANSITION_LABEL, NARRATION_FACTS_LABEL}:
+                continue
+            canonical = str(by_digest[entry["h"]]["content"])
+            journaled = str(entry["m"]["content"]).removeprefix(seal)
+            if entry["l"] == TRANSITION_LABEL:
+                pairs = [(json.loads(canonical.split("\n", 1)[1]),
+                          json.loads(journaled.split("\n", 1)[1]))]
+            else:
+                full = split_narration_facts(canonical)[1]
+                sent = split_narration_facts(journaled)[1]
+                pairs = list(zip(full[len(full) - len(sent):], sent, strict=True))
+            for before, after in pairs:
+                for path, value in removed_from(before, after):
+                    name = path.rsplit(".", 1)[-1]
+                    if path.endswith(("current_entities." + name,)):
+                        assert entities[name] == value, (path, name)
+                    elif name in {"actor", "completed_actor"}:
+                        context = before["result"]["context"]
+                        ident = context["_actor_id" if name == "actor" else "_completed_actor_id"]
+                        assert entities[ident] == value, path
+                    elif name in {"lasting_state", "time_stop_state"}:
+                        context = before["result"]["context"]
+                        ident = context["_lasting_state_id" if name == "lasting_state"
+                                        else "_time_stop_state_id"]
+                        assert any(n.endswith("." + ident) and v == value
+                                   for n, v in namespaces.items()), path
+                    elif name == "current_entities":
+                        assert all(entities[k] == v for k, v in value.items()), path
+                    else:
+                        raise AssertionError(f"unexpected removed key {path}")
+                    checked += 1
+    assert checked >= 10, checked
+
+
 def test_party_combat_rounds_extend_on_every_route(party_combat):
     frames = party_combat
     assert len(frames) >= 8
@@ -1145,6 +1209,7 @@ def test_narration_facts_reconstruct_the_canonical_pending_facts_in_party_combat
     """Q2: the facts the model was given for the turn equal the canonical pending facts."""
     from sylvia_gm.agent._context_ledger import (
         NARRATION_FACTS_LABEL,
+        comparable_facts,
         host_seal,
         narration_facts_given,
         split_narration_facts,
@@ -1161,7 +1226,10 @@ def test_narration_facts_reconstruct_the_canonical_pending_facts_in_party_combat
                 continue
             parsed = split_narration_facts(str(canonical[-1]["content"]))
             assert parsed is not None
-            assert narration_facts_given(frame.wire, host_seal(frame.session_id)) == parsed[1]
+            # The journal keeps facts without entity snapshots the campaign state carries
+            # (S1); the facts themselves reconstruct exactly.
+            given = narration_facts_given(frame.wire, host_seal(frame.session_id))
+            assert comparable_facts(given) == comparable_facts(parsed[1])
             checked += 1
     assert checked >= 6
     added = [e for f in frames for e in f.appended if e.get("l") == NARRATION_FACTS_LABEL
