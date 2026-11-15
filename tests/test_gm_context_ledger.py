@@ -684,3 +684,136 @@ def test_a_growing_narration_facts_list_journals_only_the_added_facts() -> None:
     assert "these add to" not in fourth.appended[-1]["m"]["content"]
     assert narration_facts_given(fourth.wire, host_seal("s1")) == [three]
     assert "SYLVIA_GM_EXACT_NARRATION_FACTS record that says it adds" in ledger_contract("x" * 12)
+
+
+# ---------------------------------------------------------------- F1: compaction planning
+
+
+class _CompactingError(Exception):
+    pass
+
+
+class _SmallModel:
+    def __init__(self, window: int) -> None:
+        self.context_window = window
+        self.transport = "chat_completions"
+        self.max_output_tokens = 2048
+        self.provider_key = "local"
+        self.wire_model_id = "m"
+        self.id = "local/m"
+
+
+def _summarizer(window: int):
+    from sylvia_gm.provider._base import Provider
+
+    class Summarizer(Provider):
+        """Reaching the summarizer means prepare() decided to compact."""
+
+        def __init__(self) -> None:
+            super().__init__()
+            self.model_info = _SmallModel(window)
+
+        async def generate(self, *args, **kwargs):
+            raise _CompactingError()
+
+        async def generate_stream(self, *args, **kwargs):
+            raise _CompactingError()
+
+        async def close(self) -> None:
+            pass
+
+    return Summarizer()
+
+
+def _files(step: int) -> dict:
+    # A latest-wins record that changes every request: canonical holds one copy, the journal
+    # keeps every superseded one.
+    return {"role": "system", "content": "SYLVIA_GM_RELEVANT_CHARACTER_FILES (application-owned "
+            "data, not player speech):\n" + json.dumps({"step": step, "notes": "n" * 6000})}
+
+
+def _prepare(ledger: ContextLedger, canonical: list[dict], window: int, *, rebase=None):
+    """One request through prepare() with ledger hooks, then commit what finalize would."""
+    import asyncio
+
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    calls: list[str] = []
+
+    def measure(projected, tools):
+        return ledger.plan(projected, request_context_id=CONTEXT, check_saved_tip=False).wire
+
+    def request_rebase():
+        calls.append("rebase")
+        (rebase or ledger.request_rebase)()
+
+    working = WorkingContextProvider(_summarizer(window), save=lambda record: None,
+                                     measure_wire=measure, rebase_wire=request_rebase)
+    try:
+        asyncio.run(working.prepare(canonical, None))
+        decision = "send"
+    except _CompactingError:
+        decision = "compact"
+    frame = ledger.plan(canonical, request_context_id=CONTEXT, check_saved_tip=False)
+    ledger.commit(frame)
+    return decision, calls, frame, working
+
+
+def test_superseded_records_over_budget_rebase_the_journal_instead_of_compacting() -> None:
+    ledger = _ledger()
+    dialogue = [_user("u1", "I search the archive.")]
+    outcomes = []
+    for step in range(40):
+        canonical = _canonical(*dialogue, extra=(_files(step),))
+        decision, calls, frame, working = _prepare(ledger, canonical, 40_000)
+        outcomes.append((decision, calls, frame.reset, frame.base_count))
+        terms = working.budget_terms(canonical, None, {})
+        # After the request, the wire is under the threshold again.
+        assert terms["history_tokens"] < terms["threshold"], (step, terms)
+        if calls:
+            break
+    decision, calls, reset, base_count = outcomes[-1]
+    assert calls == ["rebase"], outcomes
+    assert decision == "send" and reset == "journal_rebased" and base_count == 0
+    assert all(o[0] == "send" and not o[1] for o in outcomes[:-1])
+    # The rebased generation is a fresh layout from canonical, and the next request extends it.
+    after, _calls, frame, _working = _prepare(
+        ledger, _canonical(*dialogue, extra=(_files(99),)), 40_000)
+    assert after == "send" and frame.reset is None and frame.base_count > 0
+
+
+def test_canonical_history_over_target_still_compacts() -> None:
+    ledger = _ledger()
+    dialogue = []
+    for index in range(30):
+        dialogue += [_user(f"u{index}", f"Turn {index}: " + "w" * 3000),
+                     _talk(f"t{index}", f"Narration {index}: " + "x" * 3000)]
+    dialogue.append(_user("u-last", "And now?"))
+    decision, calls, _frame, _working = _prepare(ledger, _canonical(*dialogue), 40_000)
+    assert decision == "compact" and calls == []
+
+
+def test_a_rebase_is_requested_at_most_once_per_request() -> None:
+    ledger = _ledger()
+    dialogue = [_user("u1", "I search the archive.")]
+    for step in range(12):
+        _prepare(ledger, _canonical(*dialogue, extra=(_files(step),)), 1_000_000)
+    # A rebase that does not shrink the wire (ignored here): the ordinary decision follows.
+    decision, calls, frame, _working = _prepare(
+        ledger, _canonical(*dialogue, extra=(_files(50),)), 40_000, rebase=lambda: None)
+    assert calls == ["rebase"]
+    assert decision in {"send", "compact"} and frame.reset is None
+
+
+def test_a_requested_rebase_never_outlives_its_epoch() -> None:
+    ledger = _ledger()
+    _step(ledger, _canonical(_user("u1", "hello"), extra=(_files(0),)))
+    _step(ledger, _canonical(_user("u1", "hello"), extra=(_files(1),)))
+    ledger.request_rebase()
+    moved = _step(ledger, _canonical(_user("u1", "hello"), extra=(_files(2),)),
+                  context="ctx-2")
+    assert moved.reset == "epoch_changed"
+    again = _step(ledger, _canonical(_user("u1", "hello"), extra=(_files(3),)),
+                  context="ctx-2")
+    assert again.reset is None
+

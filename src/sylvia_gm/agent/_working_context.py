@@ -200,6 +200,7 @@ class WorkingContextProvider(Provider):
         pin_first_user: bool = True,
         finalize_request: Callable | None = None,
         measure_wire: Callable | None = None,
+        rebase_wire: Callable[[], None] | None = None,
     ) -> None:
         super().__init__()
         self._provider = provider
@@ -219,6 +220,7 @@ class WorkingContextProvider(Provider):
         # size history from that list rather than from the canonical projection.
         self._finalize_request = finalize_request
         self._measure_wire = measure_wire
+        self._rebase_wire = rebase_wire
         self._token_estimator = token_estimator(provider)
 
     def _estimate(self, value: object) -> int:
@@ -333,6 +335,14 @@ class WorkingContextProvider(Provider):
                 "fixed_tokens": fixed_tokens, "history_tokens": history_tokens,
                 "threshold": int(remaining * 0.70), "target": int(remaining * 0.42)}
 
+    def _canonical_fits_target(self, projected, tools, options: Mapping[str, Any]) -> bool:
+        """Would the canonical history (what legacy sends) be at or under the target?"""
+        _capacity, input_budget = self._budgets(options)
+        fixed = self._fixed_messages(projected)
+        fixed_tokens = self._estimate([fixed, self._request_tools(tools)])
+        target = int(max(256, input_budget - fixed_tokens) * 0.42)
+        return self._estimate([m for m in projected if m not in fixed]) <= target
+
     async def prepare(self, messages, tools=None, *, force=False, **options):
         self._check_cancelled()
         self._source = messages
@@ -348,6 +358,18 @@ class WorkingContextProvider(Provider):
                 "exchange are too large. Saved work is intact; use a larger context model or "
                 "a bounded source read."
             )
+        if (
+            not force
+            and self.model_info is not None
+            and terms["history_tokens"] >= terms["threshold"]
+            and self._rebase_wire is not None
+            and self._canonical_fits_target(projected, tools, options)
+        ):
+            # Only superseded journal records are over the threshold: restart the journal from
+            # canonical history (a declared reset, full re-send) instead of summarising. Once
+            # per request; afterwards the ordinary decision applies to the rebased wire.
+            self._rebase_wire()
+            terms = self.budget_terms(projected, tools, options)
         history_tokens, threshold, target = (
             terms["history_tokens"], terms["threshold"], terms["target"])
         if not force and (

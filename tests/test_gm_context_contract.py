@@ -537,12 +537,12 @@ def _party_combat_frames(tmp_path, monkeypatch) -> list[Any]:
     return frames
 
 
-def test_combat_turn_is_sized_from_the_wire_with_200k(party_combat):
-    """F1: compaction planning counts each sent record once.
+def test_combat_turn_is_sized_from_the_wire_and_never_compacts_with_200k(party_combat):
+    """F1: compaction planning counts each sent record once and rebases before compacting.
 
-    The recorded combat turn runs through a real ledger with prepare()'s measure hook, as the
-    GM adapter wires it, against a 200,000-token model (8,192 output tokens). Ledger mode may
-    compact only where the real wire's history is over the threshold.
+    The recorded combat turn runs through a real ledger with prepare()'s measure and rebase
+    hooks, as the GM adapter wires them, against a 200,000-token model (8,192 output tokens).
+    Legacy never compacts in this turn; ledger mode must not compact either.
     """
     import asyncio
 
@@ -577,28 +577,35 @@ def test_combat_turn_is_sized_from_the_wire_with_200k(party_combat):
                            context_owner=frames[0].context_owner, transport="chat_completions")
     decisions = []
     for frame in frames:
+        rebased: list[bool] = []
+
         def measure(projected, tools, frame=frame):
             return provider_messages(ledger.plan(projected, request_context_id=frame.context_id,
                                                  check_saved_tip=False).wire)
 
+        def rebase(rebased=rebased):
+            rebased.append(True)
+            ledger.request_rebase()
+
         working = WorkingContextProvider(Summarizer(), save=lambda record: None,
-                                         measure_wire=measure)
+                                         measure_wire=measure, rebase_wire=rebase)
         legacy = WorkingContextProvider(Summarizer(), save=lambda record: None)
-        terms = working.budget_terms(frame.canonical, None, {})
-        wire = measure(frame.canonical, None)
-        # Every sent message is counted once: fixed plus history is the wire, not more.
-        assert terms["fixed_tokens"] + terms["history_tokens"] <= working._estimate(wire) * 1.02
         for name, provider in (("legacy", legacy), ("ledger", working)):
             try:
                 asyncio.run(provider.prepare(frame.canonical, None))
             except CompactingError:
                 decisions.append((name, "compact"))
-                if name == "ledger":
-                    assert terms["history_tokens"] >= terms["threshold"], terms
+        terms = working.budget_terms(frame.canonical, None, {})
+        wire = measure(frame.canonical, None)
+        # Every sent message is counted once: fixed plus history is the wire, not more.
+        assert terms["fixed_tokens"] + terms["history_tokens"] <= working._estimate(wire) * 1.02
+        decisions.append(("ledger", "rebase") if rebased else ("ledger", "send"))
         planned = ledger.plan(frame.canonical, request_context_id=frame.context_id,
                               check_saved_tip=False)
         ledger.commit(planned)
+        assert terms["history_tokens"] < terms["threshold"] or rebased
     assert ("legacy", "compact") not in decisions
+    assert ("ledger", "compact") not in decisions, decisions
 
 
 def test_party_combat_rounds_extend_on_every_route(party_combat):

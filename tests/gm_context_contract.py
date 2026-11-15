@@ -268,7 +268,8 @@ def check_extension(frames: Sequence[Recorded], transport: str) -> dict[str, Any
                         transport, index, "undeclared epoch change")
                 else:
                     assert reason in {"identity_missing", "journal_invalid",
-                                      "journal_started"}, (transport, index, reason)
+                                      "journal_started", "journal_rebased"}, (
+                        transport, index, reason)
         previous[frame.session_id] = (frame, rendered)
     return {"pairs": pairs, "resets": resets}
 

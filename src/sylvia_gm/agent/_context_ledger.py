@@ -720,6 +720,17 @@ class ContextLedger:
         self.seal = host_seal(session_id)
         self.state: JournalState | None = None
         self.prefix_sha256: str | None = None
+        #: A declared reset requested for the next frame of this epoch (``journal_rebased``).
+        self._pending_reset: tuple[str, str] | None = None
+
+    def request_rebase(self) -> None:
+        """Restart the journal from canonical history on the next request of this epoch.
+
+        Compaction planning asks for this when the wire is over budget only because of
+        superseded journal records. It applies to one committed frame, then clears.
+        """
+        if self.state is not None and self.state.entries:
+            self._pending_reset = ("journal_rebased", self.state.epoch)
 
     # The epoch identity covers every declared epoch reset: context owner (campaign, session,
     # package lock, model context), transport and the active working-context checkpoint.
@@ -828,6 +839,11 @@ class ContextLedger:
             state = JournalState.fresh(epoch, state.generation + 1)
             journaled = set()
             reset = "native_records_unknown"
+        elif (self._pending_reset is not None and self._pending_reset[1] == epoch
+              and state.entries):
+            state = JournalState.fresh(epoch, state.generation + 1)
+            journaled = set()
+            reset = self._pending_reset[0]
         base_count = len(state.entries)
         fresh_layout = base_count == 0
         appended: list[dict[str, Any]] = []
@@ -1029,6 +1045,8 @@ class ContextLedger:
         """Adopt a planned frame after its journal record was acknowledged."""
         self.state = frame.state
         self.prefix_sha256 = frame.prefix_sha256
+        # A requested reset applies once: to this frame, or never once the epoch moved on.
+        self._pending_reset = None
 
 
 def native_marker(value: Mapping[str, Any]) -> dict[str, Any]:

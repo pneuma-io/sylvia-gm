@@ -2268,7 +2268,7 @@ class ProviderSessionAdapter:
 
     def _ledger_hooks(
         self, provider_input: SessionProviderInput, provider: Provider, bridge: Any,
-    ) -> tuple[Any, Any]:
+    ) -> tuple[Any, Any, Any]:
         """Bind the session's ledger to one provider round: plan, journal, then send."""
         session_id = provider_input.session.session_id
         owner = self._ledger_owner(provider_input)
@@ -2343,7 +2343,12 @@ class ProviderSessionAdapter:
                 has_tools=bool(tools),
             )
 
-        return finalize, measure
+        def rebase() -> None:
+            # Compaction planning found only superseded journal records over budget.
+            ledger.request_rebase()
+            measured.clear()
+
+        return finalize, measure, rebase
 
     @staticmethod
     def _claude_native_route(
@@ -3746,9 +3751,9 @@ class ProviderSessionAdapter:
                        else [m.content for m in provider_input.history.messages])
             # Keep all conversation and checkpoints, but bind callbacks to this request's control.
             bridge = CheckpointBridge()
-            finalize_request, measure_wire = (
+            finalize_request, measure_wire, rebase_wire = (
                 self._ledger_hooks(provider_input, provider, bridge)
-                if self._ledger_active(provider_input) else (None, None)
+                if self._ledger_active(provider_input) else (None, None, None)
             )
             working = WorkingContextProvider(
                 provider, records=records, record_owner=self._gm_context_owner(provider_input),
@@ -3763,6 +3768,7 @@ class ProviderSessionAdapter:
                 ),
                 finalize_request=finalize_request,
                 measure_wire=measure_wire,
+                rebase_wire=rebase_wire,
             )
             self._working_contexts[session_id] = (working, bridge)
             provider = working

@@ -1482,7 +1482,10 @@ the ledger resets. Builder and participant requests do not use it.
 - **Declared resets.** A new working-context checkpoint or a changed context owner (campaign,
   session, package lock, model context, route) starts a new epoch. A journaled player or narration
   identity missing from canonical history (rewind, restore, edit) starts a new generation, as does
-  saved journal evidence that fails validation. A changed stable instruction or tool definition
+  saved journal evidence that fails validation. When compaction planning finds the wire over
+  its threshold only because of superseded journal records (canonical history is at or under
+  the compaction target), the journal restarts from canonical history instead of summarising
+  (`journal_rebased`, a new generation and a full re-send), at most once per request. A changed stable instruction or tool definition
   keeps the journal and records the prefix change. Per-round tool gating is unchanged and each
   request's tool-list fingerprint is recorded.
 - **Routes.** `claude_code` writes the frozen prefix as its system file and the journal as its
