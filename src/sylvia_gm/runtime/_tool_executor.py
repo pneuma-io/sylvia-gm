@@ -146,13 +146,15 @@ def prepare_tool_context(
     }
 
     # 2. Validate parameters
-    validation_errors = _validate_params(tool_def, params, state_bridge)
+    unknown_references: list[str] = []
+    validation_errors = _validate_params(tool_def, params, state_bridge, unknown_references)
     if validation_errors:
         return ToolResult(
             tool_name=tool_name,
             success=False,
             error=f"Parameter validation failed: {'; '.join(validation_errors)}",
             failure_kind="parameter_validation",
+            unknown_references=tuple(dict.fromkeys(unknown_references)),
         )
 
     # 3. Build execution context
@@ -334,12 +336,15 @@ def _validate_params(
     tool_def: ToolDef,
     params: dict[str, Any],
     state_bridge: Any,
+    unknown_references: list[str] | None = None,
 ) -> list[str]:
     """Validate tool parameters against the tool definition.
 
-    Returns list of error strings (empty = valid).
+    Returns list of error strings (empty = valid). IDs that name no saved entity or
+    participant are also appended to ``unknown_references`` when it is given.
     """
     errors: list[str] = []
+    unknown = unknown_references if unknown_references is not None else []
 
     for param_def in tool_def.parameters:
         name = param_def.name
@@ -362,12 +367,14 @@ def _validate_params(
                 errors.append(f"Parameter '{name}' must be an entity ID string")
             elif state_bridge and not state_bridge.entity_exists(value):
                 errors.append(f"Entity '{value}' not found for parameter '{name}'")
+                unknown.append(value)
 
         elif resolve == "participant":
             if not isinstance(value, str):
                 errors.append(f"Parameter '{name}' must be a participant ID string")
             elif state_bridge and not state_bridge.participant_exists(value):
                 errors.append(f"Participant '{value}' not found for parameter '{name}'")
+                unknown.append(value)
 
         elif ptype == "string":
             if not isinstance(value, str):
@@ -418,6 +425,7 @@ def _validate_params(
                     for eid in value:
                         if isinstance(eid, str) and not state_bridge.entity_exists(eid):
                             errors.append(f"Entity '{eid}' not found in parameter '{name}'")
+                            unknown.append(eid)
 
         elif ptype == "object":
             if not isinstance(value, dict):

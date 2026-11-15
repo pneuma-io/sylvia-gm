@@ -1079,6 +1079,37 @@ def test_range_refusals_name_scene_inputs_and_preserve_state(
     assert after.state == before.state and after.revision == before.revision
 
 
+def test_cast_at_a_character_without_saved_statistics_is_refused_with_a_reason(
+    lite_save, tmp_path
+):
+    """A named bystander has no game state: the GM is told so, not handed a bare failure."""
+    database = tmp_path / "bystander.sqlite3"
+    shutil.copyfile(lite_save, database)
+    provider = DefectGM(
+        "cast_spell_outside_combat",
+        {
+            "caster_state": "hero",
+            "spell": "cure_wounds",
+            "target": "mira",
+            "slot_resource": "spell_slot_1",
+            "verbal_component_available": True,
+            "caster_can_touch_target": True,
+        },
+    )
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        before = owner.snapshot("casting")
+        play(owner, provider, campaign="casting", turn="casting-turn")
+        after = owner.snapshot("casting")
+    assert provider.receipt["status"] == "rejected", provider.receipt
+    assert provider.receipt["code"] == "ruleset_precondition_failed"
+    assert provider.receipt["state_changed"] is False
+    assert "no saved game statistics for 'mira'" in provider.receipt["reason"]
+    assert not re.search(
+        r"Parameter validation failed|not found for parameter", json.dumps(provider.receipt)
+    )
+    assert after.state == before.state and after.revision == before.revision
+
+
 @pytest.mark.parametrize(
     "name",
     (
