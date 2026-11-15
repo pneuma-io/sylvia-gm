@@ -140,6 +140,24 @@ test('Cancel, Escape and a second open all resolve without a start', async () =>
   assert.equal(await chooser([]).controller.choose({ role: 'dm', title: 'T', action: 'A' }), null);
 });
 
+test('a close event left over from an earlier choice does not cancel the reopened chooser', async () => {
+  const h = chooser();
+  const dialog = h.node('chat-start-dialog');
+  const first = h.controller.choose({ role: 'dm', title: 'T', action: 'A', model: fastModel });
+  h.node('chat-start-confirm').events.click();
+  assert.equal((await first).model_id, 'chatgpt/gpt-6.1-sol');
+  const second = h.controller.choose({ role: 'dm', title: 'T', action: 'A', model: plainModel });
+  // A browser delivers the first choice's close event only now, with the dialog open again.
+  dialog.events.close();
+  assert.equal(dialog.open, true, 'the chooser on screen stays open');
+  let settled = false;
+  void second.then(() => { settled = true; });
+  await Promise.resolve();
+  assert.equal(settled, false, 'the reopened choice is still waiting for the person');
+  h.node('chat-start-confirm').events.click();
+  assert.equal((await second).model_id, 'local/small');
+});
+
 // ── Renderer paths whose first model call starts by itself ───────────────────────────────
 
 function chooseStub(answer, seen = []) {
