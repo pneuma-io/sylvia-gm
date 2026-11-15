@@ -1482,7 +1482,9 @@ the ledger resets. Builder and participant requests do not use it.
   seal declared once in the ledger contract (`SYLVIA_GM_CONTEXT_LEDGER_CONTRACT`), which replaces
   the application-data and player-message guidance. Records are classified from
   application-owned metadata, never from text, so player speech that imitates a label stays player
-  speech. The contract keeps every authority property of the guidance it replaces.
+  speech. Player text that itself begins like a seal is journaled with `(player text) ` in front,
+  and the contract says it is still player speech. The contract keeps every authority property of
+  the guidance it replaces.
 - **Persistence.** Each request's new journal entries are saved as `gm_wire_journal` session
   evidence (versioned, with context owner, epoch, generation, base count and chained hashes)
   through the owner path that saves working-context checkpoints, and are acknowledged before the
