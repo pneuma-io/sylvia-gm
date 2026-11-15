@@ -1447,8 +1447,11 @@ the ledger resets. Builder and participant requests do not use it.
   record of that label is still the journal tail, or the record has stayed in canonical assembly
   unchanged since it was journaled (an engine transition result kept for the turn is one record,
   not a new event after each tool exchange). Nothing is removed or rewritten. The positional
-  `SYLVIA_GM_CURRENT_PLAYER_MESSAGE` control is replaced by the ledger contract's rule that the
-  current input is the latest unsealed user message.
+  `SYLVIA_GM_CURRENT_PLAYER_MESSAGE` control is replaced by the ledger contract's rule that, in a
+  turn started by player input, the current input is the latest unsealed user message; a turn
+  started by a player control or an automatic event has no new player input. The contract
+  limits superseding to the campaign-state keyframe and the latest-wins labels; every other
+  record is an event, and events accumulate.
 - **Narration facts.** `SYLVIA_GM_EXACT_NARRATION_FACTS` repeats every earlier fact of the
   turn each round; when the list extends what was given since the last player message, only
   the added facts are journaled, worded as adding to the facts already given. A list that is
