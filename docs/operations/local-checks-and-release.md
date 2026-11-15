@@ -171,3 +171,19 @@ Scripted tests cover deterministic behavior. Real-provider replies, packaged bui
 Windows interaction have separate acceptance checks in the [Development Process](quality-preserving-development-process.md#5-installed-app-verification).
 Use the selected test environment and data, record actual outcomes and remaining gaps, and obtain
 owner release approval. Source checks and a PR merge do not grant release approval.
+
+## Versions, tags and channel
+
+- A release version is plain `X.Y.Z`, for example `0.4.1`. Its tag is `vX.Y.Z`, and its files
+  use the same version, such as `sylvia-gm-0.4.1-windows-x86_64-portable.zip`.
+- The release channel is declared in code, not read from the version: `__release_channel__` in
+  `src/sylvia_gm/__init__.py` and `RELEASE_CHANNEL` in `src-tauri/src/lib.rs`. Both say `alpha`
+  today. The release version check fails if they differ.
+- While the channel is `alpha`, mark the GitHub release as a Pre-release. The updater treats a
+  plain tag marked Pre-release as part of the alpha channel, and an unmarked one as stable.
+- The Windows installer version equals the release version.
+- The earlier form `X.Y.Z-alpha.N` is still accepted so that past releases such as
+  `0.4.0-alpha.1` stay valid. For that form only, the installer version is `X.Y.Z-N`.
+- Change the version in every pinned place together: `pyproject.toml`, `uv.lock`,
+  `src/sylvia_gm/__init__.py`, `config/config.yaml`, `src-tauri/Cargo.toml`,
+  `src-tauri/Cargo.lock` and `src-tauri/tauri.conf.json`.

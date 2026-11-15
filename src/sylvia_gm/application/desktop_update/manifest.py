@@ -13,6 +13,8 @@ from pathlib import PurePosixPath
 from types import MappingProxyType
 from urllib.parse import unquote, urlsplit
 
+from sylvia_gm import __release_channel__
+
 MANIFEST_LIMIT = 2 * 1024 * 1024
 ARTIFACT_LIMIT = 512 * 1024 * 1024
 EXPANDED_LIMIT = 2 * 1024 * 1024 * 1024
@@ -390,7 +392,10 @@ def _parse_manifest(
         raise UpdateError(
             "wrong_component_version", "Desktop and owner versions must update together."
         )
-    if signed["channel"] != current.channel or version.channel != current.channel:
+    # The running build declares its channel. A plain X.Y.Z version names no channel itself.
+    if signed["channel"] != __release_channel__ or (
+        version.prerelease and version.channel != __release_channel__
+    ):
         raise UpdateError("wrong_channel", "This release is for a different update channel.")
     if signed["target"] != target or signed["distribution"] != distribution:
         raise UpdateError(
@@ -440,7 +445,7 @@ def _parse_manifest(
         raise UpdateError("wrong_distribution", "The update would change this distribution mode.")
     return Manifest(
         version,
-        current.channel,
+        __release_channel__,
         target,
         distribution,
         notes,

@@ -7,7 +7,11 @@ from dataclasses import replace
 
 import pytest
 
-from sylvia_gm.application.desktop_update.installed import InstalledReplacement, nsis_command_line
+from sylvia_gm.application.desktop_update.installed import (
+    InstalledReplacement,
+    nsis_command_line,
+    registered_versions,
+)
 from sylvia_gm.application.desktop_update.manifest import (
     PayloadFile,
     UpdateError,
@@ -99,6 +103,18 @@ def installation(tmp_path):
 
     update = InstalledReplacement(live, operation, manifest, previous, registry, run)
     return update, old, new, registry, calls, data
+
+
+@pytest.mark.parametrize(
+    "version,expected",
+    [
+        ("0.4.1", {"0.4.1"}),
+        ("0.4.0-alpha.1", {"0.4.0-alpha.1", "0.4.0-1"}),
+        ("0.4.0-beta.1", {"0.4.0-beta.1"}),
+    ],
+)
+def test_registered_versions_map_only_the_old_alpha_form(version, expected):
+    assert registered_versions(Version.parse(version)) == expected
 
 
 def test_installed_prepare_apply_and_explicit_rollback_are_idempotent(tmp_path):
