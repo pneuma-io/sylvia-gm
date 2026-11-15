@@ -1356,7 +1356,7 @@ Young Blue, Brass, Bronze, Copper, Gold and Green Dragons have complete referenc
 
 ### Final prepared inherited young dragons: Red, Silver and White
 
-Young Red, Silver and White Dragons complete the reviewed inherited catalogue with full references, multiview studies and reusable portraits. Each retains four legs, two independent back wings and one tail, with selected youthful proportions. Red paired horns/frills, Silver paired horns/cheek fins/low crest and White hornless swept-back crest are editable defaults. Source types, movement, immunities, breath/conditional Paralyzing Breath and Ice Walk clauses, false execution states and unsupported source limitations remain unchanged. No active breath/aura or new form-execution qualification; no individual owner sign-off.
+Young Red, Silver and White Dragons complete the reviewed inherited catalogue with full references, multiview studies and reusable portraits. Each retains four legs, two independent back wings and one tail, with selected youthful proportions. Red paired horns/frills, Silver paired horns/cheek fins/attached crest and White hornless swept-back crest are editable defaults. Source types, movement, immunities, breath/conditional Paralyzing Breath and Ice Walk clauses, false execution states and unsupported source limitations remain unchanged. No active breath/aura or new form-execution qualification; no individual owner sign-off.
 
 | Character | Full body | Multiview | Portrait |
 |---|---|---|---|
