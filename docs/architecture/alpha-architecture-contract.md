@@ -1499,10 +1499,14 @@ the ledger resets. Builder and participant requests do not use it.
 - **Declared resets.** A new working-context checkpoint or a changed context owner (campaign,
   session, package lock, model context, route) starts a new epoch. A journaled player or narration
   identity missing from canonical history (rewind, restore, edit) starts a new generation, as does
-  saved journal evidence that fails validation. When compaction planning finds the wire over
-  its threshold only because of superseded journal records (canonical history is at or under
-  the compaction target), the journal restarts from canonical history instead of summarising
-  (`journal_rebased`, a new generation and a full re-send), at most once per request. On
+  saved journal evidence that fails validation. Working-context compaction is decided exactly
+  as in the previous assembly, from the canonical request and its tools, in both modes, so the
+  ledger never compacts where the previous assembly sends. The wire decides only a rebase: when
+  the previous assembly's rule says send and the wire's excess over the fixed term passes 0.85
+  of the remaining budget (superseded journal records), the journal restarts from canonical
+  history (`journal_rebased`, a new generation and a full re-send). Right after a rebase that
+  excess is about canonical history, at most 0.70, so the next rebase is at least 0.15 of the
+  budget of superseded records away and one cannot repeat on the same request. On
   `claude_code`, a request that would replay Claude Code context records known to be lost or
   unknown starts a new generation (`native_records_unknown`). A changed stable instruction or tool
   definition keeps the journal and records the prefix change. Per-round tool gating is unchanged;
@@ -1533,7 +1537,7 @@ the ledger resets. Builder and participant requests do not use it.
   `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
   last system block and the last non-thinking block of the last message; other Messages-compatible
   endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
-  request context identifier. Working-context compaction sizes history from the actual wire list.
+  request context identifier.
 - **Legacy switch.** `SYLVIA_GM_CONTEXT_MODE=legacy`, read once per GM adapter, restores the previous
   assembly byte for byte (including no Anthropic breakpoints) for A/B benchmarking and rollback.
   On `claude_code` legacy mode keeps the previous transcript and flags, with the fixed working

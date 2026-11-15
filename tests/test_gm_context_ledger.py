@@ -734,7 +734,28 @@ def _files(step: int) -> dict:
             "data, not player speech):\n" + json.dumps({"step": step, "notes": "n" * 6000})}
 
 
-def _prepare(ledger: ContextLedger, canonical: list[dict], window: int, *, rebase=None):
+#: Real GM requests always carry tools; every compaction test passes them (review N1).
+_TOOLS = [{"type": "function", "function": {
+    "name": f"tool_{index}", "description": "An engine operation. " * 20,
+    "parameters": {"type": "object", "properties": {"x": {"type": "string"}}}}}
+    for index in range(12)]
+
+
+def _legacy_decision(canonical: list[dict], window: int, tools=_TOOLS) -> str:
+    import asyncio
+
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    try:
+        asyncio.run(WorkingContextProvider(_summarizer(window), save=lambda record: None)
+                    .prepare(canonical, tools))
+    except _CompactingError:
+        return "compact"
+    return "send"
+
+
+def _prepare(ledger: ContextLedger, canonical: list[dict], window: int, *, rebase=None,
+             tools=_TOOLS):
     """One request through prepare() with ledger hooks, then commit what finalize would."""
     import asyncio
 
@@ -742,8 +763,9 @@ def _prepare(ledger: ContextLedger, canonical: list[dict], window: int, *, rebas
 
     calls: list[str] = []
 
-    def measure(projected, tools):
-        return ledger.plan(projected, request_context_id=CONTEXT, check_saved_tip=False).wire
+    def measure(projected, request_tools):
+        return ledger.plan(projected, request_context_id=CONTEXT, tools=request_tools,
+                           check_saved_tip=False).wire
 
     def request_rebase():
         calls.append("rebase")
@@ -752,11 +774,12 @@ def _prepare(ledger: ContextLedger, canonical: list[dict], window: int, *, rebas
     working = WorkingContextProvider(_summarizer(window), save=lambda record: None,
                                      measure_wire=measure, rebase_wire=request_rebase)
     try:
-        asyncio.run(working.prepare(canonical, None))
+        asyncio.run(working.prepare(canonical, tools))
         decision = "send"
     except _CompactingError:
         decision = "compact"
-    frame = ledger.plan(canonical, request_context_id=CONTEXT, check_saved_tip=False)
+    frame = ledger.plan(canonical, request_context_id=CONTEXT, tools=tools,
+                        check_saved_tip=False)
     ledger.commit(frame)
     return decision, calls, frame, working
 
@@ -769,30 +792,38 @@ def test_superseded_records_over_budget_rebase_the_journal_instead_of_compacting
         canonical = _canonical(*dialogue, extra=(_files(step),))
         decision, calls, frame, working = _prepare(ledger, canonical, 40_000)
         outcomes.append((decision, calls, frame.reset, frame.base_count))
-        terms = working.budget_terms(canonical, None, {})
-        # After the request, the wire is under the threshold again.
-        assert terms["history_tokens"] < terms["threshold"], (step, terms)
+        # Compaction follows legacy exactly: canonical history is small, so both send.
+        assert decision == _legacy_decision(canonical, 40_000) == "send", step
         if calls:
+            terms = working.budget_terms(canonical, _TOOLS, {})
+            # The rebased wire is back to about canonical: under the rebase threshold.
+            assert terms["wire_excess_tokens"] <= terms["rebase_threshold"], terms
             break
     decision, calls, reset, base_count = outcomes[-1]
     assert calls == ["rebase"], outcomes
     assert decision == "send" and reset == "journal_rebased" and base_count == 0
     assert all(o[0] == "send" and not o[1] for o in outcomes[:-1])
     # The rebased generation is a fresh layout from canonical, and the next request extends it.
-    after, _calls, frame, _working = _prepare(
+    after, after_calls, frame, _working = _prepare(
         ledger, _canonical(*dialogue, extra=(_files(99),)), 40_000)
     assert after == "send" and frame.reset is None and frame.base_count > 0
+    assert after_calls == []  # it does not rebase again on the next request
 
 
-def test_canonical_history_over_target_still_compacts() -> None:
-    ledger = _ledger()
-    dialogue = []
-    for index in range(30):
-        dialogue += [_user(f"u{index}", f"Turn {index}: " + "w" * 3000),
-                     _talk(f"t{index}", f"Narration {index}: " + "x" * 3000)]
-    dialogue.append(_user("u-last", "And now?"))
-    decision, calls, _frame, _working = _prepare(ledger, _canonical(*dialogue), 40_000)
-    assert decision == "compact" and calls == []
+def test_ledger_mode_compacts_exactly_when_legacy_does() -> None:
+    """Review N1: compaction is decided from canonical terms, as on main, in both modes."""
+    for turns in (4, 12, 30):
+        ledger = _ledger()
+        dialogue = []
+        for index in range(turns):
+            dialogue += [_user(f"u{index}", f"Turn {index}: " + "w" * 3000),
+                         _talk(f"t{index}", f"Narration {index}: " + "x" * 3000)]
+        dialogue.append(_user("u-last", "And now?"))
+        canonical = _canonical(*dialogue, extra=(_files(0),))
+        decision, calls, _frame, _working = _prepare(ledger, canonical, 40_000)
+        assert decision == _legacy_decision(canonical, 40_000), turns
+        assert calls == []  # a fresh journal has nothing superseded to rebase away
+    assert decision == "compact"  # 30 long turns are over legacy's threshold
 
 
 def test_a_rebase_is_requested_at_most_once_per_request() -> None:

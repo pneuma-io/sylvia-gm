@@ -788,12 +788,12 @@ def _party_combat_frames(tmp_path, monkeypatch) -> list[Any]:
     return frames
 
 
-def test_combat_turn_is_sized_from_the_wire_and_never_compacts_with_200k(party_combat):
-    """F1: compaction planning counts each sent record once and rebases before compacting.
+def _combat_decisions(frames: list[Any], window: int, *, fresh: bool = False) -> list[dict]:
+    """Per request: legacy's and ledger mode's compaction decision, and any rebase.
 
-    The recorded combat turn runs through a real ledger with prepare()'s measure and rebase
-    hooks, as the GM adapter wires them, against a 200,000-token model (8,192 output tokens).
-    Legacy never compacts in this turn; ledger mode must not compact either.
+    The recorded turn runs through a real ledger with prepare()'s measure and rebase hooks as
+    the GM adapter wires them, passing each request's real tools (review N1). With ``fresh``
+    every request is planned on a new ledger, so nothing superseded is in its journal.
     """
     import asyncio
 
@@ -806,7 +806,7 @@ def test_combat_turn_is_sized_from_the_wire_and_never_compacts_with_200k(party_c
         pass
 
     class Model:
-        context_window, transport, max_output_tokens = 200_000, "chat_completions", 8192
+        context_window, transport, max_output_tokens = window, "chat_completions", 8192
         provider_key, wire_model_id, id = "local", "m", "local/m"
 
     class Summarizer(Provider):
@@ -823,40 +823,75 @@ def test_combat_turn_is_sized_from_the_wire_and_never_compacts_with_200k(party_c
         async def close(self):
             pass
 
-    frames = party_combat
-    ledger = ContextLedger(session_id=frames[0].session_id,
-                           context_owner=frames[0].context_owner, transport="chat_completions")
-    decisions = []
+    def ledger_for() -> ContextLedger:
+        return ContextLedger(session_id=frames[0].session_id,
+                             context_owner=frames[0].context_owner, transport="chat_completions")
+
+    ledger = ledger_for()
+    rows = []
     for frame in frames:
+        if fresh:
+            ledger = ledger_for()
+        assert frame.tools, "the recorded request lost its tools"
         rebased: list[bool] = []
 
-        def measure(projected, tools, frame=frame):
+        def measure(projected, tools, frame=frame, ledger=ledger):
             return provider_messages(ledger.plan(projected, request_context_id=frame.context_id,
-                                                 check_saved_tip=False).wire)
+                                                 tools=tools, check_saved_tip=False).wire)
 
-        def rebase(rebased=rebased):
+        def rebase(rebased=rebased, ledger=ledger):
             rebased.append(True)
             ledger.request_rebase()
 
-        working = WorkingContextProvider(Summarizer(), save=lambda record: None,
-                                         measure_wire=measure, rebase_wire=rebase)
-        legacy = WorkingContextProvider(Summarizer(), save=lambda record: None)
-        for name, provider in (("legacy", legacy), ("ledger", working)):
+        row: dict[str, Any] = {}
+        for name, provider in (
+            ("legacy", WorkingContextProvider(Summarizer(), save=lambda record: None)),
+            ("ledger", WorkingContextProvider(Summarizer(), save=lambda record: None,
+                                              measure_wire=measure, rebase_wire=rebase)),
+        ):
+            if name == "ledger":
+                # What the decision sees: the journal before any rebase this request asks for.
+                row["before"] = provider.budget_terms(
+                    provider.project(frame.canonical), frame.tools, {})
             try:
-                asyncio.run(provider.prepare(frame.canonical, None))
+                asyncio.run(provider.prepare(frame.canonical, frame.tools))
+                row[name] = "send"
             except CompactingError:
-                decisions.append((name, "compact"))
-        terms = working.budget_terms(frame.canonical, None, {})
-        wire = measure(frame.canonical, None)
-        # Every sent message is counted once: fixed plus history is the wire, not more.
-        assert terms["fixed_tokens"] + terms["history_tokens"] <= working._estimate(wire) * 1.02
-        decisions.append(("ledger", "rebase") if rebased else ("ledger", "send"))
+                row[name] = "compact"
+            if name == "ledger":
+                terms = provider.budget_terms(provider.project(frame.canonical), frame.tools, {})
+                sent = measure(frame.canonical, frame.tools)
+                # The rebase check sizes the real wire once, tools included.
+                assert terms["wire_tokens"] == provider._estimate(
+                    [sent, provider._request_tools(frame.tools)])
+                assert terms["wire_excess_tokens"] == max(
+                    0, terms["wire_tokens"] - terms["fixed_tokens"])
+                row["terms"] = terms
+        row["rebased"] = bool(rebased)
         planned = ledger.plan(frame.canonical, request_context_id=frame.context_id,
-                              check_saved_tip=False)
+                              tools=frame.tools, check_saved_tip=False)
         ledger.commit(planned)
-        assert terms["history_tokens"] < terms["threshold"] or rebased
-    assert ("legacy", "compact") not in decisions
-    assert ("ledger", "compact") not in decisions, decisions
+        row["reset"] = planned.reset
+        rows.append(row)
+    return rows
+
+
+@pytest.mark.parametrize("fresh", [False, True], ids=["journal", "fresh-journal"])
+def test_combat_turn_compacts_exactly_when_legacy_does_with_real_tools(party_combat, fresh):
+    """Review N1: on a 200,000-token model ledger mode compacts on a request if and only if
+    legacy does; the wire decides only a rebase, and a fresh journal never rebases."""
+    rows = _combat_decisions(party_combat, 200_000, fresh=fresh)
+    assert [r["ledger"] for r in rows] == [r["legacy"] for r in rows], rows
+    for row in rows:
+        if row["rebased"]:
+            assert row["legacy"] == "send" and row["ledger"] == "send"
+            assert row["before"]["wire_excess_tokens"] > row["before"]["rebase_threshold"]
+            # After the rebase the wire is back near canonical, under the rebase threshold.
+            assert row["terms"]["wire_excess_tokens"] <= row["terms"]["rebase_threshold"]
+    if fresh:
+        assert not any(r["rebased"] for r in rows)
+    # A rebase never repeats on consecutive requests.
+    assert not any(a["rebased"] and b["rebased"] for a, b in zip(rows, rows[1:], strict=False))
 
 
 def test_party_combat_rounds_extend_on_every_route(party_combat):
