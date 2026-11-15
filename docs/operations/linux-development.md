@@ -129,14 +129,18 @@ estimates come from `scripts/journey_case_timings.json` and are for scheduling o
 
 Sizing a share:
 
-- Wall-clock time for a share is roughly its test time divided by its worker count, and
-  never less than its longest case. The longest cases take about half an hour each, so no
-  number of machines brings a complete run below that.
+- Measured: share 1 of 6 on a machine with 4 cores and 8 GB of memory, four workers, took
+  1 h 35 min, with peak memory of 4.8 GB and an output folder of 2.7 GB. Its test time was
+  about 244 minutes, so on a small machine allow about one and a half times the share's
+  test time divided by its worker count. That covers collecting the suite, which every
+  share does first and which takes several minutes.
+- A share never takes less than its longest case. The two longest cases take about 25
+  minutes each, so no number of machines brings a complete run much below half an hour.
 - Allow about 1.3 GB of memory per worker plus the system's own use. `--full-run` chooses
   workers from the core count alone, so on a machine with little memory per core, start
   the runner yourself with a smaller `--jobs` and `--case-workers`.
-- Each machine needs room for its own output folder: about 20 GB for a whole run, less for
-  a share, though the benchmark group writes about 1.3 GB per worker wherever it lands.
+- Each machine needs room for its own output folder: about 20 GB for a whole run and a few
+  gigabytes for a share.
 
 ## What is excluded on Linux
 
