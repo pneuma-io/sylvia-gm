@@ -10,6 +10,7 @@ from email.message import Message
 import pytest
 
 from sylvia_gm.application.desktop_update.controller import UpdateController
+from sylvia_gm.application.desktop_update.discovery import discover
 from sylvia_gm.application.desktop_update.manifest import OFFICIAL_RELEASES, UpdateError, Version
 from sylvia_gm.application.desktop_update.storage import UpdateStore
 from tests.desktop_update_move_checks import (
@@ -237,3 +238,83 @@ def test_empty_failed_checks_can_retry_beyond_cap_but_download_partials_are_pres
     with pytest.raises(UpdateError) as refused:
         controller(tmp_path, fixture).check()
     assert refused.value.code == "recovery_required"
+
+
+def plain_release_fixture(version="0.4.1", *, flagged=True, channel="alpha"):
+    fixture = ReleaseFixture()
+    fixture.signed.update(
+        version=version, owner_version=version, minimum_app_version="0.4.0-alpha.1"
+    )
+    fixture.signed["channel"] = channel
+    fixture.signed["artifact"]["url"] = (
+        f"https://github.com/pneuma-io/sylvia-gm/releases/download/v{version}/"
+        f"sylvia-gm-{version}-windows-x86_64-portable.zip"
+    )
+    name = f"sylvia-gm-{version}-windows-x86_64-portable-update.json"
+    fixture.url = f"https://github.com/pneuma-io/sylvia-gm/releases/download/v{version}/{name}"
+    fixture.index = [
+        {
+            "draft": False,
+            "prerelease": flagged,
+            "tag_name": f"v{version}",
+            "assets": [{"name": name, "browser_download_url": fixture.url}],
+        }
+    ]
+    return fixture
+
+
+def other_release(version, *, flagged):
+    name = f"sylvia-gm-{version}-windows-x86_64-portable-update.json"
+    url = f"https://github.com/pneuma-io/sylvia-gm/releases/download/v{version}/{name}"
+    return {
+        "draft": False,
+        "prerelease": flagged,
+        "tag_name": f"v{version}",
+        "assets": [{"name": name, "browser_download_url": url}],
+    }
+
+
+def discover_from(fixture, current="0.4.0-alpha.1"):
+    return discover(
+        fixture,
+        threading.Event(),
+        current=Version.parse(current),
+        target="windows-x86_64",
+        distribution="portable",
+        verify=accept_stub,
+    )
+
+
+def test_alpha_build_accepts_newer_plain_tag_flagged_prerelease_and_skips_other_channels():
+    fixture = plain_release_fixture()
+    # Newer releases for other channels: a plain unflagged tag is stable, beta names its own.
+    fixture.index += [
+        other_release("0.5.0", flagged=False),
+        other_release("0.6.0-beta.1", flagged=True),
+    ]
+    manifest = discover_from(fixture)
+    assert manifest is not None
+    assert manifest.version.text == "0.4.1" and manifest.channel == "alpha"
+    assert fixture.calls == [OFFICIAL_RELEASES, fixture.url]
+
+
+def test_plain_tag_not_flagged_prerelease_is_stable_and_not_offered_to_alpha():
+    fixture = plain_release_fixture(flagged=False)
+    assert discover_from(fixture) is None
+    assert fixture.calls == [OFFICIAL_RELEASES]
+
+
+def test_plain_tag_flagged_prerelease_with_another_signed_channel_is_rejected():
+    fixture = plain_release_fixture(channel="stable")
+    with pytest.raises(UpdateError) as rejected:
+        discover_from(fixture)
+    assert rejected.value.code == "wrong_channel"
+
+
+def test_alpha_tag_not_flagged_prerelease_is_still_an_inconsistent_channel():
+    fixture = ReleaseFixture()
+    fixture.index[0]["prerelease"] = False
+    with pytest.raises(UpdateError) as rejected:
+        discover_from(fixture, current="0.3.0-alpha.1")
+    assert rejected.value.code == "invalid_metadata"
+    assert fixture.calls == [OFFICIAL_RELEASES]
