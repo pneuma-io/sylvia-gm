@@ -404,6 +404,7 @@ PYTHON_JOURNEYS = {
         'tests/test_claude_native_protocol.py',
         'tests/test_claude_runtime.py',
         'tests/test_claude_native_route.py',
+        'tests/test_claude_native_wire.py',
     ],
     "bundled-content": [
         "tests/test_plan_snapshot_cache.py",
