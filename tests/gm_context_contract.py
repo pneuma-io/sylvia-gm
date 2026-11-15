@@ -337,14 +337,29 @@ def canonical_state(canonical: Sequence[dict[str, Any]]) -> dict[str, Any] | Non
     return json.loads(content.split("\n", 1)[1])
 
 
+def canonical_active(canonical: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    """The active record IDs canonical assembly attached to its state message (F3)."""
+    from sylvia_gm.agent._context_ledger import ACTIVE_RECORDS_KEY, tag_of
+
+    message = next((m for m in reversed(canonical) if m.get("role") == "system"
+                    and str(m.get("content", "")).startswith(STATE_LABEL + " ")), None)
+    return None if message is None else tag_of(message, ACTIVE_RECORDS_KEY)
+
+
 def check_freshness(frames: Sequence[Recorded]) -> int:
-    """After every request, keyframe plus updates reconstructs the canonical state."""
+    """After every request, keyframe plus updates reconstructs the canonical state.
+
+    With the active record IDs canonical assembly supplies, a fact the model still holds must
+    still be active: retired facts were removed by update records.
+    """
     checked = 0
     for frame in frames:
         state = canonical_state(frame.canonical)
         if state is None:
             continue
-        assert state_covers(frame.view, state), "the model's state is stale"
+        active = canonical_active(frame.canonical)
+        assert active is not None, "the state message lost its active record IDs"
+        assert state_covers(frame.view, state, active), "the model's state is stale"
         assert frame.view["campaign"]["revision"] == state["campaign"]["revision"]
         seal = seal_prefix(host_seal(frame.session_id))
         last = next(m for m in reversed(frame.wire) if str(m.get("content", "")).startswith(

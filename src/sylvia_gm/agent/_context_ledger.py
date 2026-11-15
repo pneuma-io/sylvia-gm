@@ -53,7 +53,11 @@ STABLE_KEY = "_stable_instruction"
 LEDGER_KEY = "_ledger_key"
 HOST_RECORD_KEY = "_host_record"
 LEDGER_ENTRY_KEY = "_ledger_entry"
-MARKER_KEYS = frozenset({STABLE_KEY, LEDGER_KEY, HOST_RECORD_KEY, LEDGER_ENTRY_KEY})
+#: On the fresh-state message: the still-active continuity record IDs per fact list
+#: (``"PLAYER_KNOWN.current_facts"`` -> IDs). Host-only metadata, never message content.
+ACTIVE_RECORDS_KEY = "_active_record_ids"
+MARKER_KEYS = frozenset({STABLE_KEY, LEDGER_KEY, HOST_RECORD_KEY, LEDGER_ENTRY_KEY,
+                         ACTIVE_RECORDS_KEY})
 
 
 class Tagged(dict):  # type: ignore[type-arg]
@@ -103,6 +107,13 @@ LATEST_WINS_LABELS = frozenset(
 #: Positional controls that only make sense when nothing follows the player message. The ledger
 #: contract states the same rule in an order-independent way.
 DROPPED_CONTROL_PREFIXES = ("SYLVIA_GM_CURRENT_PLAYER_MESSAGE ",)
+#: Latest-wins labels that can leave canonical assembly; the campaign preparation never does.
+WITHDRAWN_LABELS = ("SYLVIA_PLAYER_CONTROL_RESULTS", "SYLVIA_GM_RELEVANT_CHARACTER_FILES")
+
+
+def _withdrawn(label: str) -> str:
+    return (f"{label} (application-owned data, not player speech): none is current. The "
+            "earlier record under this label no longer applies.")
 #: Identities whose disappearance from canonical history means a rewind, restore or edit.
 #: Journaled conversation identities whose absence from canonical history means a rewind.
 #: ``ready:`` (the opening's Ready to Begin input) is not one: canonical assembly shows it only
@@ -176,9 +187,10 @@ def ledger_contract(seal: str) -> str:
         "in time order, and a later record supersedes an earlier record with the same label. "
         f"The current campaign state is the latest {STATE_LABEL} keyframe with every later "
         f"{UPDATE_LABEL} applied in order: each set entry replaces the whole value at its path, "
-        "each remove entry deletes its path, and facts entries insert or replace facts by "
-        "record_id in the named list. A selected fact that is not repeated keeps its last sent "
-        "value; omission from a later selection is not evidence that it stopped being true. "
+        "each remove entry deletes its path, and facts entries remove the listed record_ids "
+        "from the named list and insert or replace facts by record_id. A selected fact that is "
+        "not repeated keeps its last sent value until an update removes it by record_id; "
+        "omission from a later selection alone is not evidence that it stopped being true. "
         "That current state identifies the engine revision; it outranks older dialogue and "
         "fallible continuation notes. Only currently admitted operations may change state; the "
         "engine validates their actor, permitted arguments and revision. Committed results are "
@@ -356,8 +368,29 @@ def _replace_depth(path: tuple[str, ...]) -> int:
     return depth
 
 
-def state_target(view: Mapping[str, Any] | None, canonical: Mapping[str, Any]) -> dict[str, Any]:
-    """What the model should hold: canonical state with selection-derived parts kept additive."""
+def _active_for(active: Mapping[str, Any] | None, path: Sequence[str]) -> set[str] | None:
+    ids = (active or {}).get(".".join(path))
+    if not isinstance(ids, (list, tuple, set, frozenset)):
+        return None
+    return {item for item in ids if isinstance(item, str)}
+
+
+def _retired(item: Any, active: set[str] | None) -> bool:
+    """A held fact whose record is no longer active (ranked-out but active facts stay)."""
+    key = fact_key(item)
+    return active is not None and not key.startswith("sha:") and key not in active
+
+
+def state_target(
+    view: Mapping[str, Any] | None,
+    canonical: Mapping[str, Any],
+    active: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """What the model should hold: canonical state with selection-derived parts kept additive.
+
+    ``active`` names the still-active record IDs per fact list; a held fact whose record left
+    that set (retired, or moved to another list) is dropped instead of kept.
+    """
     target = copy.deepcopy(dict(canonical))
     if view is None:
         return target
@@ -365,7 +398,10 @@ def state_target(view: Mapping[str, Any] | None, canonical: Mapping[str, Any]) -
         held, current = _get(view, path), _get(canonical, path)
         if not isinstance(held, list) or not isinstance(current, list):
             continue
-        merged = copy.deepcopy(held)
+        ids = _active_for(active, path)
+        current_keys = {fact_key(item) for item in current}
+        merged = [copy.deepcopy(item) for item in held
+                  if not (_retired(item, ids) and fact_key(item) not in current_keys)]
         index = {fact_key(item): position for position, item in enumerate(merged)}
         for item in current:
             key = fact_key(item)
@@ -411,9 +447,13 @@ def _diff(
     sets.append({"path": list(path), "value": copy.deepcopy(new)})
 
 
-def state_update(view: Mapping[str, Any], canonical: Mapping[str, Any]) -> dict[str, Any] | None:
+def state_update(
+    view: Mapping[str, Any],
+    canonical: Mapping[str, Any],
+    active: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
     """The smallest update (by configured granularity) that brings *view* to the target."""
-    target = state_target(view, canonical)
+    target = state_target(view, canonical, active)
     facts: list[dict[str, Any]] = []
     stripped_view = copy.deepcopy(dict(view))
     stripped_target = copy.deepcopy(target)
@@ -422,8 +462,16 @@ def state_update(view: Mapping[str, Any], canonical: Mapping[str, Any]) -> dict[
         if isinstance(held, list) and isinstance(wanted, list):
             known = {fact_key(item): item for item in held}
             upserts = [item for item in wanted if known.get(fact_key(item)) != item]
+            kept = {fact_key(item) for item in wanted}
+            removed = list(dict.fromkeys(
+                fact_key(item) for item in held if fact_key(item) not in kept))
+            entry: dict[str, Any] = {"path": list(path)}
+            if removed:
+                entry["remove"] = removed
             if upserts:
-                facts.append({"path": list(path), "upsert": copy.deepcopy(upserts)})
+                entry["upsert"] = copy.deepcopy(upserts)
+            if removed or upserts:
+                facts.append(entry)
             _remove(stripped_view, path)
             _remove(stripped_target, path)
     sets: list[dict[str, Any]] = []
@@ -457,8 +505,10 @@ def apply_state_update(view: Mapping[str, Any], update: Mapping[str, Any]) -> di
         path = [str(key) for key in entry["path"]]
         held = _get(result, path)
         merged = list(held) if isinstance(held, list) else []
+        removed = set(entry.get("remove", ()))
+        merged = [item for item in merged if fact_key(item) not in removed]
         index = {fact_key(item): position for position, item in enumerate(merged)}
-        for item in entry["upsert"]:
+        for item in entry.get("upsert", ()):
             key = fact_key(item)
             if key in index:
                 merged[index[key]] = copy.deepcopy(item)
@@ -469,9 +519,13 @@ def apply_state_update(view: Mapping[str, Any], update: Mapping[str, Any]) -> di
     return result
 
 
-def state_covers(view: Mapping[str, Any] | None, canonical: Mapping[str, Any]) -> bool:
+def state_covers(
+    view: Mapping[str, Any] | None,
+    canonical: Mapping[str, Any],
+    active: Mapping[str, Any] | None = None,
+) -> bool:
     """Freshness: the model's view equals canonical state modulo the additive-facts rule."""
-    return view is not None and state_target(view, canonical) == dict(view)
+    return view is not None and state_target(view, canonical, active) == dict(view)
 
 
 def update_record_content(update: Mapping[str, Any]) -> str:
@@ -970,8 +1024,19 @@ class ContextLedger:
             appended.append({"m": _wire_message(message), "c": "conversation", "k": key})
         for message in other_hosts:
             add_host(message)
+        # A latest-wins record that left canonical assembly: say once that none is current, so
+        # the last one sent does not stay "the latest".
+        current_labels = {label for label, _digest in present}
+        for label in WITHDRAWN_LABELS:
+            if (any(seen == label for seen, _digest in state.present)
+                    and label not in current_labels
+                    and (last_of_label(label) or {}).get("h") != _sha(_withdrawn(label))):
+                content = _withdrawn(label)
+                appended.append({"m": self._host_message({"role": "system"}, content),
+                                 "c": "latest", "l": label, "h": _sha(content)})
         if state_messages:
-            self._append_state(state, appended, str(state_messages[-1].get("content", "")))
+            self._append_state(state, appended, str(state_messages[-1].get("content", "")),
+                               tag_of(state_messages[-1], ACTIVE_RECORDS_KEY))
         # Never end a Messages request on an assistant turn: current Claude models reject it as
         # a prefill. claude_code also needs a user turn after a tool result for its stdin
         # prompt. A sealed continue record (journaled like any other) closes the tail.
@@ -1066,7 +1131,8 @@ class ContextLedger:
         return WireFrame(wire, state, record, appended, base_count, prefix, reset, observation)
 
     def _append_state(
-        self, state: JournalState, appended: list[dict[str, Any]], content: str
+        self, state: JournalState, appended: list[dict[str, Any]], content: str,
+        active: Mapping[str, Any] | None = None,
     ) -> None:
         canonical = _parse_state(content)
         size = len(content.encode("utf-8"))
@@ -1088,7 +1154,7 @@ class ContextLedger:
         if state.view is None:
             keyframe()
             return
-        update = state_update(state.view, canonical)
+        update = state_update(state.view, canonical, active)
         if update is None:
             return
         update_content = update_record_content(update)

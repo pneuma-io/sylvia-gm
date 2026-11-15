@@ -21,6 +21,7 @@ from typing import Any, cast
 
 from sylvia_gm.agent._campaign_memory import select_campaign_memory
 from sylvia_gm.agent._context_ledger import (
+    ACTIVE_RECORDS_KEY,
     CURRENT_WIRE_FRAME,
     HOST_RECORD_KEY,
     JOURNAL_KIND,
@@ -3338,6 +3339,17 @@ class ProviderSessionAdapter:
                 str(current_scene.get("summary") or ""),
             ),
         )
+        # Host-only, for the context ledger: the still-active records per fact list, so a
+        # retired (or re-scoped) fact is removed from what the model holds. Ranked-out facts
+        # are still active and stay.
+        self._active_record_ids = {
+            "PLAYER_KNOWN.current_facts": sorted(
+                str(fact["record_id"]) for fact in continuity.facts
+                if fact.get("record_id") and fact.get("visibility") == "player_known"),
+            "GM_PRIVATE_CURRENT.current_facts": sorted(
+                str(fact["record_id"]) for fact in continuity.facts
+                if fact.get("record_id") and fact.get("visibility") != "player_known"),
+        }
         player_known: list[dict[str, object]] = []
         gm_private_facts: list[dict[str, object]] = []
         character_knowledge: dict[str, list[str]] = {}
@@ -3571,10 +3583,12 @@ class ProviderSessionAdapter:
     ) -> tuple[dict[str, object], dict[str, object]]:
         """Split cacheable campaign explainers from fresh authority near the decision."""
 
+        self._active_record_ids = None
         payload = self._current_campaign_context_payload(
             provider_input,
             include_opening_direction=include_opening_direction,
         )
+        active_records = self._active_record_ids
         campaign = cast(Mapping[str, object], payload.get("campaign", {}))
         gm_private = cast(Mapping[str, object], payload.get("GM_PRIVATE", {}))
         explainers = {
@@ -3621,7 +3635,7 @@ class ProviderSessionAdapter:
                     )
                 ),
             },
-            {
+            tagged({
                 "role": "system",
                 "content": (
                     "SYLVIA_GM_FRESH_CAMPAIGN_STATE "
@@ -3633,7 +3647,7 @@ class ProviderSessionAdapter:
                         ensure_ascii=False,
                     )
                 ),
-            },
+            }, **({ACTIVE_RECORDS_KEY: active_records} if active_records is not None else {})),
         )
 
     def _attach_native_continuation(

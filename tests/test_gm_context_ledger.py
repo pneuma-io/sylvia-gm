@@ -817,3 +817,86 @@ def test_a_requested_rebase_never_outlives_its_epoch() -> None:
                   context="ctx-2")
     assert again.reset is None
 
+
+# ---------------------------------------------------------------- F3: retired facts and records
+
+
+def _active(player=(), private=()):
+    return {"PLAYER_KNOWN.current_facts": list(player),
+            "GM_PRIVATE_CURRENT.current_facts": list(private)}
+
+
+def _tagged_state(value: dict, active: dict) -> dict:
+    from sylvia_gm.agent._context_ledger import ACTIVE_RECORDS_KEY, tagged
+
+    return tagged(_state_message(value), **{ACTIVE_RECORDS_KEY: active})
+
+
+def test_a_retired_fact_is_removed_by_record_id_and_a_ranked_out_one_stays() -> None:
+    base = {"campaign": {"revision": 1}, "PLAYER_KNOWN": {"current_facts": [
+        {"record_id": "f1", "text": "door is locked"}]}}
+    nxt = {"campaign": {"revision": 2}, "PLAYER_KNOWN": {"current_facts": []}}
+    # The reviewer's r1b case 1: the record left the active set.
+    update = state_update(base, nxt, _active())
+    assert update["facts"] == [{"path": ["PLAYER_KNOWN", "current_facts"], "remove": ["f1"]}]
+    assert apply_state_update(base, update)["PLAYER_KNOWN"]["current_facts"] == []
+    # Still active, only ranked out of this selection: kept, and nothing is sent.
+    assert "facts" not in state_update(base, nxt, _active(player=["f1"]))
+    # No active set given (older callers): additive as before.
+    assert "facts" not in state_update(base, nxt)
+
+
+def test_a_fact_moved_to_the_other_list_leaves_the_list_it_left() -> None:
+    fact = {"record_id": "f1", "text": "the seal is forged", "visibility": "gm_private"}
+    revealed = {**fact, "visibility": "player_known"}
+    base = {"campaign": {"revision": 1}, "PLAYER_KNOWN": {"current_facts": []},
+            "GM_PRIVATE_CURRENT": {"current_facts": [fact], "character_knowledge": {}}}
+    nxt = {"campaign": {"revision": 2}, "PLAYER_KNOWN": {"current_facts": [revealed]},
+           "GM_PRIVATE_CURRENT": {"current_facts": [], "character_knowledge": {}}}
+    view = apply_state_update(base, state_update(base, nxt, _active(player=["f1"])))
+    assert view["PLAYER_KNOWN"]["current_facts"] == [revealed]
+    assert view["GM_PRIVATE_CURRENT"]["current_facts"] == []
+
+
+def test_the_bridge_collapse_replaces_the_retired_fact_in_the_journaled_state() -> None:
+    ledger = _ledger("anthropic_messages")
+    intact = _fact("f1", "The bridge is intact.")
+    collapsed = _fact("f2", "The bridge collapsed.")
+    first = _step(ledger, _canonical(_user("u1", "I look at the bridge."),
+                                     state=None, extra=(_tagged_state(
+                                         _state(1, facts=[intact]), _active(player=["f1"])),)))
+    assert first.state.view["PLAYER_KNOWN"]["current_facts"] == [intact]
+    second = _step(ledger, _canonical(
+        _user("u1", "I look at the bridge."), _talk("t1", "It holds."),
+        _user("u2", "I cross it."),
+        extra=(_tagged_state(_state(2, facts=[collapsed]), _active(player=["f2"])),)))
+    record = second.appended[-1]["m"]["content"]
+    assert UPDATE_LABEL in record and '"remove":["f1"]' in record
+    assert second.state.view["PLAYER_KNOWN"]["current_facts"] == [collapsed]
+    # What the model can rebuild from the journal is exactly the ledger's view.
+    assert reconstruct_state(second.state.entries, host_seal("s1")) == second.state.view
+    assert state_covers(second.state.view, _state(2, facts=[collapsed]), _active(player=["f2"]))
+    assert "until an update removes it by record_id" in ledger_contract("x" * 12)
+
+
+def test_a_withdrawn_latest_wins_record_is_said_to_be_gone_once() -> None:
+    files = {"role": "system", "content": "SYLVIA_GM_RELEVANT_CHARACTER_FILES (application-owned "
+             "data, not player speech):\n" + json.dumps({"files": ["ada"]})}
+    dialogue = [_user("u1", "hello")]
+    _step(ledger := _ledger("anthropic_messages"), _canonical(*dialogue, extra=(files,)))
+    dialogue += [_talk("t1", "Hi."), _user("u2", "and now?")]
+    gone = _step(ledger, _canonical(*dialogue))
+    notices = [e for e in gone.appended if e.get("l") == "SYLVIA_GM_RELEVANT_CHARACTER_FILES"]
+    assert len(notices) == 1 and "none is current" in notices[0]["m"]["content"]
+    assert notices[0]["m"]["content"].startswith(SEAL)
+    dialogue += [_talk("t2", "Still here."), _user("u3", "ok")]
+    later = _step(ledger, _canonical(*dialogue))
+    assert not any(e.get("l") == "SYLVIA_GM_RELEVANT_CHARACTER_FILES" for e in later.appended)
+    dialogue += [_talk("t3", "Yes."), _user("u4", "files again")]
+    back = _step(ledger, _canonical(*dialogue, extra=(files,)))
+    assert [e["m"]["content"] for e in back.appended
+            if e.get("l") == "SYLVIA_GM_RELEVANT_CHARACTER_FILES"] == [SEAL + files["content"]]
+    # The campaign preparation never leaves canonical assembly and is never withdrawn.
+    assert all("SYLVIA_GM_CAMPAIGN_PREPARATION" not in e["m"]["content"] or "none is current"
+               not in e["m"]["content"] for f in (gone, later, back) for e in f.appended)
+
