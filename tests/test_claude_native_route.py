@@ -419,6 +419,16 @@ def test_the_cli_may_finish_writing_its_records_before_it_is_closed(tmp_path):
     assert time.monotonic() - started < 2
 
 
+def _age(*paths: Path, minutes: float = 20) -> None:
+    import os
+    import time
+
+    old = time.time() - minutes * 60
+    for path in paths:
+        for item in [path, *(path.rglob("*") if path.is_dir() else ())]:
+            os.utime(item, (old, old))
+
+
 def test_sweep_removes_leftover_session_files_and_step_folders_only(tmp_path):
     config, steps = tmp_path / "profile", tmp_path / "steps"
     project_dir = config / "projects" / "C--runtime-workspace"
@@ -433,9 +443,40 @@ def test_sweep_removes_leftover_session_files_and_step_folders_only(tmp_path):
     (steps / stale).mkdir(parents=True)
     (steps / stale / "system.txt").write_bytes(b"private")
     (steps / running).mkdir()
-    assert sweep(config, steps, {running}) == 3
-    assert sorted(p.name for p in project_dir.iterdir()) == [f"{running}.jsonl", "notes.txt"]
-    assert [p.name for p in steps.iterdir()] == [running]
+    # C2: another process's step that is still fresh (its file and folder) is left alone.
+    foreign = "eeeeeeee-0000-4000-8000-000000000005"
+    (project_dir / f"{foreign}.jsonl").write_bytes(b"another process, mid-step")
+    (steps / foreign).mkdir()
+    (steps / foreign / "system.txt").write_bytes(b"another process, mid-step")
+    _age(project_dir / f"{stale}.jsonl", project_dir / stale, steps / stale,
+         project_dir / f"{running}.jsonl", steps / running, project_dir / "notes.txt")
+    assert sweep(config, steps, {running}, tmp_path) == 3
+    assert sorted(p.name for p in project_dir.iterdir()) == [
+        f"{running}.jsonl", f"{foreign}.jsonl", "notes.txt"]
+    assert sorted(p.name for p in steps.iterdir()) == sorted([running, foreign])
+    # Once the foreign step has been quiet for more than 15 minutes it is a leftover too.
+    _age(project_dir / f"{foreign}.jsonl", steps / foreign, minutes=16)
+    assert sweep(config, steps, {running}, tmp_path) == 2
+
+
+def test_sweep_and_delete_never_touch_a_config_directory_outside_the_runtime_home(tmp_path):
+    """C1: a person's own Claude Code profile keeps its saved sessions."""
+    from sylvia_gm.provider._claude_native import delete_session
+
+    home = tmp_path / "runtime"
+    (home / "steps").mkdir(parents=True)
+    person = tmp_path / "person" / ".claude"
+    session = "ffffffff-0000-4000-8000-000000000006"
+    saved = person / "projects" / "C--work" / f"{session}.jsonl"
+    saved.parent.mkdir(parents=True)
+    saved.write_bytes(b"the person's own session")
+    _age(saved, minutes=60)
+    assert sweep(person, home / "steps", set(), home) == 0
+    assert delete_session(person, session, home) is False
+    assert saved.read_bytes() == b"the person's own session"
+    # A config path that only looks inside (via ..) is resolved first.
+    assert sweep(home / ".." / "person" / ".claude", home / "steps", set(), home) == 0
+    assert saved.exists()
 
 
 # ---------------------------------------------------------------- provider with a scripted CLI
@@ -726,6 +767,7 @@ def test_leftover_session_files_are_swept_before_each_step(runtime):
     leftover = home / "steps" / "aaaaaaaa-0000-4000-8000-00000000000b"
     leftover.mkdir(parents=True)
     (leftover / "history.jsonl").write_bytes(b"an earlier transcript")
+    _age(stale.with_suffix(".jsonl"), stale, leftover)
     run_step(provider, Chain(), chain_canonicals()[0][1], text_reply("Hello."))
     cli = ScriptedCLI.instances[-1]
     assert cli.config_files == []

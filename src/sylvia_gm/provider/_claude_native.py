@@ -30,6 +30,10 @@ CLI_INSERTED_MODEL = "<synthetic>"
 #: The audit description of the CLI session file under the context ledger.
 TRANSIENT_SESSION = "transient_deleted_after_step"
 
+#: A session file or step folder another process may still be using is only swept once it has
+#: not been modified for this long; this process deletes its own finished steps directly.
+STALE_AFTER_SECONDS = 15 * 60
+
 _UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)
 
 
@@ -96,8 +100,39 @@ def _remove(path: Path) -> bool:
     return False
 
 
-def delete_session(config: Path, session_id: str) -> bool:
-    """Delete everything the CLI persisted for one step; False if something could not go."""
+def inside(path: Path, home: Path) -> bool:
+    """Is ``path`` (resolved) inside Sylvia's runtime home ``home`` (resolved)?"""
+    try:
+        path.resolve().relative_to(home.resolve())
+    except (OSError, ValueError):
+        return False
+    return True
+
+
+def _newest_change(path: Path) -> float:
+    """The latest modification time of ``path`` and, for a folder, of anything inside it."""
+    try:
+        newest = path.stat().st_mtime
+        if path.is_dir() and not path.is_symlink():
+            for child in path.rglob("*"):
+                try:
+                    newest = max(newest, child.stat().st_mtime)
+                except OSError:
+                    continue
+    except OSError:
+        return float("inf")
+    return newest
+
+
+def delete_session(config: Path, session_id: str, home: Path) -> bool:
+    """Delete everything the CLI persisted for one step; False if something could not go.
+
+    Never touches a config directory outside Sylvia's runtime home (it could be a person's
+    own Claude Code profile with their saved sessions).
+    """
+    if not inside(config, home):
+        logger.warning("A Claude config directory outside Sylvia's runtime home was not touched.")
+        return False
     removed = True
     for path in session_files(config, session_id):
         removed = _remove(path) and removed
@@ -109,18 +144,36 @@ def delete_session(config: Path, session_id: str) -> bool:
     return removed
 
 
-def sweep(config: Path, steps: Path, active: set[str]) -> int:
-    """Remove leftover session files and step folders not owned by a running step."""
+def sweep(
+    config: Path, steps: Path, active: set[str], home: Path, *, now: float | None = None
+) -> int:
+    """Remove leftover session files and step folders.
+
+    Only inside Sylvia's runtime home, only entries this process is not running, and only
+    those unchanged for ``STALE_AFTER_SECONDS``: another owner process may share the home and
+    be mid-step.
+    """
+    if not (inside(config, home) and inside(steps, home)):
+        logger.warning(
+            "A Claude config or step directory outside Sylvia's runtime home was not swept."
+        )
+        return 0
+    cutoff = (time.time() if now is None else now) - STALE_AFTER_SECONDS
     count = 0
     projects = config / "projects"
     candidates = [*projects.glob("*/*")] if projects.is_dir() else []
     for path in candidates:
         name = path.name[:-6] if path.name.endswith(".jsonl") else path.name
-        if _UUID.fullmatch(name) and name not in active and _remove(path):
+        if (
+            _UUID.fullmatch(name)
+            and name not in active
+            and _newest_change(path) < cutoff
+            and _remove(path)
+        ):
             count += 1
     if steps.is_dir():
         for path in steps.iterdir():
-            if path.name not in active and _remove(path):
+            if path.name not in active and _newest_change(path) < cutoff and _remove(path):
                 count += 1
     return count
 

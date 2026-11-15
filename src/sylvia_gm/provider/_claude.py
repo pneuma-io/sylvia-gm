@@ -393,7 +393,7 @@ class ClaudeProvider(Provider):
                 active.add(session_id)
             try:
                 # Earlier session files hold copies of earlier requests: never leave them.
-                sweep(config, steps, running | {session_id})
+                sweep(config, steps, running | {session_id}, self.home)
                 step.mkdir()
                 system, records, prompt, native_tools = prepare_request(
                     messages,
@@ -743,7 +743,7 @@ class ClaudeProvider(Provider):
             finally:
                 # Success, error, cancel or timeout: the CLI's session file and the step's
                 # files hold full copies of the request and never outlive the step.
-                delete_session(config, session_id)
+                delete_session(config, session_id, self.home)
                 shutil.rmtree(step, ignore_errors=True)
                 with _ACTIVE_LOCK:
                     active.discard(session_id)
@@ -770,7 +770,7 @@ class ClaudeProvider(Provider):
             return
         files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
         result = collect(files[0] if files else None, prompt["message"]["content"])
-        delete_session(config, session_id)
+        delete_session(config, session_id, self.home)
         if result.status != "collected":
             logger.warning(
                 "Claude runtime context records are unknown for this step (%s); the next "
