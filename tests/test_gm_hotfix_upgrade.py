@@ -241,6 +241,10 @@ def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
         candidate = options["candidates"][0]["candidate_id"]
         preview = owner.preview_campaign_rules_update("casting", candidate)
         assert preview["compatible"], preview["conflicts"]
+        # A return to the earlier version is usually blocked (issue 70); the player is told
+        # before confirming, not promised a way back.
+        assert "Treat this update as one-way." in preview["recovery"]
+        assert "keeps your current progress" not in preview["recovery"]
         assert owner.current_package_lock("casting") == pin
         assert owner.snapshot("casting") == before
         adopt(owner, preview)

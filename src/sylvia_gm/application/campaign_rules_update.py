@@ -744,8 +744,9 @@ def _preview(owner: AuthorityOwner, campaign_id: str, candidate_id: str) -> Safe
         "conflicts": conflicts,
         "compatible": not conflicts,
         "recovery": review_notice
-        + "Previous versions stay retained. Returning to one requires another "
-        "compatibility preview and keeps your current progress.",
+        + "Treat this update as one-way. Previous versions stay retained, but a return "
+        "to one needs its own compatibility preview, and that preview is usually blocked. "
+        "Export the campaign first if you may want the earlier rules back.",
     }
     result["confirmation"] = hashlib.sha256(canonical_json_bytes(result)).hexdigest()
     return owned_payload(result)
