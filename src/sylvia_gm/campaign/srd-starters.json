@@ -123,7 +123,7 @@
   {
     "id": "bard",
     "summary": "Bard · Level 1. Help allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.",
-    "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Also carried, at no cost: phosphorescent moss for Light. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
     "participant": {
       "name": "Neri Vale",
       "level": 1,
@@ -210,7 +210,8 @@
         "book_prayers",
         "parchment",
         "robe",
-        "holy_symbol"
+        "holy_symbol",
+        "phosphorescent_moss"
       ],
       "inventory_quantities": {
         "leather": 1,
@@ -222,7 +223,8 @@
         "book_prayers": 1,
         "parchment": 10,
         "robe": 1,
-        "holy_symbol": 1
+        "holy_symbol": 1,
+        "phosphorescent_moss": 1
       },
       "available_bonus_actions": [],
       "prepared_spells": [
@@ -235,6 +237,26 @@
         "guidance",
         "light",
         "healing_word"
+      ],
+      "spell_materials": [
+        {
+          "id": "lute",
+          "inventory_item": "lute",
+          "kind": "musical_instrument",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 3500
+        },
+        {
+          "id": "phosphorescent_moss",
+          "inventory_item": "phosphorescent_moss",
+          "kind": "specific",
+          "components": [
+            "light.1"
+          ],
+          "quantity": 1,
+          "value_cp": 0
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -273,7 +295,7 @@
   {
     "id": "cleric",
     "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-    "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
     "participant": {
       "name": "Oren Reed",
       "level": 1,
@@ -359,7 +381,8 @@
         "calligraphers_supplies",
         "book_prayers",
         "parchment",
-        "robe"
+        "robe",
+        "lodestones"
       ],
       "inventory_quantities": {
         "chain_shirt": 1,
@@ -371,7 +394,8 @@
         "calligraphers_supplies": 1,
         "book_prayers": 1,
         "parchment": 10,
-        "robe": 1
+        "robe": 1,
+        "lodestones": 2
       },
       "available_bonus_actions": [],
       "prepared_spells": [
@@ -385,6 +409,28 @@
         "spare_the_dying",
         "mending",
         "command"
+      ],
+      "spell_materials": [
+        {
+          "id": "holy_symbol",
+          "inventory_item": "holy_symbol",
+          "kind": "holy_symbol",
+          "components": [
+            "bless.1"
+          ],
+          "quantity": 1,
+          "value_cp": 500
+        },
+        {
+          "id": "lodestones",
+          "inventory_item": "lodestones",
+          "kind": "specific",
+          "components": [
+            "mending.1"
+          ],
+          "quantity": 1,
+          "value_cp": 0
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -425,7 +471,7 @@
   {
     "id": "druid",
     "summary": "Druid · Level 1. Control space with Fog Cloud and attack with Starry Wisp. Cure Wounds helps an injured ally; Wild Shape arrives at level two.",
-    "authored_profile": "# Sela Moss\n\nHuman Druid, level 1. Pronouns: they/them.\n\nQuietly amused; notices small changes in weather and mood. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Sela\n\nControl space with Fog Cloud and attack with Starry Wisp. Cure Wounds helps an injured ally; Wild Shape arrives at level two. Primal Order: Warden. Druidic is known. The quarterstaff is the Druidic Focus.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: animal handling medicine stealth. Class skill choices: nature survival. Starting equipment uses class option A and background option A, with 17 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "authored_profile": "# Sela Moss\n\nHuman Druid, level 1. Pronouns: they/them.\n\nQuietly amused; notices small changes in weather and mood. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Sela\n\nControl space with Fog Cloud and attack with Starry Wisp. Cure Wounds helps an injured ally; Wild Shape arrives at level two. Primal Order: Warden. Druidic is known. The quarterstaff is the Druidic Focus.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: animal handling medicine stealth. Class skill choices: nature survival. Starting equipment uses class option A and background option A, with 17 GP retained. Also carried, at no cost: phosphorescent moss for Light and two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
     "participant": {
       "name": "Sela Moss",
       "level": 1,
@@ -520,7 +566,9 @@
         "book_prayers",
         "parchment",
         "robe",
-        "holy_symbol"
+        "holy_symbol",
+        "phosphorescent_moss",
+        "lodestones"
       ],
       "inventory_quantities": {
         "leather": 1,
@@ -534,7 +582,9 @@
         "book_prayers": 1,
         "parchment": 10,
         "robe": 1,
-        "holy_symbol": 1
+        "holy_symbol": 1,
+        "phosphorescent_moss": 1,
+        "lodestones": 2
       },
       "available_bonus_actions": [],
       "prepared_spells": [
@@ -548,6 +598,36 @@
         "light",
         "mending",
         "healing_word"
+      ],
+      "spell_materials": [
+        {
+          "id": "druidic_focus",
+          "inventory_item": "quarterstaff",
+          "kind": "druidic_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 500
+        },
+        {
+          "id": "phosphorescent_moss",
+          "inventory_item": "phosphorescent_moss",
+          "kind": "specific",
+          "components": [
+            "light.1"
+          ],
+          "quantity": 1,
+          "value_cp": 0
+        },
+        {
+          "id": "lodestones",
+          "inventory_item": "lodestones",
+          "kind": "specific",
+          "components": [
+            "mending.1"
+          ],
+          "quantity": 1,
+          "value_cp": 0
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -944,6 +1024,18 @@
         "bless",
         "cure_wounds"
       ],
+      "spell_materials": [
+        {
+          "id": "holy_symbol",
+          "inventory_item": "holy_symbol",
+          "kind": "holy_symbol",
+          "components": [
+            "bless.1"
+          ],
+          "quantity": 1,
+          "value_cp": 500
+        }
+      ],
       "resources": {
         "hit_die": 1,
         "spell_slot_1": 2,
@@ -1101,6 +1193,16 @@
         "cure_wounds",
         "longstrider",
         "hunters_mark"
+      ],
+      "spell_materials": [
+        {
+          "id": "druidic_focus",
+          "inventory_item": "druidic_focus",
+          "kind": "druidic_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 100
+        }
       ],
       "resources": {
         "hit_die": 1,
@@ -1383,6 +1485,16 @@
         "spare_the_dying",
         "healing_word"
       ],
+      "spell_materials": [
+        {
+          "id": "arcane_focus",
+          "inventory_item": "arcane_focus",
+          "kind": "arcane_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 1000
+        }
+      ],
       "resources": {
         "hit_die": 1,
         "spell_slot_1": 2,
@@ -1525,6 +1637,16 @@
         "spare_the_dying",
         "healing_word"
       ],
+      "spell_materials": [
+        {
+          "id": "arcane_focus",
+          "inventory_item": "arcane_focus",
+          "kind": "arcane_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 2000
+        }
+      ],
       "resources": {
         "hit_die": 1,
         "spell_slot_1": 1
@@ -1560,7 +1682,7 @@
   {
     "id": "wizard",
     "summary": "Wizard · Level 1. Use Fire Bolt freely. Four prepared spells cover damage, defense and control; your spellbook has six first-level spells.",
-    "authored_profile": "# Eli Penn\n\nHuman Wizard, level 1. Pronouns: they/them.\n\nMethodical and generous; enjoys explaining a discovery without showing off. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Eli\n\nUse Fire Bolt freely. Four prepared spells cover damage, defense and control; your spellbook has six first-level spells. The quarterstaff is the Arcane Focus. Arcane Recovery restores one level-one slot once per Long Rest after a Short Rest.\n\n## Creation choices\n\nStandard array, then the Sage background increases, is reflected in the final ability scores. Sage supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: perception stealth insight. Class skill choices: investigation medicine. Starting equipment uses class option A and background option A, with 13 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+    "authored_profile": "# Eli Penn\n\nHuman Wizard, level 1. Pronouns: they/them.\n\nMethodical and generous; enjoys explaining a discovery without showing off. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Eli\n\nUse Fire Bolt freely. Four prepared spells cover damage, defense and control; your spellbook has six first-level spells. The quarterstaff is the Arcane Focus. Arcane Recovery restores one level-one slot once per Long Rest after a Short Rest.\n\n## Creation choices\n\nStandard array, then the Sage background increases, is reflected in the final ability scores. Sage supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: perception stealth insight. Class skill choices: investigation medicine. Starting equipment uses class option A and background option A, with 13 GP retained. Also carried, at no cost: two lodestones for Mending and a pinch of dirt for Longstrider. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
     "participant": {
       "name": "Eli Penn",
       "level": 1,
@@ -1651,7 +1773,9 @@
         "gp",
         "calligraphers_supplies",
         "book_history",
-        "parchment"
+        "parchment",
+        "lodestones",
+        "pinch_of_dirt"
       ],
       "inventory_quantities": {
         "dagger": 2,
@@ -1662,7 +1786,9 @@
         "gp": 13,
         "calligraphers_supplies": 1,
         "book_history": 1,
-        "parchment": 8
+        "parchment": 8,
+        "lodestones": 2,
+        "pinch_of_dirt": 1
       },
       "available_bonus_actions": [],
       "prepared_spells": [
@@ -1676,6 +1802,36 @@
         "mending",
         "shocking_grasp",
         "longstrider"
+      ],
+      "spell_materials": [
+        {
+          "id": "arcane_focus",
+          "inventory_item": "quarterstaff",
+          "kind": "arcane_focus",
+          "components": [],
+          "quantity": 1,
+          "value_cp": 500
+        },
+        {
+          "id": "lodestones",
+          "inventory_item": "lodestones",
+          "kind": "specific",
+          "components": [
+            "mending.1"
+          ],
+          "quantity": 1,
+          "value_cp": 0
+        },
+        {
+          "id": "pinch_of_dirt",
+          "inventory_item": "pinch_of_dirt",
+          "kind": "specific",
+          "components": [
+            "longstrider.1"
+          ],
+          "quantity": 1,
+          "value_cp": 0
+        }
       ],
       "resources": {
         "hit_die": 1,

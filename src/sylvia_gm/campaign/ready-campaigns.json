@@ -3,7 +3,7 @@
   "provenance": {
     "adventures": "Existing bundled Severed Lands Campaign Plans; story preparation unchanged.",
     "characters": "Existing SRD starters and Tavin Bell; independent prepared role/level editions.",
-    "starter_source_sha256": "fbf9da650afe2fd8e3044496e78d35f74184a5cd0340c355ebe4119ab594f803",
+    "starter_source_sha256": "40fe46595f4b4b70d7188e96877e71a50c5342e8d4027f44026a4b265268a716",
     "rules": "Contained SRD Lite 0.3.23; retained SRD 5.2.1 class and creation references.",
     "notices": [
       "LICENSING-STATUS.md",
@@ -44,7 +44,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -135,7 +135,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -143,6 +144,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -172,6 +174,28 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -228,7 +252,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+          "content_sha256": "d081b91298cb5dac106fd15cd287038accdba00d69889dee59cef9d013f90b49"
         }
       ]
     },
@@ -462,7 +486,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -573,7 +597,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -581,6 +606,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -613,6 +639,28 @@
                 "spell_slot_1": 3,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -669,7 +717,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+          "content_sha256": "c3ede65103fd97b323fa802e0796ce7deceb50ef979636cc5910ca9e50307274"
         }
       ]
     },
@@ -1095,7 +1143,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -1206,7 +1254,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -1214,6 +1263,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -1246,6 +1296,28 @@
                 "spell_slot_1": 3,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1302,7 +1374,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "9fe73145567c27f752e5e81f71d99c69a5c6bcca5cddbd36163ece64a7be32c2"
+          "content_sha256": "c3ede65103fd97b323fa802e0796ce7deceb50ef979636cc5910ca9e50307274"
         }
       ]
     },
@@ -1334,7 +1406,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Bard · Level 1. Help allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.",
-            "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Also carried, at no cost: phosphorescent moss for Light. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
             "participant": {
               "abilities": {
                 "charisma": 17,
@@ -1426,7 +1498,8 @@
                 "book_prayers",
                 "parchment",
                 "robe",
-                "holy_symbol"
+                "holy_symbol",
+                "phosphorescent_moss"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -1438,6 +1511,7 @@
                 "leather": 1,
                 "lute": 1,
                 "parchment": 10,
+                "phosphorescent_moss": 1,
                 "robe": 1
               },
               "max_hp": 9,
@@ -1464,6 +1538,26 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [],
+                  "id": "lute",
+                  "inventory_item": "lute",
+                  "kind": "musical_instrument",
+                  "quantity": 1,
+                  "value_cp": 3500
+                },
+                {
+                  "components": [
+                    "light.1"
+                  ],
+                  "id": "phosphorescent_moss",
+                  "inventory_item": "phosphorescent_moss",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1516,7 +1610,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "2e7af37fe3a43d6c4f058ddccbae9b09a4c71a5a28b46ea53a2dd025ac708093"
+          "content_sha256": "c5137d76c495da3ccca80643a5a0e6edc98d985faf7056dc3a8645739ee86096"
         },
         {
           "role": "companion",
@@ -1710,7 +1804,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -1801,7 +1895,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -1809,6 +1904,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -1838,6 +1934,28 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1894,7 +2012,7 @@
             },
             "setting_data": {}
           },
-          "content_sha256": "8b0554e6d8e7145f50a91d10fe710d5c4f184a18822e4fc3001df9a84ec9c0a5"
+          "content_sha256": "d081b91298cb5dac106fd15cd287038accdba00d69889dee59cef9d013f90b49"
         }
       ]
     }
