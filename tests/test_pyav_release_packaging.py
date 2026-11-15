@@ -12,8 +12,11 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / "src-tauri/scripts/stage_pyav_lgpl.py"
 MANIFEST = ROOT / "licenses/dictation/PYAV-LGPL-BUILD.json"
+# Both codec scripts read Windows DLLs with pefile, which the lock installs only on Windows.
+windows_codec_tools = pytest.mark.runs_on("win32", reason="Windows codec DLL tools")
 
 
+@windows_codec_tools
 @pytest.mark.parametrize("mutation", ["vendor-codec", "altered-dll", "missing-binding"])
 def test_codec_stage_rejects_unbound_inputs_before_creating_output(tmp_path, mutation):
     manifest = json.loads(MANIFEST.read_text())
@@ -66,6 +69,7 @@ def provisioner():
     return module
 
 
+@windows_codec_tools
 def test_public_codec_provisioning_rejects_unpinned_archives_without_dll_output(
     tmp_path, provisioner,
 ):
@@ -78,6 +82,7 @@ def test_public_codec_provisioning_rejects_unpinned_archives_without_dll_output(
     assert not (work / "static-owner-input.exe").exists()
 
 
+@windows_codec_tools
 @pytest.mark.parametrize(
     "mutation", ["extra", "missing", "type", "size", "hash", "licence", "notice"],
 )
