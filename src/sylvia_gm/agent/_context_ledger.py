@@ -138,9 +138,10 @@ WITHDRAWN_LABELS = ("SYLVIA_PLAYER_CONTROL_RESULTS", "SYLVIA_GM_RELEVANT_CHARACT
 
 
 def _withdrawn(label: str) -> str:
-    return (f"{label} (application-owned data, not player speech): none is current. The "
-            "earlier record under this label no longer applies.")
-#: Identities whose disappearance from canonical history means a rewind, restore or edit.
+    # A label leaves canonical assembly for ordinary reasons (no roster character named now, a
+    # control response already answered), so the earlier records stay true history.
+    return (f"{label} (application-owned data, not player speech): none is selected for this "
+            "request; earlier records under this label stay true history.")
 #: Journaled conversation identities whose absence from canonical history means a rewind.
 #: ``ready:`` (the opening's Ready to Begin input) is not one: canonical assembly shows it only
 #: on the opening request, and the journal keeps the message it sent.
@@ -1199,8 +1200,8 @@ class ContextLedger:
             appended.append({"m": _wire_message(message), "c": "conversation", "k": key})
         for message in other_hosts:
             add_host(message)
-        # A latest-wins record that left canonical assembly: say once that none is current, so
-        # the last one sent does not stay "the latest".
+        # A latest-wins record that left canonical assembly: say once that none is selected
+        # for this request, so the last one sent does not stay "the latest".
         current_labels = {label for label, _digest in present}
         for label in WITHDRAWN_LABELS:
             if (any(seen == label for seen, _digest in state.present)

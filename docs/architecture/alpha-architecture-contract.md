@@ -1481,7 +1481,8 @@ the ledger resets. Builder and participant requests do not use it.
   it. Keyframe plus updates must reconstruct the canonical state (modulo the additive rule).
 - **Withdrawn records.** When `SYLVIA_PLAYER_CONTROL_RESULTS` or
   `SYLVIA_GM_RELEVANT_CHARACTER_FILES` was in the previous request's canonical list and is absent
-  now, one sealed record under that label says none is current. The campaign preparation is never
+  now, one sealed record under that label says none is selected for this request and earlier
+  records under it stay true history. The campaign preparation is never
   withdrawn.
 - **Roles and the host seal.** Data records are user-role everywhere. Control records stay
   system-role where the route keeps system messages in place (`chat_completions`, `responses`) and

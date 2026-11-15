@@ -920,7 +920,10 @@ def test_a_withdrawn_latest_wins_record_is_said_to_be_gone_once() -> None:
     dialogue += [_talk("t1", "Hi."), _user("u2", "and now?")]
     gone = _step(ledger, _canonical(*dialogue))
     notices = [e for e in gone.appended if e.get("l") == "SYLVIA_GM_RELEVANT_CHARACTER_FILES"]
-    assert len(notices) == 1 and "none is current" in notices[0]["m"]["content"]
+    assert len(notices) == 1 and "none is selected for this request" in notices[0]["m"][
+        "content"]
+    assert "earlier records under this label stay true history" in notices[0]["m"]["content"]
+    assert "no longer applies" not in notices[0]["m"]["content"]
     assert notices[0]["m"]["content"].startswith(SEAL)
     dialogue += [_talk("t2", "Still here."), _user("u3", "ok")]
     later = _step(ledger, _canonical(*dialogue))
@@ -930,7 +933,7 @@ def test_a_withdrawn_latest_wins_record_is_said_to_be_gone_once() -> None:
     assert [e["m"]["content"] for e in back.appended
             if e.get("l") == "SYLVIA_GM_RELEVANT_CHARACTER_FILES"] == [SEAL + files["content"]]
     # The campaign preparation never leaves canonical assembly and is never withdrawn.
-    assert all("SYLVIA_GM_CAMPAIGN_PREPARATION" not in e["m"]["content"] or "none is current"
+    assert all("SYLVIA_GM_CAMPAIGN_PREPARATION" not in e["m"]["content"] or "none is selected"
                not in e["m"]["content"] for f in (gone, later, back) for e in f.appended)
 
 
