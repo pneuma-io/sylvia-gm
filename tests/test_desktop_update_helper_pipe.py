@@ -61,7 +61,7 @@ def test_access_denial_is_not_mislabeled_as_a_file_lock():
     assert "locked" not in progress._ERRORS[helper._failure_code(error)].lower()
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Windows file-sharing semantics")
+@pytest.mark.runs_on("win32", reason="Windows file-sharing semantics")
 def test_actual_locked_application_file_has_actionable_error_and_retry(tmp_path):
     from tests.test_desktop_update_replacement import assert_player_data, assert_tree, upgrade
 

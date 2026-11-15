@@ -33,3 +33,23 @@ def test_all_test_files_are_accounted_for():
             "unaccounted": sorted(actual - assigned.union(pending)),
             "missing": sorted(assigned.union(pending) - actual),
         }
+
+
+def test_platform_specific_cases_use_runs_on_not_a_conditional_skip():
+    import re
+
+    root = Path(__file__).resolve().parents[1]
+    conditional = re.compile(r"mark\s*\.\s*skip" + "if")
+    sources = [root / "conftest.py"] + [
+        path for path in (root / "tests").rglob("*.py") if "node_modules" not in path.parts
+    ]
+    offenders = sorted(
+        path.relative_to(root).as_posix()
+        for path in sources
+        if conditional.search(path.read_text(encoding="utf-8", errors="replace"))
+    )
+    assert not offenders, (
+        "The local gate fails every skipped required case, so a conditional skip can only "
+        "fail it. Mark platform-specific cases with @pytest.mark.runs_on(<platforms>, "
+        "reason=...) instead: " + ", ".join(offenders)
+    )

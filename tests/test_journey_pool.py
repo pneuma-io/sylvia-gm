@@ -7,6 +7,7 @@ import pytest
 from scripts import journey_pool
 from scripts.check_supported_journeys import PYTHON_JOURNEYS
 from scripts.journey_pool import balanced_assignments, partition_reports
+from tests.runner_checkouts import install_runs_on_plugin, record_no_platform_exclusions
 
 
 def test_case_key_keeps_parameter_delimiters_out_of_class_names():
@@ -82,6 +83,7 @@ def test_overlapping_collected_cases_fail_before_workers_start(
     def collect(command, **kwargs):
         calls.append(command)
         assert "--collect-only" in command, "Overlapping cases must not launch test workers"
+        record_no_platform_exclusions(kwargs)
         return subprocess.CompletedProcess(command, 0, "tests/test_shared.py::test_one\n", "")
 
     monkeypatch.setattr(journey_pool, "subprocess", SimpleNamespace(run=collect))
@@ -104,6 +106,7 @@ def test_real_pool_runs_disjoint_collected_cases_once(tmp_path, monkeypatch):
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     tests = root / "tests"
     tests.mkdir()
     (tests / "__init__.py").write_text("")
@@ -142,6 +145,7 @@ def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     tests = root / "tests"
     tests.mkdir()
     (tests / "__init__.py").write_text("")
@@ -180,6 +184,7 @@ def test_real_collection_and_workers_import_the_selected_source_before_ambient_p
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     owned = root / "src/qa_source_binding"
     owned.mkdir(parents=True)
     (owned / "__init__.py").write_text("IDENTITY = 'selected-source'\n")
@@ -223,6 +228,7 @@ def test_real_pool_collects_new_behavior_once_and_reports_historical_exclusion(
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     tests = root / "tests"
     tests.mkdir()
     (tests / "__init__.py").write_text("")
@@ -246,7 +252,45 @@ def test_real_pool_collects_new_behavior_once_and_reports_historical_exclusion(
     assert (historical in executed) is include_historical
     excluded = json.loads((destination / "gm-turn-excluded-cases.json").read_text())
     assert excluded == ([] if include_historical else [
-        {"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical]},
+        {"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical], "kind": "historical"},
     ])
     cases = list(ET.parse(destination / "gm-turn.xml").iter("testcase"))
     assert len(cases) == len(executed) and all(not list(case) for case in cases)
+
+
+def test_real_pool_excludes_other_platform_cases_by_exact_id(tmp_path, monkeypatch):
+    from tests.runner_checkouts import OTHER_PLATFORM
+
+    root = tmp_path / "source"
+    (root / "scripts").mkdir(parents=True)
+    (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
+    tests = root / "tests"
+    tests.mkdir()
+    (tests / "__init__.py").write_text("")
+    (tests / "test_marked.py").write_text(
+        "import pytest\n"
+        f"@pytest.mark.runs_on('{OTHER_PLATFORM}', reason='Elsewhere semantics')\n"
+        "def test_elsewhere():\n    raise AssertionError('must never run on this platform')\n"
+        "def test_behavior():\n    assert True\n"
+    )
+    destination = tmp_path / "evidence"
+    destination.mkdir()
+    monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
+    results = journey_pool.run_balanced_gate(
+        root, destination, {"marked": ["tests/test_marked.py"]}, ["marked"], 1, 0.0, None,
+    )
+    assert results["marked"][0]
+    assignments = json.loads((destination / "pool-assignments.json").read_text())
+    assert [nodeid for bucket in assignments["tasks"] for _, nodeid in bucket] == [
+        "tests/test_marked.py::test_behavior",
+    ]
+    assert json.loads((destination / "marked-excluded-cases.json").read_text()) == [{
+        "nodeid": "tests/test_marked.py::test_elsewhere",
+        "reason": f"Runs only on {OTHER_PLATFORM}: Elsewhere semantics",
+        "kind": "platform",
+        "platforms": [OTHER_PLATFORM],
+    }]
+    cases = list(ET.parse(destination / "marked.xml").iter("testcase"))
+    assert [case.get("name") for case in cases] == ["test_behavior"]
+    assert not list(cases[0])

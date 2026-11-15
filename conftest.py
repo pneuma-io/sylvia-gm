@@ -40,10 +40,16 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(items):
-    """Known failures still execute; an unexpected pass fails until the entry is reviewed."""
+    """Known failures still execute; an unexpected pass fails until the entry is reviewed.
+
+    Cases marked ``runs_on`` for another platform skip with a fixed reason, and the journey
+    runner excludes them by exact ID (see scripts/platform_exclusions.py).
+    """
     import pytest
     from scripts.known_test_defects import KNOWN_DEFECTS, failure_reason
+    from scripts.platform_exclusions import apply_runs_on
 
     for item in items:
         if item.nodeid in KNOWN_DEFECTS:
             item.add_marker(pytest.mark.xfail(strict=True, reason=failure_reason(item.nodeid)))
+    apply_runs_on(items)

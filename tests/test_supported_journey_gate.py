@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.runner_checkouts import install_runs_on_plugin, record_no_platform_exclusions
+
 
 @pytest.fixture
 def gate():
@@ -29,6 +31,7 @@ def test_documented_autoload_environment_runs_async_standalone_then_runner(
     tests = root / "tests"
     tests.mkdir(parents=True)
     (root / "pyproject.toml").write_text('[tool.pytest.ini_options]\naddopts = ""\n')
+    install_runs_on_plugin(root)
     relative = "tests/test_async_behavior.py"
     (root / relative).write_text(
         "import asyncio\nimport pytest\n"
@@ -71,6 +74,7 @@ def test_runner_rejects_incomplete_or_failed_required_checks(gate, tmp_path, mon
         assert "PYTEST_ADDOPTS" not in kwargs["env"]
         assert kwargs["timeout"] is None
         if "--collect-only" in command:
+            record_no_platform_exclusions(kwargs)
             return subprocess.CompletedProcess(
                 command,
                 0,
@@ -128,6 +132,7 @@ def test_group_runner_applies_historical_policy_to_collection_and_execution(
 
     def run(command, **kwargs):
         if "--collect-only" in command:
+            record_no_platform_exclusions(kwargs)
             return subprocess.CompletedProcess(command, 0, behavior + "\n" + historical + "\n", "")
         deselected = f"--deselect={historical}" in command
         executed.append(deselected)
@@ -186,6 +191,7 @@ def test_parallel_merge_requires_every_original_case_exactly_once(
     def execute(command, **kwargs):
         assert "PYTEST_ADDOPTS" not in kwargs["env"]
         if "--collect-only" in command:
+            record_no_platform_exclusions(kwargs)
             return subprocess.CompletedProcess(
                 command,
                 0,
@@ -392,3 +398,313 @@ def test_workflow_includes_native_unit_tests_and_explicit_future_budget():
     assert "post_launch_ci_budget" in text and "default: false" in text
     assert "workflow_dispatch' -and" in text
     assert "timeout-minutes" not in text
+
+
+MARKED_CASES = (
+    "@pytest.mark.runs_on(sys.platform, reason='Here semantics')\n"
+    "def test_here():\n    assert True\n"
+    "@pytest.mark.runs_on('{other}', reason='Elsewhere semantics')\n"
+    "def test_elsewhere():\n    raise AssertionError('must never run on this platform')\n"
+    "@pytest.mark.runs_on('win32', 'linux', reason='Both semantics')\n"
+    "def test_both():\n    assert True\n"
+    "def test_plain():\n    assert True\n"
+)
+
+
+def _marked_checkout(root, body):
+    """A synthetic checkout with the real marker registration and collection hook."""
+    import json
+    import tomllib
+
+    install_runs_on_plugin(root)
+    (root / "tests").mkdir(parents=True, exist_ok=True)
+    project = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    markers = tomllib.loads(project.read_text(encoding="utf-8"))["tool"]["pytest"]["ini_options"]
+    registered = [line for line in markers["markers"] if line.startswith("runs_on(")]
+    assert len(registered) == 1, "runs_on must be registered for --strict-markers"
+    (root / "pyproject.toml").write_text(
+        "[tool.pytest.ini_options]\naddopts = \"--strict-markers\"\n"
+        f"markers = {json.dumps(registered)}\n",
+        encoding="utf-8",
+    )
+    (root / "tests/test_marked.py").write_text("import sys\nimport pytest\n" + body, encoding="utf-8")
+
+
+def _pytest(root, *args, record=None):
+    import os
+    import sys
+
+    environment = dict(os.environ)
+    environment.pop("PYTEST_ADDOPTS", None)
+    environment.pop("SYLVIA_PLATFORM_EXCLUSIONS_FILE", None)
+    if record is not None:
+        environment["SYLVIA_PLATFORM_EXCLUSIONS_FILE"] = str(record)
+    return subprocess.run(
+        [sys.executable, "-m", "pytest", "-p", "no:cacheprovider", *args],
+        cwd=root, env=environment, capture_output=True, text=True, timeout=120,
+    )
+
+
+def test_runs_on_runs_on_a_listed_platform_and_skips_elsewhere_with_the_exact_reason(tmp_path):
+    import json
+    import xml.etree.ElementTree as ET
+
+    from tests.runner_checkouts import OTHER_PLATFORM
+
+    root = tmp_path / "checkout"
+    _marked_checkout(root, MARKED_CASES.format(other=OTHER_PLATFORM))
+    report = tmp_path / "report.xml"
+    record = tmp_path / "exclusions.json"
+    result = _pytest(root, f"--junitxml={report}", "tests/test_marked.py", record=record)
+    assert result.returncode == 0, result.stdout + result.stderr
+    cases = {case.get("name"): case for case in ET.parse(report).iter("testcase")}
+    assert set(cases) == {"test_here", "test_elsewhere", "test_both", "test_plain"}
+    assert all(not list(cases[name]) for name in ("test_here", "test_both", "test_plain"))
+    skipped = cases["test_elsewhere"].find("skipped")
+    assert skipped is not None and skipped.get("type") == "pytest.skip"
+    assert skipped.get("message") == f"Runs only on {OTHER_PLATFORM}: Elsewhere semantics"
+    assert json.loads(record.read_text(encoding="utf-8")) == [{
+        "nodeid": "tests/test_marked.py::test_elsewhere",
+        "platforms": [OTHER_PLATFORM],
+        "reason": "Elsewhere semantics",
+    }]
+
+
+@pytest.mark.parametrize(
+    ("decorator", "message"),
+    [
+        ("@pytest.mark.runs_on(reason='No platform')", "needs at least one platform"),
+        ("@pytest.mark.runs_on('darwin', reason='Unknown platform')", "'darwin' is not one of"),
+        ("@pytest.mark.runs_on('linux')", "needs a non-empty reason="),
+        ("@pytest.mark.runs_on('linux', reason='  ')", "needs a non-empty reason="),
+    ],
+    ids=["no-platform", "unknown-platform", "missing-reason", "empty-reason"],
+)
+def test_invalid_runs_on_marker_fails_collection_instead_of_being_ignored(
+    tmp_path, decorator, message,
+):
+    root = tmp_path / "checkout"
+    _marked_checkout(root, decorator + "\ndef test_marked():\n    assert True\n")
+    record = tmp_path / "exclusions.json"
+    result = _pytest(root, "--collect-only", "-q", "tests/test_marked.py", record=record)
+    output = result.stdout + result.stderr
+    assert result.returncode == pytest.ExitCode.USAGE_ERROR, output
+    assert "tests/test_marked.py::test_marked: runs_on" in output and message in output, output
+    assert not record.exists()
+
+
+class _Item:
+    """Only what the collection hook reads from a pytest item."""
+
+    def __init__(self, nodeid, *marks):
+        self.nodeid = nodeid
+        self.marks = [mark.mark for mark in marks]
+        self.added = []
+
+    def iter_markers(self, name):
+        return (mark for mark in self.marks if mark.name == name)
+
+    def add_marker(self, marker):
+        self.added.append(marker.mark)
+
+
+@pytest.mark.parametrize(
+    "marks",
+    [
+        [pytest.mark.runs_on("linux", "Positional reason")],
+        [pytest.mark.runs_on("linux", "linux", reason="Twice")],
+        [pytest.mark.runs_on("linux", reason="Semantics", platform="win32")],
+        [pytest.mark.runs_on("linux", reason="One"), pytest.mark.runs_on("win32", reason="Two")],
+        [pytest.mark.runs_on("linux", reason=None)],
+    ],
+    ids=["positional-reason", "duplicate-platform", "unknown-keyword", "two-markers", "none-reason"],
+)
+def test_ambiguous_runs_on_markers_are_usage_errors(marks):
+    from scripts.platform_exclusions import apply_runs_on
+
+    with pytest.raises(pytest.UsageError, match=r"^tests/example\.py::test_case: "):
+        apply_runs_on([_Item("tests/example.py::test_case", *marks)])
+
+
+@pytest.mark.parametrize("recorded", ["mixed", "none-excluded", "unset"])
+def test_collection_records_platform_exclusions_only_when_the_runner_asks(
+    tmp_path, monkeypatch, recorded,
+):
+    import json
+
+    from scripts.platform_exclusions import apply_runs_on
+    from tests.runner_checkouts import OTHER_PLATFORM
+
+    here = _Item("tests/example.py::test_here", pytest.mark.runs_on("win32", "linux", reason="Both"))
+    plain = _Item("tests/example.py::test_plain")
+    elsewhere = _Item(
+        "tests/example.py::test_elsewhere[case]",
+        pytest.mark.runs_on(OTHER_PLATFORM, reason="Elsewhere semantics"),
+    )
+    items = [here, plain] + ([elsewhere] if recorded != "none-excluded" else [])
+    record = tmp_path / "evidence" / "exclusions.json"
+    record.parent.mkdir()
+    monkeypatch.chdir(tmp_path / "evidence")
+    if recorded == "unset":
+        monkeypatch.delenv("SYLVIA_PLATFORM_EXCLUSIONS_FILE", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_PLATFORM_EXCLUSIONS_FILE", str(record))
+    expected = [] if recorded == "none-excluded" else [{
+        "nodeid": "tests/example.py::test_elsewhere[case]",
+        "platforms": [OTHER_PLATFORM],
+        "reason": "Elsewhere semantics",
+    }]
+    assert apply_runs_on(items) == expected
+    assert not here.added and not plain.added
+    if recorded != "none-excluded":
+        assert [(mark.name, mark.kwargs) for mark in elsewhere.added] == [
+            ("skip", {"reason": f"Runs only on {OTHER_PLATFORM}: Elsewhere semantics"}),
+        ]
+    if recorded == "unset":
+        assert not any((tmp_path / "evidence").iterdir())
+    else:
+        assert json.loads(record.read_text(encoding="utf-8")) == expected
+
+
+def test_platform_reason_names_every_listed_platform():
+    from scripts.platform_exclusions import platform_reason
+
+    assert platform_reason(["linux"], "Linux descriptor semantics") == (
+        "Runs only on linux: Linux descriptor semantics"
+    )
+    assert platform_reason(["win32", "linux"], "Native protection") == (
+        "Runs only on win32, linux: Native protection"
+    )
+
+
+@pytest.mark.parametrize("case_workers", [1, 2], ids=["one-process", "parallel"])
+@pytest.mark.parametrize("ordinary_skip", [False, True], ids=["passing", "ordinary-skip"])
+def test_platform_excluded_case_is_not_required_or_run_but_an_ordinary_skip_still_fails(
+    gate, tmp_path, monkeypatch, case_workers, ordinary_skip,
+):
+    import json
+    import xml.etree.ElementTree as ET
+
+    from tests.runner_checkouts import OTHER_PLATFORM
+
+    root = tmp_path / "checkout"
+    _marked_checkout(
+        root,
+        f"@pytest.mark.runs_on('{OTHER_PLATFORM}', reason='Elsewhere semantics')\n"
+        "def test_elsewhere():\n    raise AssertionError('must never run on this platform')\n"
+        "def test_required():\n"
+        + ("    pytest.skip('A missing prerequisite')\n" if ordinary_skip else "    assert True\n"),
+    )
+    monkeypatch.delenv("PYTEST_ADDOPTS", raising=False)
+    monkeypatch.setattr(gate, "ROOT", root)
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": ["tests/test_marked.py"]})
+    output = tmp_path / "runner"
+    output.mkdir()
+    passed, _ = gate._run("gm-turn", output, case_workers=case_workers)
+    log = (output / "gm-turn.log").read_text(encoding="utf-8")
+    assert passed is (not ordinary_skip), log
+    cases = list(ET.parse(output / "gm-turn.xml").iter("testcase"))
+    assert [(case.get("classname"), case.get("name")) for case in cases] == [
+        ("tests.test_marked", "test_required"),
+    ]
+    assert (cases[0].find("skipped") is not None) is ordinary_skip
+    assert json.loads((output / "gm-turn-required-cases.json").read_text()) == [
+        ["tests.test_marked", "test_required"],
+    ]
+    assert json.loads((output / "gm-turn-excluded-cases.json").read_text()) == [{
+        "nodeid": "tests/test_marked.py::test_elsewhere",
+        "reason": f"Runs only on {OTHER_PLATFORM}: Elsewhere semantics",
+        "kind": "platform",
+        "platforms": [OTHER_PLATFORM],
+    }]
+
+
+@pytest.mark.parametrize("record", ["missing", "stale", "malformed", "uncollected"])
+def test_group_fails_when_collection_did_not_record_its_platform_exclusions(
+    gate, tmp_path, monkeypatch, record,
+):
+    import json
+    from types import SimpleNamespace
+
+    calls = []
+    stale = tmp_path / "gm-turn-platform-exclusions.json"
+    if record == "stale":
+        stale.write_text("[]", encoding="utf-8")
+
+    def execute(command, **kwargs):
+        calls.append(command)
+        path = Path(kwargs["env"]["SYLVIA_PLATFORM_EXCLUSIONS_FILE"])
+        assert path == stale.resolve()
+        if record == "malformed":
+            path.write_text("{", encoding="utf-8")
+        elif record == "uncollected":
+            path.write_text(json.dumps([{
+                "nodeid": "tests/test_required.py::test_absent",
+                "platforms": ["linux"],
+                "reason": "Synthetic",
+            }]), encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0, "tests/test_required.py::test_one\n", "")
+
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": ["tests/test_required.py"]})
+    monkeypatch.setattr(gate, "subprocess", SimpleNamespace(
+        run=execute, TimeoutExpired=subprocess.TimeoutExpired, STDOUT=subprocess.STDOUT,
+    ))
+    assert gate._run("gm-turn", tmp_path)[0] is False
+    assert len(calls) == 1, "No checks may run without the collection's platform record"
+    assert "Platform exclusions" in (tmp_path / "gm-turn.log").read_text(encoding="utf-8")
+
+
+def test_receipt_counts_and_lists_platform_exclusions_apart_from_historical_ones(
+    gate, tmp_path, monkeypatch, capsys,
+):
+    import json
+    import sys
+
+    platform = {
+        "nodeid": "tests/test_required.py::test_elsewhere",
+        "reason": "Runs only on linux: Linux descriptor semantics",
+        "kind": "platform",
+        "platforms": ["linux"],
+    }
+    historical = {"nodeid": "tests/test_required.py::test_old", "reason": "Old", "kind": "historical"}
+
+    def run(name, output, **kwargs):
+        (output / f"{name}-excluded-cases.json").write_text(json.dumps([platform, historical]))
+        return True, 0.0
+
+    monkeypatch.setattr(gate, "PYTHON_JOURNEYS", {"gm-turn": ["tests/test_required.py"]})
+    monkeypatch.setattr(gate, "_run_guarded", run)
+    monkeypatch.setattr(gate, "source_identity", lambda: {"sha256": "same", "head": None, "files": {}})
+    monkeypatch.setattr(sys, "argv", [
+        "gate", "--journey", "gm-turn", "--jobs", "1", "--output-dir", str(tmp_path / "evidence"),
+    ])
+    assert gate.main() == 0
+    summary = json.loads((tmp_path / "evidence/summary.json").read_text())
+    assert summary["excluded_cases"] == [platform, historical]
+    assert summary["excluded_case_counts"] == {"platform": 1, "historical": 1}
+    assert summary["platform"] == sys.platform
+    assert f"Excluded by platform: 1 cases cannot run on {sys.platform}" in capsys.readouterr().out
+
+
+def test_repository_collection_records_the_safe_file_platform_cases(tmp_path):
+    import json
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    record = tmp_path / "exclusions.json"
+    result = _pytest(
+        root, "--collect-only", "-q", "-o", "addopts=", "tests/test_safe_file_adapter.py",
+        record=record,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    entries = json.loads(record.read_text(encoding="utf-8"))
+    if sys.platform == "linux":
+        assert entries == []
+    else:
+        assert len(entries) == 7
+        assert all(
+            entry["nodeid"].startswith("tests/test_safe_file_adapter.py::test_linux_")
+            and entry["platforms"] == ["linux"]
+            and entry["reason"] == "Linux descriptor semantics"
+            for entry in entries
+        ), entries

@@ -114,10 +114,12 @@ def test_pool_reports_a_non_cp1252_failure_from_a_parent_without_utf8_mode(tmp_p
     import xml.etree.ElementTree as ET
 
     from scripts import journey_pool
+    from tests.runner_checkouts import install_runs_on_plugin
 
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     tests = root / "tests"
     tests.mkdir()
     (tests / "__init__.py").write_text("")

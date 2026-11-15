@@ -81,7 +81,7 @@ def test_failed_dialog_creation_refuses_readiness_and_lost_window_refuses_later_
     assert lost.value.code == "progress_lost"
 
 
-@pytest.mark.skipif(not hasattr(ctypes, "WINFUNCTYPE"), reason="Windows callback ABI")
+@pytest.mark.runs_on("win32", reason="Windows callback ABI")
 def test_task_dialog_packing_callback_timer_and_own_window_close_rules_without_native_calls(
     monkeypatch,
 ):

@@ -106,7 +106,7 @@ def test_completion_probe_failure_never_means_process_exit():
     owned.close()
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="Windows handle component")
+@pytest.mark.runs_on("win32", reason="Windows handle component")
 def test_real_windows_duplicates_wait_only_for_two_owned_windowless_children():
     from ctypes import wintypes
 

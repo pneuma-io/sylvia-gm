@@ -18,10 +18,12 @@ from pathlib import Path
 if __package__:
     from .check_catalog import qualification_cases
     from .known_test_defects import accepted_case
+    from .platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from scripts.check_catalog import qualification_cases
     from scripts.known_test_defects import accepted_case
+    from scripts.platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 
 
 def case_key(nodeid):
@@ -134,6 +136,9 @@ def run_balanced_gate(
             continue
         collection_started = time.monotonic()
         print(f"COLLECT {name}", flush=True)
+        # Collection records runs_on cases for other platforms; only it may write this file.
+        platform_file = (destination / f"{name}-platform-exclusions.json").resolve()
+        platform_file.unlink(missing_ok=True)
         result = subprocess.run(
             [
                 sys.executable,
@@ -148,7 +153,7 @@ def run_balanced_gate(
                 *journeys[name],
             ],
             cwd=root,
-            env=environment,
+            env={**environment, EXCLUSIONS_FILE_VARIABLE: str(platform_file)},
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -168,7 +173,10 @@ def run_balanced_gate(
         collected_count = len(nodeids)
         if len(set(nodeids)) != collected_count:
             raise ValueError("Required collection contains duplicate cases")
-        nodeids, excluded = qualification_cases(nodeids, include_historical=include_historical)
+        nodeids, excluded = qualification_cases(
+            nodeids, include_historical=include_historical,
+            platform_exclusions=read_platform_exclusions(platform_file),
+        )
         (destination / f"{name}-excluded-cases.json").write_text(
             json.dumps(excluded, indent=2), encoding="utf-8",
         )

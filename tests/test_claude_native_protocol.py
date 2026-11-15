@@ -33,7 +33,7 @@ def published_binary() -> Path:
     return binary
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Windows code signatures")
+@pytest.mark.runs_on("win32", reason="Windows code signatures")
 def test_publisher_check_accepts_anthropic_and_rejects_other_files(tmp_path):
     _claude_install.verify_publisher(published_binary())
     signed_by_another_publisher = Path(os.environ["SYSTEMROOT"]) / "System32" / "cmd.exe"

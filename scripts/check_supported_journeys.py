@@ -24,11 +24,13 @@ if __package__:
     from .check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
     from .journey_fixture_inputs import candidate_identity, prepare_candidate
     from .known_test_defects import accepted_case, case_key, report_outcomes
+    from .platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
     from scripts.journey_fixture_inputs import candidate_identity, prepare_candidate
     from scripts.known_test_defects import accepted_case, case_key, report_outcomes
+    from scripts.platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
@@ -893,6 +895,9 @@ def _run(
     collected_nodeids = []
     try:
         if name != "ui-controls":
+            # Collection records runs_on cases for other platforms; only it may write this file.
+            platform_file = (destination / f"{name}-platform-exclusions.json").resolve()
+            platform_file.unlink(missing_ok=True)
             collection = subprocess.run(
                 [
                     sys.executable,
@@ -905,7 +910,7 @@ def _run(
                     *PYTHON_JOURNEYS[name],
                 ],
                 cwd=ROOT,
-                env=child_environment,
+                env={**child_environment, EXCLUSIONS_FILE_VARIABLE: str(platform_file)},
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
@@ -918,9 +923,15 @@ def _run(
                     collected_nodeids.append(line)
             if len(set(collected_nodeids)) != len(collected_nodeids):
                 raise ValueError("Required collection contains duplicate cases")
+            platform_exclusions = (
+                read_platform_exclusions(platform_file) if collection.returncode == 0 else []
+            )
             collected_nodeids, excluded = qualification_cases(
                 collected_nodeids, include_historical=include_historical,
+                platform_exclusions=platform_exclusions,
             )
+            # The whole-module command must not run cases that cannot run on this platform.
+            command.extend(f"--deselect={entry['nodeid']}" for entry in platform_exclusions)
             expected_cases = {tuple(case_key(nodeid).split("::", 1)) for nodeid in collected_nodeids}
             (destination / f"{name}-excluded-cases.json").write_text(
                 json.dumps(excluded, indent=2), encoding="utf-8",
@@ -1189,12 +1200,18 @@ def main() -> int:
     case_counts, expected_failures = report_outcomes(python_cases)
     excluded_cases = [case for path in sorted(destination.glob("*-excluded-cases.json"))
                       for case in json.loads(path.read_text(encoding="utf-8"))]
+    platform_excluded = sum(case.get("kind") == "platform" for case in excluded_cases)
     summary = {
         "python_case_counts": case_counts,
         "expected_failures": expected_failures,
         "qualification_kind": "historical" if include_historical else "product",
         "historical_check": selection.get("check") if include_historical else None,
         "excluded_cases": excluded_cases,
+        "excluded_case_counts": {
+            "platform": platform_excluded,
+            "historical": len(excluded_cases) - platform_excluded,
+        },
+        "platform": sys.platform,
         "status": "completed",
         "passed": not failed and within_time_budget,
         "complete_gate": args.journey is None
@@ -1253,6 +1270,10 @@ def main() -> int:
     failure_labels = failed + ([] if within_time_budget else ["time budget"])
     if expected_failures:
         print(f"Known expected failures: {len(expected_failures)} (reported separately from passes)")
+    print(
+        f"Excluded by platform: {platform_excluded} cases cannot run on {sys.platform} "
+        "(not required, not run; listed by exact ID in summary.json)"
+    )
     print(
         f"{label}: {'FAIL: ' + ', '.join(failure_labels) if failure_labels else 'PASS'}",
         flush=True,

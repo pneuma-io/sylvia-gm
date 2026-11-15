@@ -241,6 +241,7 @@ markers = [
     "anyio: mark a test as an async test (uses anyio backend)",
     "asyncio: mark a test as an async test (uses asyncio backend)",
     "slow: mark a test as slow (requires network, may be flaky)",
+    "runs_on(*platforms, reason): run only on these sys.platform values (win32, linux); elsewhere the case is skipped and the journey runner excludes it by exact ID",
 ]
 
 [dependency-groups]
