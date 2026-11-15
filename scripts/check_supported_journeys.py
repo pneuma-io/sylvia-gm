@@ -1038,6 +1038,13 @@ def _run_guarded(
         return False, elapsed
 
 
+def _source_files_digest(identity) -> str:
+    """One fingerprint of the checked source that is the same on every machine at a commit."""
+    candidate = identity.get("srd_lite_candidate") or {}
+    stable = {"files": identity.get("files", {}), "srd_lite_candidate": candidate.get("sha256")}
+    return hashlib.sha256(json.dumps(stable, sort_keys=True).encode("utf-8")).hexdigest()
+
+
 def _print_machine_share_plan(machine_share, selected) -> int:
     """Collect the suite and print how it splits across machines; nothing is run."""
     from journey_pool import run_balanced_gate
@@ -1300,6 +1307,9 @@ def main() -> int:
             "total_required_cases": share_report["total_required_cases"],
             "ui_controls_included": share_report["ui_controls_included"],
             "groups_not_in_this_share": sorted(absent_groups),
+            # source_sha256 below also covers a path inside this run's output folder, so it
+            # differs on every machine. Shares are matched on the source files alone.
+            "source_files_sha256": _source_files_digest(initial_identity),
         } if share_report else None,
         "gate_kind": (
             f"machine share {machine_share[0]} of {machine_share[1]} "

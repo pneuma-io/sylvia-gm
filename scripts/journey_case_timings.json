@@ -6626,8 +6626,6 @@
     "tests.test_sylvia_gm_identity::test_canonical_frontend_presents_sylvia_without_pneuma_cobrand": 0.006,
     "tests.test_sylvia_gm_identity::test_current_product_surfaces_reject_retired_identity": 0.986,
     "tests.test_sylvia_gm_identity::test_informational_cli_cannot_launch_a_competing_application": 0.601,
-    "tests.test_sylvia_gm_identity::test_readme_retired_checkout_commands_are_rejected[cd retired-checkout-fixture-dm]": 0.007,
-    "tests.test_sylvia_gm_identity::test_readme_retired_checkout_commands_are_rejected[git clone https://github.com/pneuma-io/retired-checkout-fixture-dm.git]": 0.007,
     "tests.test_sylvia_gm_identity::test_sylvia_gm_is_the_canonical_project_identity": 0.006,
     "tests.test_sylvia_gm_identity::test_sylvia_gm_structural_identifiers_are_exact_and_old_package_ids_fail_closed": 0.081,
     "tests.test_sylviabench_checks::test_an_unrecognized_amount_or_total_still_stays_unscored[He recovers eleven points of health.]": 0.004,
@@ -6850,6 +6848,7 @@
   },
   "sources": [
     "Complete run on Linux (Ubuntu 24.04, 16 cores, --jobs 4 --case-workers 3), November 2026: 6845 cases, setup, call and teardown summed per case.",
-    "Earlier Windows complete-gate reports, October 2026, for cases the Linux run did not execute (1)."
+    "Earlier Windows complete-gate reports, October 2026, for cases the Linux run did not execute (1).",
+    "Cases whose IDs contain a retired product name are left out (2); they use the default."
   ]
 }

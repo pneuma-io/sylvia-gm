@@ -168,9 +168,17 @@ def _real_runner(gate, monkeypatch, root, journeys):
     monkeypatch.setattr(gate, "ROOT", root)
     monkeypatch.setattr(gate, "PYTHON_JOURNEYS", journeys)
     monkeypatch.setattr(gate, "prepare_candidate", lambda environment, source, destination: {})
-    monkeypatch.setattr(
-        gate, "source_identity", lambda: {"sha256": "same", "head": "abc123", "files": {}}
-    )
+    # As in a real run, the whole-identity hash covers a path inside this run's output folder,
+    # so it differs between machines even though the source files are the same.
+    monkeypatch.setattr(gate, "source_identity", lambda: {
+        "sha256": "hash-with-" + sys.argv[sys.argv.index("--output-dir") + 1],
+        "head": "abc123",
+        "files": {"src/module.py": "aaa", "tests/test_one.py": "bbb"},
+        "srd_lite_candidate": {
+            "path": sys.argv[sys.argv.index("--output-dir") + 1] + "/inputs/candidate",
+            "sha256": "ccc",
+        },
+    })
     monkeypatch.setattr(gate, "_run_guarded", lambda name, output, **kwargs: (True, 1.0))
     monkeypatch.setitem(sys.modules, "journey_pool", journey_pool)
 
@@ -219,6 +227,7 @@ def test_a_share_receipt_says_what_it_is_and_an_ordinary_receipt_is_unchanged(sh
     assert ordinary["complete_gate"] is True and ordinary["gate_kind"] == "complete deterministic"
     assert not (whole / "machine-share.json").exists()
     included = 0
+    fingerprints = set()
     for index, folder in enumerate(folders, start=1):
         receipt = json.loads((folder / "summary.json").read_text())
         share = receipt["machine_share"]
@@ -231,9 +240,12 @@ def test_a_share_receipt_says_what_it_is_and_an_ordinary_receipt_is_unchanged(sh
         }
         assert receipt["python_case_counts"]["passed"] == share["assigned_cases"]
         included += share["ui_controls_included"]
-        for field in ("revision", "source_sha256", "platform", "unchanged_source"):
+        for field in ("revision", "platform", "unchanged_source"):
             assert receipt[field] == ordinary[field]
+        assert receipt["source_sha256"] != ordinary["source_sha256"], "it covers the output path"
+        fingerprints.add(share["source_files_sha256"])
     assert included == 1
+    assert len(fingerprints) == 1 and len(next(iter(fingerprints))) == 64
 
 
 def test_merged_shares_equal_one_ordinary_run(share_folders, tmp_path, capsys):
@@ -248,8 +260,11 @@ def test_merged_shares_equal_one_ordinary_run(share_folders, tmp_path, capsys):
     assert merged["python_case_counts"]["passed"] == 6 == merged["total_required_cases"]
     assert merged["excluded_cases"] == ordinary["excluded_cases"]
     assert [share["index"] for share in merged["machine_shares"]] == [1, 2, 3]
-    for field in ("revision", "source_sha256", "platform"):
+    for field in ("revision", "platform"):
         assert merged[field] == ordinary[field]
+    shares = [json.loads((folder / "summary.json").read_text()) for folder in folders]
+    assert len({share["source_sha256"] for share in shares}) == 3, "each run's own hash differs"
+    assert merged["source_files_sha256"] == shares[0]["machine_share"]["source_files_sha256"]
     assert "PASS" in capsys.readouterr().out
 
 
@@ -283,6 +298,18 @@ def _other_revision(folders):
 
 def _other_platform(folders):
     _edit(folders[2], "summary.json", lambda data: data.update(platform="elsewhere"))
+
+
+def _other_source_files(folders):
+    def change(data):
+        data["machine_share"]["source_files_sha256"] = "0" * 64
+    _edit(folders[2], "summary.json", change)
+
+
+def _no_source_fingerprint(folders):
+    def change(data):
+        del data["machine_share"]["source_files_sha256"]
+    _edit(folders[1], "summary.json", change)
 
 
 def _changed_source(folders):
@@ -356,6 +383,8 @@ def _missing_plan_file(folders):
         (_repeat_first, "repeated \\[1\\]"),
         (_other_revision, "differ in revision"),
         (_other_platform, "differ in platform"),
+        (_other_source_files, "differ in source files"),
+        (_no_source_fingerprint, "does not record its source files"),
         (_changed_source, "source changed"),
         (_still_running, "not a completed run"),
         (_ordinary_run, "not a machine share"),

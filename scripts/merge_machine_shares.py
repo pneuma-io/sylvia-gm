@@ -17,9 +17,7 @@ import sys
 from pathlib import Path
 
 # Fields that must be identical in every share of one run.
-SAME_IN_EVERY_SHARE = (
-    "revision", "source_sha256", "platform", "qualification_kind", "qualification_mode",
-)
+SAME_IN_EVERY_SHARE = ("revision", "platform", "qualification_kind", "qualification_mode")
 
 
 class ShareSetError(ValueError):
@@ -56,6 +54,8 @@ def _load(folder):
         raise ShareSetError(f"{folder}: the assigned case count does not match summary.json")
     if summary.get("unchanged_source") is not True:
         raise ShareSetError(f"{folder}: the source changed during that share's run")
+    if not isinstance(share.get("source_files_sha256"), str):
+        raise ShareSetError(f"{folder}: the share does not record its source files")
     return {"folder": folder, "summary": summary, "share": share, "plan": plan}
 
 
@@ -78,6 +78,13 @@ def merge(folders):
                     f"{item['folder']} and {first['folder']} differ in {field}: "
                     f"{item['summary'].get(field)!r} and {first['summary'].get(field)!r}"
                 )
+        # The per-run source_sha256 covers a path in each machine's own output folder, so the
+        # shares are matched on the fingerprint of the source files alone.
+        if item["share"].get("source_files_sha256") != first["share"].get("source_files_sha256"):
+            raise ShareSetError(
+                f"{item['folder']} and {first['folder']} differ in source files: "
+                "they were not run from the same source"
+            )
         if item["share"]["required_cases_sha256"] != first["share"]["required_cases_sha256"]:
             raise ShareSetError(
                 f"{item['folder']} and {first['folder']} were split from different case lists"
@@ -146,6 +153,7 @@ def merge(folders):
         "excluded_case_counts": summary.get("excluded_case_counts"),
         "total_required_cases": first["share"]["total_required_cases"],
         "required_cases_sha256": first["share"]["required_cases_sha256"],
+        "source_files_sha256": first["share"]["source_files_sha256"],
         "installed_acceptance_run": False,
         **{field: summary.get(field) for field in SAME_IN_EVERY_SHARE},
         "unchanged_source": True,
