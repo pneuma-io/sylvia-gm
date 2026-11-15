@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Prepare a Linux machine for Sylvia GM's complete local check run, and optionally run it.
 #
-#   scripts/setup_linux_dev.sh [--check | --dry-run | --full-run | --help]
+#   scripts/setup_linux_dev.sh [--check | --dry-run | --full-run [--machine-share I/N] | --help]
 #
 # Supported: Linux on x86_64 with apt (tested on Ubuntu 24.04). Tools are installed for the
 # current user. sudo is used only for apt packages and never prompts for a password. The
@@ -60,6 +60,7 @@ chromium.launch({ headless: true, args: ["--disable-gpu"] })
   });'
 
 MODE="setup"
+MACHINE_SHARE=""
 ORIGINAL_PATH="${PATH:-}"
 STEP_NUMBER=0
 MISSING=()
@@ -94,7 +95,7 @@ CASE_WORKERS=1
 
 usage() {
   cat <<'USAGE'
-Usage: scripts/setup_linux_dev.sh [--check | --dry-run | --full-run | --help]
+Usage: scripts/setup_linux_dev.sh [--check | --dry-run | --full-run [--machine-share I/N] | --help]
 
 Prepare this Linux machine for Sylvia GM's complete local check run.
 
@@ -104,6 +105,10 @@ Prepare this Linux machine for Sylvia GM's complete local check run.
   --dry-run    Print the steps the default mode would take on this machine, without doing them.
   --full-run   Set up, then run the complete check run and report its time and result.
                Exits with the check runner's exit code.
+  --machine-share I/N
+               With --full-run: run only share I of N of the complete run on this machine.
+               Start the other shares on copies of this machine, then join the N output
+               folders with scripts/merge_machine_shares.py.
   --help       Show this help.
 
 Supported: Linux on x86_64 with apt, tested on Ubuntu 24.04. Run as a normal user, not root.
@@ -841,9 +846,15 @@ run_full() {
   choose_workers
   local output_dir
   output_dir="$CHECKS_DIR/full-$(date +%Y%m%d-%H%M%S)"
+  if [ -n "$MACHINE_SHARE" ]; then
+    output_dir+="-share-${MACHINE_SHARE%/*}-of-${MACHINE_SHARE#*/}"
+  fi
   mkdir -- "$output_dir" || die "Could not create a new empty output folder $output_dir."
   local command=("$VENV_PYTHON" scripts/check_supported_journeys.py --jobs "$JOBS"
     --case-workers "$CASE_WORKERS" --output-dir "$output_dir")
+  if [ -n "$MACHINE_SHARE" ]; then
+    command+=(--machine-share "$MACHINE_SHARE")
+  fi
   info "Output: $output_dir"
   info "Running: $(quote_command "${command[@]}")"
   local started=$SECONDS status=0
@@ -852,11 +863,17 @@ run_full() {
       PYTHONDONTWRITEBYTECODE=1 SYLVIA_RETAIN_SUCCESSFUL_FIXTURES=0 \
       "${command[@]}") || status=$?
   local elapsed=$((SECONDS - started))
-  local result="PASS"
+  local result="PASS" what="Complete check run"
   [ "$status" -eq 0 ] || result="FAIL"
-  printf '\nComplete check run: %s (runner exit code %d) after %dh %02dm %02ds.\n' \
-    "$result" "$status" $((elapsed / 3600)) $((elapsed % 3600 / 60)) $((elapsed % 60))
+  if [ -n "$MACHINE_SHARE" ]; then
+    what="Share ${MACHINE_SHARE%/*} of ${MACHINE_SHARE#*/} of the complete check run"
+  fi
+  printf '\n%s: %s (runner exit code %d) after %dh %02dm %02ds.\n' \
+    "$what" "$result" "$status" $((elapsed / 3600)) $((elapsed % 3600 / 60)) $((elapsed % 60))
   printf 'Result: %s\n' "$output_dir/summary.json"
+  if [ -n "$MACHINE_SHARE" ]; then
+    printf 'Join all %s output folders with scripts/merge_machine_shares.py.\n' "${MACHINE_SHARE#*/}"
+  fi
   exit "$status"
 }
 
@@ -995,6 +1012,22 @@ run_dry_run() {
   fi
 }
 
+# I/N in plain digits with 1 <= I <= N <= 64, the form the check runner accepts.
+valid_machine_share() {
+  local index count
+  case "$1" in
+    '' | */*/* | /* | */ | *[!0-9/]*) return 1 ;;
+    */*) ;;
+    *) return 1 ;;
+  esac
+  index=${1%/*}
+  count=${1#*/}
+  [ "${#index}" -le 2 ] && [ "${#count}" -le 2 ] || return 1
+  index=$((10#$index))
+  count=$((10#$count))
+  [ "$count" -ge 1 ] && [ "$count" -le 64 ] && [ "$index" -ge 1 ] && [ "$index" -le "$count" ]
+}
+
 parse_args() {
   local chosen=""
   while [ "$#" -gt 0 ]; do
@@ -1011,6 +1044,15 @@ parse_args() {
         fi
         chosen=$1
         ;;
+      --machine-share)
+        if [ "$#" -lt 2 ] || ! valid_machine_share "$2"; then
+          printf -- '--machine-share needs I/N with 1 <= I <= N <= 64, for example 2/6.\n\n' >&2
+          usage >&2
+          exit 2
+        fi
+        MACHINE_SHARE=$2
+        shift
+        ;;
       *)
         printf 'Unknown option: %s\n\n' "$1" >&2
         usage >&2
@@ -1019,6 +1061,11 @@ parse_args() {
     esac
     shift
   done
+  if [ -n "$MACHINE_SHARE" ] && [ "$chosen" != "--full-run" ]; then
+    printf -- '--machine-share is only used with --full-run.\n\n' >&2
+    usage >&2
+    exit 2
+  fi
   case "$chosen" in
     --check) MODE="check" ;;
     --dry-run) MODE="dry-run" ;;

@@ -140,6 +140,36 @@ def test_unknown_or_conflicting_options_exit_non_zero(args):
 
 
 @linux_only
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["--machine-share", "2/6"],
+        ["--check", "--machine-share", "2/6"],
+        ["--full-run", "--machine-share"],
+        ["--full-run", "--machine-share", "0/6"],
+        ["--full-run", "--machine-share", "7/6"],
+        ["--full-run", "--machine-share", "1/65"],
+        ["--full-run", "--machine-share", "six"],
+        ["--full-run", "--machine-share", "1/2/3"],
+    ],
+    ids=["without-full-run", "with-check", "no-value", "zero", "beyond-count", "too-many",
+         "not-a-fraction", "three-parts"],
+)
+def test_a_machine_share_needs_full_run_and_a_valid_fraction(args):
+    result = subprocess.run([_bash(), str(SCRIPT), *args], capture_output=True, text=True)
+    assert result.returncode == 2, result.stdout + result.stderr
+    assert "--machine-share" in result.stderr and "Usage:" in result.stderr
+    assert "==>" not in result.stdout, "no setup step may start"
+
+
+def test_the_script_passes_a_machine_share_to_the_runner_and_names_the_output_after_it():
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert 'command+=(--machine-share "$MACHINE_SHARE")' in source
+    assert 'output_dir+="-share-${MACHINE_SHARE%/*}-of-${MACHINE_SHARE#*/}"' in source
+    assert "--machine-share I/N" in source
+
+
+@linux_only
 def test_dry_run_lists_every_step_in_order_and_changes_nothing(fresh_machine):
     home, environment = fresh_machine
     status_before = _git("status", "--porcelain")

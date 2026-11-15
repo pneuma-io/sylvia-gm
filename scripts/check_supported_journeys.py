@@ -23,14 +23,22 @@ from pathlib import Path
 if __package__:
     from .check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
     from .journey_fixture_inputs import candidate_identity, prepare_candidate
-    from .journey_pool import retain_successful_fixtures, retention_arguments
+    from .journey_pool import (
+        parse_machine_share,
+        retain_successful_fixtures,
+        retention_arguments,
+    )
     from .known_test_defects import accepted_case, case_key, report_outcomes
     from .platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
     from scripts.journey_fixture_inputs import candidate_identity, prepare_candidate
-    from scripts.journey_pool import retain_successful_fixtures, retention_arguments
+    from scripts.journey_pool import (
+        parse_machine_share,
+        retain_successful_fixtures,
+        retention_arguments,
+    )
     from scripts.known_test_defects import accepted_case, case_key, report_outcomes
     from scripts.platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 
@@ -118,6 +126,7 @@ PYTHON_JOURNEYS = {
         "tests/test_package_inspector_runtime.py",
         "tests/test_character_card_import_lifecycle.py",
         "tests/test_journey_pool.py",
+        "tests/test_machine_shares.py",
         "tests/test_rich_character_profiles.py",
         "tests/test_rich_profile_tools.py",
         "tests/test_character_profiles.py",
@@ -1029,6 +1038,40 @@ def _run_guarded(
         return False, elapsed
 
 
+def _source_files_digest(identity) -> str:
+    """One fingerprint of the checked source that is the same on every machine at a commit."""
+    candidate = identity.get("srd_lite_candidate") or {}
+    stable = {"files": identity.get("files", {}), "srd_lite_candidate": candidate.get("sha256")}
+    return hashlib.sha256(json.dumps(stable, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _print_machine_share_plan(machine_share, selected) -> int:
+    """Collect the suite and print how it splits across machines; nothing is run."""
+    from journey_pool import run_balanced_gate
+
+    plan: dict = {}
+    with tempfile.TemporaryDirectory(prefix="sylvia-share-plan-") as scratch:
+        prepare_candidate(os.environ, ROOT, Path(scratch))
+        run_balanced_gate(
+            ROOT, Path(scratch), PYTHON_JOURNEYS, selected, machine_share[1], time.monotonic(),
+            None, machine_share=machine_share, share_report=plan, plan_only=True,
+        )
+    print(
+        f"Machine shares: {plan['count']} shares of {plan['total_required_cases']} required "
+        "Python cases plus the browser tests. Times are scheduling estimates of test time, "
+        "not wall-clock time."
+    )
+    for share in plan["shares"]:
+        print(
+            f"  share {share['index']}/{plan['count']}: {share['cases']} cases, "
+            f"about {share['estimated_seconds'] / 60:.0f} min of test time, "
+            f"longest single case about {share['longest_case_seconds'] / 60:.1f} min"
+            + ("; includes the browser tests" if share["ui_controls"] else "")
+        )
+    print(f"Required cases SHA-256: {plan['required_cases_sha256']}")
+    return 0
+
+
 def main() -> int:
     """The default is the complete change gate; selections are explicitly partial checks."""
     global PYTHON_JOURNEYS, UI_JOURNEY
@@ -1084,6 +1127,14 @@ def main() -> int:
         type=Path,
         help="Empty destination for synthetic diagnostics, timings and XML reports",
     )
+    parser.add_argument(
+        "--machine-share",
+        metavar="I/N",
+        help=(
+            "Run share I of N of the complete suite on this machine; merge the N results "
+            "with scripts/merge_machine_shares.py. With --list, print the plan and exit"
+        ),
+    )
     args = parser.parse_args()
     if args.ci and args.journey:
         parser.error("--ci requires the complete suite")
@@ -1093,7 +1144,20 @@ def main() -> int:
         retain_successful_fixtures(dict(os.environ))
     except ValueError as error:
         parser.error(str(error))
+    machine_share = None
+    if args.machine_share:
+        if args.journey or args.selection_manifest or args.ci:
+            parser.error(
+                "--machine-share splits the complete run; it cannot be combined with "
+                "--journey, --selection-manifest or --ci"
+            )
+        try:
+            machine_share = parse_machine_share(args.machine_share)
+        except ValueError as error:
+            parser.error(str(error))
     selected = list(dict.fromkeys(args.journey or names))
+    if args.list and machine_share:
+        return _print_machine_share_plan(machine_share, selected)
     if args.list:
         for name in selected:
             print(
@@ -1155,6 +1219,7 @@ def main() -> int:
 
     # Each group runs in its own process and pytest temporary directory; only immutable
     # repository inputs are shared. Keep concurrency bounded on the Windows CI runner.
+    share_report = {} if machine_share else None
     if args.journey is None:
         from journey_pool import run_balanced_gate
 
@@ -1169,6 +1234,9 @@ def main() -> int:
             deadline=deadline,
             scheduler=args.scheduler,
             include_historical=include_historical,
+            # Passed only for a share, so an ordinary run calls the pool exactly as before.
+            **({"machine_share": machine_share, "share_report": share_report}
+               if machine_share else {}),
         )
     else:
         with ThreadPoolExecutor(max_workers=args.jobs) as executor:
@@ -1193,7 +1261,9 @@ def main() -> int:
             results = {name: future.result() for name, future in pending.items()}
     elapsed = time.monotonic() - started
     failed = [name for name, (passed, _) in results.items() if not passed]
-    missing_groups = sorted(set(selected) - set(results))
+    # Groups with no case in this machine's share are not part of its run.
+    absent_groups = set(share_report["absent_groups"]) if share_report else set()
+    missing_groups = sorted(set(selected) - absent_groups - set(results))
     unexpected_groups = sorted(set(results) - set(selected))
     failed.extend(f"missing group: {name}" for name in missing_groups)
     failed.extend(f"unexpected group: {name}" for name in unexpected_groups)
@@ -1226,10 +1296,26 @@ def main() -> int:
         "platform": sys.platform,
         "status": "completed",
         "passed": not failed and within_time_budget,
-        "complete_gate": args.journey is None
+        "complete_gate": args.journey is None and machine_share is None
         and (selection is None or selection["mode"] == "full"),
+        # One machine's share of the complete run; scripts/merge_machine_shares.py joins them.
+        "machine_share": {
+            "index": share_report["index"],
+            "count": share_report["count"],
+            "required_cases_sha256": share_report["required_cases_sha256"],
+            "assigned_cases": share_report["assigned_cases"],
+            "total_required_cases": share_report["total_required_cases"],
+            "ui_controls_included": share_report["ui_controls_included"],
+            "groups_not_in_this_share": sorted(absent_groups),
+            # source_sha256 below also covers a path inside this run's output folder, so it
+            # differs on every machine. Shares are matched on the source files alone.
+            "source_files_sha256": _source_files_digest(initial_identity),
+        } if share_report else None,
         "gate_kind": (
-            "historical checkpoint" if include_historical
+            f"machine share {machine_share[0]} of {machine_share[1]} "
+            "of the complete deterministic gate"
+            if machine_share
+            else "historical checkpoint" if include_historical
             else "affected PR" if selection and selection["mode"] == "affected"
             else "selected product checks" if args.journey
             else "complete deterministic"
@@ -1277,6 +1363,8 @@ def main() -> int:
         if args.journey
         else "CI qualification"
         if args.ci
+        else f"Machine share {machine_share[0]} of {machine_share[1]} of the complete run"
+        if machine_share
         else "Development qualification"
     )
     failure_labels = failed + ([] if within_time_budget else ["time budget"])

@@ -131,11 +131,18 @@ default, leave about 20 GB free for a full run's output folder: the measured pea
 ## Run the checks on Linux
 
 Linux runs the same checks with the same runner command, using `.venv/bin/python` in place of
-`.venv/Scripts/python.exe`. The first complete run took 2 h 40 min on 16 cores with 15 GB of
+`.venv/Scripts/python.exe`. A complete run took 2 h 50 min on 16 cores with 15.9 GB of
 memory at `--jobs 4 --case-workers 3`. Keep the checkout and the output folder on ext4, xfs or
 btrfs; the saved-file checks need one of those file systems. Cases that run only on Windows are
 excluded by platform and listed in `summary.json`. Windows remains the platform for release
-builds and for installer and updater qualification.
+builds and for installer and updater qualification. [Linux development](linux-development.md)
+covers setting up a machine.
+
+A complete run can also be split across several machines with `--machine-share I/N` and joined
+with `scripts/merge_machine_shares.py`; see
+[Split a complete run across machines](linux-development.md#split-a-complete-run-across-machines).
+A merged receipt from a valid set of shares is the same evidence as a single complete run on
+that platform. One share on its own is not: its receipt has `complete_gate` false.
 
 ## Read and retain the result
 
