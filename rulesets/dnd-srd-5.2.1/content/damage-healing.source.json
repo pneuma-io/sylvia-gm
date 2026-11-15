@@ -1,0 +1,102 @@
+{
+  "authority_id": "wotc.srd.5.2.1.pdf",
+  "source_unit_id": "srd.5.2.1.damage-and-healing-core",
+  "section_path": [
+    "Playing the Game",
+    "Damage and Healing"
+  ],
+  "derivation": "Normalized transcription of cited official PDF passages; line-wrap hyphenation and table layout are removed.",
+  "claim_status": "PARTIAL_MECHANICAL_MAPPING",
+  "fragments": [
+    {
+      "id": "hit-points-and-damage-rolls",
+      "page": 16,
+      "derived_text": "Hit Points represent durability and the will to live. Creatures with more Hit Points are more difficult to kill. Your Hit Point maximum is the number of Hit Points you have when uninjured. Your current Hit Points can be any number from that maximum down to 0, which is the lowest Hit Points can go. Whenever you take damage, subtract it from your Hit Points. Hit Point loss has no effect on your capabilities until you reach 0 Hit Points. If you have half your Hit Points or fewer, you're Bloodied, which has no game effect on its own but which might trigger other game effects. Damage Rolls Each weapon, spell, and damaging monster ability specifies the damage it deals. You roll the damage dice, add any modifiers, and deal the damage to your target. If there's a penalty to the damage, it's possible to deal 0 damage but not negative damage.",
+      "derived_text_sha256": "beedf36eb44d4e828270c2cd0533d3d47c376929d8171b969e7c1e3fcad3704f"
+    },
+    {
+      "id": "critical-and-saving-throw-damage",
+      "page": 16,
+      "derived_text": "When you score a Critical Hit, you deal extra damage. Roll the attack's damage dice twice, add them together, and add any relevant modifiers as normal. For example, if you score a Critical Hit with a Dagger, roll 2d4 for the damage rather than 1d4, and add your relevant ability modifier. If the attack involves other damage dice, such as from the Rogue's Sneak Attack feature, you also roll those dice twice. Saving Throws and Damage Damage dealt via saving throws uses these rules. Damage against Multiple Targets When you create a damaging effect that forces two or more targets to make saving throws against it at the same time, roll the damage once for all the targets. For example, when a wizard casts Fireball, the spell's damage is rolled once for all creatures caught in the blast. Half Damage Many saving throw effects deal half damage (round down) to a target when the target succeeds on the saving throw. The halved damage is equal to half the damage that would be dealt on a failed save.",
+      "derived_text_sha256": "680c01fcac805089c6c280f02c5a1c1a0b8bf983c95fa0940d62825b18e1ff49"
+    },
+    {
+      "id": "damage-types",
+      "page": 180,
+      "section_path": [
+        "Rules Glossary",
+        "Damage Types"
+      ],
+      "derived_text": "Damage types have no rules of their own, but other rules such as Resistance rely on them. The official damage types are Acid, Bludgeoning, Cold, Fire, Force, Lightning, Necrotic, Piercing, Poison, Psychic, Radiant, Slashing, and Thunder.",
+      "derived_text_sha256": "82aa951e76f5e39dd61322dea4667226a51df12e5abf7c0d10e741fbfa156c62"
+    },
+    {
+      "id": "defenses-order-and-healing",
+      "page": 17,
+      "derived_text": "Resistance to a damage type halves damage of that type, rounded down. Vulnerability doubles damage of that type. Multiple instances of the same Resistance or Vulnerability count only once. Apply adjustments such as bonuses, penalties, or multipliers first, Resistance second, and Vulnerability third. Immunity to a damage type means no damage of that type is taken. Healing adds restored Hit Points to current Hit Points but cannot exceed the Hit Point maximum.",
+      "derived_text_sha256": "ca6148084362d9f5b93a31dc5ad7579666a16ba344de25a458fb4ad688090a6d"
+    },
+    {
+      "id": "dropping-to-zero",
+      "page": 17,
+      "derived_text": "At 0 Hit Points a creature dies outright or falls Unconscious. A monster normally dies instantly at 0 Hit Points, though the GM can treat an individual monster like a character. A character dies from massive damage when damage reduces it to 0 and the remaining damage equals or exceeds its Hit Point maximum. Otherwise the character has the Unconscious condition until regaining Hit Points and faces Death Saving Throws.",
+      "derived_text_sha256": "b7ca6effc7511d721d621a684019859cd977982654cbbb173decc9aa434d5dbd"
+    },
+    {
+      "id": "death-saving-throws",
+      "pages": [
+        17,
+        18
+      ],
+      "derived_text": "Whenever you start your turn with 0 Hit Points, you must make a Death Saving Throw to determine whether you creep closer to death or hang on to life. Unlike other saving throws, this one isn’t tied to an ability score. Roll 1d20. If the roll is 10 or higher, you succeed. Otherwise, you fail. A success or failure has no effect by itself. On your third success, you become Stable. On your third failure, you die. The successes and failures don’t need to be consecutive; keep track of both until you collect three of a kind. The number of both is reset to zero when you regain any Hit Points or become Stable. When you roll a 1 on the d20 for a Death Saving Throw, you suffer two failures. If you roll a 20 on the d20, you regain 1 Hit Point.",
+      "derived_text_sha256": "8fb67a5bdf57a4c802bf169a81aecb2d21977293fe8816434bb66d110cb128e4"
+    },
+    {
+      "id": "damage-at-zero-hit-points",
+      "page": 18,
+      "section_path": [
+        "Playing the Game",
+        "Damage and Healing",
+        "Death Saving Throws",
+        "Damage at 0 Hit Points"
+      ],
+      "derived_text": "If a character takes any damage while it has 0 Hit Points, it suffers one Death Saving Throw failure, or two failures if the damage is from a Critical Hit. If the damage equals or exceeds its Hit Point maximum, it dies.",
+      "derived_text_sha256": "a992324cd50061894660751dd977ec510fdba403124a909d089b1693703f6fc5"
+    },
+    {
+      "id": "temporary-hit-points-damage-buffer",
+      "page": 18,
+      "derived_text": "When a creature with Temporary Hit Points takes damage, it loses Temporary Hit Points first and any leftover damage carries over to its Hit Points. Temporary Hit Points are not Hit Points or healing, cannot be restored by healing, and do not restore consciousness at 0 Hit Points.",
+      "derived_text_sha256": "7709b9c838a925f1bb5ba73ada73a972e36c43a0db164c781afa47c093a29134"
+    },
+    {
+      "id": "temporary-hit-points-grant-replacement",
+      "page": 18,
+      "section_path": [
+        "Playing the Game",
+        "Damage and Healing",
+        "Temporary Hit Points",
+        "They Don’t Stack"
+      ],
+      "derived_text": "Temporary Hit Points can’t be added together. If a creature has Temporary Hit Points and receives more, it decides whether to keep the ones it has or gain the new ones; the values are not added together. Receiving Temporary Hit Points does not count as healing, and at 0 Hit Points it does not restore consciousness.",
+      "derived_text_sha256": "f7aaefd37d0d4eb09813e8adb5adf298089c4e7c916dba206ac8b9ab63f15b87"
+    },
+    {
+      "id": "stabilizing-and-delayed-recovery",
+      "page": 18,
+      "section_path": [
+        "Playing the Game",
+        "Damage and Healing",
+        "Stabilizing a Character"
+      ],
+      "derived_text": "You can take the Help action to try to stabilize a creature with 0 Hit Points, which requires a successful DC 10 Wisdom (Medicine) check. A Stable creature doesn't make Death Saving Throws even though it has 0 Hit Points, but it still has the Unconscious condition. If the creature takes damage, it stops being Stable and starts making Death Saving Throws again. A Stable creature that isn't healed regains 1 Hit Point after 1d4 hours.",
+      "derived_text_sha256": "4536d10e1f9cd2735f8d5169eef95417aec199075a2e3ec8a3e182a3f02a6dec"
+    }
+  ],
+  "not_yet_mapped": [
+    "automatic spell and monster ability damage-dice and modifier derivation",
+    "mixed or additional attack damage-dice composition",
+    "revival from death",
+    "saving-throw multi-target roll sharing and half-damage orchestration"
+  ]
+}

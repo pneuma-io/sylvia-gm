@@ -1,0 +1,11 @@
+{
+  "authority_id": "wotc.srd.5.2.1.pdf",
+  "source_unit_id": "srd.5.2.1.page-180.d20-test",
+  "page": 180,
+  "section_path": [
+    "Rules Glossary",
+    "D20 Test"
+  ],
+  "derived_text": "D20 Tests encompass the three main d20 rolls of the game: ability checks, attack rolls, and saving throws. If something in the game affects D20 Tests, it affects all three of these rolls. The GM determines whether a D20 Test is warranted in a given circumstance. See also “Playing the Game” (“D20 Tests”).",
+  "derived_text_sha256": "08abc48b3725cdc8bbf87abb09dc484e2d04c69b6c3413d285e1cb0d7ac243dc"
+}
