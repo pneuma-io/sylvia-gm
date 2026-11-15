@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "2b7d9d29b599d25ae92fe321bedb63dc4273c5ac941b70b81cae71fdb8d1a9a9",
+  "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -159,7 +159,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "1028f7006135dcbba6fa1c04b0227d1cca25a05d98dd9070d83f1899df130bd8"
+      "sha256": "f54e7d76d2c56141fa920b0081e4ffa2da20d650fed067a187e676eb922ca7ef"
     },
     {
       "bytes": 5865,
