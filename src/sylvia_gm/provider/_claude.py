@@ -6,7 +6,6 @@ import asyncio
 import json
 import logging
 import re
-import shutil
 import threading
 import uuid
 from collections.abc import AsyncIterator, Callable
@@ -29,9 +28,11 @@ from sylvia_gm.provider._claude_native import (
     CURRENT_NATIVE_ROUTE,
     FILLER_TEXT,
     TRANSIENT_SESSION,
+    NativeCollection,
     NativeRoute,
     collect,
     delete_session,
+    remove_step_folder,
     session_files,
     sweep,
     wait_for_flush,
@@ -563,9 +564,9 @@ class ClaudeProvider(Provider):
                                 )
                                 # Reaching the actual MCP call means native permissions admitted it.
                                 # No result is sent to Claude and no game action runs in this child.
-                                await self._await_flush(route, config, session_id, prompt)
+                                flushed = await self._await_flush(route, config, session_id, prompt)
                                 await self._close_owned(connection)
-                                await self._collect(route, config, session_id, prompt)
+                                await self._collect(route, config, session_id, prompt, flushed)
                                 response.tool_calls = [call]
                                 response.finish_reason = "tool_calls"
                                 if native_content is not None:
@@ -713,11 +714,12 @@ class ClaudeProvider(Provider):
                             raise RateLimitError(
                                 "Claude reports that this account has reached its usage limit."
                             )
+                    flushed = True
                     if not response.tool_calls:
-                        await self._await_flush(route, config, session_id, prompt)
+                        flushed = await self._await_flush(route, config, session_id, prompt)
                     await self._close_owned(connection)
                     if not response.tool_calls:
-                        await self._collect(route, config, session_id, prompt)
+                        await self._collect(route, config, session_id, prompt, flushed)
                     response.content = "".join(text_parts) or None
                     self._last_response = response
                     await self.hooks.fire_on_response(
@@ -744,22 +746,34 @@ class ClaudeProvider(Provider):
                 # Success, error, cancel or timeout: the CLI's session file and the step's
                 # files hold full copies of the request and never outlive the step.
                 delete_session(config, session_id, self.home)
-                shutil.rmtree(step, ignore_errors=True)
+                if step.exists():
+                    remove_step_folder(step, self.home)
                 with _ACTIVE_LOCK:
                     active.discard(session_id)
 
     @staticmethod
     async def _await_flush(
         route: NativeRoute | None, config: Path, session_id: str, prompt: dict[str, Any]
-    ) -> None:
-        """Let the CLI finish writing this step's records before its process is closed."""
-        if route is not None:
+    ) -> bool:
+        """Let the CLI finish writing this step's records before its process is closed.
+
+        False when the wait ended before the records were complete.
+        """
+        if route is None:
+            return True
+        return bool(
             await asyncio.to_thread(
                 wait_for_flush, config, session_id, prompt["message"]["content"]
             )
+        )
 
     async def _collect(
-        self, route: NativeRoute | None, config: Path, session_id: str, prompt: dict[str, Any]
+        self,
+        route: NativeRoute | None,
+        config: Path,
+        session_id: str,
+        prompt: dict[str, Any],
+        flushed: bool = True,
     ) -> None:
         """Copy the CLI's context records for the ledger, then delete its session file.
 
@@ -770,6 +784,9 @@ class ClaudeProvider(Provider):
             return
         files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
         result = collect(files[0] if files else None, prompt["message"]["content"])
+        if not flushed and result.status == "collected":
+            # The CLI may still have had records queued: what was read may be incomplete.
+            result = NativeCollection("unknown", reason="flush_incomplete")
         delete_session(config, session_id, self.home)
         if result.status != "collected":
             logger.warning(

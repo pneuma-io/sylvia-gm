@@ -14,6 +14,7 @@ import json
 import logging
 import re
 import shutil
+import threading
 import time
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextvars import ContextVar
@@ -124,22 +125,62 @@ def _newest_change(path: Path) -> float:
     return newest
 
 
+#: Per runtime home, the session files and step folders this process failed to delete. They
+#: hold full copies of requests, so they are retried at the start of every step whatever their
+#: age; the age rule in ``sweep`` is only for leftovers of other processes or a crash.
+_FAILED_DELETIONS: dict[Path, set[Path]] = {}
+_FAILED_LOCK = threading.Lock()
+
+
+def _remember_failed(home: Path, path: Path) -> None:
+    with _FAILED_LOCK:
+        _FAILED_DELETIONS.setdefault(home.resolve(), set()).add(path)
+
+
+def retry_failed_deletions(home: Path) -> int:
+    """Delete again what this process could not delete before; return how many went."""
+    with _FAILED_LOCK:
+        pending = set(_FAILED_DELETIONS.get(home.resolve(), ()))
+    removed = 0
+    for path in pending:
+        if _remove(path):
+            removed += 1
+            with _FAILED_LOCK:
+                _FAILED_DELETIONS.get(home.resolve(), set()).discard(path)
+    return removed
+
+
+def remove_step_folder(step: Path, home: Path) -> bool:
+    """Remove one step's own folder; a failure is remembered and retried next step."""
+    if _remove(step):
+        return True
+    _remember_failed(home, step)
+    logger.warning(
+        "A Claude runtime step folder could not be deleted yet; this process "
+        "retries it at the start of its next step."
+    )
+    return False
+
+
 def delete_session(config: Path, session_id: str, home: Path) -> bool:
     """Delete everything the CLI persisted for one step; False if something could not go.
 
     Never touches a config directory outside Sylvia's runtime home (it could be a person's
-    own Claude Code profile with their saved sessions).
+    own Claude Code profile with their saved sessions). Anything that cannot be deleted now is
+    remembered and retried at the start of this process's next step.
     """
     if not inside(config, home):
         logger.warning("A Claude config directory outside Sylvia's runtime home was not touched.")
         return False
     removed = True
     for path in session_files(config, session_id):
-        removed = _remove(path) and removed
+        if not _remove(path):
+            removed = False
+            _remember_failed(home, path)
     if not removed:
         logger.warning(
-            "A Claude runtime session file could not be deleted yet; it is swept "
-            "before the next step."
+            "A Claude runtime session file could not be deleted yet; this process retries it "
+            "at the start of its next step."
         )
     return removed
 
@@ -158,8 +199,9 @@ def sweep(
             "A Claude config or step directory outside Sylvia's runtime home was not swept."
         )
         return 0
+    # This process's own failed deletions first, whatever their age.
+    count = retry_failed_deletions(home)
     cutoff = (time.time() if now is None else now) - STALE_AFTER_SECONDS
-    count = 0
     projects = config / "projects"
     candidates = [*projects.glob("*/*")] if projects.is_dir() else []
     for path in candidates:

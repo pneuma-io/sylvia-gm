@@ -919,3 +919,42 @@ def test_gm_turn_saves_cli_records_once_and_replays_them(tmp_path, monkeypatch):
     assert "isSynthetic" not in next(w for w in second.writes if w.get("type") == "user")
     assert_nothing_private_left(home)
     shutil.rmtree(home / "profile", ignore_errors=True)
+
+
+def test_a_failed_deletion_is_retried_next_step_without_waiting(runtime, monkeypatch):
+    """Review N4: this process's own leftovers are retried at once, whatever their age."""
+    from sylvia_gm.provider import _claude_native
+
+    provider, home, _hook = runtime
+    real_remove = _claude_native._remove
+    failing = {"left": 2}
+
+    def flaky(path):
+        if failing["left"] and path.suffix == ".jsonl":
+            failing["left"] -= 1
+            return False  # still locked by the closing process for the rest of this step
+        return real_remove(path)
+
+    monkeypatch.setattr(_claude_native, "_remove", flaky)
+    run_step(provider, Chain(), chain_canonicals()[0][1], text_reply("Hello."))
+    left = session_files_left(home)
+    assert len(left) == 1  # one fresh copy of the request survived this step
+    run_step(provider, Chain(), chain_canonicals()[0][1], text_reply("Hello again."))
+    # Retried at the start of the next step, though it is seconds old, not 15 minutes.
+    assert not left[0].exists()
+    assert ScriptedCLI.instances[-1].config_files == []
+    assert_nothing_private_left(home)
+
+
+def test_an_incomplete_flush_reports_the_records_unknown(runtime, monkeypatch):
+    """Review N5: a flush wait that did not complete never reports "collected"."""
+    provider, home, _hook = runtime
+    monkeypatch.setattr(_claude, "wait_for_flush", lambda *args, **kwargs: False)
+    chain = Chain()
+    frame, _route, chunks = run_step(provider, chain, chain_canonicals()[0][1],
+                                     text_reply("Hello."))
+    assert chunks[-1].finish_reason == "stop"  # the step's output is still used
+    assert chain.ledger.state.native[len(frame.state.entries)] == {
+        "status": "unknown", "records": []}
+    assert_nothing_private_left(home)
+
