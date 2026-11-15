@@ -81,6 +81,12 @@ async function fixture(browser, { legacy, saved, existing = false, configured = 
 async function next(page) { await page.locator('#tutorial-next-btn').click(); }
 async function pause(page) { await page.locator('#tutorial-pause-btn').click(); }
 async function start(page, id) { await page.evaluate(id => window.tutorialTest.controller().start(id), id); }
+// The guide repositions in the animation frame that its resize listener schedules, so a resized
+// layout is measured only after that frame has run.
+async function resizeTo(page, viewport) {
+  await page.setViewportSize(viewport);
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
 async function session(page, { role = 'dm', ruleset = '', interview = false } = {}) {
   await page.evaluate(({ role, ruleset, interview }) => {
     const { state, showSessionView, ensureSessionActivity, refreshSessionInputAdmission } = window.tutorialTest;
@@ -138,7 +144,7 @@ test('optional tutorial suite in the shipped shell', { timeout: 120000 }, async 
       assert.match(await page.locator('#tutorial-title').innerText(), /Sign in/);
       assert.equal(await page.locator('#tutorial-next-btn').isDisabled(), true);
       assert.deepEqual(await page.evaluate(() => window.commandCalls), ['status', 'status']);
-      await page.setViewportSize({ width: 420, height: 800 });
+      await resizeTo(page, { width: 420, height: 800 });
       await screenshot(page, 'subscription-guide-narrow');
       const card = await page.locator('.tutorial-card').boundingBox();
       assert.ok(card.x >= 0 && card.x + card.width <= 421);
