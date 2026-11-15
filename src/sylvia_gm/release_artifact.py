@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-from sylvia_gm import __version__
+from sylvia_gm import __release_channel__, __version__
 from sylvia_gm.covered_source_delivery import (
     CoveredSourceError,
     covered_source_required,
@@ -22,7 +22,7 @@ from sylvia_gm.covered_source_delivery import (
 )
 
 PRERELEASE_VERSION = __version__
-WINDOWS_INSTALLER_VERSION = "0.4.0-1"
+RELEASE_CHANNEL = __release_channel__
 RELEASE_FORMAT_ID = "sylvia-gm-windows-release-manifest"
 RELEASE_FORMAT_VERSION = 3
 DEPENDENCY_NOTICES_SOURCE = "dependency-notices.txt"
@@ -47,9 +47,13 @@ UNSIGNED_DISCLOSURE = (
     "before running it."
 )
 
+# Plain X.Y.Z is the current form. X.Y.Z-alpha.N stays valid for earlier releases.
 _VERSION_RE = re.compile(
-    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-alpha\.([1-9][0-9]*)$"
+    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-alpha\.([1-9][0-9]*))?$"
 )
+_CHANNEL_RE = re.compile(r"^[a-z][a-z0-9]*$")
+_RUST_CHANNEL_RE = re.compile(rb'^const RELEASE_CHANNEL: &str = "([^"\r\n]*)";\r?$', re.MULTILINE)
+RUST_CHANNEL_SOURCE = "src-tauri/src/lib.rs"
 _GIT_ID_RE = re.compile(r"^[0-9a-f]{40}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _UTC_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
@@ -83,14 +87,6 @@ _MANIFEST_KEYS = frozenset(
 )
 _ARTIFACT_KEYS = frozenset({"kind", "name", "sha256", "size_bytes"})
 _NOTICE_KEYS = frozenset({"path", "sha256", "size_bytes"})
-_PRODUCT = {
-    "architecture": "x86_64",
-    "channel": "alpha",
-    "name": "Sylvia GM",
-    "platform": "windows",
-    "version": PRERELEASE_VERSION,
-    "windows_installer_version": WINDOWS_INSTALLER_VERSION,
-}
 _SIGNING = {
     "disclosure": UNSIGNED_DISCLOSURE,
     "status": "unsigned",
@@ -125,21 +121,52 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _require_prerelease_version(value: str) -> re.Match[str]:
-    matched = _VERSION_RE.fullmatch(value)
+def _require_release_version(value: str, channel: str = RELEASE_CHANNEL) -> re.Match[str]:
+    """Accept X.Y.Z, or X.Y.Z-alpha.N when the declared channel is alpha."""
+
+    if not isinstance(channel, str) or not _CHANNEL_RE.fullmatch(channel):
+        raise ReleaseArtifactError("Release channel is not a lowercase channel name")
+    matched = _VERSION_RE.fullmatch(value) if isinstance(value, str) else None
     if matched is None:
-        raise ReleaseArtifactError("Release version is not a semantic Alpha prerelease version")
+        raise ReleaseArtifactError("Release version is not X.Y.Z or X.Y.Z-alpha.N")
+    if matched.group(4) is not None and channel != "alpha":
+        raise ReleaseArtifactError("Release version prerelease part does not match the channel")
     return matched
 
 
 def _uv_normalized_version(value: str) -> str:
-    matched = _require_prerelease_version(value)
-    return f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}a{matched.group(4)}"
+    matched = _require_release_version(value)
+    core = f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}"
+    return core if matched.group(4) is None else f"{core}a{matched.group(4)}"
 
 
-def _expected_windows_installer_version(value: str) -> str:
-    matched = _require_prerelease_version(value)
-    return f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}-{matched.group(4)}"
+def windows_installer_version(value: str) -> str:
+    """NSIS needs a numeric prerelease: X.Y.Z-alpha.N becomes X.Y.Z-N; X.Y.Z is unchanged."""
+
+    matched = _require_release_version(value)
+    core = f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}"
+    return core if matched.group(4) is None else f"{core}-{matched.group(4)}"
+
+
+WINDOWS_INSTALLER_VERSION = windows_installer_version(PRERELEASE_VERSION)
+_PRODUCT = {
+    "architecture": "x86_64",
+    "channel": RELEASE_CHANNEL,
+    "name": "Sylvia GM",
+    "platform": "windows",
+    "version": PRERELEASE_VERSION,
+    "windows_installer_version": WINDOWS_INSTALLER_VERSION,
+}
+
+
+def _rust_release_channel(source: bytes) -> str:
+    matches = _RUST_CHANNEL_RE.findall(source)
+    if len(matches) != 1:
+        raise ReleaseArtifactError("Rust release channel declaration is missing or ambiguous")
+    try:
+        return cast(bytes, matches[0]).decode("ascii")
+    except UnicodeDecodeError as error:
+        raise ReleaseArtifactError("Rust release channel is not ASCII") from error
 
 
 def _package_version(document: Mapping[str, object], name: str, source: str) -> str:
@@ -157,10 +184,11 @@ def _package_version(document: Mapping[str, object], name: str, source: str) -> 
 
 
 def validate_version_sources(root: Path) -> str:
-    """Require one coherent prerelease identity across every release input."""
+    """Require one coherent version and declared channel across every release input."""
 
     root = root.resolve()
     try:
+        rust_channel = _rust_release_channel((root / RUST_CHANNEL_SOURCE).read_bytes())
         pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
         cargo = tomllib.loads((root / "src-tauri/Cargo.toml").read_text(encoding="utf-8"))
         tauri = json.loads((root / "src-tauri/tauri.conf.json").read_text(encoding="utf-8"))
@@ -177,10 +205,12 @@ def validate_version_sources(root: Path) -> str:
         raise ReleaseArtifactError("Release version sources cannot be read") from error
     if any(not isinstance(value, str) for value in versions.values()):
         raise ReleaseArtifactError("Release version source is not text")
+    if rust_channel != RELEASE_CHANNEL:
+        raise ReleaseArtifactError("Python and Rust declare different release channels")
     expected = cast(str, versions["python_runtime"])
-    _require_prerelease_version(expected)
-    if _expected_windows_installer_version(expected) != WINDOWS_INSTALLER_VERSION:
-        raise ReleaseArtifactError("Windows installer version does not match the prerelease")
+    _require_release_version(expected)
+    if windows_installer_version(expected) != WINDOWS_INSTALLER_VERSION:
+        raise ReleaseArtifactError("Windows installer version does not match the release")
     if set(cast(dict[str, str], versions).values()) != {expected}:
         raise ReleaseArtifactError("Release version sources do not match exactly")
     uv_version = _package_version(uv_lock, "sylvia-gm", "uv.lock")
@@ -363,9 +393,9 @@ def assemble_release_layout(
 ) -> dict[str, object]:
     """Atomically assemble one canonical unsigned prerelease directory."""
 
-    _require_prerelease_version(version)
+    _require_release_version(version)
     if version != PRERELEASE_VERSION:
-        raise ReleaseArtifactError("Release prerelease version does not match the application")
+        raise ReleaseArtifactError("Release version does not match the application")
     selected = _validated_artifacts(artifacts)
     source = _validated_mapping(
         provenance,

@@ -699,14 +699,14 @@ mod trusted_caller_tests {
     }
 
     #[test]
-    fn application_info_channel_handles_stable_prerelease_and_build_metadata() {
-        for (version, expected) in [
-            ("1.0.0", "stable"),
-            ("1.0.0+build-with-dashes", "stable"),
-            ("1.0.0-alpha.2", "alpha"),
-            ("1.0.0-beta.3+build", "beta"),
-        ] {
-            assert_eq!(super::build_release_channel(version), expected);
+    fn application_info_channel_is_declared_and_agrees_with_any_version_prerelease() {
+        // A plain X.Y.Z build still reports the declared channel.
+        assert_eq!(super::RELEASE_CHANNEL, "alpha");
+        assert_eq!(application_info_projection()["release_channel"], super::RELEASE_CHANNEL);
+        let version = env!("CARGO_PKG_VERSION");
+        let precedence = version.split('+').next().unwrap_or(version);
+        if let Some((_, prerelease)) = precedence.split_once('-') {
+            assert_eq!(prerelease.split('.').next(), Some(super::RELEASE_CHANNEL));
         }
     }
 
@@ -784,18 +784,15 @@ async fn owner_request_async(
         .map_err(|_| "Sylvia GM authority worker could not complete".to_string())?
 }
 
-fn build_release_channel(version: &str) -> &str {
-    let precedence = version.split('+').next().unwrap_or(version);
-    precedence.split_once('-')
-        .and_then(|(_, prerelease)| prerelease.split('.').next())
-        .unwrap_or("stable")
-}
+// The release channel is declared, not read from the version. It must match
+// __release_channel__ in src/sylvia_gm/__init__.py; the release version check compares them.
+const RELEASE_CHANNEL: &str = "alpha";
 
 fn application_info_projection() -> Value {
     json!({
         "product_name": "Sylvia GM",
         "version": env!("CARGO_PKG_VERSION"),
-        "release_channel": build_release_channel(env!("CARGO_PKG_VERSION")),
+        "release_channel": RELEASE_CHANNEL,
         "signing_status": "unsigned",
     })
 }

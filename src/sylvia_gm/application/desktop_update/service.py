@@ -7,7 +7,7 @@ from collections.abc import Callable, Mapping
 from pathlib import Path
 from types import MappingProxyType
 
-from sylvia_gm import __version__
+from sylvia_gm import __release_channel__, __version__
 
 from .controller import UpdateController
 from .launch import Installation
@@ -126,7 +126,7 @@ class DesktopUpdateService:
             "operation_id": None,
             "current_version": __version__,
             "version": None,
-            "channel": Version.parse(__version__).channel,
+            "channel": __release_channel__,
             "target": target,
             "distribution": distribution,
             "notes": "",
