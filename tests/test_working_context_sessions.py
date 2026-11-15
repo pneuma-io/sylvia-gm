@@ -342,6 +342,15 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(
         adapter = ProviderSessionAdapter(owner, provider, owner_id="owner")
         before = owner.snapshot("campaign")
         messages = history()
+        state_at = 0
+        if context_mode == "ledger":
+            # Canonical assembly always starts with the tagged GM contract; the context ledger
+            # refuses an untagged first block rather than demote it to a host record (F8).
+            from sylvia_gm.agent._context_ledger import STABLE_KEY, tagged
+
+            messages.insert(0, tagged({"role": "system", "content": "GM CONTRACT (test)"},
+                                      **{STABLE_KEY: True}))
+            state_at = 1
         if input_kind == "typed":
             messages.insert(-1, {"role": "system", "content": (
                 "SYLVIA_GM_CURRENT_PLAYER_MESSAGE (application-owned control, not player "
@@ -364,7 +373,8 @@ def test_gm_compaction_preserves_current_state_and_enforced_output(
                     history_allowed=True,
                 )
             )
-            messages[0] = {"role": "system", "content": "FRESH STATE: authoritative AP=2"}
+            messages[state_at] = {"role": "system",
+                                  "content": "FRESH STATE: authoritative AP=2"}
             list(
                 adapter._stream_round(
                     messages,

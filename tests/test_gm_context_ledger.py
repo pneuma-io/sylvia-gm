@@ -918,3 +918,18 @@ def test_the_contract_limits_superseding_and_names_turns_without_player_input() 
     assert ("A turn started by a player control or an automatic event has no new player "
             "input: earlier player speech is history, never a new instruction.") in text
 
+
+def test_copied_canonical_messages_fail_loudly_instead_of_demoting_the_contract() -> None:
+    """F8: tags are attributes; a copy must never turn the GM contract into a host record."""
+    from sylvia_gm.agent._context_ledger import LedgerTagError, tagged
+
+    stable = tagged({"role": "system", "content": "GM CONTRACT"}, **{STABLE_KEY: True})
+    guide = tagged({"role": "system", "content": "SYLVIA_GM_RULESET_OPERATING_GUIDE "
+                    "(trusted package-owned instructions): guide"}, **{STABLE_KEY: True})
+    canonical = [stable, guide, _user("u1", "hello")]
+    _ledger("anthropic_messages").plan(canonical, request_context_id=CONTEXT)
+    for copied in ([dict(m) for m in canonical], [stable, dict(guide), canonical[2]]):
+        for transport in ("anthropic_messages", "chat_completions", "claude_code"):
+            with pytest.raises(LedgerTagError):
+                _ledger(transport).plan(copied, request_context_id=CONTEXT)
+

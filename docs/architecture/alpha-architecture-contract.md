@@ -1437,7 +1437,9 @@ the ledger resets. Builder and participant requests do not use it.
   GM contract, the model narration block, `SYLVIA_GM_CONTEXT_CONTRACT`, the ledger contract, the
   Ruleset operating guide and `SYLVIA_GM_RESPONSE_FORMAT`. The ledger hoists them, in that order,
   to the front on every route. Any untagged system message is an in-stream host record, so an
-  unknown or future block cannot change the prefix.
+  unknown or future block cannot change the prefix. Tags are attributes and a copy drops them, so
+  a request whose GM contract (always first) or a labelled fixed block arrives untagged is refused
+  (`LedgerTagError`) instead of being sent as a host record.
 - **Journal.** The ordered non-system messages already sent in the epoch. Conversational messages
   (player turns, assistant turns, tool results) are journaled once by identity: tool call and
   result IDs, saved message identities, otherwise a content hash plus occurrence. The journal's copy

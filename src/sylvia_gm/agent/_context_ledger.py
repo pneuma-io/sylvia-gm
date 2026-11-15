@@ -84,6 +84,32 @@ def tag_of(message: Mapping[str, Any], name: str) -> Any:
         return tags[name]
     return message.get(name)
 
+
+#: Labels of fixed instruction blocks; such a block is never an in-stream host record.
+FIXED_BLOCK_PREFIXES = (
+    "SYLVIA_GM_CONTEXT_CONTRACT ", "SYLVIA_GM_CONTEXT_LEDGER_CONTRACT ",
+    "SYLVIA_GM_RULESET_OPERATING_GUIDE ", "SYLVIA_GM_RESPONSE_FORMAT",
+)
+
+
+class LedgerTagError(ValueError):
+    """Canonical assembly's ledger tags were lost (for example by copying the messages)."""
+
+
+def check_fixed_blocks_tagged(canonical: Sequence[Mapping[str, Any]]) -> None:
+    """Fail loudly instead of sending the GM contract or a fixed block as a host record.
+
+    Tags are attributes, so a ``dict(m)`` copy between canonical assembly and the ledger drops
+    them silently. Canonical assembly always starts with the tagged GM contract.
+    """
+    first = canonical[0] if canonical else None
+    if first is not None and first.get("role") == "system" and not tag_of(first, STABLE_KEY):
+        raise LedgerTagError("The GM contract reached the context ledger without its tags.")
+    for message in canonical:
+        if (message.get("role") == "system" and not tag_of(message, STABLE_KEY)
+                and str(message.get("content", "")).startswith(FIXED_BLOCK_PREFIXES)):
+            raise LedgerTagError("A fixed instruction block reached the context ledger untagged.")
+
 # Private per-exchange provider fields. They belong to the owner's private continuation store
 # and are reattached from ``_native_reference``; the journal never persists them.
 _NATIVE_FIELDS = frozenset(
@@ -900,6 +926,7 @@ class ContextLedger:
                 # No saved journal for this epoch: a full send, whether first or after a
                 # restart whose evidence is unavailable. Recorded, never an error.
                 reset = "journal_started"
+        check_fixed_blocks_tagged(canonical)
         stable = [dict(m) for m in canonical
                   if m.get("role") == "system" and tag_of(m, STABLE_KEY)]
         # The ledger contract follows the leading fixed blocks (GM contract, narration block,
