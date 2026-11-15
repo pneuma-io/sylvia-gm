@@ -43,9 +43,9 @@ Use PowerShell in the checkout after `uv sync --locked --all-extras`. For JavaSc
 checks, install the locked dependencies once with `npm ci --prefix tests --ignore-scripts`.
 Choose a fresh output directory beside the checkout, within the current work item.
 
-A few checks need something the machine provides. Without it the case skips while it runs,
-and because a skip is never a pass the run fails. That is a missing prerequisite, not a
-platform exclusion, so provide it and run again:
+A few checks need something the machine provides. Without it the case skips or fails while
+it runs, and because a skip is never a pass the run fails either way. That is a missing
+prerequisite, not a platform exclusion, so provide it and run again:
 
 - Node.js on `PATH`, for the browser group (`ui-controls`). Without it the runner fails that
   group with "Node.js is required".
@@ -62,6 +62,16 @@ platform exclusion, so provide it and run again:
   and skip only when both fail.
 - A tmpfs `/dev/shm` (as `/proc/self/mountinfo` reports it), for the Linux case
   `tests/test_safe_file_adapter.py::test_linux_refuses_tmpfs_destinations`.
+- The PortAudio shared library on Linux, for
+  `tests/test_local_dictation.py::test_model_metadata_and_missing_model_never_start_audio_or_network`.
+  The `sounddevice` package loads it from the system there; on Windows its wheel includes it.
+- The release codec inputs on Windows, for
+  `tests/test_fc01_release_exclusions.py::test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels`.
+  Set `SYLVIA_FFMPEG_LGPL_DIR` to the LGPL FFmpeg DLLs, which
+  `src-tauri/scripts/provision_ffmpeg_lgpl.py --work-dir <folder>` downloads from the pinned
+  public release into `<folder>/ffmpeg-lgpl`. Set `SYLVIA_TEST_PYAV_LGPL_STAGE` to a new folder
+  staged from them with `src-tauri/scripts/stage_pyav_lgpl.py --ffmpeg <DLL folder> --output
+  <stage folder> --manifest licenses/dictation/PYAV-LGPL-BUILD.json`.
 
 The runner starts its child Python processes with `PYTHONUTF8=1` and `PYTHONIOENCODING=utf-8`,
 so results do not depend on the machine's console encoding. A direct `pytest` run on a machine
@@ -109,6 +119,23 @@ recorded legacy exceptions in `pyproject.toml`; new refactor modules stay strict
 Development runs have no whole-run time cutoff. `--ci` explicitly selects the separate
 future post-launch budget; it is not a development setting or a promised full-suite runtime.
 Coordinate worker counts with other builds. Keep healthy checks running.
+
+The runner removes each passed test's scratch folder when the test ends and keeps a failed
+test's scratch for diagnosis. To keep passed tests' scratch as well, set
+`SYLVIA_RETAIN_SUCCESSFUL_FIXTURES` to `1` (`$env:SYLVIA_RETAIN_SUCCESSFUL_FIXTURES = '1'`, or
+`export SYLVIA_RETAIN_SUCCESSFUL_FIXTURES=1`); that takes 40 GB or more for a full run. Unset
+or `0` is the default, and any other value stops the runner before it starts. Even with the
+default, leave about 20 GB free for a full run's output folder: the measured peak on Linux was
+19.5 GB, about 12 GB of it the benchmark group's session data, one copy per worker.
+
+## Run the checks on Linux
+
+Linux runs the same checks with the same runner command, using `.venv/bin/python` in place of
+`.venv/Scripts/python.exe`. The first complete run took 2 h 40 min on 16 cores with 15 GB of
+memory at `--jobs 4 --case-workers 3`. Keep the checkout and the output folder on ext4, xfs or
+btrfs; the saved-file checks need one of those file systems. Cases that run only on Windows are
+excluded by platform and listed in `summary.json`. Windows remains the platform for release
+builds and for installer and updater qualification.
 
 ## Read and retain the result
 

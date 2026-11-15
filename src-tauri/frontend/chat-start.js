@@ -162,8 +162,10 @@
       });
     });
     node('chat-start-cancel').addEventListener('click', () => finish(null));
-    // Escape and any other native close also cancel without sending anything.
-    dialog.addEventListener('close', () => finish(null));
+    // Escape and any other native close also cancel without sending anything. The browser
+    // delivers a close event after the close, so one from an earlier choice can arrive once
+    // the chooser is open again; that one must not cancel the choice now on screen.
+    dialog.addEventListener('close', () => { if (!dialog.open) finish(null); });
     return { choose };
   }
 

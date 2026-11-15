@@ -328,6 +328,9 @@ def test_outside_root_character_directory_link_is_rejected_without_content_read(
     )
 
 
+# Needs SYLVIA_FFMPEG_LGPL_DIR and SYLVIA_TEST_PYAV_LGPL_STAGE: the release codec DLLs and their
+# staged PyAV bindings, which only the Windows codec tools produce.
+@pytest.mark.runs_on("win32", reason="Windows owner sidecar codec inputs")
 def test_actual_sidecar_arguments_cover_all_synthetic_directory_sentinels(tmp_path):
     spec = importlib.util.spec_from_file_location(
         "fc01_sidecar", FROZEN / "src-tauri/scripts/build_owner_sidecar.py"

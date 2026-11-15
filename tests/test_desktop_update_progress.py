@@ -174,6 +174,7 @@ def main_fixture(tmp_path, monkeypatch, factory, execute):
     return update, result, [json.loads(row) for row in output.getvalue().splitlines()], events
 
 
+@pytest.mark.runs_on("win32", reason="Windows update release target")
 def test_missing_presentation_never_acknowledges_readiness_or_calls_apply(tmp_path, monkeypatch):
     def unavailable(*_):
         raise UpdateError("progress_unavailable", "No status window")
@@ -185,6 +186,7 @@ def test_missing_presentation_never_acknowledges_readiness_or_calls_apply(tmp_pa
     assert events == ["handles-closed"]
 
 
+@pytest.mark.runs_on("win32", reason="Windows update release target")
 def test_post_commit_error_is_durable_and_releases_helper_ownership_before_error_ui(
     tmp_path, monkeypatch,
 ):

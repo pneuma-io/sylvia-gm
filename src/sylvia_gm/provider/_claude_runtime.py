@@ -77,6 +77,11 @@ def native_environment(home: Path) -> dict[str, str]:
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
         }
     )
+    if sys.platform != "win32":
+        # Off Windows the runtime writes logs and state under the XDG folders, which default
+        # to the person's own home. Keep them inside Sylvia's profile as well.
+        environment["XDG_CACHE_HOME"] = str(home / "cache")
+        environment["XDG_STATE_HOME"] = str(home / "state")
     return environment
 
 

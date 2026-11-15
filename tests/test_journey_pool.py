@@ -141,7 +141,14 @@ def test_real_pool_runs_disjoint_collected_cases_once(tmp_path, monkeypatch):
         assert timings[-1]["seconds"] >= timings[0]["seconds"]
 
 
-def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    ("setting", "retained"),
+    [(None, False), ("0", False), ("1", True)],
+    ids=["default", "explicit-remove", "explicit-keep"],
+)
+def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(
+    tmp_path, monkeypatch, setting, retained,
+):
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
@@ -159,7 +166,11 @@ def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_
     destination = tmp_path / "evidence"
     destination.mkdir()
     monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
-    monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "0")
+    # Keeping passed tests' scratch is only ever the caller's explicit choice.
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", setting)
     results = journey_pool.run_balanced_gate(
         root,
         destination,
@@ -170,11 +181,27 @@ def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_
         None,
     )
     assert not results["outcomes"][0]
-    assert not list((destination / "attempts").rglob("success.sqlite3"))
+    kept = list((destination / "attempts").rglob("success.sqlite3"))
+    assert len(kept) == (1 if retained else 0)
     failed = list((destination / "attempts").rglob("failed.sqlite3"))
     assert len(failed) == 1 and failed[0].read_bytes() == b"preserve failed evidence"
+    assignments = json.loads((destination / "pool-assignments.json").read_text())
+    assert assignments["retain_successful_fixtures"] is retained
     cases = list(ET.parse(destination / "outcomes.xml").iter("testcase"))
     assert len(cases) == 2 and sum(case.find("failure") is not None for case in cases) == 1
+
+
+def test_pool_refuses_an_unknown_retention_setting_before_collecting(tmp_path, monkeypatch):
+    monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "yes")
+    monkeypatch.setattr(journey_pool, "subprocess", SimpleNamespace(
+        run=lambda *args, **kwargs: pytest.fail("An unknown setting must stop before collection"),
+    ))
+    destination = tmp_path / "evidence"
+    with pytest.raises(ValueError, match="must be 0 or 1"):
+        journey_pool.run_balanced_gate(
+            tmp_path / "source", destination, {"one": ["tests/test_one.py"]}, ["one"], 1, 0.0, None,
+        )
+    assert not destination.exists()
 
 
 def test_real_collection_and_workers_import_the_selected_source_before_ambient_packages(

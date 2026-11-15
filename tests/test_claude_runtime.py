@@ -388,6 +388,12 @@ def test_environment_selects_sylvias_profile_and_no_tokens_or_harness_overrides(
     assert environment["CLAUDE_CONFIG_DIR"] == str(tmp_path / "profile")
     assert environment["ANTHROPIC_CONFIG_DIR"] == str(tmp_path / "anthropic")
     assert environment["CLAUDE_CODE_TMPDIR"] == str(tmp_path / "temp")
+    # Off Windows the runtime's logs and state would otherwise land in the person's own home.
+    if sys.platform == "win32":
+        assert not {"XDG_CACHE_HOME", "XDG_STATE_HOME"} & environment.keys()
+    else:
+        assert environment["XDG_CACHE_HOME"] == str(tmp_path / "cache")
+        assert environment["XDG_STATE_HOME"] == str(tmp_path / "state")
     # Claude Code's own updater writes to the shared per-user installation.
     assert environment["DISABLE_UPDATES"] == environment["DISABLE_AUTOUPDATER"] == "1"
     assert (

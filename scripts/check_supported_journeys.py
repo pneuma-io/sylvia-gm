@@ -23,12 +23,14 @@ from pathlib import Path
 if __package__:
     from .check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
     from .journey_fixture_inputs import candidate_identity, prepare_candidate
+    from .journey_pool import retain_successful_fixtures, retention_arguments
     from .known_test_defects import accepted_case, case_key, report_outcomes
     from .platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS, qualification_cases
     from scripts.journey_fixture_inputs import candidate_identity, prepare_candidate
+    from scripts.journey_pool import retain_successful_fixtures, retention_arguments
     from scripts.known_test_defects import accepted_case, case_key, report_outcomes
     from scripts.platform_exclusions import EXCLUSIONS_FILE_VARIABLE, read_platform_exclusions
 
@@ -762,6 +764,7 @@ def _remaining_timeout(deadline):
 def _parallel_pytest_cases(name, destination, testdata, environment, nodeids, count, deadline=None):
     """Run every collected case once, with separate mutable data and an optional CI deadline."""
     assignments = [nodeids[index::count] for index in range(count)]
+    retention = retention_arguments(retain_successful_fixtures(environment))
 
     def run_shard(index, selected):
         prefix = destination / f"{name}-shard-{index}"
@@ -776,6 +779,7 @@ def _parallel_pytest_cases(name, destination, testdata, environment, nodeids, co
             f"cache_dir={destination / 'pytest-cache' / str(index)}",
             f"--junitxml={xml}",
             f"--basetemp={data}",
+            *retention,
             *selected,
         ]
         argument_file = prefix.with_suffix(".arguments.json")
@@ -870,8 +874,6 @@ def _run(
             f"--basetemp={testdata}",
             *PYTHON_JOURNEYS[name],
         ]
-        if os.environ.get("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES") == "0":
-            command.extend(["-o", "tmp_path_retention_policy=failed"])
         if not include_historical:
             command.extend(f"--deselect={nodeid}" for nodeid in PRODUCT_CASE_EXCLUSIONS)
     started = time.monotonic()
@@ -886,6 +888,10 @@ def _run(
     child_environment.update(PYTHONUTF8="1", PYTHONIOENCODING="utf-8")
     child_environment["SYLVIA_QA_FIXTURE_ROOT"] = str(destination.resolve())
     child_environment["SYLVIA_RUNTIME_CACHE_DIR"] = str(destination.resolve() / "runtime-cache")
+    # Passed tests' scratch is removed unless the caller asked to keep it; failed tests keep theirs.
+    retain = retain_successful_fixtures(child_environment)
+    if name != "ui-controls":
+        command.extend(retention_arguments(retain))
     # Keep archive spools and browser profiles in this run's owned data volume.
     temporary = destination / "temporary" / name
     temporary.mkdir(parents=True, exist_ok=True)
@@ -1083,6 +1089,10 @@ def main() -> int:
         parser.error("--ci requires the complete suite")
     if args.selection_manifest and args.journey:
         parser.error("A selection manifest cannot be combined with an ad hoc journey")
+    try:
+        retain_successful_fixtures(dict(os.environ))
+    except ValueError as error:
+        parser.error(str(error))
     selected = list(dict.fromkeys(args.journey or names))
     if args.list:
         for name in selected:

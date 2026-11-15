@@ -2006,6 +2006,11 @@ const SylviaGMFrontend = (() => {
       panel.classList.toggle('active', selected);
       panel.hidden = !selected;
     });
+    // A waiting Models notice, such as a save that failed while Settings was closed, must be on
+    // screen. Fonts differ between systems and wrap the section above it differently, so the
+    // tab's top does not always include it; scroll only as far as showing it needs.
+    const modelsNotice = $('models-action-status');
+    if (tab === 'models' && modelsNotice?.textContent) modelsNotice.scrollIntoView?.({ block: 'nearest' });
     if (tab === 'accounts') renderAccountView();
     if (chatgptPageVisible) void updateChatGPTConnection('status');
     if (claudePageVisible) resumeClaudeConnection();
@@ -12679,9 +12684,9 @@ const SylviaGMFrontend = (() => {
     if (!selected) {
       // Explain where the user is sent; the open campaign's chat status is not about Builder.
       $('models-action-status').textContent = 'Configure a provider before starting Builder';
+      // Narrow Settings scrolls as one column; opening Models keeps this reason on screen
+      // without moving focus from Close.
       openSettings('models');
-      // Narrow Settings scrolls as one column; keep the reason on screen without moving focus from Close.
-      $('models-action-status').scrollIntoView?.({ block: 'nearest' });
       return;
     }
     const nonce = Date.now();
