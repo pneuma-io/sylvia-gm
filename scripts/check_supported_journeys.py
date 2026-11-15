@@ -518,6 +518,7 @@ PYTHON_JOURNEYS = {
         'tests/test_desktop_update_progress.py',
         'tests/test_desktop_update_recovery_phase_gap.py',
         'tests/test_docs_index.py',
+        'tests/test_linux_dev_setup.py',
         'tests/test_owned_package_updates.py',
         'tests/test_public_zone_display_anchor.py',
         'tests/test_public_zone_display_geometry.py',

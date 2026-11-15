@@ -126,6 +126,8 @@ the complete documentation set. Their original dates and evidence limits remain 
 |---|---|
 | [`agents/issue-tracker.md`](agents/issue-tracker.md) | Dot Desk work items, source/PR links and the status of local scratch records. |
 | [`operations/local-checks-and-release.md`](operations/local-checks-and-release.md) | Plain-English local check commands, evidence and release acceptance; the Development Process remains policy. |
+| [`operations/linux-development.md`](operations/linux-development.md) | Setting up a Linux machine for development and the complete local check run; not a Linux player-platform commitment. |
+| [`operations/windows-release-checklist.md`](operations/windows-release-checklist.md) | The Windows-only checks, build, installer and installed-app steps before each release, linking the sections that explain them. |
 | [`reference/content-formats.md`](reference/content-formats.md) | Installed content-definition retrieval, examples and validation owners; a supporting implementation reference. |
 | [`launch-compatibility.md`](launch-compatibility.md) | Lite package compatibility, current implementation ownership and bounded candidate evidence; current task and product contract select scope. |
 
