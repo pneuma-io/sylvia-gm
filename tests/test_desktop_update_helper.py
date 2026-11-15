@@ -211,7 +211,7 @@ def test_real_source_entry_rejects_unconfigured_helper_without_owner_or_database
         capture_output=True,
         cwd=tmp_path,
         env=environment,
-        creationflags=subprocess.CREATE_NO_WINDOW,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
         timeout=15,
     )
     assert result.returncode == 2 and result.stderr == b""
