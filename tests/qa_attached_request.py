@@ -6,6 +6,18 @@ def request_attached(
     harness, identity, method, params, *, campaign_id, attempt_id, provider_session_id=None,
 ):
     """Renew narration by campaign, or Builder provider work by its independent session."""
+    target = send_attached(
+        harness, identity, method, params, campaign_id=campaign_id, attempt_id=attempt_id,
+        provider_session_id=provider_session_id,
+    )
+    assert target["ok"] is True, target
+    return target["result"]
+
+
+def send_attached(
+    harness, identity, method, params, *, campaign_id, attempt_id, provider_session_id=None,
+):
+    """Keep the attachment renewed until the request replies; return the raw reply."""
     provider_work = provider_session_id is not None
     lease_owner = provider_session_id if provider_work else campaign_id
     heartbeat_method = "provider_stream_heartbeat" if provider_work else "stream_heartbeat"
@@ -75,5 +87,4 @@ def request_attached(
                     harness._pending_replies[incoming["id"]] = incoming
         if len(identities) > 1:
             assert successful, "No ordinary attachment heartbeat was acknowledged"
-    assert target["ok"] is True, target
-    return target["result"]
+    return target
