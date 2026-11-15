@@ -1069,3 +1069,27 @@ def test_journaled_host_records_leave_out_covered_snapshots_and_dedupe_on_canoni
     assert '"current_entities"' not in entry["m"]["content"]
     assert entry["h"] == _sha(transition["content"])
 
+
+def test_a_changed_tool_set_is_saved_even_when_nothing_is_appended() -> None:
+    """Review N6: after a restart the next request compares with the tools last sent."""
+    from sylvia_gm.agent._context_ledger import toolset_fingerprint
+
+    first_tools, second_tools = _TOOLS[:6], _TOOLS[:5]
+    ledger = _ledger("anthropic_messages")
+    canonical = _canonical(_user("u1", "hello"))
+    records = []
+    for tools in (first_tools, second_tools):
+        frame = ledger.plan(canonical, request_context_id=CONTEXT, tools=tools,
+                            history_records=lambda: records)
+        ledger.commit(frame)
+        if frame.record is not None:
+            records.append(frame.record)
+    assert frame.appended == [] and frame.record is not None  # saved although nothing new
+    assert records[-1]["toolset_sha256"] == toolset_fingerprint(second_tools)
+    state, reset = load_journal(records, epoch=frame.state.epoch, context_owner=OWNER,
+                                seal=host_seal("s1"))
+    assert reset is None and state.last_toolset == toolset_fingerprint(second_tools)
+    # An unchanged tool set with nothing new still writes no record.
+    again = ledger.plan(canonical, request_context_id=CONTEXT, tools=second_tools)
+    assert again.record is None
+

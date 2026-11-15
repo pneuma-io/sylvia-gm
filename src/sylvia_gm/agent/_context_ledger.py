@@ -1241,6 +1241,7 @@ class ContextLedger:
         state.present = frozenset(present)
         appended_bytes = sum(len(_json(entry["m"]).encode("utf-8")) for entry in appended)
         toolset = toolset_fingerprint(tools)
+        toolset_before = state.last_toolset
         floor_before = state.thinking_floor
         thinking_strip = None
         if self.transport == "anthropic_messages":
@@ -1268,8 +1269,12 @@ class ContextLedger:
                                   else "tools_changed")
             state.last_prefix, state.last_toolset = prefix, toolset
         floor_moved = state.thinking_floor != floor_before
+        # A changed tool set is saved even when nothing is appended, so a restart compares the
+        # next request with the tools actually last sent (the thinking floor depends on it).
+        toolset_changed = (self.transport == "anthropic_messages"
+                           and toolset_before is not None and toolset_before != toolset)
         record = None
-        if appended or reset is not None or floor_moved:
+        if appended or reset is not None or floor_moved or toolset_changed:
             record = {
                 "kind": JOURNAL_KIND,
                 "version": JOURNAL_VERSION,
