@@ -1462,11 +1462,17 @@ the ledger resets. Builder and participant requests do not use it.
   an epoch. Later changes are `SYLVIA_GM_CAMPAIGN_STATE_UPDATE` records computed against the
   ledger's reconstruction of what the model holds: whole-value replacements of the shallowest
   changed subtrees (engine-owned values per entity field, current scene per field, otherwise
-  top-level sections), removed paths, and fact upserts by record ID. Relevance-ranked fact lists
-  and the character-knowledge lists derived from them are additive: a fact already sent is not
-  re-sent or reordered, and dropping out of the selection sends nothing. A new keyframe replaces
-  the chain when the updates since the last keyframe outgrow it. Keyframe plus updates must
-  reconstruct the canonical state (modulo the additive rule).
+  top-level sections), removed paths, and fact upserts and removals by record ID. Relevance-ranked
+  fact lists and the character-knowledge lists derived from them are additive: a fact already sent
+  is not re-sent or reordered, and dropping out of the selection sends nothing. Canonical assembly
+  passes the still-active continuity record IDs per fact list as host-only metadata on the state
+  message; a held fact whose record left that set (retired, or moved to the other list) is removed
+  by record ID. A new keyframe replaces the chain when the updates since the last keyframe outgrow
+  it. Keyframe plus updates must reconstruct the canonical state (modulo the additive rule).
+- **Withdrawn records.** When `SYLVIA_PLAYER_CONTROL_RESULTS` or
+  `SYLVIA_GM_RELEVANT_CHARACTER_FILES` was in the previous request's canonical list and is absent
+  now, one sealed record under that label says none is current. The campaign preparation is never
+  withdrawn.
 - **Roles and the host seal.** Data records are user-role everywhere. Control records stay
   system-role where the route keeps system messages in place (`chat_completions`, `responses`) and
   are user-role where the route lifts them (`anthropic_messages`, `claude_code`,
@@ -1480,27 +1486,51 @@ the ledger resets. Builder and participant requests do not use it.
   through the owner path that saves working-context checkpoints, and are acknowledged before the
   request is sent. Native continuation is attached afterwards by `_native_reference`; signed or
   private provider fields never enter the journal. A restarted owner rebuilds the journal from
-  that evidence. The owner protocol exposes only a marker, because the journal repeats GM-private
-  state. Existing saves need no migration.
+  that evidence. On `claude_code` the context records Claude Code writes itself are saved as
+  `gm_native_records` evidence for the request that produced them. The owner protocol exposes only
+  a marker for both kinds, because they repeat GM-private state. Existing saves need no migration.
+  A GM context without a declared owner identity uses the fallback owner
+  `{kind: gm, campaign_id, session_id}`; an owner that cannot append session evidence (bare test
+  stand-ins) keeps the journal in memory only.
 - **Declared resets.** A new working-context checkpoint or a changed context owner (campaign,
   session, package lock, model context, route) starts a new epoch. A journaled player or narration
   identity missing from canonical history (rewind, restore, edit) starts a new generation, as does
   saved journal evidence that fails validation. When compaction planning finds the wire over
   its threshold only because of superseded journal records (canonical history is at or under
   the compaction target), the journal restarts from canonical history instead of summarising
-  (`journal_rebased`, a new generation and a full re-send), at most once per request. A changed stable instruction or tool definition
-  keeps the journal and records the prefix change. Per-round tool gating is unchanged and each
-  request's tool-list fingerprint is recorded.
-- **Routes.** `claude_code` writes the frozen prefix as its system file and the journal as its
-  transcript; when the journal would end in a tool result, the ledger appends and journals a sealed
-  `SYLVIA_GM_CONTINUE` record instead of the runtime's invented continuation. The first-party
+  (`journal_rebased`, a new generation and a full re-send), at most once per request. On
+  `claude_code`, a request that would replay Claude Code context records known to be lost or
+  unknown starts a new generation (`native_records_unknown`). A changed stable instruction or tool
+  definition keeps the journal and records the prefix change. Per-round tool gating is unchanged;
+  each request records an order-sensitive tool-list fingerprint and an order-insensitive tool-set
+  fingerprint.
+- **Tails.** No request ends on a journal tail the route cannot send. On `claude_code`, when the
+  journal would end on anything other than a user-role entry (a tool result or an assistant turn),
+  the ledger appends and journals a sealed `SYLVIA_GM_CONTINUE` record; on `anthropic_messages` it
+  does the same when the journal would end on an assistant turn, which current Claude models
+  reject as a prefill. The runtime's own invented continuation prompt is never used.
+- **Claude thinking (`anthropic_messages`).** A thinking block is bound to the top-level system,
+  the tool set and every earlier message (Anthropic documentation, not verified live). The journal
+  keeps a thinking floor: assistant turns below it are reattached without thinking or
+  redacted-thinking blocks. It only moves forward within a generation, is saved in the journal
+  record that moves it and is restored on load. On models where every account enforces the
+  binding (Fable 5.2, Mythos 5.2) a changed system prefix or tool set moves it to the journal
+  length before the request's new entries. On every model, a 400 naming a thinking signature
+  moves it to the full journal length and the request is retried once.
+- **Routes.** `claude_code` writes the frozen prefix as its system file (LF bytes) and a native
+  projection of the journal as its transcript, run from one fixed, empty working directory: each
+  earlier request's prompt group is one list-content user record followed by the context records
+  Claude Code wrote after it (collected with a fresh `--session-id`, then deleted with its session
+  file on every path), and a `No response requested.` assistant record precedes any prompt group
+  that follows a user record. The stdin prompt is the request's own prompt group. The first-party
   `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
   last system block and the last non-thinking block of the last message; other Messages-compatible
   endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
   request context identifier. Working-context compaction sizes history from the actual wire list.
 - **Legacy switch.** `SYLVIA_GM_CONTEXT_MODE=legacy`, read once per GM adapter, restores the previous
   assembly byte for byte (including no Anthropic breakpoints) for A/B benchmarking and rollback.
-  A GM context without an owner identity (bare test stand-ins) also uses the previous assembly.
+  On `claude_code` legacy mode keeps the previous transcript and flags, with the fixed working
+  directory and LF system bytes.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 
