@@ -334,9 +334,12 @@ test('reopening Settings after a failed save shows the failure, scrolling Models
       const content = document.querySelector('.settings-content');
       const notice = document.getElementById('models-action-status').getBoundingClientRect();
       const pane = content.getBoundingClientRect();
-      return { scrollTop: content.scrollTop, noticeInView: notice.top >= pane.top && notice.bottom <= pane.bottom,
+      // Whole pixels: a scroll offset is a whole number, so a notice scrolled flush to the pane's edge can
+      // overhang it by a fraction of a pixel.
+      const [top, bottom, paneTop, paneBottom] = [notice.top, notice.bottom, pane.top, pane.bottom].map(Math.round);
+      return { scrollTop: content.scrollTop, noticeInView: top >= paneTop && bottom <= paneBottom,
         // Whether the notice would be inside the pane with the tab at its top, and its distance from the pane's edge now.
-        fitsAtTop: notice.bottom + content.scrollTop <= pane.bottom, gapBelow: Math.round(pane.bottom - notice.bottom) };
+        fitsAtTop: Math.round(notice.bottom + content.scrollTop) <= paneBottom, gapBelow: paneBottom - bottom };
     });
     assert.equal(view.noticeInView, true, JSON.stringify(view));
     // Models stays at its top whenever the notice fits there. Fonts that wrap the section above it push the
