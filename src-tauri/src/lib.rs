@@ -24,6 +24,17 @@ use panel_windows::PanelWindows;
 
 const HANDSHAKE_TRANSCRIPT: &[u8] = b"sylvia-gm-f6-local-owner-handshake-v1";
 const MAX_MESSAGE_BYTES: usize = 67_108_864;
+// The bundled authority sits beside the desktop executable under its platform's file name.
+const OWNER_EXECUTABLE: &str = if cfg!(windows) { "sylvia-gm-owner.exe" } else { "sylvia-gm-owner" };
+
+// A development build runs the authority from the checkout's own Python environment.
+fn development_python(environment: &Path) -> PathBuf {
+    if cfg!(windows) {
+        environment.join("Scripts").join("python.exe")
+    } else {
+        environment.join("bin").join("python")
+    }
+}
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -93,20 +104,18 @@ impl OwnerBridge {
         }
 
         if cfg!(debug_assertions) && !portable {
-            let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            let environment = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?
-                .join(".venv")
-                .join("Scripts")
-                .join("python.exe");
-            return Self::spawn_python(&python, database);
+                .join(".venv");
+            return Self::spawn_python(&development_python(&environment), database);
         }
 
         let executable = std::env::current_exe()
             .map_err(|_| "Sylvia GM executable path is unavailable".to_string())?
             .parent()
             .ok_or_else(|| "Sylvia GM executable directory is unavailable".to_string())?
-            .join("sylvia-gm-owner.exe");
+            .join(OWNER_EXECUTABLE);
         let application = std::env::current_exe()
             .map_err(|_| "Sylvia GM executable path is unavailable".to_string())?;
         let context = if !cfg!(all(windows, target_arch = "x86_64"))
@@ -694,6 +703,7 @@ mod trusted_caller_tests {
                 "version": env!("CARGO_PKG_VERSION"),
                 "release_channel": "alpha",
                 "signing_status": "unsigned",
+                "platform": if cfg!(windows) { "windows" } else { std::env::consts::OS },
             })
         );
     }
@@ -794,6 +804,8 @@ fn application_info_projection() -> Value {
         "version": env!("CARGO_PKG_VERSION"),
         "release_channel": RELEASE_CHANNEL,
         "signing_status": "unsigned",
+        // Lets the page word the few sentences that name the operating system.
+        "platform": std::env::consts::OS,
     })
 }
 
@@ -3423,7 +3435,7 @@ pub fn run() {
             )
             .map_err(std::io::Error::other)?;
             if let Some(parent) = database.parent() {
-                std::fs::create_dir_all(parent)?;
+                desktop_storage::create_data_directory(parent)?;
                 app.manage(dictation::Dictation::new(parent.join("dictation-models/base-ebe41f70")));
             }
             let startup = desktop_update_start_arguments(&std::env::args_os().skip(1).collect::<Vec<_>>())

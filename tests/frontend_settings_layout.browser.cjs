@@ -34,7 +34,7 @@ async function openShell(browser, viewport, { browserInvoke = false } = {}) {
     let body = fs.readFileSync(file);
     if (name === 'app.js') body = body.toString().replace(
       "document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
-      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings };\n  // ---- Public API ----');
+      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings, refreshApplicationInfo, renderDictation };\n  // ---- Public API ----');
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' :
       name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
@@ -435,6 +435,76 @@ test('browser Dictation explains the desktop requirement instead of suggesting a
     const status = await page.locator('#dictation-model-status').innerText();
     assert.doesNotMatch(status, /reinstall/i);
     assert.equal(await page.evaluate(() => window.getUserMediaCalls), 0);
+  } finally {
+    await browser.close();
+  }
+});
+
+test('the Linux app says dictation is not available yet and keeps its button off', async () => {
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
+    const facts = (platform) => page.evaluate(async (platform) => {
+      const info = { product_name: 'Sylvia GM', version: '0.0.0', release_channel: 'alpha', signing_status: 'unsigned', platform };
+      // No speech runtime answers on either system here; only the wording and the button differ.
+      window.layoutTest.state.bridge = {
+        application_info: async () => info,
+        dictation_capabilities: async () => { throw 'unavailable'; },
+      };
+      await window.layoutTest.refreshApplicationInfo();
+      document.getElementById('dictation-model-status').textContent = '';
+      window.layoutTest.openSettings('dictation');
+      await new Promise(resolve => setTimeout(resolve, 50));
+      const status = document.getElementById('dictation-model-status').textContent;
+      window.layoutTest.closeSettings();
+      window.layoutTest.state.view = 'session';
+      document.getElementById('player-input').disabled = false;
+      window.layoutTest.renderDictation({ phase: 'idle', message: '', transcript: '' });
+      const toggle = document.getElementById('dictation-toggle');
+      return { status, disabled: toggle.disabled, label: toggle.getAttribute('aria-label') };
+    }, platform);
+    assert.deepEqual(await facts('linux'), {
+      status: 'Dictation is not available in the Linux app yet. You can keep typing.',
+      disabled: true, label: 'Dictation is not available in the Linux app yet',
+    });
+    assert.deepEqual(await facts('windows'), {
+      status: 'Local speech isn’t available in this copy of Sylvia. You can keep typing.',
+      disabled: false, label: 'Start dictation',
+    });
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
+});
+
+test('sentences that name Windows change only for a host that says it runs on Linux', async () => {
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
+    const wording = (platform) => page.evaluate(async (platform) => {
+      const info = { product_name: 'Sylvia GM', version: '0.0.0', release_channel: 'alpha', signing_status: 'unsigned' };
+      if (platform) info.platform = platform;
+      window.layoutTest.state.bridge = { application_info: async () => info };
+      await window.layoutTest.refreshApplicationInfo();
+      const copy = {};
+      for (const node of document.querySelectorAll('[data-platform-copy]'))
+        copy[node.dataset.platformCopy] = node.textContent.replace(/\s+/g, ' ').trim();
+      return { copy, signing: document.getElementById('application-signing').textContent };
+    }, platform);
+    const shipped = await wording(null);
+    assert.deepEqual(Object.keys(shipped.copy).sort(), ['key-protection', 'key-protection-limits', 'unsigned-download']);
+    assert.match(shipped.copy['key-protection'], /^Saved API keys and private headers are protected by Windows for your user account\./);
+    assert.match(shipped.copy['key-protection-limits'], /outside your Windows account/);
+    assert.match(shipped.copy['unsigned-download'], /so Windows may warn about an unfamiliar publisher/);
+    assert.equal(shipped.signing, 'Windows publisher signature: unsigned');
+    for (const platform of ['windows', 'macos', 'freebsd'])
+      assert.deepEqual(await wording(platform), shipped, `${platform} keeps the page's wording`);
+    const linux = await wording('linux');
+    assert.equal(linux.signing, 'Publisher signature: unsigned');
+    assert.match(linux.copy['key-protection'], /key file that only your Linux user account can read/);
+    assert.match(linux.copy['key-protection-limits'], /a copy of your whole home folder/);
+    for (const text of [...Object.values(linux.copy), linux.signing]) assert.doesNotMatch(text, /Windows/);
+    assert.deepEqual(errors, []);
   } finally {
     await browser.close();
   }

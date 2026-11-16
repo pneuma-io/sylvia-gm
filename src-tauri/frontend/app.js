@@ -281,12 +281,17 @@ const SylviaGMFrontend = (() => {
     if (!value || !$('dictation-toggle')) return;
     const busy = ['requesting', 'recording', 'transcribing'].includes(value.phase);
     const recording = value.phase === 'recording';
-    const enabled = !$('player-input').disabled && state.view === 'session' && !window.__sylviaBrowserInvoke;
+    // The Linux app carries no speech runtime yet, so its button is off like the browser's.
+    const linuxHost = state.applicationInfo?.platform === 'linux';
+    const enabled = !$('player-input').disabled && state.view === 'session' &&
+      !window.__sylviaBrowserInvoke && !linuxHost;
     $('dictation-toggle').disabled = (!enabled && !recording) ||
       ['requesting', 'transcribing'].includes(value.phase) || Boolean(dictationModelJob);
     $('dictation-toggle').setAttribute('aria-pressed', String(recording));
     $('dictation-toggle').setAttribute('aria-label', window.__sylviaBrowserInvoke
-      ? 'Dictation requires the desktop application' : recording ? 'Stop dictation' : 'Start dictation');
+      ? 'Dictation requires the desktop application'
+      : linuxHost ? 'Dictation is not available in the Linux app yet'
+      : recording ? 'Stop dictation' : 'Start dictation');
     $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
     if ($('dictation-status').textContent !== value.message) $('dictation-status').textContent = value.message;
     $('dictation-status').hidden = value.phase === 'idle' && !value.message;
@@ -2021,7 +2026,9 @@ const SylviaGMFrontend = (() => {
         // The browser never offers recording; only the desktop app can lack its speech runtime.
         $('dictation-model-status').textContent = window.__sylviaBrowserInvoke
           ? 'Dictation is only available in the Sylvia desktop app. You can keep typing here.'
-          : 'Local speech isn’t available in this copy of Sylvia. You can keep typing.';
+          : state.applicationInfo?.platform === 'linux'
+            ? 'Dictation is not available in the Linux app yet. You can keep typing.'
+            : 'Local speech isn’t available in this copy of Sylvia. You can keep typing.';
       });
     }
   }
@@ -2057,6 +2064,28 @@ const SylviaGMFrontend = (() => {
     settingsReturnFocus = null;
   }
 
+  // The page ships the wording for Windows. A host that says it runs on Linux gets the Linux
+  // wording for the few sentences that name the operating system; anything else keeps the page's.
+  const LINUX_COPY = {
+    'key-protection': 'Saved API keys and private headers are encrypted with a key file that only '
+      + 'your Linux user account can read. They are sent only to the selected service for '
+      + 'authentication and are never put in chats or campaign backups. If they cannot be '
+      + 'unlocked, enter them again in Connection settings.',
+    'key-protection-limits': 'This protects a settings file copied on its own. It does not protect '
+      + 'against software running as your Linux user or a copy of your whole home folder, or '
+      + 'erase older plaintext copies of your settings.',
+    'unsigned-download': 'This Alpha prerelease is unsigned. Before running a download, check its '
+      + 'SHA-256 against the supplied release manifest.',
+  };
+
+  function applyPlatformCopy(platform) {
+    if (platform !== 'linux') return;
+    for (const node of document.querySelectorAll('[data-platform-copy]')) {
+      const text = LINUX_COPY[node.dataset.platformCopy];
+      if (text) node.textContent = text;
+    }
+  }
+
   async function refreshApplicationInfo() {
     const version = $('application-version');
     const channel = $('application-channel');
@@ -2075,9 +2104,10 @@ const SylviaGMFrontend = (() => {
       channel.textContent = releaseChannel === 'stable' ? 'Stable release'
         : releaseChannel ? `${releaseChannel.charAt(0).toUpperCase()}${releaseChannel.slice(1)} prerelease`
         : 'Release channel unavailable';
-      signing.textContent = info.signing_status === 'unsigned'
-        ? 'Windows publisher signature: unsigned'
-        : 'Signing status supplied by the host';
+      signing.textContent = info.signing_status !== 'unsigned' ? 'Signing status supplied by the host'
+        : info.platform === 'linux' ? 'Publisher signature: unsigned'
+        : 'Windows publisher signature: unsigned';
+      applyPlatformCopy(info.platform);
     } catch (error) {
       state.applicationInfo = null;
       version.textContent = 'Version unavailable';

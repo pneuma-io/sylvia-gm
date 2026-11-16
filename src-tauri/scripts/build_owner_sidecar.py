@@ -103,6 +103,31 @@ def dictation_build_arguments(repository_root: Path) -> list[str]:
     return arguments
 
 
+_DICTATION_MODULES = (
+    "faster_whisper",
+    "ctranslate2",
+    "sounddevice",
+    "onnxruntime",
+    "av",
+    "hf_xet",
+    "huggingface_hub",
+    "tokenizers",
+)
+
+
+def dictation_exclusion_arguments(repository_root: Path) -> list[str]:
+    """Leave the speech runtime out even when its extra is installed in the build environment."""
+    # The hooks directory also carries the command-registry hook every build needs.
+    hook = _contained_data_file(
+        repository_root,
+        repository_root / "src-tauri/scripts/hooks/hook-sylvia_gm.interfaces.commands.py",
+    )
+    arguments = ["--additional-hooks-dir", str(hook.parent)]
+    for module in _DICTATION_MODULES:
+        arguments.extend(["--exclude-module", module])
+    return arguments
+
+
 def _contained_data_file(root: Path, path: Path) -> Path:
 
     resolved = path.resolve()
@@ -266,7 +291,9 @@ def main() -> int:
 
     target_triple = os.environ.get("TAURI_ENV_TARGET_TRIPLE") or _rust_host_triple()
 
-    suffix = ".exe" if target_triple.endswith("windows-msvc") else ""
+    windows = target_triple.endswith("windows-msvc")
+
+    suffix = ".exe" if windows else ""
 
     # Each build owns a fresh directory under its source checkout. Never clean a
 
@@ -290,20 +317,30 @@ def main() -> int:
 
     # Stock PyAV wheels bundle GPL-linked codecs. Release builds use the pinned
     # LGPL-only libraries and a private binding stage, leaving the venv unchanged.
-    ffmpeg_directory = os.environ.get("SYLVIA_FFMPEG_LGPL_DIR")
-    if not ffmpeg_directory:
-        raise RuntimeError("Set SYLVIA_FFMPEG_LGPL_DIR to the manifest-bound LGPL FFmpeg DLLs")
+    # Only the Windows build carries the speech runtime. Elsewhere dictation reports itself
+    # unavailable, so its packages, and above all the stock codec wheel, stay out of the file.
     pyav_stage = work_root / "pyav-lgpl"
-    subprocess.run(
-        [
-            sys.executable,
-            str(tauri_root / "scripts" / "stage_pyav_lgpl.py"),
-            "--ffmpeg", ffmpeg_directory,
-            "--output", str(pyav_stage),
-            "--manifest", str(repository_root / "licenses/dictation/PYAV-LGPL-BUILD.json"),
-        ],
-        check=True,
-    )
+    if windows:
+        ffmpeg_directory = os.environ.get("SYLVIA_FFMPEG_LGPL_DIR")
+        if not ffmpeg_directory:
+            raise RuntimeError(
+                "Set SYLVIA_FFMPEG_LGPL_DIR to the manifest-bound LGPL FFmpeg DLLs"
+            )
+        subprocess.run(
+            [
+                sys.executable,
+                str(tauri_root / "scripts" / "stage_pyav_lgpl.py"),
+                "--ffmpeg", ffmpeg_directory,
+                "--output", str(pyav_stage),
+                "--manifest", str(repository_root / "licenses/dictation/PYAV-LGPL-BUILD.json"),
+            ],
+            check=True,
+        )
+        speech_paths = ["--paths", str(pyav_stage)]
+        speech_arguments = dictation_build_arguments(repository_root)
+    else:
+        speech_paths = []
+        speech_arguments = dictation_exclusion_arguments(repository_root)
 
     command = [
         sys.executable,
@@ -315,8 +352,7 @@ def main() -> int:
         "--noupx",
         "--name",
         "sylvia-gm-owner",
-        "--paths",
-        str(pyav_stage),
+        *speech_paths,
         "--paths",
         str(repository_root / "src"),
         "--add-data",
@@ -324,7 +360,7 @@ def main() -> int:
         *sidecar_data_arguments(repository_root, work_root / "data"),
         *campaign_plan_data_arguments(repository_root),
         *webui_data_arguments(repository_root),
-        *dictation_build_arguments(repository_root),
+        *speech_arguments,
         "--workpath",
         str(build_dir),
         "--distpath",
@@ -339,7 +375,8 @@ def main() -> int:
     build_environment.pop("PYTHONHOME", None)
 
     build_environment.pop("PYTHONPATH", None)
-    build_environment["PYTHONPATH"] = str(pyav_stage)
+    if windows:
+        build_environment["PYTHONPATH"] = str(pyav_stage)
     build_environment["HF_HOME"] = str(work_root / "hf-cache")
     build_environment["HF_XET_CACHE"] = str(work_root / "hf-cache/xet")
     build_environment["HF_HUB_OFFLINE"] = "1"
