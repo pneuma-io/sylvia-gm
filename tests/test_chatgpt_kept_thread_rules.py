@@ -513,8 +513,9 @@ async def test_a_cancellation_while_a_finished_requests_thread_closes_still_writ
 async def test_a_turn_left_waiting_is_closed_after_its_idle_limit(
     tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
 ) -> None:
-    # The wait is the player's reading and typing time between turns.
-    assert answering.pending_idle_seconds == answering.idle_seconds == 600.0
+    # The wait is the player's reading and typing time between turns, up to the provider's
+    # cache retention; an interrupted thread keeps the shorter limit.
+    assert answering.pending_idle_seconds == 1800.0 > answering.idle_seconds == 600.0
     answering.pending_idle_seconds = 0.05
     runtime = AnswerRuntime(Waiting([asks("call-1", 7)]))
     provider, _ = provider_for(runtime, tmp_path)
@@ -535,7 +536,7 @@ async def test_an_idle_waiting_turn_past_its_limit_is_closed_when_the_next_reque
     provider, audit = provider_for(runtime, tmp_path)
     await provider.generate(FIRST, tools=TOOLS)
     [kept] = answering._idle  # noqa: SLF001
-    kept.idle_since -= 601
+    kept.idle_since -= 1801
     await provider.generate(SECOND, tools=TOOLS)
     assert not runtime.connections[0].alive and audit.reuse[1]["continued"] is False
 

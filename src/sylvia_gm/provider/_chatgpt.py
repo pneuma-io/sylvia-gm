@@ -82,8 +82,10 @@ _KEPT_THREAD_LIMIT = 4
 _KEPT_THREAD_IDLE_SECONDS = 600.0
 #: The same for a thread whose turn is still open, waiting for a call's result. A GM turn
 #: ends with such a call, so the next player message answers it: the wait is the player's
-#: reading and typing time. A stopped turn does not wait for this (``release_idle``).
-_PENDING_TURN_IDLE_SECONDS = 600.0
+#: reading and typing time. Measured: the runtime keeps an unanswered call open for at least
+#: 30 minutes, and the provider's cache retention is 30 minutes, so waiting longer would
+#: only hold the process. A stopped turn does not wait for this (``release_idle``).
+_PENDING_TURN_IDLE_SECONDS = 1800.0
 #: Abandoned threads' usage reports held until a request of their runtime home records them.
 _ABANDONED_REPORT_LIMIT = 64
 
@@ -417,7 +419,7 @@ class _KeptThreads:
     def idle_limit(self, kept: _KeptThread) -> float:
         if kept.pending is None:
             return self.idle_seconds
-        return min(self.idle_seconds, self.pending_idle_seconds)
+        return self.pending_idle_seconds
 
     def take(
         self, home: Path, model: str, instructions: str,
