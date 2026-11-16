@@ -1,9 +1,9 @@
 # Linux development
 
 Linux is a development and test platform for Sylvia GM. This page is for a developer or agent
-starting on a new Linux machine. It does not make Linux a supported player platform. Release
-builds, the installer and the updater stay on Windows; see
-[What stays on Windows](#what-stays-on-windows).
+starting on a new Linux machine. The Linux app for players is built as described in the
+[Linux release checklist](linux-release-checklist.md). The Windows release build, the installer
+and the updater stay on Windows; see [What stays on Windows](#what-stays-on-windows).
 
 ## What you need
 
@@ -163,8 +163,15 @@ folder. The [architecture contract](../architecture/alpha-architecture-contract.
 describes that protection and its limits: it guards a settings file copied on its own, not a copy
 of the whole home folder from an unencrypted disk or another program running as the same user.
 
+The desktop app keeps its data in `~/.local/share/com.pneuma-io.sylvia-gm`. It creates that
+folder, and any missing folder above it such as `~/.local/share`, readable by its owner only
+(mode 700); a folder that already exists keeps its access. When the app is used through the
+browser host, the page describes key storage for the system the owner program runs on, not the
+system the browser runs on, because that is where the keys are kept.
+
 ## What stays on Windows
 
-Windows remains the platform for release builds, the installer, the updater, the installed-app
-checks and the Windows-only test cases. Before each release, work through the
-[Windows release checklist](windows-release-checklist.md).
+Windows remains the platform for the Windows release build, the installer, the updater, the
+Windows installed-app checks and the Windows-only test cases. Before each release, work through
+the [Windows release checklist](windows-release-checklist.md) and the
+[Linux release checklist](linux-release-checklist.md).

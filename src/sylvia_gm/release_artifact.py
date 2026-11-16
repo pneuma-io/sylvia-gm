@@ -1,4 +1,4 @@
-"""Deterministic, integrity-verifiable Windows prerelease layouts."""
+"""Deterministic, integrity-verifiable prerelease layouts for Windows and Linux."""
 
 from __future__ import annotations
 
@@ -91,6 +91,11 @@ _SIGNING = {
     "disclosure": UNSIGNED_DISCLOSURE,
     "status": "unsigned",
 }
+LINUX_RELEASE_FORMAT_ID = "sylvia-gm-linux-release-manifest"
+LINUX_UNSIGNED_DISCLOSURE = (
+    "This Sylvia GM Alpha prerelease is unsigned. Verify the AppImage SHA-256 against "
+    "release-manifest.json or SHA256SUMS.txt before running it."
+)
 
 
 class ReleaseArtifactError(ValueError):
@@ -157,6 +162,68 @@ _PRODUCT = {
     "version": PRERELEASE_VERSION,
     "windows_installer_version": WINDOWS_INSTALLER_VERSION,
 }
+
+
+@dataclass(frozen=True, slots=True)
+class ReleasePlatform:
+    """Everything that differs between the release layouts of two operating systems."""
+
+    format_id: str
+    format_versions: tuple[int, ...]
+    product: Mapping[str, str]
+    artifact_suffix: Mapping[str, str]
+    required_kinds: frozenset[str]
+    required_kinds_message: str
+    qualification_keys: frozenset[str]
+    toolchain_keys: frozenset[str]
+    disclosure: str
+
+    @property
+    def signing(self) -> dict[str, str]:
+        return {"disclosure": self.disclosure, "status": "unsigned"}
+
+
+# Both descriptions read this module's values when called, never a copy taken at import.
+def windows_release_platform() -> ReleasePlatform:
+    """The Windows layout: one NSIS installer, optionally an MSI and a portable ZIP."""
+
+    return ReleasePlatform(
+        format_id=RELEASE_FORMAT_ID,
+        format_versions=(2, RELEASE_FORMAT_VERSION),
+        product=_PRODUCT,
+        artifact_suffix=_ARTIFACT_SUFFIX,
+        required_kinds=_REQUIRED_ARTIFACT_KINDS,
+        required_kinds_message="Release must contain exactly one NSIS installer",
+        qualification_keys=_QUALIFICATION_KEYS,
+        toolchain_keys=_TOOLCHAIN_KEYS,
+        disclosure=UNSIGNED_DISCLOSURE,
+    )
+
+
+def linux_release_platform() -> ReleasePlatform:
+    """The Linux layout: one AppImage.
+
+    Its toolchain record adds the build machine's system and C library, because those decide
+    the oldest distribution the AppImage runs on.
+    """
+
+    return ReleasePlatform(
+        format_id=LINUX_RELEASE_FORMAT_ID,
+        format_versions=(RELEASE_FORMAT_VERSION,),
+        product={
+            "architecture": "x86_64",
+            "channel": RELEASE_CHANNEL,
+            "name": "Sylvia GM",
+            "platform": "linux",
+            "version": PRERELEASE_VERSION,
+        },
+        artifact_suffix={"appimage": ".appimage"},
+        required_kinds=frozenset({"appimage"}),
+        required_kinds_message="Release must contain exactly one AppImage",
+        qualification_keys=frozenset({"ubuntu_22_04", "ubuntu_24_04"}),
+        toolchain_keys=_TOOLCHAIN_KEYS | {"appimage_tools_sha256", "build_system", "glibc"},
+        disclosure=LINUX_UNSIGNED_DISCLOSURE,
+    )
 
 
 def _rust_release_channel(source: bytes) -> str:
@@ -233,14 +300,17 @@ def _safe_leaf(name: str) -> str:
     return name
 
 
-def _validated_artifacts(artifacts: Sequence[ReleaseArtifact]) -> tuple[ReleaseArtifact, ...]:
+def _validated_artifacts(
+    artifacts: Sequence[ReleaseArtifact], platform: ReleasePlatform | None = None
+) -> tuple[ReleaseArtifact, ...]:
+    platform = platform or windows_release_platform()
     if not artifacts:
         raise ReleaseArtifactError("Release has no installer artifacts")
     names: set[str] = set()
     kinds: set[str] = set()
     validated: list[ReleaseArtifact] = []
     for artifact in artifacts:
-        expected_suffix = _ARTIFACT_SUFFIX.get(artifact.kind)
+        expected_suffix = platform.artifact_suffix.get(artifact.kind)
         if expected_suffix is None:
             raise ReleaseArtifactError("Release artifact kind is unsupported")
         try:
@@ -263,8 +333,8 @@ def _validated_artifacts(artifacts: Sequence[ReleaseArtifact]) -> tuple[ReleaseA
         names.add(folded)
         kinds.add(artifact.kind)
         validated.append(ReleaseArtifact(source=source, kind=artifact.kind))
-    if not _REQUIRED_ARTIFACT_KINDS.issubset(kinds):
-        raise ReleaseArtifactError("Release must contain exactly one NSIS installer")
+    if not platform.required_kinds.issubset(kinds):
+        raise ReleaseArtifactError(platform.required_kinds_message)
     return tuple(sorted(validated, key=lambda item: item.source.name.casefold()))
 
 
@@ -390,13 +460,15 @@ def assemble_release_layout(
     dependency_notices_sha256: str,
     dependency_notice_companions_directory: Path | None = None,
     version: str = PRERELEASE_VERSION,
+    platform: ReleasePlatform | None = None,
 ) -> dict[str, object]:
-    """Atomically assemble one canonical unsigned prerelease directory."""
+    """Atomically assemble one canonical unsigned prerelease directory (Windows by default)."""
 
+    platform = platform or windows_release_platform()
     _require_release_version(version)
     if version != PRERELEASE_VERSION:
         raise ReleaseArtifactError("Release version does not match the application")
-    selected = _validated_artifacts(artifacts)
+    selected = _validated_artifacts(artifacts, platform)
     source = _validated_mapping(
         provenance,
         name="provenance",
@@ -408,11 +480,11 @@ def assemble_release_layout(
         raise ReleaseArtifactError("Release source identity is invalid")
     if not _UTC_RE.fullmatch(source["source_timestamp_utc"]):
         raise ReleaseArtifactError("Release source timestamp is invalid")
-    tools = _validated_mapping(toolchain, name="toolchain", exact_keys=_TOOLCHAIN_KEYS)
+    tools = _validated_mapping(toolchain, name="toolchain", exact_keys=platform.toolchain_keys)
     qualified = _validated_mapping(
         qualification,
         name="qualification",
-        exact_keys=_QUALIFICATION_KEYS,
+        exact_keys=platform.qualification_keys,
     )
     if any(status not in _QUALIFICATION_STATES for status in qualified.values()):
         raise ReleaseArtifactError("Release qualification state is invalid")
@@ -466,7 +538,7 @@ def assemble_release_layout(
         notice_destination.write_bytes(notice_bytes)
         for name, blob in companions.items():
             (staging / name).write_bytes(blob)
-        (staging / "UNSIGNED.txt").write_text(UNSIGNED_DISCLOSURE + "\n", encoding="utf-8")
+        (staging / "UNSIGNED.txt").write_text(platform.disclosure + "\n", encoding="utf-8")
         manifest: dict[str, object] = {
             "artifacts": records,
             "dependency_notices": {
@@ -474,12 +546,12 @@ def assemble_release_layout(
                 "sha256": dependency_notices_sha256,
                 "size_bytes": len(notice_bytes),
             },
-            "format_id": RELEASE_FORMAT_ID,
+            "format_id": platform.format_id,
             "format_version": RELEASE_FORMAT_VERSION,
-            "product": {**_PRODUCT, "version": version},
+            "product": {**platform.product, "version": version},
             "provenance": source,
             "qualification": qualified,
-            "signing": _SIGNING,
+            "signing": platform.signing,
             "toolchain": tools,
         }
         if companions:
@@ -504,8 +576,16 @@ def assemble_release_layout(
         raise
 
 
-def verify_release_layout(directory: Path) -> dict[str, object]:
-    """Verify every declared byte and reject unlisted release-layout files."""
+def verify_release_layout(
+    directory: Path, platform: ReleasePlatform | None = None
+) -> dict[str, object]:
+    """Verify every declared byte and reject unlisted release-layout files.
+
+    A layout is checked as the platform the caller names (Windows by default), so a Windows
+    tool never accepts a Linux layout or the reverse.
+    """
+
+    platform = platform or windows_release_platform()
 
     try:
         resolved_directory = directory.resolve(strict=True)
@@ -528,15 +608,15 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
         raise ReleaseArtifactError("Release manifest is not canonical")
     if frozenset(manifest) != _MANIFEST_KEYS:
         raise ReleaseArtifactError("Release manifest fields are incomplete or unknown")
-    if manifest.get("format_id") != RELEASE_FORMAT_ID or manifest.get("format_version") not in (
-        2,
-        RELEASE_FORMAT_VERSION,
+    if (
+        manifest.get("format_id") != platform.format_id
+        or manifest.get("format_version") not in platform.format_versions
     ):
         raise ReleaseArtifactError("Release manifest format is unsupported")
     product = manifest.get("product")
-    if product != _PRODUCT:
+    if product != platform.product:
         raise ReleaseArtifactError("Release manifest version does not match the application")
-    if manifest.get("signing") != _SIGNING:
+    if manifest.get("signing") != platform.signing:
         raise ReleaseArtifactError("Release signing disclosure is invalid")
     source = _manifest_mapping(
         manifest.get("provenance"),
@@ -552,14 +632,14 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
     qualified = _manifest_mapping(
         manifest.get("qualification"),
         name="qualification",
-        exact_keys=_QUALIFICATION_KEYS,
+        exact_keys=platform.qualification_keys,
     )
     if any(status not in _QUALIFICATION_STATES for status in qualified.values()):
         raise ReleaseArtifactError("Release qualification state is invalid")
     _manifest_mapping(
         manifest.get("toolchain"),
         name="toolchain",
-        exact_keys=_TOOLCHAIN_KEYS,
+        exact_keys=platform.toolchain_keys,
     )
     records = manifest.get("artifacts")
     if not isinstance(records, list) or not records:
@@ -609,12 +689,12 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
         if _sha256_file(path) != expected_sha256:
             raise ReleaseArtifactError("Release artifact hash does not match the manifest")
         kind = record.get("kind")
-        if not isinstance(kind, str) or kind not in _ARTIFACT_SUFFIX:
+        if not isinstance(kind, str) or kind not in platform.artifact_suffix:
             raise ReleaseArtifactError("Release artifact kind is invalid")
-        if path.suffix.casefold() != _ARTIFACT_SUFFIX[kind]:
+        if path.suffix.casefold() != platform.artifact_suffix[kind]:
             raise ReleaseArtifactError("Release artifact kind is invalid")
-    if not _REQUIRED_ARTIFACT_KINDS.issubset({cast(str, record["kind"]) for record in records}):
-        raise ReleaseArtifactError("Release must contain exactly one NSIS installer")
+    if not platform.required_kinds.issubset({cast(str, record["kind"]) for record in records}):
+        raise ReleaseArtifactError(platform.required_kinds_message)
     if [cast(str, record["name"]) for record in records] != sorted(
         (cast(str, record["name"]) for record in records), key=str.casefold
     ):
@@ -638,7 +718,7 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
             raise ReleaseArtifactError("Release layout contains undeclared files")
     if actual_names != expected_names:
         raise ReleaseArtifactError("Release layout contains undeclared files")
-    if (directory / "UNSIGNED.txt").read_text(encoding="utf-8") != UNSIGNED_DISCLOSURE + "\n":
+    if (directory / "UNSIGNED.txt").read_text(encoding="utf-8") != platform.disclosure + "\n":
         raise ReleaseArtifactError("Release unsigned disclosure does not match")
     checksum_names = sorted(expected_names - {"SHA256SUMS.txt"}, key=str.casefold)
     if (directory / "SHA256SUMS.txt").read_bytes() != _checksums_bytes(directory, checksum_names):
@@ -651,10 +731,12 @@ def assemble_qualified_release_layout(
     source: Path,
     output: Path,
     qualification: Mapping[str, str],
+    platform: ReleasePlatform | None = None,
 ) -> dict[str, object]:
     """Copy verified installer bytes into a new layout with completed qualification state."""
 
-    manifest = verify_release_layout(source)
+    platform = platform or windows_release_platform()
+    manifest = verify_release_layout(source, platform)
     source = source.resolve(strict=True)
     records = cast(list[dict[str, object]], manifest["artifacts"])
     artifacts = tuple(
@@ -680,4 +762,5 @@ def assemble_qualified_release_layout(
             else None
         ),
         version=cast(str, product["version"]),
+        platform=platform,
     )
