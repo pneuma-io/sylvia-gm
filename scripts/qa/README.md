@@ -2,6 +2,8 @@
 
 These adapters exercise the existing Tauri 2 / WebView2 desktop and compiled Python owner. They are the default routes for future focused tests. They do not add an HTTP command bridge, debug port, persistent access or credentials.
 
+`linux_installed_check.py` is the Linux counterpart for a built AppImage. One command runs the installed-application pass of the [Linux release checklist](../../docs/operations/linux-release-checklist.md#5-installed-application-pass) on a hidden display through WebDriver, with `standin_model_endpoint.py` as a local stand-in model service (no paid calls, no sign-ins, empty private homes), and writes a report with screenshots. Its guards, report and stand-in are tested in `tests/test_linux_installed_check.py`.
+
 Use a separately owned checkout/build and synthetic database. Preserve installed user data and exact package pins. Start the supplied QA launcher normally; its database, temporary files and WebView profile are isolated beside the build. To use an already approved QA account, point a separately named synthetic database at that profile through the existing `SYLVIA_GM_AUTHORITY_DATABASE` process variable. Do not copy account stores or credentials.
 
 `owner_protocol.CompiledOwner(executable, database, qa_root)` uses the production private stdin/stdout launch handshake. It refuses an existing database unless `resume=True`, records executable SHA-256/PID, and closes only its own process. Use normal commands for admission, Interview setup, mechanics, export and reopen. Actual provider runs use the normal resolver and configured model; scripted replies are deterministic engine evidence only.
