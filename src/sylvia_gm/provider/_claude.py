@@ -39,7 +39,9 @@ from sylvia_gm.provider._claude_native import (
     wait_for_flush,
 )
 from sylvia_gm.provider._claude_runtime import (
+    DOCUMENTED_CONTEXT_WINDOW_AT,
     ClaudeConnection,
+    documented_context_window,
     find_runtime,
     native_environment,
     runtime_version,
@@ -353,8 +355,15 @@ class ClaudeProvider(Provider):
         self._active: ClaudeConnection | None = None
         self._lock = asyncio.Lock()
         self._last_response = ProviderResponse()
-        # Set when Claude refused a request planned within the window Claude Code reported.
+        # Set when Claude refused a request planned within a documented or reported window.
         self._reported_window_refused = False
+        if model_info.runtime_context_window is None:
+            # A model saved before this figure existed, or by a caller that named none.
+            documented = documented_context_window(model_info.wire_model_id)
+            if documented is not None:
+                self._apply_runtime_window(
+                    documented, "model_catalog", DOCUMENTED_CONTEXT_WINDOW_AT,
+                )
 
     async def _close_owned(self, connection: ClaudeConnection) -> None:
         """Finish child collection even when the caller cancels more than once."""
@@ -914,15 +923,25 @@ class ClaudeProvider(Provider):
             )
         )
 
-    def _apply_runtime_window(self, value: int | None) -> None:
-        """Set or clear the runtime's reported window; a saved allowance can only lower it."""
+    def _apply_runtime_window(
+        self, value: int | None, source: str = "runtime_reported",
+        observed_at: str | None = None,
+    ) -> None:
+        """Set or clear the window planned within; a saved allowance can only lower it.
+
+        ``source`` says where the figure comes from: ``runtime_reported`` for the one Claude
+        Code names in a result record, ``model_catalog`` for the documented one.
+        """
         model = self.model_info
-        observed_at = datetime.now(UTC).isoformat() if value is not None else None
+        if value is None:
+            observed_at = None
+        elif observed_at is None:
+            observed_at = datetime.now(UTC).isoformat()
         capacity = resolve_context_capacity(
             declared_context_window=model.declared_context_window,
             declared_context_source=model.declared_context_source,
             runtime_context_window=value,
-            runtime_context_source="runtime_reported" if value is not None else "unknown",
+            runtime_context_source=source if value is not None else "unknown",
             configured_context_window=model.configured_context_window,
             declared_observed_at=model.declared_context_observed_at,
             runtime_observed_at=observed_at,
@@ -959,19 +978,21 @@ class ClaudeProvider(Provider):
             self._apply_runtime_window(value)
 
     def _refuse_reported_window(self) -> None:
-        """Claude refused a request as too large: stop planning within the reported window.
+        """Claude refused a request as too large: stop planning within that window.
 
-        Planning returns to the saved allowance, or to the figure used when none is known, for
-        as long as this provider lives, so the shorten-and-retry step that follows works against
-        the smaller figure and does not send the same oversized request again.
+        The window is the documented one for the model or the one Claude Code reported; a plan
+        may allow less. Planning returns to the saved allowance, or to the figure used when
+        none is known, for as long as this provider lives, so the shorten-and-retry step that
+        follows works against the smaller figure and does not send the same oversized request
+        again.
         """
         if self._reported_window_refused or self.model_info.runtime_context_window is None:
             return
         self._reported_window_refused = True
         logger.warning(
-            "Claude refused a request planned within its reported context window of %s tokens; "
+            "Claude refused a request planned within a context window of %s tokens (%s); "
             "planning within the saved or default allowance from now on.",
-            self.model_info.runtime_context_window,
+            self.model_info.runtime_context_window, self.model_info.runtime_context_source,
         )
         self._apply_runtime_window(None)
 

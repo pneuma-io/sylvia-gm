@@ -13,7 +13,9 @@ from pathlib import Path
 from sylvia_gm.config.provider_settings import save_provider_settings
 from sylvia_gm.provider._claude_install import ClaudeInstaller
 from sylvia_gm.provider._claude_runtime import (
+    DOCUMENTED_CONTEXT_WINDOW_AT,
     authentication_status,
+    documented_context_window,
     find_runtime,
     native_auth_command,
     native_environment,
@@ -181,6 +183,7 @@ def claude_settings_action(
             raise ProviderConnectionError(
                 "Enter a positive context limit of at least 512 tokens, or leave it blank."
             )
+        documented = documented_context_window(model["id"])
         result = save_provider_settings(
             storage_root / "config.yaml",
             provider_id="claude_runtime",
@@ -191,6 +194,12 @@ def claude_settings_action(
             model_name=f"{model['id']} (Claude)",
             context_window=None,
             configured_context_window=capacity,
+            # The documented window, shown as a catalog figure; None for any other name.
+            runtime_context_window=documented,
+            runtime_context_source="model_catalog" if documented is not None else None,
+            runtime_context_observed_at=(
+                DOCUMENTED_CONTEXT_WINDOW_AT if documented is not None else None
+            ),
             max_output_tokens=None,
             transport="claude_code",
             supports_streaming=True,

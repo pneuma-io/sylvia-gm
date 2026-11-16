@@ -55,17 +55,166 @@ TOOLS = [
 ]
 
 
-def model() -> ModelInfo:
+#: A model name Sylvia has no documented window for, so nothing is known until one is reported.
+UNLISTED = "custom"
+
+
+def model(name: str = "opus") -> ModelInfo:
     return ModelInfo(
-        id="claude-runtime/opus",
+        id=f"claude-runtime/{name}",
         name="Claude",
         provider_name="Claude",
         provider_key="claude_runtime",
         provider_mode="subscription",
         transport="claude_code",
-        provider_model_id="opus",
+        provider_model_id=name,
         max_output_tokens=None,
     )
+
+
+@pytest.mark.parametrize(("name", "expected"), [
+    ("opus", 1_000_000), ("sonnet", 1_000_000), ("haiku", 1_000_000), ("fable", 1_000_000),
+    ("claude-opus-5-5", 1_000_000), ("claude-sonnet-5-5", 1_000_000),
+    ("claude-haiku-5-5", 1_000_000), ("claude-fable-5-2", 1_000_000),
+    # Claude Code's own suffix for the same window.
+    ("sonnet[1m]", 1_000_000), ("claude-opus-5-5[1m]", 1_000_000),
+    # Only exact names: anything else is unknown and keeps the cautious figure.
+    ("default", None), ("Opus", None), ("opus ", None), ("claude-sonnet-4-5", None),
+    ("claude-opus-5", None), ("claude-sonnet-5-5-20261001", None), ("custom", None),
+    ("[1m]", None), ("", None), (None, None), (1_000_000, None),
+])
+def test_the_documented_window_is_known_only_for_exact_names_and_aliases(name, expected):
+    assert _claude_runtime.documented_context_window(name) == expected
+
+
+def test_a_listed_model_is_planned_within_its_documented_window_from_the_first_request(
+    tmp_path, monkeypatch,
+):
+    adapter, _ = provider(tmp_path, monkeypatch, [])
+    info = adapter.model_info
+    assert info.runtime_context_window == info.context_window == 1_000_000
+    # A catalog figure, not one the runtime reported.
+    assert info.runtime_context_source == info.context_window_source == "model_catalog"
+    assert info.runtime_context_observed_at == "2026-11-17"
+    assert planning_capacity(adapter) == 1_000_000
+
+    unlisted, _ = provider(tmp_path, monkeypatch, [], UNLISTED)
+    assert unlisted.model_info.context_window is None
+    assert unlisted.model_info.context_window_source == "unknown"
+    assert planning_capacity(unlisted) == 200_000
+
+
+@pytest.mark.parametrize(("saved", "expected", "source", "mismatch"), [
+    (200_000, 200_000, "user_configured", False),
+    (999_999, 999_999, "user_configured", False),
+    # A saved allowance cannot raise the documented figure either.
+    (2_000_000, 1_000_000, "model_catalog", True),
+])
+def test_a_saved_allowance_caps_the_documented_window_and_cannot_raise_it(
+    tmp_path, monkeypatch, saved, expected, source, mismatch,
+):
+    info = model()
+    info.configured_context_window = info.context_window = saved
+    info.context_window_source = "user_configured"
+    adapter = ClaudeProvider(tmp_path / "runtime", info)
+    assert info.context_window == expected and info.context_window_source == source
+    assert info.configured_context_window == saved
+    assert info.configured_runtime_mismatch is mismatch
+    assert planning_capacity(adapter) == expected
+
+
+def test_a_window_already_saved_with_the_model_is_left_as_it_is(tmp_path):
+    info = model()
+    info.runtime_context_window = info.context_window = 400_000
+    info.runtime_context_source = info.context_window_source = "runtime_reported"
+    info.runtime_context_observed_at = "2026-11-01T00:00:00+00:00"
+    ClaudeProvider(tmp_path / "runtime", info)
+    assert info.runtime_context_window == info.context_window == 400_000
+    assert info.runtime_context_source == "runtime_reported"
+    assert info.runtime_context_observed_at == "2026-11-01T00:00:00+00:00"
+
+
+def test_a_gm_turn_of_tool_calls_is_planned_within_the_documented_window_throughout(
+    tmp_path, monkeypatch,
+):
+    """Every GM request ends in a tool call, so no result record ever names a window."""
+    step = streamed_call_without_arguments([""])
+    adapter, connection = provider(tmp_path, monkeypatch, step + step)
+    records = []
+
+    class Audit:
+        async def on_request(self, context):
+            records.append((context.request_json or {}).get("method"))
+
+    adapter.hooks.register(Audit())
+    for _ in range(2):
+        assert planning_capacity(adapter) == 1_000_000
+        response = asyncio.run(adapter.generate([{"role": "user", "content": "Go."}], END_TURN))
+        assert response.finish_reason == "tool_calls"
+    assert planning_capacity(adapter) == 1_000_000
+    assert adapter.model_info.runtime_context_source == "model_catalog"
+    assert records == ["claude/native_step", "claude/native_step"]
+
+
+def test_a_refusal_withdraws_the_documented_window_for_the_rest_of_the_providers_life(
+    tmp_path, monkeypatch, caplog,
+):
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, connection = provider(
+        tmp_path, monkeypatch, [refusal, refusal, *narrated({"claude-opus-5-5": 1_000_000})],
+    )
+    info = adapter.model_info
+    assert planning_capacity(adapter) == 1_000_000
+    with caplog.at_level("WARNING"), pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    # One request was sent and refused; the provider sent nothing again by itself.
+    assert len(connection.writes) == 2
+    assert info.runtime_context_window is None and info.context_window is None
+    assert info.context_window_source == "unknown" and planning_capacity(adapter) == 200_000
+    assert "context window of 1000000 tokens (model_catalog)" in caplog.text
+
+    # A second refusal changes nothing more, and neither the documented figure nor one
+    # reported later is used again.
+    caplog.clear()
+    with caplog.at_level("WARNING"), pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    assert "refused a request planned" not in caplog.text
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.context_window is None and planning_capacity(adapter) == 200_000
+
+
+def test_a_refused_request_is_shortened_against_the_smaller_figure_and_sent_once_more(
+    tmp_path, monkeypatch,
+):
+    """The caller's shorten-and-retry step after a refusal: one summary, one resend, no loop."""
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, connection = provider(
+        tmp_path, monkeypatch, [refusal, *narrated({}), *narrated({})],
+    )
+    saved = []
+
+    async def save(record) -> None:
+        saved.append(record)
+
+    working = WorkingContextProvider(adapter, save=save, pin_first_user=False)
+    history = [{"role": "system", "content": "Only saved campaign facts are authoritative."}]
+    for index in range(4):
+        history += [{"role": "user", "content": f"Player step {index}. " + "x" * 2000},
+                    {"role": "assistant", "content": f"Narration {index}. " + "y" * 2000}]
+    history.append({"role": "user", "content": "I open the door."})
+    assert working.budget_terms(history, None, {})["capacity"] == 1_000_000
+
+    response = asyncio.run(working.generate(history))
+    assert response.content == "Open."
+    # Refused request, one summary request, one resend: three steps and no more.
+    assert len(connection.writes) == 6
+    assert len(saved) == 1 and saved[0]["covered_exchanges"] == 8
+    assert working.budget_terms(history, None, {})["capacity"] == 200_000
+    assert adapter.model_info.context_window is None
 
 
 def tool_history() -> list[dict]:
@@ -128,7 +277,7 @@ def assert_step_removed(connection, tmp_path):
     assert not connection.step.exists()
 
 
-def provider(tmp_path, monkeypatch, events):
+def provider(tmp_path, monkeypatch, events, name="opus"):
     connection = Connection(events)
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
     monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
@@ -140,7 +289,8 @@ def provider(tmp_path, monkeypatch, events):
         connection.environment = environment
         return connection
 
-    return ClaudeProvider(tmp_path / "runtime", model(), connection_factory=factory), connection
+    adapter = ClaudeProvider(tmp_path / "runtime", model(name), connection_factory=factory)
+    return adapter, connection
 
 
 def native_call(name="inspect", arguments=None):
@@ -470,7 +620,9 @@ def planning_capacity(adapter) -> int:
 def test_the_window_claude_code_reports_is_planned_with_from_the_next_request(
     tmp_path, monkeypatch,
 ):
-    adapter, _ = provider(tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}))
+    adapter, _ = provider(
+        tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}), UNLISTED,
+    )
     info = adapter.model_info
     assert info.context_window is None and planning_capacity(adapter) == 200_000
 
@@ -509,7 +661,9 @@ def test_the_reported_counts_and_window_are_audited_without_the_price_estimate(
 
 
 def test_a_saved_context_allowance_still_caps_the_reported_window(tmp_path, monkeypatch):
-    adapter, _ = provider(tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}))
+    adapter, _ = provider(
+        tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}), UNLISTED,
+    )
     info = adapter.model_info
     info.configured_context_window = info.context_window = 200_000
     info.context_window_source = "user_configured"
@@ -536,7 +690,7 @@ def test_only_a_plain_figure_for_the_selected_model_is_used(
     events = narrated(reported)
     if resolved is not None:
         events.insert(0, {"type": "system", "subtype": "init", "tools": [], "model": resolved})
-    adapter, _ = provider(tmp_path, monkeypatch, events)
+    adapter, _ = provider(tmp_path, monkeypatch, events, UNLISTED)
     asyncio.run(adapter.generate(tool_history()))
     assert adapter.model_info.runtime_context_window == expected
     assert adapter.model_info.context_window == expected
@@ -551,6 +705,7 @@ def test_a_request_claude_refuses_as_too_large_withdraws_the_reported_window(
         tmp_path, monkeypatch,
         narrated({"claude-opus-5-5": 1_000_000}) + [refusal]
         + narrated({"claude-opus-5-5": 1_000_000}),
+        UNLISTED,
     )
     info = adapter.model_info
     asyncio.run(adapter.generate(tool_history()))
@@ -566,7 +721,8 @@ def test_a_request_claude_refuses_as_too_large_withdraws_the_reported_window(
     assert info.runtime_context_window is None and info.context_window is None
     assert info.runtime_context_source == info.context_window_source == "unknown"
     assert planning_capacity(adapter) == 200_000
-    assert "refused a request planned within its reported context window" in caplog.text
+    assert "refused a request planned within a context window of 1000000" in caplog.text
+    assert "(runtime_reported)" in caplog.text
 
     # The same figure reported again is not trusted for the rest of this provider's life.
     asyncio.run(adapter.generate(tool_history()))
@@ -578,7 +734,9 @@ def test_a_refusal_keeps_a_saved_allowance_and_one_without_a_reported_window_cha
 ):
     refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
                "errors": ["prompt is too long"]}
-    adapter, _ = provider(tmp_path, monkeypatch, [refusal, *narrated({"x": 1_000_000}), refusal])
+    adapter, _ = provider(
+        tmp_path, monkeypatch, [refusal, *narrated({"x": 1_000_000}), refusal], UNLISTED,
+    )
     info = adapter.model_info
     info.configured_context_window = info.context_window = 600_000
     info.context_window_source = "user_configured"
@@ -859,7 +1017,12 @@ def test_setup_saves_separate_runtime_and_resolves_after_reopen(tmp_path, monkey
     resolver = ConfiguredProviderResolver(tmp_path / "config.yaml")
     choice = resolver.model_choices()[0]
     assert choice["output_budget_mode"] == "runtime_managed"
-    assert choice["context_window"] is None
+    # A listed name is saved with its documented window, shown as a catalog figure.
+    assert choice["context_window"] == 1_000_000
+    saved = settings["configured"][0]["models"][0]
+    assert saved["runtime_context_window"] == 1_000_000
+    assert saved["runtime_context_source"] == "model_catalog"
+    assert saved["configured_context_window"] is None
     assert output_allowance(model()) is None
     for role in [WriterRole.DM, WriterRole.BUILDER]:
         record = SessionRecord(
