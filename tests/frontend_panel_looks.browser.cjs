@@ -119,6 +119,50 @@ test('SRD Lite panels use the fantasy look for casters and non-casters alike', {
   } finally { await browser.close(); }
 });
 
+// On an SRD adventurer card the party role shares the Details row with the Details control. With a wider font
+// (Linux desktops usually give DejaVu Sans) the two ran together as "DetailsPlayer Character". They need clear
+// space between them, and the role stays whole inside the card.
+test('SRD party card keeps Details and the party role apart', { timeout: 60000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await open(browser);
+    await show(page, nonCaster(srd));
+    // In the installed app's default arrangement the Party panel is short, so its cards form the compact strip
+    // (the roster content is a size container; the strip applies below 229px). Size it so here, at the app's
+    // own panel width.
+    await page.evaluate(() => {
+      const content = document.querySelector('[data-panel-id="dnd-party"] .ruleset-panel-content');
+      Object.assign(content.style, { height: '200px', maxHeight: '200px', width: '225px' });
+    });
+    const card = page.locator('[data-panel-id="dnd-party"] .squad-card').first();
+    await card.waitFor();
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+    const geometry = await card.evaluate((node) => {
+      const text = (element) => { const range = document.createRange(); range.selectNodeContents(element);
+        const r = range.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom }; };
+      const role = node.querySelector('.panel-unit-role');
+      const box = node.getBoundingClientRect();
+      return { card: { left: box.left, right: box.right }, role: text(role), roleText: role.textContent,
+        details: text(node.querySelector('.roster-inspection > summary')),
+        roleCut: role.scrollWidth > role.clientWidth + 0.5, roleEllipsis: getComputedStyle(role).textOverflow,
+        roleFontSize: parseFloat(getComputedStyle(role).fontSize),
+        strip: Boolean(node.closest('.squad-list')) };
+    });
+    assert.equal(geometry.roleText, 'Player Character');
+    const sameRow = Math.min(geometry.role.bottom, geometry.details.bottom) - Math.max(geometry.role.top, geometry.details.top) > 0.5;
+    if (sameRow) {
+      const gap = geometry.role.left - geometry.details.right;
+      // At least one character's height apart, so the gap holds when a desktop draws the labels larger.
+      assert.ok(gap >= geometry.roleFontSize,
+        `Details and the role need space between them (gap ${gap.toFixed(1)}px): ${JSON.stringify(geometry)}`);
+    }
+    assert.ok(geometry.role.left >= geometry.card.left - 0.5 && geometry.role.right <= geometry.card.right + 0.5,
+      `the role stays inside the card: ${JSON.stringify(geometry)}`);
+    assert.equal(geometry.roleCut, false, `the role is shown whole on the card: ${JSON.stringify(geometry)}`);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('Trigger Discipline panels keep the tactical look', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {
