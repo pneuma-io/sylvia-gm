@@ -10,7 +10,6 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import webbrowser
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from functools import wraps
@@ -21,6 +20,7 @@ from urllib.parse import urlsplit
 import httpx
 
 from sylvia_gm.config._credential_protection import UNAVAILABLE_MESSAGE, unprotect_credentials
+from sylvia_gm.config._host_browser import open_in_browser
 from sylvia_gm.config._resolver import ConfigError
 from sylvia_gm.config._user_settings import CONFIG_LOCK, read_user_settings, write_user_settings
 from sylvia_gm.config.loader import load_config, provider_credentials
@@ -402,11 +402,7 @@ def open_provider_setup(preset_id: object) -> dict[str, object]:
     url = preset.get("setup_url")
     if not isinstance(url, str):
         raise ConfigError("Ask your custom service for its connection instructions")
-    try:
-        opened = webbrowser.open(url, new=2)
-    except (OSError, webbrowser.Error):
-        opened = False
-    return {"opened": bool(opened), "url": url}
+    return {"opened": open_in_browser(url), "url": url}
 
 
 def _provider_profile_id(

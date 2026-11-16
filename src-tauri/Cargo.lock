@@ -3307,6 +3307,7 @@ dependencies = [
 name = "sylvia-gm"
 version = "0.4.0-alpha.1"
 dependencies = [
+ "gtk",
  "hex",
  "hmac",
  "rand 0.8.7",

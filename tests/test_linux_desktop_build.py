@@ -239,6 +239,34 @@ def test_linux_dialogs_need_no_desktop_helpers_and_never_open_in_the_bundle_fold
     assert "set_current_dir" not in shell
 
 
+def test_linux_error_boxes_cannot_wait_for_the_loop_that_draws_them():
+    import tomllib
+
+    cargo = tomllib.loads((ROOT / "src-tauri/Cargo.toml").read_text(encoding="utf-8"))
+    shell = (ROOT / "src-tauri/src/lib.rs").read_text(encoding="utf-8")
+    # A blocking rfd box asked for on the thread that runs the GTK loop waits for itself: the
+    # start-up "selected data unavailable" box hung this way. One helper shows every blocking
+    # box and, on that thread, uses GTK directly. GTK is already part of the Linux build.
+    assert cargo["target"]['cfg(target_os = "linux")']["dependencies"]["gtk"] == "0.18"
+    assert "gtk" not in cargo["dependencies"]
+    assert shell.count("rfd::MessageDialog::new()") == 1
+    helper = shell[shell.index("fn error_box(") : shell.index("pub fn run() {")]
+    assert "rfd::MessageDialog::new()" in helper
+    assert '#[cfg(target_os = "linux")]' in helper
+    assert "if gtk::is_initialized_main_thread() {" in helper
+    assert "dialog.run();" in helper
+    assert shell.count("error_box(") == 8
+    for title in (
+        "Sylvia GM - storage unavailable",
+        "Sylvia GM - update repair required",
+        "Sylvia GM - selected data unavailable",
+        "Sylvia GM - owner close failed",
+        "Sylvia GM - close not completed",
+        "Sylvia GM - exit not completed",
+    ):
+        assert f'"{title}"' in shell
+
+
 def test_a_missing_codex_runtime_says_what_to_do_where_the_desktop_path_is_short(
     tmp_path, monkeypatch
 ):
