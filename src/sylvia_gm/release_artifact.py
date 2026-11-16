@@ -182,6 +182,8 @@ class ReleasePlatform:
     # Where the notices for bundled system libraries sit in the layout, for a platform whose
     # artifact carries them; such a layout must hold the file and its manifest record.
     bundled_notices_path: str | None = None
+    # Artifact kinds a person starts directly; the layout keeps them marked executable.
+    executable_kinds: frozenset[str] = frozenset()
 
     @property
     def signing(self) -> dict[str, str]:
@@ -229,6 +231,7 @@ def linux_release_platform() -> ReleasePlatform:
         toolchain_keys=_TOOLCHAIN_KEYS | {"appimage_tools_sha256", "build_system", "glibc"},
         disclosure=LINUX_UNSIGNED_DISCLOSURE,
         bundled_notices_path=LINUX_BUNDLED_NOTICES_PATH,
+        executable_kinds=frozenset({"appimage"}),
     )
 
 
@@ -538,6 +541,9 @@ def assemble_release_layout(
         for artifact in selected:
             destination = staging / artifact.source.name
             shutil.copyfile(artifact.source, destination)
+            if artifact.kind in platform.executable_kinds:
+                # copyfile copies bytes only; an AppImage that is not executable does not start.
+                destination.chmod(0o755)
             records.append(
                 {
                     "kind": artifact.kind,

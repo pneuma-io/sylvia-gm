@@ -59,6 +59,22 @@ def isolated_environment(home: Path) -> dict[str, str]:
     return environment
 
 
+def missing_runtime_message(windows: bool) -> str:
+    """What to tell a person when no Codex runtime is found.
+
+    A Linux desktop starts applications with a shorter PATH than a terminal has, so a Codex
+    that works in a terminal can still be invisible here; say how to make it visible.
+    """
+    message = "Install the Codex runtime before connecting ChatGPT."
+    if windows:
+        return message
+    return (
+        f"{message} Sylvia looks for the codex program in the folders on its PATH. If Codex "
+        "is already installed, start Sylvia from a terminal in which codex works, or link "
+        "codex into a folder your desktop session has on its PATH, such as ~/.local/bin."
+    )
+
+
 def find_codex_runtime() -> str | None:
     """Find a native runtime on PATH or in the Windows Codex desktop installation."""
     executable = shutil.which("codex")
@@ -160,7 +176,7 @@ class CodexConnection:
         """Create and retain only this connection's isolated runtime instance."""
         resolved = str(self.executable) if self.executable else find_codex_runtime()
         if not resolved or (os.name == "nt" and Path(resolved).suffix.lower() != ".exe"):
-            raise CodexConnectionError("Install the Codex runtime before connecting ChatGPT.")
+            raise CodexConnectionError(missing_runtime_message(os.name == "nt"))
         self.workspace.mkdir(parents=True, exist_ok=True)
         self._responses = queue.Queue()
         self._notifications = queue.Queue(maxsize=8192)

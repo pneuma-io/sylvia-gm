@@ -34,7 +34,7 @@ async function openShell(browser, viewport, { browserInvoke = false } = {}) {
     let body = fs.readFileSync(file);
     if (name === 'app.js') body = body.toString().replace(
       "document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
-      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings, refreshApplicationInfo, renderDictation };\n  // ---- Public API ----');
+      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings, refreshApplicationInfo, renderDictation, renderClaudeStatus };\n  // ---- Public API ----');
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' :
       name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
@@ -456,21 +456,64 @@ test('the Linux app says dictation is not available yet and keeps its button off
       window.layoutTest.openSettings('dictation');
       await new Promise(resolve => setTimeout(resolve, 50));
       const status = document.getElementById('dictation-model-status').textContent;
+      // The lists, the shortcut hint and the model note describe a feature; they show only where it exists.
+      const controls = ['.settings-field-grid', '.provider-field-help', '#dictation-privacy'].map(selector =>
+        getComputedStyle(document.querySelector(`#settings-panel-dictation ${selector}`)).display !== 'none');
       window.layoutTest.closeSettings();
       window.layoutTest.state.view = 'session';
       document.getElementById('player-input').disabled = false;
       window.layoutTest.renderDictation({ phase: 'idle', message: '', transcript: '' });
       const toggle = document.getElementById('dictation-toggle');
-      return { status, disabled: toggle.disabled, label: toggle.getAttribute('aria-label') };
+      return { status, controls, disabled: toggle.disabled, label: toggle.getAttribute('aria-label') };
     }, platform);
-    assert.deepEqual(await facts('linux'), {
-      status: 'Dictation is not available in the Linux app yet. You can keep typing.',
-      disabled: true, label: 'Dictation is not available in the Linux app yet',
-    });
+    // Windows first: once a host has said it is Linux the page stays marked for Linux.
     assert.deepEqual(await facts('windows'), {
       status: 'Local speech isn’t available in this copy of Sylvia. You can keep typing.',
-      disabled: false, label: 'Start dictation',
+      controls: [true, true, true], disabled: false, label: 'Start dictation',
     });
+    assert.deepEqual(await facts('linux'), {
+      status: 'Dictation is not available in the Linux app yet. You can keep typing.',
+      controls: [false, false, false], disabled: true, label: 'Dictation is not available in the Linux app yet',
+    });
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
+});
+
+test('a Linux host says Claude Code setup is Windows-only at once and offers no download', async () => {
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
+    const facts = (platform, result) => page.evaluate(async ({ platform, result }) => {
+      const info = { product_name: 'Sylvia GM', version: '0.0.0', release_channel: 'alpha', signing_status: 'unsigned', platform };
+      window.layoutTest.state.bridge = { application_info: async () => info };
+      await window.layoutTest.refreshApplicationInfo();
+      window.layoutTest.renderClaudeStatus(result);
+      const hidden = (selector) => document.querySelector(selector).hidden;
+      return {
+        status: document.getElementById('claude-connection-status').textContent,
+        detail: document.getElementById('claude-connection-detail').hidden ? '' : document.getElementById('claude-connection-detail').textContent,
+        install: !hidden('[data-claude-action="install"]'), terms: !hidden('#claude-terms-btn'),
+        help: !hidden('#claude-install-help'), check: !hidden('[data-claude-action="status"]'),
+      };
+    }, { platform, result });
+    const missing = { installed: false };
+    assert.deepEqual(await facts('windows', missing), {
+      status: 'Sylvia doesn’t have its copy of Claude Code yet.', detail: '',
+      install: true, terms: true, help: true, check: true,
+    });
+    assert.deepEqual(await facts('linux', missing), {
+      status: 'Sylvia doesn’t have its copy of Claude Code yet.',
+      detail: 'Sylvia can set up Claude Code on Windows only in this version.',
+      install: false, terms: false, help: false, check: true,
+    });
+    // A copy that is already there is used on Linux like anywhere else.
+    const ready = await facts('linux', { installed: true, supported: true, signed_in: false, version: '2.1.0' });
+    assert.equal(ready.status, 'Claude Code is ready. Sign in to use your account.');
+    assert.equal(ready.detail, '');
+    // Before any check nothing is claimed.
+    assert.equal((await facts('linux', null)).install, false);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();
