@@ -320,6 +320,16 @@ def runtime_failure(event: dict[str, Any]) -> ProviderError:
     )
 
 
+#: The adapter's own refusals of a response, by their message, as codes for the audit.
+_INVALID_REASONS = {
+    "Claude requested an unavailable or uncorrelated Sylvia operation.": "uncorrelated_call",
+    "Claude did not expose exactly this request's Sylvia tools.": "tools_not_exposed",
+    "Claude could not admit the requested operation under its native permissions.": (
+        "operation_not_admitted"
+    ),
+    "Claude returned invalid text.": "invalid_text",
+}
+
 #: The whole-number fields of a result record's per-model usage that are kept for the audit.
 _MODEL_USAGE_COUNTS = (
     "inputTokens", "outputTokens", "cacheReadInputTokens", "cacheCreationInputTokens",
@@ -480,6 +490,7 @@ class ClaudeProvider(Provider):
                 native_state = _AnthropicStreamContent()
                 native_content: list[dict[str, Any]] | None = None
                 has_native_stream = False
+                event: dict[str, Any] = {}
                 deferred_call: dict[str, Any] | None = None
                 try:
                     await self.hooks.fire_on_request(
@@ -696,7 +707,11 @@ class ClaudeProvider(Provider):
                                 block = blocks.pop(native["index"], {})
                                 if block.get("type") == "tool_use":
                                     if "partial_json" in block:
-                                        block["input"] = json.loads(block.pop("partial_json"))
+                                        # An operation without arguments streams an empty
+                                        # string; its input stays the start block's {}.
+                                        fragments = block.pop("partial_json")
+                                        if fragments:
+                                            block["input"] = json.loads(fragments)
                                     pending.append(block)
                             elif subtype == "message_delta":
                                 input_usage.update(native.get("usage", {}))
@@ -749,7 +764,13 @@ class ClaudeProvider(Provider):
                         )
                     )
                     yield ProviderStreamChunk(finish_reason=response.finish_reason)
-                except (AttributeError, KeyError, TypeError, ValueError):
+                except InvalidResponseError as error:
+                    await self._audit_invalid_response(
+                        _INVALID_REASONS.get(str(error), "invalid_response"), event, pending,
+                    )
+                    raise
+                except (AttributeError, KeyError, TypeError, ValueError) as error:
+                    await self._audit_invalid_response("malformed_event", event, pending, error)
                     raise InvalidResponseError(
                         "Claude returned an invalid runtime response."
                     ) from None
@@ -824,6 +845,52 @@ class ClaudeProvider(Provider):
             raise
         except Exception:  # noqa: BLE001 - saving evidence never fails the player's step
             logger.warning("Claude runtime context records could not be saved.", exc_info=True)
+
+    async def _audit_invalid_response(
+        self, reason: str, event: dict[str, Any], pending: list[dict[str, Any]],
+        error: BaseException | None = None,
+    ) -> None:
+        """Say which check refused a response: kinds, codes and tool names, never content."""
+
+        def part(value: object) -> dict[str, Any]:
+            return value if isinstance(value, dict) else {}
+
+        request = part(event.get("request"))
+        subtype = next(
+            (
+                value
+                for value in (
+                    event.get("subtype"), part(event.get("event")).get("type"),
+                    part(request.get("message")).get("method"), request.get("subtype"),
+                )
+                if isinstance(value, str)
+            ),
+            None,
+        )
+        denials = event.get("permission_denials")
+        facts = {
+            "reason": reason,
+            "event": event.get("type") if isinstance(event.get("type"), str) else None,
+            "subtype": subtype,
+            "exception": type(error).__name__ if error is not None else None,
+            "permission_denials": [
+                str(denial.get("tool_name")) for denial in denials if isinstance(denial, dict)
+            ] if isinstance(denials, list) else [],
+            "pending_tool_uses": [str(block.get("name")) for block in pending],
+        }
+        logger.warning("The Claude adapter refused a response: %s", facts)
+        await self.hooks.fire_on_request(
+            HookContext(
+                provider_key="claude_runtime",
+                model_id=self.model_info.id,
+                stream=True,
+                request_json={
+                    "direction": "receive",
+                    "method": "claude/invalid_response",
+                    "params": facts,
+                },
+            )
+        )
 
     async def _audit_model_usage(self, usage_by_model: object, resolved_model: str | None) -> None:
         """Record the counts and windows Claude Code reports per model, never its price estimate."""

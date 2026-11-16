@@ -271,6 +271,103 @@ def test_stream_returns_one_admitted_tool_only_after_child_collection(tmp_path, 
     assert_step_removed(connection, tmp_path)
 
 
+END_TURN = [{"type": "function", "function": {
+    "name": "end_turn", "description": "End the turn", "parameters": {"type": "object"},
+}}]
+
+
+def streamed_call_without_arguments(fragments):
+    """A tool use as Claude streams it for an operation that takes no arguments.
+
+    The start block carries ``input: {}``; the argument deltas that follow are empty strings,
+    or there are none at all.
+    """
+    events = [
+        {"type": "content_block_start", "index": 0,
+         "content_block": {"type": "text", "text": ""}},
+        {"type": "content_block_delta", "index": 0,
+         "delta": {"type": "text_delta", "text": "Next step is ending the turn."}},
+        {"type": "content_block_stop", "index": 0},
+        {"type": "content_block_start", "index": 1, "content_block": {
+            "type": "tool_use", "id": "call_end", "name": "mcp__sylvia__end_turn", "input": {}}},
+        *({"type": "content_block_delta", "index": 1,
+           "delta": {"type": "input_json_delta", "partial_json": fragment}}
+          for fragment in fragments),
+        {"type": "content_block_stop", "index": 1},
+        {"type": "message_stop"},
+    ]
+    call = native_call("end_turn", {"unused": True})
+    call["request"]["message"]["params"]["arguments"] = {}
+    return [{"type": "stream_event", "event": event} for event in events] + [call]
+
+
+@pytest.mark.parametrize("fragments", [[""], ["", ""], [], ["{}"], ["{", "}"]])
+def test_an_operation_without_arguments_is_returned_like_any_other(
+    tmp_path, monkeypatch, fragments,
+):
+    adapter, connection = provider(
+        tmp_path, monkeypatch, streamed_call_without_arguments(fragments),
+    )
+    response = asyncio.run(adapter.generate([{"role": "user", "content": "Attack."}], END_TURN))
+    assert response.content == "Next step is ending the turn."
+    assert [(call.id, call.name, call.arguments) for call in response.tool_calls] == [
+        ("call_end", "end_turn", "{}"),
+    ]
+    assert response.finish_reason == "tool_calls" and connection.closed
+
+
+class RefusalAudit:
+    def __init__(self):
+        self.records = []
+
+    async def on_request(self, context):
+        if (context.request_json or {}).get("method") == "claude/invalid_response":
+            self.records.append(context.request_json)
+
+
+@pytest.mark.parametrize(("events", "tools", "expected"), [
+    # Arguments that are not JSON: the event being read and the failure's kind, no content.
+    (streamed_call_without_arguments(["{"]), END_TURN, {
+        "reason": "malformed_event", "event": "stream_event", "subtype": "content_block_stop",
+        "exception": "JSONDecodeError", "permission_denials": [], "pending_tool_uses": [],
+    }),
+    # A call Claude Code makes that the model's stream did not announce with these arguments.
+    (streamed_call_without_arguments([""])[:-1] + [native_call("end_turn", {"extra": 1})],
+     END_TURN, {
+        "reason": "uncorrelated_call", "event": "control_request", "subtype": "tools/call",
+        "exception": None, "permission_denials": [],
+        "pending_tool_uses": ["mcp__sylvia__end_turn"],
+    }),
+    # Claude Code ended the step without making the announced call, and says it was denied.
+    (streamed_call_without_arguments([""])[:-1] + [{
+        "type": "result", "subtype": "success", "is_error": False, "result": "",
+        "permission_denials": [{"tool_name": "mcp__sylvia__end_turn", "tool_input": {"x": "y"}}],
+    }], END_TURN, {
+        "reason": "operation_not_admitted", "event": "result", "subtype": "success",
+        "exception": None, "permission_denials": ["mcp__sylvia__end_turn"],
+        "pending_tool_uses": ["mcp__sylvia__end_turn"],
+    }),
+    # Claude Code started with other tools than this request's.
+    ([{"type": "system", "subtype": "init", "tools": ["Bash"]}], END_TURN, {
+        "reason": "tools_not_exposed", "event": "system", "subtype": "init",
+        "exception": None, "permission_denials": [], "pending_tool_uses": [],
+    }),
+])
+def test_a_refused_response_says_which_check_refused_it_and_nothing_of_its_content(
+    tmp_path, monkeypatch, caplog, events, tools, expected,
+):
+    adapter, connection = provider(tmp_path, monkeypatch, events)
+    audit = RefusalAudit()
+    adapter.hooks.register(audit)
+    with caplog.at_level("WARNING"), pytest.raises(InvalidResponseError):
+        asyncio.run(adapter.generate([{"role": "user", "content": "Attack."}], tools))
+    assert [record["params"] for record in audit.records] == [expected]
+    assert audit.records[0]["direction"] == "receive"
+    assert f"'reason': '{expected['reason']}'" in caplog.text
+    assert "ending the turn" not in str(audit.records) + caplog.text
+    assert connection.closed
+
+
 @pytest.mark.parametrize("name,arguments", [("Bash", {}), ("inspect", {"target": "wrong"})])
 def test_unadvertised_or_uncorrelated_calls_never_escape(tmp_path, monkeypatch, name, arguments):
     events = [
