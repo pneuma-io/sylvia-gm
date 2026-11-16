@@ -5995,6 +5995,7 @@ const SylviaGMFrontend = (() => {
       ...participants.filter((participant) => (participant.data?.party_role || participant.kind) !== 'player_character'),
     ];
     const acting = mapActingActorId();
+    const partyStyle = panelWidget('party').style;
     const cards = ordered.map((participant) => {
       const details = participant.data || {};
       const detailSurface = state.panelProjection?.surfaces.find((item) => item.renderer === 'unit_list' &&
@@ -6044,7 +6045,17 @@ const SylviaGMFrontend = (() => {
       // Suite card: the whole card face is the inspect control; vitals, AP and weapon read at a glance.
       const shortClass = [details.class_id || details.class || entity.class_id ? panelIdentifierLabel(details.class_id || details.class || entity.class_id) : '',
         Number.isFinite(details.level ?? entity.level) ? `L${details.level ?? entity.level}` : ''].filter(Boolean).join(' · ');
-      const cardFace = `${actorTokenMarkup(participant.id, details.name)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
+      // Adventurer card (fantasy PanelWidget style): an HP medal, the class by name and level, and AC and HP as numbers.
+      const adventurer = partyStyle === 'adventurer-cards';
+      const adventurerClass = Array.isArray(details.classes) && details.classes.length ? details.classes.map((item) =>
+        `${panelIdentifierLabel(item.id || '').replace(/\b\w/g, (letter) => letter.toUpperCase())}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : shortClass;
+      const adventurerVitals = [Number.isFinite(entity.armor_class) ? `AC <b>${escapeHtml(entity.armor_class)}</b>` : '',
+        Number.isFinite(entity.hp) ? `HP <b>${escapeHtml(entity.hp)}</b>${Number.isFinite(entity.max_hp) ? `/${escapeHtml(entity.max_hp)}` : ''}` : ''].filter(Boolean);
+      const cardFace = adventurer
+        ? `${suiteMedal(participant.id, details.name, entity, 40)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
+          (adventurerClass ? `<small>${escapeHtml(adventurerClass)}</small>` : '') + '</span>' +
+          (adventurerVitals.length ? `<span class="sq-bars sq-vitals">${adventurerVitals.map((item) => `<span class="sq-num">${item}</span>`).join('')}</span>` : '') + '</span>'
+        : `${actorTokenMarkup(participant.id, details.name)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
         (shortClass ? `<small>${escapeHtml(shortClass)}</small>` : '') + '</span>' +
         `<span class="sq-bars">${suiteBar(entity.hp, entity.max_hp, 'hp', 'HP') || (Number.isFinite(entity.hp) ? `<span class="sq-num">HP <b>${escapeHtml(entity.hp)}</b></span>` : '')}` +
         `${suitePips(entity.ap, entity.max_ap)}${Number.isFinite(entity.ap) && !suitePips(entity.ap, entity.max_ap) ? `<span class="sq-num">AP <b>${escapeHtml(entity.ap)}</b></span>` : ''}</span>` +
@@ -6177,6 +6188,9 @@ const SylviaGMFrontend = (() => {
       return entries.length ? `<details class="character-stat-group" data-character-stat="${escapeHtml(JSON.stringify([actorId, field]))}"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
         entries.map(([name, value]) => `<span>${escapeHtml(panelIdentifierLabel(name))} <b>${value}</b></span>`).join('') + '</details>' : '';
     }).join('');
+    // The fantasy character sheet draws every character without a carried firearm, caster or not.
+    if (!compact && panelWidget('unit_list').style === 'character-sheet' && !(entity.weapon && typeof entity.weapon === 'object'))
+      return grimoireMarkup(surface, actorId, { participant, entity, name, details, values });
     if (!compact) return operatorMarkup(surface, actorId, { participant, entity, name, details, level, values });
     return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
       (compact ? (description ? `<p class="character-description">${description}</p>` : '') : `<div class="character-identity">${actorTokenMarkup(actorId, name)}` +
@@ -6214,9 +6228,17 @@ const SylviaGMFrontend = (() => {
     return other ? other.data.spell_categories : {};
   }
 
+  // Roman numerals for the fantasy sheet's numbered resource tiers (1 to 39); other numbers stay as they are.
+  function romanNumeral(number) {
+    if (!Number.isInteger(number) || number < 1 || number > 39) return String(number);
+    return 'X'.repeat(Math.floor(number / 10)) + ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][number % 10];
+  }
+
   function grimoireMarkup(surface, actorId, { participant, entity, name, details, values }) {
     const { map, casts } = mapCastActions();
     const categories = projectedSpellCategories(surface);
+    const sheet = panelWidget('unit_list');
+    const fantasy = sheet.style === 'character-sheet';
     const word = (value) => String(panelIdentifierLabel(value || '')).replace(/\b\w/g, (letter) => letter.toUpperCase());
     const initials = (key) => word(key).split(/\s+/).map((part) => part.charAt(0)).join('');
     const classes = Array.isArray(details.classes) ? details.classes.map((item) => `${word(item.id)}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
@@ -6252,7 +6274,9 @@ const SylviaGMFrontend = (() => {
       const available = panelActionAvailable(map, action, actorId);
       const label = action.label || panelIdentifierLabel(action.id);
       const category = typeof categories[action.params?.spell] === 'string' ? categories[action.params.spell].trim() : '';
-      const subline = [category ? word(category) : '', resource ? word(resource) : ''].filter(Boolean).join(' · ');
+      // The fantasy sheet reads level first, as the reel does: "Cantrip · Evocation".
+      const subline = (fantasy ? [resource ? word(resource) : '', category ? word(category) : '']
+        : [category ? word(category) : '', resource ? word(resource) : '']).filter(Boolean).join(' · ');
       return `<button type="button" class="grim-spell${available ? '' : ' is-off'}" data-grimoire-cast="${escapeHtml(action.id)}" data-grimoire-map="${escapeHtml(map.id)}" ` +
         (category ? `data-spell-category="${escapeHtml(category)}" ` : '') +
         `aria-label="Ready ${escapeHtml(label)}: choose a target on ${escapeHtml(map.title || 'the map')}" ${available ? '' : 'aria-disabled="true"'}>${suiteIcon(suiteActionIcon(action) || 'burstarea')}` +
@@ -6260,7 +6284,11 @@ const SylviaGMFrontend = (() => {
         `<span class="grim-spell-cost">${resourceCost(resource)}</span></button>`;
     };
     // Projected scores as projected, in projected order; membership in a projected proficiency list is highlighted.
-    const abilities = details.abilities && typeof details.abilities === 'object' ? Object.entries(details.abilities).filter(([, score]) => Number.isFinite(score)) : [];
+    // A declared ability order (a field of the character-sheet style) places those first; the rest follow as projected.
+    const abilityOrder = Array.isArray(sheet.fields.abilities) ? sheet.fields.abilities : [];
+    const abilityRank = (key) => (abilityOrder.includes(key) ? abilityOrder.indexOf(key) : abilityOrder.length);
+    const abilities = details.abilities && typeof details.abilities === 'object' ? Object.entries(details.abilities).filter(([, score]) => Number.isFinite(score))
+      .sort(([a], [b]) => abilityRank(a) - abilityRank(b)) : [];
     const savesKey = 'saving_throw_proficiencies';
     const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
     const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
@@ -6268,9 +6296,9 @@ const SylviaGMFrontend = (() => {
       `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}: initials (no portrait projected)"><b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small></div>` +
       `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
       `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
-      `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` +
+      (casts.length ? `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` : '') +
       Array.from(families, ([prefix, items]) => `<section class="grim-slots" aria-label="${escapeHtml(word(prefix))}"><span class="grim-sec">${escapeHtml(word(prefix))}</span>` +
-        `<div class="grim-ribbon">${items.map(([number, value, key]) => `<span class="grim-tier" title="${escapeHtml(word(key))}: ${escapeHtml(value)}"><small>${escapeHtml(number)}</small>` +
+        `<div class="grim-ribbon">${items.map(([number, value, key]) => `<span class="grim-tier" title="${escapeHtml(word(key))}: ${escapeHtml(value)}"><small>${escapeHtml(fantasy ? romanNumeral(number) : number)}</small>` +
         `${'<i class="on"></i>'.repeat(Math.min(value, 6))}${value === 0 ? '<em>0</em>' : ''}</span>`).join('')}</div></section>`).join('') +
       (abilities.length ? `<div class="grim-runes" role="list" aria-label="${escapeHtml(word('abilities'))}">${abilities.map(([key, score]) =>
         `<span role="listitem" class="grim-rune${saves.includes(key) ? ' save' : ''}" title="${escapeHtml(word(key))} ${escapeHtml(score)}${saves.includes(key) ? ` · ${escapeHtml(word(savesKey))}` : ''}">` +
@@ -8036,6 +8064,24 @@ const SylviaGMFrontend = (() => {
     return selected;
   }
 
+  // The active Ruleset's PanelSystem look (architecture contract §10.5.1): neutral when none is declared, and
+  // neutral styles when the looks table is not loaded (the neutral styles share the tactical markup).
+  const NEUTRAL_WIDGETS = { party: 'roster', unit_list: 'sheet', encounter: 'turn-list', coordinate_map: 'plain', tactical_grid: 'plain' };
+  let resolvedPanelLook = null;
+  function panelLook() {
+    const rulesetId = state.panelProjection?.ruleset_id || null;
+    if (!globalThis.SylviaPanelLooks) return null;
+    if (!resolvedPanelLook || resolvedPanelLook.key !== rulesetId)
+      resolvedPanelLook = { key: rulesetId, look: globalThis.SylviaPanelLooks.resolve(rulesetId) };
+    return resolvedPanelLook.look;
+  }
+
+  // The PanelWidget style (and its declared fields) a renderer draws with under the active look.
+  function panelWidget(renderer) {
+    const look = panelLook();
+    return look ? globalThis.SylviaPanelLooks.widget(look, renderer) : { style: NEUTRAL_WIDGETS[renderer] || 'plain', fields: {} };
+  }
+
   function panelContent(surface) {
     if (surface.renderer === 'piece_table') {
       return window.SylviaPieceTable.render(surface.data, surface.actions);
@@ -8129,7 +8175,7 @@ const SylviaGMFrontend = (() => {
       `<button type="button" class="btn btn-primary ruleset-panel-action" data-panel-action-id="${escapeHtml(selectedAction.id)}" ` +
       `${panelActionAvailable(surface, selectedAction) ? '' : 'disabled'}>${sequenceModeActive() ? 'Queue' : 'Commit'} ${escapeHtml(mapActionLabel(surface, selectedAction))}</button></div>` : '';
     return `<section class="ruleset-panel ${surface.id === ACTION_QUEUE_PANEL_ID ? 'ruleset-queue-panel' : ''} ${['tactical_grid', 'coordinate_map'].includes(surface.renderer) ? 'ruleset-map-panel' : surface.renderer === 'party' ? 'ruleset-roster-panel' : surface.renderer === 'unit_list' ? 'ruleset-character-panel' : ''}" data-panel-id="${escapeHtml(surface.id)}" ` +
-      `style="min-height:${minimum}px"><div>${header}` +
+      `data-panel-widget="${escapeHtml(panelWidget(surface.renderer).style)}" style="min-height:${minimum}px"><div>${header}` +
       `<div class="ruleset-panel-content" data-panel-size-id="${escapeHtml(surface.id)}" ` +
       `style="height:${preferred}px;min-height:${minimum}px">${mapSurface ? content.replace('<!--map-turn-end-->', contextual || endTurns.length
         ? `<span class="map-turn-end">${contextual}${endTurns.map((action) => `<button class="btn btn-secondary ruleset-panel-action map-end-turn" type="button" ` +
@@ -8168,6 +8214,7 @@ const SylviaGMFrontend = (() => {
     if (state.panelProjectionSource !== nativeProjection) state.panelActionChecks.clear();
     state.panelProjectionSource = nativeProjection;
     state.panelProjection = projection;
+    if (globalThis.SylviaPanelLooks) globalThis.SylviaPanelLooks.apply(document.documentElement, panelLook());
     state.queuePreviousCards = new Set(Array.from(container.querySelectorAll('[data-sequence-step]'), node => node.dataset.sequenceStep));
     const markup = gamePanels().markup(projection);
     applySidebarWidth();
