@@ -1427,7 +1427,8 @@ and reminds the GM to leave follow-up observation or investigation for a later p
 
 #### 13.1.1 GM request assembly: frozen prefix and append-only context
 
-The canonical assembly above decides what the GM should know. A separate wire layer, the context
+The canonical assembly above decides what the GM should know. Where it is selected (see *Mode
+switch* below; the previous assembly is the shipped default), a separate wire layer, the context
 ledger (`agent/_context_ledger.py`), decides how that reaches the provider, so that within a
 **context epoch** each GM request's messages are a byte-exact extension of the previous request's
 messages and the system prefix is identical. Correctness wins over prefix reuse: when in doubt,
