@@ -333,6 +333,39 @@ async def test_a_stalled_continued_thread_is_not_retried(
     assert len(runtime.connections) == 1 and runtime.alive() == []
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["stable", "answer"])
+async def test_a_stop_that_surfaces_as_a_lost_child_is_a_cancellation_not_a_retry(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads,  # noqa: F811
+    mode: str,
+) -> None:
+    from sylvia_gm.provider._codex_rpc import CodexConnectionError
+
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", mode)
+    first = tool_turn("call-1") if mode == "stable" else Waiting([asks("call-1", 7)], [])
+    runtime = AnswerRuntime(first, Turn([]), text_turn())
+    provider, audit = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    [connection] = runtime.connections
+    waited = connection.next_event
+
+    def stopped_while_waiting(timeout: float = 0.25) -> dict[str, Any] | None:
+        # The stop arrives during the wait, and the wait then finds the child gone.
+        event = waited(timeout)
+        if event is not None:
+            return event
+        connection.request_stop()
+        raise CodexConnectionError("The ChatGPT runtime stopped before completing its response.")
+
+    connection.next_event = stopped_while_waiting  # type: ignore[method-assign]
+    with pytest.raises(asyncio.CancelledError):
+        await provider.generate(SECOND, tools=TOOLS)
+    # No fresh thread, so no further model request after the stop.
+    assert len(runtime.connections) == 1 and runtime.alive() == [] and len(pool) == 0
+    assert audit.reuse[1]["retried_fresh"] is False
+    assert audit.receipts[1]["status"] == "cancelled"
+
+
 # ---- what a kept thread is matched on, and leftovers of its last turn ---------------------
 
 @pytest.mark.asyncio

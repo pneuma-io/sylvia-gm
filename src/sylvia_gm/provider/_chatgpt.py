@@ -1243,6 +1243,19 @@ class ChatGPTProvider(Provider):
                 request.status = status
             raise asyncio.CancelledError("The ChatGPT response was cancelled.") from None
         except CodexConnectionError as error:
+            if kept is not None:
+                # A stop that lands while a kept thread waits for events can surface as the
+                # child having gone. That is a cancellation: reported as a lost connection
+                # it would be retried on a fresh thread, a new model request after a stop.
+                try:
+                    self._check_stopped(connection)
+                except CodexCancelledError:
+                    if status != "completed":
+                        status = "cancelled"
+                        request.status = status
+                    raise asyncio.CancelledError(
+                        "The ChatGPT response was cancelled."
+                    ) from None
             raise ProviderConnectionError(str(error)) from None
         finally:
             # Closing the owned child cancels unresolved runtime calls and ephemeral history.
