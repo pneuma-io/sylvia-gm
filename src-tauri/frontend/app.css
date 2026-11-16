@@ -174,6 +174,9 @@ input:focus, textarea:focus, select:focus { outline: none; border-color: var(--a
    unless the page says it is dark, which left light text on a white list. Every Sylvia theme is
    dark. Set only for a Linux host, so other systems keep the controls they had. */
 html[data-host-platform="linux"] { color-scheme: dark; }
+/* The Linux app has no dictation yet. Its Settings page keeps the one line that says so and
+   hides the empty lists, the shortcut hint and the model note, which describe what is not there. */
+html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-grid, .provider-field-help, #dictation-privacy, #dictation-download) { display: none; }
 
 /* ============================================================
    UI-001 — Campaign Session Frame

@@ -136,6 +136,30 @@ def test_linux_layout_is_one_appimage_with_its_own_identity_and_disclosure(tmp_p
     assert f"{hashlib.sha256(BUNDLED).hexdigest()}  {LINUX_BUNDLED_NOTICES_PATH}\n" in sums
 
 
+@pytest.mark.runs_on("linux", reason="File permission bits are a POSIX property")
+def test_the_appimage_in_a_linux_layout_is_executable_and_other_files_are_not(tmp_path):
+    source = _appimage(tmp_path)
+    source.chmod(0o600)
+    output, manifest = _linux_release(tmp_path, artifacts=(ReleaseArtifact(source, "appimage"),))
+    appimage = output / manifest["artifacts"][0]["name"]
+    assert appimage.stat().st_mode & 0o777 == 0o755
+    assert (output / "LICENSE").stat().st_mode & 0o111 == 0
+    assert (output / LINUX_BUNDLED_NOTICES_PATH).stat().st_mode & 0o111 == 0
+    qualified = tmp_path / "qualified"
+    assemble_qualified_release_layout(
+        source=output,
+        output=qualified,
+        qualification={"ubuntu_22_04": "passed", "ubuntu_24_04": "passed"},
+        platform=linux_release_platform(),
+    )
+    assert (qualified / appimage.name).stat().st_mode & 0o777 == 0o755
+
+
+def test_only_the_linux_layout_marks_an_artifact_executable():
+    assert linux_release_platform().executable_kinds == frozenset({"appimage"})
+    assert windows_release_platform().executable_kinds == frozenset()
+
+
 def test_bundled_library_notices_are_required_on_linux_and_refused_on_windows(tmp_path):
     with pytest.raises(ReleaseArtifactError, match="Bundled library notices are required"):
         _linux_release(tmp_path, bundled_notices_path=None)

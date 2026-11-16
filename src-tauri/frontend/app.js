@@ -3157,6 +3157,9 @@ const SylviaGMFrontend = (() => {
     const supported = installed && result.supported === true;
     const pending = supported && result.login_pending === true;
     const signedIn = supported && result.signed_in === true && !pending;
+    // Sylvia fetches its own copy of Claude Code on Windows only. A Linux host says so as soon
+    // as the check finds no copy, and offers no download that could only be refused.
+    const setupUnavailable = checked && !installed && !installing && state.applicationInfo?.platform === 'linux';
     $('claude-signin-step').textContent = !checked ? '1. Set up Claude Code' : installing ? '1. Installing Claude Code'
       : !installed ? '1. Install Claude Code' : !supported ? '1. Update Claude Code' : signedIn ? '1. Claude connected'
         : pending ? '1. Finish sign-in in your browser' : '1. Sign in to Claude';
@@ -3178,7 +3181,8 @@ const SylviaGMFrontend = (() => {
     }
     // A finished setup's result is shown until the next button press, then normal status returns.
     const outcome = claudeInstallOutcome && !installing && install.message;
-    const detail = String(outcome || (checked && typeof result.message === 'string' ? result.message : '')).trim();
+    const detail = setupUnavailable ? 'Sylvia can set up Claude Code on Windows only in this version.'
+      : String(outcome || (checked && typeof result.message === 'string' ? result.message : '')).trim();
     $('claude-connection-detail').textContent = installing ? '' : detail;
     $('claude-connection-detail').hidden = installing || !detail || detail === $('claude-connection-status').textContent;
     $('claude-runtime-facts').hidden = !installed;
@@ -3200,7 +3204,7 @@ const SylviaGMFrontend = (() => {
     statusButton.classList.toggle('btn-secondary', checked);
     // One button installs, updates an unsupported copy, or looks for a newer release.
     const installButton = document.querySelector('[data-claude-action="install"]');
-    installButton.hidden = !checked || installing || pending;
+    installButton.hidden = !checked || installing || pending || setupUnavailable;
     installButton.textContent = !installed ? 'Install Claude Code for Sylvia' : !supported ? 'Update Claude Code'
       : 'Check for a newer version';
     installButton.classList.toggle('btn-primary', !supported);
@@ -3213,8 +3217,8 @@ const SylviaGMFrontend = (() => {
     cancelButton.hidden = !pending && !['checking', 'downloading'].includes(install.state);
     cancelButton.textContent = pending ? 'Cancel sign-in' : 'Cancel download';
     document.querySelector('[data-claude-action="logout"]').hidden = !signedIn || installing;
-    $('claude-terms-btn').hidden = !checked || supported;
-    $('claude-install-help').hidden = !checked || supported;
+    $('claude-terms-btn').hidden = !checked || supported || setupUnavailable;
+    $('claude-install-help').hidden = !checked || supported || setupUnavailable;
     $('claude-login-help').hidden = !supported || signedIn || installing;
     $('claude-cancel-help').hidden = cancelButton.hidden;
     $('claude-signout-help').hidden = !signedIn;

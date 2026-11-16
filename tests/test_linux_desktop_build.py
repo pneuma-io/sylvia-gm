@@ -239,6 +239,27 @@ def test_linux_dialogs_need_no_desktop_helpers_and_never_open_in_the_bundle_fold
     assert "set_current_dir" not in shell
 
 
+def test_a_missing_codex_runtime_says_what_to_do_where_the_desktop_path_is_short(
+    tmp_path, monkeypatch
+):
+    from sylvia_gm.provider import _codex_rpc
+
+    windows = _codex_rpc.missing_runtime_message(True)
+    other = _codex_rpc.missing_runtime_message(False)
+    # Windows keeps the sentence it always had.
+    assert windows == "Install the Codex runtime before connecting ChatGPT."
+    # A Linux desktop starts applications with a shorter PATH than a terminal has.
+    assert other.startswith(windows + " ")
+    assert "start Sylvia from a terminal in which codex works" in other
+    assert "~/.local/bin" in other
+    monkeypatch.setattr(_codex_rpc, "find_codex_runtime", lambda: None)
+    connection = _codex_rpc.CodexConnection(tmp_path / "codex-home")
+    with pytest.raises(_codex_rpc.CodexConnectionError) as refused:
+        connection._start_process()
+    assert str(refused.value) == _codex_rpc.missing_runtime_message(os.name == "nt")
+    assert not (tmp_path / "codex-home" / "workspace").exists()
+
+
 def test_desktop_shell_names_the_authority_and_private_data_folder_per_platform():
     shell = (ROOT / "src-tauri/src/lib.rs").read_text(encoding="utf-8")
     assert 'if cfg!(windows) { "sylvia-gm-owner.exe" } else { "sylvia-gm-owner" }' in shell

@@ -103,8 +103,14 @@ cd dist/sylvia-gm-<version>-linux-x86_64 && sha256sum -c SHA256SUMS.txt
 
 ## 5. Installed-application pass
 
-Run the built AppImage, not a development build. A person needs FUSE 2 (`libfuse2`) to start an
-AppImage directly; `--appimage-extract-and-run` starts it without.
+Run the built AppImage, not a development build. The copy in the release folder is marked
+executable; a downloaded copy is not, so a person runs `chmod +x` on it first, and the release
+notes should say so. A person needs FUSE 2 (`libfuse2`) to start an AppImage directly;
+`--appimage-extract-and-run` starts it without.
+
+On a machine that runs Linux inside Windows (WSL), remove the Windows folders from `PATH` before
+starting the app or a build. WSL adds them, and the app would otherwise find and start Windows
+programs, such as a Codex runtime with that person's own sign-in.
 
 The pass can be driven on a hidden X display, without a desktop session, which is how an agent
 runs it: start `Xvfb`, a window manager and one D-Bus session, set `GDK_BACKEND=x11` and
