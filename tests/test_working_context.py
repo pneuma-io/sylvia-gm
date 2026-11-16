@@ -140,9 +140,19 @@ async def test_a_claude_code_model_with_no_known_window_is_planned_as_a_claude_m
     messages = history()
     if admitted:
         assert await wrapper.prepare(messages, tools) == messages
-    else:
+    elif saved_window:
         with pytest.raises(TokenLimitError, match="cannot be shortened further"):
             await wrapper.prepare(messages, tools)
+    else:
+        # Issue 92: the model may be large enough; the refusal names the missing limit and
+        # where to enter it, and does not tell the player to use a larger model.
+        with pytest.raises(TokenLimitError) as refused:
+            await wrapper.prepare(messages, tools)
+        message = str(refused.value)
+        assert "does not know this model's context limit" in message
+        assert "planned for 65,536 tokens" in message
+        assert "Advanced model settings" in message
+        assert "larger context model" not in message
     assert not saved and not model.calls
 
 
