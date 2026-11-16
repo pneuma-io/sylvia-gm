@@ -321,6 +321,7 @@ PYTHON_JOURNEYS = {
     "interruption-and-recovery": [
         "tests/test_fc_recovery_composition.py",
         "tests/test_session_history_pages.py",
+        "tests/test_session_message_reads.py",
         "tests/test_alpha_f6e_owner_session_transport.py::"
         "test_owner_manual_retry_reuses_action_and_resettles_campaign_file",
         "tests/test_alpha_f6e_owner_session_transport.py::"
