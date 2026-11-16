@@ -506,18 +506,39 @@ async def test_without_the_switch_release_idle_does_nothing(
 async def test_exit_cleanup_closes_every_kept_thread(
     tmp_path: Path, stable: _chatgpt._KeptThreads,  # noqa: F811
 ) -> None:
-    import atexit
-
     runtime = Runtime(tool_turn("call-1"), tool_turn("call-2"))
     provider, _ = provider_for(runtime, tmp_path)
     await provider.generate(FIRST, tools=TOOLS)
     await provider.generate([SYSTEM, OPENING, user("Another session.")], tools=TOOLS)
     assert len(runtime.alive()) == len(stable) > 0
-    # Registered for interpreter exit: unregistering reports nothing, so run it and check.
-    atexit.unregister(_chatgpt._close_all_kept_threads)  # noqa: SLF001
-    atexit.register(_chatgpt._close_all_kept_threads)  # noqa: SLF001
     _chatgpt._close_all_kept_threads()  # noqa: SLF001
     assert runtime.alive() == [] and len(stable) == 0
+
+
+def test_a_process_that_exits_with_a_kept_thread_closes_it() -> None:
+    """The cleanup is registered for interpreter exit, not only callable."""
+    import os
+    import subprocess
+    import sys
+
+    script = "\n".join([
+        "from pathlib import Path",
+        "from sylvia_gm.provider import _chatgpt",
+        "class Connection:",
+        "    def close(self):",
+        "        print('kept thread closed at exit')",
+        "kept = _chatgpt._KeptThread(connection=Connection(), home=Path('.'), model='m',",
+        "    thread_id='t', instructions='', dynamic_tools=[], items=[], generation=0)",
+        "assert _chatgpt._KEPT_THREADS.keep(kept) == []",
+        "print('exiting with', len(_chatgpt._KEPT_THREADS), 'kept')",
+    ])
+    done = subprocess.run(
+        [sys.executable, "-c", script], capture_output=True, text=True, timeout=120,
+        env={**os.environ, "PYTHONPATH": os.pathsep.join(sys.path)}, check=False,
+    )
+    assert done.returncode == 0, done.stderr[-400:]
+    assert done.stdout.splitlines()[:2] == ["exiting with 1 kept", "kept thread closed at exit"]
+
 
 
 # ---- the account ------------------------------------------------------------------------
