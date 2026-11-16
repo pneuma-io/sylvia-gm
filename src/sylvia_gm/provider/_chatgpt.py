@@ -80,9 +80,31 @@ _DRAFT_KEEPING_VALUE = "answer-draft"
 _KEPT_THREAD_LIMIT = 4
 #: A kept thread left unused this long is closed.
 _KEPT_THREAD_IDLE_SECONDS = 600.0
-#: The same for a thread whose turn is still open, waiting for a call's result. The owner
-#: normally answers within seconds; a turn the player stopped must not wait long.
-_PENDING_TURN_IDLE_SECONDS = 90.0
+#: The same for a thread whose turn is still open, waiting for a call's result. A GM turn
+#: ends with such a call, so the next player message answers it: the wait is the player's
+#: reading and typing time. Measured: the runtime keeps an unanswered call open for at least
+#: 30 minutes, and the provider's cache retention is 30 minutes, so waiting longer would
+#: only hold the process. A stopped turn does not wait for this (``release_idle``).
+_PENDING_TURN_IDLE_SECONDS = 1800.0
+#: Abandoned threads' usage reports held until a request of their runtime home records them.
+_ABANDONED_REPORT_LIMIT = 64
+
+
+def _usage_figures(params: object) -> dict[str, object] | None:
+    """The input, cached and output counts of a usage report, or None when incomplete."""
+    token_usage = params.get("tokenUsage") if isinstance(params, dict) else None
+    last = token_usage.get("last") if isinstance(token_usage, dict) else None
+    if not isinstance(last, dict):
+        return None
+
+    def count(key: str) -> int | None:
+        value = last.get(key)
+        return value if type(value) is int and value >= 0 else None
+
+    prompt, output = count("inputTokens"), count("outputTokens")
+    if prompt is None or output is None or count("totalTokens") is None:
+        return None
+    return {"input": prompt, "cached": count("cachedInputTokens"), "output": output}
 #: Events of a waiting turn that show the runtime went on without the call's answer.
 _TURN_MOVED_ON = frozenset({
     "turn/completed", "item/tool/call", "item/agentMessage/delta",
@@ -279,6 +301,8 @@ class _KeptThread:
     effort: object = None
     tier: object = None
     pending: _PendingCall | None = None
+    #: The number of the request whose response made the pending call (``next_ordinal``).
+    ordinal: int = 0
     idle_since: float = field(default_factory=time.monotonic)
     timer: threading.Timer | None = None
 
@@ -294,8 +318,39 @@ class _KeptThread:
             and len(items) > held and items[:held] == self.items
         )
 
-    def close_quietly(self) -> None:
+    def collect_owed_usage(self) -> dict[str, object] | None:
+        """End a waiting turn whose response's usage is unreported, and return that report.
+
+        The runtime reports a response's usage when its call is answered, or when its turn is
+        interrupted. A waiting turn that will not be answered is interrupted, so the report
+        is not lost with the thread. Bounded; never raises.
+        """
+        pending = self.pending
+        if pending is None or not pending.usage_owed:
+            return None
+        pending.usage_owed = False
+        identity = {"threadId": self.thread_id, "turnId": pending.turn_id}
+        try:
+            self.connection.call("turn/interrupt", identity, timeout=_USAGE_REPORT_SECONDS * 5)
+            deadline = time.monotonic() + _USAGE_REPORT_SECONDS
+            while time.monotonic() < deadline:
+                event = self.connection.next_event(timeout=0.1)
+                params = event.get("params") if isinstance(event, dict) else None
+                if (
+                    event is not None and event.get("method") == "thread/tokenUsage/updated"
+                    and isinstance(params, dict) and params.get("threadId") == self.thread_id
+                    and params.get("turnId") == pending.turn_id
+                ):
+                    return _usage_figures(params)
+        except Exception:  # noqa: BLE001 - a report that cannot be had is an explained miss
+            return None
+        return None
+
+    def close_quietly(self, pool: _KeptThreads | None = None) -> None:
         _stop_timers([self])
+        figures = self.collect_owed_usage()
+        if figures is not None and pool is not None:
+            pool.abandon(self.home, self.ordinal, figures)
         with suppress(Exception):
             self.connection.close()
 
@@ -327,6 +382,8 @@ class _KeptThreads:
         self._lock = threading.Lock()
         self._idle: list[_KeptThread] = []  # least recently used first
         self._generations: dict[Path, int] = {}
+        self._ordinals: dict[Path, int] = {}
+        self._abandoned: list[tuple[Path, int, dict[str, object]]] = []
 
     def __len__(self) -> int:
         with self._lock:
@@ -336,10 +393,33 @@ class _KeptThreads:
         with self._lock:
             return self._generations.get(home, 0)
 
+    def next_ordinal(self, home: Path) -> int:
+        """Number this home's requests in order, so a late report names its request."""
+        with self._lock:
+            self._ordinals[home] = self._ordinals.get(home, 0) + 1
+            return self._ordinals[home]
+
+    def abandon(self, home: Path, ordinal: int, figures: dict[str, object]) -> None:
+        """Hold the usage report of a thread closed without its call being answered."""
+        with self._lock:
+            self._abandoned.append((home, ordinal, figures))
+            del self._abandoned[:-_ABANDONED_REPORT_LIMIT]
+
+    def take_abandoned(self, home: Path, ordinal: int) -> list[dict[str, object]]:
+        """This home's held reports, each saying how many requests before *ordinal* it is."""
+        with self._lock:
+            mine = [entry for entry in self._abandoned if entry[0] == home]
+            self._abandoned = [entry for entry in self._abandoned if entry[0] != home]
+        return [
+            {"response": "previous" if ordinal - made == 1 else "earlier",
+             "requests_ago": ordinal - made, "closed_unanswered": True, **figures}
+            for _home, made, figures in mine
+        ]
+
     def idle_limit(self, kept: _KeptThread) -> float:
         if kept.pending is None:
             return self.idle_seconds
-        return min(self.idle_seconds, self.pending_idle_seconds)
+        return self.pending_idle_seconds
 
     def take(
         self, home: Path, model: str, instructions: str,
@@ -394,7 +474,7 @@ class _KeptThreads:
             if kept not in self._idle:
                 return
             self._idle.remove(kept)
-        kept.close_quietly()
+        kept.close_quietly(self)
 
     def release(self, home: Path | None = None, model: str | None = None) -> list[_KeptThread]:
         """Remove idle threads of a home (and model); a busy one of that home is not kept."""
@@ -415,7 +495,7 @@ class _KeptThreads:
 
     def close_all(self) -> None:
         for kept in self.release():
-            kept.close_quietly()
+            kept.close_quietly(self)
 
 
 _KEPT_THREADS = _KeptThreads()
@@ -424,7 +504,7 @@ _KEPT_THREADS = _KeptThreads()
 def _close_kept_threads_for(home: Path) -> None:
     """A sign-in or sign-out changes the account a kept child would answer for."""
     for kept in _KEPT_THREADS.release(home.resolve()):
-        kept.close_quietly()
+        kept.close_quietly(_KEPT_THREADS)
 
 
 def _close_all_kept_threads() -> None:
@@ -452,6 +532,8 @@ class _Request:
     timeout: float
     options: dict[str, object]
     generation: int = 0
+    #: This request's number among its home's requests (``_KeptThreads.next_ordinal``).
+    ordinal: int = 0
     status: str | None = None
     keep: _KeptThread | None = None
     #: The call was answered although the request dropped the model's text before it.
@@ -486,6 +568,9 @@ class ChatGPTProvider(Provider):
         # State of the attempt in progress; attempts are serialised by ``_lock``.
         self._usage_reports: list[dict[str, object]] = []
         self._owed_previous_usage = False
+        # The waiting call whose usage the attempt in progress expects first, if any.
+        self._owing: _PendingCall | None = None
+        self._owing_ago = 1
         self._extra_call_seen = False
 
     def _request_stop(self, connection: CodexConnection) -> None:
@@ -589,7 +674,13 @@ class ChatGPTProvider(Provider):
             # An answered call: the runtime first reports the response that made the call.
             # Those figures belong to the previous request and are recorded, not attached.
             self._owed_previous_usage = False
-            self._usage_reports.append({"response": "previous", **figures})
+            if self._owing is not None:
+                self._owing.usage_owed = False
+            ago = self._owing_ago
+            self._usage_reports.append({
+                "response": "previous" if ago == 1 else "earlier", "requests_ago": ago,
+                **figures,
+            })
             return
         own = {"response": "own", **figures}
         if not self._usage_reports or self._usage_reports[-1] != own:
@@ -814,6 +905,7 @@ class ChatGPTProvider(Provider):
     async def _take_kept_thread(self, request: _Request) -> _KeptThread | None:
         home = self.home.resolve()
         request.generation = _KEPT_THREADS.generation(home)
+        request.ordinal = _KEPT_THREADS.next_ordinal(home)
         kept, stale = _KEPT_THREADS.take(
             home, request.model, request.instructions, request.dynamic_tools, request.items,
         )
@@ -840,6 +932,13 @@ class ChatGPTProvider(Provider):
         cancelled: asyncio.CancelledError | None = None
         for kept in threads:
             try:
+                _stop_timers([kept])
+                if cancelled is None:
+                    figures = None
+                    with suppress(Exception):
+                        figures = await asyncio.to_thread(kept.collect_owed_usage)
+                    if figures is not None:
+                        _KEPT_THREADS.abandon(kept.home, kept.ordinal, figures)
                 with suppress(Exception):
                     await self._close_owned(kept.connection)
             except asyncio.CancelledError as error:
@@ -942,9 +1041,15 @@ class ChatGPTProvider(Provider):
                     receipt = timing.snapshot(request.status)
                     if self._stable_threads:
                         if self._thread_mode == "answer":
-                            # In order. "previous" is the response whose call this request
-                            # answered; its figures are never attached to this response.
-                            reuse["usage_reports"] = list(request.usage_reports)
+                            # In order. "previous" (or "earlier", with how many requests
+                            # before) is a response whose call this request answered, or whose
+                            # waiting turn was closed unanswered; never this response's.
+                            reuse["usage_reports"] = [
+                                *_KEPT_THREADS.take_abandoned(
+                                    self.home.resolve(), request.ordinal,
+                                ),
+                                *request.usage_reports,
+                            ]
                         if self._keeps_dropped_draft:
                             reuse["kept_dropped_draft"] = bool(
                                 reuse.get("answered_in_place") and request.kept_dropped_draft
@@ -989,6 +1094,8 @@ class ChatGPTProvider(Provider):
         self._owed_previous_usage = bool(
             kept is not None and kept.pending is not None and kept.pending.usage_owed
         )
+        self._owing = kept.pending if kept is not None else None
+        self._owing_ago = request.ordinal - kept.ordinal if kept is not None else 1
         self._extra_call_seen = False
         status = "error"
         request.status = status
@@ -1240,6 +1347,7 @@ class ChatGPTProvider(Provider):
                     dynamic_tools=request.dynamic_tools,
                     items=request.items,
                     generation=request.generation,
+                    ordinal=request.ordinal,
                     call_id=response.tool_calls[0].id,
                     spoken="".join(text_parts),
                     # An answered turn keeps what it was started with.
@@ -1285,6 +1393,16 @@ class ChatGPTProvider(Provider):
             end_stream(status)
             try:
                 if request.keep is None:
+                    if (kept is not None and kept.pending is not None
+                            and kept.pending.usage_owed and status != "cancelled"):
+                        # The waiting turn will not be answered (the request did not match
+                        # it, or it failed): its response's report is collected before the
+                        # child closes. A stopped request does not wait for it.
+                        figures = None
+                        with suppress(Exception):
+                            figures = await asyncio.to_thread(kept.collect_owed_usage)
+                        if figures is not None:
+                            _KEPT_THREADS.abandon(kept.home, kept.ordinal, figures)
                     await stop()
             finally:
                 self._active = None
@@ -1297,8 +1415,16 @@ class ChatGPTProvider(Provider):
         await self.release_idle()
 
     async def release_idle(self) -> None:
-        """Close the runtime threads kept between requests for this home and model."""
+        """Close the runtime threads kept between requests for this home and model.
+
+        A waiting turn's unreported usage is collected first and written to the audit now,
+        since no later request may come to record it.
+        """
         if self._stable_threads:
+            home = self.home.resolve()
             await self._close_kept(
-                *_KEPT_THREADS.release(self.home.resolve(), self.model_info.wire_model_id)
+                *_KEPT_THREADS.release(home, self.model_info.wire_model_id)
             )
+            reports = _KEPT_THREADS.take_abandoned(home, _KEPT_THREADS.next_ordinal(home))
+            if reports:
+                await self._audit("sylvia/thread_reuse_closed", {"usage_reports": reports})
