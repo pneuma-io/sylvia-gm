@@ -52,7 +52,75 @@
   --device-soft: rgba(179,157,255,.14);
   --good: #6fd38a;
   --font-number: Bahnschrift, 'Segoe UI', system-ui, sans-serif;
+  /* PanelSystem look (architecture contract §10.5.1). panel-looks.js sets the declared PanelTheme values on the root;
+     these defaults are the neutral look. Each base's ornament, which a Ruleset cannot declare, is in "Panel looks". */
+  --look-accent: #9db5d4;
+  --look-ally: #4fd1b5;
+  --look-hostile: #ff7b6e;
+  --look-resource: #b39dff;
+  --look-heading-font: var(--font-sans);
 }
+
+/* ---- Panel looks (architecture contract §10.5.1) ----
+   Each base's ornament, which a Ruleset cannot declare. The :root values are the neutral look; tactical is
+   Trigger Discipline's look and fantasy is the SRD sizzle reel's. panel-looks.js sets data-panel-look. */
+:root {
+  --look-bar-skew: 0deg;
+  --look-plate-clip: none;
+  --look-plate-radius: 10px;
+  --look-plate-fill: var(--bg-secondary);
+  --look-tag-clip: none;
+  --look-tag-radius: 4px;
+  --look-turn-colour: var(--look-accent);
+  --look-turn-font: var(--look-heading-font);
+  --look-seal: var(--bg-secondary);
+  --look-seal-shadow: 0 0 0 1px var(--border-color);
+  --look-now-edge: color-mix(in srgb, var(--look-accent) 45%, transparent);
+  --look-now-fill: var(--bg-card);
+  --look-now-mark: inset 3px 0 0 var(--ally);
+  --look-order-fill: color-mix(in srgb, var(--text-muted) 30%, var(--bg-card));
+  --look-order-clip: none;
+  --look-spell-edge: var(--look-accent);
+  --look-medal-fill: transparent;
+  --look-medal-ink: var(--look-accent);
+  --look-tier-ink: var(--text-dim);
+  --look-ground-outer: var(--bg-primary);
+  --look-ground: radial-gradient(circle, rgba(220,210,160,.16) 1px, transparent 1.4px) 0 0 / 32px 32px, rgba(123,140,168,.04);
+  --look-field-edge: none;
+}
+:root[data-panel-look="tactical"] {
+  --look-bar-skew: -18deg;
+  --look-plate-clip: polygon(0 0, 100% 0, 100% 86%, 84% 100%, 0 100%);
+  --look-plate-radius: 10px 10px 0 10px;
+  --look-plate-fill: repeating-linear-gradient(135deg, var(--bg-secondary) 0 6px, var(--bg-card) 6px 12px);
+  --look-tag-clip: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+  --look-tag-radius: 0;
+  --look-turn-colour: var(--look-ally);
+  --look-turn-font: var(--font-serif);
+}
+:root[data-panel-look="fantasy"] {
+  --look-seal: radial-gradient(circle at 35% 30%, #c0504a, #7a1f1c 70%);
+  --look-seal-shadow: 0 0 0 3px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.4);
+  --look-now-edge: color-mix(in srgb, var(--look-accent) 40%, var(--border-color));
+  --look-now-fill: linear-gradient(160deg, color-mix(in srgb, var(--look-accent) 6%, var(--bg-card)), var(--bg-card) 70%);
+  --look-now-mark: none;
+  --look-order-fill: linear-gradient(#6e302a, #3c1713);
+  --look-order-clip: polygon(50% 0, 100% 20%, 100% 68%, 50% 100%, 0 68%, 0 20%);
+  --look-spell-edge: #f08a3c;
+  --look-medal-fill: radial-gradient(circle at 40% 35%, #6b3d22, #2a170d 75%);
+  --look-medal-ink: #ffd6a0;
+  --look-tier-ink: var(--look-accent);
+  --look-ground-outer: radial-gradient(ellipse 90% 80% at 50% 50%, #1b2115, #0d100a 75%);
+  --look-ground: radial-gradient(circle, rgba(230,220,170,.10) 1px, transparent 1.4px) 0 0 / 32px 32px,
+    radial-gradient(ellipse 32% 26% at 22% 28%, rgba(132,152,92,.38), transparent 70%),
+    radial-gradient(ellipse 36% 30% at 72% 58%, rgba(112,136,78,.36), transparent 70%),
+    radial-gradient(ellipse 26% 34% at 44% 84%, rgba(96,118,64,.34), transparent 70%),
+    radial-gradient(ellipse 30% 22% at 86% 18%, rgba(70,88,48,.4), transparent 70%),
+    #36422b;
+  --look-field-edge: 0 0 0 1px color-mix(in srgb, var(--look-accent) 55%, transparent), inset 0 0 48px rgba(0,0,0,.32);
+}
+/* The declared ally and hostile colours apply inside the panels. */
+#ruleset-panels { --ally: var(--look-ally); --hostile: var(--look-hostile); }
 
 /* ---- Session Theme: Sylvia (purple logo palette) ---- */
 [data-theme="sylvia"] {
@@ -4313,7 +4381,7 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .suite-pips i.on { background: var(--ally); border-color: var(--ally); box-shadow: 0 0 6px color-mix(in srgb, var(--ally) 60%, transparent); }
 .suite-pips.big { gap: 5px; } .suite-pips.big i { width: 13px; height: 13px; }
 .suite-bar { display: inline-flex; gap: 2px; flex: 1; min-width: 60px; align-self: center; }
-.suite-bar i { flex: 1; height: 8px; border-radius: 2px; background: color-mix(in srgb, var(--text-muted) 30%, transparent); transform: skewX(-18deg); }
+.suite-bar i { flex: 1; height: 8px; border-radius: 2px; background: color-mix(in srgb, var(--text-muted) 30%, transparent); transform: skewX(var(--look-bar-skew)); }
 .suite-bar[data-tone="hp"] i.on { background: var(--good); }
 .suite-bar[data-tone="res"] i.on { background: var(--story); }
 .suite-bar[data-tone="hostile"] i.on { background: var(--hostile); }
@@ -4326,15 +4394,15 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .suite-act:focus-visible, .op-stance:focus-visible, .squad-card-face:focus-visible, .op-pick:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 /* Panel chrome: rounded panel cards with a branded active tab. */
-.session-frame.has-panels .panel-tab-group { border: 1px solid color-mix(in srgb, var(--border-color) 80%, var(--brand) 20%); border-radius: 14px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, var(--brand) 4%), var(--bg-card));
+.session-frame.has-panels .panel-tab-group { border: 1px solid color-mix(in srgb, var(--border-color) 80%, var(--look-accent) 20%); border-radius: 14px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-card) 96%, var(--look-accent) 4%), var(--bg-card));
   box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 10px 30px rgba(0,0,0,.25); overflow: hidden; }
 .session-frame.has-panels .ruleset-panel-tabs { gap: 2px; padding: 4px 6px 0; border-bottom: 1px solid var(--border-color);
   background: color-mix(in srgb, var(--bg-secondary) 70%, transparent); }
 .session-frame.has-panels .ruleset-panel-tab { padding: 6px 11px 7px; border: 0; border-radius: 8px 8px 0 0; color: var(--text-dim); font-size: 12.5px; font-weight: 600; }
 .session-frame.has-panels .ruleset-panel-tab:hover { color: var(--text-bright); }
-.session-frame.has-panels .ruleset-panel-tab[aria-selected="true"] { color: var(--text-bright); background: var(--bg-card); box-shadow: inset 0 2px 0 var(--brand); border-bottom-color: transparent; }
-.panel-glyph { margin-right: 6px; color: var(--brand); font-size: 11px; }
+.session-frame.has-panels .ruleset-panel-tab[aria-selected="true"] { color: var(--text-bright); background: var(--bg-card); box-shadow: inset 0 2px 0 var(--look-accent); border-bottom-color: transparent; }
+.panel-glyph { margin-right: 6px; color: var(--look-accent); font-size: 11px; }
 .panel-chip .panel-glyph { margin-right: 5px; }
 .session-frame.has-panels .panel-chip { border-radius: 999px; font-weight: 600; }
 .session-frame.has-panels .panel-chip[data-panel-placement="shown"] { border-color: var(--border-accent); }
@@ -4397,16 +4465,16 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .op-pick .panel-actor-token { width: 28px; height: 28px; flex-basis: 28px; font-size: 10.5px; }
 .op-pick.on { border-color: var(--ally); color: var(--text-bright); background: var(--ally-soft); }
 .op-hero { display: grid; grid-template-columns: minmax(110px, 40%) 1fr; gap: 12px; }
-.op-art { position: relative; height: 172px; overflow: hidden; clip-path: polygon(0 0, 100% 0, 100% 86%, 84% 100%, 0 100%);
-  border-radius: 10px 10px 0 10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
-.op-art.no-art { display: grid; place-items: center; background: repeating-linear-gradient(135deg, var(--bg-secondary) 0 6px, var(--bg-card) 6px 12px); }
+.op-art { position: relative; height: 172px; overflow: hidden; clip-path: var(--look-plate-clip);
+  border-radius: var(--look-plate-radius); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.op-art.no-art { display: grid; place-items: center; background: var(--look-plate-fill); }
 .op-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(8,8,14,.6)); pointer-events: none; }
 .op-monogram { display: grid; justify-items: center; gap: 4px; margin-top: -14px; text-align: center; }
 .op-monogram b { display: grid; place-items: center; width: 64px; height: 64px; border: 2px solid var(--ally); border-radius: 50%;
   background: var(--bg-primary); color: var(--ally); font: 700 26px var(--font-number); }
 .op-monogram span { max-width: 96px; color: var(--text-muted); font-size: 9.5px; }
 .op-chevrons { position: absolute; left: 6px; bottom: 7px; z-index: 1; display: flex; gap: 3px; }
-.op-chevrons span { padding: 1px 8px 1px 6px; clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%); background: var(--ally); color: #062019;
+.op-chevrons span { padding: 1px 8px 1px 6px; clip-path: var(--look-tag-clip); border-radius: var(--look-tag-radius); background: var(--ally); color: #062019;
   font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .op-chevrons span + span { background: var(--brand); color: #150f26; }
 .op-stats { display: grid; gap: 6px; align-content: start; min-width: 0; }
@@ -4470,6 +4538,11 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
   .op-manip .suite-act { flex-basis: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .op-rig-phase .pulse { animation: none; } }
+/* Adventurer cards (fantasy party PanelWidget style): serif names, an HP medal, AC and HP as numbers. */
+[data-panel-widget="adventurer-cards"] .sq-name strong { font-family: var(--look-heading-font); font-size: 14.5px; font-weight: 600; }
+[data-panel-widget="adventurer-cards"] .sq-vitals { gap: 12px; }
+[data-panel-widget="adventurer-cards"] .squad-card.character-inspected { border-color: color-mix(in srgb, var(--look-accent) 60%, transparent) !important;
+  box-shadow: inset 3px 0 0 var(--look-accent); background: linear-gradient(90deg, color-mix(in srgb, var(--look-accent) 9%, transparent), transparent 70%); }
 /* A party card is narrow. Beside the card face, the party role ran over the name and the vitals with a long
    name or a wider font (Linux desktops usually give DejaVu Sans), so the role takes its own line under the
    face, lined up with the name. In the name row the name comes first and the class and level take what is
@@ -4518,7 +4591,7 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .ruleset-map-panel .map-turn-strip .panel-actor-token { width: 28px; height: 28px; flex-basis: 28px; font-size: 10.5px; }
 .ruleset-map-panel .map-turn-strip.panel-empty > span:first-child { color: var(--text-dim); font-size: 12px; }
 .map-turn-label { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: var(--text-bright); font-size: 13px; white-space: nowrap; }
-.map-turn-label b { color: var(--ally); font-family: var(--font-serif); font-size: 15px; font-weight: 600; }
+.map-turn-label b { color: var(--look-turn-colour); font-family: var(--look-turn-font); font-size: 15px; font-weight: 600; }
 .map-turn-label b[data-side^="host"] { color: var(--hostile); }
 .map-turn-revision { padding: 2px 8px; border-radius: 6px; background: var(--bg-primary); color: var(--text-dim); font: 11px var(--font-number); }
 .map-turn-end { display: inline-flex; flex: 0 0 auto; }
@@ -4642,20 +4715,20 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .suite-medal[data-tone="hostile"] .m-hp { stroke: var(--hostile); }
 .suite-medal .m-face { fill: color-mix(in srgb, var(--ally) 16%, var(--bg-card)); stroke: color-mix(in srgb, var(--ally) 60%, transparent); stroke-width: 1; }
 .suite-medal[data-tone="hostile"] .m-face { fill: color-mix(in srgb, var(--hostile) 16%, var(--bg-card)); stroke: color-mix(in srgb, var(--hostile) 60%, transparent); }
-.suite-medal b { position: relative; color: var(--text-bright); font: 700 calc(var(--s) * .3) var(--font-serif); }
+.suite-medal b { position: relative; color: var(--text-bright); font: 700 calc(var(--s) * .3) var(--look-heading-font); }
 .ladder { display: grid; gap: 8px; align-content: start; }
 .ladder-head { display: flex; align-items: center; gap: 10px; }
 .ladder-head .panel-unit-meta { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .ladder-seal { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; color: #fff4e6; line-height: 1;
-  background: radial-gradient(circle at 35% 30%, #c0504a, #7a1f1c 70%); box-shadow: 0 0 0 3px rgba(0,0,0,.35), 0 6px 14px rgba(0,0,0,.4); }
+  background: var(--look-seal); box-shadow: var(--look-seal-shadow); }
 .ladder-seal small { font: 700 8.5px var(--font-sans); letter-spacing: .14em; text-transform: uppercase; }
-.ladder-seal b { font: 700 22px var(--font-serif); }
-.ruleset-panel .panel-unit.ladder-now { display: grid; justify-items: start; gap: 8px; padding: 14px 14px 12px; border: 1px solid color-mix(in srgb, var(--ally) 45%, transparent);
-  border-radius: 14px; background: linear-gradient(160deg, color-mix(in srgb, var(--ally) 10%, var(--bg-card)), var(--bg-card) 70%); }
+.ladder-seal b { font: 700 22px var(--look-heading-font); }
+.ruleset-panel .panel-unit.ladder-now { display: grid; justify-items: start; gap: 8px; padding: 14px 14px 12px; border: 1px solid var(--look-now-edge);
+  border-radius: 14px; background: var(--look-now-fill); box-shadow: var(--look-now-mark); }
 .ladder-now[data-tone="hostile"] { border-color: color-mix(in srgb, var(--hostile) 45%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--hostile) 10%, var(--bg-card)), var(--bg-card) 70%); }
 .ladder-now-text { display: grid; gap: 2px; }
 .ladder-now-tag { color: var(--intent); font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-.ladder-now strong { color: var(--text-bright); font: 600 21px var(--font-serif); }
+.ladder-now strong { color: var(--text-bright); font: 600 21px var(--look-heading-font); }
 .ladder-now-class { color: var(--text-dim); font-size: 12px; }
 .ladder-vitals { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; color: var(--text-bright); font: 600 12.5px var(--font-number); }
 .ladder-sec { margin-top: 4px; color: var(--text-muted); font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
@@ -4666,7 +4739,7 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .ladder-rung[data-tone="hostile"]::after { background: var(--hostile) !important; }
 .ladder-rung.down { opacity: .5; }
 .ladder-init { display: grid; flex: 0 0 26px; place-items: center; width: 26px; height: 28px; color: var(--text-bright); font: 700 12px var(--font-number);
-  background: color-mix(in srgb, var(--text-muted) 30%, var(--bg-card)); clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%); }
+  background: var(--look-order-fill); clip-path: var(--look-order-clip); }
 .ladder-name { display: grid; flex: 1; min-width: 0; line-height: 1.2; }
 .ladder-name strong { overflow: hidden; color: var(--text-bright); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .ladder-name small { color: var(--text-muted); font-size: 11px; }
@@ -4690,9 +4763,9 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .grim-head { display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; }
 .grim-plinth { display: grid; place-items: center; align-content: center; gap: 2px; height: 104px; border: 1px solid color-mix(in srgb, var(--ally) 40%, transparent);
   border-radius: 46px 46px 12px 12px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--ally) 16%, var(--bg-card)), var(--bg-primary)); text-align: center; }
-.grim-plinth b { color: var(--text-bright); font: 700 30px var(--font-serif); }
+.grim-plinth b { color: var(--text-bright); font: 700 30px var(--look-heading-font); }
 .grim-plinth small { max-width: 80px; color: var(--text-muted); font-size: 9.5px; }
-.grim-id h3 { margin: 0; color: var(--text-bright); font: 600 25px var(--font-serif); }
+.grim-id h3 { margin: 0; color: var(--text-bright); font: 600 25px var(--look-heading-font); }
 .grim-id h3 strong { font-weight: 600; }
 .grim-id p { margin: 2px 0 6px; color: var(--text-dim); font-size: 12.5px; }
 .grim-vitals { display: flex; align-items: center; gap: 16px; }
@@ -4707,35 +4780,36 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .grim-shield { position: relative; }
 .grim-shield svg { width: 26px; height: 28px; fill: var(--bg-secondary); stroke: var(--accent-primary-bright); stroke-width: 1.6; }
 .grim-shield b { position: absolute; top: 5px; font-size: 12px; }
-.grim-sec { display: block; margin: 2px 0 6px; color: var(--intent); font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.grim-sec { display: block; margin: 2px 0 6px; color: var(--look-accent); font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 .grim-book { display: grid; gap: 6px; }
 .grim-spell { position: relative; display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; text-align: left;
-  border: 1px solid var(--border-color); border-left: 3px solid var(--intent); border-radius: 10px; background: linear-gradient(90deg, var(--bg-card-hover), var(--bg-card)); color: inherit; font: inherit; cursor: pointer; }
-.grim-spell:hover { border-color: var(--border-accent); border-left-color: var(--intent); }
+  border: 1px solid var(--border-color); border-left: 3px solid var(--look-spell-edge); border-radius: 10px; background: linear-gradient(90deg, var(--bg-card-hover), var(--bg-card)); color: inherit; font: inherit; cursor: pointer; }
+.grim-spell:hover { border-color: var(--border-accent); border-left-color: var(--look-spell-edge); }
 .grim-spell:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .grim-spell.is-off { opacity: .6; border-left-color: var(--text-muted); }
-.grim-spell .suite-ico { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid color-mix(in srgb, var(--intent) 45%, transparent); border-radius: 50%; color: #ffb24a; }
+.grim-spell .suite-ico { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid color-mix(in srgb, var(--look-spell-edge) 45%, transparent); border-radius: 50%;
+  background: var(--look-medal-fill); color: var(--look-medal-ink); }
 .grim-spell .suite-ico svg { width: 18px; height: 18px; }
 .grim-spell-main { display: grid; line-height: 1.2; }
-.grim-spell-main b { color: var(--text-bright); font: 600 15px var(--font-serif); }
+.grim-spell-main b { color: var(--text-bright); font: 600 15px var(--look-heading-font); }
 .grim-spell-main small { color: var(--text-muted); font-size: 11.5px; }
 .grim-spell-cost { display: grid; justify-items: end; gap: 2px; color: var(--text-muted); font-size: 11px; }
 .grim-crystals, .grim-tier { display: inline-flex; align-items: center; gap: 3px; }
 .grim-crystals i, .grim-tier i { width: 8px; height: 11px; clip-path: polygon(50% 0, 100% 35%, 50% 100%, 0 35%); background: rgba(255,255,255,.1); }
-.grim-crystals i.on, .grim-tier i.on { background: linear-gradient(#e6d8ff, var(--brand)); }
+.grim-crystals i.on, .grim-tier i.on { background: linear-gradient(#e6d8ff, var(--look-resource)); }
 .grim-ribbon { display: flex; flex-wrap: wrap; gap: 6px 14px; }
-.grim-tier small { margin-right: 3px; color: var(--text-dim); font: 700 12px var(--font-serif); }
+.grim-tier small { margin-right: 3px; color: var(--look-tier-ink); font: 700 12px var(--look-heading-font); }
 .grim-tier em { color: var(--text-muted); font: 11px var(--font-number); font-style: normal; }
 .grim-runes { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
 .grim-rune { display: grid; justify-items: center; padding: 5px 0; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-secondary); }
-.grim-rune.save { border-color: color-mix(in srgb, var(--intent) 60%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--intent) 25%, transparent) inset; }
+.grim-rune.save { border-color: color-mix(in srgb, var(--look-accent) 60%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--look-accent) 25%, transparent) inset; }
 .grim-rune small { color: var(--text-muted); font-size: 9.5px; font-weight: 700; letter-spacing: .06em; }
 .grim-rune b { color: var(--text-bright); font: 700 15px var(--font-number); }
 .grim-gear:empty { display: none; }
 .ruleset-character-panel .ruleset-panel-content:has(> .character-hero.grimoire) { padding: 10px 12px 12px; }
 /* Battlefield: the arcane tabletop ground with a 5 ft dot grid; tokens wear nameplates. */
-.ruleset-map-panel .tactical-scroll:has(> .coordinate-world) { background: radial-gradient(ellipse 80% 70% at 50% 45%, #2a3122, #161a12 70%, #0e110b); }
-.ruleset-map-panel .coordinate-world { background-image: radial-gradient(circle, rgba(220,210,160,.16) 1px, transparent 1.4px); background-size: 32px 32px; }
+.ruleset-map-panel .tactical-scroll:has(> .coordinate-world) { background: var(--look-ground-outer); }
+.ruleset-map-panel .coordinate-world { background: var(--look-ground); box-shadow: var(--look-field-edge); }
 .ruleset-map-panel .coordinate-world .tactical-entity .map-name-label { top: calc(100% + 3px); bottom: auto; padding: 0 5px; border-radius: 4px;
   background: rgba(10,10,8,.82); color: #eee6cf; font: 600 10px var(--font-sans); text-shadow: none; }
 .ruleset-map-panel .coordinate-world .tactical-entity .map-token-label { font-family: var(--font-serif); }
@@ -4753,6 +4827,10 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
   .session-frame.has-panels .panel-strip-chips { display: flex; flex: 1 1 auto; flex-wrap: wrap; gap: 5px; min-width: 0; }
   .session-frame.has-panels .panel-layout-controls { flex: 0 0 auto; }
 }
+/* Fantasy turn bar: the economy as shapes alone, as in the reel; the words stay in the page for screen readers. */
+:root[data-panel-look="fantasy"] .map-turn-strip [data-action-readiness] .panel-tag[data-econ]:not([data-econ="move"]) {
+  width: 21px; height: 21px; justify-content: center; padding: 0; overflow: hidden; border: 0; background: none; font-size: 0; }
+:root[data-panel-look="fantasy"] .map-turn-strip [data-action-readiness] .panel-tag[data-econ]::before { width: 15px; height: 15px; flex: 0 0 15px; }
 /* Orbs stay inline-level so the economy still reads as one sentence. */
 .ruleset-map-panel .map-turn-strip [data-action-readiness] { display: block; }
 [data-action-readiness] .panel-tag[data-econ] { margin: 0 4px 0 0; vertical-align: middle; }

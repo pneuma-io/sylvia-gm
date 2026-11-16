@@ -36,6 +36,7 @@
     "dictation.js",
     "local-diagnostics.js",
     "panel-host.js",
+    "panel-looks.js",
     "panel-workspace.js",
     "panel.html",
     "piece-table.js",

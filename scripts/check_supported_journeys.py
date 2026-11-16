@@ -715,6 +715,8 @@ UI_JOURNEY = [
     'tests/frontend_home.browser.cjs',
     'tests/frontend_rig_motion.browser.cjs',
     'tests/frontend_suite_order_categories.browser.cjs',
+    'tests/frontend_panel_looks.browser.cjs',
+    'tests/frontend_panel_looks.test.cjs',
     'tests/frontend_suite_roster_strip.browser.cjs',
     'tests/frontend_weapon_reload.browser.cjs',
     'tests/frontend_weapon_reload.test.cjs',
