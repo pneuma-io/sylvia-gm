@@ -9,7 +9,9 @@ import os
 import secrets
 import sqlite3
 import stat
+import threading
 import zipfile
+from collections import OrderedDict
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field, replace
@@ -955,7 +957,7 @@ def _reject_nonstandard_constant(_constant: str) -> Never:
     raise ValueError("Canonical JSON constants must be finite and standard")
 
 
-def _parse_canonical_json(value: str) -> object:
+def _decode_canonical_json(value: str) -> object:
     parsed = json.loads(
         value,
         object_pairs_hook=_reject_duplicate_members,
@@ -965,6 +967,62 @@ def _parse_canonical_json(value: str) -> object:
     if value != _dump(captured):
         raise ValueError("Stored JSON is not the exact canonical representation")
     return captured
+
+
+class _CanonicalJsonReuse:
+    """Return the earlier decode of a stored JSON string identical to one decoded before.
+
+    Decoding depends only on the exact input string and yields a deeply frozen value, so
+    an earlier result is the same value a fresh decode would give and no caller can change
+    it. A hit also skips the re-serialisation that proves the input is exactly canonical;
+    that is legitimate because the identical input already passed it. Failures are never
+    kept: an input that raises is decoded, and raises, again on every call.
+    """
+
+    # Each kept input is also charged a fixed amount for its key, entry and smallest value.
+    ENTRY_CHARGE = 200
+
+    def __init__(self, maximum_characters: int) -> None:
+        self._lock = threading.Lock()
+        self._maximum = maximum_characters
+        self._values: OrderedDict[str, tuple[int, object]] = OrderedDict()
+        self._charged = 0
+
+    def decode(self, value: str) -> object:
+        if type(value) is not str:
+            return _decode_canonical_json(value)
+        with self._lock:
+            kept = self._values.get(value)
+            if kept is not None:
+                self._values.move_to_end(value)
+                return kept[1]
+        decoded = _decode_canonical_json(value)
+        charge = len(value) + self.ENTRY_CHARGE
+        if charge > self._maximum:
+            return decoded
+        with self._lock:
+            if value not in self._values:
+                self._values[value] = (charge, decoded)
+                self._charged += charge
+                while self._charged > self._maximum:
+                    _evicted, (size, _value) = self._values.popitem(last=False)
+                    self._charged -= size
+        return decoded
+
+    def clear(self) -> None:
+        with self._lock:
+            self._values.clear()
+            self._charged = 0
+
+
+# Decoded values take about five to six times the characters of their JSON, plus the kept
+# input itself: eight million characters stays near 60 MB at worst, and holds several full
+# campaign snapshots (a long saved fight decodes about 1.3 million distinct characters).
+_CANONICAL_JSON = _CanonicalJsonReuse(maximum_characters=8_000_000)
+
+
+def _parse_canonical_json(value: str) -> object:
+    return _CANONICAL_JSON.decode(value)
 
 
 def _load_json(value: str) -> JsonValue:
