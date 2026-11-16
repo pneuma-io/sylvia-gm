@@ -911,8 +911,9 @@ an action or automatically moving the camera.
 TD/Siren Protocol's retained later design (not an Alpha blocker) uses these declarative surfaces,
 layout trees, selection and owner-command paths. It does not introduce package-executable UI or a second game
 state. Panel chrome and tactical presentation inherit the host's current theme tokens in the main
-window and extra windows, including after theme changes; no package-owned fixed green palette or
-independent theme setting is introduced. Numeric geometry remains canonical; Full/Half/Quarter
+window and extra windows, including after theme changes, with the Ruleset's declared PanelTheme
+values (§10.5.1) layered over them; no package-owned stylesheet or independent theme setting is
+introduced. Numeric geometry remains canonical; Full/Half/Quarter
 labels and cosmetic fill opacity are presentation, not replacement collision/visibility semantics.
 
 The selected Network panel uses the existing bounded network projection and command paths.
@@ -943,6 +944,78 @@ separate ability-free conformance package declares a different generic status pa
 the core and frontend do not require D&D panel identities or state shapes. Dormant predecessor
 `PanelDef`/`UIConfig` models are not a second runtime contract and must be removed or reduced to an
 adapter onto the package manifest declaration.
+
+### 10.5.1 PanelSystem, Panels and PanelWidgets
+
+Every Ruleset shares one way of arranging and operating panels. Each Ruleset decides how its panels
+look. The shared frontend must never carry one game's look as everyone's look: that was the mistake
+behind issue 109, where the SRD (D&D 5e) play screen inherited Trigger Discipline's look because
+commit `063ef742` built both games' styling into the shared frontend with nothing to choose between
+them.
+
+| Name | What it is | Who owns it | Where it is today |
+|---|---|---|---|
+| **PanelSystem** | Arranging, tabs, docking, floating windows, resizing, panel chips and menus, selection shared between panels, action gating and the command path. Structure and behaviour only, never a game's colours, type or ornament. | Sylvia, one for every Ruleset | `panel-host.js`, `panel-workspace.js`, and the panel chrome in `app.js` |
+| **Panel** | One panel a Ruleset offers: identity, title, icon, renderer, source, actions and placements (§10.5). | The Ruleset package (`ui_surfaces`) | Package manifests, validated in `domain/package_library.py` |
+| **PanelWidget** | What a Panel is drawn with: a built-in renderer (`party`, `encounter`, `unit_list`, `inventory`, `coordinate_map`, `tactical_grid` and the rest of `_UI_RENDERERS`) in a named **style**. Sylvia ships every style as code; a Ruleset only picks styles by name. | Sylvia draws; the Ruleset chooses | Renderers in `app.js`; styles are listed in `panel-looks.js` |
+| **PanelTheme** | The values a Ruleset gives its panels: a named base (`neutral`, `tactical`, `fantasy`) plus accent, ally, hostile and resource colours and a heading type (`sans`, `serif`, `condensed`). | The Ruleset declares; the PanelSystem applies | `panel-looks.js` |
+
+**Declaring a look.** A Ruleset's panel look is data, version 1:
+`{ "version": 1, "theme": { "base": "fantasy", "accent": "#e2b45c", … }, "widgets": { "party": "adventurer-cards", … } }`.
+"Declaring a PanelWidget" means naming, for one renderer, which built-in style draws it. A Ruleset
+never ships code, CSS, HTML, fonts or images for its panels: packages are files people share, and
+Sylvia does not run or inject what they carry. Colours are `#rrggbb` only. An unknown style or base
+falls back to the neutral one; a colour that is invalid, or too dim to read against the panel
+background, falls back to the base theme's value. A Pathfinder Ruleset gets a fantasy look by
+declaring the `fantasy` base and the fantasy styles with its own colours; it needs no new code
+unless it wants a style Sylvia does not yet have, which is then added to Sylvia for every Ruleset.
+
+| Renderer | neutral style (default) | tactical style (Trigger Discipline) | fantasy style (SRD) |
+|---|---|---|---|
+| `party` | `roster` | `squad-strip` | `adventurer-cards` |
+| `unit_list` (Character) | `sheet` | `operator` | `character-sheet`, with the spell book when the map declares cast actions |
+| `encounter` | `turn-list` | `turn-list` | `initiative-ladder` |
+| `coordinate_map`, `tactical_grid` | `plain` | `tactical-grid` | `battlefield` |
+| everything else | `plain` | `plain` | `plain` |
+
+**Fixed for every Ruleset, not declarable.** Arrangement, docking and floating; keyboard use and a
+visible focus ring; readable contrast; reduced motion and the Effects setting; minimum text sizes;
+nothing clipped, overflowing or overlapping; the player's chosen session theme (backgrounds and body
+text); and honesty: a PanelWidget shows only projected values and declared actions, labels what is
+missing, and never calculates rules.
+
+**The SRD look is the published sizzle reel** (Opus cut v1, 27 to 41 seconds), which was cut from
+the Professional Effects design demo Daniel chose as the look players will see. Reference stills:
+[play screen](panel-looks/srd-reel-play-screen.jpg), [spell cards](panel-looks/srd-reel-spell-cards.jpg),
+[spell slots](panel-looks/srd-reel-spell-slots.jpg). Fantasy, not tactical: warm gold accent on the
+active tab, section labels in spaced gold capitals, serif character and spell names; a red Round
+seal; an initiative ladder with an Acting-now card and rungs with shield-shaped order badges, a
+side-coloured underline and struck-through fallen creatures; a battlefield of mossy green ground
+inside a gold-edged field with a distance ruler; a turn bar reading "Name's turn · Round n" in gold
+serif with the action, bonus action and reaction shapes and a movement bar; a character sheet with
+an initials plinth, a flask for HP, a shield for AC and walking speed; spell cards with a copper
+medallion, an orange left edge, "Cantrip · Evocation" and either "at will" or slot gems on the
+right; spell slots by Roman numeral with lilac gems; six ability tiles in one row.
+
+**Trigger Discipline's look is tactical**: purple brand accent on the active tab, teal allies,
+sans-serif and condensed type; a horizontal squad strip with segmented, slanted HP bars and AP
+diamonds; an Operator sheet with a cut-corner portrait plate, rank chevrons, posture buttons and the
+weapon card with its rig; a dark grid map. Its design-demo reference contains private setting art and
+is not reproduced in this repository.
+
+**A Ruleset with no declaration** gets the neutral look: the session theme's own accent, sans type, a
+roster list, a plain character sheet, a turn list and a plain map. It is complete and usable, not a
+fallback to either game.
+
+**Where declarations live.** First step (0.4.1): in the app, in `src-tauri/frontend/panel-looks.js`,
+keyed by Ruleset identity, in exactly the version-1 shape above. No Ruleset bytes change, and every
+SRD Lite campaign, old or new, gets the SRD look at once. Next step: the same data becomes a package
+artifact, `ui/panel-look.json`, admitted like `ui/panel-layout.json`. The app's entry then remains
+only as the fallback for package versions that predate the artifact, so a campaign pinned to an
+older version keeps the same look and needs no rules update. Panel titles (for example the reel's
+"Initiative" and "Grimoire" against the package's "Encounter" and "Character") and data the
+projection does not carry (ability modifiers, portraits, area previews) are Ruleset package or
+engine changes, not part of a look.
 
 ## 11. Package library, pins, and activation
 
