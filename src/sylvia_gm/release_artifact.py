@@ -92,6 +92,8 @@ _SIGNING = {
     "status": "unsigned",
 }
 LINUX_RELEASE_FORMAT_ID = "sylvia-gm-linux-release-manifest"
+LINUX_BUNDLED_NOTICES_PATH = "licenses/LINUX-BUNDLED-LIBRARIES.txt"
+BUNDLED_NOTICES_KEY = "bundled_library_notices"
 LINUX_UNSIGNED_DISCLOSURE = (
     "This Sylvia GM Alpha prerelease is unsigned. Verify the AppImage SHA-256 against "
     "release-manifest.json or SHA256SUMS.txt before running it."
@@ -177,6 +179,9 @@ class ReleasePlatform:
     qualification_keys: frozenset[str]
     toolchain_keys: frozenset[str]
     disclosure: str
+    # Where the notices for bundled system libraries sit in the layout, for a platform whose
+    # artifact carries them; such a layout must hold the file and its manifest record.
+    bundled_notices_path: str | None = None
 
     @property
     def signing(self) -> dict[str, str]:
@@ -223,6 +228,7 @@ def linux_release_platform() -> ReleasePlatform:
         qualification_keys=frozenset({"ubuntu_22_04", "ubuntu_24_04"}),
         toolchain_keys=_TOOLCHAIN_KEYS | {"appimage_tools_sha256", "build_system", "glibc"},
         disclosure=LINUX_UNSIGNED_DISCLOSURE,
+        bundled_notices_path=LINUX_BUNDLED_NOTICES_PATH,
     )
 
 
@@ -461,10 +467,18 @@ def assemble_release_layout(
     dependency_notice_companions_directory: Path | None = None,
     version: str = PRERELEASE_VERSION,
     platform: ReleasePlatform | None = None,
+    bundled_notices_path: Path | None = None,
 ) -> dict[str, object]:
     """Atomically assemble one canonical unsigned prerelease directory (Windows by default)."""
 
     platform = platform or windows_release_platform()
+    if (bundled_notices_path is None) != (platform.bundled_notices_path is None):
+        raise ReleaseArtifactError(
+            "Bundled library notices are required for this platform and not accepted otherwise"
+        )
+    bundled_notices = (
+        read_dependency_notices(bundled_notices_path) if bundled_notices_path is not None else None
+    )
     _require_release_version(version)
     if version != PRERELEASE_VERSION:
         raise ReleaseArtifactError("Release version does not match the application")
@@ -538,6 +552,8 @@ def assemble_release_layout(
         notice_destination.write_bytes(notice_bytes)
         for name, blob in companions.items():
             (staging / name).write_bytes(blob)
+        if bundled_notices is not None:
+            (staging / cast(str, platform.bundled_notices_path)).write_bytes(bundled_notices)
         (staging / "UNSIGNED.txt").write_text(platform.disclosure + "\n", encoding="utf-8")
         manifest: dict[str, object] = {
             "artifacts": records,
@@ -559,12 +575,19 @@ def assemble_release_layout(
                 {"path": name, "sha256": hashlib.sha256(blob).hexdigest(), "size_bytes": len(blob)}
                 for name, blob in companions.items()
             ]
+        if bundled_notices is not None:
+            manifest[BUNDLED_NOTICES_KEY] = {
+                "path": platform.bundled_notices_path,
+                "sha256": hashlib.sha256(bundled_notices).hexdigest(),
+                "size_bytes": len(bundled_notices),
+            }
         (staging / "release-manifest.json").write_bytes(_canonical_json_bytes(manifest))
         checksummed_names = [
             *(cast(str, record["name"]) for record in records),
             "LICENSE",
             DEPENDENCY_NOTICES_PATH,
             *companions,
+            *([cast(str, platform.bundled_notices_path)] if bundled_notices is not None else []),
             "UNSIGNED.txt",
             "release-manifest.json",
         ]
@@ -606,7 +629,12 @@ def verify_release_layout(
         raise ReleaseArtifactError("Release manifest cannot be read") from error
     if not isinstance(manifest, dict) or raw_manifest != _canonical_json_bytes(manifest):
         raise ReleaseArtifactError("Release manifest is not canonical")
-    if frozenset(manifest) != _MANIFEST_KEYS:
+    expected_keys = (
+        _MANIFEST_KEYS | {BUNDLED_NOTICES_KEY}
+        if platform.bundled_notices_path is not None
+        else _MANIFEST_KEYS
+    )
+    if frozenset(manifest) != expected_keys:
         raise ReleaseArtifactError("Release manifest fields are incomplete or unknown")
     if (
         manifest.get("format_id") != platform.format_id
@@ -652,6 +680,26 @@ def verify_release_layout(
         "release-manifest.json",
         DEPENDENCY_NOTICES_PATH,
     }
+    if platform.bundled_notices_path is not None:
+        bundled = manifest.get(BUNDLED_NOTICES_KEY)
+        if (
+            not isinstance(bundled, dict)
+            or frozenset(bundled) != _NOTICE_KEYS
+            or bundled.get("path") != platform.bundled_notices_path
+            or not isinstance(bundled.get("sha256"), str)
+            or not _SHA256_RE.fullmatch(cast(str, bundled["sha256"]))
+        ):
+            raise ReleaseArtifactError("Release bundled library notice record is invalid")
+        content = read_dependency_notices(
+            directory / platform.bundled_notices_path,
+            expected_sha256=cast(str, bundled["sha256"]),
+        )
+        size = bundled.get("size_bytes")
+        if not isinstance(size, int) or isinstance(size, bool) or size != len(content):
+            raise ReleaseArtifactError(
+                "Release bundled library notice size does not match the manifest"
+            )
+        expected_names.add(platform.bundled_notices_path)
     notice_record = cast(dict[str, object], manifest["dependency_notices"])
     if "companions" in notice_record:
         if manifest["format_version"] != RELEASE_FORMAT_VERSION:
@@ -763,4 +811,9 @@ def assemble_qualified_release_layout(
         ),
         version=cast(str, product["version"]),
         platform=platform,
+        bundled_notices_path=(
+            source / platform.bundled_notices_path
+            if platform.bundled_notices_path is not None
+            else None
+        ),
     )

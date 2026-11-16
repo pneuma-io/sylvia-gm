@@ -64,7 +64,9 @@ uv run --locked --all-extras python scripts/build_linux_prerelease.py --dependen
 
 The builder writes the AppImage, `release-manifest.json`, `SHA256SUMS.txt`, `UNSIGNED.txt`, the
 licence and the notices to `dist/sylvia-gm-<version>-linux-x86_64` unless `--output` names
-another new folder. The manifest's format is `sylvia-gm-linux-release-manifest`; besides what the
+another new folder. The notices include `licenses/LINUX-BUNDLED-LIBRARIES.txt`, which the builder
+writes from the bundle it has just made
+([What the Linux build carries](#4-what-the-linux-build-carries-and-leaves-out)). The manifest's format is `sylvia-gm-linux-release-manifest`; besides what the
 Windows manifest records, its toolchain section names the build machine's system and glibc. The
 `--ubuntu-22-04` and `--ubuntu-24-04` options record qualification states and default to
 `pending`. `--allow-newer-glibc` is for trial builds on a newer machine only; such a build does
@@ -88,10 +90,16 @@ cd dist/sylvia-gm-<version>-linux-x86_64 && sha256sum -c SHA256SUMS.txt
   ([Provider keys](linux-development.md#provider-keys-on-shared-or-rented-machines)). There is no
   desktop keyring in front of it yet.
 - **Bundled system libraries:** the AppImage carries the web view (WebKitGTK), GTK and the
-  libraries they need from the build machine, with the copyright files the bundling tool copies
-  from their packages. These are not covered by `dependency-notices.txt`, which describes the
-  Python and Rust components. Whether that is sufficient for a release: Not documented in this
-  repository.
+  libraries they need, copied from the build machine's packages. `dependency-notices.txt`
+  describes the Python and Rust components, not these. The builder therefore writes
+  `licenses/LINUX-BUNDLED-LIBRARIES.txt` for every build: each package behind a bundled file,
+  with its version, its Ubuntu source package and its copyright file, where to get the source and
+  how a person can replace a library. The build stops if a bundled shared library belongs to no
+  installed package or a package has no copyright file. The file ships in the release folder and
+  the manifest records its hash; publish it with the AppImage. It can also be written for any
+  unpacked AppImage with `scripts/build_linux_bundled_notices.py`.
+- **Not covered by either notices file:** the libraries built into the Python runtime of the
+  Linux build.
 
 ## 5. Installed-application pass
 
@@ -127,8 +135,8 @@ programs such as the Codex runtime are found), the clipboard, and detached panel
 ## 6. Publish
 
 Publishing is the release owner's step and is the same for both systems: attach the AppImage,
-`release-manifest.json` and `SHA256SUMS.txt` to the GitHub release that holds the Windows files,
-marked Pre-release. Say in the release notes which distributions the build was checked on and
+`release-manifest.json`, `SHA256SUMS.txt` and `LINUX-BUNDLED-LIBRARIES.txt` to the GitHub release
+that holds the Windows files, marked Pre-release. Say in the release notes which distributions the build was checked on and
 what the Linux build leaves out.
 
 ## 7. Record

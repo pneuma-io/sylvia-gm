@@ -15,8 +15,10 @@ from scripts import build_linux_prerelease as linux_builder
 from scripts.build_windows_prerelease import LOCK_CHECK_COMMANDS
 
 from sylvia_gm.release_artifact import (
+    BUNDLED_NOTICES_KEY,
     DEPENDENCY_NOTICES_PATH,
     DEPENDENCY_NOTICES_SOURCE,
+    LINUX_BUNDLED_NOTICES_PATH,
     LINUX_RELEASE_FORMAT_ID,
     LINUX_UNSIGNED_DISCLOSURE,
     PRERELEASE_VERSION,
@@ -33,6 +35,7 @@ from sylvia_gm.release_artifact import (
 ROOT = Path(__file__).parents[1]
 NOTICES = b"SYNTHETIC TEST FIXTURE ONLY - no shipping licence text.\n"
 NOTICES_SHA256 = hashlib.sha256(NOTICES).hexdigest()
+BUNDLED = b"SYNTHETIC TEST FIXTURE ONLY - notices for bundled system libraries.\n"
 PROVENANCE = {
     "source_commit": "a" * 40,
     "source_tree": "b" * 40,
@@ -62,6 +65,12 @@ def _notices(tmp_path: Path) -> Path:
     return path
 
 
+def _bundled(tmp_path: Path) -> Path:
+    path = tmp_path / "synthetic-bundled-libraries.txt"
+    path.write_bytes(BUNDLED)
+    return path
+
+
 def _appimage(tmp_path: Path, name: str | None = None) -> Path:
     path = tmp_path / (name or f"Sylvia GM_{PRERELEASE_VERSION}_amd64.AppImage")
     path.write_bytes(b"synthetic AppImage - never execute")
@@ -80,6 +89,7 @@ def _linux_release(tmp_path: Path, **changes: object) -> tuple[Path, dict[str, o
         "dependency_notices_path": _notices(tmp_path),
         "dependency_notices_sha256": NOTICES_SHA256,
         "platform": linux_release_platform(),
+        "bundled_notices_path": _bundled(tmp_path),
     }
     arguments.update(changes)
     return output, assemble_release_layout(**arguments)  # type: ignore[arg-type]
@@ -115,12 +125,68 @@ def test_linux_layout_is_one_appimage_with_its_own_identity_and_disclosure(tmp_p
         ]
     )
     assert (output / DEPENDENCY_NOTICES_PATH).read_bytes() == NOTICES
+    # The notices for the libraries inside the AppImage ship beside it, declared and hashed.
+    assert (output / LINUX_BUNDLED_NOTICES_PATH).read_bytes() == BUNDLED
+    assert manifest[BUNDLED_NOTICES_KEY] == {
+        "path": LINUX_BUNDLED_NOTICES_PATH,
+        "sha256": hashlib.sha256(BUNDLED).hexdigest(),
+        "size_bytes": len(BUNDLED),
+    }
+    sums = (output / "SHA256SUMS.txt").read_text(encoding="utf-8")
+    assert f"{hashlib.sha256(BUNDLED).hexdigest()}  {LINUX_BUNDLED_NOTICES_PATH}\n" in sums
+
+
+def test_bundled_library_notices_are_required_on_linux_and_refused_on_windows(tmp_path):
+    with pytest.raises(ReleaseArtifactError, match="Bundled library notices are required"):
+        _linux_release(tmp_path, bundled_notices_path=None)
+    assert not (tmp_path / "linux-release").exists()
+    installer = tmp_path / "synthetic-setup.exe"
+    installer.write_bytes(b"synthetic installer - never execute")
+    with pytest.raises(ReleaseArtifactError, match="not accepted otherwise"):
+        assemble_release_layout(
+            output=tmp_path / "windows-release",
+            artifacts=(ReleaseArtifact(installer, "nsis-installer"),),
+            provenance=PROVENANCE,
+            toolchain=WINDOWS_TOOLCHAIN,
+            qualification={"windows_10": "pending", "windows_11": "pending"},
+            license_path=ROOT / "LICENSE",
+            dependency_notices_path=_notices(tmp_path),
+            dependency_notices_sha256=NOTICES_SHA256,
+            bundled_notices_path=_bundled(tmp_path),
+        )
+    empty = tmp_path / "empty.txt"
+    empty.write_bytes(b"  \n")
+    with pytest.raises(ReleaseArtifactError, match="empty or unreadable"):
+        _linux_release(tmp_path, bundled_notices_path=empty)
+
+
+def test_linux_layout_detects_changed_missing_or_undeclared_bundled_notices(tmp_path):
+    output, _ = _linux_release(tmp_path)
+    notices = output / LINUX_BUNDLED_NOTICES_PATH
+    notices.write_bytes(BUNDLED + b"changed\n")
+    with pytest.raises(ReleaseArtifactError, match="pin"):
+        verify_release_layout(output, linux_release_platform())
+    notices.unlink()
+    with pytest.raises(ReleaseArtifactError, match="cannot be read"):
+        verify_release_layout(output, linux_release_platform())
+    notices.write_bytes(BUNDLED)
+    assert verify_release_layout(output, linux_release_platform())
+    manifest_path = output / "release-manifest.json"
+    original = manifest_path.read_bytes()
+    record = b'"bundled_library_notices":'
+    assert original.count(record) == 1
+    start = original.index(record)
+    end = original.index(b"}", start) + 2
+    manifest_path.write_bytes(original[:start] + original[end:])
+    with pytest.raises(ReleaseArtifactError, match="fields are incomplete or unknown"):
+        verify_release_layout(output, linux_release_platform())
 
 
 def test_a_linux_layout_never_verifies_as_windows_and_the_reverse(tmp_path):
     linux, _ = _linux_release(tmp_path)
+    refused = "format is unsupported|fields are incomplete or unknown"
     for platform in (None, windows_release_platform()):
-        with pytest.raises(ReleaseArtifactError, match="format is unsupported"):
+        with pytest.raises(ReleaseArtifactError, match=refused):
             verify_release_layout(linux, platform) if platform else verify_release_layout(linux)
     installer = tmp_path / "synthetic-setup.exe"
     installer.write_bytes(b"synthetic installer - never execute")
@@ -136,7 +202,8 @@ def test_a_linux_layout_never_verifies_as_windows_and_the_reverse(tmp_path):
         dependency_notices_sha256=NOTICES_SHA256,
     )
     assert verify_release_layout(windows)["product"]["platform"] == "windows"
-    with pytest.raises(ReleaseArtifactError, match="format is unsupported"):
+    assert BUNDLED_NOTICES_KEY not in verify_release_layout(windows)
+    with pytest.raises(ReleaseArtifactError, match=refused):
         verify_release_layout(windows, linux_release_platform())
 
 
@@ -205,7 +272,9 @@ def test_qualified_linux_layout_keeps_the_same_bytes_with_new_states(tmp_path):
     assert qualified["artifacts"] == manifest["artifacts"]
     assert qualified["qualification"] == {"ubuntu_22_04": "passed", "ubuntu_24_04": "not_available"}
     assert verify_release_layout(tmp_path / "qualified", linux_release_platform()) == qualified
-    with pytest.raises(ReleaseArtifactError, match="format is unsupported"):
+    assert qualified[BUNDLED_NOTICES_KEY] == manifest[BUNDLED_NOTICES_KEY]
+    assert (tmp_path / "qualified" / LINUX_BUNDLED_NOTICES_PATH).read_bytes() == BUNDLED
+    with pytest.raises(ReleaseArtifactError, match="format is unsupported|fields are incomplete"):
         assemble_qualified_release_layout(
             source=source,
             output=tmp_path / "as-windows",
@@ -309,10 +378,25 @@ def _builder_fixture(tmp_path, monkeypatch, *, glibc=(2, 35), system="linux"):
             bundle.mkdir(parents=True)
             built = bundle / "Sylvia GM_synthetic_amd64.AppImage"
             built.write_bytes(b"synthetic - never execute")
+            library = bundle / "Sylvia GM.AppDir/usr/lib/libsynthetic.so.1"
+            library.parent.mkdir(parents=True)
+            library.write_bytes(b"synthetic library - never load")
             (cache / "tauri").mkdir(parents=True)
             (cache / "tauri/linuxdeploy-x86_64.AppImage").write_bytes(b"synthetic bundler")
         return ""
 
+    written = []
+
+    def write_notices(appdir, output, *, own_folder, build_system):
+        # The real writer asks the build machine's package database; here it is replaced.
+        assert appdir.name == "Sylvia GM.AppDir" and (appdir / "usr/lib").is_dir()
+        assert own_folder == "Sylvia GM" and build_system == "Ubuntu 22.04.5 LTS"
+        assert output.parent.is_relative_to(root / ".owner-build")
+        output.write_bytes(BUNDLED)
+        written.append(output)
+        return ["synthetic-package"]
+
+    monkeypatch.setattr(linux_builder.bundled, "write_notices", write_notices)
     monkeypatch.setattr(linux_builder.sys, "platform", system)
     monkeypatch.setattr(linux_builder, "_glibc_version", lambda: glibc)
     monkeypatch.setattr(linux_builder, "_build_system", lambda: "Ubuntu 22.04.5 LTS")
@@ -356,6 +440,34 @@ def test_linux_builder_runs_the_locked_steps_and_records_the_build_machine(tmp_p
     assert len(tools["appimage_tools_sha256"]) == 64
     assert {key: tools[key] for key in WINDOWS_TOOLCHAIN} == WINDOWS_TOOLCHAIN
     assert (output / DEPENDENCY_NOTICES_PATH).read_bytes() == NOTICES
+    assert (output / LINUX_BUNDLED_NOTICES_PATH).read_bytes() == BUNDLED
+    assert manifest[BUNDLED_NOTICES_KEY]["sha256"] == hashlib.sha256(BUNDLED).hexdigest()
+
+
+def test_linux_builder_stops_when_a_bundled_library_cannot_be_accounted_for(tmp_path, monkeypatch):
+    root, _notice, _commands = _builder_fixture(tmp_path, monkeypatch)
+
+    def unaccounted(*_arguments, **_options):
+        raise linux_builder.bundled.BundledNoticesError(
+            "No installed package ships these bundled libraries: usr/lib/libmystery.so.3"
+        )
+
+    monkeypatch.setattr(linux_builder.bundled, "write_notices", unaccounted)
+    with pytest.raises(ReleaseArtifactError, match="libmystery"):
+        _build(root, tmp_path / "unaccounted", tmp_path)
+    assert not (tmp_path / "unaccounted").exists()
+
+
+def test_the_unpacked_bundle_is_found_only_when_there_is_exactly_one(tmp_path):
+    bundle = tmp_path / "release/bundle/appimage"
+    with pytest.raises(ReleaseArtifactError, match="exactly one unpacked"):
+        linux_builder.discover_appdir(tmp_path)
+    (bundle / "Sylvia GM.AppDir").mkdir(parents=True)
+    (bundle / "not-a-folder.AppDir").write_bytes(b"synthetic")
+    assert linux_builder.discover_appdir(tmp_path) == bundle / "Sylvia GM.AppDir"
+    (bundle / "Second.AppDir").mkdir()
+    with pytest.raises(ReleaseArtifactError, match="exactly one unpacked"):
+        linux_builder.discover_appdir(tmp_path)
 
 
 def test_linux_builder_refuses_a_newer_machine_unless_told_it_is_a_trial(tmp_path, monkeypatch):
