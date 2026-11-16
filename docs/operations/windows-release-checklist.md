@@ -1,8 +1,9 @@
 # Windows release checklist
 
 Day-to-day development and testing can happen on Linux
-([Linux development](linux-development.md)). Windows remains the platform for release builds,
-the installer, the updater and the installed-app checks. Work through these steps on the Windows
+([Linux development](linux-development.md)), and the Linux app has its own
+[Linux release checklist](linux-release-checklist.md). Windows remains the platform for the
+Windows release build, the installer, the updater and the Windows installed-app checks. Work through these steps on the Windows
 machine for each release candidate, in order, from the clean committed source selected for the
 release. Each step links to the section that explains it; this page does not replace those.
 
