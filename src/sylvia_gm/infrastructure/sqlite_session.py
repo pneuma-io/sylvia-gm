@@ -407,7 +407,9 @@ class _DecodedMessageCache:
             self._characters = 0
 
 
-_DECODED_MESSAGES = _DecodedMessageCache(maximum_sessions=32, maximum_characters=64_000_000)
+# Decoded messages take several times the memory of their saved JSON, so the bound is set on
+# the JSON: 16 million characters is about ten long campaigns' GM sessions.
+_DECODED_MESSAGES = _DecodedMessageCache(maximum_sessions=32, maximum_characters=16_000_000)
 
 
 def read_messages(connection: sqlite3.Connection, session_id: str) -> tuple[SessionMessage, ...]:
