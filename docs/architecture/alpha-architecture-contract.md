@@ -978,6 +978,9 @@ unless it wants a style Sylvia does not yet have, which is then added to Sylvia 
 | `coordinate_map`, `tactical_grid` | `plain` | `tactical-grid` | `battlefield` |
 | everything else | `plain` | `plain` | `plain` |
 
+**Not part of a PanelTheme.** The map's ground picture. Every look draws maps on the same plain dark
+ground with its grid; a generated or authored map image is a separate feature, not a look value.
+
 **Fixed for every Ruleset, not declarable.** Arrangement, docking and floating; keyboard use and a
 visible focus ring; readable contrast; reduced motion and the Effects setting; minimum text sizes;
 nothing clipped, overflowing or overlapping; the player's chosen session theme (backgrounds and body
@@ -990,12 +993,14 @@ the Professional Effects design demo Daniel chose as the look players will see. 
 [spell slots](panel-looks/srd-reel-spell-slots.jpg). Fantasy, not tactical: warm gold accent on the
 active tab, section labels in spaced gold capitals, serif character and spell names; a red Round
 seal; an initiative ladder with an Acting-now card and rungs with shield-shaped order badges, a
-side-coloured underline and struck-through fallen creatures; a battlefield of mossy green ground
-inside a gold-edged field with a distance ruler; a turn bar reading "Name's turn · Round n" in gold
-serif with the action, bonus action and reaction shapes and a movement bar; a character sheet with
+side-coloured underline and struck-through fallen creatures; a turn bar reading "Name's turn · Round n"
+in gold serif with the action, bonus action and reaction shapes, and a gold End combat turn button; a character sheet with
 an initials plinth, a flask for HP, a shield for AC and walking speed; spell cards with a copper
 medallion, an orange left edge, "Cantrip · Evocation" and either "at will" or slot gems on the
-right; spell slots by Roman numeral with lilac gems; six ability tiles in one row.
+right; spell slots by Roman numeral with lilac gems; six ability tiles in one row. Gold and parchment
+tones carry the panels and controls; the ally colour is kept for tokens, hit points and thin outlines.
+The reel's textured green battlefield is not part of the SRD look: it was a mockup of a future
+generated map picture.
 
 **Trigger Discipline's look is tactical**: purple brand accent on the active tab, teal allies,
 sans-serif and condensed type; a horizontal squad strip with segmented, slanted HP bars and AP

@@ -63,7 +63,8 @@
 
 /* ---- Panel looks (architecture contract §10.5.1) ----
    Each base's ornament, which a Ruleset cannot declare. The :root values are the neutral look; tactical is
-   Trigger Discipline's look and fantasy is the SRD sizzle reel's. panel-looks.js sets data-panel-look. */
+   Trigger Discipline's look and fantasy is the SRD sizzle reel's. panel-looks.js sets data-panel-look.
+   No look paints a picture on the map ground: the reel's green battlefield was a mockup of a future generated map image. */
 :root {
   --look-bar-skew: 0deg;
   --look-plate-clip: none;
@@ -78,15 +79,14 @@
   --look-now-edge: color-mix(in srgb, var(--look-accent) 45%, transparent);
   --look-now-fill: var(--bg-card);
   --look-now-mark: inset 3px 0 0 var(--ally);
+  --look-go: var(--ally);
+  --look-plinth: var(--ally);
   --look-order-fill: color-mix(in srgb, var(--text-muted) 30%, var(--bg-card));
   --look-order-clip: none;
   --look-spell-edge: var(--look-accent);
   --look-medal-fill: transparent;
   --look-medal-ink: var(--look-accent);
   --look-tier-ink: var(--text-dim);
-  --look-ground-outer: var(--bg-primary);
-  --look-ground: radial-gradient(circle, rgba(220,210,160,.16) 1px, transparent 1.4px) 0 0 / 32px 32px, rgba(123,140,168,.04);
-  --look-field-edge: none;
 }
 :root[data-panel-look="tactical"] {
   --look-bar-skew: -18deg;
@@ -110,14 +110,8 @@
   --look-medal-fill: radial-gradient(circle at 40% 35%, #6b3d22, #2a170d 75%);
   --look-medal-ink: #ffd6a0;
   --look-tier-ink: var(--look-accent);
-  --look-ground-outer: radial-gradient(ellipse 90% 80% at 50% 50%, #1b2115, #0d100a 75%);
-  --look-ground: radial-gradient(circle, rgba(230,220,170,.10) 1px, transparent 1.4px) 0 0 / 32px 32px,
-    radial-gradient(ellipse 32% 26% at 22% 28%, rgba(132,152,92,.38), transparent 70%),
-    radial-gradient(ellipse 36% 30% at 72% 58%, rgba(112,136,78,.36), transparent 70%),
-    radial-gradient(ellipse 26% 34% at 44% 84%, rgba(96,118,64,.34), transparent 70%),
-    radial-gradient(ellipse 30% 22% at 86% 18%, rgba(70,88,48,.4), transparent 70%),
-    #36422b;
-  --look-field-edge: 0 0 0 1px color-mix(in srgb, var(--look-accent) 55%, transparent), inset 0 0 48px rgba(0,0,0,.32);
+  --look-go: var(--look-accent);
+  --look-plinth: var(--look-accent);
 }
 /* The declared ally and hostile colours apply inside the panels. */
 #ruleset-panels { --ally: var(--look-ally); --hostile: var(--look-hostile); }
@@ -4595,9 +4589,9 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .map-turn-label b[data-side^="host"] { color: var(--hostile); }
 .map-turn-revision { padding: 2px 8px; border-radius: 6px; background: var(--bg-primary); color: var(--text-dim); font: 11px var(--font-number); }
 .map-turn-end { display: inline-flex; flex: 0 0 auto; }
-.map-turn-end .btn { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 4px 12px; border-color: color-mix(in srgb, var(--ally) 50%, transparent);
-  border-radius: 9px; background: var(--ally-soft); color: var(--text-bright); font-size: 12.5px; font-weight: 600; }
-.map-turn-end .btn::before { content: ''; width: 13px; height: 13px; background: var(--ally);
+.map-turn-end .btn { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 4px 12px; border-color: color-mix(in srgb, var(--look-go) 50%, transparent);
+  border-radius: 9px; background: color-mix(in srgb, var(--look-go) 14%, transparent); color: var(--text-bright); font-size: 12.5px; font-weight: 600; }
+.map-turn-end .btn::before { content: ''; width: 13px; height: 13px; background: var(--look-go);
   clip-path: polygon(0 0, 18% 0, 18% 100%, 0 100%, 0 0, 30% 0, 100% 50%, 30% 100%); }
 .ruleset-map-panel .map-status-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 10px 0; }
 .ruleset-map-panel .map-status-chips .panel-tag { padding: 2px 8px; border-radius: 999px; font-size: 11px; }
@@ -4756,13 +4750,13 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 [data-action-readiness] .panel-tag[data-econ="action"][data-econ-state="on"]::before { background: var(--good); opacity: 1; box-shadow: 0 0 6px var(--good); }
 [data-action-readiness] .panel-tag[data-econ="bonus"][data-econ-state="on"]::before { background: var(--intent); opacity: 1; }
 [data-action-readiness] .panel-tag[data-econ="reaction"][data-econ-state="on"]::before { background: var(--device); opacity: 1; }
-[data-action-readiness] .panel-tag[data-econ="move"][data-econ-state="on"]::before { background: var(--ally); opacity: 1; }
+[data-action-readiness] .panel-tag[data-econ="move"][data-econ-state="on"]::before { background: var(--look-go); opacity: 1; }
 .ruleset-map-panel .map-turn-strip [data-action-readiness] { display: inline-flex; flex-wrap: nowrap; gap: 4px; }
 /* Grimoire */
 .character-hero.grimoire { display: grid; gap: 10px; padding: 2px 0; border: 0; background: none; overflow: visible; }
 .grim-head { display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; }
-.grim-plinth { display: grid; place-items: center; align-content: center; gap: 2px; height: 104px; border: 1px solid color-mix(in srgb, var(--ally) 40%, transparent);
-  border-radius: 46px 46px 12px 12px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--ally) 16%, var(--bg-card)), var(--bg-primary)); text-align: center; }
+.grim-plinth { display: grid; place-items: center; align-content: center; gap: 2px; height: 104px; border: 1px solid color-mix(in srgb, var(--look-plinth) 40%, transparent);
+  border-radius: 46px 46px 12px 12px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--look-plinth) 16%, var(--bg-card)), var(--bg-primary)); text-align: center; }
 .grim-plinth b { color: var(--text-bright); font: 700 30px var(--look-heading-font); }
 .grim-plinth small { max-width: 80px; color: var(--text-muted); font-size: 9.5px; }
 .grim-id h3 { margin: 0; color: var(--text-bright); font: 600 25px var(--look-heading-font); }
@@ -4807,9 +4801,10 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .grim-rune b { color: var(--text-bright); font: 700 15px var(--font-number); }
 .grim-gear:empty { display: none; }
 .ruleset-character-panel .ruleset-panel-content:has(> .character-hero.grimoire) { padding: 10px 12px 12px; }
-/* Battlefield: the arcane tabletop ground with a 5 ft dot grid; tokens wear nameplates. */
-.ruleset-map-panel .tactical-scroll:has(> .coordinate-world) { background: var(--look-ground-outer); }
-.ruleset-map-panel .coordinate-world { background: var(--look-ground); box-shadow: var(--look-field-edge); }
+/* Coordinate maps: a plain dark ground with a 5 ft dot grid in every look (a generated map picture would be a separate
+   feature); tokens wear nameplates. */
+.ruleset-map-panel .tactical-scroll:has(> .coordinate-world) { background: var(--bg-primary); }
+.ruleset-map-panel .coordinate-world { background: radial-gradient(circle, rgba(220,210,160,.16) 1px, transparent 1.4px) 0 0 / 32px 32px, rgba(123,140,168,.04); }
 .ruleset-map-panel .coordinate-world .tactical-entity .map-name-label { top: calc(100% + 3px); bottom: auto; padding: 0 5px; border-radius: 4px;
   background: rgba(10,10,8,.82); color: #eee6cf; font: 600 10px var(--font-sans); text-shadow: none; }
 .ruleset-map-panel .coordinate-world .tactical-entity .map-token-label { font-family: var(--font-serif); }
