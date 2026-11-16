@@ -180,7 +180,7 @@ async def test_an_answered_request_never_carries_or_loses_another_responses_usag
     # Its own report only; the answered response's is in the record, not overwritten.
     assert second.usage.prompt_tokens == 160 and second.cache_usage.cache_read_tokens == 150
     assert audit.reuse[1]["usage_reports"] == [
-        {"response": "previous", "input": 100, "cached": 0, "output": 5},
+        {"response": "previous", "requests_ago": 1, "input": 100, "cached": 0, "output": 5},
         {"response": "own", "input": 160, "cached": 150, "output": 5},
     ]
 
@@ -510,10 +510,11 @@ async def test_a_cancellation_while_a_finished_requests_thread_closes_still_writ
 
 
 @pytest.mark.asyncio
-async def test_a_turn_left_waiting_is_closed_sooner_than_an_idle_thread(
+async def test_a_turn_left_waiting_is_closed_after_its_idle_limit(
     tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
 ) -> None:
-    assert answering.pending_idle_seconds == 90.0 < answering.idle_seconds == 600.0
+    # The wait is the player's reading and typing time between turns.
+    assert answering.pending_idle_seconds == answering.idle_seconds == 600.0
     answering.pending_idle_seconds = 0.05
     runtime = AnswerRuntime(Waiting([asks("call-1", 7)]))
     provider, _ = provider_for(runtime, tmp_path)
@@ -534,7 +535,7 @@ async def test_an_idle_waiting_turn_past_its_limit_is_closed_when_the_next_reque
     provider, audit = provider_for(runtime, tmp_path)
     await provider.generate(FIRST, tools=TOOLS)
     [kept] = answering._idle  # noqa: SLF001
-    kept.idle_since -= 91
+    kept.idle_since -= 601
     await provider.generate(SECOND, tools=TOOLS)
     assert not runtime.connections[0].alive and audit.reuse[1]["continued"] is False
 
@@ -603,6 +604,144 @@ def test_a_process_that_exits_with_a_kept_thread_closes_it() -> None:
     assert done.returncode == 0, done.stderr[-400:]
     assert done.stdout.splitlines()[:2] == ["exiting with 1 kept", "kept thread closed at exit"]
 
+
+
+# ---- usage of a waiting turn that is not answered ---------------------------------------
+
+def waiting_that_reports_when_interrupted(*after_answer: list[dict[str, Any]]) -> Waiting:
+    """A turn waiting at a call, which reports its response's usage when interrupted."""
+    turn = Waiting([asks("call-1", 7)], *after_answer)
+    turn.after_interrupt = [usage(100, 0), ended("interrupted")]
+    return turn
+
+
+ABANDONED = {"response": "previous", "requests_ago": 1, "closed_unanswered": True,
+             "input": 100, "cached": 0, "output": 5}
+
+
+@pytest.mark.asyncio
+async def test_a_waiting_turn_a_request_does_not_answer_reports_its_usage_before_closing(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    runtime = AnswerRuntime(waiting_that_reports_when_interrupted(), text_turn())
+    provider, audit = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    await provider.generate([*FIRST, user("Wait, stop.")], tools=TOOLS)
+    waiting, fresh = runtime.connections
+    assert len(waiting.methods("turn/interrupt")) == 1 and not waiting.alive
+    assert audit.reuse[1]["fresh_reason"] == "no_call_result"
+    # The first response's report, then the fresh thread's own.
+    assert audit.reuse[1]["usage_reports"] == [
+        ABANDONED, {"response": "own", "input": 120, "cached": 100, "output": 5},
+    ]
+    assert runtime.alive() == []
+
+
+@pytest.mark.asyncio
+async def test_a_waiting_turn_closed_on_its_idle_limit_reports_with_the_next_request(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    answering.pending_idle_seconds = 0.05
+    runtime = AnswerRuntime(waiting_that_reports_when_interrupted(), text_turn(), text_turn())
+    provider, audit = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    for _ in range(150):
+        if not runtime.alive():
+            break
+        await asyncio.sleep(0.02)
+    assert runtime.alive() == [] and len(answering) == 0
+    assert len(runtime.connections[0].methods("turn/interrupt")) == 1
+    await provider.generate(SECOND, tools=TOOLS)
+    assert audit.reuse[1]["continued"] is False
+    assert audit.reuse[1]["usage_reports"][0] == ABANDONED
+    # Recorded once: a later request does not repeat it.
+    await provider.generate([*SECOND, user("Again.")], tools=TOOLS)
+    assert all(not r.get("closed_unanswered") for r in audit.reuse[2]["usage_reports"])
+
+
+@pytest.mark.asyncio
+async def test_stop_between_requests_writes_the_waiting_turns_usage_to_the_audit(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    runtime = AnswerRuntime(waiting_that_reports_when_interrupted())
+    provider, _ = provider_for(runtime, tmp_path)
+    closed: list[dict[str, Any]] = []
+
+    class Closed(Audit):
+        async def on_request(self, context: Any) -> None:
+            value = context.request_json or {}
+            if value.get("method") == "sylvia/thread_reuse_closed":
+                closed.append(value["params"])
+
+    provider.hooks.register(Closed())
+    await provider.generate(FIRST, tools=TOOLS)
+    await provider.release_idle()
+    assert runtime.alive() == [] and len(answering) == 0
+    assert closed == [{"usage_reports": [ABANDONED]}]
+    await provider.release_idle()
+    assert len(closed) == 1
+
+
+@pytest.mark.asyncio
+async def test_a_waiting_turn_whose_usage_was_already_reported_is_closed_without_interrupt(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    reported_first = Waiting([usage(100, 0), asks("call-1", 7)])
+    reported_first.after_interrupt = [usage(999, 0)]
+    runtime = AnswerRuntime(reported_first)
+    provider, audit = provider_for(runtime, tmp_path)
+    first = await provider.generate(FIRST, tools=TOOLS)
+    assert first.usage_reported and first.usage.prompt_tokens == 100
+    await provider.release_idle()
+    assert runtime.connections[0].methods("turn/interrupt") == []
+    assert audit.reuse[0]["usage_reports"] == [
+        {"response": "own", "input": 100, "cached": 0, "output": 5},
+    ]
+
+
+@pytest.mark.asyncio
+async def test_a_request_stopped_while_answering_does_not_wait_to_collect_usage(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    # The answer is sent, then nothing comes back: the player presses Stop.
+    runtime = AnswerRuntime(waiting_that_reports_when_interrupted([]))
+    provider, _ = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    [connection] = runtime.connections
+    task = asyncio.create_task(provider.generate(SECOND, tools=TOOLS, timeout=30))
+    for _ in range(200):
+        if connection.methods("answer"):
+            break
+        await asyncio.sleep(0.01)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+    # A stopped request is an explained miss: no interrupt is sent to collect a report.
+    assert connection.methods("turn/interrupt") == []
+    assert runtime.alive() == [] and len(answering) == 0
+
+
+def test_a_held_report_names_how_many_requests_before_it_belongs(tmp_path: Path) -> None:
+    held_pool = _chatgpt._KeptThreads()
+    home, other = tmp_path / "a", tmp_path / "b"
+    assert [held_pool.next_ordinal(home) for _ in range(3)] == [1, 2, 3]
+    assert held_pool.next_ordinal(other) == 1
+    held_pool.abandon(home, 1, {"input": 1, "cached": 0, "output": 1})
+    held_pool.abandon(home, 3, {"input": 3, "cached": 0, "output": 1})
+    held_pool.abandon(other, 1, {"input": 9, "cached": 0, "output": 1})
+    assert held_pool.take_abandoned(home, 4) == [
+        {"response": "earlier", "requests_ago": 3, "closed_unanswered": True,
+         "input": 1, "cached": 0, "output": 1},
+        {"response": "previous", "requests_ago": 1, "closed_unanswered": True,
+         "input": 3, "cached": 0, "output": 1},
+    ]
+    assert held_pool.take_abandoned(home, 5) == []
+    assert [r["input"] for r in held_pool.take_abandoned(other, 2)] == [9]
+    for index in range(_chatgpt._ABANDONED_REPORT_LIMIT + 5):  # noqa: SLF001
+        held_pool.abandon(home, index, {"input": index, "cached": 0, "output": 1})
+    held = held_pool.take_abandoned(home, 999)
+    assert len(held) == _chatgpt._ABANDONED_REPORT_LIMIT  # noqa: SLF001
+    assert held[-1]["input"] == _chatgpt._ABANDONED_REPORT_LIMIT + 4  # noqa: SLF001
 
 
 # ---- the account ------------------------------------------------------------------------

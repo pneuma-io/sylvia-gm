@@ -158,11 +158,12 @@ async def test_a_call_is_answered_inside_the_turn_that_made_it(
          "usage_reports": []},
         {"continued": True, "held_items": 1, "injected_items": 2,
          "retried_fresh": False, "kept": True, "answered_in_place": True,
-         "usage_reports": [{"response": "previous", "input": 100, "cached": 0, "output": 5}]},
+         "usage_reports": [{"response": "previous", "requests_ago": 1,
+                            "input": 100, "cached": 0, "output": 5}]},
         {"continued": True, "held_items": 3, "injected_items": 3,
          "retried_fresh": False, "kept": False, "answered_in_place": True,
          "usage_reports": [
-             {"response": "previous", "input": 150, "cached": 140, "output": 5},
+             {"response": "previous", "requests_ago": 1, "input": 150, "cached": 140, "output": 5},
              {"response": "own", "input": 160, "cached": 150, "output": 5},
          ]},
     ]
