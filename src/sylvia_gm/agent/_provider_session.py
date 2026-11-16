@@ -14,11 +14,28 @@ import json
 import queue
 import re
 import uuid
+import weakref
 from collections.abc import AsyncIterator, Awaitable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
 from sylvia_gm.agent._campaign_memory import select_campaign_memory
+from sylvia_gm.agent._context_ledger import (
+    ACTIVE_RECORDS_KEY,
+    CURRENT_WIRE_FRAME,
+    HOST_RECORD_KEY,
+    JOURNAL_KIND,
+    LEDGER_KEY,
+    LEDGER_MODE,
+    NATIVE_KIND,
+    STABLE_KEY,
+    ContextLedger,
+    WireFrame,
+    context_mode,
+    native_inputs,
+    native_record,
+    tagged,
+)
 from sylvia_gm.agent._inference_identity import inference_context_id
 from sylvia_gm.agent._provider_runtime import _PROVIDER_ASYNC_RUNTIME
 from sylvia_gm.agent._request_data import (
@@ -56,6 +73,7 @@ from sylvia_gm.domain.authority import (
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk
+from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
 
 from ._provider_turn_decisions import (
     _actor_decision_can_be_requested,
@@ -1542,6 +1560,12 @@ def _public_action_result(action_id: str | None, result: object) -> object:
     return _plain_json(result)
 
 
+#: Context ledgers by owner object (see ProviderSessionAdapter._ledger_store).
+_SHARED_LEDGERS: weakref.WeakKeyDictionary[Any, dict[str, ContextLedger]] = (
+    weakref.WeakKeyDictionary()
+)
+
+
 class ProviderSessionAdapter:
     """Run one configured provider through rules-neutral canonical session events."""
 
@@ -1569,6 +1593,11 @@ class ProviderSessionAdapter:
         self._owner_id = owner_id
         self._provider = provider
         self._working_contexts: dict[str, Any] = {}
+        # Read once per adapter. The previous request assembly is the shipped default;
+        # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
+        self._context_mode = context_mode(
+            transport=getattr(getattr(provider, "model_info", None), "transport", None))
+        self._context_ledgers: dict[str, ContextLedger] = {}
         self._timeout = timeout
         self._gm_system_prompt = gm_system_prompt
         if campaign_plan_text is not None:
@@ -2221,6 +2250,164 @@ class ProviderSessionAdapter:
         return ({**declared, "session_id": provider_input.session.session_id}
                 if declared is not None else None)
 
+    def _ledger_active(self, provider_input: SessionProviderInput) -> bool:
+        """GM play uses the context ledger when the mode read for this adapter selects it.
+
+        Builder and participant sessions never use it.
+        """
+        return (
+            self._context_mode == LEDGER_MODE
+            and provider_input.session.role is WriterRole.DM
+            and provider_input.session.campaign_id is not None
+        )
+
+    def _ledger_owner(self, provider_input: SessionProviderInput) -> dict[str, object]:
+        """The journal's owner: the declared GM context owner, else this campaign session."""
+        session = provider_input.session
+        return dict(self._gm_context_owner(provider_input) or {
+            "kind": "gm", "campaign_id": session.campaign_id, "session_id": session.session_id,
+        })
+
+    def _ledger_hooks(
+        self, provider_input: SessionProviderInput, provider: Provider, bridge: Any,
+    ) -> tuple[Any, Any, Any, Any]:
+        """Bind the session's ledger to one provider round: plan, journal, then send."""
+        session_id = provider_input.session.session_id
+        owner = self._ledger_owner(provider_input)
+        transport = getattr(getattr(provider, "model_info", None), "transport", None)
+        # Stand-in owners without the session append path keep the journal in memory only.
+        persistent = callable(getattr(self._owner, "append_agent_message", None))
+        ledgers = self._ledger_store()
+        ledger = ledgers.get(session_id)
+        if ledger is None or ledger.context_owner != owner or ledger.transport != transport:
+            previous = ledger
+            ledger = ContextLedger(session_id=session_id, context_owner=owner,
+                                   transport=transport)
+            if previous is not None:
+                # A different owner or transport is a new epoch; keep the reset visible.
+                ledger.state = previous.state
+            ledgers[session_id] = ledger
+        context_id = self._gm_request_context_id(provider_input)
+        # Claude Messages: on models where every account binds thinking to the system prompt
+        # and tool set, a change moves the journal's thinking floor before it is replayed.
+        from sylvia_gm.provider._anthropic import binds_thinking_for_every_account
+
+        thinking_enforced = transport == "anthropic_messages" and binds_thinking_for_every_account(
+            str(getattr(getattr(provider, "model_info", None), "wire_model_id", "") or ""))
+
+        def saved_records() -> list[Mapping[str, object]]:
+            # Read the owner's saved session, not this request's history view: a Retry's view
+            # leaves out the failed attempt's evidence, which includes its journal records.
+            reader = getattr(self._owner, "session_context", None)
+            try:
+                saved = reader(session_id).messages if callable(reader) else None
+            except Exception:  # noqa: BLE001 - a stand-in owner may not know the session
+                saved = None
+            return [
+                message.content
+                for message in (saved if saved is not None
+                                else getattr(provider_input.history, "messages", ()))
+                if message.kind is SessionMessageKind.EVIDENCE
+                and isinstance(message.content, Mapping)
+                and message.content.get("kind") in {JOURNAL_KIND, NATIVE_KIND}
+            ]
+
+        # Size planning and the send plan the same request; keep the measured frame so the
+        # send reuses it when nothing changed in between (same list, journal and tools).
+        measured: dict[str, Any] = {}
+
+        def measure(
+            projected: list[dict[str, object]], tools: list[dict[str, object]] | None,
+        ) -> list[dict[str, Any]]:
+            frame = ledger.plan(projected, request_context_id=context_id,
+                                history_records=saved_records, tools=tools,
+                                check_saved_tip=False, thinking_enforced=thinking_enforced)
+            measured.update(projected=projected, state=ledger.state, tools=tools, frame=frame)
+            return frame.wire
+
+        async def finalize(
+            projected: list[dict[str, object]], tools: list[dict[str, object]] | None,
+        ) -> list[dict[str, object]]:
+            reusable = (
+                measured.get("projected") is projected
+                and measured.get("state") is ledger.state
+                and measured.get("tools") == tools
+            )
+            frame = measured["frame"] if reusable else ledger.plan(
+                projected, request_context_id=context_id, history_records=saved_records,
+                tools=tools, check_saved_tip=False, thinking_enforced=thinking_enforced)
+            measured.clear()
+            if frame.record is not None and persistent:
+                # Durable before the request leaves: replay after a restart rehydrates the
+                # same journal, with native continuation still attached by reference.
+                await bridge.save(frame.record)
+            ledger.commit(frame)
+            CURRENT_WIRE_FRAME.set(frame.observation)
+            if transport == "claude_code":
+                CURRENT_NATIVE_ROUTE.set(
+                    self._claude_native_route(ledger, frame, bridge, persistent))
+            return self._attach_native_continuation(
+                cast(list[dict[str, object]], frame.wire), provider_input,
+                has_tools=bool(tools),
+                thinking_before=len(frame.wire) - len(frame.state.entries)
+                + frame.state.thinking_floor,
+            )
+
+        def rebase() -> None:
+            # Compaction planning found only superseded journal records over budget.
+            ledger.request_rebase()
+            measured.clear()
+
+        def strip_thinking() -> None:
+            # The service rejected a replayed thinking block: strip all of them, once.
+            ledger.request_thinking_strip()
+            measured.clear()
+
+        return finalize, measure, rebase, strip_thinking
+
+    @staticmethod
+    def _claude_native_route(
+        ledger: ContextLedger, frame: WireFrame, bridge: Any, persistent: bool,
+    ) -> NativeRoute:
+        """Claude Code's transcript inputs: earlier request boundaries and the CLI's records.
+
+        The callback keeps what this step's session file contained, in memory for the next
+        request and as session evidence when there is anything to keep.
+        """
+        state = frame.state
+        boundaries, saved = native_inputs(state)
+        boundary = len(state.entries)
+
+        async def on_collected(result: NativeCollection) -> None:
+            payload = native_record(
+                state, context_owner=ledger.context_owner, boundary=boundary,
+                status=result.status, reason=result.reason, records=result.records,
+            )
+            if ledger.state is state:
+                state.native[boundary] = {"status": result.status, "records": payload["records"]}
+            if persistent:
+                await bridge.save(payload)
+
+        return NativeRoute(
+            stable_count=len(frame.wire) - boundary,
+            entry_count=boundary,
+            boundaries=boundaries,
+            native_records=saved,
+            on_collected=on_collected,
+        )
+
+    def _ledger_store(self) -> dict[str, ContextLedger]:
+        """One ledger per session for each owner, shared by every adapter that owner runs.
+
+        A Retry or a later turn may use a new adapter; sharing the ledger keeps one writer for
+        the journal, so saved evidence is read only when a journal starts (for example after
+        an owner restart), not on every request.
+        """
+        try:
+            return _SHARED_LEDGERS.setdefault(self._owner, {})
+        except TypeError:  # an owner that cannot be weakly referenced (test stand-ins)
+            return self._context_ledgers
+
     def _gm_request_context_id(self, provider_input: SessionProviderInput) -> str:
         session = provider_input.session
         campaign_id = session.campaign_id
@@ -2355,12 +2542,23 @@ class ProviderSessionAdapter:
                 )
             )
         )
+        # Ledger mode tags the canonical list for the context ledger: stable instruction blocks,
+        # saved message identities and application-created user-role records. Tags are
+        # attributes, so every message still equals what it was; legacy mode adds none.
+        ledger_tags = self._ledger_active(provider_input)
+
+        def stable(message: dict[str, object]) -> dict[str, object]:
+            return tagged(message, **{STABLE_KEY: True}) if ledger_tags else message
+
+        def identity(message: dict[str, object], key: str) -> dict[str, object]:
+            return tagged(message, **{LEDGER_KEY: key}) if ledger_tags else message
+
         messages: list[dict[str, object]] = [
-            {
+            stable({
                 "role": "system",
                 "content": system_contract,
                 **({"_context_owner": context_owner} if context_owner is not None else {}),
-            }
+            })
         ]
         narration_block = (
             _model_gm_narration_block(self._provider)
@@ -2368,21 +2566,21 @@ class ProviderSessionAdapter:
             else None
         )
         if narration_block is not None:
-            messages.append({"role": "system", "content": narration_block})
+            messages.append(stable({"role": "system", "content": narration_block}))
         if persisted_contracts and any(
             message.content.get("version", 0) != _GM_SYSTEM_CONTRACT_VERSION
             for message in selected
             if message.content.get("kind") == "gm_system_contract"
         ):
             # Preserve the immutable saved contract and apply the current host interface.
-            messages.append({"role": "system", "content": (
+            messages.append(stable({"role": "system", "content": (
                 f"SYLVIA_GM_CONTEXT_CONTRACT v{_GM_SYSTEM_CONTRACT_VERSION} "
                 "(current application control): " + _GM_CONTEXT_PRIVACY + " When a required "
                 "tool call is missing, prose is held as an unsettled draft until the action "
                 "and Campaign File disposition are settled. Preserve committed results. "
                 "Use exact IDs from SYLVIA_GM_CAMPAIGN_PREPARATION or "
                 "SYLVIA_GM_FRESH_CAMPAIGN_STATE."
-            )})
+            )}))
         campaign_id = provider_input.session.campaign_id
         player_actions_reader = getattr(self._owner, "player_action_context", None)
         player_actions = (
@@ -2437,13 +2635,13 @@ class ProviderSessionAdapter:
             else None
         )
         guide_message: dict[str, object] | None = (
-            {
+            stable({
                 "role": "system",
                 "content": (
                     "SYLVIA_GM_RULESET_OPERATING_GUIDE "
                     "(trusted package-owned instructions):\n" + guide
                 ),
-            }
+            })
             if isinstance(guide, str) and guide
             else None
         )
@@ -2820,7 +3018,7 @@ class ProviderSessionAdapter:
                     ):
                         continue
                     if has_session_talk:
-                        recent_dialogue.append(
+                        recent_dialogue.append(identity(
                             {
                                 "role": (
                                     "user"
@@ -2832,8 +3030,10 @@ class ProviderSessionAdapter:
                                     final_references[latest_historical_user_id]}
                                    if message.kind is SessionMessageKind.TALK
                                    and latest_historical_user_id in final_references else {}),
-                            }
-                        )
+                            },
+                            ("user:" if message.kind is SessionMessageKind.USER else "talk:")
+                            + message.message_id,
+                        ))
                         if message.kind is SessionMessageKind.USER:
                             recent_dialogue.extend(
                                 historical_tools_by_basis.get(message.message_id, ())
@@ -2847,7 +3047,9 @@ class ProviderSessionAdapter:
                         )
                         if narration_parts:
                             narration = "".join(narration_parts)
-                            recent_dialogue.append({"role": "user", "content": text})
+                            recent_dialogue.append(identity(
+                                {"role": "user", "content": text}, "user:" + message.message_id,
+                            ))
                             recent_dialogue.extend(
                                 historical_tools_by_basis.get(message.message_id, ())
                             )
@@ -2857,11 +3059,11 @@ class ProviderSessionAdapter:
                                 and narration
                                 in tool_text_responses_by_basis.get(message.message_id, set())
                             ):
-                                recent_dialogue.append({
+                                recent_dialogue.append(identity({
                                     "role": "assistant", "content": narration,
                                     **({"_native_reference": final_references[message.message_id]}
                                        if message.message_id in final_references else {}),
-                                })
+                                }, "narration:" + message.message_id))
             if message.kind is SessionMessageKind.USER:
                 text = (
                     _player_turn_text(message_content)
@@ -2869,7 +3071,9 @@ class ProviderSessionAdapter:
                     else ""
                 )
                 if message.message_id == current_user_message_id:
-                    current_user = {"role": "user", "content": str(text)}
+                    current_user = identity(
+                        {"role": "user", "content": str(text)}, "user:" + message.message_id,
+                    )
             elif response_message is not None and message.message_id == response_message.message_id:
                 player_action_response_task = {
                     "role": "system",
@@ -2937,10 +3141,15 @@ class ProviderSessionAdapter:
                 opening_task = _campaign_opening_task_message(
                     self._opening_footing_payload(provider_input)
                 )
-                ready_user = {"role": "user", "content": str(source_message.content["text"])}
+                ready_user = identity(
+                    {"role": "user", "content": str(source_message.content["text"])},
+                    "ready:" + source_message_id,
+                )
             elif message.kind is SessionMessageKind.STEERING:
                 text = message_content.get("text", "") if isinstance(message_content, dict) else ""
-                steering_messages.append({"role": "user", "content": str(text)})
+                steering_messages.append(identity(
+                    {"role": "user", "content": str(text)}, "steering:" + message.message_id,
+                ))
         if fresh_context is not None:
             messages.append(fresh_context)
         messages.extend(lifecycle_controls)
@@ -2959,7 +3168,7 @@ class ProviderSessionAdapter:
         if guide_message is not None:
             messages.append(guide_message)
         if provider_input.session.role is WriterRole.DM:
-            messages.append(_response_format_contract_message())
+            messages.append(stable(_response_format_contract_message()))
         if opening_task is not None:
             messages.append(opening_task)
         if ready_user is not None:
@@ -2985,7 +3194,7 @@ class ProviderSessionAdapter:
             # Native transports lift system controls out of conversation order. Preserve a
             # new input boundary after historical tools without inventing player speech or
             # recording another USER session message.
-            messages.append({
+            control_event: dict[str, object] = {
                 "role": "user",
                 "content": (
                     "SYLVIA_PLAYER_CONTROL_EVENT (application event, not player speech):\n"
@@ -2995,7 +3204,12 @@ class ProviderSessionAdapter:
                         "automatic": response_message.content.get("automatic_response", False),
                     }, ensure_ascii=False)
                 ),
-            })
+            }
+            # Application-created, so the ledger seals it as a host record.
+            messages.append(
+                tagged(control_event, **{HOST_RECORD_KEY: True}) if ledger_tags
+                else control_event
+            )
         messages.extend(resumed_tool_messages)
         return messages
 
@@ -3126,6 +3340,17 @@ class ProviderSessionAdapter:
                 str(current_scene.get("summary") or ""),
             ),
         )
+        # Host-only, for the context ledger: the still-active records per fact list, so a
+        # retired (or re-scoped) fact is removed from what the model holds. Ranked-out facts
+        # are still active and stay.
+        self._active_record_ids = {
+            "PLAYER_KNOWN.current_facts": sorted(
+                str(fact["record_id"]) for fact in continuity.facts
+                if fact.get("record_id") and fact.get("visibility") == "player_known"),
+            "GM_PRIVATE_CURRENT.current_facts": sorted(
+                str(fact["record_id"]) for fact in continuity.facts
+                if fact.get("record_id") and fact.get("visibility") != "player_known"),
+        }
         player_known: list[dict[str, object]] = []
         gm_private_facts: list[dict[str, object]] = []
         character_knowledge: dict[str, list[str]] = {}
@@ -3359,10 +3584,12 @@ class ProviderSessionAdapter:
     ) -> tuple[dict[str, object], dict[str, object]]:
         """Split cacheable campaign explainers from fresh authority near the decision."""
 
+        self._active_record_ids = None
         payload = self._current_campaign_context_payload(
             provider_input,
             include_opening_direction=include_opening_direction,
         )
+        active_records = self._active_record_ids
         campaign = cast(Mapping[str, object], payload.get("campaign", {}))
         gm_private = cast(Mapping[str, object], payload.get("GM_PRIVATE", {}))
         explainers = {
@@ -3409,7 +3636,7 @@ class ProviderSessionAdapter:
                     )
                 ),
             },
-            {
+            tagged({
                 "role": "system",
                 "content": (
                     "SYLVIA_GM_FRESH_CAMPAIGN_STATE "
@@ -3421,14 +3648,19 @@ class ProviderSessionAdapter:
                         ensure_ascii=False,
                     )
                 ),
-            },
+            }, **({ACTIVE_RECORDS_KEY: active_records} if active_records is not None else {})),
         )
 
     def _attach_native_continuation(
         self, messages: list[dict[str, object]], provider_input: SessionProviderInput,
-        *, has_tools: bool = True,
+        *, has_tools: bool = True, thinking_before: int = 0,
     ) -> list[dict[str, object]]:
-        """Attach private data only to exchanges retained in the selected provider request."""
+        """Attach private data only to exchanges retained in the selected provider request.
+
+        ``thinking_before`` (the context ledger's thinking floor, as a wire index): Claude
+        assistant turns before it get their native blocks without thinking or redacted
+        thinking; text and tool calls stay.
+        """
         from sylvia_gm.agent._native_continuation import (
             attach_chat_metadata,
             requires_reasoning_with_tools,
@@ -3438,7 +3670,7 @@ class ProviderSessionAdapter:
             getattr(self._provider, "model_info", None), has_tools=has_tools,
         )
         prepared = []
-        for original in messages:
+        for position, original in enumerate(messages):
             message = dict(original)
             message.pop("_context_owner", None)
             if not resend_reasoning:
@@ -3524,6 +3756,12 @@ class ProviderSessionAdapter:
                             "Saved native tool continuation does not match this exchange",
                             code="provider_native_continuation_mismatch",
                         )
+                    if position < thinking_before and isinstance(blocks, list):
+                        blocks = [
+                            block for block in blocks
+                            if not (isinstance(block, Mapping) and block.get("type") in {
+                                "thinking", "redacted_thinking"})
+                        ]
                     message = {**message, "anthropic_content": blocks}
             prepared.append(message)
         return prepared
@@ -3552,6 +3790,10 @@ class ProviderSessionAdapter:
                        else [m.content for m in provider_input.history.messages])
             # Keep all conversation and checkpoints, but bind callbacks to this request's control.
             bridge = CheckpointBridge()
+            finalize_request, measure_wire, rebase_wire, strip_thinking = (
+                self._ledger_hooks(provider_input, provider, bridge)
+                if self._ledger_active(provider_input) else (None, None, None, None)
+            )
             working = WorkingContextProvider(
                 provider, records=records, record_owner=self._gm_context_owner(provider_input),
                 request_context_id=self._gm_request_context_id(provider_input),
@@ -3563,6 +3805,10 @@ class ProviderSessionAdapter:
                         self._request_messages(selected), provider_input, has_tools=has_tools,
                     )
                 ),
+                finalize_request=finalize_request,
+                measure_wire=measure_wire,
+                rebase_wire=rebase_wire,
+                strip_thinking=strip_thinking,
             )
             self._working_contexts[session_id] = (working, bridge)
             provider = working
@@ -3637,7 +3883,13 @@ class ProviderSessionAdapter:
                             continue
                         self._owner.append_agent_message(
                             session_id=provider_input.session.session_id,
-                            message_id=f"context-{pending.payload['checkpoint_id']}",
+                            message_id=(
+                                f"wire-journal-{pending.payload['journal_record_id']}"
+                                if pending.payload.get("kind") == JOURNAL_KIND
+                                else f"claude-native-{pending.payload['native_record_id']}"
+                                if pending.payload.get("kind") == NATIVE_KIND
+                                else f"context-{pending.payload['checkpoint_id']}"
+                            ),
                             kind=SessionMessageKind.EVIDENCE,
                             content=pending.payload,
                         )

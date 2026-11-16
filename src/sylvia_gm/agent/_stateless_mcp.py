@@ -25,6 +25,13 @@ from mcp.server import Server
 from mcp.server.context import ServerRequestContext
 from mcp.shared.exceptions import MCPError
 
+from sylvia_gm.agent._tool_exposure import (
+    EXPOSURE_KEY,
+    SPELL_SCOPE_KEY,
+    ExposureContext,
+    exposure_spell_ids,
+    scoped_spell_choices,
+)
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner
 from sylvia_gm.domain.authority import (
     ActionReceipt,
@@ -341,9 +348,14 @@ def _model_input_schema(
         if child.get("x-sylvia-gm-reference") == "participant":
             child["enum"] = list(participant_ids)
         enum = child.get("enum")
-        if (child.get("x-sylvia-gm-castable-spells") is True
-                and isinstance(enum, list) and castable_spell_ids is not None):
-            child["enum"] = [value for value in enum if value in castable_spell_ids]
+        spell_scope = child.pop(SPELL_SCOPE_KEY, None)
+        if child.get("x-sylvia-gm-castable-spells") is True and isinstance(enum, list):
+            child["enum"] = scoped_spell_choices(
+                enum,
+                castable_spell_ids=castable_spell_ids,
+                scope=spell_scope,
+                aliases=child.get("x-sylvia-gm-value-aliases"),
+            )
         properties[name] = child
     raw_required = projected.get("required", ())
     required = (
@@ -354,6 +366,7 @@ def _model_input_schema(
     )
     projected["properties"] = properties
     projected["required"] = sorted(required | model_required)
+    projected.pop(EXPOSURE_KEY, None)
     return projected, derivations
 
 
@@ -1400,8 +1413,20 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                 for participant in getattr(snapshot, "participants", ())
             )
             castable_spell_ids = _castable_spell_ids(snapshot)
+            catalog = owner.catalog(campaign_id)
+            asked_spell_ids = exposure_spell_ids(tool.input_schema for tool in catalog)
+            exposure = ExposureContext(
+                # Exposure reads the whole saved state, including engine-private records,
+                # because a lasting effect may live there. It only decides which tools to
+                # list; no state value is shown to the model.
+                owner.snapshot(campaign_id).state,
+                castable_spell_ids=castable_spell_ids,
+                asked_spell_ids=asked_spell_ids,
+            )
             projected: list[types.Tool] = []
-            for tool in owner.catalog(campaign_id):
+            for tool in catalog:
+                if not exposure.exposed(tool.input_schema):
+                    continue
                 schema = _plain_json(tool.input_schema)
                 if not isinstance(schema, dict):  # pragma: no cover - CatalogTool contract
                     raise CommandRejected("Catalog input schema is invalid")

@@ -110,13 +110,20 @@ def application_data_after_history(
     return instructions + history + data + current
 
 
+#: Host-only message metadata, including the context ledger's canonical tags.
+_HOST_MARKERS = frozenset({
+    "_application_data", "_fresh_application_data",
+    "_stable_instruction", "_ledger_key", "_host_record", "_ledger_entry",
+})
+
+
 def strip_data_markers(messages: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """Keep host projection metadata off every provider's wire format."""
     return [
         {
             key: value
             for key, value in message.items()
-            if key not in {"_application_data", "_fresh_application_data"}
+            if key not in _HOST_MARKERS
         }
         for message in messages
     ]

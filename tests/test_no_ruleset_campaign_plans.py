@@ -266,10 +266,9 @@ class _PlanAndPlayModel(_ScriptedProvider):
 
     @staticmethod
     def _latest_user(messages: list[dict[str, Any]]) -> tuple[int, str]:
-        for index in range(len(messages) - 1, -1, -1):
-            if messages[index].get("role") == "user":
-                return index, str(messages[index].get("content", ""))
-        return -1, ""
+        from tests.gm_context_contract import latest_player_message
+
+        return latest_player_message(messages)
 
     def _builder_call(self, messages: list[dict[str, Any]]) -> dict[str, Any] | None:
         index, _player = self._latest_user(messages)
@@ -375,10 +374,16 @@ def _released(harness: _OwnerHarness, session_id: str, request_id: str) -> list[
 
 
 def _fresh_state(messages: list[dict[str, Any]]) -> str:
-    return next(
-        str(message["content"]) for message in messages
-        if str(message.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
-    )
+    """The campaign state a request conveys, in either request assembly.
+
+    The previous assembly sends one whole state record; the context ledger sends a keyframe
+    and then small updates, as sealed records.
+    """
+    from tests.gm_context_contract import current_state
+
+    state = current_state(messages)
+    assert state is not None, "the request carries no campaign state"
+    return json.dumps(state, ensure_ascii=False)
 
 
 def test_no_ruleset_structured_plan_journey_survives_save_and_reopen(tmp_path: Path) -> None:

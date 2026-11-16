@@ -393,6 +393,12 @@ def _tool_input_change(prior: ToolDeclaration, incoming: ToolDeclaration) -> str
                     or (not key.endswith("value-aliases") and not isinstance(value, bool))
                 ):
                     return None
+            # Presentation-only narrowing of which spells the model is shown for this tool.
+            scope = child.pop("x-sylvia-gm-spell-scope", None)
+            if scope is not None and not (
+                isinstance(scope, list) and all(isinstance(item, str) for item in scope)
+            ):
+                return None
         if left.get("enum") != right.get("enum"):
             if left.get("type") != "string" or right.get("type") != "string":
                 return None
@@ -415,6 +421,11 @@ def _tool_input_change(prior: ToolDeclaration, incoming: ToolDeclaration) -> str
             ):
                 return None
             choices_changed = True
+    # Exposure decides only whether the model is shown the tool; admission is unchanged.
+    for schema in (before, after):
+        exposure = schema.pop("x-sylvia-gm-exposure", None)
+        if exposure is not None and not isinstance(exposure, dict):
+            return None
     if before != after:
         return None
     return "changed_input_choices" if choices_changed else "changed_model_guidance"

@@ -487,11 +487,7 @@ def test_exact_roster_identity_and_pending_states(cases):
     with zipfile.ZipFile(BytesIO(bundled_srd_archive())) as package:
         shipped = json.loads(package.read(prefix + "spell-catalogue.json"))
         generated = json.loads(json.dumps(catalogue))
-        # The stale version stamp is its own known defect below; every other field is exact.
-        assert shipped.keys() == generated.keys()
-        assert {k: v for k, v in shipped.items() if k != "variant_version"} == {
-            k: v for k, v in generated.items() if k != "variant_version"
-        }
+        assert shipped == generated
         assert prefix + "normal-roster.txt" not in package.namelist()
         assert prefix + "roster-crosswalk.csv" not in package.namelist()
         assert not any(name.startswith("historical/") for name in package.namelist())

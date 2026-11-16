@@ -200,6 +200,40 @@ class _ControlledTimeoutLoop(asyncio.SelectorEventLoop):
         super()._run_once()
 
 
+#: These tests pin the previous GM wire shape (system-role data records, the state record by
+#: its unsealed label, the player message as the final user message). They run under the
+#: legacy switch, which restores that assembly byte for byte. The same scenarios run in ledger
+#: mode in tests/test_gm_context_contract.py, which checks the wire invariant on every request.
+LEGACY_WIRE_SHAPE_PINS = frozenset({
+    "test_resolved_correction_is_absent_after_automatic_transition",
+    "test_stream_adapter_round_trips_exact_catalog_action_and_talk",
+    "test_model_selected_start_combat_resolves_the_already_declared_player_attack",
+    "test_gm_decision_boundary_cannot_finalize_campaign_file_before_turn_progression",
+    "test_exact_narration_facts_survive_followup_tool_rounds",
+    "test_player_wording_cannot_change_the_engine_supplied_tool_surface",
+    "test_completed_turn_keeps_recorded_native_tool_history_for_the_next_turn",
+    "test_ignored_required_prose_keeps_every_legal_tool_choice",
+    "test_required_tool_recovery_keeps_the_current_action_as_the_latest_user_message",
+    "test_campaign_file_update_cannot_precede_a_batched_ruleset_result",
+    "test_broad_glance_uses_the_ruleset_surface_without_a_host_editorial_inference",
+    "test_same_gm_searches_reads_updates_and_narrates_in_one_tool_loop",
+    "test_forced_campaign_file_review_reports_an_empty_required_tool_response_exactly",
+    "test_resume_reuses_held_narration_and_releases_it_only_after_disposition",
+    "test_resume_narrates_after_an_accepted_tool_only_campaign_file_update",
+    "test_campaign_start_keeps_the_ruleset_supplied_tool_surface",
+    "test_campaign_start_projects_selected_party_and_high_level_footing",
+    "test_explicit_refusal_then_unrelated_play_keeps_the_player_action_in_control",
+    "test_post_mechanics_recovery_restores_the_live_rounds_exact_narration_facts",
+    "test_direct_action_response_starts_new_provider_work_after_completed_opening",
+})
+
+
+@pytest.fixture(autouse=True)
+def _pinned_wire_shape(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    if request.node.originalname in LEGACY_WIRE_SHAPE_PINS:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
+
+
 def _next_action_event(events: object) -> ProviderEvent:
     """Advance through durable tool evidence to the next executable action."""
 
@@ -14114,3 +14148,20 @@ def test_player_boundary_control_lets_an_ordered_player_action_finish() -> None:
     # still forbids choosing anything the player did not state.
     assert content.index(ordered) < content.index("Narrate the committed outcome and stop")
     assert "Never choose a new action, target, tactic" in content
+
+
+@pytest.mark.parametrize(("setting", "expected"), [
+    (None, "legacy"), ("ledger", "ledger"), ("legacy", "legacy"), ("unrecognised", "legacy"),
+])
+def test_gm_adapter_ships_the_previous_assembly_and_the_switch_selects_the_ledger(
+    monkeypatch: pytest.MonkeyPatch, setting: str | None, expected: str,
+) -> None:
+    """What a player gets without any setting, and what SYLVIA_GM_CONTEXT_MODE changes."""
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", setting)
+    adapter = ProviderSessionAdapter(
+        cast(AuthorityOwner, object()), _ScriptedProvider([]), owner_id="owner-default-mode"
+    )
+    assert adapter._context_mode == expected  # noqa: SLF001

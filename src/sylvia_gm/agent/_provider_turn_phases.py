@@ -1685,26 +1685,42 @@ def prepare_tool_batch(
         ),
         "tool_calls": raw_calls,
     }
+    native_requirement: dict[str, object] = {
+        "provider_id": provider_input.session.provider_id,
+        "model_id": provider_input.session.model_id,
+        "anthropic_required": state.native_assistant_content is not None,
+        "chat_completion_required": state.native_chat_metadata is not None,
+        "reasoning_required": bool(state.assistant_reasoning),
+    }
     # Signed native blocks belong only to this in-memory provider exchange. The separate
     # evidence message below stays player-safe and must never persist private thinking.
-    state.exchange_messages.append(
-        attach_chat_metadata(
-            {
-                **assistant_message,
-                **(
-                    {"anthropic_content": state.native_assistant_content}
-                    if state.native_assistant_content is not None
-                    else {}
-                ),
-                **(
-                    {"reasoning_content": "".join(state.assistant_reasoning)}
-                    if state.assistant_reasoning
-                    else {}
-                ),
-            },
-            state.native_chat_metadata,
-        )
+    in_turn_assistant = attach_chat_metadata(
+        {
+            **assistant_message,
+            **(
+                {"anthropic_content": state.native_assistant_content}
+                if state.native_assistant_content is not None
+                else {}
+            ),
+            **(
+                {"reasoning_content": "".join(state.assistant_reasoning)}
+                if state.assistant_reasoning
+                else {}
+            ),
+        },
+        state.native_chat_metadata,
     )
+    # The context ledger journals this exchange in its saved form and reattaches the native
+    # blocks by reference, exactly as for the canonical evidence after the turn. Host-only tag.
+    from sylvia_gm.agent._context_ledger import LEDGER_ENTRY_KEY, tagged
+
+    state.exchange_messages.append(tagged(in_turn_assistant, **{LEDGER_ENTRY_KEY: {
+        **cast(dict[str, object], _plain_json(assistant_message)),
+        "_native_reference": {
+            "response_id": state.inference_id,
+            "requirement": dict(native_requirement),
+        },
+    }}))
     yield ProviderEvent.tool_evidence(
         message_id=f"{state.inference_id}-assistant-tools",
         payload={
@@ -1714,13 +1730,7 @@ def prepare_tool_batch(
             "inference_id": state.inference_id,
             "basis_message_id": state.basis_message_id,
             "assistant": cast(SafePayload, _plain_json(assistant_message)),
-            "native_continuation": {
-                "provider_id": provider_input.session.provider_id,
-                "model_id": provider_input.session.model_id,
-                "anthropic_required": state.native_assistant_content is not None,
-                "chat_completion_required": state.native_chat_metadata is not None,
-                "reasoning_required": bool(state.assistant_reasoning),
-            },
+            "native_continuation": cast(SafePayload, native_requirement),
         },
     )
     state.progress.state_changing_call_submitted = False

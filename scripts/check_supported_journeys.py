@@ -359,6 +359,9 @@ PYTHON_JOURNEYS = {
     "gm-request-contracts": [
         "tests/test_gm_memory_casting_hotfix.py",
         "tests/test_gm_schema_minimal_refusals.py",
+        "tests/test_gm_tool_exposure.py",
+        "tests/test_gm_context_ledger.py",
+        "tests/test_gm_context_contract.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",
@@ -400,6 +403,8 @@ PYTHON_JOURNEYS = {
         'tests/test_claude_install.py',
         'tests/test_claude_native_protocol.py',
         'tests/test_claude_runtime.py',
+        'tests/test_claude_native_route.py',
+        'tests/test_claude_native_wire.py',
     ],
     "bundled-content": [
         "tests/test_plan_snapshot_cache.py",

@@ -37,6 +37,7 @@ from sylvia_gm.provider._base import ProviderStreamChunk
 from sylvia_gm.runtime._runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ToolDef
+from tests.gm_context_contract import current_state, unsealed
 from tests.qa_attached_request import request_attached
 from tests.test_alpha_f4_generic_sessions import _campaign
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
@@ -661,18 +662,26 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
     fresh = next(
         m
         for m in request["messages"]
-        if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        if unsealed(m.get("content")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
     )
     assert "golden-bell" in json.dumps(
-        json.loads(fresh["content"].split("\n", 1)[1])["PLAYER_KNOWN"]
+        json.loads(unsealed(fresh["content"]).split("\n", 1)[1])["PLAYER_KNOWN"]
     )
-    # Frozen Cleric request was 413,576 bytes after stub removal. Allow the measured
-    # casting descriptions and enums, while catching a return to 549,640 stub bytes.
-    assert len(json.dumps(tools).encode("utf-8")) < 450_000
+    # SRD Lite 0.3.24 exposure: 154 tools and 420,975 bytes became 93 tools and 263,655
+    # bytes for this Cleric. Catch a return of the hidden follow-up and casting tools.
+    assert len(json.dumps(tools).encode("utf-8")) < 290_000
     assert not any(name.endswith("_select_srd_clone_body") for name in names)
     assert any(name.endswith("_cast_spell_outside_combat") for name in names)
     assert any(name.endswith("_read_campaign_reference") for name in names)
-    assert len(tools) == 154
+    for hidden in (
+        "_cast_srd_reaction_spell",
+        "_begin_srd_after_hit_smite",
+        "_mount_srd_otherworldly_steed",
+        "_use_srd_second_wind",
+        "_record_srd_magic_jar_container",
+    ):
+        assert not any(name.endswith(hidden) for name in names), hidden
+    assert len(tools) == 93
     casting = next(
         t["function"] for t in tools if t["function"]["name"].endswith("_cast_spell_outside_combat")
     )
@@ -775,14 +784,9 @@ class HealingGM(CaptureGM):
             if t["function"]["name"].endswith("_cast_spell_outside_combat")
         )
         schema = cast["parameters"]
-        fresh = next(
-            m
-            for m in messages
-            if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
-        )
-        state = json.loads(fresh["content"].split("\n", 1)[1])["campaign_state"][
-            "ruleset_owned_values"
-        ]
+        current = current_state(messages)
+        assert current is not None, "the request carries no campaign state"
+        state = current["campaign_state"]["ruleset_owned_values"]
         actor = schema["properties"]["caster"]["enum"][0]
         entity = state[f"{SRD}.entities"][actor]
         if self.arguments is None:
@@ -866,11 +870,6 @@ class DefectGM(CaptureGM):
             {"target": "hero", "resource": "action_surge", "amount": 1},
             "rejected",
         ),
-        (
-            "record_srd_contingency_world_fact",
-            {"caster_state": "hero", "fact_tag": "bell_rang"},
-            "action_committed",
-        ),
     ],
 )
 def test_named_ruleset_failures_use_safe_refusal_or_valid_noop(
@@ -914,6 +913,18 @@ def test_out_of_roster_spell_refusal_tells_the_gm_what_it_can_cast(lite_save, tm
     }
     assert after.state == before.state
     assert after.revision == before.revision
+
+
+def test_outside_lite_fact_tool_is_hidden_from_the_gm_but_kept_by_authority(lite_save, tmp_path):
+    """Contingency is outside SRD Lite, so recording its world fact can have no effect."""
+    database = tmp_path / "hidden-contingency.sqlite3"
+    shutil.copyfile(lite_save, database)
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1.0) as owner:
+        request = play(owner, CaptureGM(), campaign="casting", turn="casting-turn")
+        catalog = {tool.name for tool in owner.catalog("casting")}
+    names = [tool["function"]["name"] for tool in request["tools"]]
+    assert not any(name.endswith("_record_srd_contingency_world_fact") for name in names)
+    assert "record_srd_contingency_world_fact" in catalog
 
 
 def test_advertised_healing_flow_corrects_once_and_commits_exact_effects(lite_save, tmp_path):
@@ -1272,9 +1283,9 @@ def test_saved_memory_reaches_actual_provider_after_reopen_without_history_answe
         fresh = next(
             m
             for m in request["messages"]
-            if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+            if unsealed(m.get("content")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
         )
-        body = json.loads(fresh["content"].split("\n", 1)[1])
+        body = json.loads(unsealed(fresh["content"]).split("\n", 1)[1])
         remaining = json.dumps([m for m in request["messages"] if m is not fresh])
         assert "juniper" not in remaining and "north bell rings" not in remaining
         assert body["campaign"]["revision"] == revision
@@ -1370,18 +1381,18 @@ def test_real_transport_restores_current_act_progress_and_secret_audiences(tmp_p
     fresh = next(
         m
         for m in messages
-        if str(m.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        if unsealed(m.get("content")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
     )
-    body = json.loads(fresh["content"].split("\n", 1)[1])
+    body = json.loads(unsealed(fresh["content"]).split("\n", 1)[1])
     assert body["campaign_state"]["current_scene"]["act_id"] == "act-2"
     assert body["campaign_state"]["plan_progress"][0]["status"] == "resolved"
     assert body["campaign_state"]["reveals"]["mentor-knew"] == ["player"]
     preparation = next(
         m
         for m in messages
-        if str(m.get("content", "")).startswith("SYLVIA_GM_CAMPAIGN_PREPARATION")
+        if unsealed(m.get("content")).startswith("SYLVIA_GM_CAMPAIGN_PREPARATION")
     )
-    prepared = json.loads(preparation["content"].split("\n", 1)[1])
+    prepared = json.loads(unsealed(preparation["content"]).split("\n", 1)[1])
     assert prepared["campaign_plan_preparation"]["prepared_acts"][0]["id"] == "act-2"
     assert "mentor-knew" in body["PLAYER_KNOWN"]["revealed_secret_ids"]
     assert "rift-is-one-way" not in body["PLAYER_KNOWN"]["revealed_secret_ids"]

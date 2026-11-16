@@ -228,6 +228,7 @@ def test_builder_role_does_not_receive_gm_style_block() -> None:
     )
 
 
+@pytest.mark.parametrize("context_mode", ["legacy", "ledger"])
 @pytest.mark.parametrize("wire", ["gpt-6.1-sol", "gpt-6-luna"])
 @pytest.mark.parametrize(
     "malformed",
@@ -240,9 +241,11 @@ def test_response_correction_retry_keeps_block_once_and_old_contract(
     monkeypatch: pytest.MonkeyPatch,
     wire: str,
     malformed: object,
+    context_mode: str,
 ) -> None:
     from tests import test_alpha_f4_provider_session_adapter as existing
 
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     captured = []
     original = existing._ScriptedProvider
 
@@ -255,6 +258,22 @@ def test_response_correction_retry_keeps_block_once_and_old_contract(
     monkeypatch.setattr(existing, "_ScriptedProvider", configured)
     existing.test_old_dialogue_shape_is_rejected_before_write_then_same_gm_corrects_it(malformed)
     assert len(captured[0].calls) == 2
+    if context_mode == "ledger":
+        # The frozen prefix: the saved contract, the model's style block (Sol only), the current
+        # context contract for an older saved contract, then the ledger contract, which
+        # replaces the two legacy guidance blocks.
+        for messages, _ in captured[0].calls:
+            prefix = [m["content"] for m in messages if m["role"] == "system"][:4]
+            expected = ["UNCHANGED OLD GM"] + (
+                [_GM_MODEL_NARRATION_BLOCK] if wire == "gpt-6.1-sol" else [])
+            assert prefix[: len(expected)] == expected
+            assert prefix[len(expected)].startswith("SYLVIA_GM_CONTEXT_CONTRACT ")
+            assert prefix[len(expected) + 1].startswith("SYLVIA_GM_CONTEXT_LEDGER_CONTRACT ")
+            assert not any(item.get("content") in {APPLICATION_DATA_GUIDANCE,
+                                                   PLAYER_MESSAGE_GUIDANCE} for item in messages)
+            assert sum(item.get("content") == _GM_MODEL_NARRATION_BLOCK
+                       for item in messages) == (wire == "gpt-6.1-sol")
+        return
     for messages, _ in captured[0].calls:
         # The provider projection inserts fixed host guidance before the model's style block.
         prefix = ["UNCHANGED OLD GM", APPLICATION_DATA_GUIDANCE, PLAYER_MESSAGE_GUIDANCE]

@@ -25,6 +25,7 @@ from sylvia_gm.provider._base import ProviderStreamChunk
 from tests.action_sequence_move_checks import (
     assert_action_sequence_moves as assert_action_sequence_moves,
 )
+from tests.gm_context_contract import narration_facts_record, unsealed
 from tests.test_action_sequences import lite as lite
 from tests.test_action_sequences import td as td
 from tests.test_alpha_f4_provider_session_adapter import (
@@ -389,11 +390,7 @@ def test_adapter_runs_ordered_queue_then_one_combined_response_and_refreshes_cat
     )
     assert len(discovered) == 4 and discovered[-1][1] == owner.revision
     final_messages = provider.calls[-1][0]
-    exact = next(
-        row["content"]
-        for row in final_messages
-        if str(row.get("content", "")).startswith("SYLVIA_GM_EXACT_NARRATION_FACTS")
-    )
+    exact = narration_facts_record(final_messages)
     assert "committed-move" in exact
     if status == "completed":
         assert "committed-aim" in exact
@@ -538,7 +535,7 @@ def test_saved_chat_queue_results_do_not_absorb_later_control_outcomes():
     controlled = next(
         row["content"]
         for row in projected
-        if str(row.get("content", "")).startswith("SYLVIA_PLAYER_CONTROL_RESULTS")
+        if unsealed(row.get("content")).startswith("SYLVIA_PLAYER_CONTROL_RESULTS")
     )
     assert "committed-move" in controlled and "committed-aim" in controlled
     assert "later-move" not in controlled
@@ -768,11 +765,12 @@ class NativeIntentProvider(_ScriptedProvider):
 
 
 def controlled_result_ids(messages):
-    text = next(
-        row["content"]
+    # The latest control-results record (ledger requests may also carry earlier ones).
+    text = [
+        unsealed(row["content"])
         for row in messages
-        if str(row.get("content", "")).startswith("SYLVIA_PLAYER_CONTROL_RESULTS")
-    )
+        if unsealed(row.get("content")).startswith("SYLVIA_PLAYER_CONTROL_RESULTS")
+    ][-1]
     return [row["action_id"] for row in json.loads(text[text.index("[") :])]
 
 
@@ -827,11 +825,7 @@ def test_real_lite_provider_stops_at_spent_action_and_describes_only_committed_p
         ]
         assert len(narrations) == 1
         messages = provider.calls[-1][0]
-        facts = next(
-            row["content"]
-            for row in messages
-            if str(row.get("content", "")).startswith("SYLVIA_GM_EXACT_NARRATION_FACTS")
-        )
+        facts = narration_facts_record(messages)
         assert all(identity in facts for identity in queue["committed_action_ids"])
         assert queue["steps"][1]["operation_id"] not in facts
         assert any("SYLVIA_ACTION_SEQUENCE_STOP" in str(row.get("content", "")) for row in messages)
@@ -1077,11 +1071,7 @@ def test_real_td_saved_retry_freezes_queue_range_after_commit_and_reopen(
             provider_factory=retry_adapter.for_turn,
         )
         assert controlled_result_ids(retry_provider.calls[0][0]) == original_ids
-        facts_text = next(
-            str(row["content"])
-            for row in retry_provider.calls[0][0]
-            if str(row.get("content", "")).startswith("SYLVIA_GM_EXACT_NARRATION_FACTS")
-        )
+        facts_text = narration_facts_record(retry_provider.calls[0][0])
         # Saved round facts and the canonical queue receipt describe the queue exactly once.
         assert [
             [action["action_id"] for action in fact["committed_actions"]]

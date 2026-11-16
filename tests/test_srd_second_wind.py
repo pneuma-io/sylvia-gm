@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from sylvia_gm.agent._provider_session import _derive_mechanics_parameters
-from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
+from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics, _model_input_schema
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner, CampaignCreate
 from sylvia_gm.application.bundled_packages import bundled_srd_archive
 from sylvia_gm.domain.authority import (
@@ -124,18 +124,36 @@ def _create_case(
     )
 
 
-def _use(owner: AuthorityOwner, campaign_id: str) -> ActionReceipt | AwaitingChoiceReceipt:
+def _use(
+    owner: AuthorityOwner, campaign_id: str, *, listed: bool = True
+) -> ActionReceipt | AwaitingChoiceReceipt:
     mechanics = StatelessMcpMechanics(owner)
-    tool = next(
+    shown = [
         tool for tool in mechanics.list_tools(campaign_id) if tool.name == "use_srd_second_wind"
-    )
-    assert set(tool.input_schema["properties"]) == {"actor"}
+    ]
+    if listed:
+        (tool,) = shown
+        properties, derivations = tool.input_schema["properties"], tool.parameter_derivations
+    else:
+        # Not shown to the GM; the engine must still refuse a direct call unchanged.
+        assert shown == []
+        declared = next(
+            t for t in owner.catalog(campaign_id) if t.name == "use_srd_second_wind"
+        )
+        schema, derivations = _model_input_schema(
+            declared.input_schema, participant_ids=("hero",)
+        )
+        properties = schema["properties"]
+    assert set(properties) == {"actor"}
     parameters = _derive_mechanics_parameters(
         {"actor": "hero"},
-        tool.parameter_derivations or {},
+        derivations or {},
         owner.snapshot(campaign_id).participants,
     )
-    return mechanics.execute_action(
+    # A listed tool goes through the GM's MCP adapter. A hidden one is never offered to the
+    # GM, so call the engine directly to prove its own refusal is unchanged.
+    execute = mechanics.execute_action if listed else owner.execute_action
+    return execute(
         ActionCommand(
             campaign_id=campaign_id,
             action_id=f"action-{campaign_id}",
@@ -193,7 +211,7 @@ def test_second_wind_rejection_leaves_state_unchanged(
         _create_case(owner, campaign_id=campaign_id, hp=20, uses=uses, fighter=fighter)
         before = owner.snapshot(campaign_id)
         with pytest.raises(MechanicsRejected) as rejected:
-            _use(owner, campaign_id)
+            _use(owner, campaign_id, listed=fighter)
         assert rejected.value.code == "ruleset_precondition_failed"
         after = owner.snapshot(campaign_id)
         assert after.revision == before.revision == 0

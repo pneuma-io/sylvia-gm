@@ -21,6 +21,8 @@ marketing/
 *.db
 *.db-*
 *.jsonl
+# Synthetic Claude Code session files for the native-route tests (see their README).
+!tests/fixtures/claude-native/*.jsonl
 *.log
 *.sylvia-gm-campaign
 # Generated build and development state

@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "6076e4b10909f7a773b699b7ed264dd09ebc0416b5b1d51310a43c08a2a946b9",
+  "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -159,7 +159,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "1028f7006135dcbba6fa1c04b0227d1cca25a05d98dd9070d83f1899df130bd8"
+      "sha256": "f54e7d76d2c56141fa920b0081e4ffa2da20d650fed067a187e676eb922ca7ef"
     },
     {
       "bytes": 5865,
@@ -189,7 +189,7 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "2f1c5c4d878c2de79cb3157351d3697dc2fa73140ea9afbc6fedc2de914e38fe"
+      "sha256": "9ba2e15398a7a0ef620a4de61fd52bd48ffe259f11522a8125ed1b93a0ae0671"
     },
     {
       "bytes": 25922,
@@ -16122,7 +16122,16 @@
           "corpse_state",
           "other_language"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "create_undead"
+              ]
+            }
+          ]
+        }
       },
       "name": "admit_srd_native_wight_rise_language",
       "state_predicates": [],
@@ -16327,7 +16336,17 @@
           "question",
           "answer_words"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "commune",
+                "contact_other_plane"
+              ]
+            }
+          ]
+        }
       },
       "name": "ask_srd_divination_question",
       "state_predicates": [],
@@ -16411,7 +16430,20 @@
           "target_is_charmer",
           "fear_source_in_sight"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "alter_self"
+              ]
+            },
+            {
+              "entity_field": "form_current_source_id",
+              "op": "not_null"
+            }
+          ]
+        }
       },
       "name": "attack_srd_altered_natural_weapon",
       "state_predicates": [],
@@ -16502,7 +16534,20 @@
           "target_is_charmer",
           "fear_source_in_sight"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "polymorph"
+              ]
+            },
+            {
+              "entity_field": "form_current_source_id",
+              "op": "not_null"
+            }
+          ]
+        }
       },
       "name": "attack_srd_transformed_form",
       "state_predicates": [],
@@ -19699,6 +19744,9 @@
             ],
             "type": "string",
             "x-sylvia-gm-castable-spells": true,
+            "x-sylvia-gm-spell-scope": [
+              "divine_smite"
+            ],
             "x-sylvia-gm-value-aliases": {
               "hunter_s_mark": "hunters_mark",
               "mage_armour": "mage_armor"
@@ -21265,7 +21313,16 @@
           "target_states",
           "fall_cause"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "feather_fall"
+              ]
+            }
+          ]
+        }
       },
       "name": "begin_srd_scene_fall",
       "state_predicates": [],
@@ -24428,6 +24485,119 @@
             ],
             "type": "string",
             "x-sylvia-gm-castable-spells": true,
+            "x-sylvia-gm-spell-scope": [
+              "acid_arrow",
+              "acid_splash",
+              "aid",
+              "alter_self",
+              "arcane_eye",
+              "aura_of_life",
+              "bane",
+              "beacon_of_hope",
+              "befuddlement",
+              "bless",
+              "blight",
+              "blindness_deafness",
+              "blur",
+              "burning_hands",
+              "chain_lightning",
+              "charm_monster",
+              "chill_touch",
+              "chromatic_orb",
+              "circle_of_death",
+              "cloud_of_daggers",
+              "command",
+              "cone_of_cold",
+              "counterspell",
+              "cure_wounds",
+              "darkvision",
+              "daylight",
+              "death_ward",
+              "disintegrate",
+              "dispel_magic",
+              "dissonant_whispers",
+              "divine_smite",
+              "dragons_breath",
+              "eldritch_blast",
+              "enhance_ability",
+              "etherealness",
+              "false_life",
+              "fear",
+              "find_steed",
+              "finger_of_death",
+              "fire_bolt",
+              "fire_shield",
+              "fire_storm",
+              "fireball",
+              "flame_strike",
+              "fly",
+              "fog_cloud",
+              "freedom_of_movement",
+              "freezing_sphere",
+              "greater_restoration",
+              "guardian_of_faith",
+              "guidance",
+              "guiding_bolt",
+              "harm",
+              "heal",
+              "healing_word",
+              "hex",
+              "hold_monster",
+              "hold_person",
+              "hunters_mark",
+              "ice_knife",
+              "ice_storm",
+              "inflict_wounds",
+              "insect_plague",
+              "lesser_restoration",
+              "light",
+              "lightning_bolt",
+              "longstrider",
+              "mage_armor",
+              "mage_hand",
+              "magic_missile",
+              "mass_cure_wounds",
+              "mass_healing_word",
+              "meteor_swarm",
+              "misty_step",
+              "poison_spray",
+              "polymorph",
+              "power_word_heal",
+              "power_word_kill",
+              "power_word_stun",
+              "protection_from_energy",
+              "protection_from_evil_and_good",
+              "ray_of_frost",
+              "ray_of_sickness",
+              "revivify",
+              "sacred_flame",
+              "scorching_ray",
+              "shatter",
+              "shield",
+              "shield_of_faith",
+              "shillelagh",
+              "shocking_grasp",
+              "sleep",
+              "sleet_storm",
+              "spare_the_dying",
+              "speak_with_animals",
+              "starry_wisp",
+              "stinking_cloud",
+              "stoneskin",
+              "suggestion",
+              "summon_dragon",
+              "sunburst",
+              "thaumaturgy",
+              "thunderwave",
+              "tree_stride",
+              "true_strike",
+              "vicious_mockery",
+              "vitriolic_sphere",
+              "wall_of_fire",
+              "wall_of_stone",
+              "web",
+              "zone_of_truth"
+            ],
             "x-sylvia-gm-value-aliases": {
               "hunter_s_mark": "hunters_mark",
               "mage_armour": "mage_armor"
@@ -36063,6 +36233,10 @@
             ],
             "type": "string",
             "x-sylvia-gm-castable-spells": true,
+            "x-sylvia-gm-spell-scope": [
+              "counterspell",
+              "shield"
+            ],
             "x-sylvia-gm-value-aliases": {
               "hunter_s_mark": "hunters_mark",
               "mage_armour": "mage_armor"
@@ -36927,7 +37101,16 @@
           "ability",
           "target_number"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "create_undead"
+              ]
+            }
+          ]
+        }
       },
       "name": "check_srd_native_wight_ability",
       "state_predicates": [],
@@ -37000,7 +37183,16 @@
           "caster_state",
           "pending_action_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "chromatic_orb"
+              ]
+            }
+          ]
+        }
       },
       "name": "choose_srd_chromatic_orb_leap",
       "state_predicates": [],
@@ -37037,7 +37229,20 @@
         "required": [
           "actor_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "irresistible_dance"
+              ]
+            },
+            {
+              "entity_field": "control_dance_active",
+              "op": "true"
+            }
+          ]
+        }
       },
       "name": "collect_srd_irresistible_dance",
       "state_predicates": [],
@@ -37081,7 +37286,15 @@
           "summon_state",
           "command"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "entity_field": "summon_active",
+              "op": "true"
+            }
+          ]
+        }
       },
       "name": "command_srd_summoned_creature",
       "state_predicates": [],
@@ -37450,7 +37663,16 @@
           "source_id",
           "operation"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "mage_hand"
+              ]
+            }
+          ]
+        }
       },
       "name": "control_srd_mage_hand",
       "state_predicates": [],
@@ -37881,7 +38103,16 @@
         "required": [
           "caster_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "etherealness"
+              ]
+            }
+          ]
+        }
       },
       "name": "dismiss_srd_etherealness",
       "state_predicates": [],
@@ -37914,7 +38145,20 @@
           "caster_state",
           "spell"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "aura_of_life",
+                "daylight",
+                "fire_shield",
+                "light",
+                "wall_of_fire"
+              ]
+            }
+          ]
+        }
       },
       "name": "dismiss_srd_illumination_spell",
       "state_predicates": [],
@@ -38074,7 +38318,17 @@
           "area_id",
           "wind_zone_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "fog_cloud",
+                "stinking_cloud"
+              ]
+            }
+          ]
+        }
       },
       "name": "disperse_srd_fog",
       "state_predicates": [],
@@ -38359,7 +38613,20 @@
           "actor_state",
           "restraint"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "freedom_of_movement"
+              ]
+            },
+            {
+              "entity_field": "spell_freedom_of_movement",
+              "op": "true"
+            }
+          ]
+        }
       },
       "name": "escape_srd_nonmagical_restraint",
       "state_predicates": [],
@@ -38404,7 +38671,16 @@
           "actor_state",
           "source_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "web"
+              ]
+            }
+          ]
+        }
       },
       "name": "escape_srd_web",
       "state_predicates": [],
@@ -38919,7 +39195,16 @@
         "required": [
           "subject"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "thaumaturgy"
+              ]
+            }
+          ]
+        }
       },
       "name": "inspect_srd_minor_world_effects",
       "state_predicates": [],
@@ -40084,7 +40369,16 @@
           "observer_state",
           "proxy_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "arcane_eye"
+              ]
+            }
+          ]
+        }
       },
       "name": "observe_srd_information_proxy",
       "state_predicates": [],
@@ -40132,7 +40426,17 @@
           "caster_state",
           "spell"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "arcane_eye",
+                "clairvoyance"
+              ]
+            }
+          ]
+        }
       },
       "name": "operate_srd_information_proxy",
       "state_predicates": [],
@@ -40998,7 +41302,16 @@
         "required": [
           "listener_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "thunderwave"
+              ]
+            }
+          ]
+        }
       },
       "name": "query_srd_thunderwave_sound",
       "state_predicates": [],
@@ -41131,7 +41444,21 @@
           "target_state",
           "distance"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "polymorph",
+                "alter_self"
+              ]
+            },
+            {
+              "entity_field": "form_current_source_id",
+              "op": "not_null"
+            }
+          ]
+        }
       },
       "name": "read_srd_transformed_appearance",
       "state_predicates": [],
@@ -41173,7 +41500,16 @@
           "caster_state",
           "source_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "zone_of_truth"
+              ]
+            }
+          ]
+        }
       },
       "name": "read_srd_truth_zone_outcomes",
       "state_predicates": [],
@@ -41246,7 +41582,16 @@
           "creature_type",
           "destination_subjects"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "banishment"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_banishment_plane",
       "state_predicates": [],
@@ -41300,7 +41645,16 @@
           "interior_feet",
           "sealed"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "clone"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_body_vessel",
       "state_predicates": [],
@@ -41341,7 +41695,16 @@
           "caster_state",
           "fact_tag"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "contingency"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_contingency_world_fact",
       "state_predicates": [],
@@ -41625,7 +41988,16 @@
           "room_id",
           "nature_and_contents_known"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "demiplane"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_demiplane_room_knowledge",
       "state_predicates": [],
@@ -41722,7 +42094,16 @@
           "stationary",
           "specific"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_the_path"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_find_path_location",
       "state_predicates": [],
@@ -41808,7 +42189,16 @@
           "direction",
           "routes"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_the_path"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_find_path_routes",
       "state_predicates": [],
@@ -41942,7 +42332,16 @@
           "material_id",
           "depicts_target"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "imprisonment"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_imprisonment_statuette",
       "state_predicates": [],
@@ -42152,7 +42551,16 @@
           "object_id",
           "loose"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "levitate"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_levitate_object_looseness",
       "state_predicates": [],
@@ -42214,7 +42622,16 @@
           "contact_point",
           "contact_within_reach"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "levitate"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_levitate_surface_grip",
       "state_predicates": [],
@@ -42332,7 +42749,16 @@
           "object_id",
           "material_item_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "magic_jar"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_magic_jar_container",
       "state_predicates": [],
@@ -42453,7 +42879,16 @@
         "required": [
           "corpse_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "create_undead"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_native_wight_body_destruction",
       "state_predicates": [],
@@ -42925,7 +43360,16 @@
           "anchored",
           "grabbable"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "reverse_gravity"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_reverse_gravity_anchoring",
       "state_predicates": [],
@@ -43107,7 +43551,16 @@
           "chest_material_id",
           "replica_material_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "secret_chest"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_secret_chest_components",
       "state_predicates": [],
@@ -43243,7 +43696,16 @@
           "object_id",
           "size"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "telekinesis"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_telekinesis_object_size",
       "state_predicates": [],
@@ -43287,7 +43749,16 @@
           "destination_subject",
           "familiarity"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "teleport"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_teleport_destination",
       "state_predicates": [],
@@ -43314,7 +43785,16 @@
           "destination_subject",
           "similar_subject"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "teleport"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_teleport_similar_area",
       "state_predicates": [],
@@ -44497,7 +44977,19 @@
           "completion_evidence",
           "task_kind"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "command",
+                "suggestion",
+                "geas",
+                "charm_monster"
+              ]
+            }
+          ]
+        }
       },
       "name": "resolve_srd_control_activity",
       "state_predicates": [],
@@ -44572,7 +45064,19 @@
           "safe_route",
           "shortest_route"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "command",
+                "suggestion",
+                "geas",
+                "charm_monster"
+              ]
+            }
+          ]
+        }
       },
       "name": "resolve_srd_control_order",
       "state_predicates": [],
@@ -44711,7 +45215,20 @@
           "can_flee",
           "safe_route"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "fear"
+              ]
+            },
+            {
+              "entity_field": "control_behavior_source_ids",
+              "op": "not_null"
+            }
+          ]
+        }
       },
       "name": "resolve_srd_fear_turn",
       "state_predicates": [],
@@ -45606,7 +46123,16 @@
           "target_state",
           "target_distance"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "sleep"
+              ]
+            }
+          ]
+        }
       },
       "name": "shake_srd_sleeping_creature",
       "state_predicates": [],
@@ -45649,7 +46175,16 @@
           "statement",
           "statement_kind"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "zone_of_truth"
+              ]
+            }
+          ]
+        }
       },
       "name": "speak_srd_truth_zone",
       "state_predicates": [],
@@ -46432,7 +46967,17 @@
           "target_state",
           "source_id"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "hex",
+                "hunters_mark"
+              ]
+            }
+          ]
+        }
       },
       "name": "transfer_srd_attack_mark",
       "state_predicates": [],
@@ -46486,7 +47031,16 @@
           "destination_subject",
           "destination"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "tree_stride"
+              ]
+            }
+          ]
+        }
       },
       "name": "traverse_srd_tree_stride",
       "state_predicates": [],
@@ -46985,7 +47539,15 @@
           }
         },
         "required": [],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "entity_field": "resources.wholeness_of_body",
+              "op": "not_null"
+            }
+          ]
+        }
       },
       "name": "use_monk_wholeness_of_body",
       "state_predicates": [],
@@ -47094,7 +47656,16 @@
         "required": [
           "breather_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "dragons_breath"
+              ]
+            }
+          ]
+        }
       },
       "name": "use_srd_dragon_breath",
       "state_predicates": [],
@@ -47134,7 +47705,16 @@
           "actor_state",
           "target_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "create_undead"
+              ]
+            }
+          ]
+        }
       },
       "name": "use_srd_native_mummy_glare",
       "state_predicates": [],
@@ -47174,7 +47754,16 @@
           "actor_state",
           "target_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "create_undead"
+              ]
+            }
+          ]
+        }
       },
       "name": "use_srd_native_wight_life_drain",
       "state_predicates": [],
@@ -47210,7 +47799,15 @@
           }
         },
         "required": [],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "entity_field": "fighter_level",
+              "op": "gte1"
+            }
+          ]
+        }
       },
       "name": "use_srd_second_wind",
       "state_predicates": [],
@@ -47254,7 +47851,16 @@
           "directly_counter",
           "action_evidence"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "geas"
+              ]
+            }
+          ]
+        }
       },
       "name": "violate_srd_geas",
       "state_predicates": [],
@@ -47319,7 +47925,16 @@
           "rider_state",
           "steed_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "mount_srd_otherworldly_steed",
       "state_predicates": [],
@@ -47392,7 +48007,16 @@
           "rider_state",
           "steed_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "dismount_srd_otherworldly_steed",
       "state_predicates": [],
@@ -47433,7 +48057,16 @@
           "steed_state",
           "target_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "use_srd_steed_healing_touch",
       "state_predicates": [],
@@ -47477,7 +48110,16 @@
           "steed_state",
           "target_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "use_srd_steed_fell_glare",
       "state_predicates": [],
@@ -47537,7 +48179,16 @@
         "required": [
           "steed_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "use_srd_steed_fey_step",
       "state_predicates": [],
@@ -47617,7 +48268,16 @@
           "rider_state",
           "steed_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "begin_srd_controlled_steed_phase",
       "state_predicates": [],
@@ -47646,7 +48306,16 @@
           "rider_state",
           "steed_state"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "pause_srd_controlled_steed_phase",
       "state_predicates": [],
@@ -47682,7 +48351,16 @@
           "steed_state",
           "action"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "take_srd_otherworldly_steed_action",
       "state_predicates": [],
@@ -47731,7 +48409,16 @@
           "pending_action_id",
           "destination"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "resolve_srd_otherworldly_mount_balance",
       "state_predicates": [],
@@ -47773,7 +48460,16 @@
           "steed_state",
           "destination"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "begin_srd_otherworldly_forced_movement",
       "state_predicates": [],
@@ -47882,7 +48578,16 @@
           "distance_feet",
           "same_plane"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "establish_srd_lite_steed_healing_proximity",
       "state_predicates": [],
@@ -47973,7 +48678,16 @@
           "established_plane",
           "established_landing_supported"
         ],
-        "type": "object"
+        "type": "object",
+        "x-sylvia-gm-exposure": {
+          "any_of": [
+            {
+              "spells": [
+                "find_steed"
+              ]
+            }
+          ]
+        }
       },
       "name": "record_srd_lite_steed_disappearance_facts",
       "state_predicates": [],
@@ -49600,5 +50314,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.23"
+  "version": "0.3.24"
 }

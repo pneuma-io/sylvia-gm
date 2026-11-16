@@ -127,10 +127,9 @@ class _RulelessGM(_ScriptedProvider):
 
     @staticmethod
     def _latest_user(messages: list[dict[str, Any]]) -> tuple[int, str]:
-        for index in range(len(messages) - 1, -1, -1):
-            if messages[index].get("role") == "user":
-                return index, str(messages[index].get("content", ""))
-        return -1, ""
+        from tests.gm_context_contract import latest_player_message
+
+        return latest_player_message(messages)
 
     def _payload(self, messages: list[dict[str, Any]]) -> dict[str, Any]:
         index, player = self._latest_user(messages)
@@ -254,6 +253,31 @@ def _system_text(messages: list[dict[str, Any]]) -> str:
     )
 
 
+def _application_text(messages: list[dict[str, Any]]) -> str:
+    """Everything the application tells the GM: its instructions and its own records.
+
+    The previous request assembly sends campaign records as system messages; the context
+    ledger sends data records as sealed user-role records after the fixed instructions.
+    """
+    from tests.gm_context_contract import unsealed
+
+    return "\n".join(
+        unsealed(message.get("content"))
+        for message in messages
+        if message.get("role") == "system"
+        or str(message.get("content", "")).startswith("[host-seal ")
+    )
+
+
+def _campaign_state_text(messages: list[dict[str, Any]]) -> str:
+    """The campaign state a request conveys, in either request assembly."""
+    from tests.gm_context_contract import current_state
+
+    state = current_state(messages)
+    assert state is not None, "the request carries no campaign state"
+    return json.dumps(state, ensure_ascii=False)
+
+
 def _released_narration(harness: _OwnerHarness, session_id: str, request_id: str) -> list[str]:
     context = harness.request(request_id, "session_context", {"session_id": session_id})
     return [
@@ -330,7 +354,8 @@ def test_no_ruleset_play_records_world_refuses_mechanics_and_survives_reopen(
         opening_messages, opening_tools = provider.calls[-1]
         system = _system_text(opening_messages)
         assert _GUIDE_HEADING in system
-        assert "open-ended narrative sandbox with no Ruleset" in system
+        assert "open-ended narrative sandbox with no Ruleset" in _application_text(
+            opening_messages)
         advertised = {tool["function"]["name"] for tool in opening_tools or []}
         assert len(advertised) == 3
         assert all(
@@ -385,10 +410,7 @@ def test_no_ruleset_play_records_world_refuses_mechanics_and_survives_reopen(
         messages, _tools = provider.calls[calls_before_resume]
         system = _system_text(messages)
         assert _GUIDE_HEADING in system
-        fresh = next(
-            str(message["content"]) for message in messages
-            if str(message.get("content", "")).startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
-        )
+        fresh = _campaign_state_text(messages)
         for recorded in ("Opens the lamp-room lock", "On Warden Ilse's belt",
                          "Ships have wrecked", "lamp-room door stands open"):
             assert recorded in fresh

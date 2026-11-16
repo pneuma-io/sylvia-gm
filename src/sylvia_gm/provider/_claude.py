@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import re
-import tempfile
+import threading
 import uuid
 from collections.abc import AsyncIterator, Callable
 from datetime import UTC, datetime
@@ -22,6 +23,20 @@ from sylvia_gm.provider._base import (
     ProviderStreamChunk,
     TokenUsage,
     ToolCall,
+)
+from sylvia_gm.provider._claude_native import (
+    CURRENT_NATIVE_ROUTE,
+    FILLER_TEXT,
+    TRANSIENT_SESSION,
+    NativeCollection,
+    NativeRoute,
+    collect,
+    delete_session,
+    remove_debug_logs,
+    remove_step_folder,
+    session_files,
+    sweep,
+    wait_for_flush,
 )
 from sylvia_gm.provider._claude_runtime import (
     ClaudeConnection,
@@ -42,7 +57,12 @@ from sylvia_gm.provider._exceptions import (
 )
 from sylvia_gm.provider._hooks import HookContext
 
+logger = logging.getLogger(__name__)
+
 _PREFIX = "mcp__sylvia__"
+#: Session ids of steps running in this process, by runtime home (kept out of the sweep).
+_ACTIVE_STEPS: dict[Path, set[str]] = {}
+_ACTIVE_LOCK = threading.Lock()
 _CONTINUE = (
     "SYLVIA_GM_RUNTIME_CONTINUE: Continue the response to the saved Sylvia conversation, "
     "using the committed tool results above. This is an application invocation, not player speech."
@@ -54,8 +74,14 @@ def prepare_request(
     tools: list[dict[str, Any]] | None,
     model_id: str,
     workspace: Path,
+    native: NativeRoute | None = None,
 ) -> tuple[str, list[dict[str, Any]], dict[str, Any], list[dict[str, Any]]]:
-    """Project canonical roles and correlated tools into a disposable native transcript."""
+    """Project canonical roles and correlated tools into a disposable native transcript.
+
+    With ``native`` (the context ledger's route for this wire) the transcript is the ledger's
+    native projection: every earlier request's prompt group as one user record, the CLI's saved
+    context records after it, a filler after any trailing user record, list content throughout.
+    """
     request = AnthropicMessagesTransport().format_request(model_id, messages, tools, True)
     system = request.get("system", "")
     if isinstance(system, list):
@@ -83,6 +109,9 @@ def prepare_request(
             for block in content:
                 if block.get("type") == "tool_use":
                     block["name"] = _PREFIX + block["name"]
+    if native is not None:
+        records, prompt = _native_projection(messages, history, native, model_id, workspace)
+        return str(system), records, prompt, native_tools
     # A genuine final player input goes directly to stdin. A typed tool-result tail must
     # stay in the transcript: Claude's stdin prompt normalizer drops tool_result blocks.
     is_player = bool(messages) and messages[-1].get("role") == "user"
@@ -100,6 +129,98 @@ def prepare_request(
     records = []
     for message in history:
         identity = str(uuid.uuid4())
+        entry = dict(message)
+        if entry["role"] == "assistant":
+            entry.update(
+                {
+                    "id": "msg_" + uuid.uuid4().hex,
+                    "type": "message",
+                    "model": model_id,
+                    "stop_reason": "tool_use"
+                    if any(block.get("type") == "tool_use" for block in entry["content"])
+                    else "end_turn",
+                    "stop_sequence": None,
+                }
+            )
+        records.append(
+            {
+                "type": entry["role"],
+                "uuid": identity,
+                "parentUuid": parent,
+                "sessionId": session,
+                "isSidechain": False,
+                "cwd": str(workspace),
+                "timestamp": datetime.now(UTC).isoformat(),
+                "message": entry,
+            }
+        )
+        parent = identity
+    return str(system), records, prompt, native_tools
+
+
+def _text_blocks(content: Any) -> list[dict[str, Any]]:
+    """Every user record and prompt uses list content, so its form never depends on a marker."""
+    if isinstance(content, str):
+        return [{"type": "text", "text": content}]
+    if isinstance(content, list) and all(isinstance(block, dict) for block in content):
+        return [dict(block) for block in content]
+    raise InvalidResponseError("Claude cannot represent this Sylvia input.")
+
+
+def _is_prompt_entry(message: dict[str, Any]) -> bool:
+    content = message.get("content")
+    return message.get("role") == "user" and not (
+        isinstance(content, list)
+        and any(isinstance(b, dict) and b.get("type") == "tool_result" for b in content)
+    )
+
+
+def _native_projection(
+    messages: list[dict[str, Any]],
+    history: list[dict[str, Any]],
+    route: NativeRoute,
+    model_id: str,
+    workspace: Path,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """The ledger journal as Claude Code's transcript plus this step's stdin prompt.
+
+    The transcript is a pure function of the journal entries, the boundaries at which earlier
+    requests ended and the CLI records saved for them, so an earlier step's transcript plus its
+    prompt is always a prefix of every later transcript.
+    """
+    leading = 0
+    while leading < len(messages) and messages[leading].get("role") == "system":
+        leading += 1
+    if (
+        leading != route.stable_count
+        or len(history) != route.entry_count
+        or len(messages) - leading != route.entry_count
+        or any(m.get("role") == "system" for m in messages[leading:])
+        or any(not 0 < b < route.entry_count for b in route.boundaries)
+        or list(route.boundaries) != sorted(set(route.boundaries))
+    ):
+        raise InvalidResponseError("Claude's native transcript does not match this request.")
+    session, timestamp = str(uuid.uuid4()), datetime.now(UTC).isoformat()
+    records: list[dict[str, Any]] = []
+    parent: list[str | None] = [None]
+
+    def add(kind: str, body: dict[str, Any]) -> None:
+        identity = str(uuid.uuid4())
+        records.append(
+            {
+                "type": kind,
+                "uuid": identity,
+                "parentUuid": parent[0],
+                "sessionId": session,
+                "isSidechain": False,
+                "cwd": str(workspace),
+                "timestamp": timestamp,
+                **body,
+            }
+        )
+        parent[0] = identity
+
+    def add_message(message: dict[str, Any]) -> None:
         native = dict(message)
         if native["role"] == "assistant":
             native.update(
@@ -113,20 +234,60 @@ def prepare_request(
                     "stop_sequence": None,
                 }
             )
-        records.append(
-            {
-                "type": native["role"],
-                "uuid": identity,
-                "parentUuid": parent,
-                "sessionId": session,
-                "isSidechain": False,
-                "cwd": str(workspace),
-                "timestamp": datetime.now(UTC).isoformat(),
-                "message": native,
-            }
-        )
-        parent = identity
-    return str(system), records, prompt, native_tools
+        else:
+            native["content"] = _text_blocks(native.get("content"))
+        add(native["role"], {"message": native})
+
+    def needs_filler() -> bool:
+        # Claude Code inserts its own unrecorded filler after a trailing user record.
+        last = next((r["type"] for r in reversed(records) if r["type"] != "attachment"), None)
+        return last == "user"
+
+    prompt: dict[str, Any] | None = None
+    ends = [*route.boundaries, len(history)]
+    start = 0
+    for end in ends:
+        group = end
+        while group > start and _is_prompt_entry(history[group - 1]):
+            group -= 1
+        for message in history[start:group]:
+            add_message(message)
+        content = [block for m in history[group:end] for block in _text_blocks(m["content"])]
+        start = end
+        if not content:
+            if end == len(history):
+                raise InvalidResponseError("Claude has no prompt for this request.")
+            continue
+        if needs_filler():
+            add(
+                "assistant",
+                {
+                    "message": {
+                        "role": "assistant",
+                        "content": [{"type": "text", "text": FILLER_TEXT}],
+                        "id": "msg_" + uuid.uuid4().hex,
+                        "type": "message",
+                        "model": model_id,
+                        "stop_reason": "end_turn",
+                        "stop_sequence": None,
+                    }
+                },
+            )
+        if end == len(history):
+            prompt = {"type": "user", "message": {"role": "user", "content": content}}
+        else:
+            add("user", {"message": {"role": "user", "content": content}})
+            for saved in route.native_records.get(end, ()):
+                add(
+                    "attachment",
+                    {
+                        key: saved[key]
+                        for key in ("attachment", "rendered", "renderedRole")
+                        if key in saved
+                    },
+                )
+    assert prompt is not None
+    return records, prompt
 
 
 def runtime_failure(event: dict[str, Any]) -> ProviderError:
@@ -207,6 +368,9 @@ class ClaudeProvider(Provider):
         timeout: float = 120,
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
+        # The context ledger's route belongs to exactly the request it was planned for.
+        route = CURRENT_NATIVE_ROUTE.get()
+        CURRENT_NATIVE_ROUTE.set(None)
         async with self._lock:
             executable = find_runtime(self.home)
             if executable is None:
@@ -215,21 +379,41 @@ class ClaudeProvider(Provider):
                 )
             await asyncio.to_thread(runtime_version, executable, self.home)
             self.home.mkdir(parents=True, exist_ok=True)
-            with tempfile.TemporaryDirectory(prefix="turn-", dir=self.home) as directory:
-                workspace = Path(directory)
+            # One fixed, empty working directory: Claude Code names it in every request. The
+            # system and transcript files live in a per-step folder that is always removed.
+            workspace = self.home / "workspace"
+            workspace.mkdir(exist_ok=True)
+            steps = self.home / "steps"
+            steps.mkdir(exist_ok=True)
+            environment = native_environment(self.home)
+            config = Path(environment.get("CLAUDE_CONFIG_DIR") or self.home / "profile")
+            cache = Path(environment["XDG_CACHE_HOME"]) if environment.get(
+                "XDG_CACHE_HOME") else None
+            session_id = str(uuid.uuid4())
+            step = steps / session_id
+            with _ACTIVE_LOCK:
+                active = _ACTIVE_STEPS.setdefault(self.home.resolve(), set())
+                running = set(active)
+                active.add(session_id)
+            try:
+                # Earlier session files hold copies of earlier requests: never leave them.
+                sweep(config, steps, running | {session_id}, self.home)
+                step.mkdir()
                 system, records, prompt, native_tools = prepare_request(
                     messages,
                     tools,
                     self.model_info.wire_model_id,
                     workspace,
+                    route,
                 )
-                system_path = workspace / "system.txt"
-                history_path = workspace / "history.jsonl"
-                system_path.write_text(system, encoding="utf-8")
-                history_path.write_text(
-                    "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records),
-                    encoding="utf-8",
-                )
+                system_path = step / "system.txt"
+                history_path = step / "history.jsonl"
+                system_path.write_bytes(system.encode("utf-8"))
+                transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)
+                if route is None:
+                    history_path.write_text(transcript, encoding="utf-8")
+                else:
+                    history_path.write_bytes(transcript.encode("utf-8"))
                 arguments = [
                     "--print",
                     "--safe-mode",
@@ -242,7 +426,7 @@ class ClaudeProvider(Provider):
                     "--settings",
                     '{"disableAllHooks":true,"autoMemoryEnabled":false}',
                     "--strict-mcp-config",
-                    "--no-session-persistence",
+                    *(["--no-session-persistence"] if route is None else []),
                     "--no-chrome",
                     "--input-format",
                     "stream-json",
@@ -257,6 +441,9 @@ class ClaudeProvider(Provider):
                 ]
                 if records:
                     arguments.extend(["--resume", str(history_path), "--fork-session"])
+                if route is not None:
+                    # Persisted only so Sylvia can copy the CLI's context records; deleted below.
+                    arguments.extend(["--session-id", session_id])
                 if native_tools:
                     arguments.extend(
                         [
@@ -268,9 +455,7 @@ class ClaudeProvider(Provider):
                     )
                 else:
                     arguments.extend(["--mcp-config", '{"mcpServers":{}}'])
-                connection = self._connection_factory(
-                    executable, workspace, arguments, native_environment(self.home)
-                )
+                connection = self._connection_factory(executable, workspace, arguments, environment)
                 self._active = connection
                 response = ProviderResponse(
                     model=self.model_info.wire_model_id, usage_reported=False
@@ -301,7 +486,9 @@ class ClaudeProvider(Provider):
                                 "controls": {
                                     "safe_mode": True,
                                     "builtin_tools": [],
-                                    "persist_session": False,
+                                    "persist_session": (
+                                        False if route is None else TRANSIENT_SESSION
+                                    ),
                                     "output_allowance": "runtime_managed",
                                     "tool_choice": "runtime_managed",
                                 },
@@ -380,7 +567,9 @@ class ClaudeProvider(Provider):
                                 )
                                 # Reaching the actual MCP call means native permissions admitted it.
                                 # No result is sent to Claude and no game action runs in this child.
+                                flushed = await self._await_flush(route, config, session_id, prompt)
                                 await self._close_owned(connection)
+                                await self._collect(route, config, session_id, prompt, flushed)
                                 response.tool_calls = [call]
                                 response.finish_reason = "tool_calls"
                                 if native_content is not None:
@@ -528,7 +717,12 @@ class ClaudeProvider(Provider):
                             raise RateLimitError(
                                 "Claude reports that this account has reached its usage limit."
                             )
+                    flushed = True
+                    if not response.tool_calls:
+                        flushed = await self._await_flush(route, config, session_id, prompt)
                     await self._close_owned(connection)
+                    if not response.tool_calls:
+                        await self._collect(route, config, session_id, prompt, flushed)
                     response.content = "".join(text_parts) or None
                     self._last_response = response
                     await self.hooks.fire_on_response(
@@ -551,6 +745,70 @@ class ClaudeProvider(Provider):
                         await self._close_owned(connection)
                     finally:
                         self._active = None
+            finally:
+                # Success, error, cancel or timeout: the CLI's session file and the step's
+                # files hold full copies of the request and never outlive the step.
+                delete_session(config, session_id, self.home)
+                if step.exists():
+                    remove_step_folder(step, self.home)
+                # The CLI's MCP debug log (tool names, session ID, working folder path).
+                remove_debug_logs(cache, self.home)
+                with _ACTIVE_LOCK:
+                    active.discard(session_id)
+
+    @staticmethod
+    async def _await_flush(
+        route: NativeRoute | None, config: Path, session_id: str, prompt: dict[str, Any]
+    ) -> bool:
+        """Let the CLI finish writing this step's records before its process is closed.
+
+        False when the wait ended before the records were complete.
+        """
+        if route is None:
+            return True
+        return bool(
+            await asyncio.to_thread(
+                wait_for_flush, config, session_id, prompt["message"]["content"]
+            )
+        )
+
+    async def _collect(
+        self,
+        route: NativeRoute | None,
+        config: Path,
+        session_id: str,
+        prompt: dict[str, Any],
+        flushed: bool = True,
+    ) -> None:
+        """Copy the CLI's context records for the ledger, then delete its session file.
+
+        Never fatal: an unknown result is reported to the ledger, which starts a new journal
+        generation for this route on the next request.
+        """
+        if route is None:
+            return
+        files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
+        result = collect(files[0] if files else None, prompt["message"]["content"])
+        if not flushed and result.status == "collected":
+            # The CLI may still have had records queued: what was read may be incomplete.
+            result = NativeCollection("unknown", reason="flush_incomplete")
+        delete_session(config, session_id, self.home)
+        if result.status != "collected":
+            logger.warning(
+                "Claude runtime context records are unknown for this step (%s); the next "
+                "request starts a new context journal generation.",
+                result.reason,
+            )
+        if route.on_collected is None or not (
+            result.records or result.status != "collected" or route.first_step
+        ):
+            return
+        try:
+            await route.on_collected(result)
+        except asyncio.CancelledError:
+            raise
+        except Exception:  # noqa: BLE001 - saving evidence never fails the player's step
+            logger.warning("Claude runtime context records could not be saved.", exc_info=True)
 
     @staticmethod
     def _usage(response: ProviderResponse, usage: dict[str, Any]) -> None:
