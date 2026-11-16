@@ -3605,7 +3605,8 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .equipment-set { border: 1px solid var(--border, #333); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
 .equipment-set-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .equipment-active { color: var(--accent, #c4a7e7); font-size: 12px; }
-.equipment-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+/* Main hand and Off hand side by side only when each has room for an item's name; otherwise one under the other. */
+.equipment-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: 8px; }
 .equipment-slot-label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; min-width: 0; }
 .equipment-slot { width: 100%; min-width: 0; }
 .equipment-occupied { padding: 8px 0; color: var(--text-muted, #aaa); }
@@ -4194,6 +4195,12 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .equipment-set:has(.equipment-active) { border-color: color-mix(in srgb, var(--ally) 50%, transparent); background: linear-gradient(180deg, rgba(79,209,181,.07), transparent); }
 .equipment-active { padding: 1px 8px; border-radius: 6px; background: var(--ally-soft); color: var(--ally); font-size: 11.5px; }
 .equipment-slot { min-height: 32px; border-radius: 8px; }
+/* In a narrow panel the nested card padding and the drop-down's own padding give way, so an item's name still fits. */
+.prepared-equipment { container-type: inline-size; }
+@container (max-width: 200px) {
+  .equipment-set { padding: 8px 4px; }
+  .equipment-slot { padding-inline: 6px 2px; font-size: 12px; }
+}
 
 /* Turn-order rows */
 .ruleset-panel .panel-unit-heading:has(.turn-order) { flex-wrap: wrap; }

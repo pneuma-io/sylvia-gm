@@ -209,6 +209,58 @@ test('SRD character sheet stays inside its panel at every game-panel width', { t
   } finally { await browser.close(); }
 });
 
+// SRD weapon sets with the longer item names a player meets: a copy number in one hand, an empty hand in the other.
+const armed = (source) => variant(nonCaster(source), (projection) => {
+  for (const surface of projection.surfaces) {
+    const hero = surface.data?.entities?.hero;
+    if (hero) Object.assign(hero, { inventory: ['light_hammer', 'dagger', 'hand_crossbow'], inventory_quantities: { dagger: 2 },
+      inventory_weapon_copies: {}, weapon_copy_refs: { melee: { main_hand: 1, off_hand: 2 } },
+      weapon_sets: { format: 1, active_set: 'melee', melee: { main_hand: 'light_hammer', off_hand: 'dagger' }, ranged: { main_hand: 'hand_crossbow', off_hand: null } } });
+  }
+});
+
+// Inventory's Main hand and Off hand drop-downs sat side by side at every width, so at the default panel width they
+// read "Unse" for "Unselected" and would cut an equipped item's name.
+test('SRD Inventory hand drop-downs show their values whole', { timeout: 90000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await open(browser);
+    await show(page, armed(srd));
+    const tab = page.locator('.ruleset-panel-tab[data-workspace-panel="dnd-inventory"]');
+    if (await tab.count()) await tab.first().click();
+    await page.locator('[data-panel-id="dnd-inventory"] select.equipment-slot').first().waitFor();
+    // The divider's minimum and its default (one column of panels), then the Inventory panel itself made wide.
+    for (const width of [220, 280, 'wide']) {
+      const found = await page.evaluate((pixels) => {
+        const content = document.querySelector('[data-panel-id="dnd-inventory"] .ruleset-panel-content');
+        if (pixels === 'wide') Object.assign(content.style, { width: '440px', maxWidth: 'none' });
+        else document.getElementById('right-sidebar').style.width = `${pixels}px`;
+        const selects = Array.from(content?.querySelectorAll('select.equipment-slot') || []);
+        const box = content.getBoundingClientRect();
+        return { selects: selects.map((select) => {
+          // The width this drop-down needs for its own value: a copy holding only the selected choice, at its natural size.
+          const probe = select.cloneNode(true);
+          Array.from(probe.options).forEach((option, index) => { if (index !== select.selectedIndex) option.remove(); });
+          Object.assign(probe.style, { width: 'auto', minWidth: '0', maxWidth: 'none', position: 'absolute', visibility: 'hidden' });
+          select.parentElement.append(probe);
+          const need = probe.getBoundingClientRect().width;
+          probe.remove();
+          const r = select.getBoundingClientRect();
+          return { slot: select.dataset.equipmentSlot, set: select.dataset.equipmentSet, value: select.options[select.selectedIndex]?.text,
+            have: r.width, need, top: r.top, inside: r.left >= box.left - 0.5 && r.right <= box.right + 0.5 };
+        }) };
+      }, width);
+      assert.deepEqual(found.selects.map((item) => item.value), ['Light Hammer', 'Dagger · copy 2', 'Hand Crossbow', 'Unselected']);
+      for (const item of found.selects) {
+        assert.ok(item.have + 0.5 >= item.need, `${item.set} ${item.slot} at a ${width} game-panel column shows "${item.value}" whole: ${JSON.stringify(item)}`);
+        assert.ok(item.inside, `${item.set} ${item.slot} stays inside the panel at ${width}: ${JSON.stringify(item)}`);
+      }
+      if (width === 'wide') assert.ok(Math.abs(found.selects[0].top - found.selects[1].top) < 1, 'a wide panel keeps the two hands side by side');
+    }
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('Trigger Discipline panels keep the tactical look', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {
