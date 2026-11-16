@@ -4470,7 +4470,22 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
   .op-manip .suite-act { flex-basis: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .op-rig-phase .pulse { animation: none; } }
-.sq-name strong { flex: 0 0 auto; }
+/* A party card is narrow. Beside the card face, the party role ran over the name and the vitals with a long
+   name or a wider font (Linux desktops usually give DejaVu Sans), so the role takes its own line under the
+   face, lined up with the name. In the name row the name comes first and the class and level take what is
+   left; a name too long for the card is cut with an ellipsis. */
+.ruleset-roster-panel .panel-unit-heading .sq-name strong { flex: 0 1 auto; min-width: 3em; overflow: hidden; text-overflow: ellipsis; }
+.sq-name small { flex: 1 1 0; min-width: 0; }
+.ruleset-roster-panel .squad-card .panel-unit-heading { flex-wrap: wrap; row-gap: 0; }
+.squad-card .panel-unit-heading > .panel-unit-role { order: 1; flex: 0 0 calc(100% - 57px); min-width: 0; margin: -6px 0 6px 57px;
+  padding-right: 8px; overflow: hidden; color: var(--text-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+/* The compact roster strip has no height for another line: there the role sits on the Details row, to its
+   right, and Details moves up beside it. */
+@container (max-height: 229px) {
+  .squad-list .squad-card .panel-unit-heading > .panel-unit-role { flex: 0 0 100%; margin: -5px 0 0; padding: 0 0 0 96px;
+    font-size: 10.5px; line-height: 13px; text-align: right; }
+  .squad-list .squad-card:has(> .panel-unit-heading > .panel-unit-role) > .roster-inspection { margin-top: -14px; padding-left: 0; }
+}
 /* Desktop docked workspace fills the panel area the way panel windows do: column splits use their saved
    ratio and row splits share one height, so the suite reads as one board without page scrolling. The
    narrow stacked arrangement below 720px keeps per-panel heights. */
