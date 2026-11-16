@@ -1566,13 +1566,18 @@ the ledger resets. Builder and participant requests do not use it.
   last system block and the last non-thinking block of the last message; other Messages-compatible
   endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
   request context identifier.
-- **Mode switch.** The previous assembly is the shipped default on every route
-  (`DEFAULT_CONTEXT_MODE`, with `DEFAULT_CONTEXT_MODE_BY_TRANSPORT` for a route whose measured
-  results support the ledger). `SYLVIA_GM_CONTEXT_MODE=ledger` or `=legacy`, read once per GM
+- **Mode switch.** The previous assembly is the shipped default (`DEFAULT_CONTEXT_MODE`) on
+  every route except those named in `DEFAULT_CONTEXT_MODE_BY_TRANSPORT`, which lists a route
+  once its measured results support the ledger. `claude_code` is listed: it ships with the
+  ledger. `SYLVIA_GM_CONTEXT_MODE=ledger` or `=legacy`, read once per GM
   adapter, selects an assembly for every route. The previous assembly is byte for byte what it
   was before the ledger existed (including no Anthropic breakpoints).
   On `claude_code` legacy mode keeps the previous transcript and flags, with the fixed working
   directory and LF system bytes.
+- **Tool list switch.** In the ledger assembly, per-round tool lists are the shipped default
+  (`DEFAULT_TOOL_LIST`) on every route except those named in `DEFAULT_TOOL_LIST_BY_TRANSPORT`,
+  which send one tool list for the session. `claude_code` is listed. `SYLVIA_GM_TOOL_LIST=stable`
+  or `=rounds` selects either for every route.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 
