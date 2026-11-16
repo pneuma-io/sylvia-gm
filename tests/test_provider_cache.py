@@ -184,6 +184,79 @@ async def test_chatgpt_drains_owned_usage_after_tool_shutdown(tmp_path):
     assert response.cache_usage.cache_write_tokens == 10
 
 
+TOOL_CALL = {
+    "method": "item/tool/call",
+    "params": {"namespace": "sylvia", "tool": "choose", "callId": "one", "arguments": {}},
+}
+CHOOSE = [{
+    "type": "function",
+    "function": {"name": "choose", "description": "Choose", "parameters": {"type": "object"}},
+}]
+
+
+@pytest.mark.asyncio
+async def test_chatgpt_keeps_usage_reported_just_after_a_tool_call(tmp_path):
+    """Issue 78: the report follows the tool call; it is kept and the runtime is still stopped."""
+    runtime = SyntheticRuntime([
+        TOOL_CALL,
+        usage_event({"inputTokens": 900, "outputTokens": 90, "totalTokens": 990},
+                    turn="other-turn"),
+        usage_event({"inputTokens": 64, "outputTokens": 6, "totalTokens": 70,
+                     "cachedInputTokens": 48}),
+    ])
+    response = await provider_for(runtime, tmp_path).generate(
+        [{"role": "user", "content": "Test"}], tools=CHOOSE,
+    )
+    assert [call.name for call in response.tool_calls] == ["choose"]
+    assert response.usage_reported and response.usage.prompt_tokens == 64
+    assert response.cache_usage.cache_read_tokens == 48
+    assert response.cache_usage.hit_ratio == 0.75
+    assert runtime.closed
+
+
+@pytest.mark.asyncio
+async def test_chatgpt_tool_call_without_a_usage_report_waits_briefly_then_less(
+    tmp_path, monkeypatch
+):
+    import time
+
+    from sylvia_gm.provider import _chatgpt
+
+    monkeypatch.setattr(_chatgpt, "_USAGE_GRACE_SECONDS", 0.3)
+    monkeypatch.setattr(_chatgpt, "_USAGE_GRACE_PROBE_SECONDS", 0.02)
+    waits = []
+    provider = None
+    for _ in range(3):
+        runtime = SyntheticRuntime([TOOL_CALL])
+        provider = provider or provider_for(runtime, tmp_path)
+        provider._connection_factory = lambda *args, runtime=runtime, **kwargs: runtime
+        started = time.monotonic()
+        response = await provider.generate([{"role": "user", "content": "Test"}], tools=CHOOSE)
+        waits.append(time.monotonic() - started)
+        assert [call.name for call in response.tool_calls] == ["choose"]
+        assert not response.usage_reported and runtime.closed
+    # Two requests in a row without a report: the third waits only one short poll.
+    assert waits[0] >= 0.3 and waits[1] >= 0.3 and waits[2] < 0.3
+
+
+@pytest.mark.asyncio
+async def test_chatgpt_runtime_failure_while_waiting_for_usage_keeps_the_tool_call(tmp_path):
+    from sylvia_gm.provider._codex_rpc import CodexConnectionError
+
+    class Runtime(SyntheticRuntime):
+        def next_event(self):
+            if self.events:
+                return self.events.pop(0)
+            raise CodexConnectionError("The ChatGPT runtime stopped before completing.")
+
+    runtime = Runtime([TOOL_CALL])
+    response = await provider_for(runtime, tmp_path).generate(
+        [{"role": "user", "content": "Test"}], tools=CHOOSE,
+    )
+    assert [call.name for call in response.tool_calls] == ["choose"]
+    assert not response.usage_reported and runtime.closed
+
+
 def test_cache_audit_and_totals_distinguish_unknown_zero_and_partial_coverage():
     from sylvia_gm.provider._admin_audit import _usage_projection
     from sylvia_gm.provider._base import CacheUsage, ProviderResponse, TokenUsage
