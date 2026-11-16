@@ -589,6 +589,19 @@ fn desktop_update_launch_context(
     }))
 }
 
+// Every file dialog belongs to the window that asked for it. A Linux AppImage runs with its own
+// read-only mount as the working folder, and must keep it because its web view finds helper
+// programs relative to it; a dialog would otherwise open there, so name the home folder.
+fn file_dialog(window: &WebviewWindow) -> rfd::AsyncFileDialog {
+    let dialog = rfd::AsyncFileDialog::new().set_parent(window);
+    #[cfg(target_os = "linux")]
+    let dialog = match std::env::var_os("HOME") {
+        Some(home) => dialog.set_directory(home),
+        None => dialog,
+    };
+    dialog
+}
+
 // Drop performs no blocking protocol call. Closing the last input drops its pipe;
 // the reply reader retains the exact child and Windows job through real collection.
 // Abnormal desktop termination closes that kill-on-close job, containing its tree.
@@ -2243,7 +2256,7 @@ async fn install_package(
 #[tauri::command]
 async fn preview_character_card_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(source) = rfd::AsyncFileDialog::new().set_parent(&window)
+    let Some(source) = file_dialog(&window)
         .add_filter("Character Card JSON / PNG", &["json", "png"]).pick_file().await
     else { return Ok(json!({"status":"cancelled"})); };
     owner_call_async(window, "preview_character_card_file", json!({"source_path":source.path()})).await
@@ -2257,8 +2270,7 @@ async fn confirm_character_card_import(window: WebviewWindow, source_sha256: Str
 #[tauri::command]
 async fn install_package_file(window: WebviewWindow, install_id: String) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(source) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(source) = file_dialog(&window)
         .add_filter(
             "Sylvia GM Content",
             &["sylvia-gm-package", "sylvia-gm-plan", "zip"],
@@ -2376,8 +2388,7 @@ async fn export_package_candidate_file(
     candidate_id: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Package", &["sylvia-gm-package"])
         .set_file_name("ruleset-package.sylvia-gm-package")
         .save_file()
@@ -2405,8 +2416,7 @@ async fn export_campaign_plan_file(
     expected_content_sha256: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Campaign Plan", &["sylvia-gm-plan"])
         .set_file_name("campaign-plan.sylvia-gm-plan")
         .save_file()
@@ -2436,8 +2446,7 @@ async fn ingest_builder_sources(
     ingestion_id: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(sources) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(sources) = file_dialog(&window)
         .add_filter(
             "Builder sources",
             &["txt", "md", "json", "yaml", "yml", "csv", "pdf"],
@@ -3219,8 +3228,7 @@ async fn export_campaign_file(
     if confirmed != rfd::MessageDialogResult::Ok {
         return Ok(json!({"status": "cancelled"}));
     }
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Campaign", &["sylvia-gm-campaign"])
         .set_file_name(&suggested)
         .save_file()
@@ -3265,8 +3273,7 @@ async fn recover_campaign_file(
     recovery_id: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(source) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(source) = file_dialog(&window)
         .add_filter("Sylvia GM Campaign", &["sylvia-gm-campaign"])
         .pick_file()
         .await
@@ -3334,8 +3341,7 @@ async fn cancel_local_report(window: WebviewWindow, preview_id: String) -> Resul
 #[tauri::command]
 async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia local report JSON", &["json"])
         .set_file_name("sylvia-local-report.json")
         .save_file()
@@ -3363,8 +3369,7 @@ async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<
 async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
     // Audit has a passive spoilers notice; only the ordinary save chooser is needed here.
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Audit JSON", &["json"])
         .set_file_name("sylvia-gm-admin-audit.json")
         .save_file()

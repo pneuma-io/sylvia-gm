@@ -170,6 +170,10 @@ input, textarea, select {
   transition: var(--transition);
 }
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent-primary); box-shadow: var(--shadow-glow); }
+/* The Linux web view draws drop-down lists and other native controls from its own light theme
+   unless the page says it is dark, which left light text on a white list. Every Sylvia theme is
+   dark. Set only for a Linux host, so other systems keep the controls they had. */
+html[data-host-platform="linux"] { color-scheme: dark; }
 
 /* ============================================================
    UI-001 — Campaign Session Frame

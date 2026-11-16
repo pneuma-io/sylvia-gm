@@ -167,8 +167,22 @@ def test_linux_bundle_settings_only_add_to_the_shared_configuration():
     assert shared["bundle"]["targets"] == "nsis"
     assert shared["bundle"]["icon"] == ["icons/icon.ico"]
     assert set(linux) == {"bundle"}
-    assert set(linux["bundle"]) == {"targets", "icon"}
+    assert set(linux["bundle"]) == {"targets", "icon", "resources"}
     assert linux["bundle"]["targets"] == ["appimage"]
+    # The Linux build carries no speech runtime, so it leaves that runtime's notices out. A null
+    # removes the shared entry when Tauri merges the two files; nothing else may be touched.
+    removed = linux["bundle"]["resources"]
+    assert set(removed.values()) == {None}
+    speech = {
+        source for source, target in shared["bundle"]["resources"].items()
+        if target.startswith("licenses/dictation/")
+    }
+    assert set(removed) == speech and len(speech) == 11
+    assert all(
+        target.startswith("licenses/")
+        for source, target in shared["bundle"]["resources"].items()
+        if source not in removed
+    )
     icons = linux["bundle"]["icon"]
     assert icons and all(name.endswith(".png") for name in icons)
     for name in icons:
@@ -200,6 +214,29 @@ def test_browser_host_names_the_system_its_owner_runs_on(monkeypatch):
     ):
         monkeypatch.setattr(webui.sys, "platform", value)
         assert webui._host_platform() == expected
+
+
+def test_linux_dialogs_need_no_desktop_helpers_and_never_open_in_the_bundle_folder():
+    import tomllib
+
+    cargo = tomllib.loads((ROOT / "src-tauri/Cargo.toml").read_text(encoding="utf-8"))
+    # The default backend needs a portal service for file dialogs and the zenity program for
+    # message dialogs. GTK is already part of the Linux build, so use it there; elsewhere the
+    # dependency is what it always was.
+    assert "rfd" not in cargo["dependencies"]
+    assert cargo["target"]['cfg(not(target_os = "linux"))']["dependencies"]["rfd"] == "0.15"
+    assert cargo["target"]['cfg(target_os = "linux")']["dependencies"]["rfd"] == {
+        "version": "0.15",
+        "default-features": False,
+        "features": ["gtk3"],
+    }
+    shell = (ROOT / "src-tauri/src/lib.rs").read_text(encoding="utf-8")
+    # One helper builds every file dialog and names its starting folder on Linux. The working
+    # folder itself must stay: an AppImage's web view finds its helper programs relative to it.
+    assert shell.count("rfd::AsyncFileDialog::new()") == 1
+    assert shell.count("file_dialog(&window)") == 9
+    assert "Some(home) => dialog.set_directory(home)," in shell
+    assert "set_current_dir" not in shell
 
 
 def test_desktop_shell_names_the_authority_and_private_data_folder_per_platform():
