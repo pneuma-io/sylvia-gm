@@ -682,7 +682,14 @@ def reject_unavailable_tool(
             for alias, tool in state.aliases.items()
         ],
         "instruction": (
-            "This provider tool is absent from the current request and cannot "
+            # With one tool list the request lists tools that cannot be called this round.
+            "This provider tool cannot be called at this step. Do not call it again in "
+            "this correction. Choose one exact provider_tool_name from "
+            "available_operations only when its operation fits the current Ruleset "
+            "state. If an engine transition is marked required, call that transition "
+            "first."
+            if self._one_tool_list and self._ledger_active(provider_input)
+            else "This provider tool is absent from the current request and cannot "
             "be called. Do not call it again in this correction. Choose one "
             "exact provider_tool_name from available_operations only when its "
             "operation fits the current Ruleset state. If an engine transition "

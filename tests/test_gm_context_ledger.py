@@ -144,6 +144,42 @@ def test_a_route_default_applies_only_without_the_switch(monkeypatch) -> None:
                         transport="anthropic_messages") == "legacy"
 
 
+def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_either() -> None:
+    # The shipped default: per-round tool lists on every route. Changing either line below
+    # changes what players get, so it needs a measured run on the route concerned.
+    assert ledger_module.DEFAULT_TOOL_LIST == "rounds"
+    assert dict(ledger_module.DEFAULT_TOOL_LIST_BY_TRANSPORT) == {}
+    stable_tool_list = ledger_module.stable_tool_list
+    assert stable_tool_list({}) is False
+    for transport in ("codex_app_server", "anthropic_messages", "claude_code",
+                      "chat_completions", "responses", None):
+        assert stable_tool_list({}, transport=transport) is False
+    # The switch selects one list, or per-round lists, for every route.
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "stable"}) is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": " Stable "}, transport="claude_code") is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"}) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": " Rounds "},
+                            transport="anthropic_messages") is False
+    # Any other value is not a choice: the route's default applies.
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "1"}) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "anything"}, transport="responses") is False
+
+
+def test_a_route_tool_list_default_applies_only_without_the_switch(monkeypatch) -> None:
+    monkeypatch.setattr(ledger_module, "DEFAULT_TOOL_LIST_BY_TRANSPORT",
+                        {"anthropic_messages": "stable"})
+    stable_tool_list = ledger_module.stable_tool_list
+    assert stable_tool_list({}, transport="anthropic_messages") is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "other"},
+                            transport="anthropic_messages") is True
+    assert stable_tool_list({}, transport="codex_app_server") is False
+    assert stable_tool_list({}) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"},
+                            transport="anthropic_messages") is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "stable"},
+                            transport="codex_app_server") is True
+
+
 def test_host_seal_is_deterministic_per_session() -> None:
     assert host_seal("s1") == host_seal("s1")
     assert host_seal("s1") != host_seal("s2")
@@ -1202,3 +1238,233 @@ def test_exchange_identity_survives_a_message_shown_on_one_request_only() -> Non
     opening = _step(ledger, _canonical(ready, *first))
     later = _step(ledger, _canonical(*first))
     assert later.wire == opening.wire and later.record is None
+
+
+def _tool(name: str, description: str = "does it") -> dict:
+    return {"type": "function", "function": {
+        "name": name, "description": description,
+        "parameters": {"type": "object", "properties": {}}}}
+
+
+def _one_list(transport: str | None = "chat_completions") -> ContextLedger:
+    return ContextLedger(session_id="s1", context_owner=OWNER, transport=transport,
+                         one_tool_list=True)
+
+
+def _offer(ledger: ContextLedger, canonical: list[dict], tools, *, records=()):
+    frame = ledger.plan(canonical, request_context_id=CONTEXT, tools=tools,
+                        history_records=lambda: records)
+    sent = ledger.sent_tools(tools, history_records=lambda: records)
+    ledger.commit(frame)
+    # What the provider is sent is the same before and after the frame is committed.
+    assert ledger.sent_tools(tools, history_records=lambda: records) == (frame.tool_list or tools)
+    assert sent == (frame.tool_list or tools)
+    return frame
+
+
+def _callable_records(frame) -> list[str]:
+    return [str(e["m"]["content"]) for e in frame.appended
+            if e.get("l") == ledger_module.CALLABLE_LABEL]
+
+
+def test_the_tool_list_switch_is_off_unless_set_to_stable() -> None:
+    assert ledger_module.stable_tool_list({}) is False
+    assert ledger_module.stable_tool_list({"SYLVIA_GM_TOOL_LIST": "Stable "}) is True
+    assert ledger_module.stable_tool_list({"SYLVIA_GM_TOOL_LIST": "1"}) is False
+    # Off: what is offered is what is sent, and nothing about tools is journaled.
+    ledger = _ledger()
+    tools = [_tool("attack"), _tool("narrate")]
+    frame = ledger.plan(_canonical(_user("u1", "Go")), request_context_id=CONTEXT, tools=tools)
+    assert ledger.sent_tools(tools) is tools
+    assert frame.tool_list is None and "tools_added" not in (frame.record or {})
+    assert not _callable_records(frame)
+
+
+def test_one_tool_list_sends_every_tool_sent_so_far_in_first_sent_order() -> None:
+    ledger = _one_list()
+    attack, narrate, dash = _tool("attack"), _tool("narrate"), _tool("dash")
+    spear = _tool("spear")
+    first = _offer(ledger, _canonical(_user("u1", "Go")), [attack, narrate, dash])
+    assert first.tool_list == [attack, narrate, dash]
+    assert first.record["tools_added"] == [attack, narrate, dash]
+    assert first.observation["tool_count"] == 3 and first.observation["callable_tool_count"] == 3
+    # The action is spent and another creature acts: fewer tools offered, one new one.
+    second = _offer(ledger, _canonical(_user("u1", "Go"), _talk("t1", "ok")), [attack, spear])
+    assert second.tool_list == [attack, narrate, dash, spear]
+    assert second.record["tools_added"] == [spear]
+    assert second.observation["tool_count"] == 4
+    assert second.observation["callable_tool_count"] == 2
+    # Back to the first list: nothing new is sent or saved for tools, and the list is the same.
+    third = _offer(ledger, _canonical(_user("u1", "Go"), _talk("t1", "ok")),
+                   [attack, narrate, dash])
+    assert third.tool_list == second.tool_list
+    assert "tools_added" not in (third.record or {})
+    # The fingerprints describe what is sent, so they stop changing once the list is whole.
+    assert third.observation["tools_sha256"] == second.observation["tools_sha256"]
+    assert third.observation["toolset_sha256"] == second.observation["toolset_sha256"]
+    assert first.observation["tools_sha256"] != second.observation["tools_sha256"]
+
+
+def _narrate(*required: str) -> dict:
+    tool = _tool("narrate")
+    tool["function"]["parameters"] = {
+        "type": "object", "properties": {"text": {"type": "string"}, "facts": {"type": "array"}},
+        "required": list(required)}
+    return tool
+
+
+def test_a_changed_definition_replaces_the_sent_one_at_its_position() -> None:
+    ledger = _one_list()
+    attack, dash = _tool("attack"), _tool("dash")
+    strict, relaxed = _narrate("text", "facts"), _narrate("facts")
+    dialogue = [_user("u1", "Go")]
+    first = _offer(ledger, _canonical(*dialogue), [attack, strict, dash])
+    assert first.tool_list == [attack, strict, dash]
+    # The turn loop offers the same tool with another schema: the model is sent the schema its
+    # call is checked against, in the same place, and the list keeps its length.
+    dialogue.append(_talk("t1", "ok"))
+    changed = _offer(ledger, _canonical(*dialogue), [relaxed])
+    assert changed.tool_list == [attack, relaxed, dash]
+    assert changed.record["tools_replaced"] == [relaxed]
+    assert "tools_added" not in changed.record
+    # That request is not an extension of the previous one: what is sent changed.
+    assert changed.observation["tools_sha256"] != first.observation["tools_sha256"]
+    assert changed.observation["toolset_sha256"] != first.observation["toolset_sha256"]
+    # The same definition again, or a narrower offer, changes nothing: later requests extend
+    # the new list again.
+    for offered in ([relaxed], [attack], [attack, relaxed, dash]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        same = _offer(ledger, _canonical(*dialogue), offered)
+        assert same.tool_list == [attack, relaxed, dash]
+        assert not {"tools_added", "tools_replaced"} & set(same.record or {})
+        assert same.observation["tools_sha256"] == changed.observation["tools_sha256"]
+    # A change and an addition in one request: replaced in place, added at the end.
+    spear, sharp = _tool("spear"), _tool("attack", "with advantage")
+    dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+    both = _offer(ledger, _canonical(*dialogue), [spear, sharp])
+    assert both.tool_list == [sharp, relaxed, dash, spear]
+    assert both.record["tools_added"] == [spear] and both.record["tools_replaced"] == [sharp]
+
+
+def test_a_reopened_session_sends_the_replaced_definition() -> None:
+    ledger = _one_list()
+    attack, strict, relaxed = _tool("attack"), _narrate("text", "facts"), _narrate("facts")
+    records = []
+    dialogue = [_user("u1", "Go")]
+    for offered in ([attack, strict], [relaxed], [attack]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        frame = _offer(ledger, _canonical(*dialogue), offered)
+        if frame.record is not None:
+            records.append(frame.record)
+    saved = _history(records)
+    assert ledger_module.saved_tool_list(saved, OWNER) == [attack, relaxed]
+    restarted = _one_list()
+    again = restarted.plan(_canonical(*dialogue), request_context_id=CONTEXT,
+                           tools=[attack], history_records=lambda: saved)
+    assert again.tool_list == [attack, relaxed]
+    assert again.wire == frame.wire and again.record is None
+    # Offering the current definition after the reopen is not a change.
+    assert restarted.sent_tools([relaxed], history_records=lambda: saved) == [attack, relaxed]
+    # Changed back: replaced again, and a reopen follows the latest definition.
+    dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+    back = _offer(ledger, _canonical(*dialogue), [strict], records=saved)
+    assert back.tool_list == [attack, strict] and back.record["tools_replaced"] == [strict]
+    assert ledger_module.saved_tool_list(_history([*records, back.record]), OWNER) == [
+        attack, strict]
+
+
+def _enforced(ledger: ContextLedger, canonical: list[dict], tools) -> object:
+    frame = ledger.plan(canonical, request_context_id=CONTEXT, tools=tools,
+                        thinking_enforced=True)
+    ledger.commit(frame)
+    return frame
+
+
+@pytest.mark.parametrize("one_tool_list", [False, True], ids=["rounds", "one-list"])
+def test_a_replaced_definition_strips_replayed_thinking_like_a_changed_list(
+    one_tool_list,
+) -> None:
+    # On an enforced Claude model a changed tool set strips the thinking of every earlier turn
+    # (``tools_changed``) and nothing else moves the floor while the tools stay the same.
+    ledger = ContextLedger(session_id="s1", context_owner=OWNER, transport="anthropic_messages",
+                           one_tool_list=one_tool_list)
+    attack, strict, relaxed = _tool("attack"), _narrate("text", "facts"), _narrate("facts")
+    dialogue = [_user("u1", "Go")]
+    frames = []
+    for offered in ([attack, strict], [attack, strict], [attack, relaxed], [attack, relaxed]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        frames.append(_enforced(ledger, _canonical(*dialogue), offered))
+    strips = [frame.observation["thinking_strip"] for frame in frames]
+    assert strips == ["new_generation", None, "tools_changed", None]
+    floors = [frame.observation["thinking_floor"] for frame in frames]
+    assert floors[0] == floors[1] < floors[2] == floors[3]
+    # A tool the turn loop stops offering strips with per-round lists, and not with one list,
+    # where the sent tools stay the same.
+    dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+    narrower = _enforced(ledger, _canonical(*dialogue), [relaxed])
+    assert narrower.observation["thinking_strip"] == (None if one_tool_list else "tools_changed")
+
+
+def test_the_model_is_told_what_can_be_called_only_when_that_changes() -> None:
+    ledger = _one_list("anthropic_messages")
+    attack, narrate, dash = _tool("attack"), _tool("narrate"), _tool("dash")
+    dialogue = [_user("u1", "Go")]
+    first = _offer(ledger, _canonical(*dialogue), [attack, narrate, dash])
+    (told,) = _callable_records(first)
+    assert told.startswith(SEAL + "SYLVIA_GM_CALLABLE_TOOLS ")
+    assert "every tool listed in this request can be called" in told
+    dialogue.append(_talk("t1", "ok"))
+    same = _offer(ledger, _canonical(*dialogue), [attack, narrate, dash])
+    assert not _callable_records(same)
+    dialogue.append(_talk("t2", "ok"))
+    fewer = _offer(ledger, _canonical(*dialogue), [attack, dash])
+    (told,) = _callable_records(fewer)
+    assert "every listed tool can be called except: narrate." in told
+    dialogue.append(_talk("t3", "ok"))
+    one = _offer(ledger, _canonical(*dialogue), [narrate])
+    (told,) = _callable_records(one)
+    assert "only these listed tools can be called: narrate." in told
+    dialogue.append(_talk("t4", "ok"))
+    none = _offer(ledger, _canonical(*dialogue), None)
+    (told,) = _callable_records(none)
+    assert "no tool can be called at this step" in told
+    assert none.tool_list == [attack, narrate, dash]
+    # Each record is sent once: the wire holds exactly the four that differed.
+    wire = [m["content"] for m in none.wire if "SYLVIA_GM_CALLABLE_TOOLS" in str(m["content"])]
+    assert len(wire) == 4
+
+
+def test_the_callable_record_is_host_control_on_a_route_that_keeps_system_messages() -> None:
+    ledger = _one_list("chat_completions")
+    frame = _offer(ledger, _canonical(_user("u1", "Go")), [_tool("attack")])
+    entry = next(e for e in frame.appended if e.get("l") == ledger_module.CALLABLE_LABEL)
+    assert entry["m"]["role"] == "system" and entry["c"] == "latest"
+    assert entry["m"]["content"].startswith("SYLVIA_GM_CALLABLE_TOOLS ")
+
+
+def test_one_tool_list_is_the_same_after_a_restart_and_a_new_generation() -> None:
+    ledger = _one_list()
+    attack, narrate, spear = _tool("attack"), _tool("narrate"), _tool("spear")
+    records = []
+    dialogue = [_user("u1", "Go")]
+    for offered in ([attack, narrate], [spear, attack], [narrate]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        frame = _offer(ledger, _canonical(*dialogue), offered)
+        if frame.record is not None:
+            records.append(frame.record)
+    assert frame.tool_list == [attack, narrate, spear]
+    saved = _history(records)
+    assert ledger_module.saved_tool_list(saved, OWNER) == [attack, narrate, spear]
+    # Another owner's records (another campaign, package lock or model context) do not count.
+    assert ledger_module.saved_tool_list(saved, {**OWNER, "session_id": "other"}) == []
+    restarted = _one_list()
+    again = restarted.plan(_canonical(*dialogue), request_context_id=CONTEXT,
+                           tools=[narrate], history_records=lambda: saved)
+    assert again.tool_list == [attack, narrate, spear]
+    assert again.wire == frame.wire and again.record is None
+    # A rewind restarts the journal; the list of tools already sent is kept, and the model is
+    # told again what can be called.
+    rewound = _offer(ledger, _canonical(_user("u9", "Elsewhere")), [narrate])
+    assert rewound.reset == "identity_missing"
+    assert rewound.tool_list == [attack, narrate, spear]
+    assert len(_callable_records(rewound)) == 1

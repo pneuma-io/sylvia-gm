@@ -225,6 +225,7 @@ class WorkingContextProvider(Provider):
         measure_wire: Callable | None = None,
         rebase_wire: Callable[[], None] | None = None,
         strip_thinking: Callable[[], None] | None = None,
+        wire_tools: Callable | None = None,
     ) -> None:
         super().__init__()
         self._provider = provider
@@ -246,6 +247,7 @@ class WorkingContextProvider(Provider):
         self._measure_wire = measure_wire
         self._rebase_wire = rebase_wire
         self._strip_thinking = strip_thinking
+        self._wire_tools = wire_tools
         self._token_estimator = token_estimator(provider)
 
     def _estimate(self, value: object) -> int:
@@ -346,7 +348,7 @@ class WorkingContextProvider(Provider):
         """
         capacity, input_budget = self._budgets(options)
         fixed = self._fixed_messages(projected)
-        request_tools = self._request_tools(tools)
+        request_tools = self._sent_tools(tools)
         fixed_tokens = self._estimate([fixed, request_tools])
         history_tokens = self._estimate([m for m in projected if m not in fixed])
         remaining = max(256, input_budget - fixed_tokens)
@@ -600,6 +602,15 @@ class WorkingContextProvider(Provider):
             return [*(tools or []), HISTORY_TOOL]
         return tools
 
+    def _sent_tools(self, tools):
+        """The tool list the provider is sent for a request that offers *tools*.
+
+        The context ledger may send one list for the whole session; what can be called stays
+        the offered list, which is what the ledger is told.
+        """
+        request_tools = self._request_tools(tools)
+        return self._wire_tools(request_tools) if self._wire_tools is not None else request_tools
+
     async def _wire(self, projected, tools):
         """The provider message list; ledger mode journals it durably before it is sent."""
         request_tools = self._request_tools(tools)
@@ -628,7 +639,7 @@ class WorkingContextProvider(Provider):
             try:
                 response = await self._provider.generate(
                     strip_data_markers(await self._wire(projected, tools)),
-                    tools=self._request_tools(tools), timeout=timeout, **options
+                    tools=self._sent_tools(tools), timeout=timeout, **options
                 )
                 if response.finish_reason == "context_length":
                     raise TokenLimitError.provider_rejection()
@@ -655,7 +666,7 @@ class WorkingContextProvider(Provider):
             try:
                 stream = self._provider.generate_stream(
                     strip_data_markers(await self._wire(projected, tools)),
-                    tools=self._request_tools(tools), timeout=timeout, **options
+                    tools=self._sent_tools(tools), timeout=timeout, **options
                 )
                 if inspect.isawaitable(stream):
                     stream = await stream

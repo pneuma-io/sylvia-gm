@@ -99,6 +99,7 @@ from sylvia_gm.provider._openai_compat import (
     OpenAICompatProvider,
     _InlineReasoningFilter,
 )
+from tests.gm_context_contract import callable_tool_names
 from tests.test_builder_library import install_character_packages
 
 
@@ -3139,13 +3140,14 @@ def test_gm_boundary_asks_model_then_engine_advances_to_player() -> None:
                     if call_index == 1
                     else player_attack.name
                 )
-                assert tools is not None and len(tools) == 1
+                # One callable tool each round; with one tool list more may be listed.
+                (callable_name,) = callable_tool_names(messages, tools)
                 yield ProviderStreamChunk(
                     tool_call_delta={
                         "index": 0,
                         "id": f"call-{call_index}-{operation}",
                         "function": {
-                            "name": tools[0]["function"]["name"],
+                            "name": callable_name,
                             "arguments": "{}",
                         },
                     },
@@ -7387,13 +7389,16 @@ def test_campaign_file_correction_keeps_its_alias_when_the_catalog_narrows() -> 
 
     assert attempts == [invalid, corrected]
     assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [narration]
-    first_tools = provider.calls[0][1] or []
-    correction_tools = provider.calls[1][1] or []
-    assert _tool_operations(first_tools) == [
+    # What the GM may call each round (with one tool list the correction lists more).
+    first_tools = callable_tool_names(*provider.calls[0])
+    correction_tools = callable_tool_names(*provider.calls[1])
+    assert _tool_operations({"function": {"name": name}} for name in first_tools) == [
         "advance",
         "update_campaign_file",
     ]
-    assert _tool_operations(correction_tools) == ["update_campaign_file"]
+    assert _tool_operations({"function": {"name": name}} for name in correction_tools) == [
+        "update_campaign_file"
+    ]
     assert provider.request_kwargs[1]["tool_choice"] == "required"
 
 

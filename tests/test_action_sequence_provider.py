@@ -25,7 +25,7 @@ from sylvia_gm.provider._base import ProviderStreamChunk
 from tests.action_sequence_move_checks import (
     assert_action_sequence_moves as assert_action_sequence_moves,
 )
-from tests.gm_context_contract import narration_facts_record, unsealed
+from tests.gm_context_contract import callable_tool_names, narration_facts_record, unsealed
 from tests.test_action_sequences import lite as lite
 from tests.test_action_sequences import td as td
 from tests.test_alpha_f4_provider_session_adapter import (
@@ -395,7 +395,7 @@ def test_adapter_runs_ordered_queue_then_one_combined_response_and_refreshes_cat
     if status == "completed":
         assert "committed-aim" in exact
     else:
-        names = [row["function"]["name"] for row in provider.calls[-1][1]]
+        names = callable_tool_names(*provider.calls[-1])
         assert not any(name.endswith("_execute_action_sequence") for name in names)
         assert any(
             "SYLVIA_ACTION_SEQUENCE_STOP" in str(row.get("content", "")) for row in final_messages
@@ -699,8 +699,8 @@ def test_uncertain_execute_reply_recovers_saved_receipts_without_resubmission():
     assert "committed-move" in payload["content"] and "committed-aim" in payload["content"]
     assert '"state_changed":false' not in payload["content"]
     assert not any(
-        row["function"]["name"].endswith("_execute_action_sequence")
-        for row in provider.calls[-1][1]
+        name.endswith("_execute_action_sequence")
+        for name in callable_tool_names(*provider.calls[-1])
     )
 
 
@@ -830,8 +830,8 @@ def test_real_lite_provider_stops_at_spent_action_and_describes_only_committed_p
         assert queue["steps"][1]["operation_id"] not in facts
         assert any("SYLVIA_ACTION_SEQUENCE_STOP" in str(row.get("content", "")) for row in messages)
         assert not any(
-            row["function"]["name"].endswith("_execute_action_sequence")
-            for row in provider.calls[-1][1]
+            name.endswith("_execute_action_sequence")
+            for name in callable_tool_names(*provider.calls[-1])
         )
     with AuthorityOwner.open(lite.path, "lite-owner", disconnect_grace_seconds=1.0) as owner:
         assert owner.snapshot("lite") == after
@@ -1079,8 +1079,8 @@ def test_real_td_saved_retry_freezes_queue_range_after_commit_and_reopen(
             if fact["tool"] == "execute_action_sequence"
         ] == [original_ids]
         assert not any(
-            row["function"]["name"].endswith("_execute_action_sequence")
-            for row in retry_provider.calls[0][1]
+            name.endswith("_execute_action_sequence")
+            for name in callable_tool_names(*retry_provider.calls[0])
         ), "Retry cannot resubmit the native sequence"
         after_retry = owner.snapshot(td.campaign_id)
         assert (
