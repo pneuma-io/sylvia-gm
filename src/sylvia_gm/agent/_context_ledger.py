@@ -450,9 +450,24 @@ def narration_facts_given(messages: Sequence[Mapping[str, Any]], seal: str) -> l
 
 
 def conversation_keys(messages: Sequence[Mapping[str, Any]]) -> list[str]:
-    """Identity keys for conversational messages; content alone never identifies a tagged turn."""
+    """Identity keys for conversational messages; content alone never identifies a tagged turn.
+
+    A tool exchange is identified by its tool-call IDs within the stretch of conversation that
+    follows the last saved message identity, counted in order. Providers are not required to
+    make tool-call IDs unique across a session, and some number them from the start in every
+    reply, so an ID alone would make a later exchange look like one already journaled.
+    """
     keys: list[str] = []
     seen: dict[str, int] = {}
+    anchor = ""
+    exchanges: dict[str, int] = {}
+
+    def exchange(base: str) -> str:
+        key = f"{base}@{anchor}"
+        ordinal = exchanges.get(key, 0)
+        exchanges[key] = ordinal + 1
+        return f"{key}#{ordinal}" if ordinal else key
+
     for message in messages:
         calls = message.get("tool_calls")
         ids = [
@@ -461,14 +476,18 @@ def conversation_keys(messages: Sequence[Mapping[str, Any]]) -> list[str]:
         if message.get("role") == "assistant" and ids and all(
             isinstance(item, str) and item for item in ids
         ):
-            keys.append("calls:" + ",".join(str(item) for item in ids))
+            keys.append(exchange("calls:" + ",".join(str(item) for item in ids)))
             continue
         if message.get("role") == "tool" and isinstance(message.get("tool_call_id"), str):
-            keys.append("result:" + str(message["tool_call_id"]))
+            keys.append(exchange("result:" + str(message["tool_call_id"])))
             continue
         tag = tag_of(message, LEDGER_KEY)
         if isinstance(tag, str) and tag:
             keys.append(tag)
+            if tag.startswith(IDENTITY_PREFIXES):
+                # Only identities canonical history keeps for the whole session scope an
+                # exchange; a message shown on one request only would move the scope.
+                anchor = tag
             continue
         digest = _sha(_json({"role": message.get("role"), "content": message.get("content"),
                              "tool_calls": message.get("tool_calls")}))[:16]

@@ -1441,8 +1441,10 @@ the ledger resets. Builder and participant requests do not use it.
   a request whose GM contract (always first) or a labelled fixed block arrives untagged is refused
   (`LedgerTagError`) instead of being sent as a host record.
 - **Journal.** The ordered non-system messages already sent in the epoch. Conversational messages
-  (player turns, assistant turns, tool results) are journaled once by identity: tool call and
-  result IDs, saved message identities, otherwise a content hash plus occurrence. The journal's copy
+  (player turns, assistant turns, tool results) are journaled once by identity: saved message
+  identities; tool call and result IDs counted in order within the stretch that follows the last
+  saved message identity, because a provider may reuse an ID in a later reply or turn; otherwise
+  a content hash plus occurrence. The journal's copy
   stands even when canonical assembly later renders the same message differently. Host records
   follow new conversation: *latest-wins* records (campaign preparation, relevant Character Files,
   player control results) only when their content changed; *event* records unless an identical

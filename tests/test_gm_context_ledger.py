@@ -1129,3 +1129,51 @@ def test_a_changed_tool_set_is_saved_even_when_nothing_is_appended() -> None:
     again = ledger.plan(canonical, request_context_id=CONTEXT, tools=second_tools)
     assert again.record is None
 
+
+def _exchange(call_id: str, result: str, *, name: str = "x") -> tuple[dict, dict]:
+    return (
+        {"role": "assistant", "content": None, "tool_calls": [
+            {"id": call_id, "type": "function", "function": {"name": name, "arguments": "{}"}}]},
+        {"role": "tool", "tool_call_id": call_id, "name": name, "content": result},
+    )
+
+
+def test_a_tool_call_id_reused_in_a_later_turn_is_a_new_exchange() -> None:
+    """Providers may number tool calls from the start in every reply or every turn."""
+    ledger = _ledger()
+    first = _exchange("call-1", '{"act":"act-2"}')
+    _step(ledger, _canonical(_user("u1", "Go"), *first))
+    told = {"role": "assistant", "content": "Done.", LEDGER_KEY: "narration:n1"}
+    earlier = (_user("u1", "Go"), *first, told, _user("u2", "Again"))
+    _step(ledger, _canonical(*earlier))
+    second = _exchange("call-1", '{"act":"act-1"}')
+    frame = _step(ledger, _canonical(*earlier, *second))
+    assert [entry["m"] for entry in frame.appended if entry["c"] == "conversation"] == [*second]
+    results = [m["content"] for m in frame.wire if m.get("role") == "tool"]
+    assert results == ['{"act":"act-2"}', '{"act":"act-1"}']
+    # Canonical history that keeps showing both exchanges adds nothing more.
+    again = _step(ledger, _canonical(*earlier, *second))
+    assert again.wire == frame.wire and again.record is None
+
+
+def test_a_tool_call_id_reused_within_one_turn_is_a_new_exchange() -> None:
+    ledger = _ledger()
+    first = _exchange("call_0", '{"round":1}')
+    _step(ledger, _canonical(_user("u1", "Go"), *first))
+    second = _exchange("call_0", '{"round":2}')
+    frame = _step(ledger, _canonical(_user("u1", "Go"), *first, *second))
+    assert [entry["m"] for entry in frame.appended if entry["c"] == "conversation"] == [*second]
+    third = _exchange("call_0", '{"round":3}')
+    last = _step(ledger, _canonical(_user("u1", "Go"), *first, *second, *third))
+    assert [m["content"] for m in last.wire if m.get("role") == "tool"] == [
+        '{"round":1}', '{"round":2}', '{"round":3}']
+
+
+def test_exchange_identity_survives_a_message_shown_on_one_request_only() -> None:
+    """The opening's Ready input leaves canonical assembly; its exchanges are not re-sent."""
+    ledger = _ledger()
+    ready = {"role": "user", "content": "Ready to begin.", LEDGER_KEY: "ready:r1"}
+    first = _exchange("call-1", '{"ok":1}')
+    opening = _step(ledger, _canonical(ready, *first))
+    later = _step(ledger, _canonical(*first))
+    assert later.wire == opening.wire and later.record is None
