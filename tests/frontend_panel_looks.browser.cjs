@@ -261,6 +261,42 @@ test('SRD Inventory hand drop-downs show their values whole', { timeout: 90000 }
   } finally { await browser.close(); }
 });
 
+// Every panel redraw replaced the panels and lost where the player had scrolled: a hand choice in Inventory threw
+// the panel column and the Inventory panel back to the top, so equipping both hands meant scrolling down twice.
+test('a panel redraw keeps the panel column and each panel scrolled where the player left them', { timeout: 60000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await open(browser);
+    await page.setViewportSize({ width: 1440, height: 520 });
+    await show(page, armed(srd));
+    await page.locator('.ruleset-panel-tab[data-workspace-panel="dnd-inventory"]').first().click();
+    const place = () => page.evaluate(() => {
+      const column = document.querySelector('.sidebar-body');
+      const inventory = document.querySelector('[data-panel-id="dnd-inventory"] .ruleset-panel-content');
+      return { column: column.scrollTop, inventory: inventory.scrollTop };
+    });
+    const scrollDown = () => page.evaluate(() => {
+      const column = document.querySelector('.sidebar-body');
+      column.scrollTop = column.scrollHeight;
+      const inventory = document.querySelector('[data-panel-id="dnd-inventory"] .ruleset-panel-content');
+      inventory.scrollTop = 150;
+    });
+    await scrollDown();
+    const scrolled = await place();
+    assert.ok(scrolled.column > 50 && scrolled.inventory > 50, `the column and Inventory both scroll here: ${JSON.stringify(scrolled)}`);
+
+    await page.locator('[data-panel-id="dnd-inventory"] select[data-equipment-set="ranged"][data-equipment-slot="off_hand"]').selectOption({ index: 1 });
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+    assert.deepEqual(await place(), scrolled, 'a hand choice keeps both scroll positions');
+
+    // Any projection update redraws the panels the same way.
+    await page.evaluate(() => window.looksQA.renderRulesetPanelProjection(window.looksQA.state.panelProjection));
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+    assert.deepEqual(await place(), scrolled, 'a redraw keeps both scroll positions');
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('Trigger Discipline panels keep the tactical look', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {

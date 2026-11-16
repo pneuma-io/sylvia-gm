@@ -8185,6 +8185,29 @@ const SylviaGMFrontend = (() => {
       `</div></section>`;
   }
 
+  // Scroll positions a panel redraw would lose: every scrolled element around the panels (the panel column) and each
+  // panel's content, by panel id.
+  function capturePanelScroll(container) {
+    const around = [];
+    for (let node = container.parentElement; node; node = node.parentElement) {
+      if (node.scrollTop || node.scrollLeft) around.push({ node, top: node.scrollTop, left: node.scrollLeft });
+    }
+    const panels = new Map(Array.from(container.querySelectorAll('[data-panel-id] .ruleset-panel-content'), (content) =>
+      [content.closest('[data-panel-id]').dataset.panelId, { top: content.scrollTop, left: content.scrollLeft }])
+      .filter(([, place]) => place.top || place.left));
+    return { around, panels };
+  }
+
+  function restorePanelScroll(container, saved) {
+    for (const [panelId, place] of saved.panels) {
+      const content = container.querySelector(`[data-panel-id="${CSS.escape(panelId)}"] .ruleset-panel-content`);
+      if (content) Object.assign(content, { scrollTop: place.top, scrollLeft: place.left });
+    }
+    for (const { node, top, left } of saved.around) {
+      if (node.isConnected) Object.assign(node, { scrollTop: top, scrollLeft: left });
+    }
+  }
+
   function renderRulesetPanelProjection(projection) {
     projection = queueProjection(projection);
     if (window.__sylviaPanelContext && state.activeSessionId) ensureSessionActivity();
@@ -8210,6 +8233,9 @@ const SylviaGMFrontend = (() => {
       surfaceId: details.closest('[data-panel-id]')?.dataset.panelId, stat: details.dataset.characterStat,
       open: details.open, focused: document.activeElement === details.querySelector('summary'),
     })) : [];
+    // A redraw replaces every panel. Within the same campaign and session, keep where the player had scrolled: the
+    // column the panels sit in and each panel's own content (a hand choice once threw both back to the top).
+    const savedScroll = sameCharacterScope ? capturePanelScroll(container) : null;
     const nativeProjection = nativePanelProjection(projection);
     if (state.panelProjectionSource !== nativeProjection) state.panelActionChecks.clear();
     state.panelProjectionSource = nativeProjection;
@@ -8442,6 +8468,7 @@ const SylviaGMFrontend = (() => {
           height });
       });
     });
+    if (savedScroll) restorePanelScroll(container, savedScroll);
     playCommittedRigMotion(projection, container);
     // Let replacement maps paint before the shared audio and visual timeline starts.
     if (!gamePanels().presentEffects(projection, animateShots)) animateShots();
