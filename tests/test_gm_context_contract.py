@@ -713,6 +713,106 @@ def test_each_request_extends_the_previous_one_on_every_route(played, transport)
     assert "journal_invalid" not in resets.values(), result
 
 
+EARLY_TURNS = ["I wait by the milestone.", "I count the carts that pass.",
+               "I ask a carter about the bridge.", "I note the carter's warning."]
+LATE_TURNS = ["I check the lantern signal again.", "I walk on toward the bridge."]
+ADOPTED_TURNS = ["I cross the bridge carefully.", "I look for the west gate.",
+                 "I wait for the lantern signal."]
+
+
+def _evidence_kinds(database: Path, session: str) -> list[str]:
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.domain.session import SessionMessageKind
+
+    with AuthorityOwner.open(database, f"adoption-read-{uuid.uuid4().hex}") as owner:
+        return [str(m.content.get("kind")) for m in owner.session_context(session).messages
+                if m.kind is SessionMessageKind.EVIDENCE]
+
+
+def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(tmp_path, monkeypatch):
+    """A campaign played before the ledger was its route's default takes it up cleanly.
+
+    A long history under the previous assembly, part of it behind a working-context
+    checkpoint and none of it journalled, then a restart under the ledger (as the
+    ``claude_code`` default now does): the first request starts the journal and is sent in
+    full, honours the saved checkpoint, and every later request extends it.
+    """
+    from sylvia_gm.application.authority import AuthorityOwner
+    from tests.test_fc_campaign_journey import _start_campaign
+
+    database = tmp_path / "adoption.sqlite3"
+    campaign, session, _turn = _start_campaign(database, PLAN)
+    with AuthorityOwner.open(database, "adoption-ids") as owner:
+        player = next(p.participant_id for p in owner.snapshot(campaign).participants
+                      if p.data.get("party_role") == "player_character")
+    gm = ContractGM()
+
+    # Played under the previous assembly, with a compaction partway.
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
+    table = Table(database, gm, campaign, session)
+    try:
+        for text in EARLY_TURNS:
+            gm.steps.append(settle(f"The road answers: {text}"))
+            reply, _identity = table.submit(text)
+            assert (reply or {}).get("interruption") is None, reply
+        basis = table.request("display_snapshot", {"campaign_id": campaign})
+        compact_id = uuid.uuid4().hex
+        table.request("submit_session_input", {
+            "session_id": session, "attempt_id": compact_id, "message_id": compact_id,
+            "turn_id": next((k for k, s in basis["turns"].items() if s == "open"),
+                            compact_id + "-turn"),
+            "expected_revision": basis["revision"], "user_text": "/compact",
+        })
+        late_steps = [[_check(player, "perception"), settle("Two short flashes, you recall.")],
+                      [settle("The bridge waits ahead.")]]
+        for text, steps in zip(LATE_TURNS, late_steps, strict=True):
+            gm.steps.extend(steps)
+            reply, _identity = table.submit(text)
+            assert (reply or {}).get("interruption") is None, reply
+    finally:
+        table.close()
+    saved = _evidence_kinds(database, session)
+    assert "working_context_checkpoint" in saved, saved
+    assert "gm_wire_journal" not in saved, saved
+
+    # The same campaign after an update makes the ledger its route's default.
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    recorder = LedgerRecorder().install(monkeypatch)
+    table = Table(database, gm, campaign, session)
+    try:
+        assert gm.position == len(gm.steps)
+        gm.steps.extend([settle("The planks hold."), _check(player, "investigation"),
+                         settle("You find the west gate."), settle("Two short flashes.")])
+        for text in ADOPTED_TURNS:
+            reply, _identity = table.submit(text)
+            assert (reply or {}).get("interruption") is None, reply
+    finally:
+        table.close()
+    frames = [f for f in recorder.stop() if f.session_id == session]
+    assert len(frames) >= len(ADOPTED_TURNS) + 1, len(frames)
+
+    first = frames[0]
+    # Sent once in full: the journal starts here, from the saved canonical history.
+    assert first.reset == "journal_started" and first.base_count == 0, first.reset
+    conversation = json.dumps([m for m in first.wire if m.get("role") != "system"])
+    # The saved checkpoint is honoured: its note stands in for the turns it covered ...
+    assert "SYLVIA_CONTINUATION_NOTE" in conversation
+    assert not any(text in conversation for text in EARLY_TURNS[:2])
+    # ... and the turns played after it under the previous assembly are carried verbatim.
+    assert all(text in conversation for text in LATE_TURNS)
+    assert ADOPTED_TURNS[0] in conversation
+
+    # Every later request extends the one before it; the journal start is the only reset.
+    for transport in ("chat_completions", "claude_code"):
+        checked = frames if transport == "chat_completions" else replay(frames, transport)
+        result = check_extension(checked, transport, f"adoption-{transport}")
+        assert result["resets"] == [], (transport, result)
+        assert result["pairs"] == len(frames) - 1, (transport, result)
+    assert all(frame.reset is None for frame in frames[1:]), [f.reset for f in frames]
+    assert {(f.epoch, f.generation) for f in frames} == {(first.epoch, first.generation)}
+    assert "gm_wire_journal" in _evidence_kinds(database, session)
+
+
 def test_owner_restart_rebuilds_the_journal_from_saved_evidence(played):
     frames = played["frames"]
     start, _end = played["marks"]["restart"]
