@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import atexit
 import threading
-import webbrowser
 from pathlib import Path
 
+from sylvia_gm.config._host_browser import open_in_browser
 from sylvia_gm.config.provider_settings import (
     provider_settings,
     refresh_subscription_reasoning,
@@ -62,7 +62,7 @@ def chatgpt_settings_action(
     account = _account(storage_root)
     if action == "login":
         login = account.begin_login()
-        if not webbrowser.open(str(login["auth_url"]), new=2):
+        if not open_in_browser(str(login["auth_url"])):
             account.cancel_login()
             raise CodexConnectionError(
                 "The sign-in browser could not open. Check your default browser."

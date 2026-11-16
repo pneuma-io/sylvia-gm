@@ -3391,6 +3391,42 @@ async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String>
     }))
 }
 
+/// Shows an error box and waits until it is dismissed.
+///
+/// On Linux a dialog is drawn by the GTK main loop. `rfd` queues its dialogs for that loop, so
+/// a blocking box asked for on the thread that runs the loop would wait for itself and never
+/// appear. On that thread the box is shown directly with GTK, which runs the loop while the
+/// box is open. Every other caller, and every other platform, uses `rfd`.
+fn error_box(title: &str, description: impl Into<String>) {
+    let description = description.into();
+    #[cfg(target_os = "linux")]
+    if gtk::is_initialized_main_thread() {
+        use gtk::prelude::*;
+        let dialog = gtk::MessageDialog::new(
+            None::<&gtk::Window>,
+            gtk::DialogFlags::MODAL,
+            gtk::MessageType::Error,
+            gtk::ButtonsType::Ok,
+            title,
+        );
+        dialog.set_title(title);
+        dialog.set_secondary_text(Some(&description));
+        dialog.run();
+        dialog.hide();
+        // SAFETY: the dialog was created here, on the GTK thread, and is not used again.
+        unsafe { dialog.destroy() };
+        while gtk::events_pending() {
+            gtk::main_iteration();
+        }
+        return;
+    }
+    rfd::MessageDialog::new()
+        .set_title(title)
+        .set_description(description)
+        .set_level(rfd::MessageLevel::Error)
+        .show();
+}
+
 pub fn run() {
     let portable = std::env::current_exe()
         .map_err(|error| format!("Sylvia GM executable path is unavailable: {error}"))
@@ -3404,11 +3440,7 @@ pub fn run() {
     let portable = match portable {
         Ok(portable) => portable,
         Err(error) => {
-            rfd::MessageDialog::new()
-                .set_title("Sylvia GM - storage unavailable")
-                .set_description(error)
-                .set_level(rfd::MessageLevel::Error)
-                .show();
+            error_box("Sylvia GM - storage unavailable", error);
             return;
         }
     };
@@ -3454,11 +3486,10 @@ pub fn run() {
                 } else {
                     "Sylvia cannot open the selected data folder. Close any other Sylvia copy using that same folder, then try again. A different installed or portable copy keeps its own data."
                 };
-                rfd::MessageDialog::new()
-                    .set_title(if interrupted { "Sylvia GM - update repair required" } else { "Sylvia GM - selected data unavailable" })
-                    .set_description(description)
-                    .set_level(rfd::MessageLevel::Error)
-                    .show();
+                error_box(
+                    if interrupted { "Sylvia GM - update repair required" } else { "Sylvia GM - selected data unavailable" },
+                    description,
+                );
                 std::io::Error::other(error)
             })?;
             let recovery_only = bridge.recovery_only;
@@ -3491,9 +3522,10 @@ pub fn run() {
                             if result == Ok(0) {
                                 if let Some(window) = exit_app.get_webview_window("main") { let _ = window.close(); }
                             } else {
-                                rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
-                                    .set_description("The owner did not close cleanly. Keep saved campaign data and application files intact; this was not a clean shutdown.")
-                                    .set_level(rfd::MessageLevel::Error).show();
+                                error_box(
+                                    "Sylvia GM - owner close failed",
+                                    "The owner did not close cleanly. Keep saved campaign data and application files intact; this was not a clean shutdown.",
+                                );
                                 if exit_app.state::<OwnerBridge>().poll_owner_exit().ok().flatten().is_some() {
                                     exit_app.exit(1);
                                 }
@@ -3518,8 +3550,7 @@ pub fn run() {
                             Ok(Some(_)) => {
                                 api.prevent_close();
                                 if owner.close_requested.swap(false, Ordering::AcqRel) {
-                                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
-                                        .set_description(&error).set_level(rfd::MessageLevel::Error).show();
+                                    error_box("Sylvia GM - owner close failed", &error);
                                     panel_app.exit(1);
                                 }
                                 return;
@@ -3532,9 +3563,10 @@ pub fn run() {
                                     }
                                 } else {
                                     if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
-                                    rfd::MessageDialog::new().set_title("Sylvia GM - close not completed")
-                                        .set_description(format!("{error}. Sylvia is staying open because the owner has not been collected. Keep saved campaign data and application files in place."))
-                                        .set_level(rfd::MessageLevel::Error).show();
+                                    error_box(
+                                        "Sylvia GM - close not completed",
+                                        format!("{error}. Sylvia is staying open because the owner has not been collected. Keep saved campaign data and application files in place."),
+                                    );
                                 }
                                 return;
                             }
@@ -3715,9 +3747,10 @@ pub fn run() {
                 if matches!(collected, Some(status) if status != 0) && *code != Some(1) {
                     api.prevent_exit();
                     owner.close_requested.store(false, Ordering::Release);
-                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
-                        .set_description("The owner exited unsuccessfully. Saved campaign data and application files have been retained; this was not a clean shutdown.")
-                        .set_level(rfd::MessageLevel::Error).show();
+                    error_box(
+                        "Sylvia GM - owner close failed",
+                        "The owner exited unsuccessfully. Saved campaign data and application files have been retained; this was not a clean shutdown.",
+                    );
                     app.exit(1);
                 } else if collected.is_none() {
                     api.prevent_exit();
@@ -3728,9 +3761,10 @@ pub fn run() {
                             }
                         } else {
                             if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
-                            rfd::MessageDialog::new().set_title("Sylvia GM - exit not completed")
-                                .set_description(format!("{error}. Sylvia retains the owner and saved data; exit has been stopped."))
-                                .set_level(rfd::MessageLevel::Error).show();
+                            error_box(
+                                "Sylvia GM - exit not completed",
+                                format!("{error}. Sylvia retains the owner and saved data; exit has been stopped."),
+                            );
                         }
                     }
                 }
