@@ -9,13 +9,15 @@ remains the only writer.
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import hashlib
 import json
+import logging
 import queue
 import re
 import uuid
 import weakref
-from collections.abc import AsyncIterator, Awaitable, Iterable, Mapping, Sequence
+from collections.abc import AsyncIterator, Awaitable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -72,7 +74,7 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
-from sylvia_gm.provider._base import Provider, ProviderStreamChunk
+from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
 
 from ._provider_turn_decisions import (
@@ -93,7 +95,11 @@ from ._provider_turn_decisions import (
 )
 from ._provider_turn_state import ProviderTurnState
 
+logger = logging.getLogger(__name__)
+
 _STREAM_POLL_SECONDS = 0.05
+_RELEASE_IDLE_TIMEOUT_SECONDS = 5.0
+"""Longest a provider may spend releasing what it keeps after an unnarrated turn ends."""
 _MAX_CAMPAIGN_PLAN_BYTES = 1024 * 1024
 _MAX_GM_SYSTEM_PROMPT_BYTES = 1024 * 1024
 _DEFAULT_DM_OUTPUT_TOKENS = 4096
@@ -147,6 +153,41 @@ class _WorkerFailure:
 
 
 _STREAM_END = object()
+_PENDING_RELEASES: set[concurrent.futures.Future[None]] = set()
+"""Scheduled releases, held until done so the provider loop cannot drop one early."""
+
+
+async def _bounded_release_idle(provider: object, timeout: float) -> None:
+    """Run one provider release within ``timeout``; log and swallow anything it raises."""
+
+    try:
+        await asyncio.wait_for(release_provider_idle(provider), timeout)
+    except TimeoutError:
+        logger.warning("Provider idle release did not finish within %.1f seconds", timeout)
+    except Exception:
+        logger.warning("Provider idle release failed", exc_info=True)
+
+
+def release_provider_idle_soon(provider: object) -> None:
+    """Ask ``provider`` to release what it keeps between requests, without waiting.
+
+    The release runs on the shared provider loop, which owns the provider's connections and
+    child processes, and is bounded there by ``_RELEASE_IDLE_TIMEOUT_SECONDS``. The caller
+    never waits for it, so a slow or failing release cannot delay or mask a Stop or an error,
+    and calling this from the provider loop's own thread is safe.
+    """
+
+    if not callable(getattr(provider, "release_idle", None)):
+        return
+    release = _bounded_release_idle(provider, _RELEASE_IDLE_TIMEOUT_SECONDS)
+    try:
+        future = asyncio.run_coroutine_threadsafe(release, _PROVIDER_ASYNC_RUNTIME.loop())
+    except Exception:
+        release.close()
+        logger.warning("Provider idle release could not be scheduled", exc_info=True)
+        return
+    _PENDING_RELEASES.add(future)
+    future.add_done_callback(_PENDING_RELEASES.discard)
 
 
 def _assistant_draft_message(narration: str) -> dict[str, object]:
@@ -1623,7 +1664,7 @@ class ProviderSessionAdapter:
             raise ValueError("Provider session TURN identity must be nonempty")
 
         def provider(provider_input: SessionProviderInput) -> Iterable[ProviderEvent]:
-            return self._events(provider_input, turn_id=turn_id)
+            return self._turn_events(provider_input, turn_id=turn_id)
 
         return provider
 
@@ -1646,7 +1687,7 @@ class ProviderSessionAdapter:
             raise ValueError("Provider retry model identity must be nonempty")
         retry_control = control or ProviderControl()
 
-        def narrator(retry_input: RetryNarrationInput, stream: NarrationStream) -> None:
+        def narrate(retry_input: RetryNarrationInput, stream: NarrationStream) -> None:
             receipt = retry_input.action_receipt
             basis_message = resolve_retry_basis_message(
                 provider_input.history,
@@ -1775,7 +1816,33 @@ class ProviderSessionAdapter:
                 )
             stream.emit(ProseChannel.TALK, narration)
 
+        def narrator(retry_input: RetryNarrationInput, stream: NarrationStream) -> None:
+            try:
+                narrate(retry_input, stream)
+            except BaseException:
+                release_provider_idle_soon(self._provider)
+                raise
+
         return narrator
+
+    def _turn_events(
+        self,
+        provider_input: SessionProviderInput,
+        *,
+        turn_id: str,
+    ) -> Iterator[ProviderEvent]:
+        """Run one turn's provider work and release the provider if it ends unnarrated.
+
+        A turn that returns after its narration needs nothing more. Any other ending (Stop
+        while a request runs or between two requests, an error, or the consumer closing the
+        events early) asks the provider once to close what it keeps between requests.
+        """
+
+        try:
+            yield from self._events(provider_input, turn_id=turn_id)
+        except BaseException:
+            release_provider_idle_soon(self._provider)
+            raise
 
     def _events(
         self,

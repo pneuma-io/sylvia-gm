@@ -18,6 +18,7 @@ from sylvia_gm.provider._base import (
     ProviderResponse,
     ProviderStreamChunk,
     closing_provider_stream,
+    release_provider_idle,
 )
 from sylvia_gm.provider._hooks import HookContext
 
@@ -391,3 +392,6 @@ class AdminAuditedProvider(Provider):
 
     async def close(self) -> None:
         await self._provider.close()
+
+    async def release_idle(self) -> None:
+        await release_provider_idle(self._provider)

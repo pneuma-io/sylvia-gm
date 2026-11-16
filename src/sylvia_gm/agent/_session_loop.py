@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import threading
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager, suppress
@@ -46,8 +47,28 @@ from sylvia_gm.domain.session import (
 )
 from sylvia_gm.provider._exceptions import ProviderError, ProviderOutputLimitError
 
+logger = logging.getLogger(__name__)
+
 _AdmissionResult = TypeVar("_AdmissionResult")
 _MAX_PROVISIONAL_SESSION_CHARS = 256_000
+
+
+def _close_provider_events(events: object) -> None:
+    """End an unfinished provider event stream now that its turn has ended.
+
+    Its own cleanup (cancelling a request, releasing what the provider keeps between
+    requests) then runs at the turn's end rather than whenever the stream is collected.
+    A stream that already finished is left as it is. Cleanup failures are logged only, so
+    they never replace the turn's own outcome.
+    """
+
+    close = getattr(events, "close", None)
+    if not callable(close):
+        return
+    try:
+        close()
+    except Exception:
+        logger.warning("Provider event stream cleanup failed", exc_info=True)
 
 
 def resolve_retry_basis_message(
@@ -1121,6 +1142,7 @@ class CampaignSessionLoop:
             self._pending.discard(request.session_id)
         receipts: list[ActionReceipt | AwaitingChoiceReceipt] = []
         narration_started = False
+        stream: Iterable[ProviderEvent] | None = None
         try:
             self._owner.start_narration_attempt(
                 campaign_id=active.campaign_id,
@@ -1293,6 +1315,8 @@ class CampaignSessionLoop:
                 )
             raise
         finally:
+            if stream is not None:
+                _close_provider_events(stream)
             if narration_started:
                 self._on_narration_finished(active.campaign_id, active.attempt_id)
             with self._active_lock:
@@ -1402,6 +1426,7 @@ class CampaignSessionLoop:
         active_control = control or ProviderControl()
         basis_message = None
         retry_failure_cancelled: bool | None = None
+        retry_events: list[Iterable[ProviderEvent]] = []
         initial_high_water = 0
         try:
             with self._owner.agent_session_work(session_id) as context:
@@ -1554,6 +1579,7 @@ class CampaignSessionLoop:
                     )
                     provider = provider_factory(retry_input.turn_id)
                     provider_events = active_control.admit(lambda: provider(provider_input))
+                    retry_events.append(provider_events)
                     for source_order, event in enumerate(provider_events):
                         active_control.progress.observe()
                         if active_control.cancelled:
@@ -1644,6 +1670,9 @@ class CampaignSessionLoop:
                     except BaseException:
                         retry_failure_cancelled = active_control.cancelled
                         raise
+                    finally:
+                        while retry_events:
+                            _close_provider_events(retry_events.pop())
 
                 result = self._owner.manual_retry(
                     campaign_id=campaign_id,
