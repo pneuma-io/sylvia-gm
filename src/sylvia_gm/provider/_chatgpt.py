@@ -46,13 +46,14 @@ from sylvia_gm.provider._hooks import HookContext
 from sylvia_gm.provider._lifecycle import LifecycleTiming
 from sylvia_gm.provider._openai_compat import ResponsesTransport
 
-#: How long a request that ended in a tool call waits for the runtime's usage report before
-#: the runtime is stopped. The report normally follows the tool call at once.
-_USAGE_GRACE_SECONDS = 2.0
-#: After this many requests in a row without a report, wait only one short poll, so a
-#: runtime that never reports usage cannot add the full wait to every tool round.
-_USAGE_GRACE_MISS_LIMIT = 2
-_USAGE_GRACE_PROBE_SECONDS = 0.25
+#: A request that ends in a tool call: the runtime reports its token and cache usage only once
+#: the tool call resolves or the turn is interrupted, and Sylvia never answers the call. So
+#: the adapter lets the runtime record the finished model response for this long, interrupts
+#: the turn, and collects the report before it stops the runtime.
+_USAGE_SETTLE_SECONDS = 0.15
+#: How long to wait for that report after the interrupt. It normally arrives at once.
+_USAGE_REPORT_SECONDS = 1.0
+
 
 class ChatGPTProvider(Provider):
     """Adapt one runtime generation to Sylvia's existing streaming provider interface."""
@@ -73,7 +74,6 @@ class ChatGPTProvider(Provider):
         self._lock = asyncio.Lock()
         self._active: CodexConnection | None = None
         self._last_response = ProviderResponse()
-        self._usage_grace_misses = 0
 
     def _request_stop(self, connection: CodexConnection) -> None:
         cancel = getattr(connection, "request_stop", None)
@@ -182,40 +182,43 @@ class ChatGPTProvider(Provider):
         self, connection: CodexConnection, response: ProviderResponse,
         thread_id: str | None, turn_id: str | None,
     ) -> None:
-        """Wait briefly for this request's usage report before the runtime is stopped.
+        """Collect this request's usage report before the runtime is stopped.
 
-        The runtime reports a request's token and cache usage just after it hands over the
-        tool call. It is then waiting for that call's result, which Sylvia never sends, so no
-        further model request can start while this waits. Without the wait the report is lost
-        for nearly every request that ends in a tool call. The wait is bounded, shrinks to one
-        poll after two requests in a row brought no report, and never fails the request.
+        The runtime holds the report until the tool call resolves, and Sylvia never sends a
+        result, so without this the report is lost for every request that ends in a tool
+        call. Interrupting the turn makes the runtime send the report and end the turn; it
+        starts no further model request. The whole step is bounded and never fails the
+        request: a runtime that rejects the interrupt, sends no report or stops is simply a
+        request without reported usage, as before.
         """
-        if response.usage_reported:
+        if response.usage_reported or not thread_id or not turn_id:
             return
-        grace = (
-            _USAGE_GRACE_SECONDS
-            if self._usage_grace_misses < _USAGE_GRACE_MISS_LIMIT
-            else _USAGE_GRACE_PROBE_SECONDS
-        )
-        deadline = time.monotonic() + grace
-        while not response.usage_reported and time.monotonic() < deadline:
-            try:
+        try:
+            await asyncio.sleep(_USAGE_SETTLE_SECONDS)
+            await self._audit("turn/interrupt", {"threadId": thread_id, "turnId": turn_id})
+            await asyncio.to_thread(
+                connection.call, "turn/interrupt", {"threadId": thread_id, "turnId": turn_id},
+            )
+            deadline = time.monotonic() + _USAGE_REPORT_SECONDS
+            while not response.usage_reported and time.monotonic() < deadline:
                 event = await asyncio.to_thread(connection.next_event)
-            except CodexCancelledError:
-                raise
-            except CodexConnectionError:
-                break
-            if event is None:
-                continue
-            params = event.get("params")
-            if event.get("method") == "thread/tokenUsage/updated" and isinstance(params, dict):
-                await self._audit("thread/tokenUsage/updated", params, received=True)
-                self._capture_usage(response, params, thread_id, turn_id)
-            else:
-                await asyncio.sleep(0)
-        self._usage_grace_misses = (
-            0 if response.usage_reported else self._usage_grace_misses + 1
-        )
+                if event is None:
+                    continue
+                method, params = event.get("method"), event.get("params")
+                if not isinstance(params, dict):
+                    continue
+                if method == "thread/tokenUsage/updated":
+                    await self._audit(method, params, received=True)
+                    self._capture_usage(response, params, thread_id, turn_id)
+                elif method == "turn/completed" and params.get("threadId") in {None, thread_id}:
+                    # The interrupted turn has ended; its report, if any, came before this.
+                    break
+                else:
+                    await asyncio.sleep(0)
+        except CodexCancelledError:
+            raise
+        except CodexConnectionError:
+            return
 
     async def generate(
         self,
