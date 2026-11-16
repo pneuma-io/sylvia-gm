@@ -28,6 +28,27 @@ class CodexCancelledError(CodexConnectionError):
     """This inference was intentionally stopped rather than losing its connection."""
 
 
+#: Requests that change which account a runtime home is signed in to.
+_ACCOUNT_CHANGES = frozenset({"account/login/start", "account/logout"})
+_account_change_listeners: list[Callable[[Path], None]] = []
+
+
+def add_account_change_listener(listener: Callable[[Path], None]) -> None:
+    """Be told a runtime home's account is about to change, before the request is sent.
+
+    Inference connections kept open for that home belong to the previous account and must
+    close; the listener receives the resolved home and must not raise.
+    """
+    if listener not in _account_change_listeners:
+        _account_change_listeners.append(listener)
+
+
+def _announce_account_change(home: Path) -> None:
+    for listener in tuple(_account_change_listeners):
+        with suppress(Exception):
+            listener(home)
+
+
 def isolated_environment(home: Path) -> dict[str, str]:
     """Carry OS essentials into the child without provider secrets or Codex overrides."""
     allowed = {
@@ -322,6 +343,8 @@ class CodexConnection:
 
     def call(self, method: str, params: dict[str, Any], *, timeout: float = 30) -> dict[str, Any]:
         """Wait for a correlated reply and close on timeout to prevent stale work reuse."""
+        if method in _ACCOUNT_CHANGES:
+            _announce_account_change(self.home)
         with self._call_lock:
             self._check_stopped()
             self._next_id += 1

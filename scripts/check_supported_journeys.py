@@ -379,6 +379,7 @@ PYTHON_JOURNEYS = {
         'tests/test_chatgpt_cancel_boundaries.py',
         'tests/test_chatgpt_lifecycle.py',
         'tests/test_chatgpt_model_defaults.py',
+        'tests/test_chatgpt_stable_thread.py',
         'tests/test_compatible_reasoning_channels.py',
         'tests/test_native_gemini_provider.py',
         'tests/test_owner_reasoning_selection.py',
