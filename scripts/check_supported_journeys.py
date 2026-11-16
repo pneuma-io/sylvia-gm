@@ -71,6 +71,7 @@ PYTHON_JOURNEYS = {
     ],
     "command-registry": ["tests/test_command_registry.py"],
     "campaign-play": [
+        "tests/test_canonical_json_reuse.py",
         "tests/test_gm_hotfix_upgrade.py",
         "tests/test_campaign_rules_update.py",
         "tests/test_campaign_rules_update_bindings.py",
