@@ -34,6 +34,17 @@ Set the machine up once:
 
 3. Install Rust with [rustup](https://rustup.rs) (stable toolchain) and the Tauri 2 CLI:
    `cargo install tauri-cli --version "^2.0.0" --locked`.
+4. For the [installed-application check](#5-installed-application-pass), install a hidden
+   display, a window manager, the input and screenshot tools and the WebDriver pieces:
+
+   ```bash
+   sudo apt-get install -y --no-install-recommends \
+     xvfb openbox dbus xdotool wmctrl imagemagick webkit2gtk-driver
+   cargo install tauri-driver --locked
+   ```
+
+   `webkit2gtk-driver` must have the same WebKitGTK version as the one the AppImage carries,
+   which it does on the build machine because the AppImage is made from its packages.
 
 The build downloads Tauri's AppImage bundling tools from GitHub the first time it runs in a
 build folder, so the machine needs network access during the build. The release manifest records
@@ -125,25 +136,58 @@ On a machine that runs Linux inside Windows (WSL), remove the Windows folders fr
 starting the app or a build. WSL adds them, and the app would otherwise find and start Windows
 programs, such as a Codex runtime with that person's own sign-in.
 
-The pass can be driven on a hidden X display, without a desktop session, which is how an agent
-runs it: start `Xvfb`, a window manager and one D-Bus session, set `GDK_BACKEND=x11` and
-`WEBKIT_DISABLE_COMPOSITING_MODE=1` (a virtual display leaves parts of the window unpainted
-otherwise), give the app an empty `HOME`, and act on it with `xdotool` while taking screenshots.
-Use a local stand-in for the model service, so no paid model call is made.
+One command runs the pass on a hidden display, with no person, no desktop session, no paid model
+call and no sign-in, on a machine prepared as [section 1](#1-the-build-machine) describes
+(step 4):
 
-Check, on Ubuntu 22.04 and on Ubuntu 24.04:
+```bash
+python3 scripts/qa/linux_installed_check.py --appimage PATH/TO/APPIMAGE --output NEW_FOLDER
+```
+
+It starts `Xvfb`, a window manager, its own D-Bus session and a local stand-in for the model
+service (`scripts/qa/standin_model_endpoint.py`), gives the app empty private home folders and
+drives it through WebDriver (`tauri-driver` in front of `WebKitWebDriver`), which finds page
+elements by id and reads their text. Native GTK message boxes and file dialogs are answered with
+`xdotool` key presses. The app gets `GDK_BACKEND=x11` and `WEBKIT_DISABLE_COMPOSITING_MODE=1` (a
+virtual display leaves parts of the window unpainted otherwise) and an allow-listed environment:
+the command removes Windows folders from `PATH` (a WSL machine adds them), never passes
+`WAYLAND_DISPLAY`, provider keys or `SYLVIA_GM_*` settings, and refuses to start if it cannot
+make the environment safe. It writes only to the output folder and its own temporary folder
+(`--work-dir`, by default the system temporary folder), removes that folder with the unpacked
+app and the private homes at the end (`--keep-work` keeps it), and stops every process it
+started, by process ID, never by name, so other sessions on the machine are left alone. The
+output folder receives `report.md`, `report.json`, screenshots and logs. The command exits 0
+only if every step that ran passed; a failed step does not stop later steps that can still run.
+
+It checks, in one run:
 
 1. First start shows Home; the data folder is `~/.local/share/com.pneuma-io.sylvia-gm` with
    mode 700.
-2. Settings: add an API-key connection, find its models, save one. `config.yaml` in the data
-   folder and `~/.local/state/sylvia-gm/credential-key` have mode 600, and no saved file contains
-   the key in plain text. The storage explanation names Linux, not Windows.
-3. Start a prepared campaign; the Game Master's opening arrives; send a player message.
-4. Settings, Campaign data: export the campaign (the confirmation box appears, the save dialog
-   opens in the home folder, the file is written); recover a campaign from an exported file.
-5. Start the app a second time while it runs: the second copy exits and one window remains.
-6. Close the window: the app exits with code 0 and leaves no process behind. Start it again: the
-   campaign is still there.
+2. Settings, Models: add the stand-in as an API-key connection (Custom OpenAI-Compatible), find
+   its model, enter its context size under Advanced model settings (Sylvia does not take a custom
+   service's listed maximum as its loaded limit), save it and make it the default.
+   `config.yaml` in the data folder and `~/.local/state/sylvia-gm/credential-key` have mode 600,
+   no saved file contains the key in plain text, the stand-in received the right key, and the
+   storage explanation names Linux, not Windows.
+3. Start a prepared campaign; the Game Master's opening arrives.
+4. Send a player message; the turn, which offers the Game Master's tools, completes with a reply.
+5. Import a made-up character card (Settings, Packages) and get a reply in Character chat.
+6. With the campaign open, Settings, Campaign data: export it. The confirmation box appears,
+   the save dialog opens in the home folder and the file is written.
+7. Start the app a second time while it runs: the second copy exits with code 0 and one window
+   remains.
+8. Close the window: the app exits with code 0 and leaves no process behind.
+9. Start it again on the same home: the campaign is still listed.
+10. In an empty profile, recover the exported file: the campaign appears and opens with its
+    story.
+11. A copy started on the same data folder through a separate D-Bus session shows the "selected
+    data unavailable" message box.
+12. Dictation says it is not available on Linux and About says in-app updates are not
+    supported. The Claude page's answer to "Check Claude Code" is recorded, not judged; nothing is
+    installed or signed in.
+
+Run it on Ubuntu 22.04 and on Ubuntu 24.04, and look through the screenshots as well as the
+result.
 
 A hidden display does not show how the app looks and behaves in a real desktop session. Look at
 these in one, on at least one release candidate per release: drawing with the desktop's own

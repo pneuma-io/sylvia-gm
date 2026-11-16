@@ -542,6 +542,7 @@ PYTHON_JOURNEYS = {
         'tests/test_host_browser.py',
         'tests/test_linux_bundled_notices.py',
         'tests/test_linux_desktop_build.py',
+        'tests/test_linux_installed_check.py',
         'tests/test_linux_dev_setup.py',
         'tests/test_linux_release_artifact.py',
         'tests/test_owned_package_updates.py',
