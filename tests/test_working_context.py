@@ -112,6 +112,41 @@ async def test_fixed_material_too_large_fails_before_any_summary_call():
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "transport,saved_window,capacity,admitted",
+    [
+        ("claude_code", None, 200_000, True),
+        ("claude_code", 1_000_000, 1_000_000, True),
+        ("claude_code", 32_000, 32_000, False),
+        ("codex_app_server", None, 65_536, False),
+        ("chat_completions", None, 65_536, False),
+    ],
+)
+async def test_a_claude_code_model_with_no_known_window_is_planned_as_a_claude_model(
+    transport, saved_window, capacity, admitted
+):
+    """Issue 90: Settings saves a Claude Code model with no context window.
+
+    Planned at the general 65,536-token assumption, the first Rules turn of a D&D campaign
+    was refused, because its tool list alone is larger. A window the player saved still wins,
+    and other connections keep the general assumption.
+    """
+    model = Model()
+    model.model_info = replace(model.model_info, transport=transport, context_window=saved_window)
+    wrapper, saved, _ = working(model)
+    assert wrapper._budgets({})[0] == capacity
+    # About the size of a D&D turn's fixed tool list: too large for 65,536, small for 200,000.
+    tools = [{"schema": "x" * 280_000}]
+    messages = history()
+    if admitted:
+        assert await wrapper.prepare(messages, tools) == messages
+    else:
+        with pytest.raises(TokenLimitError, match="cannot be shortened further"):
+            await wrapper.prepare(messages, tools)
+    assert not saved and not model.calls
+
+
+@pytest.mark.asyncio
 async def test_gm_checkpoint_reopens_with_only_note_and_current_action():
     model = Model(responses=[ProviderResponse(content="The opening action is already complete.")])
     saved = []
