@@ -134,6 +134,15 @@ Sizing a share:
   about 244 minutes, so on a small machine allow about one and a half times the share's
   test time divided by its worker count. That covers collecting the suite, which every
   share does first and which takes several minutes.
+- Measured on rented cloud machines (November 2026): a complete run split 6 ways, each
+  share on its own machine with 4 virtual CPUs and four workers, took 42 minutes of
+  wall-clock time. The machines were copies of one saved, already set-up image.
+- Under that load two cases failed and then passed when run alone, twice each, so they are
+  sensitive to load rather than broken:
+  `tests/test_background_onboarding_lifecycle.py::test_custom_monk_stop_retry_save_advance_play_and_reopen`
+  and
+  `tests/test_desktop_update_prepare_service.py::test_abort_and_shutdown_cannot_close_database_during_admitted_checkpoint`.
+  Rerun a failed case alone before treating it as a fault.
 - A share never takes less than its longest case. The two longest cases take about 25
   minutes each, so no number of machines brings a complete run much below half an hour.
 - Allow about 1.3 GB of memory per worker plus the system's own use. `--full-run` chooses
@@ -141,6 +150,16 @@ Sizing a share:
   the runner yourself with a smaller `--jobs` and `--case-workers`.
 - Each machine needs room for its own output folder: about 20 GB for a whole run and a few
   gigabytes for a share.
+
+On a machine copied from a saved image, two things can differ from a machine you set up
+yourself:
+
+- Some services hand out the copied disk from a network-backed layer until it has been
+  copied in full. `setup_linux_dev.sh` refuses to run the checks on such a file system, so
+  wait until the service reports the disk complete.
+- The copy can carry a stale shared-library cache, so PortAudio (which the dictation checks
+  load) is reported missing although it is installed. Run `sudo ldconfig` once before the
+  run.
 
 ## What is excluded on Linux
 
