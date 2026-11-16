@@ -393,11 +393,16 @@ class _KeptThreads:
         with self._lock:
             return self._generations.get(home, 0)
 
-    def next_ordinal(self, home: Path) -> int:
-        """Number this home's requests in order, so a late report names its request."""
+    def next_ordinal(self, home: Path, *, take: bool = True) -> int:
+        """Number this home's requests in order, so a late report names its request.
+
+        ``take=False`` only says which number the next request will get.
+        """
         with self._lock:
-            self._ordinals[home] = self._ordinals.get(home, 0) + 1
-            return self._ordinals[home]
+            ordinal = self._ordinals.get(home, 0) + 1
+            if take:
+                self._ordinals[home] = ordinal
+            return ordinal
 
     def abandon(self, home: Path, ordinal: int, figures: dict[str, object]) -> None:
         """Hold the usage report of a thread closed without its call being answered."""
@@ -1425,6 +1430,7 @@ class ChatGPTProvider(Provider):
             await self._close_kept(
                 *_KEPT_THREADS.release(home, self.model_info.wire_model_id)
             )
-            reports = _KEPT_THREADS.take_abandoned(home, _KEPT_THREADS.next_ordinal(home))
+            reports = _KEPT_THREADS.take_abandoned(
+                home, _KEPT_THREADS.next_ordinal(home, take=False))
             if reports:
                 await self._audit("sylvia/thread_reuse_closed", {"usage_reports": reports})
