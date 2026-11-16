@@ -167,8 +167,12 @@ def test_linux_bundle_settings_only_add_to_the_shared_configuration():
     assert shared["bundle"]["targets"] == "nsis"
     assert shared["bundle"]["icon"] == ["icons/icon.ico"]
     assert set(linux) == {"bundle"}
-    assert set(linux["bundle"]) == {"targets", "icon", "resources"}
+    assert set(linux["bundle"]) == {"targets", "icon", "resources", "linux"}
     assert linux["bundle"]["targets"] == ["appimage"]
+    # The web view plays sound through GStreamer, which an AppImage must carry: the release
+    # script hands the bundler the sound plug-ins only (build_linux_prerelease.MEDIA_PLUGINS).
+    assert linux["bundle"]["linux"] == {"appimage": {"bundleMediaFramework": True}}
+    assert "linux" not in shared["bundle"] or "appimage" not in shared["bundle"]["linux"]
     # The Linux build carries no speech runtime, so it leaves that runtime's notices out. A null
     # removes the shared entry when Tauri merges the two files; nothing else may be touched.
     removed = linux["bundle"]["resources"]

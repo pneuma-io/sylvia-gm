@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import sys
 from collections.abc import Sequence
 from pathlib import Path
@@ -52,6 +53,25 @@ TAURI_BUILD_COMMAND = (
 # theirs. Building on Ubuntu 22.04 keeps the result usable on distributions of that age.
 BASELINE_GLIBC = (2, 35)
 BASELINE_SYSTEM = "Ubuntu 22.04"
+# The GStreamer plug-ins the web view needs to play sound (WebAudio, which Sylvia's shot sound
+# effects use) and nothing else. Without a folder of its own, the bundler copies every plug-in
+# installed on the build machine, and some of those bring libraries under terms the app should
+# not ship for features it never uses (GPL text-mode video outputs, Berkeley DB through JACK).
+MEDIA_PLUGINS = (
+    "app",
+    "audioconvert",
+    "audiomixer",
+    "audiorate",
+    "audioresample",
+    "autodetect",
+    "coreelements",
+    "interleave",
+    "playback",
+    "pulseaudio",
+    "typefindfunctions",
+    "volume",
+)
+MEDIA_PLUGIN_PACKAGES = "gstreamer1.0-plugins-base and gstreamer1.0-plugins-good"
 _QUALIFICATION_STATES = ("pending", "passed", "failed", "not_available")
 
 
@@ -96,6 +116,26 @@ def _appimage_tools_digest(cache: Path) -> str:
         digest.update(path.name.encode("utf-8") + b"\0")
         digest.update(hashlib.sha256(path.read_bytes()).digest())
     return digest.hexdigest()
+
+
+def _system_plugin_folder() -> Path:
+    return Path(f"/usr/lib/{os.uname().machine}-linux-gnu/gstreamer-1.0")
+
+
+def stage_media_plugins(source: Path, target: Path) -> list[str]:
+    """Copy only the sound plug-ins into a folder of this build's own for the bundler."""
+
+    names = [f"libgst{name}.so" for name in MEDIA_PLUGINS]
+    missing = [name for name in names if not (source / name).is_file()]
+    if missing:
+        raise ReleaseArtifactError(
+            f"The build machine lacks GStreamer plug-ins the app needs for sound: "
+            f"{', '.join(missing)} (install {MEDIA_PLUGIN_PACKAGES})"
+        )
+    target.mkdir(parents=True)
+    for name in names:
+        shutil.copyfile(source / name, target / name)
+    return names
 
 
 def discover_appdir(target: Path) -> Path:
@@ -188,6 +228,10 @@ def build_linux_prerelease(
     environment["UV_PYTHON"] = sys.executable
     # The bundling tools are AppImages themselves; run them without needing FUSE.
     environment["APPIMAGE_EXTRACT_AND_RUN"] = "1"
+    # The media framework (tauri.linux.conf.json) is bundled from the sound plug-ins only.
+    environment["GSTREAMER_PLUGINS_DIR"] = str(invocation.path / "media-plugins")
+    environment.pop("GSTREAMER_INCLUDE_BAD_PLUGINS", None)
+    stage_media_plugins(_system_plugin_folder(), Path(environment["GSTREAMER_PLUGINS_DIR"]))
     # Rust panic locations must not embed the builder's personal source/registry paths.
     rust_flags = environment.get("CARGO_ENCODED_RUSTFLAGS", "")
     if not rust_flags and environment.get("RUSTFLAGS", "").strip():

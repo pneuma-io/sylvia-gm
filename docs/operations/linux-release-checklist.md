@@ -24,8 +24,13 @@ Set the machine up once:
    sudo apt-get install -y --no-install-recommends \
      build-essential pkg-config curl wget file libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev \
      libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf xdg-utils \
-     desktop-file-utils libfuse2 squashfs-tools
+     desktop-file-utils libfuse2 squashfs-tools \
+     gstreamer1.0-plugins-base gstreamer1.0-plugins-good
    ```
+
+   The last two hold the GStreamer plug-ins the AppImage carries for sound (see
+   [section 4](#4-what-the-linux-build-carries-and-leaves-out)); the build stops if one is
+   missing.
 
 3. Install Rust with [rustup](https://rustup.rs) (stable toolchain) and the Tauri 2 CLI:
    `cargo install tauri-cli --version "^2.0.0" --locked`.
@@ -84,6 +89,14 @@ cd dist/sylvia-gm-<version>-linux-x86_64 && sha256sum -c SHA256SUMS.txt
   campaigns.
 - **Left out:** local dictation. Settings says it is not available in the Linux app yet and the
   Dictate button is off. The speech runtime and its notices are not in the bundle.
+- **Sound:** the web view plays Sylvia's shot sound effects through GStreamer, and the AppImage
+  tells GStreamer to look for plug-ins only inside itself. The release script therefore hands
+  the bundler a folder with just the plug-ins sound needs (`MEDIA_PLUGINS` in
+  `scripts/build_linux_prerelease.py`: the web view's audio pipeline and the PulseAudio output,
+  which PipeWire desktops also provide). Without that folder the bundler copies every plug-in on
+  the build machine, including some that bring GPL or Berkeley DB libraries for features the
+  app never uses. A system with neither PulseAudio nor PipeWire plays no sound; the app works
+  otherwise.
 - **Not available:** in-app updates. The update service reports the Linux target as unsupported;
   a new version is a new AppImage.
 - **Saved provider keys** are encrypted with a per-user key file
