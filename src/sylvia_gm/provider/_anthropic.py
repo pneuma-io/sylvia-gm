@@ -637,9 +637,10 @@ class AnthropicProvider(Provider):
         from sylvia_gm.agent._context_ledger import LEDGER_MODE, context_mode
 
         # First-party Anthropic only: other Messages-compatible endpoints are left untouched.
-        # The legacy context switch also restores the previous request without breakpoints.
+        # The previous request assembly sends no breakpoints, as before.
         self._cache_breakpoints = (
-            model_info.provider_key == "anthropic" and context_mode() == LEDGER_MODE
+            model_info.provider_key == "anthropic"
+            and context_mode(transport="anthropic_messages") == LEDGER_MODE
         )
         self._consecutive_connection_errors = 0
         self._closed = False

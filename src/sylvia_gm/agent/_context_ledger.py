@@ -187,10 +187,31 @@ FACT_LIST_PATHS: tuple[tuple[str, ...], ...] = (
 ADDITIVE_MAP_PATHS: tuple[tuple[str, ...], ...] = (("GM_PRIVATE_CURRENT", "character_knowledge"),)
 
 
-def context_mode(environ: Mapping[str, str] | None = None) -> str:
-    """Read the request-assembly mode; anything but ``legacy`` selects the ledger."""
-    value = (os.environ if environ is None else environ).get(MODE_ENV, "")
-    return LEGACY_MODE if value.strip().casefold() == LEGACY_MODE else LEDGER_MODE
+#: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
+#: Every route ships with the previous assembly. A route is moved to the context ledger here,
+#: by its transport name, once a measured run on that route supports it.
+DEFAULT_CONTEXT_MODE = LEGACY_MODE
+DEFAULT_CONTEXT_MODE_BY_TRANSPORT: Mapping[str, str] = {}
+
+
+def context_mode_setting(environ: Mapping[str, str] | None = None) -> str | None:
+    """The assembly ``SYLVIA_GM_CONTEXT_MODE`` names (``ledger`` or ``legacy``), else None."""
+    value = (os.environ if environ is None else environ).get(MODE_ENV, "").strip().casefold()
+    return value if value in {LEGACY_MODE, LEDGER_MODE} else None
+
+
+def context_mode(
+    environ: Mapping[str, str] | None = None, *, transport: str | None = None,
+) -> str:
+    """The request assembly for GM play on *transport*.
+
+    ``SYLVIA_GM_CONTEXT_MODE=ledger`` or ``=legacy`` decides for every route. Without it (or
+    with any other value) the route's shipped default applies.
+    """
+    setting = context_mode_setting(environ)
+    if setting is not None:
+        return setting
+    return DEFAULT_CONTEXT_MODE_BY_TRANSPORT.get(transport or "", DEFAULT_CONTEXT_MODE)
 
 
 def host_seal(session_id: str) -> str:

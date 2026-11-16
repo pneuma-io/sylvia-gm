@@ -116,12 +116,32 @@ def _without_prefix(frame) -> list[dict]:
 SEAL = seal_prefix(host_seal("s1"))
 
 
-def test_context_mode_reads_only_the_legacy_switch() -> None:
-    assert context_mode({}) == "ledger"
+def test_the_previous_assembly_is_the_shipped_default_and_the_switch_selects_either() -> None:
+    # The shipped default: the previous assembly on every route. Changing either line below
+    # changes what players get, so it needs a measured run on the route concerned.
+    assert ledger_module.DEFAULT_CONTEXT_MODE == "legacy"
+    assert dict(ledger_module.DEFAULT_CONTEXT_MODE_BY_TRANSPORT) == {}
+    assert context_mode({}) == "legacy"
+    for transport in ("codex_app_server", "anthropic_messages", "claude_code",
+                      "chat_completions", "responses", None):
+        assert context_mode({}, transport=transport) == "legacy"
+    # The switch turns the ledger on, or names the previous assembly, for every route.
+    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "ledger"}) == "ledger"
+    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": " Ledger "}, transport="claude_code") == "ledger"
     assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "legacy"}) == "legacy"
     assert context_mode({"SYLVIA_GM_CONTEXT_MODE": " Legacy "}) == "legacy"
-    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "ledger"}) == "ledger"
-    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "anything"}) == "ledger"
+    # Any other value is not a choice: the route's default applies.
+    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "anything"}) == "legacy"
+    assert ledger_module.context_mode_setting({"SYLVIA_GM_CONTEXT_MODE": "anything"}) is None
+
+
+def test_a_route_default_applies_only_without_the_switch(monkeypatch) -> None:
+    monkeypatch.setattr(ledger_module, "DEFAULT_CONTEXT_MODE_BY_TRANSPORT",
+                        {"anthropic_messages": "ledger"})
+    assert context_mode({}, transport="anthropic_messages") == "ledger"
+    assert context_mode({}, transport="codex_app_server") == "legacy"
+    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "legacy"},
+                        transport="anthropic_messages") == "legacy"
 
 
 def test_host_seal_is_deterministic_per_session() -> None:
@@ -582,6 +602,8 @@ def test_first_party_anthropic_breakpoints_mark_tools_system_and_last_block() ->
 
 @pytest.mark.parametrize(("provider_key", "mode", "expected"), [
     ("anthropic", "ledger", True), ("anthropic", "legacy", False), ("minimax", "ledger", False),
+    # Without the switch the shipped default applies: the previous assembly, no breakpoints.
+    ("anthropic", None, False),
 ])
 def test_breakpoints_only_on_the_first_party_route_in_ledger_mode(
     monkeypatch, provider_key, mode, expected,
@@ -591,7 +613,10 @@ def test_breakpoints_only_on_the_first_party_route_in_ledger_mode(
     from sylvia_gm.provider._base import ModelInfo
     from sylvia_gm.provider._credentials import Credential, CredentialPool
 
-    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", mode)
+    if mode is None:
+        monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", mode)
     provider = AnthropicProvider(
         base_url="https://fixture.invalid",
         credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),

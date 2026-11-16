@@ -1565,8 +1565,11 @@ the ledger resets. Builder and participant requests do not use it.
   last system block and the last non-thinking block of the last message; other Messages-compatible
   endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
   request context identifier.
-- **Legacy switch.** `SYLVIA_GM_CONTEXT_MODE=legacy`, read once per GM adapter, restores the previous
-  assembly byte for byte (including no Anthropic breakpoints) for A/B benchmarking and rollback.
+- **Mode switch.** The previous assembly is the shipped default on every route
+  (`DEFAULT_CONTEXT_MODE`, with `DEFAULT_CONTEXT_MODE_BY_TRANSPORT` for a route whose measured
+  results support the ledger). `SYLVIA_GM_CONTEXT_MODE=ledger` or `=legacy`, read once per GM
+  adapter, selects an assembly for every route. The previous assembly is byte for byte what it
+  was before the ledger existed (including no Anthropic breakpoints).
   On `claude_code` legacy mode keeps the previous transcript and flags, with the fixed working
   directory and LF system bytes.
 

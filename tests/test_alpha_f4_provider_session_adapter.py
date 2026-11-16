@@ -14148,3 +14148,20 @@ def test_player_boundary_control_lets_an_ordered_player_action_finish() -> None:
     # still forbids choosing anything the player did not state.
     assert content.index(ordered) < content.index("Narrate the committed outcome and stop")
     assert "Never choose a new action, target, tactic" in content
+
+
+@pytest.mark.parametrize(("setting", "expected"), [
+    (None, "legacy"), ("ledger", "ledger"), ("legacy", "legacy"), ("unrecognised", "legacy"),
+])
+def test_gm_adapter_ships_the_previous_assembly_and_the_switch_selects_the_ledger(
+    monkeypatch: pytest.MonkeyPatch, setting: str | None, expected: str,
+) -> None:
+    """What a player gets without any setting, and what SYLVIA_GM_CONTEXT_MODE changes."""
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", setting)
+    adapter = ProviderSessionAdapter(
+        cast(AuthorityOwner, object()), _ScriptedProvider([]), owner_id="owner-default-mode"
+    )
+    assert adapter._context_mode == expected  # noqa: SLF001

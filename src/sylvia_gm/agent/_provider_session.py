@@ -1593,9 +1593,10 @@ class ProviderSessionAdapter:
         self._owner_id = owner_id
         self._provider = provider
         self._working_contexts: dict[str, Any] = {}
-        # Read once per adapter: ``SYLVIA_GM_CONTEXT_MODE=legacy`` restores the previous
-        # request assembly byte for byte (A/B benchmarking and rollback).
-        self._context_mode = context_mode()
+        # Read once per adapter. The previous request assembly is the shipped default;
+        # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
+        self._context_mode = context_mode(
+            transport=getattr(getattr(provider, "model_info", None), "transport", None))
         self._context_ledgers: dict[str, ContextLedger] = {}
         self._timeout = timeout
         self._gm_system_prompt = gm_system_prompt
@@ -2250,7 +2251,7 @@ class ProviderSessionAdapter:
                 if declared is not None else None)
 
     def _ledger_active(self, provider_input: SessionProviderInput) -> bool:
-        """GM play uses the context ledger unless the legacy switch is set.
+        """GM play uses the context ledger when the mode read for this adapter selects it.
 
         Builder and participant sessions never use it.
         """
