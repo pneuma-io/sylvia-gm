@@ -4485,6 +4485,9 @@ const SylviaGMFrontend = (() => {
     state.campaignOpening = null;
     state.sessionReasoning = null;
     updateModelSwitchButtons();
+    // Settings' campaign actions follow the open campaign, and Home has none.
+    $('export-campaign-btn').disabled = true;
+    updateLifecycleControls(null, null);
     $('campaign-loading-status').hidden = true;
     $('session-frame').classList.add('home-active');
     $('home-view').hidden = false;
