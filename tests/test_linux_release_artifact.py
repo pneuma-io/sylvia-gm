@@ -382,6 +382,13 @@ def _builder_fixture(tmp_path, monkeypatch, *, glibc=(2, 35), system="linux"):
     notice = root / DEPENDENCY_NOTICES_SOURCE
     notice.write_bytes(NOTICES)
     commands = []
+    # The build machine's GStreamer plug-ins: the sound set plus ones that must stay out.
+    plugins = tmp_path / "system-gstreamer-1.0"
+    plugins.mkdir()
+    for name in (*linux_builder.MEDIA_PLUGINS, "jack", "aasink", "cacasink"):
+        (plugins / f"libgst{name}.so").write_bytes(b"synthetic plug-in - never load")
+    monkeypatch.setattr(linux_builder, "_system_plugin_folder", lambda: plugins)
+    monkeypatch.delenv("GSTREAMER_INCLUDE_BAD_PLUGINS", raising=False)
 
     def run(command, *, cwd, capture=False, env=None):
         commands.append(tuple(command))
@@ -398,6 +405,12 @@ def _builder_fixture(tmp_path, monkeypatch, *, glibc=(2, 35), system="linux"):
             assert target.is_relative_to(root / ".owner-build")
             assert cache.is_relative_to(root / ".owner-build") and cache != target
             assert Path(env["UV_CACHE_DIR"]) != cache
+            # The bundler copies the media framework from this folder only: the sound set.
+            staged = Path(env["GSTREAMER_PLUGINS_DIR"])
+            assert staged.is_relative_to(root / ".owner-build")
+            assert sorted(path.name for path in staged.iterdir()) == sorted(
+                f"libgst{name}.so" for name in linux_builder.MEDIA_PLUGINS)
+            assert "GSTREAMER_INCLUDE_BAD_PLUGINS" not in env
             bundle = target / "release/bundle/appimage"
             bundle.mkdir(parents=True)
             built = bundle / "Sylvia GM_synthetic_amd64.AppImage"
@@ -480,6 +493,26 @@ def test_linux_builder_stops_when_a_bundled_library_cannot_be_accounted_for(tmp_
     with pytest.raises(ReleaseArtifactError, match="libmystery"):
         _build(root, tmp_path / "unaccounted", tmp_path)
     assert not (tmp_path / "unaccounted").exists()
+
+
+def test_only_the_sound_plugins_are_staged_and_a_missing_one_stops_the_build(tmp_path):
+    source = tmp_path / "system"
+    source.mkdir()
+    for name in ("app", "autodetect", "pulseaudio", "jack"):
+        (source / f"libgst{name}.so").write_bytes(b"synthetic plug-in - never load")
+    with pytest.raises(ReleaseArtifactError,
+                       match=r"libgstaudioconvert\.so.*gstreamer1\.0-plugins-base"):
+        linux_builder.stage_media_plugins(source, tmp_path / "refused")
+    assert not (tmp_path / "refused").exists()
+    for name in linux_builder.MEDIA_PLUGINS:
+        (source / f"libgst{name}.so").write_bytes(f"synthetic {name}".encode())
+    staged = linux_builder.stage_media_plugins(source, tmp_path / "staged")
+    assert sorted(path.name for path in (tmp_path / "staged").iterdir()) == sorted(staged)
+    assert "libgstjack.so" not in staged and len(staged) == len(linux_builder.MEDIA_PLUGINS)
+    # Sound output and what WebKit's audio pipeline is built from; no video or text outputs.
+    assert {"app", "autodetect", "pulseaudio", "audioconvert", "audioresample"} <= set(
+        linux_builder.MEDIA_PLUGINS)
+    assert not {"jack", "aasink", "cacasink"} & set(linux_builder.MEDIA_PLUGINS)
 
 
 def test_the_unpacked_bundle_is_found_only_when_there_is_exactly_one(tmp_path):
