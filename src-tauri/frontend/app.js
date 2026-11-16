@@ -2080,6 +2080,8 @@ const SylviaGMFrontend = (() => {
 
   function applyPlatformCopy(platform) {
     if (platform !== 'linux') return;
+    // The stylesheet uses this to give the Linux web view dark native controls.
+    document.documentElement.dataset.hostPlatform = 'linux';
     for (const node of document.querySelectorAll('[data-platform-copy]')) {
       const text = LINUX_COPY[node.dataset.platformCopy];
       if (text) node.textContent = text;

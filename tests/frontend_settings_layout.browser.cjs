@@ -489,7 +489,12 @@ test('sentences that name Windows change only for a host that says it runs on Li
       const copy = {};
       for (const node of document.querySelectorAll('[data-platform-copy]'))
         copy[node.dataset.platformCopy] = node.textContent.replace(/\s+/g, ' ').trim();
-      return { copy, signing: document.getElementById('application-signing').textContent };
+      return {
+        copy, signing: document.getElementById('application-signing').textContent,
+        // Native controls: the Linux web view is told the page is dark; other hosts are not.
+        host: document.documentElement.dataset.hostPlatform || '',
+        scheme: getComputedStyle(document.documentElement).colorScheme,
+      };
     }, platform);
     const shipped = await wording(null);
     assert.deepEqual(Object.keys(shipped.copy).sort(), ['key-protection', 'key-protection-limits', 'unsigned-download']);
@@ -497,10 +502,14 @@ test('sentences that name Windows change only for a host that says it runs on Li
     assert.match(shipped.copy['key-protection-limits'], /outside your Windows account/);
     assert.match(shipped.copy['unsigned-download'], /so Windows may warn about an unfamiliar publisher/);
     assert.equal(shipped.signing, 'Windows publisher signature: unsigned');
+    assert.equal(shipped.host, '');
+    assert.notEqual(shipped.scheme, 'dark');
     for (const platform of ['windows', 'macos', 'freebsd'])
       assert.deepEqual(await wording(platform), shipped, `${platform} keeps the page's wording`);
     const linux = await wording('linux');
     assert.equal(linux.signing, 'Publisher signature: unsigned');
+    assert.equal(linux.host, 'linux');
+    assert.equal(linux.scheme, 'dark');
     assert.match(linux.copy['key-protection'], /key file that only your Linux user account can read/);
     assert.match(linux.copy['key-protection-limits'], /a copy of your whole home folder/);
     for (const text of [...Object.values(linux.copy), linux.signing]) assert.doesNotMatch(text, /Windows/);
