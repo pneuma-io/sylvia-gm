@@ -16,7 +16,12 @@ from typing import Any
 from uuid import uuid4
 
 from sylvia_gm.agent._request_data import strip_data_markers
-from sylvia_gm.provider._base import Provider, ProviderStreamChunk, closing_provider_stream
+from sylvia_gm.provider._base import (
+    Provider,
+    ProviderStreamChunk,
+    closing_provider_stream,
+    release_provider_idle,
+)
 from sylvia_gm.provider._exceptions import (
     ContextCompactionError,
     InvalidRequestError,
@@ -679,6 +684,10 @@ class WorkingContextProvider(Provider):
 
     async def close(self) -> None:
         """The session resolver owns the wrapped provider's lifetime."""
+
+    async def release_idle(self) -> None:
+        """Releasing what the wrapped provider keeps between requests does not end its life."""
+        await release_provider_idle(self._provider)
 
 
 HISTORY_TOOL = {

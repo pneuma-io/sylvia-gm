@@ -13,7 +13,12 @@ import logging
 from collections.abc import AsyncIterator
 from typing import Any
 
-from sylvia_gm.provider._base import Provider, ProviderResponse, ProviderStreamChunk
+from sylvia_gm.provider._base import (
+    Provider,
+    ProviderResponse,
+    ProviderStreamChunk,
+    release_provider_idle,
+)
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
     InvalidResponseError,
@@ -172,3 +177,15 @@ class FallbackChain(Provider):
         """Release resources from all sub-providers."""
         for provider in self._providers:
             await provider.close()
+
+    async def release_idle(self) -> None:
+        """Ask every sub-provider to release what it keeps; one failure does not skip the rest."""
+        first_error: Exception | None = None
+        for provider in self._providers:
+            try:
+                await release_provider_idle(provider)
+            except Exception as error:
+                if first_error is None:
+                    first_error = error
+        if first_error is not None:
+            raise first_error

@@ -13,6 +13,7 @@ from sylvia_gm.provider._base import (
     ProviderResponse,
     ProviderStreamChunk,
     closing_provider_stream,
+    release_provider_idle,
 )
 from sylvia_gm.provider._exceptions import TokenLimitError
 from sylvia_gm.provider._output_policy import output_allowance
@@ -402,3 +403,6 @@ class ContextFittingProvider(Provider):
 
     async def close(self) -> None:
         await self._provider.close()
+
+    async def release_idle(self) -> None:
+        await release_provider_idle(self._provider)

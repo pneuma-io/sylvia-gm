@@ -355,6 +355,7 @@ PYTHON_JOURNEYS = {
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
         "tests/test_provider_turn_state.py",
+        "tests/test_provider_release_on_stop.py",
     ],
     "gm-request-contracts": [
         "tests/test_gm_memory_casting_hotfix.py",

@@ -17,6 +17,7 @@ from sylvia_gm.provider._base import (
     ProviderResponse,
     ProviderStreamChunk,
     closing_provider_stream,
+    release_provider_idle,
 )
 from sylvia_gm.provider._model_defaults import documented_model_defaults
 from sylvia_gm.provider._speed import SpeedSelection, select_speed
@@ -368,6 +369,9 @@ class TurnReasoningProvider(Provider):
 
     async def close(self) -> None:
         await self._provider.close()
+
+    async def release_idle(self) -> None:
+        await release_provider_idle(self._provider)
 
 
 def bind_session_reasoning(

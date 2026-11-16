@@ -8,7 +8,7 @@ retry configuration, and provider configuration.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -384,6 +384,30 @@ class Provider(ABC):
         Must be idempotent — calling twice is safe.
         """
         ...
+
+    async def release_idle(self) -> None:
+        """Close anything this provider keeps open between requests.
+
+        Never raises for a provider that keeps nothing. This default keeps nothing, so it
+        does nothing; it is deliberately not abstract. The provider stays usable afterwards:
+        the next request opens whatever it needs.
+        """
+        return
+
+
+async def release_provider_idle(provider: object) -> None:
+    """Forward one ``release_idle`` call to a wrapped provider that offers it.
+
+    Wrappers use this so a wrapped object without the call (such as a test double that is
+    not a :class:`Provider`) is left alone instead of failing the release.
+    """
+
+    release = getattr(provider, "release_idle", None)
+    if not callable(release):
+        return
+    result = release()
+    if isinstance(result, Awaitable):
+        await result
 
 
 class ProviderTransport(ABC):
