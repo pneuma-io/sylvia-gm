@@ -163,6 +163,52 @@ test('SRD party card keeps Details and the party role apart', { timeout: 60000 }
   } finally { await browser.close(); }
 });
 
+// An SRD Fighter: no casts, no spell slots, Hit Die and Second Wind as other resources, no weapon set in hand.
+const fighter = (source) => variant(nonCaster(source), (projection) => {
+  for (const surface of projection.surfaces) {
+    const hero = surface.data?.entities?.hero;
+    if (hero) Object.assign(hero, { name: 'Tavin Bell', hp: 12, max_hp: 12, resources: { hit_die: 1, second_wind: 2 }, weapon_sets: {} });
+    for (const participant of surface.data?.participants || []) if (participant.id === 'hero')
+      Object.assign(participant.data, { name: 'Tavin Bell', background: 'soldier', classes: [{ id: 'fighter', level: 1 }], level: 1 });
+  }
+});
+
+// The fantasy character sheet was wider than its panel for a Fighter: the HP, AC and Speed row does not wrap, and the
+// sheet's single grid column grew to that row's width instead of the panel's, so the right edge was cut off.
+test('SRD character sheet stays inside its panel at every game-panel width', { timeout: 90000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await open(browser);
+    for (const [who, source] of [['fighter', fighter(srd)], ['caster', srd]]) {
+      await show(page, source);
+      // The game panels' column, from the divider's minimum (220px) through the default to a wide setting.
+      for (const width of [220, 250, 280, 360]) {
+        const outside = await page.evaluate((pixels) => {
+          document.getElementById('right-sidebar').style.width = `${pixels}px`;
+          const content = document.querySelector('[data-panel-id="dnd-character"] .ruleset-panel-content');
+          const sheet = content?.querySelector('.character-hero.grimoire');
+          if (!sheet) return ['no fantasy sheet shown'];
+          const box = content.getBoundingClientRect(), style = getComputedStyle(content);
+          const left = box.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
+          const right = box.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+          const found = [];
+          if (content.scrollWidth > content.clientWidth + 0.5) found.push(`panel scrolls sideways (${content.scrollWidth} > ${content.clientWidth})`);
+          for (const node of [sheet, ...sheet.querySelectorAll('*')]) {
+            const r = node.getBoundingClientRect();
+            if (r.width <= 1 || r.height <= 1) continue; // nothing to see (a label kept for screen readers only)
+            if (r.left < left - 0.5 || r.right > right + 0.5) found.push(`${node.tagName.toLowerCase()}.${String(node.className?.baseVal ?? node.className).trim().replace(/\s+/g, '.')}` +
+              ` "${(node.textContent || '').trim().slice(0, 24)}" ${r.left.toFixed(1)}–${r.right.toFixed(1)} outside ${left.toFixed(1)}–${right.toFixed(1)}`);
+            if (node.scrollWidth > node.clientWidth + 0.5 && getComputedStyle(node).overflowX !== 'visible') found.push(`${node.tagName.toLowerCase()} cuts its own text`);
+          }
+          return found;
+        }, width);
+        assert.deepEqual(outside, [], `${who} at a ${width}px game-panel column: no part of the sheet is outside the panel`);
+      }
+    }
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('Trigger Discipline panels keep the tactical look', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {

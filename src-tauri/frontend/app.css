@@ -4754,16 +4754,18 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 [data-action-readiness] .panel-tag[data-econ="move"][data-econ-state="on"]::before { background: var(--look-go); opacity: 1; }
 .ruleset-map-panel .map-turn-strip [data-action-readiness] { display: inline-flex; flex-wrap: nowrap; gap: 4px; }
 /* Grimoire */
-.character-hero.grimoire { display: grid; gap: 10px; padding: 2px 0; border: 0; background: none; overflow: visible; }
-.grim-head { display: grid; grid-template-columns: 88px 1fr; gap: 12px; align-items: center; }
+/* One column that never grows past the panel: rows wrap or shrink instead (a Fighter's 12/12 HP row once pushed the
+   sheet wider than its panel). */
+.character-hero.grimoire { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 2px 0; border: 0; background: none; overflow: visible; }
+.grim-head { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 12px; align-items: center; }
 .grim-plinth { display: grid; place-items: center; align-content: center; gap: 2px; height: 104px; border: 1px solid color-mix(in srgb, var(--look-plinth) 40%, transparent);
   border-radius: 46px 46px 12px 12px; background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--look-plinth) 16%, var(--bg-card)), var(--bg-primary)); text-align: center; }
 .grim-plinth b { color: var(--text-bright); font: 700 30px var(--look-heading-font); }
 .grim-plinth small { max-width: 80px; color: var(--text-muted); font-size: 9.5px; }
-.grim-id h3 { margin: 0; color: var(--text-bright); font: 600 25px var(--look-heading-font); }
+.grim-id h3 { margin: 0; color: var(--text-bright); font: 600 25px var(--look-heading-font); overflow-wrap: anywhere; }
 .grim-id h3 strong { font-weight: 600; }
 .grim-id p { margin: 2px 0 6px; color: var(--text-dim); font-size: 12.5px; }
-.grim-vitals { display: flex; align-items: center; gap: 16px; }
+.grim-vitals { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; }
 .grim-vitals > span { display: grid; justify-items: center; line-height: 1.05; }
 .grim-vitals b { color: var(--text-bright); font: 700 17px var(--font-number); }
 .grim-vitals b small { color: var(--text-muted); font-size: 11px; }
@@ -4776,8 +4778,8 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .grim-shield svg { width: 26px; height: 28px; fill: var(--bg-secondary); stroke: var(--accent-primary-bright); stroke-width: 1.6; }
 .grim-shield b { position: absolute; top: 5px; font-size: 12px; }
 .grim-sec { display: block; margin: 2px 0 6px; color: var(--look-accent); font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-.grim-book { display: grid; gap: 6px; }
-.grim-spell { position: relative; display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; text-align: left;
+.grim-book { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.grim-spell { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; text-align: left;
   border: 1px solid var(--border-color); border-left: 3px solid var(--look-spell-edge); border-radius: 10px; background: linear-gradient(90deg, var(--bg-card-hover), var(--bg-card)); color: inherit; font: inherit; cursor: pointer; }
 .grim-spell:hover { border-color: var(--border-accent); border-left-color: var(--look-spell-edge); }
 .grim-spell:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
@@ -4785,7 +4787,7 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .grim-spell .suite-ico { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid color-mix(in srgb, var(--look-spell-edge) 45%, transparent); border-radius: 50%;
   background: var(--look-medal-fill); color: var(--look-medal-ink); }
 .grim-spell .suite-ico svg { width: 18px; height: 18px; }
-.grim-spell-main { display: grid; line-height: 1.2; }
+.grim-spell-main { display: grid; line-height: 1.2; overflow-wrap: anywhere; }
 .grim-spell-main b { color: var(--text-bright); font: 600 15px var(--look-heading-font); }
 .grim-spell-main small { color: var(--text-muted); font-size: 11.5px; }
 .grim-spell-cost { display: grid; justify-items: end; gap: 2px; color: var(--text-muted); font-size: 11px; }
@@ -4812,7 +4814,7 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .ruleset-map-panel .tactical-scroll:has(> .coordinate-world) + .tactical-preview.has-action,
 .ruleset-map-panel .map-stage:has(.coordinate-world) > .tactical-preview.has-action { border-color: color-mix(in srgb, #d8a650 50%, transparent);
   background: linear-gradient(180deg, color-mix(in srgb, #3a2f1c 80%, var(--bg-card)), color-mix(in srgb, var(--bg-card) 94%, transparent)); }
-@container (max-width: 300px) { .grim-head { grid-template-columns: 64px 1fr; } .grim-plinth { height: 78px; } .grim-runes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@container (max-width: 300px) { .grim-head { grid-template-columns: 64px minmax(0, 1fr); } .grim-plinth { height: 78px; } .grim-runes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .ruleset-map-panel .map-turn-strip { flex-wrap: wrap; row-gap: 6px; }
 .ruleset-map-panel .map-turn-strip [data-action-readiness] { order: 10; flex-basis: 100%; }
 .ruleset-map-panel .map-turn-strip > strong { overflow: hidden; text-overflow: ellipsis; }
