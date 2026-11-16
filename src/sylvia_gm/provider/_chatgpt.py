@@ -49,8 +49,10 @@ from sylvia_gm.provider._openai_compat import ResponsesTransport
 #: A request that ends in a tool call: the runtime reports its token and cache usage only once
 #: the tool call resolves or the turn is interrupted, and Sylvia never answers the call. So
 #: the adapter lets the runtime record the finished model response for this long, interrupts
-#: the turn, and collects the report before it stops the runtime.
-_USAGE_SETTLE_SECONDS = 0.15
+#: the turn, and collects the report before it stops the runtime. An interrupt that arrives
+#: before the runtime has recorded the response gets no report: at 0.15 s a live fight lost
+#: 2 of 32 reports, and the live probe that never missed used 0.3 s.
+_USAGE_SETTLE_SECONDS = 0.3
 #: How long to wait for that report after the interrupt. It normally arrives at once.
 _USAGE_REPORT_SECONDS = 1.0
 
@@ -212,6 +214,8 @@ class ChatGPTProvider(Provider):
                     self._capture_usage(response, params, thread_id, turn_id)
                 elif method == "turn/completed" and params.get("threadId") in {None, thread_id}:
                     # The interrupted turn has ended; its report, if any, came before this.
+                    # Recorded so a request left without usage can be told from a slow report.
+                    await self._audit(method, params, received=True)
                     break
                 else:
                     await asyncio.sleep(0)
