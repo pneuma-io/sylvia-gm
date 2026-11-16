@@ -365,6 +365,14 @@ class WorkingContextProvider(Provider):
         # Fixed instructions and schemas consume space, but cannot be improved by summarising.
         # Apply the compaction threshold to the remaining history allowance.
         if self.model_info is not None and terms["fixed_tokens"] >= input_budget:
+            if not getattr(self.model_info, "context_window", None):
+                # The model may be large enough: what is missing is its limit (issue 92).
+                raise TokenLimitError(
+                    "Sylvia does not know this model's context limit, so it planned for "
+                    f"{capacity:,} tokens and this request does not fit. Saved work is intact. "
+                    "In Settings, open this model's Advanced model settings, enter its context "
+                    "limit, then retry."
+                )
             raise TokenLimitError(
                 "Context cannot be shortened further: instructions, tools or the latest "
                 "exchange are too large. Saved work is intact; use a larger context model or "
