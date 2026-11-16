@@ -1305,14 +1305,104 @@ def test_one_tool_list_sends_every_tool_sent_so_far_in_first_sent_order() -> Non
     assert first.observation["tools_sha256"] != second.observation["tools_sha256"]
 
 
-def test_a_tool_keeps_the_definition_it_was_first_sent_with() -> None:
+def _narrate(*required: str) -> dict:
+    tool = _tool("narrate")
+    tool["function"]["parameters"] = {
+        "type": "object", "properties": {"text": {"type": "string"}, "facts": {"type": "array"}},
+        "required": list(required)}
+    return tool
+
+
+def test_a_changed_definition_replaces_the_sent_one_at_its_position() -> None:
     ledger = _one_list()
-    strict = _tool("narrate", "all fields required")
-    relaxed = _tool("narrate", "fewer fields required")
-    _offer(ledger, _canonical(_user("u1", "Go")), [strict])
-    frame = _offer(ledger, _canonical(_user("u1", "Go"), _talk("t1", "ok")), [relaxed])
-    assert frame.tool_list == [strict]
-    assert "tools_added" not in (frame.record or {})
+    attack, dash = _tool("attack"), _tool("dash")
+    strict, relaxed = _narrate("text", "facts"), _narrate("facts")
+    dialogue = [_user("u1", "Go")]
+    first = _offer(ledger, _canonical(*dialogue), [attack, strict, dash])
+    assert first.tool_list == [attack, strict, dash]
+    # The turn loop offers the same tool with another schema: the model is sent the schema its
+    # call is checked against, in the same place, and the list keeps its length.
+    dialogue.append(_talk("t1", "ok"))
+    changed = _offer(ledger, _canonical(*dialogue), [relaxed])
+    assert changed.tool_list == [attack, relaxed, dash]
+    assert changed.record["tools_replaced"] == [relaxed]
+    assert "tools_added" not in changed.record
+    # That request is not an extension of the previous one: what is sent changed.
+    assert changed.observation["tools_sha256"] != first.observation["tools_sha256"]
+    assert changed.observation["toolset_sha256"] != first.observation["toolset_sha256"]
+    # The same definition again, or a narrower offer, changes nothing: later requests extend
+    # the new list again.
+    for offered in ([relaxed], [attack], [attack, relaxed, dash]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        same = _offer(ledger, _canonical(*dialogue), offered)
+        assert same.tool_list == [attack, relaxed, dash]
+        assert not {"tools_added", "tools_replaced"} & set(same.record or {})
+        assert same.observation["tools_sha256"] == changed.observation["tools_sha256"]
+    # A change and an addition in one request: replaced in place, added at the end.
+    spear, sharp = _tool("spear"), _tool("attack", "with advantage")
+    dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+    both = _offer(ledger, _canonical(*dialogue), [spear, sharp])
+    assert both.tool_list == [sharp, relaxed, dash, spear]
+    assert both.record["tools_added"] == [spear] and both.record["tools_replaced"] == [sharp]
+
+
+def test_a_reopened_session_sends_the_replaced_definition() -> None:
+    ledger = _one_list()
+    attack, strict, relaxed = _tool("attack"), _narrate("text", "facts"), _narrate("facts")
+    records = []
+    dialogue = [_user("u1", "Go")]
+    for offered in ([attack, strict], [relaxed], [attack]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        frame = _offer(ledger, _canonical(*dialogue), offered)
+        if frame.record is not None:
+            records.append(frame.record)
+    saved = _history(records)
+    assert ledger_module.saved_tool_list(saved, OWNER) == [attack, relaxed]
+    restarted = _one_list()
+    again = restarted.plan(_canonical(*dialogue), request_context_id=CONTEXT,
+                           tools=[attack], history_records=lambda: saved)
+    assert again.tool_list == [attack, relaxed]
+    assert again.wire == frame.wire and again.record is None
+    # Offering the current definition after the reopen is not a change.
+    assert restarted.sent_tools([relaxed], history_records=lambda: saved) == [attack, relaxed]
+    # Changed back: replaced again, and a reopen follows the latest definition.
+    dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+    back = _offer(ledger, _canonical(*dialogue), [strict], records=saved)
+    assert back.tool_list == [attack, strict] and back.record["tools_replaced"] == [strict]
+    assert ledger_module.saved_tool_list(_history([*records, back.record]), OWNER) == [
+        attack, strict]
+
+
+def _enforced(ledger: ContextLedger, canonical: list[dict], tools) -> object:
+    frame = ledger.plan(canonical, request_context_id=CONTEXT, tools=tools,
+                        thinking_enforced=True)
+    ledger.commit(frame)
+    return frame
+
+
+@pytest.mark.parametrize("one_tool_list", [False, True], ids=["rounds", "one-list"])
+def test_a_replaced_definition_strips_replayed_thinking_like_a_changed_list(
+    one_tool_list,
+) -> None:
+    # On an enforced Claude model a changed tool set strips the thinking of every earlier turn
+    # (``tools_changed``) and nothing else moves the floor while the tools stay the same.
+    ledger = ContextLedger(session_id="s1", context_owner=OWNER, transport="anthropic_messages",
+                           one_tool_list=one_tool_list)
+    attack, strict, relaxed = _tool("attack"), _narrate("text", "facts"), _narrate("facts")
+    dialogue = [_user("u1", "Go")]
+    frames = []
+    for offered in ([attack, strict], [attack, strict], [attack, relaxed], [attack, relaxed]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        frames.append(_enforced(ledger, _canonical(*dialogue), offered))
+    strips = [frame.observation["thinking_strip"] for frame in frames]
+    assert strips == ["new_generation", None, "tools_changed", None]
+    floors = [frame.observation["thinking_floor"] for frame in frames]
+    assert floors[0] == floors[1] < floors[2] == floors[3]
+    # A tool the turn loop stops offering strips with per-round lists, and not with one list,
+    # where the sent tools stay the same.
+    dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+    narrower = _enforced(ledger, _canonical(*dialogue), [relaxed])
+    assert narrower.observation["thinking_strip"] == (None if one_tool_list else "tools_changed")
 
 
 def test_the_model_is_told_what_can_be_called_only_when_that_changes() -> None:

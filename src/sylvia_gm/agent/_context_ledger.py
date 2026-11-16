@@ -1025,27 +1025,51 @@ def toolset_fingerprint(tools: Sequence[Mapping[str, Any]] | None) -> str:
 
 def merged_tool_list(
     sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """The tools already sent plus any offered tool not yet among them, and the added ones.
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """The tools already sent, brought up to date by *offered*, the added and the replaced.
 
-    A tool is identified by its name. Its definition stays as first sent, so the list only
-    ever grows at its end and every earlier request's tool list is a prefix of a later one.
+    A tool is identified by its name. An offered tool not yet sent is added at the end. A sent
+    tool offered with a different definition is replaced at its position, so the model is sent
+    the definition its calls are checked against this round. That request's list is then not
+    an extension of the previous one (the cost of a real schema change); otherwise the list
+    only grows at its end and every earlier request's list is a prefix of a later one.
     """
     merged = [dict(tool) for tool in sent]
-    names = {_tool_name(tool) for tool in merged}
+    position = {_tool_name(tool): index for index, tool in enumerate(merged)}
+    seen: set[str] = set()
     added: list[dict[str, Any]] = []
+    replaced: list[dict[str, Any]] = []
     for tool in offered or ():
         name = _tool_name(tool)
-        if name and name not in names:
-            names.add(name)
-            added.append(dict(plain(tool)))
-    return [*merged, *added], added
+        if not name or name in seen:
+            continue
+        seen.add(name)
+        definition = dict(plain(tool))
+        index = position.get(name)
+        if index is None:
+            position[name] = len(merged)
+            merged.append(definition)
+            added.append(definition)
+        elif plain(merged[index]) != definition:
+            merged[index] = definition
+            replaced.append(definition)
+    return merged, added, replaced
+
+
+def _tool_definitions(value: Any) -> list[Mapping[str, Any]]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes, bytearray)):
+        return []
+    return [tool for tool in value if isinstance(tool, Mapping)]
 
 
 def saved_tool_list(
     records: Sequence[Mapping[str, Any]], context_owner: Mapping[str, Any] | None,
 ) -> list[dict[str, Any]]:
-    """The tools this session's journal records say were sent, in first-sent order."""
+    """The tool list this session's journal records say was last sent, in first-sent order.
+
+    Each record's additions and replaced definitions are replayed in order, so a reopened
+    session sends exactly the list it last sent.
+    """
     owner = plain(context_owner) if context_owner is not None else None
     tools: list[dict[str, Any]] = []
     for record in records:
@@ -1053,10 +1077,10 @@ def saved_tool_list(
             continue
         if owner is not None and plain(record.get("context_owner")) != owner:
             continue
-        added = record.get("tools_added")
-        if isinstance(added, Sequence) and not isinstance(added, (str, bytes, bytearray)):
-            tools, _new = merged_tool_list(
-                tools, [tool for tool in added if isinstance(tool, Mapping)])
+        changes = [*_tool_definitions(record.get("tools_added")),
+                   *_tool_definitions(record.get("tools_replaced"))]
+        if changes:
+            tools, _added, _replaced = merged_tool_list(tools, changes)
     return tools
 
 
@@ -1126,12 +1150,14 @@ class ContextLedger:
 
         Normally that is *offered*. With one tool list it is every tool sent so far followed
         by any offered tool not yet sent, so a provider's cached prefix survives the turn
-        loop offering a different subset each round. Which tools can be called is unchanged:
+        loop offering a different subset each round; a sent tool offered with a different
+        definition is sent with that definition. Which tools can be called is unchanged:
         the turn loop still accepts only the offered ones.
         """
         if not self.one_tool_list:
             return offered
-        merged, _added = merged_tool_list(self._sent_so_far(history_records), offered)
+        merged, _added, _replaced = merged_tool_list(
+            self._sent_so_far(history_records), offered)
         return merged or offered
 
     def request_thinking_strip(self) -> None:
@@ -1351,9 +1377,12 @@ class ContextLedger:
         # called. The fingerprints below describe what is sent.
         offered_tools = tools
         tools_added: list[dict[str, Any]] = []
+        tools_replaced: list[dict[str, Any]] = []
         tool_list: list[dict[str, Any]] | None = None
         if self.one_tool_list:
-            tool_list, tools_added = merged_tool_list(
+            # A replaced definition changes the tool set like a changed list in the previous
+            # mode, so the thinking floor below moves the same way.
+            tool_list, tools_added, tools_replaced = merged_tool_list(
                 self._sent_so_far(history_records), offered_tools)
             tools = tool_list or offered_tools
         state_messages = [
@@ -1459,7 +1488,8 @@ class ContextLedger:
         toolset_changed = (self.transport == "anthropic_messages"
                            and toolset_before is not None and toolset_before != toolset)
         record = None
-        if appended or reset is not None or floor_moved or toolset_changed or tools_added:
+        if (appended or reset is not None or floor_moved or toolset_changed or tools_added
+                or tools_replaced):
             record = {
                 "kind": JOURNAL_KIND,
                 "version": JOURNAL_VERSION,
@@ -1482,9 +1512,10 @@ class ContextLedger:
                 "toolset_sha256": toolset,
                 "thinking_floor": state.thinking_floor,
                 **({"thinking_strip": thinking_strip} if floor_moved else {}),
-                # One tool list: the definitions first sent by this request, so a restart
-                # sends the same list in the same order.
+                # One tool list: the definitions this request added or replaced, so a
+                # restart sends the same list in the same order.
                 **({"tools_added": tools_added} if tools_added else {}),
+                **({"tools_replaced": tools_replaced} if tools_replaced else {}),
             }
         wire = [
             {key: value for key, value in m.items() if key not in MARKER_KEYS
