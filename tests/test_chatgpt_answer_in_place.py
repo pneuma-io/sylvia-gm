@@ -294,10 +294,17 @@ def test_the_answer_is_the_calls_result_and_the_user_messages_after_it() -> None
         with pytest.raises(_AnswerInPlaceError) as refused:
             _in_place_answer(said, "call-1", held)
         assert refused.value.reason == "model_text_differs"
-    # Text the thread holds and the request dropped is a difference too.
+        with pytest.raises(_AnswerInPlaceError):
+            _in_place_answer(said, "call-1", held, dropped_draft_ok=True)
+    # Text the thread holds and the request dropped is refused under its own code, unless
+    # the experimental value accepts exactly that case.
+    dropped = tail(call("call-1"), result("call-1"))
     with pytest.raises(_AnswerInPlaceError) as refused:
-        _in_place_answer(tail(call("call-1"), result("call-1")), "call-1", "I try the handle.")
-    assert refused.value.reason == "model_text_differs"
+        _in_place_answer(dropped, "call-1", "I try the handle.")
+    assert refused.value.reason == "model_text_dropped"
+    assert _in_place_answer(
+        dropped, "call-1", "I try the handle.", dropped_draft_ok=True,
+    ) == (DOOR, [])
     # A result that is not text is sent as its JSON.
     items = tail(call("call-1"), result("call-1"))
     items[-1]["output"] = {"opened": True}

@@ -67,12 +67,15 @@ _USAGE_SETTLE_SECONDS = 0.3
 #: How long to wait for that report after the interrupt. It normally arrives at once.
 _USAGE_REPORT_SECONDS = 1.0
 
-#: Environment switch, read when a provider is created. Both values keep runtime threads.
+#: Environment switch, read when a provider is created. Every value keeps runtime threads.
 #: "stable" interrupts the turn at a tool call (as without the switch) and continues the
 #: thread with a further turn. "answer" leaves the turn waiting and, when the next request
-#: brings the call's result, answers the call inside that same turn.
+#: brings the call's result, answers the call inside that same turn. "answer-draft" is
+#: "answer" that also answers when the owner dropped the text the model streamed before its
+#: call (an unsettled draft the thread then still holds); an experiment, to be measured.
 _THREAD_SWITCH = "SYLVIA_CHATGPT_THREAD"
-_THREAD_MODES = {"stable": "interrupt", "answer": "answer"}
+_THREAD_MODES = {"stable": "interrupt", "answer": "answer", "answer-draft": "answer"}
+_DRAFT_KEEPING_VALUE = "answer-draft"
 #: Idle runtime threads kept open at once; the least recently used is closed first.
 _KEPT_THREAD_LIMIT = 4
 #: A kept thread left unused this long is closed.
@@ -178,6 +181,7 @@ def _strings(value: object) -> list[str]:
 def _call_tail(
     tail: list[dict[str, Any]], call_id: str, spoken: str,
     error: type[_KeptThreadMismatchError] = _KeptThreadMismatchError,
+    dropped_draft_ok: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
     """Sylvia's copy of the kept thread's call, its result and what follows, from a tail.
 
@@ -204,13 +208,17 @@ def _call_tail(
         or output.get("type") != "function_call_output" or output.get("call_id") != call_id
     ):
         raise error("no_call_result", "The request does not answer the kept tool call.")
-    if text != spoken:
+    if spoken and not text:
+        # The owner drops the text of a round whose call was not narrative.
+        if not dropped_draft_ok:
+            raise error("model_text_dropped", "The request dropped the model's own text.")
+    elif text != spoken:
         raise error("model_text_differs", "The request does not hold the model's own text.")
     return call, output, tail[index + 2:]
 
 
 def _in_place_answer(
-    tail: list[dict[str, Any]], call_id: str, spoken: str = "",
+    tail: list[dict[str, Any]], call_id: str, spoken: str = "", dropped_draft_ok: bool = False,
 ) -> tuple[str, list[str]]:
     """The pending call's result and the user-role texts that follow it, from a request's tail.
 
@@ -220,7 +228,9 @@ def _in_place_answer(
     narration the model wrote in the call. Anything else cannot be delivered into an open
     turn.
     """
-    call, output, rest = _call_tail(tail, call_id, spoken, _AnswerInPlaceError)
+    call, output, rest = _call_tail(
+        tail, call_id, spoken, _AnswerInPlaceError, dropped_draft_ok,
+    )
     raw = output.get("output")
     result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)
     known: list[str] = [result, str(call.get("arguments", ""))]
@@ -444,6 +454,8 @@ class _Request:
     generation: int = 0
     status: str | None = None
     keep: _KeptThread | None = None
+    #: The call was answered although the request dropped the model's text before it.
+    kept_dropped_draft: bool = False
     #: Every usage report the runtime sent during the current attempt, in order.
     usage_reports: list[dict[str, object]] = field(default_factory=list)
 
@@ -467,8 +479,10 @@ class ChatGPTProvider(Provider):
         self._lock = asyncio.Lock()
         self._active: CodexConnection | None = None
         self._last_response = ProviderResponse()
-        self._thread_mode = _THREAD_MODES.get(os.environ.get(_THREAD_SWITCH, ""))
+        switch = os.environ.get(_THREAD_SWITCH, "")
+        self._thread_mode = _THREAD_MODES.get(switch)
         self._stable_threads = self._thread_mode is not None
+        self._keeps_dropped_draft = switch == _DRAFT_KEEPING_VALUE
         # State of the attempt in progress; attempts are serialised by ``_lock``.
         self._usage_reports: list[dict[str, object]] = []
         self._owed_previous_usage = False
@@ -732,8 +746,13 @@ class ChatGPTProvider(Provider):
         """
         pending = kept.pending
         assert pending is not None
+        tail = request.items[len(kept.items):]
         result, texts = _in_place_answer(
-            request.items[len(kept.items):], pending.call_id, kept.spoken,
+            tail, pending.call_id, kept.spoken, self._keeps_dropped_draft,
+        )
+        request.kept_dropped_draft = bool(kept.spoken) and not any(
+            item.get("type") == "message" and item.get("role") == "assistant"
+            for item in tail[:1]
         )
         options = request.options
         if (options.get("reasoning_effort"), options.get("service_tier")) != (
@@ -926,6 +945,10 @@ class ChatGPTProvider(Provider):
                             # In order. "previous" is the response whose call this request
                             # answered; its figures are never attached to this response.
                             reuse["usage_reports"] = list(request.usage_reports)
+                        if self._keeps_dropped_draft:
+                            reuse["kept_dropped_draft"] = bool(
+                                reuse.get("answered_in_place") and request.kept_dropped_draft
+                            )
                         await self._audit("sylvia/thread_reuse", reuse)
                         receipt["thread_reuse"] = reuse
                     await self._audit("sylvia/provider_lifecycle", receipt)

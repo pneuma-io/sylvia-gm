@@ -94,7 +94,7 @@ async def test_a_request_that_does_not_answer_the_interrupted_call_is_not_contin
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(("kept_text", "expected"), [
-    (True, None), (False, "model_text_differs"),
+    (True, None), (False, "model_text_dropped"),
 ])
 async def test_stable_continues_only_when_the_request_holds_what_the_model_said(
     tmp_path: Path, stable: _chatgpt._KeptThreads, kept_text: bool,  # noqa: F811
@@ -116,8 +116,39 @@ async def test_stable_continues_only_when_the_request_holds_what_the_model_said(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(("value", "round_one", "expected", "draft"), [
+    # The request holds the model's text; the request dropped it; the request changed it.
+    ("answer", "same", None, None),
+    ("answer", "dropped", "model_text_dropped", None),
+    ("answer", "other", "model_text_differs", None),
+    ("answer-draft", "same", None, False),
+    ("answer-draft", "dropped", None, True),
+    ("answer-draft", "other", "model_text_differs", False),
+])
+async def test_the_draft_keeping_value_answers_a_call_whose_text_the_request_dropped(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads,  # noqa: F811
+    value: str, round_one: str, expected: str | None, draft: bool | None,
+) -> None:
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", value)
+    runtime = AnswerRuntime(Waiting([SPOKEN, asks("call-1", 7)], [*NARRATION]), text_turn())
+    provider, audit = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    copy = {
+        "same": spoken_call(), "dropped": call("call-1"),
+        "other": {**call("call-1"), "content": "Something else."},
+    }[round_one]
+    await provider.generate([*FIRST, copy, result("call-1")], tools=TOOLS)
+    record = audit.reuse[1]
+    assert record["answered_in_place"] is (expected is None)
+    assert record.get("fresh_reason") == expected
+    assert record.get("kept_dropped_draft") == draft
+    assert ("kept_dropped_draft" in audit.reuse[0]) is (value == "answer-draft")
+    assert runtime.alive() == []
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(("kept_text", "expected"), [
-    (True, None), (False, "model_text_differs"),
+    (True, None), (False, "model_text_dropped"),
 ])
 async def test_a_call_is_answered_only_when_the_request_holds_what_the_model_said(
     tmp_path: Path, answering: _chatgpt._KeptThreads, kept_text: bool,  # noqa: F811
