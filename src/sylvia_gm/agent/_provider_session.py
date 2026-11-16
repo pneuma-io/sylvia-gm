@@ -1639,7 +1639,8 @@ class ProviderSessionAdapter:
         # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
         self._context_mode = context_mode(
             transport=getattr(getattr(provider, "model_info", None), "transport", None))
-        self._one_tool_list = stable_tool_list()
+        self._one_tool_list = stable_tool_list(
+            transport=getattr(getattr(provider, "model_info", None), "transport", None))
         self._context_ledgers: dict[str, ContextLedger] = {}
         self._timeout = timeout
         self._gm_system_prompt = gm_system_prompt

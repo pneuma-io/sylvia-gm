@@ -144,6 +144,42 @@ def test_a_route_default_applies_only_without_the_switch(monkeypatch) -> None:
                         transport="anthropic_messages") == "legacy"
 
 
+def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_either() -> None:
+    # The shipped default: per-round tool lists on every route. Changing either line below
+    # changes what players get, so it needs a measured run on the route concerned.
+    assert ledger_module.DEFAULT_TOOL_LIST == "rounds"
+    assert dict(ledger_module.DEFAULT_TOOL_LIST_BY_TRANSPORT) == {}
+    stable_tool_list = ledger_module.stable_tool_list
+    assert stable_tool_list({}) is False
+    for transport in ("codex_app_server", "anthropic_messages", "claude_code",
+                      "chat_completions", "responses", None):
+        assert stable_tool_list({}, transport=transport) is False
+    # The switch selects one list, or per-round lists, for every route.
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "stable"}) is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": " Stable "}, transport="claude_code") is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"}) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": " Rounds "},
+                            transport="anthropic_messages") is False
+    # Any other value is not a choice: the route's default applies.
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "1"}) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "anything"}, transport="responses") is False
+
+
+def test_a_route_tool_list_default_applies_only_without_the_switch(monkeypatch) -> None:
+    monkeypatch.setattr(ledger_module, "DEFAULT_TOOL_LIST_BY_TRANSPORT",
+                        {"anthropic_messages": "stable"})
+    stable_tool_list = ledger_module.stable_tool_list
+    assert stable_tool_list({}, transport="anthropic_messages") is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "other"},
+                            transport="anthropic_messages") is True
+    assert stable_tool_list({}, transport="codex_app_server") is False
+    assert stable_tool_list({}) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"},
+                            transport="anthropic_messages") is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "stable"},
+                            transport="codex_app_server") is True
+
+
 def test_host_seal_is_deterministic_per_session() -> None:
     assert host_seal("s1") == host_seal("s1")
     assert host_seal("s1") != host_seal("s2")

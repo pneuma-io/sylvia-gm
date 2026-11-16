@@ -458,6 +458,52 @@ def host_records(messages: Sequence[dict[str, Any]], label: str) -> list[dict[st
     ]
 
 
+def tool_name(tool: Any) -> str:
+    """A sent tool's name, in the chat-completions shape or the flat one."""
+    if not isinstance(tool, dict):
+        return str(getattr(tool, "name", ""))
+    function = tool.get("function")
+    return str((function if isinstance(function, dict) else tool).get("name", ""))
+
+
+_CALLABLE_ONLY = __import__("re").compile(
+    r"only these listed tools can be called: (.*?)\. A call to any other tool is refused\.")
+_CALLABLE_EXCEPT = __import__("re").compile(
+    r"every listed tool can be called except: (.*?)\. A call to one of those is refused\.")
+
+
+def callable_tool_names(
+    messages: Sequence[dict[str, Any]], tools: Sequence[Any] | None,
+) -> list[str]:
+    """The names of the sent *tools* the GM may call on this request, in sent order.
+
+    With one tool list for the session a request lists tools that cannot be called this round,
+    and its latest ``SYLVIA_GM_CALLABLE_TOOLS`` record says which can. Without that record
+    (per-round lists, or the previous assembly) every tool sent can be called.
+    """
+    sent = [tool_name(tool) for tool in tools or ()]
+    records = [
+        unsealed(message.get("content"))
+        for message in messages
+        if ledger_module.CALLABLE_LABEL in str(message.get("content", ""))
+    ]
+    if not records:
+        return sent
+    text = records[-1]
+    if "every tool listed in this request can be called at this step." in text:
+        return sent
+    if "no tool can be called at this step." in text:
+        return []
+    only = _CALLABLE_ONLY.search(text)
+    if only is not None:
+        allowed = set(only.group(1).split(", "))
+        return [name for name in sent if name in allowed]
+    excluded = _CALLABLE_EXCEPT.search(text)
+    assert excluded is not None, f"unrecognized {ledger_module.CALLABLE_LABEL} record: {text}"
+    refused = set(excluded.group(1).split(", "))
+    return [name for name in sent if name not in refused]
+
+
 def current_state(messages: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
     """The campaign state a request conveys: the single legacy record, or keyframe + updates."""
     from sylvia_gm.agent._context_ledger import apply_state_update

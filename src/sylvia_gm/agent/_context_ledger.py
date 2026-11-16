@@ -188,16 +188,32 @@ ADDITIVE_MAP_PATHS: tuple[tuple[str, ...], ...] = (("GM_PRIVATE_CURRENT", "chara
 
 
 #: ``stable`` sends one tool list for the whole session in ledger mode (see
-#: ``ContextLedger.sent_tools``). Anything else keeps the list the turn loop offers each round.
+#: ``ContextLedger.sent_tools``); ``rounds`` sends the list the turn loop offers each round.
 TOOL_LIST_ENV = "SYLVIA_GM_TOOL_LIST"
 STABLE_TOOL_LIST = "stable"
+ROUND_TOOL_LISTS = "rounds"
 CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
 
+#: The tool list a route uses when ``SYLVIA_GM_TOOL_LIST`` does not name one. Every route
+#: ships with per-round lists. A route is moved to one list here, by its transport name,
+#: once a measured run on that route supports it.
+DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
+DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {}
 
-def stable_tool_list(environ: Mapping[str, str] | None = None) -> bool:
-    """Whether ledger mode sends one tool list for the session (off unless set to ``stable``)."""
+
+def stable_tool_list(
+    environ: Mapping[str, str] | None = None, *, transport: str | None = None,
+) -> bool:
+    """Whether ledger mode sends one tool list for the session on *transport*.
+
+    ``SYLVIA_GM_TOOL_LIST=stable`` or ``=rounds`` decides for every route. Without it (or
+    with any other value) the route's shipped default applies.
+    """
     value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
-    return value.strip().casefold() == STABLE_TOOL_LIST
+    setting = value.strip().casefold()
+    if setting not in {STABLE_TOOL_LIST, ROUND_TOOL_LISTS}:
+        setting = DEFAULT_TOOL_LIST_BY_TRANSPORT.get(transport or "", DEFAULT_TOOL_LIST)
+    return setting == STABLE_TOOL_LIST
 
 
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.

@@ -545,12 +545,27 @@ def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
     started_campaign, tmp_path, monkeypatch, restart,
 ):
     """F2 proactive: Fable 5.2 binds thinking to the tool set on every account."""
+    from sylvia_gm.agent._context_ledger import stable_tool_list
+
     gm = ThinkingGM("claude-fable-5-2", drop_after=2)
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
     assert all(r.get("interruption") is None for r in replies), replies
     one, two, three = list(gm.native)[:3]
     calls = [_replayed(call) for call in gm.calls]
     assert calls[1][one] == ["thinking", "tool_use"]
+    one_list = stable_tool_list(transport="anthropic_messages")
+    assert {f.observation["one_tool_list"] for f in frames} == {one_list}
+    if one_list:
+        # One tool list: the tool the turn loop stops offering is still sent, so the sent
+        # tools never change and every turn keeps its thinking on every later request.
+        assert len({tuple(c["tools"]) for c in gm.calls}) == 1
+        for call, turns in ((calls[2], (one, two)), (calls[3], (one, two, three))):
+            assert all(call[turn] == ["thinking", "tool_use"] for turn in turns), call
+        moved = [f for f in frames if f.observation.get("thinking_strip")]
+        assert [f.observation["thinking_strip"] for f in moved] == ["new_generation"]
+        assert frames[-1].observation["thinking_floor"] == moved[0].observation["thinking_floor"]
+        assert frames[-1].reset is None
+        return
     # Request 3 has a changed tool list: every assistant turn in it, including the one new in
     # this request (produced under the previous tools), loses its thinking, and stays stripped.
     assert calls[2][one] == ["tool_use"] and calls[2][two] == ["tool_use"]
