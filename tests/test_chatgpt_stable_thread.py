@@ -407,7 +407,8 @@ async def test_a_continuation_failing_before_output_falls_back_to_one_fresh_thre
     assert not kept.alive and fresh.alive
     assert fresh.methods("thread/inject_items")[0]["items"] == items_of(SECOND)
     assert audit.reuse[1] == {"continued": False, "held_items": 0, "injected_items": 3,
-                              "retried_fresh": True, "kept": True}
+                              "retried_fresh": True, "fresh_reason": "runtime_error",
+                              "kept": True}
     assert len(audit.receipts) == 2 and audit.receipts[1]["status"] == "completed"
     await provider.close()
     assert runtime.alive() == []

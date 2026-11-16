@@ -77,6 +77,14 @@ _THREAD_MODES = {"stable": "interrupt", "answer": "answer"}
 _KEPT_THREAD_LIMIT = 4
 #: A kept thread left unused this long is closed.
 _KEPT_THREAD_IDLE_SECONDS = 600.0
+#: The same for a thread whose turn is still open, waiting for a call's result. The owner
+#: normally answers within seconds; a turn the player stopped must not wait long.
+_PENDING_TURN_IDLE_SECONDS = 90.0
+#: Events of a waiting turn that show the runtime went on without the call's answer.
+_TURN_MOVED_ON = frozenset({
+    "turn/completed", "item/tool/call", "item/agentMessage/delta",
+    "item/reasoning/textDelta", "item/reasoning/summaryTextDelta", "error",
+})
 #: Errors of a continued thread that a fresh thread may not repeat. Capacity, allowance,
 #: context-size and cancellation outcomes would recur or must reach the owner unchanged.
 _CONTINUATION_FAILURES = (
@@ -123,17 +131,27 @@ def app_server_request(
     return dynamic, items, system_instructions
 
 
-class _AnswerInPlaceError(ProviderConnectionError):
+class _KeptThreadMismatchError(ProviderConnectionError):
+    """A kept thread cannot serve this request; a fresh thread must. ``reason`` is a code."""
+
+    def __init__(self, reason: str, message: str) -> None:
+        super().__init__(message)
+        self.reason = reason
+
+
+class _AnswerInPlaceError(_KeptThreadMismatchError):
     """What the next request appends cannot be delivered as the pending call's answer."""
 
 
-@dataclass(frozen=True)
+@dataclass
 class _PendingCall:
     """A Sylvia tool call the runtime is still waiting on, inside an open turn."""
 
     request_id: object
     call_id: str
     turn_id: str
+    #: The runtime has not yet reported the usage of the response that made this call.
+    usage_owed: bool = True
 
 
 def _item_text(item: dict[str, Any]) -> str:
@@ -157,30 +175,52 @@ def _strings(value: object) -> list[str]:
     return []
 
 
-def _in_place_answer(tail: list[dict[str, Any]], call_id: str) -> tuple[str, list[str]]:
-    """The pending call's result and the user-role texts that follow it, from a request's tail.
+def _call_tail(
+    tail: list[dict[str, Any]], call_id: str, spoken: str,
+    error: type[_KeptThreadMismatchError] = _KeptThreadMismatchError,
+) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
+    """Sylvia's copy of the kept thread's call, its result and what follows, from a tail.
 
-    The tail must be: optionally the model's own text or reasoning before the call (the
-    thread already holds it), Sylvia's copy of the call, the call's result, then only
-    user-role messages. An assistant message after the result is accepted, and not sent,
-    only when the result or the call's arguments already contain its text: that is Sylvia's
-    copy of narration the model wrote in the call. Anything else cannot be delivered into an
-    open turn.
+    A kept thread ends with what the model streamed (``spoken``) and its call ``call_id``.
+    A request continues it only when it appends exactly that: the same text (absent when
+    nothing was streamed, and never absent when something was: the owner drops text it does
+    not keep), the call, and the call's result. Otherwise the thread would hold something
+    the request does not, and a fresh thread must serve it.
     """
     index = 0
+    text = ""
     while index < len(tail) and (
         tail[index].get("type") == "reasoning"
         or (tail[index].get("type") == "message" and tail[index].get("role") == "assistant")
     ):
+        if tail[index].get("type") == "message":
+            text += _item_text(tail[index])
         index += 1
     if len(tail) < index + 2:
-        raise _AnswerInPlaceError("The request does not answer the pending tool call.")
+        raise error("no_call_result", "The request does not answer the kept tool call.")
     call, output = tail[index], tail[index + 1]
     if (
         call.get("type") != "function_call" or call.get("call_id") != call_id
         or output.get("type") != "function_call_output" or output.get("call_id") != call_id
     ):
-        raise _AnswerInPlaceError("The request does not answer the pending tool call.")
+        raise error("no_call_result", "The request does not answer the kept tool call.")
+    if text != spoken:
+        raise error("model_text_differs", "The request does not hold the model's own text.")
+    return call, output, tail[index + 2:]
+
+
+def _in_place_answer(
+    tail: list[dict[str, Any]], call_id: str, spoken: str = "",
+) -> tuple[str, list[str]]:
+    """The pending call's result and the user-role texts that follow it, from a request's tail.
+
+    After the call and its result (``_call_tail``) only user-role messages may follow. An
+    assistant message after the result is accepted, and not sent, only when it is exactly
+    one text value of the result or of the call's arguments: that is Sylvia's copy of
+    narration the model wrote in the call. Anything else cannot be delivered into an open
+    turn.
+    """
+    call, output, rest = _call_tail(tail, call_id, spoken, _AnswerInPlaceError)
     raw = output.get("output")
     result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)
     known: list[str] = [result, str(call.get("arguments", ""))]
@@ -189,16 +229,20 @@ def _in_place_answer(tail: list[dict[str, Any]], call_id: str) -> tuple[str, lis
             with suppress(ValueError):
                 known.extend(_strings(json.loads(source)))
     texts: list[str] = []
-    for item in tail[index + 2:]:
+    for item in rest:
         if item.get("type") != "message":
-            raise _AnswerInPlaceError("The request adds more than messages after the result.")
+            raise _AnswerInPlaceError(
+                "tail_not_deliverable", "The request adds more than messages after the result.",
+            )
         text = _item_text(item)
         if item.get("role") == "user":
             texts.append(text)
-        elif item.get("role") == "assistant" and text and any(text in each for each in known):
+        elif item.get("role") == "assistant" and text and text in known:
             continue
         else:
-            raise _AnswerInPlaceError("The request adds a message the open turn cannot take.")
+            raise _AnswerInPlaceError(
+                "tail_not_deliverable", "The request adds a message the open turn cannot take.",
+            )
     return result, texts
 
 
@@ -218,6 +262,12 @@ class _KeptThread:
     dynamic_tools: list[dict[str, Any]]
     items: list[dict[str, Any]]
     generation: int
+    #: The call the thread's last response made, and the text it streamed before it.
+    call_id: str = ""
+    spoken: str = ""
+    #: The reasoning effort and speed tier the thread's current turn was started with.
+    effort: object = None
+    tier: object = None
     pending: _PendingCall | None = None
     idle_since: float = field(default_factory=time.monotonic)
     timer: threading.Timer | None = None
@@ -259,9 +309,11 @@ class _KeptThreads:
 
     def __init__(
         self, limit: int = _KEPT_THREAD_LIMIT, idle_seconds: float = _KEPT_THREAD_IDLE_SECONDS,
+        pending_idle_seconds: float = _PENDING_TURN_IDLE_SECONDS,
     ) -> None:
         self.limit = limit
         self.idle_seconds = idle_seconds
+        self.pending_idle_seconds = pending_idle_seconds
         self._lock = threading.Lock()
         self._idle: list[_KeptThread] = []  # least recently used first
         self._generations: dict[Path, int] = {}
@@ -273,6 +325,11 @@ class _KeptThreads:
     def generation(self, home: Path) -> int:
         with self._lock:
             return self._generations.get(home, 0)
+
+    def idle_limit(self, kept: _KeptThread) -> float:
+        if kept.pending is None:
+            return self.idle_seconds
+        return min(self.idle_seconds, self.pending_idle_seconds)
 
     def take(
         self, home: Path, model: str, instructions: str,
@@ -289,7 +346,7 @@ class _KeptThreads:
         with self._lock:
             close = [
                 kept for kept in self._idle
-                if kept.home != home or now - kept.idle_since >= self.idle_seconds
+                if kept.home != home or now - kept.idle_since >= self.idle_limit(kept)
             ]
             candidates = [kept for kept in self._idle if kept not in close]
             chosen = max(
@@ -317,7 +374,7 @@ class _KeptThreads:
             self._idle = self._idle[len(evicted):]
             _stop_timers(evicted)
             if kept not in evicted:
-                kept.timer = threading.Timer(self.idle_seconds, self._expire, (kept,))
+                kept.timer = threading.Timer(self.idle_limit(kept), self._expire, (kept,))
                 kept.timer.daemon = True
                 kept.timer.start()
         return evicted
@@ -387,6 +444,8 @@ class _Request:
     generation: int = 0
     status: str | None = None
     keep: _KeptThread | None = None
+    #: Every usage report the runtime sent during the current attempt, in order.
+    usage_reports: list[dict[str, object]] = field(default_factory=list)
 
 
 class ChatGPTProvider(Provider):
@@ -410,6 +469,10 @@ class ChatGPTProvider(Provider):
         self._last_response = ProviderResponse()
         self._thread_mode = _THREAD_MODES.get(os.environ.get(_THREAD_SWITCH, ""))
         self._stable_threads = self._thread_mode is not None
+        # State of the attempt in progress; attempts are serialised by ``_lock``.
+        self._usage_reports: list[dict[str, object]] = []
+        self._owed_previous_usage = False
+        self._extra_call_seen = False
 
     def _request_stop(self, connection: CodexConnection) -> None:
         cancel = getattr(connection, "request_stop", None)
@@ -505,6 +568,18 @@ class ChatGPTProvider(Provider):
         )
         if prompt is None or output is None or total is None:
             return
+        figures: dict[str, object] = {
+            "input": prompt, "cached": count("cachedInputTokens"), "output": output,
+        }
+        if self._owed_previous_usage:
+            # An answered call: the runtime first reports the response that made the call.
+            # Those figures belong to the previous request and are recorded, not attached.
+            self._owed_previous_usage = False
+            self._usage_reports.append({"response": "previous", **figures})
+            return
+        own = {"response": "own", **figures}
+        if not self._usage_reports or self._usage_reports[-1] != own:
+            self._usage_reports.append(own)
         response.usage = TokenUsage(prompt, output, total, count("reasoningOutputTokens"))
         response.usage_reported = True
         read, write = count("cachedInputTokens"), count("cacheWriteInputTokens")
@@ -556,12 +631,20 @@ class ChatGPTProvider(Provider):
                     await self._audit(method, params, received=True)
                     return "ended"
                 else:
+                    self._note_extra_call(method, params, thread_id)
                     await asyncio.sleep(0)
         except CodexCancelledError:
             raise
         except CodexConnectionError:
             return "failed"
         return "interrupted"
+
+    def _note_extra_call(
+        self, method: object, params: dict[str, Any], thread_id: str | None,
+    ) -> None:
+        """A second tool call of the same response: Sylvia returns one, so nothing is kept."""
+        if method == "item/tool/call" and params.get("threadId") in {None, thread_id}:
+            self._extra_call_seen = True
 
     async def _await_interrupted_turn_end(
         self, connection: CodexConnection, response: ProviderResponse,
@@ -588,6 +671,7 @@ class ChatGPTProvider(Provider):
                     await self._audit(method, params, received=True)
                     return True
                 else:
+                    self._note_extra_call(method, params, thread_id)
                     await asyncio.sleep(0)
         except CodexCancelledError:
             raise
@@ -626,9 +710,10 @@ class ChatGPTProvider(Provider):
     ) -> None:
         """Add only what this request appends to a kept thread; the next turn reads it all.
 
-        The appended items start with the model's own call and its result, so the model
-        sees its call answered rather than asking again.
+        The appended items must start with the model's own text, call and result
+        (``_call_tail``), so the model sees its call answered rather than asking again.
         """
+        _call_tail(request.items[len(kept.items):], kept.call_id, kept.spoken)
         drain = getattr(connection, "notifications", None)
         if callable(drain):
             # Events of the finished turn must not be read as events of the next one.
@@ -647,22 +732,44 @@ class ChatGPTProvider(Provider):
         """
         pending = kept.pending
         assert pending is not None
-        result, texts = _in_place_answer(request.items[len(kept.items):], pending.call_id)
+        result, texts = _in_place_answer(
+            request.items[len(kept.items):], pending.call_id, kept.spoken,
+        )
+        options = request.options
+        if (options.get("reasoning_effort"), options.get("service_tier")) != (
+            kept.effort, kept.tier,
+        ):
+            # The open turn keeps the effort and tier it was started with.
+            raise _AnswerInPlaceError(
+                "effort_or_tier_changed", "The request asks for another effort or tier.",
+            )
         drain = getattr(connection, "notifications", None)
         if callable(drain):
             for event in drain():
-                params = event.get("params")
-                if (
-                    event.get("method") == "turn/completed" and isinstance(params, dict)
-                    and params.get("threadId") in {None, kept.thread_id}
-                ):
-                    # The runtime gave up on the call while the thread was idle.
-                    raise _AnswerInPlaceError("The runtime turn ended before its answer.")
+                method, params = event.get("method"), event.get("params")
+                if not isinstance(params, dict) or params.get("threadId") not in {
+                    None, kept.thread_id,
+                }:
+                    continue
+                if method == "thread/tokenUsage/updated":
+                    # The report for the response that made the call, sent while it waited.
+                    await self._audit(method, params, received=True)
+                    self._owed_previous_usage = True
+                    self._capture_usage(
+                        ProviderResponse(), params, kept.thread_id, pending.turn_id,
+                    )
+                    self._owed_previous_usage = False
+                elif method in _TURN_MOVED_ON:
+                    # The runtime gave up on the call, or went on without its answer.
+                    raise _AnswerInPlaceError(
+                        "turn_moved_on", "The runtime turn went on before its answer.",
+                    )
         with timing.measure("history_injection"):
-            if texts:
+            for text in texts:
+                # One message each, as a fresh thread would hold them.
                 steer = {
                     "threadId": kept.thread_id, "expectedTurnId": pending.turn_id,
-                    "input": [{"type": "text", "text": text} for text in texts],
+                    "input": [{"type": "text", "text": text}],
                 }
                 await self._audit("turn/steer", steer)
                 steered = await asyncio.to_thread(connection.call, "turn/steer", steer)
@@ -692,8 +799,7 @@ class ChatGPTProvider(Provider):
             home, request.model, request.instructions, request.dynamic_tools, request.items,
         )
         try:
-            for each in stale:
-                await self._close_kept(each)
+            await self._close_kept(*stale)
         except BaseException:
             # Taken from the pool, so nothing else would ever close it.
             if kept is not None:
@@ -703,14 +809,24 @@ class ChatGPTProvider(Provider):
 
     async def _keep_thread(self, kept: _KeptThread) -> bool:
         stale = _KEPT_THREADS.keep(kept)
-        for each in stale:
-            await self._close_kept(each)
+        await self._close_kept(*stale)
         return kept not in stale
 
-    async def _close_kept(self, kept: _KeptThread) -> None:
-        """Collect an idle kept child; its failure to close never fails a request."""
-        with suppress(Exception):
-            await self._close_owned(kept.connection)
+    async def _close_kept(self, *threads: _KeptThread) -> None:
+        """Collect idle kept children; a failure to close never fails a request.
+
+        These threads are out of the pool, so nothing else would close them: a cancellation
+        while one closes still closes the rest, and is raised again afterwards.
+        """
+        cancelled: asyncio.CancelledError | None = None
+        for kept in threads:
+            try:
+                with suppress(Exception):
+                    await self._close_owned(kept.connection)
+            except asyncio.CancelledError as error:
+                cancelled = error
+        if cancelled is not None:
+            raise cancelled
 
     async def generate(
         self,
@@ -764,8 +880,6 @@ class ChatGPTProvider(Provider):
                 "kept": False,
             }
             if self._thread_mode == "answer":
-                # The runtime reports a response's usage when its call is answered, so a
-                # request that answers a call carries the previous request's usage figures.
                 reuse["answered_in_place"] = bool(kept is not None and kept.pending)
             finished = False
             try:
@@ -785,6 +899,8 @@ class ChatGPTProvider(Provider):
                         reuse.update(
                             continued=False, held_items=0, injected_items=len(items),
                             retried_fresh=True,
+                            # Why the kept thread could not serve this request.
+                            fresh_reason=getattr(error, "reason", "runtime_error"),
                         )
                         if "answered_in_place" in reuse:
                             reuse["answered_in_place"] = False
@@ -792,19 +908,29 @@ class ChatGPTProvider(Provider):
                         await attempt.aclose()
                 finished = True
             finally:
+                cancelled: asyncio.CancelledError | None = None
                 if request.keep is not None:
                     held, request.keep = request.keep, None
-                    # A stream closed or cancelled after its last chunk still keeps nothing.
-                    if finished:
-                        reuse["kept"] = await self._keep_thread(held)
-                    else:
-                        await self._close_kept(held)
+                    try:
+                        # A stream closed or cancelled after its last chunk keeps nothing.
+                        if finished:
+                            reuse["kept"] = await self._keep_thread(held)
+                        else:
+                            await self._close_kept(held)
+                    except asyncio.CancelledError as error:
+                        cancelled = error
                 if request.status is not None:
                     receipt = timing.snapshot(request.status)
                     if self._stable_threads:
+                        if self._thread_mode == "answer":
+                            # In order. "previous" is the response whose call this request
+                            # answered; its figures are never attached to this response.
+                            reuse["usage_reports"] = list(request.usage_reports)
                         await self._audit("sylvia/thread_reuse", reuse)
                         receipt["thread_reuse"] = reuse
                     await self._audit("sylvia/provider_lifecycle", receipt)
+                if cancelled is not None:
+                    raise cancelled
 
     async def _attempt(
         self, request: _Request, timing: LifecycleTiming, kept: _KeptThread | None,
@@ -836,6 +962,11 @@ class ChatGPTProvider(Provider):
         text_parts: list[str] = []
         thread_id: str | None = None
         turn_id: str | None = None
+        self._usage_reports = request.usage_reports = []
+        self._owed_previous_usage = bool(
+            kept is not None and kept.pending is not None and kept.pending.usage_owed
+        )
+        self._extra_call_seen = False
         status = "error"
         request.status = status
         stream_start: int | None = None
@@ -973,7 +1104,10 @@ class ChatGPTProvider(Provider):
                         # Leave the turn waiting on this call. The runtime starts nothing
                         # until the call is answered, and reports this response's usage
                         # then, so this request ends without a usage report of its own.
-                        open_call = _PendingCall(event["id"], call_id, str(turn_id))
+                        open_call = _PendingCall(
+                            event["id"], call_id, str(turn_id),
+                            usage_owed=not response.usage_reported,
+                        )
                         keep = True
                     else:
                         interrupt = await self._await_usage_after_tool_call(
@@ -989,6 +1123,24 @@ class ChatGPTProvider(Provider):
                                 )
                             )
                         )
+                    if keep:
+                        # Sylvia returns one call. Another call of the same response already
+                        # waiting means the thread would hold a call the request never will.
+                        queue_of = getattr(connection, "notifications", None)
+                        for queued in queue_of() if callable(queue_of) else []:
+                            queued_params = queued.get("params")
+                            if isinstance(queued_params, dict):
+                                self._note_extra_call(
+                                    queued.get("method"), queued_params, thread_id,
+                                )
+                                if queued.get("method") == "thread/tokenUsage/updated":
+                                    self._capture_usage(
+                                        response, queued_params, thread_id, turn_id,
+                                    )
+                        if open_call is not None:
+                            open_call.usage_owed = not response.usage_reported
+                        if self._extra_call_seen:
+                            keep, open_call = False, None
                     # Stop the runtime before the owner can execute this returned call; a kept
                     # runtime has ended its turn and starts nothing until it is continued.
                     end_stream("completed")
@@ -1065,6 +1217,17 @@ class ChatGPTProvider(Provider):
                     dynamic_tools=request.dynamic_tools,
                     items=request.items,
                     generation=request.generation,
+                    call_id=response.tool_calls[0].id,
+                    spoken="".join(text_parts),
+                    # An answered turn keeps what it was started with.
+                    effort=(
+                        kept.effort if kept is not None and kept.pending is not None
+                        else kwargs.get("reasoning_effort")
+                    ),
+                    tier=(
+                        kept.tier if kept is not None and kept.pending is not None
+                        else kwargs.get("service_tier")
+                    ),
                     pending=open_call,
                 )
             yield ProviderStreamChunk(finish_reason=response.finish_reason)
@@ -1095,6 +1258,11 @@ class ChatGPTProvider(Provider):
         if connection is not None:
             self._request_stop(connection)
             await self._close_owned(connection)
+        await self.release_idle()
+
+    async def release_idle(self) -> None:
+        """Close the runtime threads kept between requests for this home and model."""
         if self._stable_threads:
-            for kept in _KEPT_THREADS.release(self.home.resolve(), self.model_info.wire_model_id):
-                await self._close_kept(kept)
+            await self._close_kept(
+                *_KEPT_THREADS.release(self.home.resolve(), self.model_info.wire_model_id)
+            )

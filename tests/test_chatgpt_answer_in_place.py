@@ -128,9 +128,9 @@ async def test_a_call_is_answered_inside_the_turn_that_made_it(
     second = await provider.generate(SECOND, tools=TOOLS)
     assert [c.id for c in second.tool_calls] == ["call-2"]
     assert connection.methods("answer") == [answer_to(7, DOOR)]
-    # The usage the runtime reports on an answer belongs to the response that made the call.
-    assert second.usage_reported and second.usage.prompt_tokens == 100
-    assert second.cache_usage.cache_read_tokens == 0
+    # The usage the runtime reports on an answer belongs to the response that made the call:
+    # it is recorded as the previous response's and never attached to this one.
+    assert not second.usage_reported and second.usage.prompt_tokens == 0
 
     third_messages = [*SECOND, call("call-2"), result("call-2", "It is dark inside."),
                       user("SYLVIA_GM_STATE_UPDATE: the lamp is out.")]
@@ -154,12 +154,21 @@ async def test_a_call_is_answered_inside_the_turn_that_made_it(
     assert [p["items"] for p in connection.methods("thread/inject_items")] == [items_of(FIRST)]
     assert audit.reuse == [
         {"continued": False, "held_items": 0, "injected_items": 1,
-         "retried_fresh": False, "kept": True, "answered_in_place": False},
+         "retried_fresh": False, "kept": True, "answered_in_place": False,
+         "usage_reports": []},
         {"continued": True, "held_items": 1, "injected_items": 2,
-         "retried_fresh": False, "kept": True, "answered_in_place": True},
+         "retried_fresh": False, "kept": True, "answered_in_place": True,
+         "usage_reports": [{"response": "previous", "input": 100, "cached": 0, "output": 5}]},
         {"continued": True, "held_items": 3, "injected_items": 3,
-         "retried_fresh": False, "kept": False, "answered_in_place": True},
+         "retried_fresh": False, "kept": False, "answered_in_place": True,
+         "usage_reports": [
+             {"response": "previous", "input": 150, "cached": 140, "output": 5},
+             {"response": "own", "input": 160, "cached": 150, "output": 5},
+         ]},
     ]
+    # Every model response has exactly one report across the three records.
+    reports = [report for record in audit.reuse for report in record["usage_reports"]]
+    assert [report["input"] for report in reports] == [100, 150, 160]
     assert [r["thread_reuse"] for r in audit.receipts] == audit.reuse
     # The narrated reply ended the turn, so its thread is closed like any text reply.
     assert runtime.alive() == [] and len(answering) == 0
@@ -184,7 +193,9 @@ async def test_a_request_that_does_not_answer_the_waiting_call_starts_afresh(
     assert fresh.methods("thread/inject_items")[0]["items"] == items_of(messages)
     assert audit.reuse[1] == {
         "continued": False, "held_items": 0, "injected_items": 2,
-        "retried_fresh": True, "kept": False, "answered_in_place": False,
+        "retried_fresh": True, "fresh_reason": "no_call_result", "kept": False,
+        "answered_in_place": False,
+        "usage_reports": [{"response": "own", "input": 120, "cached": 100, "output": 5}],
     }
     assert runtime.alive() == [] and len(answering) == 0
 
@@ -273,11 +284,20 @@ def test_the_answer_is_the_calls_result_and_the_user_messages_after_it() -> None
     assert _in_place_answer(
         tail(call("call-1"), result("call-1"), user("Record one."), user("I go in.")), "call-1",
     ) == (DOOR, ["Record one.", "I go in."])
-    # The model's own words before the call are already in the thread.
+    # The model's own words before the call are already in the thread, and must be the same.
     spoken = {"role": "assistant", "content": "I try the handle.", "tool_calls": [{
         "id": "call-1", "type": "function", "function": {"name": "choose", "arguments": "{}"},
     }]}
-    assert _in_place_answer(tail(spoken, result("call-1")), "call-1") == (DOOR, [])
+    said = tail(spoken, result("call-1"))
+    assert _in_place_answer(said, "call-1", "I try the handle.") == (DOOR, [])
+    for held in ("", "I try the handle", "Something else."):
+        with pytest.raises(_AnswerInPlaceError) as refused:
+            _in_place_answer(said, "call-1", held)
+        assert refused.value.reason == "model_text_differs"
+    # Text the thread holds and the request dropped is a difference too.
+    with pytest.raises(_AnswerInPlaceError) as refused:
+        _in_place_answer(tail(call("call-1"), result("call-1")), "call-1", "I try the handle.")
+    assert refused.value.reason == "model_text_differs"
     # A result that is not text is sent as its JSON.
     items = tail(call("call-1"), result("call-1"))
     items[-1]["output"] = {"opened": True}
@@ -296,6 +316,11 @@ def test_narration_the_model_wrote_in_the_call_is_not_sent_back_to_it() -> None:
     # The same holds when the result carries the text.
     echoed = result("call-1", '{"committed": true, "narration": "The door creaks open."}')
     assert _in_place_answer(tail(call("call-1"), echoed, copy), "call-1")[1] == []
+    # Only a whole text value counts: a fragment of one is something the model never wrote.
+    fragment = {"role": "assistant", "content": "The door"}
+    with pytest.raises(_AnswerInPlaceError) as refused:
+        _in_place_answer(tail(call("call-1"), echoed, fragment), "call-1")
+    assert refused.value.reason == "tail_not_deliverable"
 
 
 @pytest.mark.parametrize("appended", [

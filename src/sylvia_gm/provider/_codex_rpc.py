@@ -43,6 +43,11 @@ def add_account_change_listener(listener: Callable[[Path], None]) -> None:
         _account_change_listeners.append(listener)
 
 
+def account_changed(home: Path) -> None:
+    """Tell listeners a runtime home's account has just changed (a sign-in completed)."""
+    _announce_account_change(home)
+
+
 def _announce_account_change(home: Path) -> None:
     for listener in tuple(_account_change_listeners):
         with suppress(Exception):
