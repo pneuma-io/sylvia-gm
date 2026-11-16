@@ -436,6 +436,19 @@ def unsealed(content: object) -> str:
     return _SEAL.sub("", str(content or ""), count=1)
 
 
+def latest_player_message(messages: Sequence[dict[str, Any]]) -> tuple[int, str]:
+    """Index and text of the newest user-role message the application did not write.
+
+    The context ledger sends its own data records as sealed user-role messages, often after
+    the player's message, so "the last user message" is not the player's in that assembly.
+    """
+    for index in range(len(messages) - 1, -1, -1):
+        content = str(messages[index].get("content", ""))
+        if messages[index].get("role") == "user" and not _SEAL.match(content):
+            return index, content
+    return -1, ""
+
+
 def host_records(messages: Sequence[dict[str, Any]], label: str) -> list[dict[str, Any]]:
     """Messages carrying *label*, oldest first, in either request assembly."""
     return [
