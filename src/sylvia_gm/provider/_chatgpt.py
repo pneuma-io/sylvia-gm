@@ -18,7 +18,7 @@ import json
 import os
 import threading
 import time
-from collections.abc import AsyncGenerator, AsyncIterator, Callable
+from collections.abc import AsyncGenerator, AsyncIterator, Callable, Mapping
 from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -67,15 +67,34 @@ _USAGE_SETTLE_SECONDS = 0.3
 #: How long to wait for that report after the interrupt. It normally arrives at once.
 _USAGE_REPORT_SECONDS = 1.0
 
-#: Environment switch, read when a provider is created. Every value keeps runtime threads.
-#: "stable" interrupts the turn at a tool call (as without the switch) and continues the
-#: thread with a further turn. "answer" leaves the turn waiting and, when the next request
-#: brings the call's result, answers the call inside that same turn. "answer-draft" is
+#: Environment switch, read when a provider is created.
+#: "fresh" starts a new runtime process and thread for every request and interrupts the turn
+#: at a tool call (the behaviour before kept threads). "answer" keeps the thread and leaves
+#: the turn waiting at a tool call; the next request, which brings the call's result,
+#: answers the call inside that same turn. "stable" keeps the thread but interrupts the turn
+#: at a tool call and continues with a further turn (experimental). "answer-draft" is
 #: "answer" that also answers when the owner dropped the text the model streamed before its
-#: call (an unsettled draft the thread then still holds); an experiment, to be measured.
+#: call, so the thread still holds that draft (experimental).
+#: Unset, or any other value: "answer" with the context ledger, "fresh" without it, so
+#: ``SYLVIA_GM_CONTEXT_MODE=legacy`` alone restores the whole previous behaviour.
 _THREAD_SWITCH = "SYLVIA_CHATGPT_THREAD"
+_FRESH_THREADS = "fresh"
+_DEFAULT_THREAD_MODE = "answer"
 _THREAD_MODES = {"stable": "interrupt", "answer": "answer", "answer-draft": "answer"}
 _DRAFT_KEEPING_VALUE = "answer-draft"
+
+
+def thread_setting(environ: Mapping[str, str] | None = None) -> str:
+    """The ``SYLVIA_CHATGPT_THREAD`` value that applies: one of ``_THREAD_MODES`` or fresh."""
+    value = (os.environ if environ is None else environ).get(_THREAD_SWITCH, "")
+    setting = value.strip().casefold()
+    if setting == _FRESH_THREADS or setting in _THREAD_MODES:
+        return setting
+    from sylvia_gm.agent._context_ledger import LEDGER_MODE, context_mode
+
+    # A kept thread only pays with requests that extend the previous one (the ledger).
+    ledger = context_mode(environ, transport="codex_app_server") == LEDGER_MODE
+    return _DEFAULT_THREAD_MODE if ledger else _FRESH_THREADS
 #: Idle runtime threads kept open at once; the least recently used is closed first.
 _KEPT_THREAD_LIMIT = 4
 #: A kept thread left unused this long is closed.
@@ -346,9 +365,9 @@ class _KeptThread:
             return None
         return None
 
-    def close_quietly(self, pool: _KeptThreads | None = None) -> None:
+    def close_quietly(self, pool: _KeptThreads | None = None, *, collect: bool = True) -> None:
         _stop_timers([self])
-        figures = self.collect_owed_usage()
+        figures = self.collect_owed_usage() if collect else None
         if figures is not None and pool is not None:
             pool.abandon(self.home, self.ordinal, figures)
         with suppress(Exception):
@@ -499,8 +518,13 @@ class _KeptThreads:
         return released
 
     def close_all(self) -> None:
+        """Close every kept thread at once, at process exit.
+
+        No later request can record a waiting turn's usage then, so none is collected: the
+        app closes without waiting on the runtime.
+        """
         for kept in self.release():
-            kept.close_quietly(self)
+            kept.close_quietly(self, collect=False)
 
 
 _KEPT_THREADS = _KeptThreads()
@@ -566,7 +590,7 @@ class ChatGPTProvider(Provider):
         self._lock = asyncio.Lock()
         self._active: CodexConnection | None = None
         self._last_response = ProviderResponse()
-        switch = os.environ.get(_THREAD_SWITCH, "")
+        switch = thread_setting()
         self._thread_mode = _THREAD_MODES.get(switch)
         self._stable_threads = self._thread_mode is not None
         self._keeps_dropped_draft = switch == _DRAFT_KEEPING_VALUE

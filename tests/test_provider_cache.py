@@ -215,8 +215,14 @@ INTERRUPTED = {
 
 
 @pytest.mark.asyncio
-async def test_chatgpt_collects_usage_for_a_tool_call_by_interrupting_the_turn(tmp_path):
-    """Issue 78: the runtime holds the report until the tool call resolves or is interrupted."""
+async def test_chatgpt_collects_usage_for_a_tool_call_by_interrupting_the_turn(
+    tmp_path, monkeypatch,
+):
+    """Issue 78: the runtime holds the report until the tool call resolves or is interrupted.
+
+    That is the path with a new runtime thread per request (``SYLVIA_CHATGPT_THREAD=fresh``).
+    """
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "fresh")
     runtime = InterruptibleRuntime([TOOL_CALL], [
         usage_event({"inputTokens": 900, "outputTokens": 90, "totalTokens": 990},
                     turn="other-turn"),
@@ -236,9 +242,10 @@ async def test_chatgpt_collects_usage_for_a_tool_call_by_interrupting_the_turn(t
 
 
 @pytest.mark.asyncio
-async def test_chatgpt_interrupted_turn_without_a_report_returns_at_once(tmp_path):
+async def test_chatgpt_interrupted_turn_without_a_report_returns_at_once(tmp_path, monkeypatch):
     import time
 
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "fresh")
     runtime = InterruptibleRuntime([TOOL_CALL], [INTERRUPTED])
     started = time.monotonic()
     response = await provider_for(runtime, tmp_path).generate(

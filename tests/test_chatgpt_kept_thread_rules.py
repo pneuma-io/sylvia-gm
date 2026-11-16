@@ -725,6 +725,21 @@ async def test_a_request_stopped_while_answering_does_not_wait_to_collect_usage(
     assert runtime.alive() == [] and len(answering) == 0
 
 
+@pytest.mark.asyncio
+async def test_closing_the_app_does_not_wait_on_a_waiting_turn(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    """At process exit no later request can record usage, so none is collected."""
+    runtime = AnswerRuntime(waiting_that_reports_when_interrupted())
+    provider, _ = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    [connection] = runtime.connections
+    assert connection.alive and len(answering) == 1
+    answering.close_all()
+    assert connection.methods("turn/interrupt") == []
+    assert runtime.alive() == [] and len(answering) == 0
+
+
 def test_a_held_report_names_how_many_requests_before_it_belongs(tmp_path: Path) -> None:
     held_pool = _chatgpt._KeptThreads()
     home, other = tmp_path / "a", tmp_path / "b"

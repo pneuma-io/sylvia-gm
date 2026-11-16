@@ -729,13 +729,33 @@ def _evidence_kinds(database: Path, session: str) -> list[str]:
                 if m.kind is SessionMessageKind.EVIDENCE]
 
 
-def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(tmp_path, monkeypatch):
+class ChatGPTContractGM(ContractGM):
+    """The scripted GM as a ChatGPT subscription model, so that route's defaults apply."""
+
+    def __init__(self) -> None:
+        from sylvia_gm.provider._base import ModelInfo
+
+        super().__init__()
+        self.model_info = ModelInfo(
+            id="chatgpt-subscription/gpt-6.1-terra", name="Terra", provider_name="ChatGPT",
+            provider_key="chatgpt_subscription", provider_mode="subscription",
+            transport="codex_app_server", context_window=400_000, max_output_tokens=None,
+        )
+
+
+@pytest.mark.parametrize("route", ["switched", "chatgpt_default"])
+def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(
+    tmp_path, monkeypatch, route,
+):
     """A campaign played before the ledger was its route's default takes it up cleanly.
 
     A long history under the previous assembly, part of it behind a working-context
-    checkpoint and none of it journalled, then a restart under the ledger (as the
-    ``claude_code`` default now does): the first request starts the journal and is sent in
-    full, honours the saved checkpoint, and every later request extends it.
+    checkpoint and none of it journalled, then a restart under the ledger: the first request
+    starts the journal and is sent in full, honours the saved checkpoint, and every later
+    request extends it. ``switched`` selects the ledger with its switch (as the
+    ``claude_code`` default does); ``chatgpt_default`` is a ChatGPT subscription campaign
+    with no switch set, so that route's shipped defaults (the ledger and one tool list)
+    take over.
     """
     from sylvia_gm.application.authority import AuthorityOwner
     from tests.test_fc_campaign_journey import _start_campaign
@@ -745,7 +765,8 @@ def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(tmp_path,
     with AuthorityOwner.open(database, "adoption-ids") as owner:
         player = next(p.participant_id for p in owner.snapshot(campaign).participants
                       if p.data.get("party_role") == "player_character")
-    gm = ContractGM()
+    gm = ChatGPTContractGM() if route == "chatgpt_default" else ContractGM()
+    monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
 
     # Played under the previous assembly, with a compaction partway.
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
@@ -776,7 +797,10 @@ def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(tmp_path,
     assert "gm_wire_journal" not in saved, saved
 
     # The same campaign after an update makes the ledger its route's default.
-    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    if route == "chatgpt_default":
+        monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
     recorder = LedgerRecorder().install(monkeypatch)
     table = Table(database, gm, campaign, session)
     try:
@@ -803,7 +827,9 @@ def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(tmp_path,
     assert ADOPTED_TURNS[0] in conversation
 
     # Every later request extends the one before it; the journal start is the only reset.
-    for transport in ("chat_completions", "claude_code"):
+    transports = (("chat_completions", "codex_app_server") if route == "chatgpt_default"
+                  else ("chat_completions", "claude_code"))
+    for transport in transports:
         checked = frames if transport == "chat_completions" else replay(frames, transport)
         result = check_extension(checked, transport, f"adoption-{transport}")
         assert result["resets"] == [], (transport, result)
@@ -811,6 +837,10 @@ def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(tmp_path,
     assert all(frame.reset is None for frame in frames[1:]), [f.reset for f in frames]
     assert {(f.epoch, f.generation) for f in frames} == {(first.epoch, first.generation)}
     assert "gm_wire_journal" in _evidence_kinds(database, session)
+    if route == "chatgpt_default":
+        # One tool list is on by default there, and recorded as such on every request.
+        assert all(frame.observation.get("one_tool_list") is True for frame in frames), [
+            frame.observation.get("one_tool_list") for frame in frames]
 
 
 def test_owner_restart_rebuilds_the_journal_from_saved_evidence(played):
