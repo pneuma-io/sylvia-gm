@@ -187,6 +187,19 @@ FACT_LIST_PATHS: tuple[tuple[str, ...], ...] = (
 ADDITIVE_MAP_PATHS: tuple[tuple[str, ...], ...] = (("GM_PRIVATE_CURRENT", "character_knowledge"),)
 
 
+#: ``stable`` sends one tool list for the whole session in ledger mode (see
+#: ``ContextLedger.sent_tools``). Anything else keeps the list the turn loop offers each round.
+TOOL_LIST_ENV = "SYLVIA_GM_TOOL_LIST"
+STABLE_TOOL_LIST = "stable"
+CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
+
+
+def stable_tool_list(environ: Mapping[str, str] | None = None) -> bool:
+    """Whether ledger mode sends one tool list for the session (off unless set to ``stable``)."""
+    value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
+    return value.strip().casefold() == STABLE_TOOL_LIST
+
+
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
 #: Every route ships with the previous assembly. A route is moved to the context ledger here,
 #: by its transport name, once a measured run on that route supports it.
@@ -961,6 +974,8 @@ class WireFrame:
     prefix_sha256: str
     reset: str | None
     observation: dict[str, Any]
+    #: One tool list only: every tool sent up to and including this request.
+    tool_list: list[dict[str, Any]] | None = None
 
 
 #: The latest frame planned in this task, for benchmark provenance (read-only observation).
@@ -992,6 +1007,65 @@ def toolset_fingerprint(tools: Sequence[Mapping[str, Any]] | None) -> str:
     return _sha(_json(ordered))
 
 
+def merged_tool_list(
+    sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """The tools already sent plus any offered tool not yet among them, and the added ones.
+
+    A tool is identified by its name. Its definition stays as first sent, so the list only
+    ever grows at its end and every earlier request's tool list is a prefix of a later one.
+    """
+    merged = [dict(tool) for tool in sent]
+    names = {_tool_name(tool) for tool in merged}
+    added: list[dict[str, Any]] = []
+    for tool in offered or ():
+        name = _tool_name(tool)
+        if name and name not in names:
+            names.add(name)
+            added.append(dict(plain(tool)))
+    return [*merged, *added], added
+
+
+def saved_tool_list(
+    records: Sequence[Mapping[str, Any]], context_owner: Mapping[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """The tools this session's journal records say were sent, in first-sent order."""
+    owner = plain(context_owner) if context_owner is not None else None
+    tools: list[dict[str, Any]] = []
+    for record in records:
+        if not _saved(record, JOURNAL_KIND):
+            continue
+        if owner is not None and plain(record.get("context_owner")) != owner:
+            continue
+        added = record.get("tools_added")
+        if isinstance(added, Sequence) and not isinstance(added, (str, bytes, bytearray)):
+            tools, _new = merged_tool_list(
+                tools, [tool for tool in added if isinstance(tool, Mapping)])
+    return tools
+
+
+def callable_record(
+    sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
+) -> str:
+    """Say which of the listed tools can be called at this step, in the shorter of two forms."""
+    listed = [_tool_name(tool) for tool in sent]
+    allowed = {_tool_name(tool) for tool in offered or ()}
+    can = sorted(name for name in listed if name in allowed)
+    cannot = sorted(name for name in listed if name not in allowed)
+    head = (f"{CALLABLE_LABEL} (application control, not player speech; the latest record "
+            "with this label applies): ")
+    if not cannot:
+        return head + "every tool listed in this request can be called at this step."
+    if not can:
+        return head + ("no tool can be called at this step. Reply without a tool call; a tool "
+                       "call now is refused.")
+    if len(can) <= len(cannot):
+        return head + ("at this step only these listed tools can be called: " + ", ".join(can)
+                       + ". A call to any other tool is refused.")
+    return head + ("at this step every listed tool can be called except: " + ", ".join(cannot)
+                   + ". A call to one of those is refused.")
+
+
 class ContextLedger:
     """Reconcile canonical GM requests into an append-only wire journal for one session."""
 
@@ -1001,17 +1075,48 @@ class ContextLedger:
         session_id: str,
         context_owner: Mapping[str, Any] | None,
         transport: str | None,
+        one_tool_list: bool = False,
     ) -> None:
         self.session_id = session_id
         self.context_owner = dict(context_owner) if context_owner is not None else None
         self.transport = transport
         self.seal = host_seal(session_id)
+        #: Send every tool sent so far instead of the list offered this round.
+        self.one_tool_list = one_tool_list
+        #: The tools sent so far in first-sent order; ``None`` until read from saved records.
+        self._tool_list: list[dict[str, Any]] | None = None
         self.state: JournalState | None = None
         self.prefix_sha256: str | None = None
         #: A declared reset requested for the next frame of this epoch (``journal_rebased``).
         self._pending_reset: tuple[str, str] | None = None
         #: The epoch whose next request strips every replayed thinking block (after a 400).
         self._pending_strip: str | None = None
+
+    def _sent_so_far(
+        self, history_records: Callable[[], Sequence[Mapping[str, Any]]],
+    ) -> list[dict[str, Any]]:
+        if self._tool_list is None:
+            # Read once per ledger (an owner restart, a new owner or route starts a new one).
+            self._tool_list = saved_tool_list(history_records(), self.context_owner)
+        return self._tool_list
+
+    def sent_tools(
+        self,
+        offered: Sequence[Mapping[str, Any]] | None,
+        *,
+        history_records: Callable[[], Sequence[Mapping[str, Any]]] = tuple,
+    ) -> Sequence[Mapping[str, Any]] | None:
+        """The tool list a request offering *offered* sends.
+
+        Normally that is *offered*. With one tool list it is every tool sent so far followed
+        by any offered tool not yet sent, so a provider's cached prefix survives the turn
+        loop offering a different subset each round. Which tools can be called is unchanged:
+        the turn loop still accepts only the offered ones.
+        """
+        if not self.one_tool_list:
+            return offered
+        merged, _added = merged_tool_list(self._sent_so_far(history_records), offered)
+        return merged or offered
 
     def request_thinking_strip(self) -> None:
         """The service rejected a replayed thinking block: strip all of them from now on."""
@@ -1226,6 +1331,15 @@ class ContextLedger:
             appended.append({"m": self._host_message(message, wire_content), "c": cls,
                              "l": label, "h": digest})
 
+        # One tool list: what is sent is every tool sent so far; *tools* stays what can be
+        # called. The fingerprints below describe what is sent.
+        offered_tools = tools
+        tools_added: list[dict[str, Any]] = []
+        tool_list: list[dict[str, Any]] | None = None
+        if self.one_tool_list:
+            tool_list, tools_added = merged_tool_list(
+                self._sent_so_far(history_records), offered_tools)
+            tools = tool_list or offered_tools
         state_messages = [
             m for m in hosts if str(m.get("content", "")).startswith(STATE_LABEL + " ")
         ]
@@ -1259,6 +1373,12 @@ class ContextLedger:
                 content = _withdrawn(label)
                 appended.append({"m": self._host_message({"role": "system"}, content),
                                  "c": "latest", "l": label, "h": _sha(content)})
+        if self.one_tool_list and tool_list:
+            # Tell the model which listed tools can be called now, only when that changed.
+            content = callable_record(tool_list, offered_tools)
+            if (last_of_label(CALLABLE_LABEL) or {}).get("h") != _sha(content):
+                appended.append({"m": self._host_message({"role": "system"}, content),
+                                 "c": "latest", "l": CALLABLE_LABEL, "h": _sha(content)})
         if state_messages:
             self._append_state(state, appended, str(state_messages[-1].get("content", "")),
                                tag_of(state_messages[-1], ACTIVE_RECORDS_KEY))
@@ -1323,7 +1443,7 @@ class ContextLedger:
         toolset_changed = (self.transport == "anthropic_messages"
                            and toolset_before is not None and toolset_before != toolset)
         record = None
-        if appended or reset is not None or floor_moved or toolset_changed:
+        if appended or reset is not None or floor_moved or toolset_changed or tools_added:
             record = {
                 "kind": JOURNAL_KIND,
                 "version": JOURNAL_VERSION,
@@ -1346,6 +1466,9 @@ class ContextLedger:
                 "toolset_sha256": toolset,
                 "thinking_floor": state.thinking_floor,
                 **({"thinking_strip": thinking_strip} if floor_moved else {}),
+                # One tool list: the definitions first sent by this request, so a restart
+                # sends the same list in the same order.
+                **({"tools_added": tools_added} if tools_added else {}),
             }
         wire = [
             {key: value for key, value in m.items() if key not in MARKER_KEYS
@@ -1368,8 +1491,11 @@ class ContextLedger:
             "toolset_sha256": toolset,
             "thinking_floor": state.thinking_floor,
             "thinking_strip": thinking_strip if floor_moved else None,
+            "one_tool_list": self.one_tool_list,
+            "callable_tool_count": len(offered_tools or []),
         }
-        return WireFrame(wire, state, record, appended, base_count, prefix, reset, observation)
+        return WireFrame(wire, state, record, appended, base_count, prefix, reset, observation,
+                         tool_list)
 
     def _append_state(
         self, state: JournalState, appended: list[dict[str, Any]], content: str,
@@ -1413,6 +1539,8 @@ class ContextLedger:
         """Adopt a planned frame after its journal record was acknowledged."""
         self.state = frame.state
         self.prefix_sha256 = frame.prefix_sha256
+        if frame.tool_list is not None:
+            self._tool_list = frame.tool_list
         # A requested reset applies once: to this frame, or never once the epoch moved on.
         self._pending_reset = None
         self._pending_strip = None

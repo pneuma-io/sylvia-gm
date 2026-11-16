@@ -36,6 +36,7 @@ from sylvia_gm.agent._context_ledger import (
     context_mode,
     native_inputs,
     native_record,
+    stable_tool_list,
     tagged,
 )
 from sylvia_gm.agent._inference_identity import inference_context_id
@@ -1638,6 +1639,7 @@ class ProviderSessionAdapter:
         # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
         self._context_mode = context_mode(
             transport=getattr(getattr(provider, "model_info", None), "transport", None))
+        self._one_tool_list = stable_tool_list()
         self._context_ledgers: dict[str, ContextLedger] = {}
         self._timeout = timeout
         self._gm_system_prompt = gm_system_prompt
@@ -2337,7 +2339,7 @@ class ProviderSessionAdapter:
 
     def _ledger_hooks(
         self, provider_input: SessionProviderInput, provider: Provider, bridge: Any,
-    ) -> tuple[Any, Any, Any, Any]:
+    ) -> tuple[Any, Any, Any, Any, Any]:
         """Bind the session's ledger to one provider round: plan, journal, then send."""
         session_id = provider_input.session.session_id
         owner = self._ledger_owner(provider_input)
@@ -2349,7 +2351,8 @@ class ProviderSessionAdapter:
         if ledger is None or ledger.context_owner != owner or ledger.transport != transport:
             previous = ledger
             ledger = ContextLedger(session_id=session_id, context_owner=owner,
-                                   transport=transport)
+                                   transport=transport,
+                                   one_tool_list=self._one_tool_list)
             if previous is not None:
                 # A different owner or transport is a new epoch; keep the reset visible.
                 ledger.state = previous.state
@@ -2430,7 +2433,13 @@ class ProviderSessionAdapter:
             ledger.request_thinking_strip()
             measured.clear()
 
-        return finalize, measure, rebase, strip_thinking
+        def wire_tools(
+            tools: list[dict[str, object]] | None,
+        ) -> Sequence[Mapping[str, Any]] | None:
+            # One tool list: what the provider is sent for a request offering these tools.
+            return ledger.sent_tools(tools, history_records=saved_records)
+
+        return finalize, measure, rebase, strip_thinking, wire_tools
 
     @staticmethod
     def _claude_native_route(
@@ -3857,9 +3866,9 @@ class ProviderSessionAdapter:
                        else [m.content for m in provider_input.history.messages])
             # Keep all conversation and checkpoints, but bind callbacks to this request's control.
             bridge = CheckpointBridge()
-            finalize_request, measure_wire, rebase_wire, strip_thinking = (
+            finalize_request, measure_wire, rebase_wire, strip_thinking, wire_tools = (
                 self._ledger_hooks(provider_input, provider, bridge)
-                if self._ledger_active(provider_input) else (None, None, None, None)
+                if self._ledger_active(provider_input) else (None, None, None, None, None)
             )
             working = WorkingContextProvider(
                 provider, records=records, record_owner=self._gm_context_owner(provider_input),
@@ -3876,6 +3885,7 @@ class ProviderSessionAdapter:
                 measure_wire=measure_wire,
                 rebase_wire=rebase_wire,
                 strip_thinking=strip_thinking,
+                wire_tools=wire_tools,
             )
             self._working_contexts[session_id] = (working, bridge)
             provider = working
