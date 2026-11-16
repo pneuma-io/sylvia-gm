@@ -14073,3 +14073,44 @@ def test_automatic_transition_with_required_judgment_fails_before_action_or_infe
         tuple(adapter.for_turn("turn-provider")(provider_input))
     assert captured.value.code == "invalid_engine_transition_surface"
     assert provider.calls == []
+
+
+def test_player_boundary_control_lets_an_ordered_player_action_finish() -> None:
+    """The control must not tell the GM to stop before a turn end the player asked for.
+
+    The fixed GM contract says ordered chat actions, such as attacking and then ending the
+    turn, are carried out in order with one combined response. This control arrives after the
+    first step commits; when it only said "narrate and stop", a GM that read it last narrated
+    the attack and left the player's turn open.
+    """
+    from sylvia_gm.agent._provider_session import _player_boundary_narration_message
+
+    boundary = ModelDecisionBoundary(
+        owner=ModelDecisionOwner.PLAYER,
+        actor_id="hero",
+        actor_name="Hero",
+        actor_state={},
+        campaign_revision=7,
+    )
+    message = _player_boundary_narration_message(
+        boundary,
+        current_player_action="I attack the guard with my mace, then I end my turn.",
+        committed_operations=["resolve_combat_attack"],
+        player_intent_pending=False,
+    )
+    content = str(message["content"])
+    assert message["role"] == "system"
+    assert '"current_player_action":"I attack the guard with my mace, then I end my turn."' in (
+        content
+    )
+    ordered = (
+        "If current_player_action states further steps in order that are not yet committed, "
+        "such as ending the turn after the attack, and every step before them is committed, "
+        "carry out the next stated step now with its currently exposed operation before you "
+        "narrate; stop instead if an earlier step failed or needs a decision or Reaction."
+    )
+    assert ordered in content
+    # The ordered step is read before the instruction to narrate and stop, and the control
+    # still forbids choosing anything the player did not state.
+    assert content.index(ordered) < content.index("Narrate the committed outcome and stop")
+    assert "Never choose a new action, target, tactic" in content
