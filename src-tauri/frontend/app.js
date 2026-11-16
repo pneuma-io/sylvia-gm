@@ -6228,7 +6228,7 @@ const SylviaGMFrontend = (() => {
     return other ? other.data.spell_categories : {};
   }
 
-  // Roman numerals for tier numbers 1 to 39 (the fantasy sheet's spell slot tiers); other numbers stay as they are.
+  // Roman numerals for the fantasy sheet's numbered resource tiers (1 to 39); other numbers stay as they are.
   function romanNumeral(number) {
     if (!Number.isInteger(number) || number < 1 || number > 39) return String(number);
     return 'X'.repeat(Math.floor(number / 10)) + ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][number % 10];
