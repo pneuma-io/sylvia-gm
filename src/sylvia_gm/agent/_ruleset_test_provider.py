@@ -8,6 +8,7 @@ from copy import deepcopy
 from dataclasses import replace
 from typing import Any, NoReturn
 
+from sylvia_gm.agent._context_ledger import CALLABLE_LABEL
 from sylvia_gm.agent._provider_session import _tool_alias
 from sylvia_gm.agent._session_loop import ProviderEvent, SessionProvider, SessionProviderInput
 from sylvia_gm.provider._base import Provider, ProviderResponse, ProviderStreamChunk
@@ -91,6 +92,16 @@ class RulesetTestProvider(Provider):
             str(tool["function"]["name"]): self._aliases.get(str(tool["function"]["name"]))
             for tool in tools or []
         }
+        # With one tool list the latest callable-tools record says which listed tools can be
+        # called at this step; read it as a model would.
+        record = next((str(m.get("content", "")) for m in reversed(messages)
+                       if CALLABLE_LABEL in str(m.get("content", ""))), "")
+        if "no tool can be called" in record:
+            exposed = {}
+        elif ". A call to" in record:
+            named = set(record.rsplit(": ", 1)[1].split(". A call to", 1)[0].split(", "))
+            keep = "only these listed tools" in record
+            exposed = {k: v for k, v in exposed.items() if (k in named) is keep}
         names = {name for name in exposed.values() if name is not None}
         owner = self._decision_owner()
         self.requests.append({"decision_owner": owner, "available_tools": sorted(names)})
