@@ -676,9 +676,12 @@ async def test_stop_between_requests_writes_the_waiting_turns_usage_to_the_audit
 
     provider.hooks.register(Closed())
     await provider.generate(FIRST, tools=TOOLS)
+    upcoming = answering.next_ordinal(tmp_path.resolve(), take=False)
     await provider.release_idle()
     assert runtime.alive() == [] and len(answering) == 0
     assert closed == [{"usage_reports": [ABANDONED]}]
+    # Stop is not a request: the next request keeps the number it would have had.
+    assert answering.next_ordinal(tmp_path.resolve(), take=False) == upcoming
     await provider.release_idle()
     assert len(closed) == 1
 
@@ -737,6 +740,9 @@ def test_a_held_report_names_how_many_requests_before_it_belongs(tmp_path: Path)
          "input": 3, "cached": 0, "output": 1},
     ]
     assert held_pool.take_abandoned(home, 5) == []
+    # Asking which number comes next does not use one up.
+    assert held_pool.next_ordinal(home, take=False) == 4
+    assert held_pool.next_ordinal(home) == 4
     assert [r["input"] for r in held_pool.take_abandoned(other, 2)] == [9]
     for index in range(_chatgpt._ABANDONED_REPORT_LIMIT + 5):  # noqa: SLF001
         held_pool.abandon(home, index, {"input": index, "cached": 0, "output": 1})
