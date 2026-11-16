@@ -378,6 +378,7 @@ PYTHON_JOURNEYS = {
         'tests/test_chatgpt_auth_lifecycle.py',
         'tests/test_chatgpt_cancel_boundaries.py',
         'tests/test_chatgpt_lifecycle.py',
+        'tests/test_chatgpt_answer_in_place.py',
         'tests/test_chatgpt_model_defaults.py',
         'tests/test_chatgpt_stable_thread.py',
         'tests/test_compatible_reasoning_channels.py',

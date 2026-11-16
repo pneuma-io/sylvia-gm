@@ -371,6 +371,11 @@ class CodexConnection:
                 raise CodexConnectionError("The Codex runtime returned an unsupported reply.")
             return result
 
+    def respond(self, request_id: object, result: dict[str, Any]) -> None:
+        """Answer a server request this connection forwarded, such as a Sylvia tool call."""
+        self._check_stopped()
+        self._write({"id": request_id, "result": result})
+
     def notifications(self) -> list[dict[str, Any]]:
         """Drain pending protocol notifications for owner-side interpretation only."""
         items = []

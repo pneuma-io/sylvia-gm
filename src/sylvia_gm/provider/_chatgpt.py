@@ -67,8 +67,12 @@ _USAGE_SETTLE_SECONDS = 0.3
 #: How long to wait for that report after the interrupt. It normally arrives at once.
 _USAGE_REPORT_SECONDS = 1.0
 
-#: Environment switch, read when a provider is created: "stable" keeps runtime threads.
+#: Environment switch, read when a provider is created. Both values keep runtime threads.
+#: "stable" interrupts the turn at a tool call (as without the switch) and continues the
+#: thread with a further turn. "answer" leaves the turn waiting and, when the next request
+#: brings the call's result, answers the call inside that same turn.
 _THREAD_SWITCH = "SYLVIA_CHATGPT_THREAD"
+_THREAD_MODES = {"stable": "interrupt", "answer": "answer"}
 #: Idle runtime threads kept open at once; the least recently used is closed first.
 _KEPT_THREAD_LIMIT = 4
 #: A kept thread left unused this long is closed.
@@ -119,9 +123,92 @@ def app_server_request(
     return dynamic, items, system_instructions
 
 
+class _AnswerInPlaceError(ProviderConnectionError):
+    """What the next request appends cannot be delivered as the pending call's answer."""
+
+
+@dataclass(frozen=True)
+class _PendingCall:
+    """A Sylvia tool call the runtime is still waiting on, inside an open turn."""
+
+    request_id: object
+    call_id: str
+    turn_id: str
+
+
+def _item_text(item: dict[str, Any]) -> str:
+    content = item.get("content")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(
+            str(part.get("text", "")) for part in content if isinstance(part, dict)
+        )
+    return ""
+
+
+def _strings(value: object) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [text for item in value.values() for text in _strings(item)]
+    if isinstance(value, list):
+        return [text for item in value for text in _strings(item)]
+    return []
+
+
+def _in_place_answer(tail: list[dict[str, Any]], call_id: str) -> tuple[str, list[str]]:
+    """The pending call's result and the user-role texts that follow it, from a request's tail.
+
+    The tail must be: optionally the model's own text or reasoning before the call (the
+    thread already holds it), Sylvia's copy of the call, the call's result, then only
+    user-role messages. An assistant message after the result is accepted, and not sent,
+    only when the result or the call's arguments already contain its text: that is Sylvia's
+    copy of narration the model wrote in the call. Anything else cannot be delivered into an
+    open turn.
+    """
+    index = 0
+    while index < len(tail) and (
+        tail[index].get("type") == "reasoning"
+        or (tail[index].get("type") == "message" and tail[index].get("role") == "assistant")
+    ):
+        index += 1
+    if len(tail) < index + 2:
+        raise _AnswerInPlaceError("The request does not answer the pending tool call.")
+    call, output = tail[index], tail[index + 1]
+    if (
+        call.get("type") != "function_call" or call.get("call_id") != call_id
+        or output.get("type") != "function_call_output" or output.get("call_id") != call_id
+    ):
+        raise _AnswerInPlaceError("The request does not answer the pending tool call.")
+    raw = output.get("output")
+    result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)
+    known: list[str] = [result, str(call.get("arguments", ""))]
+    for source in (result, call.get("arguments")):
+        if isinstance(source, str):
+            with suppress(ValueError):
+                known.extend(_strings(json.loads(source)))
+    texts: list[str] = []
+    for item in tail[index + 2:]:
+        if item.get("type") != "message":
+            raise _AnswerInPlaceError("The request adds more than messages after the result.")
+        text = _item_text(item)
+        if item.get("role") == "user":
+            texts.append(text)
+        elif item.get("role") == "assistant" and text and any(text in each for each in known):
+            continue
+        else:
+            raise _AnswerInPlaceError("The request adds a message the open turn cannot take.")
+    return result, texts
+
+
 @dataclass(eq=False)
 class _KeptThread:
-    """An idle runtime thread whose last turn ended in an interrupted Sylvia tool call."""
+    """An idle runtime thread that a later request may continue.
+
+    Its last turn either ended in an interrupted Sylvia tool call, or (``pending``) is still
+    open, waiting for that call's result.
+    """
 
     connection: CodexConnection
     home: Path
@@ -131,6 +218,7 @@ class _KeptThread:
     dynamic_tools: list[dict[str, Any]]
     items: list[dict[str, Any]]
     generation: int
+    pending: _PendingCall | None = None
     idle_since: float = field(default_factory=time.monotonic)
     timer: threading.Timer | None = None
 
@@ -320,7 +408,8 @@ class ChatGPTProvider(Provider):
         self._lock = asyncio.Lock()
         self._active: CodexConnection | None = None
         self._last_response = ProviderResponse()
-        self._stable_threads = os.environ.get(_THREAD_SWITCH) == "stable"
+        self._thread_mode = _THREAD_MODES.get(os.environ.get(_THREAD_SWITCH, ""))
+        self._stable_threads = self._thread_mode is not None
 
     def _request_stop(self, connection: CodexConnection) -> None:
         cancel = getattr(connection, "request_stop", None)
@@ -546,6 +635,44 @@ class ChatGPTProvider(Provider):
             drain()
         await self._inject(connection, kept.thread_id, request.items[len(kept.items):], timing)
 
+    async def _answer_pending_call(
+        self, connection: CodexConnection, kept: _KeptThread, request: _Request,
+        timing: LifecycleTiming,
+    ) -> None:
+        """Deliver what this request appends as the answer to the call the turn waits on.
+
+        User-role messages after the result (the application's records, or the player's next
+        message) are queued into the open turn first, so the model reads them with the
+        result. The turn then continues by itself: no further turn is started.
+        """
+        pending = kept.pending
+        assert pending is not None
+        result, texts = _in_place_answer(request.items[len(kept.items):], pending.call_id)
+        drain = getattr(connection, "notifications", None)
+        if callable(drain):
+            for event in drain():
+                params = event.get("params")
+                if (
+                    event.get("method") == "turn/completed" and isinstance(params, dict)
+                    and params.get("threadId") in {None, kept.thread_id}
+                ):
+                    # The runtime gave up on the call while the thread was idle.
+                    raise _AnswerInPlaceError("The runtime turn ended before its answer.")
+        with timing.measure("history_injection"):
+            if texts:
+                steer = {
+                    "threadId": kept.thread_id, "expectedTurnId": pending.turn_id,
+                    "input": [{"type": "text", "text": text} for text in texts],
+                }
+                await self._audit("turn/steer", steer)
+                steered = await asyncio.to_thread(connection.call, "turn/steer", steer)
+                await self._audit("turn/steer/result", steered, received=True)
+            answer = {"contentItems": [{"type": "inputText", "text": result}], "success": True}
+            await self._audit(
+                "item/tool/call/result", {"callId": pending.call_id, "result": answer},
+            )
+            await asyncio.to_thread(connection.respond, pending.request_id, answer)
+
     async def _inject(
         self, connection: CodexConnection, thread_id: str, items: list[dict[str, Any]],
         timing: LifecycleTiming,
@@ -636,6 +763,10 @@ class ChatGPTProvider(Provider):
                 "retried_fresh": False,
                 "kept": False,
             }
+            if self._thread_mode == "answer":
+                # The runtime reports a response's usage when its call is answered, so a
+                # request that answers a call carries the previous request's usage figures.
+                reuse["answered_in_place"] = bool(kept is not None and kept.pending)
             finished = False
             try:
                 while True:
@@ -655,6 +786,8 @@ class ChatGPTProvider(Provider):
                             continued=False, held_items=0, injected_items=len(items),
                             retried_fresh=True,
                         )
+                        if "answered_in_place" in reuse:
+                            reuse["answered_in_place"] = False
                     finally:
                         await attempt.aclose()
                 finished = True
@@ -707,6 +840,7 @@ class ChatGPTProvider(Provider):
         request.status = status
         stream_start: int | None = None
         keep = False
+        open_call: _PendingCall | None = None
 
         def end_stream(outcome: str) -> None:
             nonlocal stream_start
@@ -748,23 +882,30 @@ class ChatGPTProvider(Provider):
                 thread_id = await self._open_thread(connection, request, timing)
             else:
                 thread_id = kept.thread_id
-                await self._continue_thread(connection, kept, request, timing)
-            turn: dict[str, Any] = {
-                "threadId": thread_id,
-                "input": [],
-                "environments": [],
-                "model": self.model_info.wire_model_id,
-            }
-            if kwargs.get("reasoning_effort") is not None:
-                turn["effort"] = kwargs["reasoning_effort"]
-            if kwargs.get("service_tier") is not None:
-                # A tier id advertised by model/list; absent keeps the runtime default.
-                turn["serviceTier"] = kwargs["service_tier"]
-            await self._audit("turn/start", turn)
-            with timing.measure("turn_start"):
-                started = await asyncio.to_thread(connection.call, "turn/start", turn)
-            await self._audit("turn/start/result", started, received=True)
-            turn_id = started["turn"]["id"]
+                if kept.pending is None:
+                    await self._continue_thread(connection, kept, request, timing)
+                else:
+                    await self._answer_pending_call(connection, kept, request, timing)
+            if kept is not None and kept.pending is not None:
+                # The answered turn goes on; its effort and tier were set when it started.
+                turn_id = kept.pending.turn_id
+            else:
+                turn: dict[str, Any] = {
+                    "threadId": thread_id,
+                    "input": [],
+                    "environments": [],
+                    "model": self.model_info.wire_model_id,
+                }
+                if kwargs.get("reasoning_effort") is not None:
+                    turn["effort"] = kwargs["reasoning_effort"]
+                if kwargs.get("service_tier") is not None:
+                    # A tier id advertised by model/list; absent keeps the runtime default.
+                    turn["serviceTier"] = kwargs["service_tier"]
+                await self._audit("turn/start", turn)
+                with timing.measure("turn_start"):
+                    started = await asyncio.to_thread(connection.call, "turn/start", turn)
+                await self._audit("turn/start/result", started, received=True)
+                turn_id = started["turn"]["id"]
             last_event = time.monotonic()
             stream_start = time.perf_counter_ns()
             while True:
@@ -828,19 +969,26 @@ class ChatGPTProvider(Provider):
                     )
                     response.tool_calls = [ToolCall(id=call_id, name=name, arguments=arguments)]
                     response.finish_reason = "tool_calls"
-                    interrupt = await self._await_usage_after_tool_call(
-                        connection, response, thread_id, turn_id,
-                    )
-                    # A kept thread must have ended its turn; one still awaiting the call's
-                    # result is stopped like any other.
-                    keep = self._stable_threads and (
-                        interrupt == "ended" or (
-                            interrupt == "interrupted"
-                            and await self._await_interrupted_turn_end(
-                                connection, response, thread_id, turn_id,
+                    if self._thread_mode == "answer" and event.get("id") is not None:
+                        # Leave the turn waiting on this call. The runtime starts nothing
+                        # until the call is answered, and reports this response's usage
+                        # then, so this request ends without a usage report of its own.
+                        open_call = _PendingCall(event["id"], call_id, str(turn_id))
+                        keep = True
+                    else:
+                        interrupt = await self._await_usage_after_tool_call(
+                            connection, response, thread_id, turn_id,
+                        )
+                        # A kept thread must have ended its turn; one still awaiting the
+                        # call's result is stopped like any other.
+                        keep = self._stable_threads and (
+                            interrupt == "ended" or (
+                                interrupt == "interrupted"
+                                and await self._await_interrupted_turn_end(
+                                    connection, response, thread_id, turn_id,
+                                )
                             )
                         )
-                    )
                     # Stop the runtime before the owner can execute this returned call; a kept
                     # runtime has ended its turn and starts nothing until it is continued.
                     end_stream("completed")
@@ -917,6 +1065,7 @@ class ChatGPTProvider(Provider):
                     dynamic_tools=request.dynamic_tools,
                     items=request.items,
                     generation=request.generation,
+                    pending=open_call,
                 )
             yield ProviderStreamChunk(finish_reason=response.finish_reason)
         except (asyncio.CancelledError, GeneratorExit):
