@@ -275,6 +275,15 @@ class OwnerProcess:
             )
 
 
+def _host_platform() -> str:
+    """The operating system this owner runs on, named as the desktop shell names it."""
+    if sys.platform == "win32":
+        return "windows"
+    if sys.platform.startswith("linux"):
+        return "linux"
+    return "macos" if sys.platform == "darwin" else sys.platform
+
+
 def browser_command(method: str, raw: dict) -> tuple[str, dict]:
     """Adapt the frontend's native argument names without rewriting game payloads."""
     if method in WRAPPED:
@@ -561,6 +570,8 @@ class LocalWebUI:
                 "version": __version__,
                 "release_channel": "source WebUI",
                 "signing_status": "unsigned",
+                # The system this owner runs on, where saved keys are kept; not the browser's.
+                "platform": _host_platform(),
             }
         if method == "desktop_update_startup_state":
             return {"pending": False}

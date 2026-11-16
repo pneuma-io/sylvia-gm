@@ -48,6 +48,24 @@ pub(crate) fn database_path(
     Ok(directory.join("authority.sqlite3"))
 }
 
+// Saved campaigns and connections belong to one person. Windows keeps a per-user folder private
+// by default; elsewhere every folder this call creates is made owner-only. A folder that already
+// exists keeps the access its owner gave it.
+pub(crate) fn create_data_directory(directory: &Path) -> std::io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        std::fs::DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(directory)
+    }
+    #[cfg(not(unix))]
+    {
+        std::fs::create_dir_all(directory)
+    }
+}
+
 // Set process-local paths before any WebView or owner starts, including detached panel windows.
 pub(crate) fn configure_portable(data: &Path) -> Result<(), String> {
     for directory in [data.to_path_buf(), data.join("webview"), data.join("temp")] {
@@ -140,6 +158,36 @@ mod tests {
             .unwrap(),
             path
         );
+    }
+
+    #[test]
+    fn data_directory_is_created_with_its_missing_parents_and_reused_when_present() {
+        let fixture = Fixture::new();
+        let data = fixture.0.join("share").join("com.example.app");
+        create_data_directory(&data).unwrap();
+        assert!(data.is_dir());
+        std::fs::write(data.join("kept.txt"), b"synthetic").unwrap();
+        create_data_directory(&data).unwrap();
+        assert_eq!(std::fs::read(data.join("kept.txt")).unwrap(), b"synthetic");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn new_data_directories_are_owner_only_and_existing_ones_keep_their_access() {
+        use std::os::unix::fs::PermissionsExt;
+        let mode = |path: &Path| std::fs::metadata(path).unwrap().permissions().mode() & 0o777;
+        let fixture = Fixture::new();
+        let shared = fixture.0.join("shared");
+        std::fs::create_dir(&shared).unwrap();
+        std::fs::set_permissions(&shared, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let data = shared.join("share").join("com.example.app");
+        create_data_directory(&data).unwrap();
+        assert_eq!(mode(&data), 0o700);
+        assert_eq!(mode(&shared.join("share")), 0o700);
+        assert_eq!(mode(&shared), 0o755);
+        std::fs::set_permissions(&data, std::fs::Permissions::from_mode(0o750)).unwrap();
+        create_data_directory(&data).unwrap();
+        assert_eq!(mode(&data), 0o750);
     }
 
     #[test]
