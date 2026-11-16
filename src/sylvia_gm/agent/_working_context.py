@@ -370,8 +370,9 @@ class WorkingContextProvider(Provider):
                 raise TokenLimitError(
                     "Sylvia does not know this model's context limit, so it planned for "
                     f"{capacity:,} tokens and this request does not fit. Saved work is intact. "
-                    "In Settings, open this model's Advanced model settings, enter its context "
-                    "limit, then retry."
+                    "To continue, enter the model's context limit as the Optional Sylvia cap "
+                    "(Settings, Models, Model settings, Advanced model settings), then use "
+                    "Retry."
                 )
             raise TokenLimitError(
                 "Context cannot be shortened further: instructions, tools or the latest "

@@ -151,7 +151,9 @@ async def test_a_claude_code_model_with_no_known_window_is_planned_as_a_claude_m
         message = str(refused.value)
         assert "does not know this model's context limit" in message
         assert "planned for 65,536 tokens" in message
-        assert "Advanced model settings" in message
+        # It names the field by the label the Settings page gives it and the way to it.
+        assert "Optional Sylvia cap" in message
+        assert "Settings, Models, Model settings, Advanced model settings" in message
         assert "larger context model" not in message
     assert not saved and not model.calls
 
