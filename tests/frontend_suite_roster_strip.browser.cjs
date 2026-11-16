@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/td-delivered-map-controls.json'), 'utf8'));
 
-async function open(browser, viewport) {
+async function open(browser, viewport, member = null) {
   const page = await browser.newPage({ viewport });
   page.setDefaultTimeout(5000);
   const errors = [];
@@ -27,9 +27,13 @@ async function open(browser, viewport) {
       : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
   await page.goto('https://sylvia-strip.test/app.html');
-  await page.evaluate((source) => {
+  await page.evaluate(([source, member]) => {
     const projection = JSON.parse(JSON.stringify(source));
     delete projection.layout; // a fresh workspace: the suite default arrangement
+    // Optionally rename the first party member and give it a party role, in every surface that lists it.
+    if (member) for (const surface of projection.surfaces) for (const participant of surface.data?.participants || []) {
+      if (participant.id === 'hex') Object.assign(participant.data, member);
+    }
     const api = window.stripQA;
     document.getElementById('connecting-overlay').classList.add('hidden');
     document.getElementById('session-frame').style.display = 'flex';
@@ -45,7 +49,7 @@ async function open(browser, viewport) {
     api.wireControls(); api.initSidebarResize(); api.showSessionView();
     api.renderRulesetPanelProjection(projection); api.renderSidebarState();
     window.stripProjection = projection;
-  }, fixture);
+  }, [fixture, member]);
   return { page, errors };
 }
 
@@ -85,4 +89,57 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 1366, height: 768
       await page.close();
     } finally { await browser.close(); }
   });
+}
+
+// A party card's name, its vitals and its party-role label must all stay readable. With a long name, or a wider
+// font than the one the layout was drawn with (Linux desktops usually give DejaVu Sans), the role used to run
+// over the name and the HP and AP pips. The role now has its own line; nothing may overlap it or leave the card,
+// the name keeps at least its first letters, and anything cut ends in an ellipsis. The two common sizes show the
+// compact strip; the tall window shows the roomier list, where the role has a line of its own.
+for (const viewport of [{ width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 1440, height: 1700 }]) {
+  for (const name of ['Tavin Bell', 'Tavin Bellweather of the Lantern Road']) {
+    test(`party card "${name}" keeps name, vitals and role apart at ${viewport.width}x${viewport.height}`, { timeout: 60000 }, async () => {
+      const browser = await chromium.launch({ headless: true, args: ['--disable-gpu'],
+        channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+      try {
+        const { page, errors } = await open(browser, viewport, { name, party_role: 'player_character' });
+        const card = page.locator('[data-panel-id="operations.party"] .squad-card').first();
+        const geometry = await card.evaluate((node) => {
+          const box = (element) => { if (!element) return null; const r = element.getBoundingClientRect();
+            return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width }; };
+          const name = node.querySelector('.sq-name strong');
+          const role = node.querySelector('.panel-unit-role');
+          const cut = (element) => element.scrollWidth > element.clientWidth + 0.5;
+          // Where the text itself is drawn: a label's box can span a whole line it shares with another.
+          const text = (element) => { const range = document.createRange(); range.selectNodeContents(element);
+            const r = range.getBoundingClientRect(); return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width }; };
+          const strip = node.closest('.squad-list');
+          return { card: box(node), strip: box(strip), stripScrolls: strip.scrollHeight > strip.clientHeight + 1,
+            details: text(node.querySelector('.roster-inspection > summary')),
+            name: box(name), role: text(role), bars: box(node.querySelector('.sq-bars')),
+            weapon: text(node.querySelector('.sq-weap')), roleText: role.textContent,
+            nameCut: cut(name), nameEllipsis: getComputedStyle(name).textOverflow,
+            roleCut: cut(role), roleEllipsis: getComputedStyle(role).textOverflow };
+        });
+        assert.equal(geometry.roleText, 'Player Character');
+        const overlaps = (a, b) => a && b && Math.min(a.right, b.right) - Math.max(a.left, b.left) > 0.5 &&
+          Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 0.5;
+        // The strip shows the whole card without scrolling, as it does without a role.
+        assert.equal(geometry.stripScrolls, false, `the card fits the strip: ${JSON.stringify(geometry)}`);
+        for (const part of ['name', 'bars', 'weapon', 'details']) {
+          assert.ok(!overlaps(geometry.role, geometry[part]), `the role overlaps the ${part}: ${JSON.stringify(geometry)}`);
+        }
+        for (const part of ['name', 'role']) {
+          assert.ok(geometry[part].left >= geometry.card.left - 0.5 && geometry[part].right <= geometry.card.right + 0.5 &&
+            geometry[part].bottom <= geometry.card.bottom + 0.5, `the ${part} stays inside the card: ${JSON.stringify(geometry)}`);
+        }
+        assert.ok(geometry.name.width >= 30, `the name keeps its first letters: ${JSON.stringify(geometry)}`);
+        if (name === 'Tavin Bell') assert.equal(geometry.nameCut, false, 'a short name is shown whole');
+        if (geometry.nameCut) assert.equal(geometry.nameEllipsis, 'ellipsis', 'a cut name ends in an ellipsis');
+        if (geometry.roleCut) assert.equal(geometry.roleEllipsis, 'ellipsis', 'a cut role ends in an ellipsis');
+        assert.deepEqual(errors, []);
+        await page.close();
+      } finally { await browser.close(); }
+    });
+  }
 }

@@ -117,9 +117,13 @@ def _number(value: object, maximum: float) -> float:
     return round(max(0.0, min(maximum, numeric)), 1)
 
 
+_OS_NAMES = (("win32", "windows"), ("linux", "linux"), ("darwin", "macos"))
+
+
 def _platform() -> dict[str, object]:
-    """Use numeric OS versions, never host names or user-controlled platform strings."""
-    result: dict[str, object] = {"os": "windows" if sys.platform == "win32" else "other"}
+    """Use a fixed OS name and numeric OS versions, never host names or user-controlled strings."""
+    name = next((label for prefix, label in _OS_NAMES if sys.platform.startswith(prefix)), "other")
+    result: dict[str, object] = {"os": name}
     if sys.platform == "win32":
         version = sys.getwindowsversion()
         result.update(major=version.major, minor=version.minor, build=version.build)
