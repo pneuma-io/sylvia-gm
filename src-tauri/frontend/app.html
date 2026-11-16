@@ -910,16 +910,16 @@
                   <label class="provider-capacity-fact" for="provider-output-limit">
                     <span>Optional reply cap</span>
                     <input id="provider-output-limit" type="number" min="1" max="10000000"
-                           inputmode="numeric" placeholder="Provider-supported maximum">
+                           inputmode="numeric" placeholder="Automatic">
                     <small>Blank uses the known model maximum. Covers reasoning, tool arguments and narration
                       for GM replies.</small>
                   </label>
                   <label class="provider-capacity-fact" for="provider-builder-output-limit">
                     <span>Builder response budget</span>
                     <input id="provider-builder-output-limit" type="number" min="1" max="10000000"
-                           inputmode="numeric" placeholder="Default: 32000, capped by output limit">
+                           inputmode="numeric" placeholder="Default: 32000">
                     <small>Covers thinking and file-writing tool arguments. Blank keeps the saved budget, or
-                      the default for a new model.</small>
+                      the default for a new model. Never more than the reply limit.</small>
                   </label>
                 </div>
                 <p class="provider-capacity-warning" id="provider-capacity-warning" hidden></p>
