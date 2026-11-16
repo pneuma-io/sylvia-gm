@@ -116,7 +116,7 @@ product specification.
 
 ## Test proportionately
 
-The supported-journey gate runs locally; the GitHub workflow is manual-only. A PR is ready for review when its description records the locally checked head commit, commands, results, elapsed time and checks not run.
+The supported-journey gate runs on a local machine or, for Linux runs and complete runs, on the cloud Linux sandboxes that the Pneuma IO Rulebook sets as the default; the GitHub workflow is manual-only. A PR is ready for review when its description records the checked head commit, where it ran, commands, results, elapsed time and checks not run.
 
 - Follow [`docs/operations/quality-preserving-development-process.md`](docs/operations/quality-preserving-development-process.md).
 - Live Sylvia testing uses the Windows environment selected for the current run in that process
