@@ -2802,7 +2802,7 @@ const SylviaGMFrontend = (() => {
     const output = providerEffectiveOutput();
     const metadata = state.providerModelMetadata;
     $('provider-output-limit').placeholder = metadata?.declared_max_output_tokens
-      ? `Automatic: ${formatTokenCapacity(metadata.declared_max_output_tokens)}` : 'Automatic reply allowance';
+      ? `Automatic: ${formatTokenCapacity(metadata.declared_max_output_tokens)}` : 'Automatic';
     $('provider-output-summary').textContent = output
       ? `Reply limit: ${formatTokenCapacity(output)}. ` +
         (metadata?.declared_max_output_tokens ? `Model maximum: ${formatTokenCapacity(metadata.declared_max_output_tokens)}.` : 'Model maximum not reported.')
