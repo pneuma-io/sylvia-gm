@@ -44,6 +44,7 @@ from sylvia_gm.provider._claude_runtime import (
     native_environment,
     runtime_version,
 )
+from sylvia_gm.provider._context_capacity import resolve_context_capacity
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
     IncompleteProviderStreamError,
@@ -319,6 +320,13 @@ def runtime_failure(event: dict[str, Any]) -> ProviderError:
     )
 
 
+#: The whole-number fields of a result record's per-model usage that are kept for the audit.
+_MODEL_USAGE_COUNTS = (
+    "inputTokens", "outputTokens", "cacheReadInputTokens", "cacheCreationInputTokens",
+    "contextWindow", "maxOutputTokens",
+)
+
+
 class ClaudeProvider(Provider):
     """Use an ephemeral native conversation for each step of Sylvia's existing tool loop."""
 
@@ -335,6 +343,8 @@ class ClaudeProvider(Provider):
         self._active: ClaudeConnection | None = None
         self._lock = asyncio.Lock()
         self._last_response = ProviderResponse()
+        # Set when Claude refused a request planned within the window Claude Code reported.
+        self._reported_window_refused = False
 
     async def _close_owned(self, connection: ClaudeConnection) -> None:
         """Finish child collection even when the caller cancels more than once."""
@@ -699,7 +709,10 @@ class ClaudeProvider(Provider):
                                     pending.append(block)
                         elif kind == "result":
                             if event.get("is_error") or event.get("subtype") != "success":
-                                raise runtime_failure(event)
+                                failure = runtime_failure(event)
+                                if isinstance(failure, TokenLimitError):
+                                    self._refuse_reported_window()
+                                raise failure
                             if event.get("permission_denials") or pending:
                                 raise InvalidResponseError(
                                     "Claude could not admit the requested operation "
@@ -709,6 +722,8 @@ class ClaudeProvider(Provider):
                                 text_parts.append(event["result"])
                                 yield ProviderStreamChunk(content=event["result"])
                             self._usage(response, event.get("usage", {}))
+                            await self._audit_model_usage(event.get("modelUsage"), response.model)
+                            self._observe_context_window(event.get("modelUsage"), response.model)
                             break
                         elif (
                             kind == "rate_limit_event"
@@ -809,6 +824,89 @@ class ClaudeProvider(Provider):
             raise
         except Exception:  # noqa: BLE001 - saving evidence never fails the player's step
             logger.warning("Claude runtime context records could not be saved.", exc_info=True)
+
+    async def _audit_model_usage(self, usage_by_model: object, resolved_model: str | None) -> None:
+        """Record the counts and windows Claude Code reports per model, never its price estimate."""
+        if not isinstance(usage_by_model, dict):
+            return
+        counts = {
+            str(name): {key: row[key] for key in _MODEL_USAGE_COUNTS if type(row.get(key)) is int}
+            for name, row in usage_by_model.items()
+            if isinstance(row, dict)
+        }
+        await self.hooks.fire_on_request(
+            HookContext(
+                provider_key="claude_runtime",
+                model_id=self.model_info.id,
+                stream=True,
+                request_json={
+                    "direction": "receive",
+                    "method": "claude/result_model_usage",
+                    "params": {"model": resolved_model, "model_usage": counts},
+                },
+            )
+        )
+
+    def _apply_runtime_window(self, value: int | None) -> None:
+        """Set or clear the runtime's reported window; a saved allowance can only lower it."""
+        model = self.model_info
+        observed_at = datetime.now(UTC).isoformat() if value is not None else None
+        capacity = resolve_context_capacity(
+            declared_context_window=model.declared_context_window,
+            declared_context_source=model.declared_context_source,
+            runtime_context_window=value,
+            runtime_context_source="runtime_reported" if value is not None else "unknown",
+            configured_context_window=model.configured_context_window,
+            declared_observed_at=model.declared_context_observed_at,
+            runtime_observed_at=observed_at,
+            configured_observed_at=model.configured_context_observed_at,
+        )
+        # Wrappers retain this ModelInfo object, so update it rather than replacing it.
+        model.runtime_context_window = capacity.runtime_context_window
+        model.runtime_context_source = capacity.runtime_context_source
+        model.runtime_context_observed_at = capacity.runtime_observed_at
+        model.context_observed_at = observed_at or model.configured_context_observed_at
+        model.context_window = capacity.effective_context_window
+        model.context_window_source = capacity.effective_context_source
+        model.configured_runtime_mismatch = capacity.configured_runtime_mismatch
+
+    def _observe_context_window(self, usage_by_model: object, resolved_model: str | None) -> None:
+        """Plan later requests within the window Claude Code reports for this model.
+
+        The result record that ends a narrated reply carries the figure; a step that ends in
+        an operation has none. It is what Claude Code uses for the model, which an account may
+        not be given in full, so a later refusal withdraws it (``_refuse_reported_window``).
+        """
+        if self._reported_window_refused or not isinstance(usage_by_model, dict):
+            return
+        rows = {key: row for key, row in usage_by_model.items() if isinstance(row, dict)}
+        row = rows.get(resolved_model or "") or rows.get(self.model_info.wire_model_id)
+        if row is None:
+            if len(rows) != 1:
+                return
+            row = next(iter(rows.values()))
+        value = row.get("contextWindow")
+        if type(value) is not int or not 512 <= value <= 10_000_000:
+            return
+        if value != self.model_info.runtime_context_window:
+            self._apply_runtime_window(value)
+
+    def _refuse_reported_window(self) -> None:
+        """Claude refused a request as too large: stop planning within the reported window.
+
+        Planning returns to the saved allowance, or to the figure used when none is known, for
+        as long as this provider lives, so the shorten-and-retry step that follows works against
+        the smaller figure and does not send the same oversized request again.
+        """
+        if self._reported_window_refused or self.model_info.runtime_context_window is None:
+            return
+        self._reported_window_refused = True
+        logger.warning(
+            "Claude refused a request planned within its reported context window of %s tokens; "
+            "planning within the saved or default allowance from now on.",
+            self.model_info.runtime_context_window,
+        )
+        self._apply_runtime_window(None)
 
     @staticmethod
     def _usage(response: ProviderResponse, usage: dict[str, Any]) -> None:

@@ -348,6 +348,154 @@ def test_text_and_reported_usage_have_no_estimated_bill(tmp_path, monkeypatch):
     assert not hasattr(response, "total_cost_usd") and connection.closed
 
 
+def narrated(window_by_model):
+    """A narrated reply whose result record reports the windows Claude Code uses."""
+    usage = {
+        name: {"inputTokens": 10, "outputTokens": 4, "contextWindow": window}
+        for name, window in window_by_model.items()
+    }
+    return native_message({"type": "text", "text": "Open."}) + [{
+        "type": "result", "subtype": "success", "is_error": False, "result": "Open.",
+        "usage": {"input_tokens": 10, "output_tokens": 4}, "modelUsage": usage,
+    }]
+
+
+def planning_capacity(adapter) -> int:
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    async def save(_record) -> None:
+        return None
+
+    working = WorkingContextProvider(adapter, save=save, pin_first_user=False)
+    return working.budget_terms([{"role": "user", "content": "Check"}], None, {})["capacity"]
+
+
+def test_the_window_claude_code_reports_is_planned_with_from_the_next_request(
+    tmp_path, monkeypatch,
+):
+    adapter, _ = provider(tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}))
+    info = adapter.model_info
+    assert info.context_window is None and planning_capacity(adapter) == 200_000
+
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window == info.context_window == 1_000_000
+    assert info.runtime_context_source == info.context_window_source == "runtime_reported"
+    assert info.runtime_context_observed_at is not None
+    assert planning_capacity(adapter) == 1_000_000
+
+
+def test_the_reported_counts_and_window_are_audited_without_the_price_estimate(
+    tmp_path, monkeypatch,
+):
+    events = narrated({"claude-opus-5-5": 1_000_000})
+    events[-1]["modelUsage"]["claude-opus-5-5"].update(costUSD=0.25, webSearchRequests="none")
+    events[-1]["modelUsage"]["not-a-row"] = "ignored"
+    adapter, _ = provider(tmp_path, monkeypatch, events)
+    seen = []
+
+    class Audit:
+        async def on_request(self, context):
+            seen.append(context.request_json)
+
+    adapter.hooks.register(Audit())
+    asyncio.run(adapter.generate(tool_history()))
+    assert [record["method"] for record in seen] == [
+        "claude/native_step", "claude/result_model_usage",
+    ]
+    assert seen[1] == {
+        "direction": "receive",
+        "method": "claude/result_model_usage",
+        "params": {"model": "opus", "model_usage": {"claude-opus-5-5": {
+            "inputTokens": 10, "outputTokens": 4, "contextWindow": 1_000_000,
+        }}},
+    }
+
+
+def test_a_saved_context_allowance_still_caps_the_reported_window(tmp_path, monkeypatch):
+    adapter, _ = provider(tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}))
+    info = adapter.model_info
+    info.configured_context_window = info.context_window = 200_000
+    info.context_window_source = "user_configured"
+
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window == 1_000_000
+    assert info.context_window == 200_000 and info.context_window_source == "user_configured"
+    assert info.configured_runtime_mismatch is False
+    assert planning_capacity(adapter) == 200_000
+
+
+@pytest.mark.parametrize(("reported", "resolved", "expected"), [
+    # Several models in one record: only the one Claude says it selected counts.
+    ({"claude-haiku-5-5": 200_000, "claude-opus-5-5": 1_000_000}, "claude-opus-5-5", 1_000_000),
+    ({"claude-haiku-5-5": 200_000, "claude-opus-5-5": 1_000_000}, None, None),
+    ({"claude-opus-5-5": 0}, None, None),
+    ({"claude-opus-5-5": True}, None, None),
+    ({"claude-opus-5-5": "1000000"}, None, None),
+    ({}, None, None),
+])
+def test_only_a_plain_figure_for_the_selected_model_is_used(
+    tmp_path, monkeypatch, reported, resolved, expected,
+):
+    events = narrated(reported)
+    if resolved is not None:
+        events.insert(0, {"type": "system", "subtype": "init", "tools": [], "model": resolved})
+    adapter, _ = provider(tmp_path, monkeypatch, events)
+    asyncio.run(adapter.generate(tool_history()))
+    assert adapter.model_info.runtime_context_window == expected
+    assert adapter.model_info.context_window == expected
+
+
+def test_a_request_claude_refuses_as_too_large_withdraws_the_reported_window(
+    tmp_path, monkeypatch, caplog,
+):
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, connection = provider(
+        tmp_path, monkeypatch,
+        narrated({"claude-opus-5-5": 1_000_000}) + [refusal]
+        + narrated({"claude-opus-5-5": 1_000_000}),
+    )
+    info = adapter.model_info
+    asyncio.run(adapter.generate(tool_history()))
+    assert planning_capacity(adapter) == 1_000_000
+    steps = len(connection.writes)
+
+    # The account is not given the window Claude Code reported. The provider sends nothing
+    # again by itself; planning returns to the figure used when no window is known, so the
+    # caller's shorten-and-retry step works against that.
+    with caplog.at_level("WARNING"), pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    assert len(connection.writes) == steps + 2
+    assert info.runtime_context_window is None and info.context_window is None
+    assert info.runtime_context_source == info.context_window_source == "unknown"
+    assert planning_capacity(adapter) == 200_000
+    assert "refused a request planned within its reported context window" in caplog.text
+
+    # The same figure reported again is not trusted for the rest of this provider's life.
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.context_window is None and planning_capacity(adapter) == 200_000
+
+
+def test_a_refusal_keeps_a_saved_allowance_and_one_without_a_reported_window_changes_nothing(
+    tmp_path, monkeypatch,
+):
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, _ = provider(tmp_path, monkeypatch, [refusal, *narrated({"x": 1_000_000}), refusal])
+    info = adapter.model_info
+    info.configured_context_window = info.context_window = 600_000
+    info.context_window_source = "user_configured"
+    with pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    # Nothing had been reported, so a later report is still used, under the saved allowance.
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window == 1_000_000 and info.context_window == 600_000
+    with pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window is None
+    assert info.context_window == 600_000 and info.context_window_source == "user_configured"
+
+
 def test_signed_thinking_stays_private_and_survives_tool_continuation(tmp_path, monkeypatch):
     events = native_message(
         {"type": "thinking", "thinking": "private native reasoning", "signature": "signed-value"},
