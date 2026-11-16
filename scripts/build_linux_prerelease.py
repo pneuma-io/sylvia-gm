@@ -31,9 +31,11 @@ from sylvia_gm.release_artifact import (
 )
 
 if __package__:
+    from . import build_linux_bundled_notices as bundled
     from . import build_windows_prerelease as shared
     from .check_release_identity import check_source
 else:
+    import build_linux_bundled_notices as bundled
     import build_windows_prerelease as shared
     from check_release_identity import check_source
 
@@ -96,6 +98,17 @@ def _appimage_tools_digest(cache: Path) -> str:
     return digest.hexdigest()
 
 
+def discover_appdir(target: Path) -> Path:
+    """The unpacked bundle Tauri leaves beside the AppImage it packed from it."""
+
+    matches = sorted(
+        path for path in (target / "release/bundle/appimage").glob("*.AppDir") if path.is_dir()
+    )
+    if len(matches) != 1:
+        raise ReleaseArtifactError("Tauri must leave exactly one unpacked AppImage folder")
+    return matches[0]
+
+
 def discover_appimage(target: Path) -> ReleaseArtifact:
     matches = sorted((target / "release/bundle/appimage").glob("*.AppImage"))
     if len(matches) != 1:
@@ -128,9 +141,8 @@ def build_linux_prerelease(
         raise ReleaseArtifactError("Dependency notice SHA-256 pin is invalid")
     notice_path = root / DEPENDENCY_NOTICES_SOURCE
     notice_bytes = read_dependency_notices(notice_path, expected_sha256=dependency_notices_sha256)
-    resources = json.loads((root / "src-tauri/tauri.conf.json").read_text(encoding="utf-8"))[
-        "bundle"
-    ]["resources"]
+    tauri_config = json.loads((root / "src-tauri/tauri.conf.json").read_text(encoding="utf-8"))
+    resources = tauri_config["bundle"]["resources"]
     if (
         resources.get(f"../{DEPENDENCY_NOTICES_SOURCE}") != DEPENDENCY_NOTICES_PATH
         or list(resources.values()).count(DEPENDENCY_NOTICES_PATH) != 1
@@ -202,6 +214,20 @@ def build_linux_prerelease(
         raise ReleaseArtifactError("Notice companion input changed during the build")
     if shared._source_input_manifest(root) != source_files:
         raise ReleaseArtifactError("Release source inputs changed during the build")
+    # The notices for the system libraries this build copied into the AppImage, written from
+    # the unpacked bundle and this machine's packages so they describe exactly this build.
+    build_system = _build_system()
+    bundled_notices = invocation.path / bundled.NOTICES_NAME
+    try:
+        packages = bundled.write_notices(
+            discover_appdir(target),
+            bundled_notices,
+            own_folder=str(tauri_config["productName"]),
+            build_system=build_system,
+        )
+    except bundled.BundledNoticesError as error:
+        raise ReleaseArtifactError(str(error)) from error
+    print(f"Bundled library notices: {len(packages)} packages", flush=True)
     release_platform = linux_release_platform()
     manifest = assemble_release_layout(
         output=output,
@@ -210,7 +236,7 @@ def build_linux_prerelease(
         toolchain={
             **toolchain,
             "appimage_tools_sha256": _appimage_tools_digest(tools_cache / "tauri"),
-            "build_system": _build_system(),
+            "build_system": build_system,
             "glibc": f"{glibc[0]}.{glibc[1]}",
         },
         qualification={
@@ -222,6 +248,7 @@ def build_linux_prerelease(
         dependency_notices_sha256=dependency_notices_sha256,
         dependency_notice_companions_directory=root / "licenses",
         platform=release_platform,
+        bundled_notices_path=bundled_notices,
     )
     if verify_release_layout(output, release_platform) != manifest:
         raise ReleaseArtifactError("Assembled release did not verify exactly")
