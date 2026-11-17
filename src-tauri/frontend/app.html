@@ -120,6 +120,7 @@
     <p id="chat-start-lead"></p>
     <label for="chat-start-model">Model</label>
     <select id="chat-start-model"></select>
+    <p class="chat-start-note chat-start-context-note" id="chat-start-context-note" role="status" hidden></p>
     <label for="chat-start-effort">Reasoning effort</label>
     <select id="chat-start-effort"></select>
     <label for="chat-start-speed">Speed</label>
@@ -873,6 +874,8 @@
                       aria-label="Models found"></select>
               </div>
               <p id="provider-context-summary" class="provider-field-help"></p>
+              <p id="provider-declared-offer" class="provider-field-help provider-declared-offer" hidden><span id="provider-declared-offer-text"></span>
+                <button class="btn btn-secondary btn-sm" id="provider-use-declared-context" type="button"></button></p>
               <p id="provider-output-summary" class="provider-field-help"></p>
               <details id="provider-model-advanced" class="provider-advanced-fields">
               <summary>Advanced model settings</summary>

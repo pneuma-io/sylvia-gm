@@ -61,6 +61,22 @@
       'Sylvia requests it; the provider decides the speed it actually uses.';
   }
 
+  // Sylvia budgets the context itself for an API or local model ("enforced"); when nobody knows that
+  // model's limit it plans small and can refuse a campaign's first turn (issue 92). ChatGPT and Claude
+  // Code manage their own context, so an unknown limit there is not meant.
+  function contextLimitUnknown(choice) {
+    if (!choice || choice.output_budget_mode !== 'enforced') return false;
+    const limit = choice.effective_context_window;
+    return !(Number.isInteger(limit) && limit > 0);
+  }
+
+  function contextNote(choice) {
+    return contextLimitUnknown(choice)
+      ? 'Sylvia does not know this model’s context limit, so a campaign’s first turn may be refused. ' +
+        'Set the limit in Settings, Models: Model settings, Advanced model settings.'
+      : '';
+  }
+
   // What a new chat on this model inherits from Settings. A default the model does not
   // support falls back to the mode default effort or standard speed, as the owner does.
   function inherited(choice, defaults) {
@@ -115,6 +131,11 @@
 
     function renderNote() {
       node('chat-start-speed-note').textContent = speedNote(selectedModel(), node('chat-start-speed').value);
+      const context = node('chat-start-context-note');
+      if (context) {
+        context.textContent = contextNote(selectedModel());
+        context.hidden = !context.textContent;
+      }
     }
 
     function finish(value) {
@@ -171,7 +192,7 @@
 
   const api = {
     create, inherited, effortLabel, effortOptions, modeDefaultLabel, speedOptions, speedLabel,
-    speedNote, summary, STANDARD, MODE_DEFAULT, PROVIDER_DEFAULT,
+    speedNote, contextLimitUnknown, contextNote, summary, STANDARD, MODE_DEFAULT, PROVIDER_DEFAULT,
   };
   root.SylviaChatStart = api;
   if (typeof module !== 'undefined') module.exports = api;

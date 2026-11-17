@@ -447,6 +447,48 @@ test('cancelling a ready campaign start creates nothing', async () => {
 
 // ── Settings card and chat footer ────────────────────────────────────────────────────────
 
+// Issue 92: an API or local model whose context limit nobody knows is planned small, and a campaign's first
+// turn can be refused. Say so where the person chooses or saves the model, not only at the refusal.
+const unknownLimit = { ...plainModel, model_id: 'local/unknown', model_name: 'Unknown limit',
+  output_budget_mode: 'enforced', effective_context_window: null };
+const knownLimit = { ...plainModel, output_budget_mode: 'enforced', effective_context_window: 400000 };
+const managedLimit = { ...fastModel, output_budget_mode: 'runtime_managed', effective_context_window: null };
+
+test('an unknown context limit is named only for models whose context Sylvia budgets', () => {
+  assert.equal(chatStartModule.contextLimitUnknown(unknownLimit), true);
+  assert.equal(chatStartModule.contextLimitUnknown(knownLimit), false);
+  assert.equal(chatStartModule.contextLimitUnknown(managedLimit), false, 'ChatGPT and Claude Code manage their own');
+  assert.equal(chatStartModule.contextLimitUnknown(null), false);
+  assert.match(chatStartModule.contextNote(unknownLimit), /does not know this model’s context limit.*first turn may be refused.*Advanced model settings/);
+  assert.equal(chatStartModule.contextNote(knownLimit), '');
+});
+
+test('the start choice warns while a model with an unknown limit is selected', async () => {
+  const h = chooser([knownLimit, unknownLimit]);
+  const pending = h.controller.choose({ role: 'dm', title: 'Start Game Master', action: 'Start', model: knownLimit });
+  assert.equal(h.node('chat-start-context-note').hidden, true);
+  h.node('chat-start-model').value = '1';
+  h.node('chat-start-model').events.change();
+  assert.equal(h.node('chat-start-context-note').hidden, false);
+  assert.match(h.node('chat-start-context-note').textContent, /first turn may be refused/);
+  h.node('chat-start-model').value = '0';
+  h.node('chat-start-model').events.change();
+  assert.equal(h.node('chat-start-context-note').hidden, true);
+  h.node('chat-start-cancel').events.click();
+  assert.equal(await pending, null);
+});
+
+test('saving a model with an unknown limit says so on the Models page', () => {
+  const nodes = { 'models-action-status': { textContent: '' }, 'set-added-model-default-btn': { hidden: true } };
+  const context = { window: { SylviaChatStart: chatStartModule }, $: id => nodes[id],
+    state: { modelChoices: [unknownLimit, knownLimit] } };
+  vm.runInNewContext(slice('  function noteSavedModel(saved) {', '  function showModelsOverview('), context);
+  context.noteSavedModel({ name: 'Unknown limit', provider_id: 'local', canonical_model_id: 'local/unknown' });
+  assert.match(nodes['models-action-status'].textContent, /^Unknown limit saved\. .*first turn may be refused/);
+  context.noteSavedModel({ name: 'Small', provider_id: 'local', canonical_model_id: 'local/small' });
+  assert.equal(nodes['models-action-status'].textContent, 'Small saved. Your chats keep their current models.');
+});
+
 function settingsContext(savedDefaults, selected = fastModel) {
   const ids = ['default-effort-choice', 'default-speed-choice', 'default-speed-note'];
   const nodes = Object.fromEntries(ids.map(id => [id, { value: '', innerHTML: '', textContent: '', disabled: false }]));
