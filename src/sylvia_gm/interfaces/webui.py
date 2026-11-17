@@ -626,7 +626,12 @@ class LocalWebUI:
                 )
             token = secrets.token_urlsafe(24)
             path = Path(self.download_directory.name) / (token + suffix)
-            shutil.copyfile(self.owner.data_root / folder / (identity + suffix), path)
+            source = self.owner.data_root / folder / (identity + suffix)
+            shutil.copyfile(source, path)
+            if folder == "exports":
+                # The download copy is now the only one needed; an export's working copy in the
+                # data folder would otherwise stay there, one full archive per export.
+                source.unlink(missing_ok=True)
             if len(self.downloads) >= 128:
                 self.downloads.pop(next(iter(self.downloads))).unlink(missing_ok=True)
             self.downloads[token] = path

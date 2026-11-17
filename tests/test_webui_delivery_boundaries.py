@@ -112,6 +112,8 @@ def test_download_handles_keep_the_exact_export_bytes(tmp_path):
         try:
             first = await browser.call("export_campaign_file", {"exportId": "same-file"})
             second = await browser.call("export_campaign_file", {"exportId": "same-file"})
+            # The download copy is the only one kept: no working copy builds up in the data folder.
+            assert not list((tmp_path / "exports").iterdir())
             async with browser.client.get(browser.url + first["download"]) as response:
                 assert await response.read() == b"selected-export-1"
             async with browser.client.get(browser.url + second["download"]) as response:

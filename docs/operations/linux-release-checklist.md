@@ -173,7 +173,8 @@ It checks, in one run:
 4. Send a player message; the turn, which offers the Game Master's tools, completes with a reply.
 5. Import a made-up character card (Settings, Packages) and get a reply in Character chat.
 6. With the campaign open, Settings, Campaign data: export it. The confirmation box appears,
-   the save dialog opens in the home folder and the file is written.
+   the save dialog opens in the home folder and the file is written. No copy of the archive is
+   left in the data folder's `exports/`.
 7. Start the app a second time while it runs: the second copy exits with code 0 and one window
    remains.
 8. Close the window: the app exits with code 0 and leaves no process behind.
