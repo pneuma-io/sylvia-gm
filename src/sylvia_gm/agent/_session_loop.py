@@ -923,10 +923,17 @@ class CampaignSessionLoop:
             **active.control.progress.snapshot(),
         })
 
-    def _finish_activity(self, session_id: str, attempt_id: str, status: str) -> SafePayload:
-        """Freeze timing once, including when Stop and provider unwind share a terminal."""
-        with self._active_lock:
-            active = self._active.get(session_id)
+    def _finish_activity(
+        self, session_id: str, attempt_id: str, status: str, active: _ActiveRun | None = None,
+    ) -> SafePayload:
+        """Freeze timing once, including when Stop and provider unwind share a terminal.
+
+        A caller that holds the run passes it: the run's own unwind may have unregistered it
+        already, and the shared terminal must still carry the same frozen timing.
+        """
+        if active is None:
+            with self._active_lock:
+                active = self._active.get(session_id)
         if active is None or active.attempt_id != attempt_id:
             return {}
         return cast(SafePayload, active.control.progress.finish(status))
@@ -1290,6 +1297,7 @@ class CampaignSessionLoop:
             self._record_interrupted_terminal(
                 request.session_id,
                 interruption,
+                active=active,
                 failure_category=self._failure_category(
                     error,
                     cancelled=was_cancelled,
@@ -1340,8 +1348,14 @@ class CampaignSessionLoop:
         interruption: NarrationInterruption,
         *,
         failure_category: str,
+        active: _ActiveRun | None = None,
     ) -> None:
-        """Persist the recoverable terminal before Stop can close its owning session."""
+        """Persist the recoverable terminal before Stop can close its owning session.
+
+        Stop and the stopped run's own unwind both come here, on different threads, in
+        either order. Whichever writes first records the terminal; the other finds it and
+        writes nothing, and both read the run's timing from the run itself (``active``).
+        """
 
         self._owner.finish_private_provider_attempt(
             session_id, interruption.failed_attempt_id, completed=False,
@@ -1360,10 +1374,13 @@ class CampaignSessionLoop:
         if basis is None:
             raise CommandRejected("Interrupted session input identity is unavailable")
         context = self._owner.session_context(session_id)
+        terminal_id = f"terminal-{interruption.failed_attempt_id}"
+        if any(message.message_id == terminal_id for message in context.messages):
+            return
         recovery_kind = _recovery_kind(context, basis, interruption)
         self._owner.append_agent_message(
             session_id=session_id,
-            message_id=f"terminal-{interruption.failed_attempt_id}",
+            message_id=terminal_id,
             kind=SessionMessageKind.EVIDENCE,
             content={
                 "kind": "session_attempt_terminal",
@@ -1376,6 +1393,7 @@ class CampaignSessionLoop:
                 "activity_timing": self._finish_activity(
                     session_id, interruption.failed_attempt_id,
                     "stopped" if failure_category == "user_cancelled" else "failed",
+                    active,
                 ),
                 "recovery_kind": recovery_kind,
                 "committed_action_id": interruption.last_action_id,
@@ -1838,6 +1856,7 @@ class CampaignSessionLoop:
             session_id,
             interruption,
             failure_category="user_cancelled",
+            active=active,
         )
         self._owner.stop_agent_session(session_id)
         return SessionStopResult(
@@ -1871,6 +1890,7 @@ class CampaignSessionLoop:
                     session_id,
                     interruption,
                     failure_category="user_cancelled",
+                    active=active,
                 )
         return self._owner.stop_agent_session(session_id)
 
