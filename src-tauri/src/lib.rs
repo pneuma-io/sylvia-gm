@@ -2320,7 +2320,7 @@ async fn start_import_repair(
 }
 
 fn handoff_package_archive(payload: Value, destination: &Path) -> Result<Value, String> {
-    handoff_content_archive(payload, destination, "sylvia-gm-package")
+    deliver_owner_archive(payload, destination, "sylvia-gm-package", "package")
 }
 
 fn handoff_content_archive(
@@ -2328,52 +2328,97 @@ fn handoff_content_archive(
     destination: &Path,
     extension: &str,
 ) -> Result<Value, String> {
+    deliver_owner_archive(payload, destination, extension, "content")
+}
+
+/// Size and SHA-256 of a file, read in chunks.
+fn file_size_and_sha256(path: &Path) -> std::io::Result<(u64, String)> {
+    let mut input = std::fs::File::open(path)?;
+    let mut digest = Sha256::new();
+    let mut bytes = 0_u64;
+    let mut buffer = [0_u8; 64 * 1024];
+    loop {
+        let count = input.read(&mut buffer)?;
+        if count == 0 {
+            break;
+        }
+        digest.update(&buffer[..count]);
+        bytes += count as u64;
+    }
+    Ok((bytes, hex::encode(digest.finalize())))
+}
+
+/// The owner writes each export to a working copy in its data folder. The shell checks that copy against the
+/// owner's receipt, copies it to the file the person chose, checks the chosen file the same way, and then removes
+/// the working copy, whether or not the save succeeded, so no second copy of the archive stays behind.
+fn deliver_owner_archive(
+    payload: Value,
+    destination: &Path,
+    extension: &str,
+    noun: &str,
+) -> Result<Value, String> {
     if destination.extension().and_then(|value| value.to_str()) != Some(extension) {
         return Err(format!(
-            "Sylvia GM content exports require the .{extension} extension"
+            "Sylvia GM {noun} exports require the .{extension} extension"
         ));
     }
     let source_text = payload
         .get("artifact_path")
         .and_then(Value::as_str)
-        .ok_or_else(|| "Authority package export did not produce a handoff artifact".to_string())?;
+        .ok_or_else(|| format!("Authority {noun} export did not produce a handoff artifact"))?;
     let source = PathBuf::from(source_text)
         .canonicalize()
-        .map_err(|_| "Authority package export artifact is unavailable".to_string())?;
+        .map_err(|_| format!("Authority {noun} export artifact is unavailable"))?;
     if !source.is_file() || source.extension().and_then(|value| value.to_str()) != Some(extension) {
-        return Err("Authority export artifact is not a Sylvia GM package archive".to_string());
+        return Err(format!(
+            "Authority export artifact is not a Sylvia GM {noun} archive"
+        ));
     }
+    // Choosing the working copy itself as the destination keeps it: it is then the person's file.
+    if destination.canonicalize().ok().as_deref() == Some(source.as_path()) {
+        return Err(format!(
+            "Choose a place outside Sylvia GM's data folder for the {noun} archive"
+        ));
+    }
+    let delivered = deliver_checked_archive(&payload, &source, destination, noun);
+    let _ = std::fs::remove_file(&source);
+    delivered
+}
+
+fn deliver_checked_archive(
+    payload: &Value,
+    source: &Path,
+    destination: &Path,
+    noun: &str,
+) -> Result<Value, String> {
     let export = payload
         .get("export")
-        .ok_or_else(|| "Authority package export receipt is unavailable".to_string())?;
+        .ok_or_else(|| format!("Authority {noun} export receipt is unavailable"))?;
     let expected_bytes = export
         .get("byte_count")
         .and_then(Value::as_u64)
-        .ok_or_else(|| "Authority package export size is unavailable".to_string())?;
+        .ok_or_else(|| format!("Authority {noun} export size is unavailable"))?;
     let expected_sha256 = export
         .get("archive_sha256")
         .and_then(Value::as_str)
-        .ok_or_else(|| "Authority package export hash is unavailable".to_string())?;
-    let mut input = std::fs::File::open(&source)
-        .map_err(|_| "Authority package export artifact is unavailable".to_string())?;
-    let mut digest = Sha256::new();
-    let mut actual_bytes = 0_u64;
-    let mut buffer = [0_u8; 64 * 1024];
-    loop {
-        let count = input
-            .read(&mut buffer)
-            .map_err(|_| "Authority package export artifact could not be verified".to_string())?;
-        if count == 0 {
-            break;
-        }
-        digest.update(&buffer[..count]);
-        actual_bytes += count as u64;
+        .ok_or_else(|| format!("Authority {noun} export hash is unavailable"))?;
+    let exact = |path: &Path| {
+        file_size_and_sha256(path)
+            .map(|(bytes, sha256)| bytes == expected_bytes && sha256 == expected_sha256)
+            .unwrap_or(false)
+    };
+    if !exact(source) {
+        return Err(format!(
+            "Authority {noun} export artifact failed exact-byte verification"
+        ));
     }
-    if actual_bytes != expected_bytes || hex::encode(digest.finalize()) != expected_sha256 {
-        return Err("Authority package export artifact failed exact-byte verification".to_string());
+    std::fs::copy(source, destination)
+        .map_err(|_| format!("Sylvia GM could not save the selected {noun} archive"))?;
+    if !exact(destination) {
+        return Err(format!(
+            "The saved {noun} archive does not match the export; export it again"
+        ));
     }
-    std::fs::copy(&source, destination)
-        .map_err(|_| "Sylvia GM could not save the selected package archive".to_string())?;
     Ok(json!({
         "status": "exported",
         "file_name": destination.file_name().and_then(|value| value.to_str()),
@@ -3135,71 +3180,121 @@ async fn export_campaign(
 }
 
 fn handoff_export_archive(payload: Value, destination: &Path) -> Result<Value, String> {
-    if destination.extension().and_then(|value| value.to_str()) != Some("sylvia-gm-campaign") {
-        return Err("Sylvia GM exports require the .sylvia-gm-campaign extension".to_string());
-    }
-    let source_text = payload
-        .get("artifact_path")
-        .and_then(Value::as_str)
-        .ok_or_else(|| "Authority export did not produce a handoff artifact".to_string())?;
-    let source = PathBuf::from(source_text)
-        .canonicalize()
-        .map_err(|_| "Authority export artifact is unavailable".to_string())?;
-    if !source.is_file()
-        || source.extension().and_then(|value| value.to_str()) != Some("sylvia-gm-campaign")
-    {
-        return Err("Authority export artifact is not an Sylvia GM campaign archive".to_string());
-    }
-    std::fs::copy(&source, destination)
-        .map_err(|_| "Sylvia GM could not save the selected campaign archive".to_string())?;
-    Ok(json!({
-        "status": "exported",
-        "file_name": destination.file_name().and_then(|value| value.to_str()),
-        "export": payload.get("export").cloned().unwrap_or(Value::Null),
-    }))
+    deliver_owner_archive(payload, destination, "sylvia-gm-campaign", "campaign")
 }
 
 #[cfg(test)]
 mod selected_file_handoff_tests {
-    use super::handoff_export_archive;
-    use serde_json::json;
+    use super::{handoff_content_archive, handoff_export_archive};
+    use serde_json::{json, Value};
+    use sha2::{Digest, Sha256};
     use std::fs;
+    use std::path::{Path, PathBuf};
     use std::time::{SystemTime, UNIX_EPOCH};
 
-    #[test]
-    fn selected_export_handoff_copies_exact_bytes_without_leaking_private_path() {
+    fn fixture_root(name: &str) -> PathBuf {
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("clock follows Unix epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("sylvia-gm-handoff-{nonce}"));
-        fs::create_dir_all(&root).expect("create handoff fixture directory");
-        let private_source = root.join("private.sylvia-gm-campaign");
+        let root = std::env::temp_dir().join(format!("sylvia-gm-handoff-{name}-{nonce}"));
+        fs::create_dir_all(root.join("exports")).expect("create handoff fixture directory");
+        root
+    }
+
+    fn receipt(path: &Path, bytes: &[u8]) -> Value {
+        json!({
+            "artifact_path": path,
+            "export": {
+                "campaign_id": "campaign-portable",
+                "archive_sha256": hex::encode(Sha256::digest(bytes)),
+                "byte_count": bytes.len(),
+            },
+        })
+    }
+
+    #[test]
+    fn selected_export_handoff_copies_exact_bytes_and_removes_the_working_copy() {
+        let root = fixture_root("campaign");
+        let working = root
+            .join("exports")
+            .join("export-file-1.sylvia-gm-campaign");
         let selected_destination = root.join("selected.sylvia-gm-campaign");
         let archive_bytes = b"sealed portable campaign fixture";
-        fs::write(&private_source, archive_bytes).expect("write private owner artifact");
+        fs::write(&working, archive_bytes).expect("write private owner artifact");
 
-        let result = handoff_export_archive(
-            json!({
-                "artifact_path": private_source,
-                "export": {
-                    "campaign_id": "campaign-portable",
-                    "archive_sha256": "fixture-hash",
-                    "byte_count": archive_bytes.len(),
-                },
-            }),
-            &selected_destination,
-        )
-        .expect("copy owner artifact to selected destination");
+        let result =
+            handoff_export_archive(receipt(&working, archive_bytes), &selected_destination)
+                .expect("copy owner artifact to selected destination");
 
         assert_eq!(
             fs::read(&selected_destination).expect("read selected destination"),
             archive_bytes
         );
+        assert!(!working.exists(), "no second copy stays in the data folder");
         assert_eq!(result["status"], "exported");
         assert_eq!(result["file_name"], "selected.sylvia-gm-campaign");
         assert_eq!(result["export"]["campaign_id"], "campaign-portable");
         assert!(result.get("artifact_path").is_none());
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn plan_and_package_handoffs_also_remove_the_working_copy() {
+        let root = fixture_root("content");
+        for extension in ["sylvia-gm-plan", "sylvia-gm-package"] {
+            let working = root.join("exports").join(format!("export-1.{extension}"));
+            let selected = root.join(format!("selected.{extension}"));
+            fs::write(&working, b"content archive").expect("write working copy");
+            handoff_content_archive(receipt(&working, b"content archive"), &selected, extension)
+                .expect("deliver content archive");
+            assert_eq!(
+                fs::read(&selected).expect("read selected"),
+                b"content archive"
+            );
+            assert!(!working.exists(), "{extension}: working copy removed");
+        }
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn a_working_copy_that_fails_its_receipt_is_not_saved_and_is_still_removed() {
+        let root = fixture_root("mismatch");
+        let working = root
+            .join("exports")
+            .join("export-file-2.sylvia-gm-campaign");
+        let selected_destination = root.join("selected.sylvia-gm-campaign");
+        fs::write(&working, b"changed bytes").expect("write working copy");
+
+        let error =
+            handoff_export_archive(receipt(&working, b"original bytes"), &selected_destination)
+                .expect_err("a working copy that differs from its receipt is refused");
+
+        assert!(error.contains("exact-byte verification"), "{error}");
+        assert!(
+            !selected_destination.exists(),
+            "nothing is written to the chosen place"
+        );
+        assert!(
+            !working.exists(),
+            "the refused working copy does not accumulate"
+        );
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn choosing_the_working_copy_itself_keeps_it() {
+        let root = fixture_root("same");
+        let working = root
+            .join("exports")
+            .join("export-file-3.sylvia-gm-campaign");
+        fs::write(&working, b"archive").expect("write working copy");
+
+        let error = handoff_export_archive(receipt(&working, b"archive"), &working)
+            .expect_err("the working copy cannot be its own destination");
+
+        assert!(error.contains("outside Sylvia GM's data folder"), "{error}");
+        assert_eq!(fs::read(&working).expect("working copy kept"), b"archive");
         fs::remove_dir_all(root).expect("remove handoff fixture directory");
     }
 }

@@ -329,7 +329,8 @@ def step_plan() -> list[Step]:
              (2,)),
         Step(4, "player-turn", "A full player turn with tools offered completes", (3,)),
         Step(5, "character-chat", "Character chat with an imported card gets a reply", (2,)),
-        Step(6, "export", "Export the campaign to a file in the home folder", (3,)),
+        Step(6, "export", "Export the campaign to a file in the home folder; no copy left behind",
+             (3,)),
         Step(7, "second-start", "A second start while running exits 0; one window remains",
              (1,)),
         Step(8, "close", "Closing the window exits 0 and leaves no process", (7,)),
@@ -1135,6 +1136,12 @@ class Check:
         step.facts["sha256"] = sha256_of(target)
         if size == 0:
             raise StepError("the exported file is empty")
+        # The app's working copy of the archive goes once the chosen file is saved (issue 111).
+        left = sorted(path.name for path in (home / DATA_FOLDER / "exports").glob("*")
+                      if path.is_file())
+        step.facts["working_copies_left"] = left
+        if left:
+            raise StepError(f"the export left a copy in the app's data folder: {left}")
         self.export_path = target
 
     def step_linux_notes(self, step: Step) -> None:
