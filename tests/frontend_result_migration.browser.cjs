@@ -113,9 +113,16 @@ test('migrated results, historical checks and Builder controls fit normal and na
           assert(bound.left >= bound.parentLeft && bound.right <= bound.parentRight + 1);
           assert(bound.scroll <= bound.client + 1, `overflow at ${width}px: ${JSON.stringify(bound)}`);
         }
+        // Settle until no finite animation is still running. A style change can cancel a
+        // running transition, whose `finished` then rejects with AbortError, and start another.
         await page.locator('#chronology').evaluate(async container => {
-          await Promise.all(container.getAnimations({subtree: true}).filter(animation =>
-            animation.effect?.getTiming().iterations !== Infinity).map(animation => animation.finished));
+          for (;;) {
+            const running = container.getAnimations({subtree: true}).filter(animation =>
+              animation.playState === 'running' &&
+              animation.effect?.getTiming().iterations !== Infinity);
+            if (!running.length) return;
+            await Promise.allSettled(running.map(animation => animation.finished));
+          }
         });
         if (process.env.SYLVIA_FC16_CAPTURE_DIR) {
           fs.mkdirSync(process.env.SYLVIA_FC16_CAPTURE_DIR, { recursive: true });
