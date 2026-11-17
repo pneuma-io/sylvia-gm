@@ -1034,8 +1034,31 @@ def _run(
     elapsed = time.monotonic() - started
     print(f"{'PASS' if passed else 'FAIL'} {name} ({elapsed:.1f}s)", flush=True)
     if not passed:
+        if name == "ui-controls":
+            # The tail below rarely reaches a failure in about 800 browser tests.
+            for block in tap_failures(output):
+                print(block, flush=True)
         print(output[-16000:], flush=True)
+        print(f"Full output of {name}: {destination / (name + '.log')}", flush=True)
     return bool(passed), elapsed
+
+
+def tap_failures(output: str) -> list[str]:
+    """Each failed TAP test, with its diagnostic block, from node --test output."""
+    blocks = []
+    lines = output.splitlines()
+    for index, line in enumerate(lines):
+        match = re.match(r"^(\s*)not ok \d+ - ", line)
+        if not match:
+            continue
+        end_marker = match.group(1) + "  ..."
+        block = [line]
+        for following in lines[index + 1:index + 60]:
+            block.append(following)
+            if following == end_marker:
+                break
+        blocks.append("FAILED BROWSER TEST\n" + "\n".join(block))
+    return blocks
 
 
 def _run_guarded(
