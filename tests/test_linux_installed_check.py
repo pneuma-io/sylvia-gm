@@ -205,7 +205,7 @@ def test_missing_programs_names_every_tool_on_an_empty_path(tmp_path):
 
 def test_step_plan_numbers_the_checklist_steps_and_needs_only_known_steps():
     steps = check.step_plan()
-    assert [step.number for step in steps] == list(range(1, 13))
+    assert [step.number for step in steps] == list(range(1, 14))
     numbers = {step.number for step in steps}
     for step in steps:
         assert set(step.needs) <= numbers and step.number not in step.needs

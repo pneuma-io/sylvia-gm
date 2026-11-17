@@ -63,6 +63,7 @@ DATA_FOLDER = ".local/share/com.pneuma-io.sylvia-gm"
 KEY_FILE = ".local/state/sylvia-gm/credential-key"
 WINDOW_TITLE = "Sylvia GM"
 DATA_UNAVAILABLE_TITLE = "Sylvia GM - selected data unavailable"
+OWNER_CLOSE_FAILED_TITLE = "Sylvia GM - owner close failed"
 MARKER_VARIABLE = "SYLVIA_INSTALLED_CHECK_RUN"
 LOWEST_DISPLAY = 90
 LOWEST_PORT = 8790
@@ -339,6 +340,8 @@ def step_plan() -> list[Step]:
         Step(11, "data-unavailable-box",
              "A copy on the same data folder (separate D-Bus) shows the error box", (7,)),
         Step(12, "linux-notes", "What Linux leaves out is stated plainly", (1,)),
+        Step(13, "owner-close-failed",
+             "After the owner dies, closing shows the failure box and exits with code 1", (1,)),
     ]
 
 
@@ -1310,6 +1313,54 @@ class Check:
         if left:
             raise StepError(f"processes were left behind: {left}")
 
+    def step_owner_close_failed(self, step: Step) -> None:
+        # A copy of its own on a fresh profile: its owner is stopped from outside, as a crash would.
+        before = {pid for pid, _name in marked_processes(self.marker)}
+        copy = self.start_direct("app-owner-dies", "c")
+        try:
+            wait_for(lambda: self.main_windows() or None, APP_START_SECONDS,
+                     "the AppImage window did not appear")
+
+            def owner() -> list[int]:
+                # The packaged owner runs as a launcher and its child, both with this name.
+                return [pid for pid, name in marked_processes(self.marker)
+                        if pid not in before and name == "sylvia-gm-owner"]
+
+            wait_for(owner, OWNER_SECONDS, "the copy's owner process did not start")
+            time.sleep(5)
+            stopped = owner()
+            for pid in stopped:
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(pid, signal.SIGKILL)
+            wait_for(lambda: not owner() or None, 30, "the owner did not stop")
+            step.facts["owner_processes_stopped"] = len(stopped)
+            windows = self.main_windows()
+            if len(windows) != 1:
+                raise StepError(f"expected one window to close, found {len(windows)}")
+            run(["wmctrl", "-i", "-c", windows[0]], self.env_for("tools"))
+            self.wait_window(OWNER_CLOSE_FAILED_TITLE, BOX_SECONDS)
+            step.facts["box_title"] = OWNER_CLOSE_FAILED_TITLE
+            self.screenshot(step, "box")
+            self.keys("Return")
+            try:
+                code = copy.wait(120)
+            except subprocess.TimeoutExpired:
+                raise StepError("the app did not exit after the box was answered") from None
+        finally:
+            if copy.poll() is None:
+                self.processes.stop(copy)
+        try:
+            wait_for(lambda: not self.app_processes(), 30, "")
+            left: list[str] = []
+        except StepError:
+            left = [f"{pid} {name}" for pid, name in self.app_processes()]
+        step.facts["exit_code"] = code
+        step.facts["processes_left"] = left
+        if code != 1:
+            raise StepError(f"the app exited with code {code} after a failed close; expected 1")
+        if left:
+            raise StepError(f"processes were left behind: {left}")
+
     def step_restart(self, step: Step) -> None:
         self.open_app("a", step)
         shelves = self.wait_text("#campaign-shelves", self.campaign_name, OWNER_SECONDS)
@@ -1396,6 +1447,7 @@ class Check:
         self.run_step(7, self.step_second_start)
         self.run_step(11, self.step_data_unavailable_box)
         self.run_step(8, self.step_close)
+        self.run_step(13, self.step_owner_close_failed)
         if self.first_copy is not None and self.first_copy.poll() is None:
             self.processes.stop(self.first_copy)
         self.run_step(9, self.step_restart)

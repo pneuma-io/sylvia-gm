@@ -186,6 +186,9 @@ It checks, in one run:
 12. Dictation says it is not available on Linux and About says in-app updates are not
     supported. The Claude page's answer to "Check Claude Code" is recorded, not judged; nothing is
     installed or signed in.
+13. A copy on a fresh profile whose owner process is stopped from outside: closing its window
+    shows the "owner close failed" box, and after OK the app exits with code 1 and leaves no
+    process behind.
 
 Run it on Ubuntu 22.04 and on Ubuntu 24.04, and look through the screenshots as well as the
 result.
