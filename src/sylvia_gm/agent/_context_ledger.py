@@ -1009,6 +1009,12 @@ CURRENT_WIRE_FRAME: ContextVar[dict[str, Any] | None] = ContextVar(
     "sylvia_gm_current_wire_frame", default=None
 )
 
+#: Set by the ledger for the one ChatGPT request it has just built, and cleared by the
+#: provider as it reads it: only such a request may keep a runtime thread. Every other
+#: request (an NPC decision, Builder, a summary) runs on a fresh thread. Each stream round
+#: runs in its own task with a copy of the context, and clears it when it starts.
+LEDGER_REQUEST: ContextVar[bool] = ContextVar("sylvia_gm_ledger_request", default=False)
+
 
 def _prefix_fingerprint(stable: Sequence[Mapping[str, Any]]) -> str:
     return _sha(_json([{"role": m.get("role"), "content": m.get("content")} for m in stable]))

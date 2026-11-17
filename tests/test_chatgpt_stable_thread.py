@@ -215,6 +215,9 @@ class Audit:
 def pool(monkeypatch: pytest.MonkeyPatch):
     kept = _chatgpt._KeptThreads()
     monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", kept)
+    # These tests call the provider as the context ledger does: each request is a ledger
+    # request, the only kind that may keep a thread (see the marker tests below).
+    monkeypatch.setattr(_chatgpt, "_ledger_request", lambda: True)
     monkeypatch.setattr(_chatgpt, "_USAGE_SETTLE_SECONDS", 0.01)
     yield kept
     kept.close_all()
@@ -284,6 +287,40 @@ async def test_without_a_kept_thread_each_request_starts_its_own_process_and_thr
     assert [len(params["items"]) for params in runtime.sent("thread/inject_items")] == [1, 3]
     assert audit.reuse == [] and all("thread_reuse" not in r for r in audit.receipts)
     assert len(pool) == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("thread", [None, "answer", "stable"])
+async def test_only_a_request_the_ledger_built_may_keep_a_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, thread: str | None,
+) -> None:
+    from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+
+    kept = _chatgpt._KeptThreads()
+    monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", kept)
+    monkeypatch.setattr(_chatgpt, "_USAGE_SETTLE_SECONDS", 0.01)
+    monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    if thread is None:
+        monkeypatch.delenv("SYLVIA_CHATGPT_THREAD", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", thread)
+    from tests.test_chatgpt_answer_in_place import AnswerRuntime, Waiting, asks
+
+    runtime = (
+        Runtime(tool_turn("call-1"), tool_turn("call-2")) if thread == "stable"
+        else AnswerRuntime(Waiting([asks("call-1", 7)]), Waiting([asks("call-2", 8)]))
+    )
+    provider, audit = provider_for(runtime, tmp_path)
+    # Not built by the ledger (an NPC decision, Builder): the fresh path, as before kept
+    # threads, whatever the switch says.
+    await provider.generate(FIRST, tools=TOOLS)
+    assert runtime.alive() == [] and len(kept) == 0 and audit.reuse == []
+    # Built by the ledger: the switch's mode. The mark serves this one request.
+    LEDGER_REQUEST.set(True)
+    await provider.generate(FIRST, tools=TOOLS)
+    assert LEDGER_REQUEST.get() is False
+    assert len(runtime.alive()) == 1 and len(kept) == 1 and audit.reuse[0]["kept"] is True
+    kept.close_all()
 
 
 @pytest.mark.asyncio

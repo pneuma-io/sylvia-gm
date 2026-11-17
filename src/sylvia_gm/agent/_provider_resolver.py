@@ -417,6 +417,10 @@ class ConfiguredProviderResolver:
         self._enabled = frozenset(enabled)
         self._model_ids = frozenset(model.id for model in catalog)
         self._model_providers = {model.id: model.provider_key for model in catalog}
+        #: The ChatGPT subscription models this configuration offers, by runtime model id.
+        self.subscription_models = frozenset(
+            model.wire_model_id for model in catalog if model.transport == "codex_app_server"
+        )
         self._provider_definitions = dict(config.providers)
         self._user_config_path = Path(user_config_path) if user_config_path is not None else None
         self._model_capability_registry = (

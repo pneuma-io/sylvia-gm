@@ -27,6 +27,34 @@ class SyntheticAccount:
         return [{"id": "gpt-5.6-sol"}, {"id": "another-advertised-model"}]
 
 
+def test_the_resolver_names_the_subscription_models_it_offers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A settings reload keeps kept ChatGPT threads of exactly these models."""
+    path = tmp_path / "config.yaml"
+    save_provider_settings(
+        path, provider_id="chatgpt_subscription", preset_id="chatgpt_subscription",
+        base_url="https://chatgpt.com", credential=None, model_id="gpt-5.6-sol",
+        model_name="Saved subscription", context_window=262144, max_output_tokens=8192,
+        transport="codex_app_server",
+    )
+    save_provider_settings(
+        path, provider_id="openrouter", preset_id="openrouter",
+        base_url="https://openrouter.ai/api/v1", credential="synthetic-key",
+        model_id="synthetic/m3", model_name="Other route", context_window=524_288,
+        max_output_tokens=8192, transport="chat_completions",
+    )
+
+    class DiscoveryOnly:
+        def models(self):
+            return [{"id": "gpt-5.6-sol", "supported_reasoning_efforts": ["low", "high"],
+                     "default_reasoning_effort": "low"}]
+
+    monkeypatch.setattr(chatgpt_settings, "_account", lambda _: DiscoveryOnly())
+    resolver = ConfiguredProviderResolver(path)
+    assert resolver.subscription_models == frozenset({"gpt-5.6-sol"})
+
+
 @pytest.mark.parametrize("unavailable", [False, True])
 def test_ordinary_catalog_load_refreshes_legacy_effort_without_inference(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, unavailable: bool,

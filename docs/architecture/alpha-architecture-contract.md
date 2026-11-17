@@ -1659,14 +1659,19 @@ the ledger resets. Builder and participant requests do not use it.
 - **ChatGPT runtime thread.** On `codex_app_server` the provider keeps the Codex runtime process
   and thread between the requests of a GM turn and between turns. At a Sylvia tool call the turn
   is left waiting, and the next request, which brings the call's result, answers the call inside
-  that same turn (`answer`). A kept thread serves a request only when the request holds exactly
-  what the thread holds; otherwise a fresh thread does, and the thread-reuse audit record says
-  why. A waiting turn is closed after 30 minutes idle, on Stop, sign-in or sign-out, provider
-  close and process exit; its owed usage report is collected first except at process exit.
+  that same turn (`answer`). Only a request the context ledger built keeps a thread: the ledger
+  marks it as it builds it (`LEDGER_REQUEST`), and the provider reads and clears the mark, so it
+  serves that one request. Every other request (an NPC decision, Builder, a summary) runs on a
+  fresh thread, as before kept threads. A kept thread serves a request only when the request
+  holds exactly what the thread holds; otherwise a fresh thread does, and the thread-reuse audit
+  record says why. A waiting turn is closed after 30 minutes idle, on Stop, sign-in or sign-out,
+  provider close, a chat's change away from its model, a settings reload that no longer offers
+  its model, and process exit; its owed usage report is collected first except at process exit.
   `SYLVIA_CHATGPT_THREAD=fresh` starts a new process and thread for every request, as before kept
   threads; unset or any other value means `answer` with the ledger and `fresh` without it, so
-  `SYLVIA_GM_CONTEXT_MODE=legacy` alone restores the whole previous behaviour on that route.
-  `stable` (interrupt and continue) and `answer-draft` are experimental values.
+  `SYLVIA_GM_CONTEXT_MODE=legacy` alone restores the whole previous behaviour on that route. Any
+  value applies only to ledger-built requests. `stable` (interrupt and continue) and
+  `answer-draft` are experimental values.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 

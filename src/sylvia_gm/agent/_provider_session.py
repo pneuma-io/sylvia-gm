@@ -29,6 +29,7 @@ from sylvia_gm.agent._context_ledger import (
     JOURNAL_KIND,
     LEDGER_KEY,
     LEDGER_MODE,
+    LEDGER_REQUEST,
     NATIVE_KIND,
     STABLE_KEY,
     ContextLedger,
@@ -2414,6 +2415,9 @@ class ProviderSessionAdapter:
                 await bridge.save(frame.record)
             ledger.commit(frame)
             CURRENT_WIRE_FRAME.set(frame.observation)
+            if transport == "codex_app_server":
+                # This request may keep a ChatGPT runtime thread; the provider clears it.
+                LEDGER_REQUEST.set(True)
             if transport == "claude_code":
                 CURRENT_NATIVE_ROUTE.set(
                     self._claude_native_route(ledger, frame, bridge, persistent))
@@ -3893,6 +3897,8 @@ class ProviderSessionAdapter:
             provider.history_retrieval_enabled = history_allowed
 
         async def consume() -> None:
+            # A request is marked only by its own ledger build below, never by a copied one.
+            LEDGER_REQUEST.set(False)
             try:
                 model_info = getattr(self._provider, "model_info", None)
                 from sylvia_gm.provider._output_policy import output_allowance

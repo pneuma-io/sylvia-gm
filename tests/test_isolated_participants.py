@@ -981,6 +981,81 @@ def test_real_serializers_interleave_owned_contexts_and_reopen(
     assert "a:1" in json.dumps(frames[5]) and "a:5" in json.dumps(frames[5])
 
 
+def test_an_npc_decision_right_after_a_gm_round_runs_on_a_fresh_chatgpt_thread(
+    isolated_game, tmp_path, monkeypatch,
+):
+    """Only the request the context ledger built keeps a runtime thread.
+
+    The GM round's turn is left waiting in a kept thread. The NPC decision that follows on
+    the same provider and the same runtime loop is not a ledger request: it starts its own
+    thread, which closes when it ends, and leaves the GM's thread where it was.
+    """
+    from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+    from sylvia_gm.provider import _chatgpt
+    from sylvia_gm.provider._chatgpt import ChatGPTProvider
+    from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
+
+    for name in ("SYLVIA_GM_CONTEXT_MODE", "SYLVIA_CHATGPT_THREAD"):
+        monkeypatch.delenv(name, raising=False)  # the shipped defaults
+    monkeypatch.setattr(_chatgpt, "_USAGE_SETTLE_SECONDS", 0.01)
+    monkeypatch.setattr(_chatgpt, "_USAGE_REPORT_SECONDS", 0.05)
+    owner, session, _ = isolated_game
+    runtimes = []
+
+    class Runtime(SyntheticRuntime):
+        def call(self, method, params):
+            if method == "thread/start":
+                self.tools = [tool["name"] for namespace in params["dynamicTools"]
+                              for tool in namespace["tools"]]
+            if method == "turn/start":
+                if "select_actor_action" in self.tools:
+                    tool, arguments = "select_actor_action", {"action_id": "a:0"}
+                else:
+                    tool = next(n for n in self.tools if n.endswith("_update_campaign_file"))
+                    arguments = {}
+                self.events = [{"id": len(runtimes) + 6, "method": "item/tool/call", "params": {
+                    "namespace": "sylvia", "tool": tool, "callId": "call-" + tool,
+                    "arguments": arguments}}]
+            return super().call(method, params)
+
+    def connect(*_args, **_kwargs):
+        runtimes.append(Runtime([]))
+        return runtimes[-1]
+
+    model = provider_for(SyntheticRuntime([]), tmp_path).model_info
+    provider = ChatGPTProvider(tmp_path, model, connection_factory=connect)
+    adapter = ProviderSessionAdapter(owner, provider, owner_id="isolated-test",
+        gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL")
+    source = gm_input(owner, session)
+    tools, _ = adapter._provider_tools(source.catalog)
+    list(adapter._stream_round(adapter._messages(source), tools, control=source.control,
+                               provider_input=source))
+    [gm] = runtimes
+    [kept] = list(_chatgpt._KEPT_THREADS._idle)
+    assert kept.connection is gm and kept.pending is not None and not gm.closed
+
+    request = owner.actor_decision_request("tokens", turn_id="turn")
+    # Even a mark left in the caller's context reaches no request: each round clears its own
+    # copy when it starts, and only the ledger build inside a round sets it.
+    stray = LEDGER_REQUEST.set(True)
+    try:
+        events = iter(run_actor_decision(owner, provider, source, request,
+            owner_id="isolated-test", stream=adapter._stream_round))
+        try:
+            event = next(events)
+            assert event.action_command.parameters["choice"] == "a:0"
+        finally:
+            events.close()
+    finally:
+        LEDGER_REQUEST.reset(stray)
+    gm_runtime, npc = runtimes
+    assert npc.calls.count("thread/start") == 1 and npc.closed
+    assert "turn/interrupt" in npc.calls  # the fresh path's usage collection, as on main
+    assert list(_chatgpt._KEPT_THREADS._idle) == [kept] and not gm_runtime.closed
+    assert gm_runtime.calls.count("thread/start") == 1 and "turn/start" in gm_runtime.calls
+    assert LEDGER_REQUEST.get() is False
+
+
 @pytest.mark.parametrize("isolated_game", [{"housekeeping": True}], indirect=True)
 def test_required_transition_refreshes_the_actor_before_any_npc_request(isolated_game):
     owner, session, _ = isolated_game
