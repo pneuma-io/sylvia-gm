@@ -237,7 +237,10 @@ class RulesetFile(BaseModel):
         cfg = self.get_ability(ability_key)
         if cfg.modifier_formula is None:
             raise ValueError(f"Ability '{ability_key}' does not declare a modifier formula.")
-        return int(evaluate_expression(cfg.modifier_formula, ExecutionContext(params={"score": score})))
+        return (
+            int(
+            evaluate_expression(cfg.modifier_formula, ExecutionContext(params={"score": score})))
+        )
 
     def get_skill(self, name: str) -> SkillDef | None:
         """Find a skill by name (case-insensitive)."""

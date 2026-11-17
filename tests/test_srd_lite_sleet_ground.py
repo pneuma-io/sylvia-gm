@@ -13,7 +13,7 @@ from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ExecutionBudget
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls, _scene_entity
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls, _scene_entity
 
 SUPPORT = 'qualify_srd_sleet_storm_support'
 TERRAIN = 'resolve_srd_sleet_storm_terrain_intervals'
@@ -25,7 +25,7 @@ def bound():
         data = yaml.load(archive.read('packages/' + NAMESPACE + '/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
-        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool['parameters']]
+        tool['parameters'] = [deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])]
     if os.environ.get('SRD_LITE_PATCH_SLEET_GROUND') == '1':
         from scripts.srd_lite_sleet_terrain import bind_sleet_ground_terrain
         bind_sleet_ground_terrain(data)

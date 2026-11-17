@@ -390,3 +390,17 @@ def test_legacy_oversize_partial_and_unapproved_fields_never_enter_reports(tmp_p
     finally:
         recovered.close()
     assert "PRIVATE" not in path.read_text()
+
+
+@pytest.mark.parametrize(
+    ("platform", "expected"),
+    [("linux", "linux"), ("darwin", "macos"), ("freebsd14", "other"), ("cygwin", "other")],
+)
+def test_platform_names_the_os_from_a_fixed_set_without_host_details(monkeypatch, platform, expected):
+    monkeypatch.setattr(local.sys, "platform", platform)
+    assert local._platform() == {"os": expected}
+
+
+def test_platform_on_this_machine_is_named():
+    named = local._platform()["os"]
+    assert named == {"win32": "windows", "linux": "linux", "darwin": "macos"}.get(sys.platform, "other")

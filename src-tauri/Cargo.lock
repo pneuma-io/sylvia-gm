@@ -2830,6 +2830,9 @@ dependencies = [
  "ashpd",
  "block2",
  "dispatch2",
+ "glib-sys",
+ "gobject-sys",
+ "gtk-sys",
  "js-sys",
  "log",
  "objc2",
@@ -3302,8 +3305,9 @@ dependencies = [
 
 [[package]]
 name = "sylvia-gm"
-version = "0.3.0-alpha.4"
+version = "0.4.0-alpha.1"
 dependencies = [
+ "gtk",
  "hex",
  "hmac",
  "rand 0.8.7",

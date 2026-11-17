@@ -11,6 +11,7 @@ import os
 import queue
 import shutil
 import subprocess
+import sys
 import threading
 import time
 from collections.abc import Callable, Iterator
@@ -25,6 +26,32 @@ class CodexConnectionError(RuntimeError):
 
 class CodexCancelledError(CodexConnectionError):
     """This inference was intentionally stopped rather than losing its connection."""
+
+
+#: Requests that change which account a runtime home is signed in to.
+_ACCOUNT_CHANGES = frozenset({"account/login/start", "account/logout"})
+_account_change_listeners: list[Callable[[Path], None]] = []
+
+
+def add_account_change_listener(listener: Callable[[Path], None]) -> None:
+    """Be told a runtime home's account is about to change, before the request is sent.
+
+    Inference connections kept open for that home belong to the previous account and must
+    close; the listener receives the resolved home and must not raise.
+    """
+    if listener not in _account_change_listeners:
+        _account_change_listeners.append(listener)
+
+
+def account_changed(home: Path) -> None:
+    """Tell listeners a runtime home's account has just changed (a sign-in completed)."""
+    _announce_account_change(home)
+
+
+def _announce_account_change(home: Path) -> None:
+    for listener in tuple(_account_change_listeners):
+        with suppress(Exception):
+            listener(home)
 
 
 def isolated_environment(home: Path) -> dict[str, str]:
@@ -56,6 +83,22 @@ def isolated_environment(home: Path) -> dict[str, str]:
     environment["APPDATA"] = str(home / "AppData" / "Roaming")
     environment["LOCALAPPDATA"] = str(home / "AppData" / "Local")
     return environment
+
+
+def missing_runtime_message(windows: bool) -> str:
+    """What to tell a person when no Codex runtime is found.
+
+    A Linux desktop starts applications with a shorter PATH than a terminal has, so a Codex
+    that works in a terminal can still be invisible here; say how to make it visible.
+    """
+    message = "Install the Codex runtime before connecting ChatGPT."
+    if windows:
+        return message
+    return (
+        f"{message} Sylvia looks for the codex program in the folders on its PATH. If Codex "
+        "is already installed, start Sylvia from a terminal in which codex works, or link "
+        "codex into a folder your desktop session has on its PATH, such as ~/.local/bin."
+    )
 
 
 def find_codex_runtime() -> str | None:
@@ -161,7 +204,7 @@ class CodexConnection:
         """Create and retain only this connection's isolated runtime instance."""
         resolved = str(self.executable) if self.executable else find_codex_runtime()
         if not resolved or (os.name == "nt" and Path(resolved).suffix.lower() != ".exe"):
-            raise CodexConnectionError("Install the Codex runtime before connecting ChatGPT.")
+            raise CodexConnectionError(missing_runtime_message(os.name == "nt"))
         self.workspace.mkdir(parents=True, exist_ok=True)
         self._responses = queue.Queue()
         self._notifications = queue.Queue(maxsize=8192)
@@ -217,6 +260,9 @@ class CodexConnection:
             "-c",
             'web_search="disabled"',
         ]
+        creationflags = 0
+        if sys.platform == "win32":
+            creationflags = subprocess.CREATE_NO_WINDOW
         try:
             process = subprocess.Popen(
                 command,
@@ -228,7 +274,7 @@ class CodexConnection:
                 text=True,
                 encoding="utf-8",
                 bufsize=1,
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+                creationflags=creationflags,
             )
         except OSError:
             raise CodexConnectionError("The Codex runtime could not be started.") from None
@@ -306,6 +352,8 @@ class CodexConnection:
 
     def call(self, method: str, params: dict[str, Any], *, timeout: float = 30) -> dict[str, Any]:
         """Wait for a correlated reply and close on timeout to prevent stale work reuse."""
+        if method in _ACCOUNT_CHANGES:
+            _announce_account_change(self.home)
         with self._call_lock:
             self._check_stopped()
             self._next_id += 1
@@ -331,6 +379,11 @@ class CodexConnection:
             if not isinstance(result, dict):
                 raise CodexConnectionError("The Codex runtime returned an unsupported reply.")
             return result
+
+    def respond(self, request_id: object, result: dict[str, Any]) -> None:
+        """Answer a server request this connection forwarded, such as a Sylvia tool call."""
+        self._check_stopped()
+        self._write({"id": request_id, "result": result})
 
     def notifications(self) -> list[dict[str, Any]]:
         """Drain pending protocol notifications for owner-side interpretation only."""

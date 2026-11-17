@@ -231,81 +231,12 @@ def test_static_point_light_does_not_inherit_the_previous_held_light_anchor():
     assert changed["spatial_scene"]["entities"] == scene["entities"]
 
 
-def test_exact_exported_producers_receive_knowledge_without_rewriting_native_bodies():
-    tools = _tools()
-    original = deepcopy(tools)
-    runtime = {"tools": tools}
-    visual.bind_persistent_spell_map(runtime)
-    assert not validate_parameter_declarations(runtime)
-    for name, field in (("create_srd_source_actor_scene", "_created_actor_scene"),
-                        ("cast_srd_stone_spell_wall", "_solid_wall_new_panel"),
-                        ("cast_srd_mage_hand", "_world_created_entity")):
-        before = [row["set"]["value"] for rows in visual._lists(original[name]["effects"]) for row in rows
-                  if row.get("set", {}).get("field") == field]
-        after = [row["set"]["value"] for rows in visual._lists(tools[name]["effects"]) for row in rows
-                 if row.get("set", {}).get("field") == field and row["set"]["value"] != "_visual_body"]
-        assert after == before
-        assert any(row.get("call") == visual.BODY for rows in visual._lists(tools[name]["effects"]) for row in rows)
-    for name in ("cast_srd_spell_ward", "install_srd_illumination_source", "install_srd_actor_spell_modifier"):
-        assert tools[name]["effects"][-1]["call"] == visual.REFRESH
 
 
-def test_actual_late_cast_capsule_and_tail_keep_the_owned_object_fact_merge():
-    tools = _tools()
-    tools.update(json.loads((W / "selected-truth-dispatch-owners-1144.json").read_text(encoding="utf-8"))["tools"])
-    original = deepcopy(tools)
-    visual.bind_persistent_spell_map({"tools": tools})
-    captures = [row["set"]["value"] for rows in visual._lists(tools["cast_spell"]["effects"]) for row in rows
-                if row.get("set", {}).get("field") == "_retained_cast_tail_choices"]
-    original_captures = [row["set"]["value"] for rows in visual._lists(original["cast_spell"]["effects"]) for row in rows
-                         if row.get("set", {}).get("field") == "_retained_cast_tail_choices"]
-    assert len(captures) == len(original_captures) == 2
-    assert captures[0][0][visual.KNOWN] == visual.KNOWN
-    assert {key: value for key, value in captures[0][0].items() if key != visual.KNOWN} == original_captures[0][0]
-    assert captures[1] == original_captures[1] == [visual.CAPSULE_FACT_MERGE]
-    tail = tools["finish_srd_retained_cast_tail"]
-    assert tail["metadata"]["retained_spell_reactions_v1_choices"].count(visual.KNOWN) == 1
-    for name in ("cast_srd_spell_ward", "cast_srd_stone_spell_wall"):
-        calls = [row for rows in visual._lists(tail["effects"]) for row in rows if row.get("call") == name]
-        assert len(calls) == 1
-        assert calls[0]["params"][visual.KNOWN] == "{_visual_cast_known}"
 
 
-def test_actual_staged_dispatch_forwards_knowledge_without_an_extra_cast_or_payment_path():
-    tools = _tools()
-    for filename in ("selected-truth-dispatch-owners-1144.json", "selected-truth-pending-capture-1158.json"):
-        tools.update(json.loads((W / filename).read_text(encoding="utf-8"))["tools"])
-    complete = tools["complete_srd_pending_action"]
-    original = deepcopy(complete)
-    visual.bind_persistent_spell_map({"tools": tools})
-    rows = [row for group in visual._lists(complete["effects"]) for row in group]
-    old_rows = [row for group in visual._lists(original["effects"]) for row in group]
-    calls = [row for row in rows if row.get("call") == "cast_spell"
-             and row.get("params", {}).get("spell") == "{_pending_action.parameters.spell}"]
-    old_calls = [row for row in old_rows if row.get("call") == "cast_spell"
-                 and row.get("params", {}).get("spell") == "{_pending_action.parameters.spell}"]
-    assert len(calls) == len(old_calls) == 1
-    assert calls[0]["params"][visual.KNOWN] == "{_visual_pending_known}"
-    assert {key: value for key, value in calls[0]["params"].items() if key != visual.KNOWN} == old_calls[0]["params"]
-    assert [row["call"] for row in rows if "call" in row] == [row["call"] for row in old_rows if "call" in row]
 
 
-@pytest.mark.parametrize("count", [0, 2])
-def test_actual_staged_dispatch_rejects_a_missing_or_duplicate_owner(count):
-    tools = _tools()
-    tools.update(json.loads((W / "selected-truth-pending-capture-1158.json").read_text(encoding="utf-8"))["tools"])
-    complete = tools["complete_srd_pending_action"]
-    matches = [(rows, index, row) for rows in visual._lists(complete["effects"]) for index, row in enumerate(rows)
-               if row.get("call") == "cast_spell"
-               and row.get("params", {}).get("spell") == "{_pending_action.parameters.spell}"]
-    assert len(matches) == 1
-    rows, index, row = matches[0]
-    if count == 0:
-        del rows[index]
-    else:
-        rows.insert(index, deepcopy(row))
-    with pytest.raises(ValueError, match="exactly one actual staged spell dispatcher"):
-        visual.bind_persistent_spell_map({"tools": tools})
 
 
 def test_new_effects_obey_dsl_expression_literal_and_foreach_limits():

@@ -6,6 +6,8 @@ import hashlib
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from copy import deepcopy
+from enum import StrEnum
+from typing import Any, Final
 
 from sylvia_gm.application.player_actions import (
     player_action_origins,
@@ -24,6 +26,57 @@ from sylvia_gm.domain.authority import (
 from sylvia_gm.domain.errors import AuthorityError, CommandRejected, StaleRevision
 from sylvia_gm.domain.package_library import canonical_json_bytes
 from sylvia_gm.domain.session import SessionMessageKind, SessionStatus
+
+
+class QueueStatus(StrEnum):
+    READY = "ready"
+    RUNNING = "running"
+    PAUSED = "paused"
+    FAILED = "failed"
+    STALE = "stale"
+    COMPLETED = "completed"
+
+
+class StepStatus(StrEnum):
+    PENDING = "pending"
+    EXECUTING = "executing"
+    AWAITING_CHOICE = "awaiting_choice"
+    COMMITTED = "committed"
+
+
+# Recomposition creates a ready version, retaining any committed prefix.
+# Recovery may pause/fail a running, paused, failed or stale queue; a recovered
+# commitment can then make that paused queue stale. Execution starts as running.
+QUEUE_MOVES: Final[Mapping[QueueStatus, frozenset[QueueStatus]]] = {
+    QueueStatus.READY: frozenset({QueueStatus.READY, QueueStatus.RUNNING}),
+    QueueStatus.RUNNING: frozenset(QueueStatus),
+    QueueStatus.PAUSED: frozenset(
+        {QueueStatus.READY, QueueStatus.PAUSED, QueueStatus.FAILED, QueueStatus.STALE}
+    ),
+    QueueStatus.FAILED: frozenset({QueueStatus.READY, QueueStatus.PAUSED, QueueStatus.FAILED}),
+    QueueStatus.STALE: frozenset({QueueStatus.READY, QueueStatus.PAUSED, QueueStatus.FAILED}),
+    QueueStatus.COMPLETED: frozenset({QueueStatus.READY}),
+}
+
+# A committed step is skipped or copied unchanged. For every other saved step,
+# recovery can return it to pending or commit it; execution can retry its envelope,
+# await its saved choice, fail back to pending or commit it.
+STEP_MOVES: Final[Mapping[StepStatus, frozenset[StepStatus]]] = {
+    StepStatus.PENDING: frozenset(StepStatus),
+    StepStatus.EXECUTING: frozenset(StepStatus),
+    StepStatus.AWAITING_CHOICE: frozenset(StepStatus),
+    StepStatus.COMMITTED: frozenset(),
+}
+
+
+def _move_queue(queue: dict[str, Any], new: QueueStatus) -> None:
+    """Write the plain wire value; transition checking belongs to tests."""
+    queue["status"] = new.value
+
+
+def _move_step(step: dict[str, Any], new: StepStatus) -> None:
+    """Write the plain wire value; transition checking belongs to tests."""
+    step["status"] = new.value
 
 
 def _plain(value):
@@ -80,11 +133,11 @@ def _project(queue):
             **queue,
             "confirmation": (
                 queue.get("submission_confirmation")
-                if queue["status"] == "running"
+                if queue["status"] == QueueStatus.RUNNING
                 else _consent(queue)
             ),
             "committed_action_ids": [
-                s["operation_id"] for s in queue["steps"] if s["status"] == "committed"
+                s["operation_id"] for s in queue["steps"] if s["status"] == StepStatus.COMMITTED
             ],
         }
     )
@@ -104,7 +157,12 @@ def _save(owner, queue):
 def read(owner, *, session_id, sequence_id=None):
     with owner._operation():
         queue = _load(owner, session_id, sequence_id)
-        if queue and queue["status"] in {"running", "paused", "failed", "stale"}:
+        if queue and queue["status"] in {
+            QueueStatus.RUNNING,
+            QueueStatus.PAUSED,
+            QueueStatus.FAILED,
+            QueueStatus.STALE,
+        }:
             with owner._lane(queue["campaign_id"]):
                 changed = False
                 snapshot = owner._store.snapshot(queue["campaign_id"])
@@ -112,7 +170,7 @@ def read(owner, *, session_id, sequence_id=None):
                     owner._sessions.context(session_id).session.status is SessionStatus.ACTIVE
                 )
                 for step in queue["steps"]:
-                    if step["status"] == "committed" or not step.get("execution"):
+                    if step["status"] == StepStatus.COMMITTED or not step.get("execution"):
                         continue
                     hit = owner._store.action_hit(queue["campaign_id"], step["operation_id"])
                     if hit is None:
@@ -132,30 +190,35 @@ def read(owner, *, session_id, sequence_id=None):
                     if session_active:
                         owner._append_player_action_references(queue["session_id"], receipt)
                     step["receipt"] = _receipt(receipt)
-                    if str(receipt.status) == "committed":
-                        step["status"], step["error"] = "committed", None
+                    if str(receipt.status) == StepStatus.COMMITTED:
+                        _sequence_step_error = None
+                        _move_step(step, StepStatus.COMMITTED)
+                        step["error"] = _sequence_step_error
                         queue["error"] = None
                         queue["expected_revision"] = receipt.resulting_revision
                         queue["event_watermark"] = _watermark(snapshot)
-                        queue["status"] = "paused"
+                        _move_queue(queue, QueueStatus.PAUSED)
                         queue["pause_reason"] = (
                             "Saved commitment recovered; inspect the remaining intentions"
                         )
                         if snapshot.revision != receipt.resulting_revision or _watermark(
                             snapshot
                         ) != _commit_watermark(snapshot, receipt.action_id):
-                            queue["status"], queue["error"] = (
-                                "stale",
-                                "Campaign changed after the saved commitment",
-                            )
+                            _sequence_queue_error = "Campaign changed after the saved commitment"
+                            _move_queue(queue, QueueStatus.STALE)
+                            queue["error"] = _sequence_queue_error
                     else:
-                        step["status"], step["error"] = "pending", "Native action did not commit"
-                        queue["status"], queue["error"] = "failed", step["error"]
+                        _sequence_step_error = "Native action did not commit"
+                        _move_step(step, StepStatus.PENDING)
+                        step["error"] = _sequence_step_error
+                        _sequence_queue_error = step["error"]
+                        _move_queue(queue, QueueStatus.FAILED)
+                        queue["error"] = _sequence_queue_error
                     changed = True
                 if changed:
                     if not session_active:
                         # Stopped history stays immutable.
-                # Project the real receipt without resuming the session.
+                        # Project the real receipt without resuming the session.
                         return _project(queue)
                     return _save(owner, queue)
         return _project(queue)
@@ -190,7 +253,7 @@ def _committed_ids(owner, queue, snapshot):
         if not envelope:
             continue
         hit = owner._store.action_hit(queue["campaign_id"], step["operation_id"])
-        if hit is None or str(hit.receipt.status) != "committed":
+        if hit is None or str(hit.receipt.status) != StepStatus.COMMITTED:
             continue
         origin = player_control_origin(
             envelope["source"],
@@ -225,7 +288,7 @@ def response_results(owner, *, session_id, basis_message_id):
                         {
                             **queue,
                             "committed_action_ids": identities,
-                            "provider_execution_stopped": queue["status"] != "completed",
+                            "provider_execution_stopped": queue["status"] != QueueStatus.COMPLETED,
                         }
                     )
                 )
@@ -304,10 +367,10 @@ def _bind_execution_basis(owner, queue):
 
 def _needs_recovery(owner, queue):
     for step in queue["steps"]:
-        if step["status"] == "committed" or not step.get("execution"):
+        if step["status"] == StepStatus.COMMITTED or not step.get("execution"):
             continue
         hit = owner._store.action_hit(queue["campaign_id"], step["operation_id"])
-        if hit is not None and str(hit.receipt.status) == "committed":
+        if hit is not None and str(hit.receipt.status) == StepStatus.COMMITTED:
             return True
     return False
 
@@ -384,14 +447,16 @@ def compose(
         if (old["version"] if old else 0) != expected_version:
             raise StaleRevision("Action sequence version changed")
         pending_action = owner._store.pending_mechanics_action(campaign_id)
-        if old and any(s["status"] in {"executing", "awaiting_choice"} for s in old["steps"]):
+        if old and any(
+            s["status"] in {StepStatus.EXECUTING, StepStatus.AWAITING_CHOICE} for s in old["steps"]
+        ):
             raise CommandRejected(
                 "Recover the saved sequence execution or resolve its choice before editing"
             )
         if pending_action is not None:
             raise CommandRejected("Resolve the pending mechanics choice before composing")
         old_steps = {s["step_id"]: s for s in old["steps"]} if old else {}
-        committed = [s for s in old_steps.values() if s["status"] == "committed"]
+        committed = [s for s in old_steps.values() if s["status"] == StepStatus.COMMITTED]
         if [s.get("step_id") for s in steps[: len(committed)]] != [s["step_id"] for s in committed]:
             raise CommandRejected("Committed steps cannot be removed or reordered")
         control_scope = owner._player_control_scope(snapshot)
@@ -408,7 +473,7 @@ def compose(
                 raise CommandRejected("Action sequence step identities must be unique")
             ids.add(step_id)
             previous = old_steps.get(step_id)
-            if previous and previous["status"] == "committed":
+            if previous and previous["status"] == StepStatus.COMMITTED:
                 if previous["source"] != _plain(source) or previous["selection"] != _plain(
                     selection
                 ):
@@ -449,13 +514,15 @@ def compose(
                     )
                 ).hexdigest()
             )
-            result.append(
+            _queued_step = {
+                "step_id": step_id,
+                "source": _plain(source),
+                "selection": _plain(selection),
+                "label": label,
+            }
+            _move_step(_queued_step, StepStatus.PENDING)
+            _queued_step.update(
                 {
-                    "step_id": step_id,
-                    "source": _plain(source),
-                    "selection": _plain(selection),
-                    "label": label,
-                    "status": "pending",
                     "operation_id": operation,
                     "receipt": None,
                     "error": None,
@@ -468,21 +535,26 @@ def compose(
                     "preview": _plain((presentation or {}).get("preview")),
                 }
             )
+            result.append(_queued_step)
         queue = {
             "kind": "action_sequence",
             "campaign_id": campaign_id,
             "session_id": session_id,
             "sequence_id": sequence_id,
             "version": expected_version,
-            "status": "ready",
-            "expected_revision": snapshot.revision,
-            "event_watermark": _watermark(snapshot),
-            "scope": _scope(owner, snapshot),
-            "turn_id": owner._store.current_open_turn(campaign_id),
-            "steps": result,
-            "error": None,
-            "pause_reason": None,
         }
+        _move_queue(queue, QueueStatus.READY)
+        queue.update(
+            {
+                "expected_revision": snapshot.revision,
+                "event_watermark": _watermark(snapshot),
+                "scope": _scope(owner, snapshot),
+                "turn_id": owner._store.current_open_turn(campaign_id),
+                "steps": result,
+                "error": None,
+                "pause_reason": None,
+            }
+        )
         return _save(owner, queue)
 
 
@@ -490,7 +562,7 @@ def _receipt(receipt):
     if isinstance(receipt, AwaitingChoiceReceipt):
         return {
             "action_id": receipt.action_id,
-            "status": "awaiting_choice",
+            "status": StepStatus.AWAITING_CHOICE.value,
             "basis_revision": receipt.basis_revision,
             "choice_id": receipt.choice.choice_id,
         }
@@ -550,27 +622,33 @@ def _execute(owner, campaign_id, session_id, sequence_id, expected_version, conf
         if queue["campaign_id"] != campaign_id:
             raise CommandRejected("Action sequence belongs to another campaign")
         # Duplicate/uncertain submissions return the durable settled result, never re-execute it.
-        if queue["status"] in {"completed", "failed", "stale", "paused"}:
+        if queue["status"] in {
+            QueueStatus.COMPLETED,
+            QueueStatus.FAILED,
+            QueueStatus.STALE,
+            QueueStatus.PAUSED,
+        }:
             return _project(queue)
         if queue["version"] != expected_version and not (
-            queue["status"] == "running" and queue.get("submission_version") == expected_version
+            queue["status"] == QueueStatus.RUNNING
+            and queue.get("submission_version") == expected_version
         ):
             raise StaleRevision("Action sequence version changed")
         if confirmation != (
             _consent(queue)
-            if queue["status"] != "running"
+            if queue["status"] != QueueStatus.RUNNING
             else queue.get("submission_confirmation")
         ):
             raise CommandRejected(
                 "Inspect and confirm the ordered actions first", code="action_confirmation_required"
             )
-        if queue["status"] != "running":
+        if queue["status"] != QueueStatus.RUNNING:
             queue["submission_version"] = expected_version
             queue["submission_confirmation"] = confirmation
         _bind_execution_basis(owner, queue)
-        queue["status"] = "running"
+        _move_queue(queue, QueueStatus.RUNNING)
         for step in queue["steps"]:
-            if step["status"] == "committed":
+            if step["status"] == StepStatus.COMMITTED:
                 continue
             snapshot = owner._store.snapshot(campaign_id)
             envelope = step.get("execution")
@@ -581,27 +659,29 @@ def _execute(owner, campaign_id, session_id, sequence_id, expected_version, conf
                 if snapshot.revision != receipt.resulting_revision or _watermark(
                     snapshot
                 ) != _commit_watermark(snapshot, receipt.action_id):
-                    step["receipt"], step["status"] = _receipt(receipt), "committed"
-                    queue["status"], queue["error"] = (
-                        "stale",
-                        "Campaign changed after the saved commitment",
-                    )
+                    _sequence_step_receipt = _receipt(receipt)
+                    step["receipt"] = _sequence_step_receipt
+                    _move_step(step, StepStatus.COMMITTED)
+                    _sequence_queue_error = "Campaign changed after the saved commitment"
+                    _move_queue(queue, QueueStatus.STALE)
+                    queue["error"] = _sequence_queue_error
                     return _save(owner, queue)
             else:
                 if (
                     snapshot.revision != queue["expected_revision"]
                     or _watermark(snapshot) != queue["event_watermark"]
                 ):
-                    queue["status"], queue["error"] = (
-                        "stale",
-                        "Campaign changed outside this sequence",
-                    )
+                    _sequence_queue_error = "Campaign changed outside this sequence"
+                    _move_queue(queue, QueueStatus.STALE)
+                    queue["error"] = _sequence_queue_error
                     return _save(owner, queue)
                 if (
                     _scope(owner, snapshot) != queue["scope"]
                     or owner._store.current_open_turn(campaign_id) != queue["turn_id"]
                 ):
-                    queue["status"], queue["pause_reason"] = "paused", "Control or turn changed"
+                    _sequence_queue_pause_reason = "Control or turn changed"
+                    _move_queue(queue, QueueStatus.PAUSED)
+                    queue["pause_reason"] = _sequence_queue_pause_reason
                     return _save(owner, queue)
                 try:
                     if envelope is None:
@@ -623,26 +703,33 @@ def _execute(owner, campaign_id, session_id, sequence_id, expected_version, conf
                         preview = owner._player_action_in_owned_work(**envelope, preview_only=True)
                         envelope["confirmation"] = preview["confirmation"]
                         step["execution"] = envelope
-                        step["status"] = "executing"
+                        _move_step(step, StepStatus.EXECUTING)
                         _save(owner, queue)  # Persist exact envelope before any native transaction.
                     receipt = owner._player_action_in_owned_work(**envelope)
                 except AuthorityError as error:
-                    step["status"], step["error"] = "pending", str(error)
-                    queue["status"], queue["error"] = "failed", str(error)
+                    _sequence_step_error = str(error)
+                    _move_step(step, StepStatus.PENDING)
+                    step["error"] = _sequence_step_error
+                    _sequence_queue_error = str(error)
+                    _move_queue(queue, QueueStatus.FAILED)
+                    queue["error"] = _sequence_queue_error
                     return _save(owner, queue)
             step["receipt"] = _receipt(receipt)
             if isinstance(receipt, AwaitingChoiceReceipt):
-                step["status"] = "awaiting_choice"
-                queue["status"], queue["pause_reason"] = (
-                    "paused",
-                    "Resolve the saved mechanics choice",
-                )
+                _move_step(step, StepStatus.AWAITING_CHOICE)
+                _sequence_queue_pause_reason = "Resolve the saved mechanics choice"
+                _move_queue(queue, QueueStatus.PAUSED)
+                queue["pause_reason"] = _sequence_queue_pause_reason
                 return _save(owner, queue)
-            if str(receipt.status) != "committed":
-                step["status"], step["error"] = "pending", "Native action did not commit"
-                queue["status"], queue["error"] = "failed", step["error"]
+            if str(receipt.status) != StepStatus.COMMITTED:
+                _sequence_step_error = "Native action did not commit"
+                _move_step(step, StepStatus.PENDING)
+                step["error"] = _sequence_step_error
+                _sequence_queue_error = step["error"]
+                _move_queue(queue, QueueStatus.FAILED)
+                queue["error"] = _sequence_queue_error
                 return _save(owner, queue)
-            step["status"] = "committed"
+            _move_step(step, StepStatus.COMMITTED)
             with owner._narration_lock:
                 attempts = [
                     a
@@ -661,31 +748,34 @@ def _execute(owner, campaign_id, session_id, sequence_id, expected_version, conf
                 _scope(owner, after) != queue["scope"]
                 or owner._store.current_open_turn(campaign_id) != queue["turn_id"]
             ):
-                queue["status"], queue["pause_reason"] = (
-                    "paused",
-                    "Native action reached a control or turn boundary",
-                )
+                _sequence_queue_pause_reason = "Native action reached a control or turn boundary"
+                _move_queue(queue, QueueStatus.PAUSED)
+                queue["pause_reason"] = _sequence_queue_pause_reason
                 return _save(owner, queue)
             # The package's authoritative fresh catalog declares required engine transitions.
             # Required reactions and lifecycle stop the queue through the native catalog.
             required = [
                 t
                 for t in owner._catalog(campaign_id)
-                if str(t.model_behavior) in {
-                    "required_engine_transition", "required_ruleset_decision",
+                if str(t.model_behavior)
+                in {
+                    "required_engine_transition",
+                    "required_ruleset_decision",
                 }
             ]
             if required:
-                queue["status"], queue["pause_reason"] = (
-                    "paused",
-                    "Required Ruleset decision: " + ", ".join(t.name for t in required),
+                _sequence_queue_pause_reason = "Required Ruleset decision: " + ", ".join(
+                    t.name for t in required
                 )
+                _move_queue(queue, QueueStatus.PAUSED)
+                queue["pause_reason"] = _sequence_queue_pause_reason
                 titles = list(dict.fromkeys(t.decision_title for t in required if t.decision_title))
                 queue["pause_summary"] = (
                     "Resolve " + "; ".join(titles) + " before continuing queued actions."
-                    if titles else None
+                    if titles
+                    else None
                 )
                 return _save(owner, queue)
             _save(owner, queue)
-        queue["status"] = "completed"
+        _move_queue(queue, QueueStatus.COMPLETED)
         return _save(owner, queue)

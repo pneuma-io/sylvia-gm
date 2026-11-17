@@ -15,7 +15,7 @@ BLOCK_BYTES = 65536
 @timed("database_archive")
 def archive_closed_database(original, owned_directory):
     """Preserve a closed synthetic database in an archive verified by its restore digest."""
-    if os.environ.get("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES") == "0":
+    if os.environ.get("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES") != "1":
         # This optional evidence copy is not a gameplay or save/recovery assertion.
         # Keep closed raw data available locally, including for a failing scenario.
         return

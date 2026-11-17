@@ -1,5 +1,6 @@
 """Exercise documentation checks in disposable repositories, without touching this index."""
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -16,7 +17,9 @@ def _git(repo: Path, *args: str) -> None:
 
 def _check(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
     """Run the real checker against the test repository."""
-    bash = shutil.which("bash")
+    # On Windows PATH may select the retired WSL launcher; use Git's Bash.
+    git_bash = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe"
+    bash = str(git_bash) if os.name == "nt" and git_bash.is_file() else shutil.which("bash")
     if bash is None:
         pytest.skip("The documentation checker requires bash")
     return subprocess.run([bash, SCRIPT.name, *args], cwd=repo, capture_output=True, text=True)

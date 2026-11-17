@@ -6,6 +6,13 @@ from pathlib import Path
 
 import pytest
 
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
+
+# Off Windows the signer refuses every action before it reads any input.
+windows_signing_store = pytest.mark.runs_on("win32", reason="Windows DPAPI signing store")
+
 
 def signer():
     source = Path(__file__).resolve().parents[1] / "scripts/sign_desktop_update.py"
@@ -24,6 +31,7 @@ def test_import_and_help_never_create_files_or_enter_a_signing_action(tmp_path, 
     assert list(tmp_path.iterdir()) == []
 
 
+@windows_signing_store
 def test_generation_rejects_existing_destination_before_any_key_generation(
     tmp_path, capsys, monkeypatch
 ):
@@ -54,6 +62,7 @@ def test_generation_rejects_existing_destination_before_any_key_generation(
     assert not (tmp_path / "public.json").exists()
 
 
+@windows_signing_store
 def test_production_requires_backup_before_creating_or_importing_a_key(tmp_path, capsys):
     module = signer()
     assert (
@@ -74,6 +83,7 @@ def test_production_requires_backup_before_creating_or_importing_a_key(tmp_path,
     assert list(tmp_path.iterdir()) == []
 
 
+@windows_signing_store
 def test_bad_public_manifest_is_rejected_before_key_store_access(tmp_path, capsys, monkeypatch):
     module = signer()
     manifest = tmp_path / "manifest.json"
@@ -99,6 +109,7 @@ def test_bad_public_manifest_is_rejected_before_key_store_access(tmp_path, capsy
     assert not (tmp_path / "signed.json").exists()
 
 
+@windows_signing_store
 def test_signing_failure_never_echoes_private_error_details(tmp_path, capsys, monkeypatch):
     module = signer()
     manifest = tmp_path / "manifest.json"

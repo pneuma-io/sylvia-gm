@@ -25394,6 +25394,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/allosaurus",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/allosaurus",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -26291,6 +26297,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/ankylosaurus",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/ankylosaurus",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -26360,6 +26372,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/ape",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/ape",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -26428,6 +26446,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/archelon",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/archelon",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -26705,6 +26729,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/baboon",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/baboon",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -26773,6 +26803,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/badger",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/badger",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -27119,6 +27155,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/bat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/bat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -27325,6 +27367,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/black_bear",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/black_bear",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -27533,6 +27581,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/blood_hawk",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/blood_hawk",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -27670,6 +27724,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/boar",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/boar",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -27947,6 +28007,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/brown_bear",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/brown_bear",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -28154,6 +28220,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/camel",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/camel",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -28222,6 +28294,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/cat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/cat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -28706,6 +28784,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/constrictor_snake",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/constrictor_snake",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -28913,6 +28997,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/crab",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/crab",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -28981,6 +29071,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/crocodile",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/crocodile",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -29189,6 +29285,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/deer",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/deer",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -29327,6 +29429,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/dire_wolf",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/dire_wolf",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -29464,6 +29572,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/draft_horse",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/draft_horse",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -29879,6 +29993,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/eagle",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/eagle",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30017,6 +30137,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/elephant",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/elephant",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30085,6 +30211,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/elk",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/elk",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -30293,6 +30425,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/frog",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/frog",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30431,6 +30569,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_ape",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_ape",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30499,6 +30643,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_badger",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_badger",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -30569,6 +30719,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_bat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_bat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30637,6 +30793,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_boar",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_boar",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -30707,6 +30869,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_centipede",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_centipede",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30775,6 +30943,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_constrictor_snake",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_constrictor_snake",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -30845,6 +31019,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_crab",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_crab",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -30913,6 +31093,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_crocodile",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_crocodile",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -31121,6 +31307,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_fire_beetle",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_fire_beetle",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -31189,6 +31381,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_frog",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_frog",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -31259,6 +31457,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_goat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_goat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -31327,6 +31531,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_hyena",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_hyena",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -31397,6 +31607,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_lizard",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_lizard",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -31465,6 +31681,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_octopus",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_octopus",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -31604,6 +31826,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_rat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_rat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -31672,6 +31900,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_scorpion",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_scorpion",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -31742,6 +31976,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_seahorse",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_seahorse",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -31810,6 +32050,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_shark",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_shark",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -31880,6 +32126,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_spider",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_spider",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -31949,6 +32201,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_toad",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_toad",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -32017,6 +32275,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_venomous_snake",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_venomous_snake",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -32156,6 +32420,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_wasp",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_wasp",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -32225,6 +32495,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_weasel",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_weasel",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -32293,6 +32569,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_wolf_spider",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/giant_wolf_spider",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -32569,6 +32851,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/goat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/goat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -33398,6 +33686,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/hawk",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/hawk",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -33604,6 +33898,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/hippopotamus",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/hippopotamus",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -33881,6 +34181,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/hunter_shark",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/hunter_shark",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -33949,6 +34255,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/hyena",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/hyena",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -34226,6 +34538,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/jackal",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/jackal",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -34294,6 +34612,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/killer_whale",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/killer_whale",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -34571,6 +34895,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/lion",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/lion",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -34639,6 +34969,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/lizard",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/lizard",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -34777,6 +35113,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/mammoth",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/mammoth",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -34985,6 +35327,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/mastiff",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/mastiff",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -35191,6 +35539,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/mule",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/mule",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -35537,6 +35891,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/octopus",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/octopus",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -35744,6 +36104,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/owl",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/owl",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -35812,6 +36178,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/panther",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/panther",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -35950,6 +36322,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/piranha",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/piranha",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -36296,6 +36674,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/plesiosaurus",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/plesiosaurus",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -36365,6 +36749,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/polar_bear",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/polar_bear",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -36433,6 +36823,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/pony",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/pony",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -36710,6 +37106,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/pteranodon",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/pteranodon",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -36917,6 +37319,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/rat",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/rat",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -36985,6 +37393,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/raven",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/raven",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -37124,6 +37538,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/reef_shark",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/reef_shark",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -37192,6 +37612,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/rhinoceros",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/rhinoceros",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -37262,6 +37688,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/riding_horse",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/riding_horse",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -37330,6 +37762,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/saber_toothed_tiger",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/saber_toothed_tiger",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -37468,6 +37906,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/scorpion",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/scorpion",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -37675,6 +38119,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/seahorse",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/seahorse",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -38159,6 +38609,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/spider",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/spider",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -38573,6 +39029,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_bats",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_bats",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -38711,6 +39173,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_insects",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_insects",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -38779,6 +39247,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_piranhas",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_piranhas",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -38849,6 +39323,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_rats",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_rats",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -38917,6 +39397,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_ravens",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_ravens",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -38987,6 +39473,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_venomous_snakes",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/swarm_of_venomous_snakes",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -39055,6 +39547,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/tiger",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/tiger",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -39263,6 +39761,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/triceratops",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/triceratops",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -39400,6 +39904,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/tyrannosaurus_rex",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/tyrannosaurus_rex",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -39608,6 +40118,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/venomous_snake",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/venomous_snake",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -39746,6 +40262,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/vulture",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/vulture",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -39814,6 +40336,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/warhorse",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/warhorse",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
@@ -40022,6 +40550,12 @@
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/weasel",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
           "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/weasel",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
+          "campaign_setting_id": "pneuma.severed-lands"
         }
       ],
       "visuals": {
@@ -40159,6 +40693,12 @@
           "package_id": "sylvia.srd-lite.bg3",
           "path": "runtime/ruleset.yaml#/definitions/beast_forms/wolf",
           "sha256": "04d0f5218795bc12f02e53b3a61009715b65d6ad07d1b2a2e6dafa51c3508560",
+          "campaign_setting_id": "pneuma.severed-lands"
+        },
+        {
+          "package_id": "sylvia.srd-lite.bg3",
+          "path": "runtime/ruleset.yaml#/definitions/beast_forms/wolf",
+          "sha256": "26298f8b14c477b7691f5a8ae68832da1b0a75432daf249a173c0f833fcda127",
           "campaign_setting_id": "pneuma.severed-lands"
         }
       ],

@@ -22,6 +22,7 @@ import yaml
 from pydantic import ValidationError
 
 from sylvia_gm.application._yaml_bounds import YamlShapeError, validate_yaml_graph
+from sylvia_gm.application._runtime_cache import cached_runtime
 from sylvia_gm.application.player_actions import (
     PlayerActionChecker,
     PlayerActionPreviewer,
@@ -903,7 +904,14 @@ def _parse_runtime(
         if cached is not None:
             _PARSED_RUNTIMES.move_to_end(key)
             return cached
-    runtime = _load_runtime(package_id=package_id, runtime_bytes=runtime_bytes, authoring=authoring)
+    runtime = cached_runtime(
+        package_id=package_id,
+        runtime_bytes=runtime_bytes,
+        authoring=authoring,
+        load=lambda: _load_runtime(
+            package_id=package_id, runtime_bytes=runtime_bytes, authoring=authoring
+        ),
+    )
     with _PARSED_RUNTIMES_LOCK:
         _PARSED_RUNTIMES[key] = runtime
         _PARSED_RUNTIMES.move_to_end(key)
@@ -1031,6 +1039,14 @@ def validate_package_runtime(
                     "Package result-card declaration is invalid",
                     diagnostics=error.diagnostics,
                 ) from error
+
+
+def package_tool_permanently_refused(
+    *, package_id: str, declaration: ToolDeclaration, runtime_bytes: bytes,
+) -> bool:
+    """Read the refusal set computed once for these immutable runtime bytes."""
+    runtime = _parse_runtime(package_id=package_id, runtime_bytes=runtime_bytes)
+    return declaration.name in runtime.permanently_refused_tool_names
 
 
 def package_tool_description(
@@ -1213,7 +1229,7 @@ def _player_preflight(
         if not result.success:
             # Preserve authored refusals; unexpected runtime failures stay private.
             if result.failure_kind == "precondition" and result.error is not None:
-                raise RulesetPreconditionRejected(result.error)
+                raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
             raise PackageRuntimeError('This path or destination is unavailable; check the visible map and creature-space declarations.')
         scalars.update({key: value for key, value in result.context.items()
                         if value is None or isinstance(value, (str, bool, int, float))})
@@ -1345,6 +1361,27 @@ def materialize_player_action_previewer(
             return None
 
     return preview
+
+
+_SAFE_REFERENCE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}")
+
+
+def _unknown_reference_reason(references: Sequence[str]) -> str:
+    """Explain, in bounded model-safe text, that a chosen ID has no saved game state."""
+    named = [
+        reference for reference in references
+        if isinstance(reference, str) and _SAFE_REFERENCE_ID.fullmatch(reference)
+    ][:3]
+    if named and len(named) == len(references):
+        subject = ", ".join(f"'{reference}'" for reference in named)
+        opening = f"This campaign has no saved game statistics for {subject}."
+    else:
+        opening = "This campaign has no saved game statistics for a chosen target."
+    return (
+        f"{opening} This action only works on creatures and objects in the campaign's "
+        "game state. Choose one that is listed there, add the missing one first if a "
+        "tool for that is offered, or narrate the outcome without this action."
+    )
 
 
 def materialize_package_mechanic(
@@ -1509,8 +1546,16 @@ def materialize_package_mechanic(
                 )
         if not result.success:
             if result.failure_kind == "precondition" and result.error is not None:
-                raise RulesetPreconditionRejected(result.error)
-            raise PackageRuntimeError("Package mechanic execution failed")
+                raise RulesetPreconditionRejected(result.error, reasons=result.failure_reasons)
+            if result.failure_kind == "parameter_validation" and result.unknown_references:
+                # The model chose a target the campaign holds no game state for (a named
+                # bystander, say). That is a refusal it can act on, not a Ruleset defect.
+                raise RulesetPreconditionRejected(
+                    _unknown_reference_reason(result.unknown_references)
+                )
+            raise PackageRuntimeError("Package mechanic execution failed") from RuntimeError(
+                result.error or "Unknown Ruleset execution failure"
+            )
         if choice_control is not None and not choice_control.consumed:
             raise PackageRuntimeError("Package mechanic did not consume the authorized choice")
         if result.private_random_sampled and result.public_context is None:

@@ -1,5 +1,7 @@
 """Exact provider defaults assist setup without discovering access or running inference."""
 
+import webbrowser
+
 import httpx
 import pytest
 
@@ -273,7 +275,7 @@ def test_featherless_plan_caps_discovery_without_inventing_a_limit(
 
 def test_setup_pages_use_fixed_preset_urls_and_handle_no_browser(monkeypatch, tmp_path):
     opened = []
-    monkeypatch.setattr(settings.webbrowser, "open", lambda url, new: opened.append(url) or True)
+    monkeypatch.setattr(webbrowser, "open", lambda url, new: opened.append(url) or True)
     presets = settings.provider_settings(tmp_path / "config.yaml")["presets"]
     for preset in presets:
         assert preset["setup_hint"]
@@ -284,7 +286,7 @@ def test_setup_pages_use_fixed_preset_urls_and_handle_no_browser(monkeypatch, tm
     for invalid in ("custom", "https://untrusted.example", None):
         with pytest.raises(ConfigError):
             settings.open_provider_setup(invalid)
-    monkeypatch.setattr(settings.webbrowser, "open", lambda *args, **kwargs: False)
+    monkeypatch.setattr(webbrowser, "open", lambda *args, **kwargs: False)
     assert settings.open_provider_setup("groq") == {
         "opened": False, "url": "https://console.groq.com/keys",
     }

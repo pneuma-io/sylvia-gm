@@ -38,6 +38,9 @@ const saved=JSON.parse(process.argv[2]);
 const terminal={kind:'session_attempt_terminal',attempt_id:'attempt-test',
   status:'interrupted',failure_category:'provider_tool_round_budget_exceeded'};
 window.testState.activeSessionId='session-test';
+window.testState.view='session';
+window.testState.activeSessionRole='dm';
+window.testState.activeCampaignId='campaign-test';
 window.testState.bridge={
   session_context:async()=>({messages:[{message_id:'terminal-test',kind:'evidence',content:terminal}]}),
   player_projection:async()=>[{kind:'retry',safe_payload:{
@@ -168,7 +171,7 @@ source=source.replace('  // ---- Public API ----',`
   updateChronology=(container,html)=>{container.innerHTML=html;};
   startProjectionPolling=()=>{};stopProjectionPolling=()=>{};
   startStreamHeartbeat=()=>{};stopStreamHeartbeat=()=>{};
-  renderBuilderChatRail=()=>{};renderHome=()=>{};renderPlayerProjection=renderDMSession;
+  renderBuilderChatRail=()=>{};renderSidebarState=()=>{};renderHome=()=>{};renderPlayerProjection=renderDMSession;
   refreshCampaignIndex=async()=>{};setWebResearchPermission=()=>{};
   window.testState=state;window.saveDraft=saveSelectedSessionDraft;
   // ---- Public API ----`);

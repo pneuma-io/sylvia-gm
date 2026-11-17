@@ -21,7 +21,14 @@ from .manifest import (
 from .payload import extract_portable, verify_artifact
 from .replacement import PortableReplacement, _copy, file_matches
 from .restart import RestartHandshake
-from .storage import UpdateStore, atomic_receipt, checked_file, directory_identity, operation_id
+from .storage import (
+    UpdatePhase,
+    UpdateStore,
+    atomic_receipt,
+    checked_file,
+    directory_identity,
+    operation_id,
+)
 
 
 class PreparedUpdate:
@@ -127,7 +134,8 @@ class PreparedUpdate:
         ):
             raise UpdateError("invalid_checkpoint", "The retained storage contract is invalid.")
         return {
-            "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+            "size": len(raw),
+            "sha256": hashlib.sha256(raw).hexdigest(),
             "storage_compatibility": row["storage_compatibility"],
         }
 
@@ -135,12 +143,12 @@ class PreparedUpdate:
         self, backup_database: Callable[[Path], None], quiesced: Callable[[], bool]
     ) -> None:
         """Called only while the native parent holds the owner/worker admission reservation."""
-        self._selected({"verified", "deferred", "preparing"})
+        self._selected({UpdatePhase.VERIFIED, UpdatePhase.DEFERRED, UpdatePhase.PREPARING})
         if not quiesced():
             raise UpdateError(
                 "application_busy", "Finish admitted work before preparing an update."
             )
-        self.store.save(self.identity, "preparing", self.manifest.version.text)
+        self.store.save(self.identity, UpdatePhase.PREPARING.value, self.manifest.version.text)
         try:
             self.stage.parent.mkdir(exist_ok=True)
             directory_identity(self.stage.parent)
@@ -181,26 +189,26 @@ class PreparedUpdate:
                     "attempt": self.attempt,
                 },
             )
-            self.store.save(self.identity, "prepared", self.manifest.version.text)
+            self.store.save(self.identity, UpdatePhase.PREPARED.value, self.manifest.version.text)
         except Exception:
             # No application/data file has been replaced. Retain the failed attempt and let
             # an explicit retry take a fresh checkpoint; never reuse a stale saved database.
-            self.store.save(self.identity, "verified", self.manifest.version.text)
+            self.store.save(self.identity, UpdatePhase.VERIFIED.value, self.manifest.version.text)
             raise
 
     def require_selected(self, *, checkpoint_compatibility: int | None = None) -> None:
         self._selected(
             {
-                "prepared",
-                "closing",
-                "applying",
-                "awaiting_restart",
-                "recovery_required",
-                "rolling_back",
-                "rollback_ready",
-                "rollback_awaiting_restart",
-                "rolled_back",
-                "confirmed",
+                UpdatePhase.PREPARED,
+                UpdatePhase.CLOSING,
+                UpdatePhase.APPLYING,
+                UpdatePhase.AWAITING_RESTART,
+                UpdatePhase.RECOVERY_REQUIRED,
+                UpdatePhase.ROLLING_BACK,
+                UpdatePhase.ROLLBACK_READY,
+                UpdatePhase.ROLLBACK_AWAITING_RESTART,
+                UpdatePhase.ROLLED_BACK,
+                UpdatePhase.CONFIRMED,
             }
         )
         selection = bounded_json(checked_file(self.base / "selected-attempt.json", maximum=4096))
@@ -254,19 +262,25 @@ class PreparedUpdate:
         self.require_selected()
         row = self.store.load()
         if row is None or row["phase"] not in {
-            "prepared", "closing", "applying", "awaiting_restart",
+            UpdatePhase.PREPARED,
+            UpdatePhase.CLOSING,
+            UpdatePhase.APPLYING,
+            UpdatePhase.AWAITING_RESTART,
         }:
             raise UpdateError(
-                "invalid_phase", "This update cannot be applied in its current state.",
+                "invalid_phase",
+                "This update cannot be applied in its current state.",
             )
         if not processes_exited():
             raise UpdateError("application_busy", "Owned app processes have not all exited.")
         lock = acquire_update_data_lock(self.root / "authority.sqlite3")
         try:
             self.require_selected()
-            self.store.save(self.identity, "applying", self.manifest.version.text)
+            self.store.save(self.identity, UpdatePhase.APPLYING.value, self.manifest.version.text)
             self.replacement().apply(processes_exited)
-            self.store.save(self.identity, "awaiting_restart", self.manifest.version.text)
+            self.store.save(
+                self.identity, UpdatePhase.AWAITING_RESTART.value, self.manifest.version.text
+            )
         finally:
             lock.close()
 
@@ -296,7 +310,7 @@ class PreparedUpdate:
                 "wrong_owner_identity", "The updated sidecar identity is inconsistent."
             )
         row = self.store.load()
-        if row is None or row["phase"] != "awaiting_restart":
+        if row is None or row["phase"] != UpdatePhase.AWAITING_RESTART:
             raise UpdateError("invalid_phase", "Apply must finish before restarting this copy.")
         handshake = RestartHandshake(self.root, self.identity, self.attempt)
         handshake.create(
@@ -311,12 +325,12 @@ class PreparedUpdate:
     def confirm(self, *, checkpoint_compatibility: int | None = None) -> None:
         self.require_selected(checkpoint_compatibility=checkpoint_compatibility)
         row = self.store.load()
-        if row is None or row["phase"] not in {"awaiting_restart", "confirmed"}:
+        if row is None or row["phase"] not in {UpdatePhase.AWAITING_RESTART, UpdatePhase.CONFIRMED}:
             raise UpdateError("invalid_phase", "The update is no longer awaiting confirmation.")
         if not RestartHandshake(self.root, self.identity, self.attempt).confirmed():
             raise UpdateError("startup_unconfirmed", "The updated app has not confirmed its data.")
         self.replacement().confirm()
-        self.store.save(self.identity, "confirmed", self.manifest.version.text)
+        self.store.save(self.identity, UpdatePhase.CONFIRMED.value, self.manifest.version.text)
 
 
 def new_attempt() -> str:

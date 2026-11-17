@@ -6,6 +6,9 @@ import time
 import pytest
 
 from sylvia_gm.interfaces import owner_process
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
 
 OPERATION = "a" * 32
@@ -57,18 +60,20 @@ def test_reserve_abort_and_stale_shutdown_leave_owner_and_data_usable(owner):
 def test_worker_admitted_before_lease_publication_cannot_be_overtaken(owner, monkeypatch):
     entered, release = threading.Event(), threading.Event()
     original = threading.Thread
+    admitted = []
 
     class DelayedWorker(original):
         def run(self):
             if self.name.startswith("sylvia-gm-session-"):
+                admitted.append(self)
                 entered.set()
-                assert release.wait(5), "release controlled pre-lane worker"
+                assert release.wait(30), "release controlled pre-lane worker"
             super().run()
 
     monkeypatch.setattr(owner_process.threading, "Thread", DelayedWorker)
     owner.send("earlier", {"method": "customize_ready_campaign", "params": {}})
     try:
-        assert entered.wait(3)
+        assert entered.wait(30)
         assert (
             request_error(owner, "must-wait", "desktop_update_reserve", {"operation_id": OPERATION})
             == "update_busy"
@@ -76,6 +81,9 @@ def test_worker_admitted_before_lease_publication_cannot_be_overtaken(owner, mon
     finally:
         release.set()
     assert owner.read()["id"] == "earlier"
+    # The worker writes its reply before it leaves the owner's admitted set; wait for that.
+    admitted[0].join(30)
+    assert not admitted[0].is_alive()
     assert owner.request("after-worker", "desktop_update_reserve", {"operation_id": OPERATION}) == {
         "status": "reserved"
     }

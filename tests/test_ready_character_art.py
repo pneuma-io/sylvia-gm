@@ -13,6 +13,12 @@ from sylvia_gm.application.ready_campaigns import (
 from sylvia_gm.domain.package_library import canonical_json_bytes
 
 
+def test_rebuilding_ready_parties_preserves_art_and_exact_content_hashes():
+    from scripts.build_ready_campaigns import OUTPUT, prepare
+
+    assert json.loads(prepare()) == json.loads(OUTPUT.read_bytes())
+
+
 def test_ready_editions_and_customized_files_retain_the_same_prepared_art(tmp_path):
     source = files("sylvia_gm.campaign")
     original = source.joinpath("ready-campaigns.json").read_bytes()

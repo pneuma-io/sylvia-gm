@@ -3,30 +3,29 @@
   "provenance": {
     "adventures": "Existing bundled Severed Lands Campaign Plans; story preparation unchanged.",
     "characters": "Existing SRD starters and Tavin Bell; independent prepared role/level editions.",
-    "starter_source_sha256": "fbf9da650afe2fd8e3044496e78d35f74184a5cd0340c355ebe4119ab594f803",
-    "rules": "Contained SRD Lite 0.3.15; retained SRD 5.2.1 class and creation references.",
+    "starter_source_sha256": "24894ee7314b6c8e2e451bea0cf2fcdec169237478fce00eb560bbf0d808be2e",
+    "rules": "Contained SRD Lite 0.3.24; retained SRD 5.2.1 class and creation references.",
     "notices": [
       "LICENSING-STATUS.md",
       "campaign-settings/severed-lands/ATTRIBUTION.md",
       "rulesets/srd-lite/ATTRIBUTION.md"
-    ],
-    "artwork": "Existing authored SRD starter identities reuse their shared prepared visual records across Ready levels and roles. Character builds, equipment, prose and retained Plan bindings are unchanged."
+    ]
   },
   "campaigns": [
     {
       "id": "a-debt-in-iron",
-      "plan_content_sha256": "73140476c37f49591dc7b8612d8f274fc66bc53ad74521975fbe6f5ac27bbd33",
+      "plan_content_sha256": "5a92a76a6a2738471cedb8bcdb42ca4cbd63fb7cccc20fa4d16d8be1683edfc4",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "c9d5a13527a85b62202edddabe0b1ea1a941b2c8b87a318e57cc7c20bb3167c4",
+          "content_sha256": "82bbef926b6f6ba457f959514d7106d3fca76c229a1af1319aa97bad969b1f41",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "69a1e96155d594023c2c4e2c12f38c425d218983f9455ea8545b3d3adc536eb9",
+        "package_closure_sha256": "35dfc9b10565c1f5f930f5966904f78d6415dfe36071be21f7145de83eecc4e4",
         "ruleset": {
-          "content_sha256": "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a",
+          "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.15"
+          "version": "0.3.24"
         }
       },
       "party": [
@@ -45,7 +44,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -136,7 +135,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -144,6 +144,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -173,6 +174,28 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -229,44 +252,44 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
               "full_body": {
-                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
-                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
               },
               "reference_sheet": {
-                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
-                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
               },
               "portrait": {
-                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
-                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
-              },
-              "frame": {
-                "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
               }
             }
           },
-          "content_sha256": "de1045c1dbe92b162f9debc00d98c35ac22700696ae7bd4e92ea0bd1098c8c00"
+          "content_sha256": "7ec32c8362f444aab7cca42d0b379256c84ed359795691c7f563d317532039b8"
         }
       ]
     },
     {
       "id": "last-cart-through",
-      "plan_content_sha256": "187af333d71b872a3faacec0e0d774b216aaf3940671b837d60c2c69ff341811",
+      "plan_content_sha256": "de90578688f128117c1d329c60c93b9dcb7002f8270c773e62a02d8ae41536c0",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "d0380fb9122251752d24600c32fce67c1d0196eb0689be146b9d147fe34d6497",
+          "content_sha256": "c445657eb7fbfb11ba1c5d90ee49462c3a9c44936da59768609f96b153fc7607",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "a18a9ad20d8b10904eaf1dbad45487ea1ddbb5a630418c4d090e36db58fb950d",
+        "package_closure_sha256": "2789fd282a345ec3c27f496e28143c52d99e074c20598cc813db0dcdd6a453c9",
         "ruleset": {
-          "content_sha256": "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a",
+          "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.15"
+          "version": "0.3.24"
         }
       },
       "party": [
@@ -470,27 +493,27 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their early forties, broad stocky build, fair weathered skin, blue eyes, short dark-ginger hair and a neatly trimmed short ginger beard; steady dry-witted expression and a slight reassuring smile. Worn chain mail over a plain brown padded gambeson, a muted navy sleeveless surcoat without heraldry, belt, trousers and sturdy leather boots and fingerless leather gloves. Bareheaded, no shield. Holds a plain greatsword with both hands low on the hilt, blade pointed safely down beside the body; a compact flail hangs secured at the belt.",
-              "full_body": {
-                "path": "assets/characters/a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276.png",
-                "sha256": "a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276"
-              },
-              "reference_sheet": {
-                "path": "assets/characters/dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd.png",
-                "sha256": "dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd"
-              },
-              "portrait": {
-                "path": "assets/characters/92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04.png",
-                "sha256": "92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04"
-              },
+              "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
               "frame": {
                 "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+                "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+                "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+              },
+              "portrait": {
+                "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+                "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
               }
             }
           },
-          "content_sha256": "d205c10a2ae4bfad8b52e64c478180bc4b1e32b283ed019a176aec373d8d0249"
+          "content_sha256": "3ddd9764318406a37cd879e2465b4ab860dbd8637fb07c7b680cfbae58f7fbe0"
         },
         {
           "role": "companion",
@@ -503,7 +526,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -614,7 +637,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -622,6 +646,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -654,6 +679,28 @@
                 "spell_slot_1": 3,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -710,44 +757,44 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
               "full_body": {
-                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
-                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
               },
               "reference_sheet": {
-                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
-                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
               },
               "portrait": {
-                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
-                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
-              },
-              "frame": {
-                "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
               }
             }
           },
-          "content_sha256": "4e5323b7c668cacad38fb903e7ad021ac483fce0fdd2c547c56ae18b7de1200b"
+          "content_sha256": "4059c37699eb3aa205e653f3dc9fae90d757819e7f6d7346f3dbade2aabfbe95"
         }
       ]
     },
     {
       "id": "the-cartographers-wake",
-      "plan_content_sha256": "50d5c4bc438206f7ac5b38042ae96a0177e6a29f878bb1480b29ad4ccd18acdb",
+      "plan_content_sha256": "5566bb7df8bd291b8ce5af0ddfd1fea72fd0ad6b0cd948dd2298220ecbb494fd",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "d0380fb9122251752d24600c32fce67c1d0196eb0689be146b9d147fe34d6497",
+          "content_sha256": "c445657eb7fbfb11ba1c5d90ee49462c3a9c44936da59768609f96b153fc7607",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "a18a9ad20d8b10904eaf1dbad45487ea1ddbb5a630418c4d090e36db58fb950d",
+        "package_closure_sha256": "2789fd282a345ec3c27f496e28143c52d99e074c20598cc813db0dcdd6a453c9",
         "ruleset": {
-          "content_sha256": "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a",
+          "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.15"
+          "version": "0.3.24"
         }
       },
       "party": [
@@ -941,27 +988,27 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their early twenties, short wiry build, fair freckled skin, hazel eyes and short tousled reddish-brown curls with one stubborn forelock; bright curious eyes and a restrained mischievous smile. Worn dark-brown leather armor over a plain muted plum shirt, charcoal trousers, soft dark boots, a simple belt and fingerless leather gloves. Holds a shortbow lowered at one side without drawing it; a small quiver of arrows on the back, a sheathed shortsword and dagger at the belt and a practical closed thieves'-tools pouch. No shield, mask or hood across the face.",
+              "appearance": "Editable short adult Human with rosy-brown skin, amber eyes, small angular chin, broad nose, uneven near-black bob/fringe and quick grin. Lilac shirt under plain brown leather, dove-grey trousers and ankle boots. One shortbow held low, spare sheathed shortsword and closed tools pouch.",
+              "frame": {
+                "x": 0.6,
+                "y": 0,
+                "zoom": 1.1
+              },
               "full_body": {
-                "path": "assets/characters/484b5b0b84402411f1a9f4c5ab011aefa8af978588e4f494afff27e3fe46f4e7.png",
-                "sha256": "484b5b0b84402411f1a9f4c5ab011aefa8af978588e4f494afff27e3fe46f4e7"
+                "path": "assets/characters/54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200.png",
+                "sha256": "54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200"
               },
               "reference_sheet": {
-                "path": "assets/characters/88af2223a0426ee70da3a7bbfe01480de58d1ee6d9a17a2fa224dda68d5ba62d.png",
-                "sha256": "88af2223a0426ee70da3a7bbfe01480de58d1ee6d9a17a2fa224dda68d5ba62d"
+                "path": "assets/characters/bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377.png",
+                "sha256": "bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377"
               },
               "portrait": {
-                "path": "assets/characters/10d5029db3dbcdbb7f36526b7a95a8e738855e05b22ffa5ba5ec464f637ae821.png",
-                "sha256": "10d5029db3dbcdbb7f36526b7a95a8e738855e05b22ffa5ba5ec464f637ae821"
-              },
-              "frame": {
-                "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "path": "assets/characters/7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25.png",
+                "sha256": "7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25"
               }
             }
           },
-          "content_sha256": "4f28d281c5c2172e44a1a8078550998908f96dc77d2f8e010d971a7caa6dfe32"
+          "content_sha256": "aaa4a26986edabb4ac50cfebd34cccce91d5490b93e65bc10746287a733f7675"
         },
         {
           "role": "companion",
@@ -1163,27 +1210,27 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their early forties, broad stocky build, fair weathered skin, blue eyes, short dark-ginger hair and a neatly trimmed short ginger beard; steady dry-witted expression and a slight reassuring smile. Worn chain mail over a plain brown padded gambeson, a muted navy sleeveless surcoat without heraldry, belt, trousers and sturdy leather boots and fingerless leather gloves. Bareheaded, no shield. Holds a plain greatsword with both hands low on the hilt, blade pointed safely down beside the body; a compact flail hangs secured at the belt.",
-              "full_body": {
-                "path": "assets/characters/a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276.png",
-                "sha256": "a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276"
-              },
-              "reference_sheet": {
-                "path": "assets/characters/dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd.png",
-                "sha256": "dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd"
-              },
-              "portrait": {
-                "path": "assets/characters/92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04.png",
-                "sha256": "92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04"
-              },
+              "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
               "frame": {
                 "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+                "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+                "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+              },
+              "portrait": {
+                "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+                "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
               }
             }
           },
-          "content_sha256": "dae162efb0159302d5cf8267225f2af80d073474e1f81ddca7aaae27be6b9402"
+          "content_sha256": "b187c5fc9b42a74eaaba00c9996d693913645f15957df7682e74bf3cd600469a"
         },
         {
           "role": "companion",
@@ -1196,7 +1243,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -1307,7 +1354,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -1315,6 +1363,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -1347,6 +1396,28 @@
                 "spell_slot_1": 3,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1403,44 +1474,44 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
               "full_body": {
-                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
-                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
               },
               "reference_sheet": {
-                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
-                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
               },
               "portrait": {
-                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
-                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
-              },
-              "frame": {
-                "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
               }
             }
           },
-          "content_sha256": "4e5323b7c668cacad38fb903e7ad021ac483fce0fdd2c547c56ae18b7de1200b"
+          "content_sha256": "4059c37699eb3aa205e653f3dc9fae90d757819e7f6d7346f3dbade2aabfbe95"
         }
       ]
     },
     {
       "id": "rift-awakening",
-      "plan_content_sha256": "198b8b7beea5ac98c19e6fed5697f24d64b443230034141832216b00514725c9",
+      "plan_content_sha256": "3e22ac2a05aaa425c8fd75899d9450c471b7781bb361e466d185cdcd41836eca",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "5c2e73f71fb7ff6f2521463f57d9092e5937a3b2746cda8848426f10c9ea74be",
+          "content_sha256": "0f70cd49763b9ae09e41d2cf7f2339546ca495120b31278a86ef82873a248032",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "538f2a287bb4f6ae60b36b6f28a2df8e0d52370e63083830c1050c358c8edc0f",
+        "package_closure_sha256": "aa11b4c107d4d18e9d7054a8f577c394987df674bac17cef7ba348504e200469",
         "ruleset": {
-          "content_sha256": "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a",
+          "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.15"
+          "version": "0.3.24"
         }
       },
       "party": [
@@ -1455,7 +1526,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Bard · Level 1. Help allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.",
-            "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "authored_profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Also carried, at no cost: phosphorescent moss for Light. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
             "participant": {
               "abilities": {
                 "charisma": 17,
@@ -1547,7 +1618,8 @@
                 "book_prayers",
                 "parchment",
                 "robe",
-                "holy_symbol"
+                "holy_symbol",
+                "phosphorescent_moss"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -1559,6 +1631,7 @@
                 "leather": 1,
                 "lute": 1,
                 "parchment": 10,
+                "phosphorescent_moss": 1,
                 "robe": 1
               },
               "max_hp": 9,
@@ -1585,6 +1658,26 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [],
+                  "id": "lute",
+                  "inventory_item": "lute",
+                  "kind": "musical_instrument",
+                  "quantity": 1,
+                  "value_cp": 3500
+                },
+                {
+                  "components": [
+                    "light.1"
+                  ],
+                  "id": "phosphorescent_moss",
+                  "inventory_item": "phosphorescent_moss",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -1637,27 +1730,27 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their late twenties, slender build, fair freckled skin, gray-green eyes and chin-length tousled auburn hair; curious, playful expression. Brown leather armor over an ivory rolled-sleeve shirt, rust scarf, plain trousers and boots. Carries a lute and a sheathed dagger; no shield.",
-              "full_body": {
-                "path": "assets/characters/39512f61f70403b4f3c46988e5c8cb42450326b511fcbfc25a7c1f2a268bfc54.png",
-                "sha256": "39512f61f70403b4f3c46988e5c8cb42450326b511fcbfc25a7c1f2a268bfc54"
-              },
-              "reference_sheet": {
-                "path": "assets/characters/4e0647607d6f3b23188ca6ec25886da3857b6b332fcdb182472c31ad1ece00ea.png",
-                "sha256": "4e0647607d6f3b23188ca6ec25886da3857b6b332fcdb182472c31ad1ece00ea"
-              },
-              "portrait": {
-                "path": "assets/characters/740fae595bcb116204af1b16ee1454bc39e327ebc8ddfb18f00b639e8d1b322a.png",
-                "sha256": "740fae595bcb116204af1b16ee1454bc39e327ebc8ddfb18f00b639e8d1b322a"
-              },
+              "appearance": "Editable adult Human default: deep warm brown skin, amber-brown eyes, rounded heart-shaped face/dimples and short dense copper-auburn curls. Russet leather jerkin over dusty teal blouse, coral neckerchief, indigo waist panels and charcoal trousers; right lowered dagger, left empty hand, one lute strapped at left back/hip. No shield or named faith/history.",
               "frame": {
                 "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "y": 0.0,
+                "zoom": 1.1
+              },
+              "full_body": {
+                "path": "assets/characters/707778ba7bc3e6bccfc84d389672e337fa5ef72ec56e142fd72001a4ea7a2294.png",
+                "sha256": "707778ba7bc3e6bccfc84d389672e337fa5ef72ec56e142fd72001a4ea7a2294"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/ee62c21cd75bcdb676d5de7c2fbdb9f977e25f16b0928849af4770c66c509df2.png",
+                "sha256": "ee62c21cd75bcdb676d5de7c2fbdb9f977e25f16b0928849af4770c66c509df2"
+              },
+              "portrait": {
+                "path": "assets/characters/b5c407c1e2ac384a129c5042aeecdc5fd096ce9416d46ba64eb3bbe3f503aa9b.png",
+                "sha256": "b5c407c1e2ac384a129c5042aeecdc5fd096ce9416d46ba64eb3bbe3f503aa9b"
               }
             }
           },
-          "content_sha256": "779f903def484c0610d28561828d45b342b6c038e5c1ef2e0c6634895e561da3"
+          "content_sha256": "1070fe5742ae31ebd8c6e7e41d75b6c17bf93f45f48fc020c09a5995124118c0"
         },
         {
           "role": "companion",
@@ -1838,27 +1931,27 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their early forties, broad stocky build, fair weathered skin, blue eyes, short dark-ginger hair and a neatly trimmed short ginger beard; steady dry-witted expression and a slight reassuring smile. Worn chain mail over a plain brown padded gambeson, a muted navy sleeveless surcoat without heraldry, belt, trousers and sturdy leather boots and fingerless leather gloves. Bareheaded, no shield. Holds a plain greatsword with both hands low on the hilt, blade pointed safely down beside the body; a compact flail hangs secured at the belt.",
-              "full_body": {
-                "path": "assets/characters/a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276.png",
-                "sha256": "a0bb304b124ec85673e990bb8ca11573389e19b6757c5299a92ef16d58a7b276"
-              },
-              "reference_sheet": {
-                "path": "assets/characters/dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd.png",
-                "sha256": "dfdc3dec6ab159101e71da2ecb6386ca4bb8c0006d22b96e2f0954e3e6aed0dd"
-              },
-              "portrait": {
-                "path": "assets/characters/92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04.png",
-                "sha256": "92f098e4f0b4807c8a713330a1a14d5473ee596bdd096c4d943ab1265fcf2f04"
-              },
+              "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
               "frame": {
                 "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+                "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+                "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+              },
+              "portrait": {
+                "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+                "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
               }
             }
           },
-          "content_sha256": "ea69c84c52e2805e75174cb168b0ea59d10fecbad00b79a0147e6f18530740bf"
+          "content_sha256": "113614767224c2754f016ac3be88ce8f500f77d0dac207d45cbd068e6819ccae"
         },
         {
           "role": "companion",
@@ -1871,7 +1964,7 @@
               "content_sha256": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91"
             },
             "summary": "Cleric · Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
-            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+            "authored_profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
             "participant": {
               "abilities": {
                 "charisma": 8,
@@ -1962,7 +2055,8 @@
                 "calligraphers_supplies",
                 "book_prayers",
                 "parchment",
-                "robe"
+                "robe",
+                "lodestones"
               ],
               "inventory_quantities": {
                 "book_prayers": 1,
@@ -1970,6 +2064,7 @@
                 "chain_shirt": 1,
                 "gp": 15,
                 "holy_symbol": 2,
+                "lodestones": 2,
                 "mace": 1,
                 "parchment": 10,
                 "priests_pack": 1,
@@ -1999,6 +2094,28 @@
                 "spell_slot_1": 2,
                 "second_wind": 0
               },
+              "spell_materials": [
+                {
+                  "components": [
+                    "bless.1"
+                  ],
+                  "id": "holy_symbol",
+                  "inventory_item": "holy_symbol",
+                  "kind": "holy_symbol",
+                  "quantity": 1,
+                  "value_cp": 500
+                },
+                {
+                  "components": [
+                    "mending.1"
+                  ],
+                  "id": "lodestones",
+                  "inventory_item": "lodestones",
+                  "kind": "specific",
+                  "quantity": 1,
+                  "value_cp": 0
+                }
+              ],
               "weapon_sets": {
                 "active_set": "melee",
                 "format": 1,
@@ -2055,27 +2172,27 @@
             },
             "setting_data": {},
             "visuals": {
-              "appearance": "Adult Human in their mid fifties, broad steady build, medium olive-brown skin, dark eyes, short curly salt-and-pepper hair and a short salt-and-pepper beard; patient, practical expression. Chain shirt with plain tunic, earth-tone cloak and scarf layers, trousers, belt and boots, and a plain geometric pendant without deity or faction insignia. Lowered mace in their right hand, round wooden shield on their left arm.",
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
               "full_body": {
-                "path": "assets/characters/df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633.png",
-                "sha256": "df35ffe755907da99519d1297beb3848d952fcfc42ad6930328ebe5053ba6633"
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
               },
               "reference_sheet": {
-                "path": "assets/characters/f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698.png",
-                "sha256": "f2f736622cc7e01554dfc5004666fe3c94e8def39f6d0ae037559cb07aa11698"
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
               },
               "portrait": {
-                "path": "assets/characters/b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843.png",
-                "sha256": "b24035d5f13d92ff015da5af1596898cc671d985c6ecec76f9e0a435f2549843"
-              },
-              "frame": {
-                "x": 0.5,
-                "y": 0.35,
-                "zoom": 1
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
               }
             }
           },
-          "content_sha256": "de1045c1dbe92b162f9debc00d98c35ac22700696ae7bd4e92ea0bd1098c8c00"
+          "content_sha256": "7ec32c8362f444aab7cca42d0b379256c84ed359795691c7f563d317532039b8"
         }
       ]
     }

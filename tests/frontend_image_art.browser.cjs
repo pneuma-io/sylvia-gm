@@ -6,7 +6,8 @@ const fs=require('node:fs'),path=require('node:path'),{spawn}=require('node:chil
 const {chromium}=require('playwright');
 
 test('review, adopt, crop and reopen art through the source WebUI',{timeout:180000},async()=>{
-  const dataRoot=process.env.SYLVIA_IMAGE_UI_ROOT;
+  const dataRoot=process.env.SYLVIA_IMAGE_UI_ROOT || (process.env.SYLVIA_QA_FIXTURE_ROOT &&
+    path.join(process.env.SYLVIA_QA_FIXTURE_ROOT,'image-art-webui'));
   assert.ok(dataRoot,'Select a fresh disposable SYLVIA_IMAGE_UI_ROOT');
   assert.equal(fs.existsSync(dataRoot),false,'Never reuse or remove an existing data root');
   const source=path.resolve(__dirname,'..');

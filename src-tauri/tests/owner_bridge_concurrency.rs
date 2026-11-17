@@ -24,9 +24,12 @@ fn rust_bridge_demultiplexes_concurrent_owner_replies() {
     let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .expect("repository root")
-        .join(".venv")
-        .join("Scripts")
-        .join("python.exe");
+        .join(".venv");
+    let python = if cfg!(windows) {
+        python.join("Scripts").join("python.exe")
+    } else {
+        python.join("bin").join("python")
+    };
 
     let bridge = Arc::new(
         OwnerBridge::spawn_python(&python, &database)

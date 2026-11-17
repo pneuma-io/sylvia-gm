@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import threading
+from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from typing import cast
@@ -38,7 +40,9 @@ from sylvia_gm.domain.session import (
     builder_chat_payload_sha256,
 )
 from sylvia_gm.infrastructure.sqlite_continuity import (
-    read_act_markers, read_campaign_ending, read_campaign_endings,
+    read_act_markers,
+    read_campaign_ending,
+    read_campaign_endings,
 )
 
 
@@ -336,6 +340,78 @@ def message_from_row(row: sqlite3.Row) -> SessionMessage:
     )
 
 
+_MessageRowKey = tuple[object, object, object, object, object, object]
+
+
+def _message_row_key(row: sqlite3.Row) -> _MessageRowKey:
+    return (
+        row["session_id"], row["sequence"], row["message_id"], row["kind"],
+        row["content_json"], row["canonical_sequence"],
+    )
+
+
+def _same_row(left: _MessageRowKey, right: _MessageRowKey) -> bool:
+    # Exact stored values, compared by type as well, so 1, 1.0 and True never match.
+    return left == right and tuple(map(type, left)) == tuple(map(type, right))
+
+
+class _DecodedMessageCache:
+    """Reuse decoded messages only for stored rows whose every column is unchanged.
+
+    Every read still selects all of the session's rows in its own transaction, so it
+    always sees exactly what is saved. A message is a pure function of its row, and
+    SessionMessage is deeply immutable, so returning the earlier decode of an identical
+    row is the same result as decoding it again. Rows that are new, rewritten, deleted,
+    rolled back or written by another connection simply fail the comparison or vanish.
+    """
+
+    def __init__(self, *, maximum_sessions: int, maximum_characters: int) -> None:
+        self._lock = threading.Lock()
+        self._maximum_sessions = maximum_sessions
+        self._maximum_characters = maximum_characters
+        self._sessions: OrderedDict[
+            str, tuple[int, dict[object, tuple[_MessageRowKey, SessionMessage]]]
+        ] = OrderedDict()
+        self._characters = 0
+
+    def get(self, session_id: str) -> dict[object, tuple[_MessageRowKey, SessionMessage]]:
+        with self._lock:
+            entry = self._sessions.get(session_id)
+            if entry is None:
+                return {}
+            self._sessions.move_to_end(session_id)
+            return entry[1]
+
+    def put(
+        self, session_id: str,
+        decoded: dict[object, tuple[_MessageRowKey, SessionMessage]], characters: int,
+    ) -> None:
+        with self._lock:
+            previous = self._sessions.pop(session_id, None)
+            if previous is not None:
+                self._characters -= previous[0]
+            if characters > self._maximum_characters:
+                return
+            self._sessions[session_id] = (characters, decoded)
+            self._characters += characters
+            while (
+                len(self._sessions) > self._maximum_sessions
+                or self._characters > self._maximum_characters
+            ):
+                _evicted, (size, _rows) = self._sessions.popitem(last=False)
+                self._characters -= size
+
+    def clear(self) -> None:
+        with self._lock:
+            self._sessions.clear()
+            self._characters = 0
+
+
+# Decoded messages take several times the memory of their saved JSON, so the bound is set on
+# the JSON: 16 million characters is about ten long campaigns' GM sessions.
+_DECODED_MESSAGES = _DecodedMessageCache(maximum_sessions=32, maximum_characters=16_000_000)
+
+
 def read_messages(connection: sqlite3.Connection, session_id: str) -> tuple[SessionMessage, ...]:
     session = read_session(connection, session_id)
     table = (
@@ -343,13 +419,23 @@ def read_messages(connection: sqlite3.Connection, session_id: str) -> tuple[Sess
         if session.campaign_id is None
         else "agent_session_messages"
     )
-    return tuple(
-        message_from_row(row)
-        for row in connection.execute(
-            f"SELECT * FROM {table} WHERE session_id = ? ORDER BY sequence",
-            (session_id,),
-        )
-    )
+    previous = _DECODED_MESSAGES.get(session_id)
+    decoded: dict[object, tuple[_MessageRowKey, SessionMessage]] = {}
+    messages: list[SessionMessage] = []
+    characters = 0
+    for row in connection.execute(
+        f"SELECT * FROM {table} WHERE session_id = ? ORDER BY sequence",
+        (session_id,),
+    ):
+        key = _message_row_key(row)
+        hit = previous.get(key[1])
+        message = hit[1] if hit is not None and _same_row(hit[0], key) else message_from_row(row)
+        decoded[key[1]] = (key, message)
+        messages.append(message)
+        content = key[4]
+        characters += len(content) if isinstance(content, (str, bytes)) else 0
+    _DECODED_MESSAGES.put(session_id, decoded, characters)
+    return tuple(messages)
 
 
 def read_activity_basis(

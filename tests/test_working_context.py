@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -10,12 +11,21 @@ from sylvia_gm.agent._working_context import (
     WorkingContextProvider,
     durable_tool_result,
 )
-from sylvia_gm.provider._base import FakeProvider, ModelInfo, ProviderResponse, ProviderStreamChunk
+from sylvia_gm.provider._base import (
+    FakeProvider,
+    ModelInfo,
+    ProviderResponse,
+    ProviderStreamChunk,
+    TokenUsage,
+)
 from sylvia_gm.provider._exceptions import (
     ContextCompactionError,
     InvalidResponseError,
     TokenLimitError,
 )
+from sylvia_gm.provider._hooks import HookContext
+from sylvia_gm.provider._openai_compat import OpenAICompatProvider
+from sylvia_gm.provider._token_estimate import token_estimator
 
 
 class Model(FakeProvider):
@@ -80,6 +90,95 @@ def working(model=None, records=(), cancelled=lambda: False):
         progress=progress.append,
     )
     return wrapper, saved, progress
+
+
+@pytest.mark.asyncio
+async def test_fixed_tool_load_does_not_trigger_ineffective_compaction():
+    model = Model()
+    wrapper, saved, _ = working(model)
+    tools = [{"schema": "x" * 280_000}]
+    messages = history()
+    assert await wrapper.prepare(messages, tools) == messages
+    assert not saved and not model.calls
+
+
+@pytest.mark.asyncio
+async def test_fixed_material_too_large_fails_before_any_summary_call():
+    model = Model()
+    wrapper, saved, _ = working(model)
+    with pytest.raises(TokenLimitError, match="cannot be shortened further"):
+        await wrapper.prepare(history(), [{"schema": "x" * 400_000}])
+    assert not saved and not model.calls
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "transport,saved_window,capacity,admitted",
+    [
+        ("claude_code", None, 200_000, True),
+        ("claude_code", 1_000_000, 1_000_000, True),
+        ("claude_code", 32_000, 32_000, False),
+        ("codex_app_server", None, 65_536, False),
+        ("chat_completions", None, 65_536, False),
+    ],
+)
+async def test_a_claude_code_model_with_no_known_window_is_planned_as_a_claude_model(
+    transport, saved_window, capacity, admitted
+):
+    """Issue 90: Settings saves a Claude Code model with no context window.
+
+    Planned at the general 65,536-token assumption, the first Rules turn of a D&D campaign
+    was refused, because its tool list alone is larger. A window the player saved still wins,
+    and other connections keep the general assumption.
+    """
+    model = Model()
+    model.model_info = replace(model.model_info, transport=transport, context_window=saved_window)
+    wrapper, saved, _ = working(model)
+    assert wrapper._budgets({})[0] == capacity
+    # About the size of a D&D turn's fixed tool list: too large for 65,536, small for 200,000.
+    tools = [{"schema": "x" * 280_000}]
+    messages = history()
+    if admitted:
+        assert await wrapper.prepare(messages, tools) == messages
+    elif saved_window:
+        with pytest.raises(TokenLimitError, match="cannot be shortened further"):
+            await wrapper.prepare(messages, tools)
+    else:
+        # Issue 92: the model may be large enough; the refusal names the missing limit and
+        # where to enter it, and does not tell the player to use a larger model.
+        with pytest.raises(TokenLimitError) as refused:
+            await wrapper.prepare(messages, tools)
+        message = str(refused.value)
+        assert "does not know this model's context limit" in message
+        assert "planned for 65,536 tokens" in message
+        # It names the field by the label the Settings page gives it and the way to it.
+        assert "Optional Sylvia cap" in message
+        assert "Settings, Models, Model settings, Advanced model settings" in message
+        assert "larger context model" not in message
+    assert not saved and not model.calls
+
+
+@pytest.mark.asyncio
+async def test_gm_checkpoint_reopens_with_only_note_and_current_action():
+    model = Model(responses=[ProviderResponse(content="The opening action is already complete.")])
+    saved = []
+
+    async def save(record):
+        saved.append(record)
+
+    messages = [
+        {"role": "user", "content": "Open the door."},
+        {"role": "assistant", "content": "The door opens."},
+        {"role": "user", "content": "Walk through it."},
+    ]
+    wrapper = WorkingContextProvider(model, save=save, pin_first_user=False)
+    projected = await wrapper.prepare(messages, force=True)
+    assert len(projected) == 2
+    assert projected[0]["content"].startswith("SYLVIA_CONTINUATION_NOTE ")
+    assert projected[1] == messages[-1]
+    reopened = WorkingContextProvider(model, save=save, records=saved, pin_first_user=False)
+    assert reopened.project(messages) == projected
+    assert "Open the door." in saved[0]["source_archive"]
 
 
 @pytest.mark.asyncio
@@ -392,3 +491,62 @@ def test_malformed_or_newer_checkpoints_rebuild_from_original_history():
     )
     assert not wrapper.records
     assert wrapper.project(history()) == history()
+
+
+@pytest.mark.asyncio
+async def test_reported_usage_is_model_specific_shared_and_keeps_a_margin():
+    model = replace(Model().model_info, id="openrouter/vendor/test-model",
+                    provider_key="openrouter", provider_model_id="vendor/test-model")
+    provider = OpenAICompatProvider(base_url="https://example.invalid/v1",
+                                    api_key="offline-test", model_info=model)
+    estimator = token_estimator(provider)
+    assert token_estimator(provider) is estimator
+    request = {"messages": [{"role": "user", "content": "x" * 10000}]}
+    unknown_estimate = estimator.estimate(request, model)
+    request_context = provider._build_request_context(
+        request["messages"], None, stream=True, request_json=request,
+    )
+    await provider.hooks.fire_on_response(provider._enrich_context_response(
+        request_context,
+        ProviderResponse(usage=TokenUsage(prompt_tokens=8000), usage_reported=True),
+        0.0, 200, {},
+    ))
+    assert estimator.estimate(request, model) == 10032
+    assert estimator.estimate(request, replace(model, id="another-model")) == unknown_estimate
+    # A cheaper later sample must not erase the more conservative observation.
+    await provider.hooks.fire_on_response(provider._enrich_context_response(
+        request_context,
+        ProviderResponse(usage=TokenUsage(prompt_tokens=1000), usage_reported=True),
+        0.0, 200, {},
+    ))
+    assert estimator.estimate(request, model) == 10032
+    await provider.close()
+
+
+@pytest.mark.asyncio
+async def test_unreported_usage_is_not_used_as_a_measurement():
+    provider = Model()
+    estimator = token_estimator(provider)
+    model = provider.model_info
+    request = {"content": "x" * 1000}
+    before = estimator.estimate(request, model)
+    await provider.hooks.fire_on_response(HookContext(
+        provider_key=model.provider_key, model_id=model.id,
+        request_json=request,
+        response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000)),
+    ))
+    assert estimator.estimate(request, model) == before
+
+
+@pytest.mark.asyncio
+async def test_runtime_usage_without_request_bytes_keeps_offline_planning_estimate():
+    provider = Model()
+    estimator = token_estimator(provider)
+    model = provider.model_info
+    request = {"content": "x" * 1000}
+    before = estimator.estimate(request, model)
+    await provider.hooks.fire_on_response(HookContext(
+        provider_key=model.provider_key, model_id=model.id, request_json=None,
+        response=ProviderResponse(usage=TokenUsage(prompt_tokens=8000), usage_reported=True),
+    ))
+    assert estimator.estimate(request, model) == before

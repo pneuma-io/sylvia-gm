@@ -45,6 +45,7 @@ def _participant_context():
         schema_id="example.character",
         schema_sha256=hashlib.sha256(canonical_json_bytes(schema)).hexdigest(),
         schema=schema,
+        entity_state_schema={'type': 'object', 'properties': {}, 'additionalProperties': False},
     )
     setting = PackageBinding("example.setting", "1.0.0", "2" * 64)
     return package, declaration, setting

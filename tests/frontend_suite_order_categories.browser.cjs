@@ -102,16 +102,17 @@ test('an actor without a recorded value keeps its place number; no value is inve
   } finally { await browser.close(); }
 });
 
+// SRD Lite's fantasy character sheet reads the resource (level) first, as the sizzle reel does.
 test('spell cards show the projected category beside the resource, and only the resource without one', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {
     let { page, errors } = await open(browser, fixture);
-    assert.deepEqual(await fireBolt(page), { category: 'evocation', line: 'Evocation · Cantrip' });
+    assert.deepEqual(await fireBolt(page), { category: 'evocation', line: 'Cantrip · Evocation' });
     assert.deepEqual(errors, []);
     await page.close();
     // The caster's own surface lacks the map: another projected surface's map is used.
     ({ page, errors } = await open(browser, variant((copy) => { delete surface(copy, 'dnd-character').data.spell_categories; })));
-    assert.deepEqual(await fireBolt(page), { category: 'evocation', line: 'Evocation · Cantrip' });
+    assert.deepEqual(await fireBolt(page), { category: 'evocation', line: 'Cantrip · Evocation' });
     await page.close();
     ({ page, errors } = await open(browser, variant((copy) => { for (const item of copy.surfaces) if (item.data) delete item.data.spell_categories; })));
     assert.deepEqual(await fireBolt(page), { category: null, line: 'Cantrip' });

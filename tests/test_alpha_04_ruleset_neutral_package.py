@@ -140,6 +140,8 @@ def test_srd_light_attack_exposes_a_followup_only_with_a_different_light_weapon(
     )
     actor_id = "light-weapon-actor"
     target_id = "light-weapon-target"
+    from tests.srd_fixture_scene import fixture_scene
+
     outcome = mechanic(
         MechanicContext(
             campaign_id="campaign-light-followup",
@@ -147,7 +149,15 @@ def test_srd_light_attack_exposes_a_followup_only_with_a_different_light_weapon(
             action_id=f"action-light-followup-{len(inventory)}",
             state=owned_payload(
                 {
+                    "sylvia.srd-lite.bg3.state": {
+                        "spatial_scene": fixture_scene(
+                            {actor_id: {}, target_id: {}},
+                            {actor_id: [0, 0, 0], target_id: [5, 0, 0]},
+                        ),
+                    },
                     "sylvia.srd-lite.bg3.combat": {
+                        "encounter_active": True,
+                        "current_actor": actor_id,
                         "turn_active": True,
                         "active_actor": actor_id,
                         "action_available": True,
@@ -160,6 +170,13 @@ def test_srd_light_attack_exposes_a_followup_only_with_a_different_light_weapon(
                             "is_alive": True,
                             "conditions": [],
                             "inventory": inventory,
+                            "melee_reach": 5,
+                            "weapon_sets": {
+                                "format": 1, "active_set": "melee",
+                                "melee": {"main_hand": "shortsword",
+                                          "off_hand": "dagger" if "dagger" in inventory else None},
+                                "ranged": {"main_hand": None, "off_hand": None},
+                            },
                             "bonus_action_available": True,
                             "light_extra_attack_available": False,
                             "light_attack_source_weapon": None,
@@ -242,12 +259,12 @@ def test_srd_player_attack_binds_actor_state_from_the_active_combatant() -> None
     assert "actor_state" not in properties
     assert properties["actor"]["x-sylvia-gm-reference"] == "participant"
     assert properties["target"]["x-sylvia-gm-reference"] == "entity"
-    assert "authoritative inventory" in properties["weapon"]["description"]
+    assert "active prepared set" in properties["weapon"]["description"]
     assert "dart uses thrown" in properties["attack_mode"]["description"]
     assert "quarterstaff uses melee" in properties["attack_mode"]["description"]
     assert "dart uses Dexterity" in properties["attack_ability"]["description"]
     assert "quarterstaff uses Strength" in properties["attack_ability"]["description"]
-    assert "For a dart this must be false" in properties["wielding_two_handed"]["description"]
+    assert "cannot override an active prepared set" in properties["wielding_two_handed"]["description"]
 
 
 def test_srd_combat_movement_binds_the_active_combatant_and_requires_distance() -> None:
@@ -258,7 +275,7 @@ def test_srd_combat_movement_binds_the_active_combatant_and_requires_distance() 
 
     assert "actor" not in properties
     assert "actor_state" not in properties
-    assert properties["distance"]["minimum"] == 1
+    assert properties["distance"]["minimum"] == 0.5
 
 
 def _archive(*, runtime_bytes: bytes | None = None) -> bytes:
@@ -550,6 +567,11 @@ def test_rule005_format3_package_executes_persists_reopens_and_replays(
                 "label": "Boost signal",
                 "intent": "run_program",
                 "params": {"program": "signal_boost", "amount": 1},
+                "available": False,
+                "actor_parameter": None,
+                "response_policy": "on_request",
+                "checks_required": True,
+                "map_preview_enabled": False,
             }
         ]
         mechanics = StatelessMcpMechanics(owner)

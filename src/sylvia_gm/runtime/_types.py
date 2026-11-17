@@ -48,6 +48,8 @@ class ToolResult:
         narrative_hooks: Templates selected for AI DM narration.
         error: Error message if the tool failed.
         failure_kind: Stable internal category for a failed runtime stage.
+        unknown_references: Entity or participant IDs a parameter named that
+                 have no saved state (set with a parameter_validation failure).
         logs: Log entries recorded during execution.
         available_tools: Next tools available (from metadata hints).
     """
@@ -60,6 +62,8 @@ class ToolResult:
     narrative_directives: list[dict[str, Any]] = field(default_factory=list)
     error: str | None = None
     failure_kind: str | None = None
+    failure_reasons: tuple[str, ...] = ()
+    unknown_references: tuple[str, ...] = ()
     logs: list[dict[str, Any]] = field(default_factory=list)
     available_tools: list[str] = field(default_factory=list)
     public_context: dict[str, Any] | None = None

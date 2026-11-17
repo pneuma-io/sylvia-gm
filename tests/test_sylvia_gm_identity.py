@@ -11,6 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from sylvia_gm import __version__
 from sylvia_gm.config._env import apply_env_overrides
 from sylvia_gm.domain import package_library
 from sylvia_gm.domain.package_library import content_root_for_record, manifest_from_record
@@ -273,7 +274,7 @@ def test_informational_cli_cannot_launch_a_competing_application() -> None:
         text=True,
     )
     assert version_result.returncode == 0
-    assert version_result.stdout.strip().startswith("sylvia-gm 0.3.0")
+    assert version_result.stdout.strip() == f"sylvia-gm {__version__}"
 
     for retired_command in ("serve", "desktop"):
         retired_result = subprocess.run(

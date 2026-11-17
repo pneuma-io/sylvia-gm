@@ -38,8 +38,11 @@ test('expired sessions recover active interview and Builder drafts without repla
         };
         await page.goto(origin + '/app.html');
         await signIn();
-        await page.locator('#home-tutorial').waitFor({ state: 'visible' });
+        await page.locator('#connecting-overlay').waitFor({ state: 'hidden' });
+        await page.locator('#home-view').waitFor({ state: 'visible' });
         await page.keyboard.press('Escape');
+        await page.locator('#home-tutorial').waitFor({ state: 'hidden' });
+        await page.locator('#tutorial-welcome').waitFor({ state: 'hidden' });
         let textField, sessionId;
         if (kind === 'interview') {
           await page.locator('#home-new-campaign-btn').click();

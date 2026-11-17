@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import threading
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from contextlib import contextmanager, suppress
@@ -31,7 +32,11 @@ from sylvia_gm.domain.authority import (
     SafePayload,
     WriterRole,
 )
-from sylvia_gm.domain.errors import CommandRejected, IdempotencyConflict, MechanicsRejected
+from sylvia_gm.domain.errors import (
+    CommandRejected,
+    IdempotencyConflict,
+    MechanicsRejected,
+)
 from sylvia_gm.domain.provider_records import ProviderPrivateRecord
 from sylvia_gm.domain.session import (
     BuilderChatRecord,
@@ -40,10 +45,30 @@ from sylvia_gm.domain.session import (
     SessionMessageKind,
     SessionRecord,
 )
-from sylvia_gm.provider._exceptions import ProviderError
+from sylvia_gm.provider._exceptions import ProviderError, ProviderOutputLimitError
+
+logger = logging.getLogger(__name__)
 
 _AdmissionResult = TypeVar("_AdmissionResult")
 _MAX_PROVISIONAL_SESSION_CHARS = 256_000
+
+
+def _close_provider_events(events: object) -> None:
+    """End an unfinished provider event stream now that its turn has ended.
+
+    Its own cleanup (cancelling a request, releasing what the provider keeps between
+    requests) then runs at the turn's end rather than whenever the stream is collected.
+    A stream that already finished is left as it is. Cleanup failures are logged only, so
+    they never replace the turn's own outcome.
+    """
+
+    close = getattr(events, "close", None)
+    if not callable(close):
+        return
+    try:
+        close()
+    except Exception:
+        logger.warning("Provider event stream cleanup failed", exc_info=True)
 
 
 def resolve_retry_basis_message(
@@ -57,7 +82,8 @@ def resolve_retry_basis_message(
         for message in context.messages
         if message.content.get("attempt_id") == failed_attempt_id
         and message.kind in {SessionMessageKind.USER, SessionMessageKind.EVIDENCE}
-        and message.content.get("kind") not in {"session_attempt_terminal", "player_action_response_retry"}
+        and message.content.get(
+        "kind") not in {"session_attempt_terminal", "player_action_response_retry"}
     )
     if len(direct) == 1:
         return direct[0]
@@ -81,7 +107,8 @@ def resolve_retry_basis_message(
         for message in context.messages
         if message.message_id == original_message_id
         and message.kind in {SessionMessageKind.USER, SessionMessageKind.EVIDENCE}
-        and message.content.get("kind") not in {"session_attempt_terminal", "player_action_response_retry"}
+        and message.content.get(
+        "kind") not in {"session_attempt_terminal", "player_action_response_retry"}
     )
     if len(original) != 1:
         raise CommandRejected("Retry input identity is unavailable or ambiguous")
@@ -187,16 +214,21 @@ def _mechanics_rejection_feedback(error: MechanicsRejected) -> SafePayload:
     validation: dict[str, object] = {"field_paths": list(error.field_paths)}
     if error.validation_issues:
         validation["issues"] = [issue.as_payload() for issue in error.validation_issues]
+    correction_source = (
+        "validation.issues" if error.validation_issues
+        else "the refusal reasons and validation.field_paths"
+    )
     return cast(
         SafePayload,
         {
             "status": "rejected",
             "code": error.code,
             "reason": str(error),
+            **({"reasons": list(error.refusal_reasons)} if len(error.refusal_reasons) > 1 else {}),
             "validation": validation,
             "state_changed": error.state_changed,
             "instruction": (
-                "Use validation.issues and the current tool schemas to correct every declared "
+                f"Use {correction_source} and the current tool schemas to correct every declared "
                 "field. If this operation cannot represent the intended action, choose a "
                 "different currently exposed operation that can. Do not repeat an identical "
                 "rejected call."
@@ -831,8 +863,9 @@ class CampaignSessionLoop:
                 record_terminal(
                     "stopped" if active.control.cancelled else "interrupted",
                     reason_code=(
-                        loop_error.reason
-                        if isinstance(loop_error, AgentLoopError) and not active.control.cancelled
+                        None if active.control.cancelled
+                        else loop_error.reason if isinstance(loop_error, AgentLoopError)
+                        else "output_limit" if isinstance(error, ProviderOutputLimitError)
                         else None
                     ),
                 )
@@ -1062,7 +1095,8 @@ class CampaignSessionLoop:
                         "player_action_id": request.player_action_id,
                         "player_action_ids": [record["action_id"] for record in
                             self._owner.player_action_context(
-                                self._owner.session_context(request.session_id).session.campaign_id)],
+                                self._owner.session_context(
+                                request.session_id).session.campaign_id)],
                         "automatic_response": request.automatic_response,
                     } if request.input_kind is SessionInputKind.PLAYER_ACTION_RESPONSE else {}),
                     "canonical_start_sequence": initial_high_water,
@@ -1108,6 +1142,7 @@ class CampaignSessionLoop:
             self._pending.discard(request.session_id)
         receipts: list[ActionReceipt | AwaitingChoiceReceipt] = []
         narration_started = False
+        stream: Iterable[ProviderEvent] | None = None
         try:
             self._owner.start_narration_attempt(
                 campaign_id=active.campaign_id,
@@ -1280,6 +1315,8 @@ class CampaignSessionLoop:
                 )
             raise
         finally:
+            if stream is not None:
+                _close_provider_events(stream)
             if narration_started:
                 self._on_narration_finished(active.campaign_id, active.attempt_id)
             with self._active_lock:
@@ -1389,6 +1426,7 @@ class CampaignSessionLoop:
         active_control = control or ProviderControl()
         basis_message = None
         retry_failure_cancelled: bool | None = None
+        retry_events: list[Iterable[ProviderEvent]] = []
         initial_high_water = 0
         try:
             with self._owner.agent_session_work(session_id) as context:
@@ -1541,6 +1579,7 @@ class CampaignSessionLoop:
                     )
                     provider = provider_factory(retry_input.turn_id)
                     provider_events = active_control.admit(lambda: provider(provider_input))
+                    retry_events.append(provider_events)
                     for source_order, event in enumerate(provider_events):
                         active_control.progress.observe()
                         if active_control.cancelled:
@@ -1631,6 +1670,9 @@ class CampaignSessionLoop:
                     except BaseException:
                         retry_failure_cancelled = active_control.cancelled
                         raise
+                    finally:
+                        while retry_events:
+                            _close_provider_events(retry_events.pop())
 
                 result = self._owner.manual_retry(
                     campaign_id=campaign_id,

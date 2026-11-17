@@ -16,7 +16,7 @@ import re
 import threading
 import uuid
 from collections.abc import Coroutine, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, TypeVar, cast
 
 from mcp import types
@@ -25,11 +25,19 @@ from mcp.server import Server
 from mcp.server.context import ServerRequestContext
 from mcp.shared.exceptions import MCPError
 
+from sylvia_gm.agent._tool_exposure import (
+    EXPOSURE_KEY,
+    SPELL_SCOPE_KEY,
+    ExposureContext,
+    exposure_spell_ids,
+    scoped_spell_choices,
+)
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner
 from sylvia_gm.domain.authority import (
     ActionReceipt,
     ActionStatus,
     AwaitingChoiceReceipt,
+    CampaignDisplaySnapshot,
     MechanicsChoiceOption,
     MechanicsChoiceRequest,
     ModelToolBehavior,
@@ -309,6 +317,7 @@ def _model_input_schema(
     schema: Mapping[str, object],
     *,
     participant_ids: Sequence[str],
+    castable_spell_ids: frozenset[str] | None = None,
 ) -> tuple[dict[str, object], dict[str, Mapping[str, object]]]:
     """Project one executable model contract and its authority-owned argument derivations."""
 
@@ -338,6 +347,15 @@ def _model_input_schema(
             model_required.add(name)
         if child.get("x-sylvia-gm-reference") == "participant":
             child["enum"] = list(participant_ids)
+        enum = child.get("enum")
+        spell_scope = child.pop(SPELL_SCOPE_KEY, None)
+        if child.get("x-sylvia-gm-castable-spells") is True and isinstance(enum, list):
+            child["enum"] = scoped_spell_choices(
+                enum,
+                castable_spell_ids=castable_spell_ids,
+                scope=spell_scope,
+                aliases=child.get("x-sylvia-gm-value-aliases"),
+            )
         properties[name] = child
     raw_required = projected.get("required", ())
     required = (
@@ -348,7 +366,73 @@ def _model_input_schema(
     )
     projected["properties"] = properties
     projected["required"] = sorted(required | model_required)
+    projected.pop(EXPOSURE_KEY, None)
     return projected, derivations
+
+
+def _castable_spell_ids(snapshot: CampaignDisplaySnapshot) -> frozenset[str]:
+    """Narrow a package's declared spell choices to admitted characters and prepared creatures."""
+    choices: set[str] = set()
+    for participant in snapshot.participants:
+        book = participant.data.get("wizard_spellbook", ())
+        if isinstance(book, Sequence) and not isinstance(book, (str, bytes)):
+            choices.update(value for value in book if isinstance(value, str))
+    for key, entities in snapshot.state.items():
+        if not key.endswith(".entities") or not isinstance(entities, Mapping):
+            continue
+        for entity in entities.values():
+            if not isinstance(entity, Mapping):
+                continue
+            prepared = entity.get("prepared_spells", ())
+            if isinstance(prepared, Sequence) and not isinstance(prepared, (str, bytes)):
+                choices.update(value for value in prepared if isinstance(value, str))
+    return frozenset(choices)
+
+
+def _castable_spell_refusal(
+    error: MechanicsRejected,
+    schema: Mapping[str, object],
+    castable_spell_ids: frozenset[str],
+) -> MechanicsRejected:
+    """Name a spell outside a package's castable choices instead of a bare enum mismatch.
+
+    Its allowed values are the castable spells the model's tool schema offers, so the GM
+    is not shown a truncated list of every spell the package declares.
+    """
+
+    properties = schema.get("properties")
+    if not isinstance(properties, Mapping):
+        return error
+    issues: list[MechanicsValidationIssue] = []
+    matched = False
+    for issue in error.validation_issues:
+        child = properties.get(issue.path)
+        enum = child.get("enum") if isinstance(child, Mapping) else None
+        if (
+            issue.kind == "invalid_enum_value"
+            and isinstance(child, Mapping)
+            and child.get("x-sylvia-gm-castable-spells") is True
+            and isinstance(enum, Sequence)
+            and not isinstance(enum, (str, bytes, bytearray))
+        ):
+            issue = replace(
+                issue,
+                allowed_values=tuple(
+                    value for value in enum
+                    if isinstance(value, str) and value in castable_spell_ids
+                ),
+            )
+            matched = True
+        issues.append(issue)
+    if not matched:
+        return error
+    return MechanicsRejected(
+        str(error),
+        code="spell_unavailable",
+        field_paths=error.field_paths,
+        validation_issues=tuple(issues),
+        state_changed=error.state_changed,
+    )
 
 
 def _narrative_input_schema(
@@ -1183,6 +1267,12 @@ def _safe_error(error: AuthorityError) -> types.CallToolResult:
         "wrong_writer": "The current session is not allowed to perform this operation.",
         "idempotency_conflict": "The operation identity conflicts with an earlier request.",
         "mcp_tool_unavailable": "The selected operation is no longer available.",
+        "spell_unavailable": (
+            "This spell is not part of this Ruleset's castable spells: it is excluded or not "
+            "yet available. validation.issues allowed_values lists the spells castable in this "
+            "campaign now. Choose one of those, or tell the player this spell is unavailable; "
+            "do not retry it."
+        ),
         "campaign_knowledge_limit_invalid": (
             "Search parameter 'limit' must be an integer from 1 to 8. Retry with limit=5."
         ),
@@ -1240,6 +1330,8 @@ def _safe_error(error: AuthorityError) -> types.CallToolResult:
         "status": "rejected",
         "code": code,
         "reason": reason,
+        **({"reasons": list(error.refusal_reasons)}
+           if isinstance(error, MechanicsRejected) and len(error.refusal_reasons) > 1 else {}),
         "validation": validation,
         "state_changed": (
             error.state_changed if isinstance(error, MechanicsRejected) else False
@@ -1316,20 +1408,38 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
             _require_protocol(context)
             meta = _request_meta(context)
             campaign_id = _meta_text(meta, "campaign_id")
-            snapshot = owner.snapshot(campaign_id)
+            snapshot, _boundary = owner.model_context_snapshot(campaign_id)
             participant_ids = tuple(
                 participant.participant_id
                 for participant in getattr(snapshot, "participants", ())
             )
+            castable_spell_ids = _castable_spell_ids(snapshot)
+            catalog = owner.catalog(campaign_id)
+            asked_spell_ids = exposure_spell_ids(tool.input_schema for tool in catalog)
+            exposure = ExposureContext(
+                # Exposure reads the whole saved state, including engine-private records,
+                # because a lasting effect may live there. It only decides which tools to
+                # list; no state value is shown to the model.
+                owner.snapshot(campaign_id).state,
+                castable_spell_ids=castable_spell_ids,
+                asked_spell_ids=asked_spell_ids,
+            )
             projected: list[types.Tool] = []
-            for tool in owner.catalog(campaign_id):
+            for tool in catalog:
+                if not exposure.exposed(tool.input_schema):
+                    continue
                 schema = _plain_json(tool.input_schema)
                 if not isinstance(schema, dict):  # pragma: no cover - CatalogTool contract
                     raise CommandRejected("Catalog input schema is invalid")
                 model_schema, parameter_derivations = _model_input_schema(
                     schema,
                     participant_ids=participant_ids,
+                    castable_spell_ids=castable_spell_ids,
                 )
+                properties = cast(Mapping[str, object], model_schema["properties"])
+                spell_schema = properties.get("spell")
+                if isinstance(spell_schema, Mapping) and spell_schema.get("enum") == []:
+                    continue
                 projected.append(
                     types.Tool(
                         name=tool.name,
@@ -1900,7 +2010,20 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                 parameters=cast(SafePayload, arguments),
                 initiating_session_id=_meta_optional_text(meta, "initiating_session_id"),
             )
-            action_receipt = owner.execute_action(command)
+            try:
+                action_receipt = owner.execute_action(command)
+            except MechanicsRejected as error:
+                if not any(i.kind == "invalid_enum_value" for i in error.validation_issues):
+                    raise
+                visible, _boundary = owner.model_context_snapshot(campaign_id)
+                refusal = _castable_spell_refusal(
+                    error,
+                    cast(Mapping[str, object], _plain_json(current_tools[0].input_schema)),
+                    _castable_spell_ids(visible),
+                )
+                if refusal is error:
+                    raise
+                raise refusal from error
             action_payload: dict[str, Any]
             if isinstance(action_receipt, AwaitingChoiceReceipt):
                 action_payload = {
@@ -2156,6 +2279,7 @@ class StatelessMcpMechanics:
                 field_paths=field_paths,
                 validation_issues=_validation_issues_from_payload(raw_issues),
                 state_changed=False,
+                refusal_reasons=_string_sequence(payload.get("reasons", ())),
             )
         return cast(Mapping[str, object], _plain_json(payload))
 
@@ -2596,6 +2720,7 @@ class StatelessMcpMechanics:
                 field_paths=field_paths,
                 validation_issues=_validation_issues_from_payload(raw_issues),
                 state_changed=payload.get("state_changed") is True,
+                refusal_reasons=_string_sequence(payload.get("reasons", ())),
             )
         if payload.get("status") == "awaiting_choice":
             try:

@@ -14,6 +14,9 @@ from sylvia_gm.application.desktop_update.processes import (
     ProcessReceipt,
     WindowsHandles,
 )
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 class Handles:
@@ -103,7 +106,7 @@ def test_completion_probe_failure_never_means_process_exit():
     owned.close()
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="Windows handle component")
+@pytest.mark.runs_on("win32", reason="Windows handle component")
 def test_real_windows_duplicates_wait_only_for_two_owned_windowless_children():
     from ctypes import wintypes
 

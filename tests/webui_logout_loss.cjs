@@ -57,8 +57,11 @@ test('lost logout responses lock private drafts with honest revocation uncertain
         };
         await page.goto(origin + '/app.html');
         await signIn();
-        await page.locator('#home-tutorial').waitFor({ state: 'visible' });
+        await page.locator('#connecting-overlay').waitFor({ state: 'hidden' });
+        await page.locator('#home-view').waitFor({ state: 'visible' });
         await page.keyboard.press('Escape');
+        await page.locator('#home-tutorial').waitFor({ state: 'hidden' });
+        await page.locator('#tutorial-welcome').waitFor({ state: 'hidden' });
         const sessionId = await page.evaluate(async mode => (await window.SylviaWebUI.rpc('create_builder_chat', {
           operationId: 'logout-loss-' + mode, providerId: 'test.logout', modelId: 'test.logout/model',
           displayName: 'Private draft recovery',

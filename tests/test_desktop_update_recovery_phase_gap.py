@@ -12,15 +12,20 @@ from sylvia_gm.application.desktop_update.manifest import UpdateError
 from sylvia_gm.application.desktop_update.recovery import KEEP_DATA, RecoveryOperation
 from sylvia_gm.application.desktop_update.startup import authorize_startup
 from sylvia_gm.application.desktop_update.storage import UpdateStore
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_recovery import old_identity
 from tests.test_desktop_update_recovery_service import service_fixture
 
 
+@pytest.mark.runs_on("win32", reason="Windows update release target")
 @pytest.mark.parametrize("choice", [KEEP_DATA, RESTORE_CONFIRMATION])
 def test_failed_phase_save_requires_fresh_reviewed_intent_and_full_retry_ack(
     tmp_path, monkeypatch, choice,
 ):
+    monkeypatch.setattr(helper, "__version__", "0.3.0-alpha.1")
     update, boundary, host, database = service_fixture(tmp_path)
     recovery = RecoveryOperation(update)
     saved, failures, launches, starts, presentations = UpdateStore.save, [], [], [], []

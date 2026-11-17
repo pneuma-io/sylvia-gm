@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import cast
 
 import pytest
-from tests.test_alpha_f4_provider_session_adapter import _OwnerProjection, _provider_input
 
 from sylvia_gm.agent._builder_session import (
     _builder_prompt,
@@ -18,7 +17,11 @@ from sylvia_gm.agent._builder_session import (
     _provider_history,
 )
 from sylvia_gm.agent._mode import AgentMode
-from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+from sylvia_gm.agent._provider_session import (
+    _GM_CONTEXT_PRIVACY,
+    _GM_SYSTEM_CONTRACT_VERSION,
+    ProviderSessionAdapter,
+)
 from sylvia_gm.agent._runner import AgentRunner
 from sylvia_gm.agent._session_loop import SessionProviderInput
 from sylvia_gm.agent._skills import load_builder_skill
@@ -34,6 +37,17 @@ from sylvia_gm.domain.session import (
 from sylvia_gm.provider._base import FakeProvider, ModelInfo
 from sylvia_gm.session._context_compressor import _LLM_COMPRESS_PROMPT
 from sylvia_gm.session._prompt_assembler import PromptAssembler
+from tests.test_alpha_f4_provider_session_adapter import _OwnerProjection, _provider_input
+
+
+def test_current_gm_contract_explains_privacy_and_held_drafts():
+    adapter = ProviderSessionAdapter(cast(AuthorityOwner, _OwnerProjection()),
+                                     FakeProvider(), owner_id="context-contract")
+    messages = adapter._messages(_provider_input())
+    assert _GM_SYSTEM_CONTRACT_VERSION == 97
+    assert _GM_CONTEXT_PRIVACY in messages[0]["content"]
+    assert "held as an unsettled draft" in messages[0]["content"]
+    assert "prose without a call is discarded" not in messages[0]["content"]
 
 
 def _builder_context() -> SessionContext:

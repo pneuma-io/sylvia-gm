@@ -614,6 +614,20 @@ def compose(runtime, root, output, progress):
         bind_creature_space(runtime, record)
         from .srd_lite_frontend_projections import bind_frontend_projections
         bind_frontend_projections(record, catalogue)
+        from .srd_lite_gm_feedback import CAST_ROOTS as FEEDBACK_CAST_ROOTS
+        from .srd_lite_gm_feedback import bind_gm_feedback, retire_refusal_stubs
+        retired_refusal_tools, _removed = retire_refusal_stubs(runtime, record)
+        bind_gm_feedback(runtime)
+        for tool in record["tools"]:
+            tool["input_schema"] = _tool_schema(
+                runtime["tools"][tool["name"]], tool["input_schema"],
+            )
+            if tool["name"] in FEEDBACK_CAST_ROOTS:
+                spell_schema = tool["input_schema"]["properties"]["spell"]
+                spell_schema["x-sylvia-gm-value-aliases"] = runtime["definitions"].get(
+                    "srd_lite_aliases", {},
+                )
+                spell_schema["x-sylvia-gm-castable-spells"] = True
         # Final wrappers can retire private helpers; use the existing reachability check
         # after all movement bindings, preserving the unchanged runtime admission limit.
         omit_unreachable_private_tools(runtime, record)
@@ -648,6 +662,9 @@ def compose(runtime, root, output, progress):
         link_opportunity_movement_content(declarations)
         (output / "declarations-before.json").write_text(json.dumps(declarations, indent=2))
         for item in declarations["inclusions"]:
+            item["links"]["tools"] = [
+                name for name in item["links"]["tools"] if name not in retired_refusal_tools
+            ]
             item["links"]["schemas"] = [
                 VARIANT_ID + ".player-character"
                 if value == "sylvia.srd-lite.bg3.player-character"
@@ -761,21 +778,9 @@ def compose(runtime, root, output, progress):
             b" selection remains unverified pending final-byte gameplay and UI checks.\n"
         )
         guide = "prompts/gm-operating-guide.md"
-        names = [row['name'] for row in catalogue['profiles'] if row['identity'] in SELECTED]
-        selected_control_notes = []
-        if 'blindness_deafness' in SELECTED:
-            selected_control_notes.append('For Blindness/Deafness, partition every chosen target exactly once between blinded_targets and deafened_targets; Blindness uses the blinded partition.')
-        if 'irresistible_dance' in SELECTED:
-            selected_control_notes.append('Irresistible Dance retains its public collect_srd_irresistible_dance action-save consumer.')
-        payloads[guide] = (
-            'SRD Lite selected executable profiles: ' + ', '.join(names) + '. '
-            'Final-byte verification governs acceptance. Other catalogue entries remain pending. '
-            'Excluded or pending requests fail through casting and selection; do not narrate them as supported. '
-            'Existing full-SRD saves are not repinned. '
-            'Coordinates and map movement matter only during combat. Outside combat, use current established '
-            'fictional positions, distances and travel; never require move_srd_scene_creature or a map movement budget. '
-            + ' '.join(selected_control_notes) + '\n\n'
-        ).encode('utf-8') + payloads[guide]
+        # The checked-in operating guide owns GM guidance; build/release notes do
+        # not belong in each play request or in a reconstructed older guide.
+        payloads[guide] = (root / "source/rulesets/srd-lite" / guide).read_bytes()
         (output / "package-record.json").write_text(json.dumps(record, indent=2))
         drafts = [NormalizedPackageDraft(record, payloads, 4)]
         for reference in original:

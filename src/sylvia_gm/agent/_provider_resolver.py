@@ -44,6 +44,7 @@ from sylvia_gm.provider._request_metadata import (
     opencode_request_headers,
     without_opencode_protocol_headers,
 )
+from sylvia_gm.provider._speed import configure_speed, speed_options
 
 ProviderResolver = Callable[[SessionRecord], Provider]
 
@@ -81,6 +82,7 @@ _MODEL_FIELDS = frozenset(
         "supports_tools",
         "supported_reasoning_efforts",
         "default_reasoning_effort",
+        "service_tiers",
     }
 )
 _MODEL_ID_LIMIT = 256
@@ -238,7 +240,8 @@ def _configured_provider_models(
         )
         context_window = capacity.effective_context_window
         selected_output = row.get("max_output_tokens")
-        if selected_output is None and row.get("transport") != "codex_app_server":
+        if (selected_output is None
+                and row.get("transport") not in ("codex_app_server", "claude_code")):
             selected_output = (
                 known_model.max_output_tokens if known_model is not None
                 else min(DEFAULT_OUTPUT_ALLOWANCE, context_window or DEFAULT_OUTPUT_ALLOWANCE)
@@ -249,7 +252,8 @@ def _configured_provider_models(
             minimum=1,
         )
         if (max_output_tokens is not None and context_window is not None
-                and row.get("transport") != "codex_app_server" and max_output_tokens > context_window):
+                and row.get("transport") not in ("codex_app_server", "claude_code")
+                and max_output_tokens > context_window):
             raise ConfigError("Configured model max_output_tokens is outside the supported range")
         declared_output = _optional_model_integer(
             row.get("declared_max_output_tokens"), field="declared_max_output_tokens", minimum=1,
@@ -272,11 +276,15 @@ def _configured_provider_models(
             "responses",
             "anthropic_messages",
             "codex_app_server",
+            "claude_code",
             "gemini_generate_content",
         }:
             raise ConfigError("Configured model transport is unsupported")
         transport = cast(
-            Literal["chat_completions", "responses", "anthropic_messages", "codex_app_server", "gemini_generate_content"],
+            Literal[
+                "chat_completions", "responses", "anthropic_messages", "codex_app_server",
+                "gemini_generate_content", "claude_code",
+            ],
             transport_value,
         )
         streaming_value = row.get(
@@ -348,10 +356,12 @@ def _configured_provider_models(
             supported, suggested = reasoning_values(
                 row.get("supported_reasoning_efforts"), row.get("default_reasoning_effort"),
             )
+            advertised_speeds = speed_options(row.get("service_tiers"))
         except ValueError as error:
             raise ConfigError(str(error)) from error
         configured.append(replace(model, supported_reasoning_efforts=supported,
-                                  default_reasoning_effort=suggested))
+                                  default_reasoning_effort=suggested,
+                                  speed_options=advertised_speeds))
     return tuple(configured)
 
 
@@ -393,7 +403,9 @@ class ConfiguredProviderResolver:
             if not definition.base_url:
                 raise ConfigError(f"Enabled provider '{provider_key}' requires base_url")
             catalog.extend(
-                configure_reasoning(model, definition.base_url)
+                configure_speed(
+                    configure_reasoning(model, definition.base_url), definition.base_url,
+                )
                 for model in _configured_provider_models(provider_key, definition, known_catalog)
             )
             enabled.add(provider_key)
@@ -405,6 +417,10 @@ class ConfiguredProviderResolver:
         self._enabled = frozenset(enabled)
         self._model_ids = frozenset(model.id for model in catalog)
         self._model_providers = {model.id: model.provider_key for model in catalog}
+        #: The ChatGPT subscription models this configuration offers, by runtime model id.
+        self.subscription_models = frozenset(
+            model.wire_model_id for model in catalog if model.transport == "codex_app_server"
+        )
         self._provider_definitions = dict(config.providers)
         self._user_config_path = Path(user_config_path) if user_config_path is not None else None
         self._model_capability_registry = (
@@ -428,8 +444,11 @@ class ConfiguredProviderResolver:
                 api_key=credential,
                 headers=headers,
                 runtime_home=(
-                    str(self._user_config_path.resolve().parent / "chatgpt-runtime")
-                    if provider_key == "chatgpt_subscription" and self._user_config_path is not None
+                    str(self._user_config_path.resolve().parent / (
+                        "claude-runtime" if provider_key == "claude_runtime" else "chatgpt-runtime"
+                    ))
+                    if (provider_key in {"chatgpt_subscription", "claude_runtime"}
+                        and self._user_config_path is not None)
                     else ""
                 ),
             )
@@ -537,7 +556,8 @@ class ConfiguredProviderResolver:
                 "max_output_tokens": model.max_output_tokens,
                 "builder_output_tokens": output_allowance(model, builder=True),
                 "output_budget_mode": (
-                    "runtime_managed" if model.transport == "codex_app_server" else "enforced"
+                    "runtime_managed"
+                    if model.transport in {"codex_app_server", "claude_code"} else "enforced"
                 ),
                 "transport": model.transport,
                 "supports_streaming": model.supports_streaming,
@@ -553,6 +573,12 @@ class ConfiguredProviderResolver:
                     "dm": mode_reasoning_default(model, "dm"),
                     "builder": mode_reasoning_default(model, "builder"),
                 },
+                "speed_options": (
+                    None if not model.speed_options else
+                    [option.projection() for option in model.speed_options]
+                ),
+                "speed_control": model.speed_control,
+                "speed_source": model.speed_source,
                 "capability_registry_version": MODEL_CAPABILITY_REGISTRY_VERSION,
                 "capability_tier_id": (
                     None

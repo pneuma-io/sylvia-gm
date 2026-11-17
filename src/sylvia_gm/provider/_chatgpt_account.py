@@ -5,8 +5,12 @@ from __future__ import annotations
 import threading
 from urllib.parse import urlsplit
 
-from sylvia_gm.provider._codex_rpc import CodexConnection, CodexConnectionError
 from sylvia_gm.provider._chatgpt_model_facts import subscription_model_facts
+from sylvia_gm.provider._codex_rpc import (
+    CodexConnection,
+    CodexConnectionError,
+    account_changed,
+)
 
 
 class ChatGPTAccount:
@@ -24,12 +28,17 @@ class ChatGPTAccount:
             self.connection.start()
             for event in self.connection.notifications():
                 params = event.get("params", {})
-                if (
-                    event.get("method") == "account/login/completed"
-                    and isinstance(params, dict)
-                    and self._login_id is not None
-                    and params.get("loginId") == self._login_id
+                if event.get("method") != "account/login/completed" or not isinstance(
+                    params, dict
                 ):
+                    continue
+                if params.get("success") is True:
+                    # The home may now answer for another account than when the consent
+                    # began; inference children kept open meanwhile belong to the old one.
+                    # This does not wait for the pending sign-in below: a status read taken
+                    # while the earlier account was still signed in has already cleared it.
+                    account_changed(self.connection.home)
+                if self._login_id is not None and params.get("loginId") == self._login_id:
                     self._login_id = None
                     self._login_failed = params.get("success") is not True
             reply = self.connection.call("account/read", {"refreshToken": False})
@@ -123,6 +132,18 @@ class ChatGPTAccount:
                         and effort["reasoningEffort"]
                     )) if isinstance(efforts, list) else []
                     suggested = item.get("defaultReasoningEffort")
+                    tiers = item.get("serviceTiers", [])
+                    service_tiers = [
+                        {
+                            "id": tier["id"],
+                            "name": tier["name"],
+                            "description": tier.get("description")
+                            if isinstance(tier.get("description"), str) else "",
+                        }
+                        for tier in (tiers if isinstance(tiers, list) else [])
+                        if isinstance(tier, dict) and isinstance(tier.get("id"), str)
+                        and tier["id"] and isinstance(tier.get("name"), str) and tier["name"]
+                    ]
                     modalities = item.get("inputModalities", ["text", "image"])
                     supports_text = isinstance(modalities, list) and "text" in modalities
                     unavailable = (
@@ -139,6 +160,7 @@ class ChatGPTAccount:
                             "default_reasoning_effort": (
                                 suggested if suggested in supported else None
                             ),
+                            "service_tiers": service_tiers,
                         }
                     )
                 cursor = reply.get("nextCursor")

@@ -16,7 +16,7 @@ def native_point_cover():
     assert 'cover_from_points' in json.dumps(data['tools']['qualify_srd_sunburst_target_cover'])
     pool=data.get('parameter_declarations',{})
     for tool in data['tools'].values():
-        tool['parameters']=[deepcopy(pool[item]) if isinstance(item,str) else item for item in tool['parameters']]
+        tool['parameters']=[deepcopy(pool[item]) if isinstance(item,str) else item for item in tool.get("parameters", [])]
     closure={};pending=[QUALIFY]
     while pending:
         name=pending.pop()

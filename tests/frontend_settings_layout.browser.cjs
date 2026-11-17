@@ -34,7 +34,7 @@ async function openShell(browser, viewport, { browserInvoke = false } = {}) {
     let body = fs.readFileSync(file);
     if (name === 'app.js') body = body.toString().replace(
       "document.addEventListener('DOMContentLoaded', () => { void SylviaGMFrontend.init(); });", '')
-      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings };\n  // ---- Public API ----');
+      .replace('  // ---- Public API ----', 'window.layoutTest = { state, wireControls, openSettings, closeSettings, beginModelConnection, startBuilderChat, refreshProviderSettings, refreshApplicationInfo, renderDictation, renderClaudeStatus };\n  // ---- Public API ----');
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' :
       name.endsWith('.css') ? 'text/css' : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
@@ -324,7 +324,7 @@ for (const viewport of [{ width: 1400, height: 900 }, { width: 960, height: 640 
   });
 }
 
-test('reopening Settings after a failed save starts Models at its top with the failure in view', async () => {
+test('reopening Settings after a failed save shows the failure, scrolling Models only if it must', async () => {
   const browser = await chromium.launch();
   try {
     const { page, errors } = await openShell(browser, { width: 960, height: 640 });
@@ -334,9 +334,18 @@ test('reopening Settings after a failed save starts Models at its top with the f
       const content = document.querySelector('.settings-content');
       const notice = document.getElementById('models-action-status').getBoundingClientRect();
       const pane = content.getBoundingClientRect();
-      return { scrollTop: content.scrollTop, noticeInView: notice.top >= pane.top && notice.bottom <= pane.bottom };
+      // Whole pixels: a scroll offset is a whole number, so a notice scrolled flush to the pane's edge can
+      // overhang it by a fraction of a pixel.
+      const [top, bottom, paneTop, paneBottom] = [notice.top, notice.bottom, pane.top, pane.bottom].map(Math.round);
+      return { scrollTop: content.scrollTop, noticeInView: top >= paneTop && bottom <= paneBottom,
+        // Whether the notice would be inside the pane with the tab at its top, and its distance from the pane's edge now.
+        fitsAtTop: Math.round(notice.bottom + content.scrollTop) <= paneBottom, gapBelow: paneBottom - bottom };
     });
-    assert.deepEqual(view, { scrollTop: 0, noticeInView: true });
+    assert.equal(view.noticeInView, true, JSON.stringify(view));
+    // Models stays at its top whenever the notice fits there. Fonts that wrap the section above it push the
+    // notice lower; then Settings scrolls, and no further than showing the notice needs.
+    if (view.fitsAtTop) assert.equal(view.scrollTop, 0, JSON.stringify(view));
+    else assert.ok(view.scrollTop > 0 && view.gapBelow >= 0 && view.gapBelow <= 24, JSON.stringify(view));
     assert.match(result.notice, /settings file/);
     assert.deepEqual(errors, []);
   } finally {
@@ -426,6 +435,128 @@ test('browser Dictation explains the desktop requirement instead of suggesting a
     const status = await page.locator('#dictation-model-status').innerText();
     assert.doesNotMatch(status, /reinstall/i);
     assert.equal(await page.evaluate(() => window.getUserMediaCalls), 0);
+  } finally {
+    await browser.close();
+  }
+});
+
+test('the Linux app says dictation is not available yet and keeps its button off', async () => {
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
+    const facts = (platform) => page.evaluate(async (platform) => {
+      const info = { product_name: 'Sylvia GM', version: '0.0.0', release_channel: 'alpha', signing_status: 'unsigned', platform };
+      // No speech runtime answers on either system here; only the wording and the button differ.
+      window.layoutTest.state.bridge = {
+        application_info: async () => info,
+        dictation_capabilities: async () => { throw 'unavailable'; },
+      };
+      await window.layoutTest.refreshApplicationInfo();
+      document.getElementById('dictation-model-status').textContent = '';
+      window.layoutTest.openSettings('dictation');
+      await new Promise(resolve => setTimeout(resolve, 50));
+      const status = document.getElementById('dictation-model-status').textContent;
+      // The lists, the shortcut hint and the model note describe a feature; they show only where it exists.
+      const controls = ['.settings-field-grid', '.provider-field-help', '#dictation-privacy'].map(selector =>
+        getComputedStyle(document.querySelector(`#settings-panel-dictation ${selector}`)).display !== 'none');
+      window.layoutTest.closeSettings();
+      window.layoutTest.state.view = 'session';
+      document.getElementById('player-input').disabled = false;
+      window.layoutTest.renderDictation({ phase: 'idle', message: '', transcript: '' });
+      const toggle = document.getElementById('dictation-toggle');
+      return { status, controls, disabled: toggle.disabled, label: toggle.getAttribute('aria-label') };
+    }, platform);
+    // Windows first: once a host has said it is Linux the page stays marked for Linux.
+    assert.deepEqual(await facts('windows'), {
+      status: 'Local speech isn’t available in this copy of Sylvia. You can keep typing.',
+      controls: [true, true, true], disabled: false, label: 'Start dictation',
+    });
+    assert.deepEqual(await facts('linux'), {
+      status: 'Dictation is not available in the Linux app yet. You can keep typing.',
+      controls: [false, false, false], disabled: true, label: 'Dictation is not available in the Linux app yet',
+    });
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
+});
+
+test('a Linux host says Claude Code setup is Windows-only at once and offers no download', async () => {
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
+    const facts = (platform, result) => page.evaluate(async ({ platform, result }) => {
+      const info = { product_name: 'Sylvia GM', version: '0.0.0', release_channel: 'alpha', signing_status: 'unsigned', platform };
+      window.layoutTest.state.bridge = { application_info: async () => info };
+      await window.layoutTest.refreshApplicationInfo();
+      window.layoutTest.renderClaudeStatus(result);
+      const hidden = (selector) => document.querySelector(selector).hidden;
+      return {
+        status: document.getElementById('claude-connection-status').textContent,
+        detail: document.getElementById('claude-connection-detail').hidden ? '' : document.getElementById('claude-connection-detail').textContent,
+        install: !hidden('[data-claude-action="install"]'), terms: !hidden('#claude-terms-btn'),
+        help: !hidden('#claude-install-help'), check: !hidden('[data-claude-action="status"]'),
+      };
+    }, { platform, result });
+    const missing = { installed: false };
+    assert.deepEqual(await facts('windows', missing), {
+      status: 'Sylvia doesn’t have its copy of Claude Code yet.', detail: '',
+      install: true, terms: true, help: true, check: true,
+    });
+    assert.deepEqual(await facts('linux', missing), {
+      status: 'Sylvia doesn’t have its copy of Claude Code yet.',
+      detail: 'Sylvia can set up Claude Code on Windows only in this version.',
+      install: false, terms: false, help: false, check: true,
+    });
+    // A copy that is already there is used on Linux like anywhere else.
+    const ready = await facts('linux', { installed: true, supported: true, signed_in: false, version: '2.1.0' });
+    assert.equal(ready.status, 'Claude Code is ready. Sign in to use your account.');
+    assert.equal(ready.detail, '');
+    // Before any check nothing is claimed.
+    assert.equal((await facts('linux', null)).install, false);
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+  }
+});
+
+test('sentences that name Windows change only for a host that says it runs on Linux', async () => {
+  const browser = await chromium.launch();
+  try {
+    const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
+    const wording = (platform) => page.evaluate(async (platform) => {
+      const info = { product_name: 'Sylvia GM', version: '0.0.0', release_channel: 'alpha', signing_status: 'unsigned' };
+      if (platform) info.platform = platform;
+      window.layoutTest.state.bridge = { application_info: async () => info };
+      await window.layoutTest.refreshApplicationInfo();
+      const copy = {};
+      for (const node of document.querySelectorAll('[data-platform-copy]'))
+        copy[node.dataset.platformCopy] = node.textContent.replace(/\s+/g, ' ').trim();
+      return {
+        copy, signing: document.getElementById('application-signing').textContent,
+        // Native controls: the Linux web view is told the page is dark; other hosts are not.
+        host: document.documentElement.dataset.hostPlatform || '',
+        scheme: getComputedStyle(document.documentElement).colorScheme,
+      };
+    }, platform);
+    const shipped = await wording(null);
+    assert.deepEqual(Object.keys(shipped.copy).sort(), ['key-protection', 'key-protection-limits', 'unsigned-download']);
+    assert.match(shipped.copy['key-protection'], /^Saved API keys and private headers are protected by Windows for your user account\./);
+    assert.match(shipped.copy['key-protection-limits'], /outside your Windows account/);
+    assert.match(shipped.copy['unsigned-download'], /so Windows may warn about an unfamiliar publisher/);
+    assert.equal(shipped.signing, 'Windows publisher signature: unsigned');
+    assert.equal(shipped.host, '');
+    assert.notEqual(shipped.scheme, 'dark');
+    for (const platform of ['windows', 'macos', 'freebsd'])
+      assert.deepEqual(await wording(platform), shipped, `${platform} keeps the page's wording`);
+    const linux = await wording('linux');
+    assert.equal(linux.signing, 'Publisher signature: unsigned');
+    assert.equal(linux.host, 'linux');
+    assert.equal(linux.scheme, 'dark');
+    assert.match(linux.copy['key-protection'], /key file that only your Linux user account can read/);
+    assert.match(linux.copy['key-protection-limits'], /a copy of your whole home folder/);
+    for (const text of [...Object.values(linux.copy), linux.signing]) assert.doesNotMatch(text, /Windows/);
+    assert.deepEqual(errors, []);
   } finally {
     await browser.close();
   }

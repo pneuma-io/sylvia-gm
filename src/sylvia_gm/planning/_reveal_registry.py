@@ -16,7 +16,6 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-
 # ── Entity ID pattern ─────────────────────────────────────────────────────
 
 _SECRET_ID_FIELD = Field(

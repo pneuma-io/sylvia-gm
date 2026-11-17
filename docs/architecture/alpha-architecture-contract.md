@@ -775,6 +775,15 @@ The application derives the engine-calculated surface from:
 - current campaign state and package-defined TURN/mode/phase;
 - writer/lifecycle permissions.
 
+A Ruleset may also mark what the model is shown, without changing what the engine admits. An
+input schema's `x-sylvia-gm-exposure` lists conditions (a spell castable now or present in saved
+state, or a saved entity field). A tool whose conditions all fail is left out of `list_tools`. A
+`spell` input's `x-sylvia-gm-spell-scope` narrows the shown choices to spells that tool can run. A
+Ruleset declares these only where the tool would be refused or have no effect otherwise. The
+canonical catalog, engine admission and schema validation are unchanged, so player and panel
+actions behave as before; the GM's MCP adapter refuses an unlisted tool as unavailable, as for any
+tool outside the listed surface. An unknown condition shows the tool (`agent/_tool_exposure.py`).
+
 An application **TURN** remains the durable envelope defined in §8. A **GM inference step** is one
 provider request within that envelope, including a continuation after a TOOL RESULT. MCP discovery
 runs from fresh authority before every GM inference step. After a committed mechanic, the next step
@@ -902,8 +911,9 @@ an action or automatically moving the camera.
 TD/Siren Protocol's retained later design (not an Alpha blocker) uses these declarative surfaces,
 layout trees, selection and owner-command paths. It does not introduce package-executable UI or a second game
 state. Panel chrome and tactical presentation inherit the host's current theme tokens in the main
-window and extra windows, including after theme changes; no package-owned fixed green palette or
-independent theme setting is introduced. Numeric geometry remains canonical; Full/Half/Quarter
+window and extra windows, including after theme changes, with the Ruleset's declared PanelTheme
+values (§10.5.1) layered over them; no package-owned stylesheet or independent theme setting is
+introduced. Numeric geometry remains canonical; Full/Half/Quarter
 labels and cosmetic fill opacity are presentation, not replacement collision/visibility semantics.
 
 The selected Network panel uses the existing bounded network projection and command paths.
@@ -934,6 +944,83 @@ separate ability-free conformance package declares a different generic status pa
 the core and frontend do not require D&D panel identities or state shapes. Dormant predecessor
 `PanelDef`/`UIConfig` models are not a second runtime contract and must be removed or reduced to an
 adapter onto the package manifest declaration.
+
+### 10.5.1 PanelSystem, Panels and PanelWidgets
+
+Every Ruleset shares one way of arranging and operating panels. Each Ruleset decides how its panels
+look. The shared frontend must never carry one game's look as everyone's look: that was the mistake
+behind issue 109, where the SRD (D&D 5e) play screen inherited Trigger Discipline's look because
+commit `063ef742` built both games' styling into the shared frontend with nothing to choose between
+them.
+
+| Name | What it is | Who owns it | Where it is today |
+|---|---|---|---|
+| **PanelSystem** | Arranging, tabs, docking, floating windows, resizing, panel chips and menus, selection shared between panels, action gating and the command path. Structure and behaviour only, never a game's colours, type or ornament. | Sylvia, one for every Ruleset | `panel-host.js`, `panel-workspace.js`, and the panel chrome in `app.js` |
+| **Panel** | One panel a Ruleset offers: identity, title, icon, renderer, source, actions and placements (§10.5). | The Ruleset package (`ui_surfaces`) | Package manifests, validated in `domain/package_library.py` |
+| **PanelWidget** | What a Panel is drawn with: a built-in renderer (`party`, `encounter`, `unit_list`, `inventory`, `coordinate_map`, `tactical_grid` and the rest of `_UI_RENDERERS`) in a named **style**. Sylvia ships every style as code; a Ruleset only picks styles by name. | Sylvia draws; the Ruleset chooses | Renderers in `app.js`; styles are listed in `panel-looks.js` |
+| **PanelTheme** | The values a Ruleset gives its panels: a named base (`neutral`, `tactical`, `fantasy`) plus accent, ally, hostile and resource colours and a heading type (`sans`, `serif`, `condensed`). | The Ruleset declares; the PanelSystem applies | `panel-looks.js` |
+
+**Declaring a look.** A Ruleset's panel look is data, version 1:
+`{ "version": 1, "theme": { "base": "fantasy", "accent": "#e2b45c", … }, "widgets": { "party": "adventurer-cards", … } }`.
+"Declaring a PanelWidget" means naming, for one renderer, which built-in style draws it. A Ruleset
+never ships code, CSS, HTML, fonts or images for its panels: packages are files people share, and
+Sylvia does not run or inject what they carry. Colours are `#rrggbb` only. An unknown style or base
+falls back to the neutral one; a colour that is invalid, or too dim to read against the panel
+background, falls back to the base theme's value. A Pathfinder Ruleset gets a fantasy look by
+declaring the `fantasy` base and the fantasy styles with its own colours; it needs no new code
+unless it wants a style Sylvia does not yet have, which is then added to Sylvia for every Ruleset.
+
+| Renderer | neutral style (default) | tactical style (Trigger Discipline) | fantasy style (SRD) |
+|---|---|---|---|
+| `party` | `roster` | `squad-strip` | `adventurer-cards` |
+| `unit_list` (Character) | `sheet` | `operator` | `character-sheet`, with the spell book when the map declares cast actions |
+| `encounter` | `turn-list` | `turn-list` | `initiative-ladder` |
+| `coordinate_map`, `tactical_grid` | `plain` | `tactical-grid` | `battlefield` |
+| everything else | `plain` | `plain` | `plain` |
+
+**Not part of a PanelTheme.** The map's ground picture. Every look draws maps on the same plain dark
+ground with its grid; a generated or authored map image is a separate feature, not a look value.
+
+**Fixed for every Ruleset, not declarable.** Arrangement, docking and floating; keyboard use and a
+visible focus ring; readable contrast; reduced motion and the Effects setting; minimum text sizes;
+nothing clipped, overflowing or overlapping; the player's chosen session theme (backgrounds and body
+text); and honesty: a PanelWidget shows only projected values and declared actions, labels what is
+missing, and never calculates rules.
+
+**The SRD look is the published sizzle reel** (Opus cut v1, 27 to 41 seconds), which was cut from
+the Professional Effects design demo Daniel chose as the look players will see. Reference stills:
+[play screen](panel-looks/srd-reel-play-screen.jpg), [spell cards](panel-looks/srd-reel-spell-cards.jpg),
+[spell slots](panel-looks/srd-reel-spell-slots.jpg). Fantasy, not tactical: warm gold accent on the
+active tab, section labels in spaced gold capitals, serif character and spell names; a red Round
+seal; an initiative ladder with an Acting-now card and rungs with shield-shaped order badges, a
+side-coloured underline and struck-through fallen creatures; a turn bar reading "Name's turn · Round n"
+in gold serif with the action, bonus action and reaction shapes, and a gold End combat turn button; a character sheet with
+an initials plinth, a flask for HP, a shield for AC and walking speed; spell cards with a copper
+medallion, an orange left edge, "Cantrip · Evocation" and either "at will" or slot gems on the
+right; spell slots by Roman numeral with lilac gems; six ability tiles in one row. Gold and parchment
+tones carry the panels and controls; the ally colour is kept for tokens, hit points and thin outlines.
+The reel's textured green battlefield is not part of the SRD look: it was a mockup of a future
+generated map picture.
+
+**Trigger Discipline's look is tactical**: purple brand accent on the active tab, teal allies,
+sans-serif and condensed type; a horizontal squad strip with segmented, slanted HP bars and AP
+diamonds; an Operator sheet with a cut-corner portrait plate, rank chevrons, posture buttons and the
+weapon card with its rig; a dark grid map. Its design-demo reference contains private setting art and
+is not reproduced in this repository.
+
+**A Ruleset with no declaration** gets the neutral look: the session theme's own accent, sans type, a
+roster list, a plain character sheet, a turn list and a plain map. It is complete and usable, not a
+fallback to either game.
+
+**Where declarations live.** First step (0.4.1): in the app, in `src-tauri/frontend/panel-looks.js`,
+keyed by Ruleset identity, in exactly the version-1 shape above. No Ruleset bytes change, and every
+SRD Lite campaign, old or new, gets the SRD look at once. Next step: the same data becomes a package
+artifact, `ui/panel-look.json`, admitted like `ui/panel-layout.json`. The app's entry then remains
+only as the fallback for package versions that predate the artifact, so a campaign pinned to an
+older version keeps the same look and needs no rules update. Panel titles (for example the reel's
+"Initiative" and "Grimoire" against the package's "Encounter" and "Character") and data the
+projection does not carry (ability modifiers, portraits, area previews) are Ruleset package or
+engine changes, not part of a look.
 
 ## 11. Package library, pins, and activation
 
@@ -1306,8 +1393,47 @@ compatible configuration may be saved with an honest warning rather than misrepr
 agent-capable. Saving or removing a provider atomically rebuilds the in-memory provider resolver so
 model choices update without restarting the application.
 
+The `claude_runtime` provider uses the distinct `claude_code` transport. The owner keeps its own
+unmodified copy under `claude-runtime/install/<version>/` in the owner data directory and resolves
+only that copy; `PATH`, `~/.local` and saved executable paths are never consulted.
+`provider/_claude_install.py` downloads Anthropic's published binary on request and keeps it only
+after the manifest checksum, the Windows code signature (`Anthropic, PBC`) and the reported
+version all match. Setup moves through the `InstallState` table beside it. Every native process
+receives `CLAUDE_CONFIG_DIR`, `ANTHROPIC_CONFIG_DIR` and `CLAUDE_CODE_TMPDIR` inside
+`claude-runtime/`, with Claude Code's own updater disabled, so settings, sessions and sign-in
+stay separate from any other Claude Code on the computer. The owner invokes the binary's native
+authentication, status and sign-out flow. No OAuth client,
+credential-file reader or subscription-token storage is part of Sylvia. Only native-reported safe
+account fields reach the renderer. Cancelling sign-in or signing out affects Sylvia's profile only.
+Direct Anthropic API configuration remains separate, and native inference accepts no Sylvia API
+credentials or automatic fallback chain.
+
+Each provider step creates a disposable transcript/workspace and native process. Safe mode,
+empty built-in tools and strict MCP configuration isolate the request from user customizations.
+The SDK stdio MCP channel advertises only that step's current Sylvia schemas. The adapter waits
+for an admitted, correlated MCP call, preserves signed native continuation privately, and collects
+the process before yielding a game operation to Sylvia's existing validation/commit boundary.
+The next step reconstructs authoritative history and committed results; it does not replay native
+actions. Separate resolved sessions do not share a process or event-loop lock. Process cancellation
+and temporary-file cleanup never target unrelated Claude sessions.
+
+Native stdin cannot represent an appended typed tool result on its own. A tool-result continuation
+therefore uses the explicitly labelled `isSynthetic` `SYLVIA_GM_RUNTIME_CONTINUE` invocation after
+reconstructing the typed pair in the transcript. This is non-User application control, never saved
+player speech. Native resume framing also remains outside canonical history. Full Audit records
+the `claude_code_boundary` and labels downstream model input as not exposed. Output and native
+reasoning controls are runtime-managed; unknown account limits and CLI price estimates are not
+invented as usage facts. [Implementation evidence and limits](../research/claude-native-runtime-2026-11-11.md)
+and the [dedicated copy's setup and isolation](../research/claude-dedicated-instance-2026-11-12.md)
+remain separate from genuine-account and installed-app qualification.
+
 Saved API keys and private request headers use current-user Windows DPAPI at the owner-local
-configuration boundary. A versioned protected envelope reuses atomic settings replacement;
+configuration boundary. On Linux, which is not yet a supported player platform, they use an
+AES-256-GCM envelope under a per-user key file kept in the state folder, outside the data folder.
+That protects against the settings file being copied on its own, not against another program
+running as the same user or a copy of the whole home folder from an unencrypted disk. Each
+platform opens only its own envelope kind. A versioned protected envelope reuses atomic settings
+replacement;
 decryption is confined to owner memory for provider operations. Legacy plaintext migration builds
 and protects the replacement before publication, retains recoverable source settings on failure,
 and introduces no plaintext fallback or migration backup. Protection/decryption/version failures
@@ -1334,6 +1460,19 @@ pending/active. Adapters translate to supported native parameters without silent
 budgets or service tiers. Audit distinguishes requested options from provider-confirmed values;
 absence of confirmation is not proof of application. Effort never changes canonical tool outcomes
 or the private-reasoning storage/inspection rules in §9.2.
+
+New-chat defaults and speed use the same boundary. The owner-local settings document holds the
+default effort and speed beside the default model, and each chat's saved speed. None of these
+enters campaign data, exports or backups. Every command that creates a Builder or GM session
+settles its start once: a value named in the command, otherwise the saved default where that
+session's model supports it. An unsupported named value is rejected before anything is created.
+The settled effort and speed are saved on the new session before the command returns, so the first
+provider turn, including an automatic opening, reads them exactly as any later turn does. Speed
+capability is a model-catalog fact bound to an exact endpoint, transport and model, or advertised
+by the ChatGPT runtime's model list. The selection is snapshotted with effort for the whole
+provider turn. A saved tier that the answering model does not offer is not sent, and a permanent
+model switch clears it. Audit records the requested tier and, where the provider reports one, the
+tier it says it used.
 
 The standalone left-sidebar Builder entry creates an ordinary top-level Builder session and
 workspace without creating or selecting a campaign. It uses the same owner, SQLite authority,
@@ -1443,6 +1582,20 @@ Provider errors distinguish actual overflow, requested compaction and explicitly
 exhaustion; unreported subscription limits remain unknown. Recovery resumes unresolved work without
 automatic provider fallback or replay after visible output.
 
+The Builder tool loop has no total-round cutoff. A loop guard ends a turn that has stopped making
+progress: three consecutive identical rounds in which every call failed, six consecutive rounds with
+identical calls and results, three failed reads of one selected source, or a structurally unreadable
+source. Stop, the Builder question tool and provider errors end the turn as before, and each
+further steering pass requires new player steering. When a Builder response reports output
+exhaustion, the loop keeps the readable text as an assistant message, executes none of that
+response's tool calls, saves no native continuation for it and appends a labelled
+`SYLVIA_GM_BUILDER_CONTINUE` user-role envelope, because Messages transports need a conversation
+turn after assistant text. The envelope is application-owned projection data: it is never saved as a
+player message and does not displace the latest player request during compaction. The loop
+continues up to three exhausted responses in a row; a fourth fails the turn with the output-limit
+error, and a completed response resets the count. The saved Builder outcome carries a reason code
+for each of these stops.
+
 For a structured DM session, the owner builds one knowledge catalog from the accepted Campaign
 Plan and its exact contained Campaign Setting. The optional fixed Setting artifact
 `setting-knowledge.json` contains bounded, canonically ordered facts with stable identity, source
@@ -1506,6 +1659,176 @@ Immediately before ordinary current player input, the owner supplies one compact
 control. It does not classify the action, set a word limit, score prose, or rewrite the result. It
 keeps the player's exact words salient after the larger Campaign File and preparation projections,
 and reminds the GM to leave follow-up observation or investigation for a later player choice.
+
+#### 13.1.1 GM request assembly: frozen prefix and append-only context
+
+The canonical assembly above decides what the GM should know. Where it is selected (see *Mode
+switch* below; the previous assembly is the shipped default), a separate wire layer, the context
+ledger (`agent/_context_ledger.py`), decides how that reaches the provider, so that within a
+**context epoch** each GM request's messages are a byte-exact extension of the previous request's
+messages and the system prefix is identical. Correctness wins over prefix reuse: when in doubt,
+the ledger resets. Builder and participant requests do not use it.
+
+- **Frozen system prefix.** Canonical assembly tags the session-constant instruction blocks: the
+  GM contract, the model narration block, `SYLVIA_GM_CONTEXT_CONTRACT`, the ledger contract, the
+  Ruleset operating guide and `SYLVIA_GM_RESPONSE_FORMAT`. The ledger hoists them, in that order,
+  to the front on every route. Any untagged system message is an in-stream host record, so an
+  unknown or future block cannot change the prefix. Tags are attributes and a copy drops them, so
+  a request whose GM contract (always first) or a labelled fixed block arrives untagged is refused
+  (`LedgerTagError`) instead of being sent as a host record.
+- **Journal.** The ordered non-system messages already sent in the epoch. Conversational messages
+  (player turns, assistant turns, tool results) are journaled once by identity: saved message
+  identities; tool call and result IDs counted in order within the stretch that follows the last
+  saved message identity, because a provider may reuse an ID in a later reply or turn; otherwise
+  a content hash plus occurrence. The journal's copy
+  stands even when canonical assembly later renders the same message differently. Host records
+  follow new conversation: *latest-wins* records (campaign preparation, relevant Character Files,
+  player control results) only when their content changed; *event* records unless an identical
+  record of that label is still the journal tail, or the record has stayed in canonical assembly
+  unchanged since it was journaled (an engine transition result kept for the turn is one record,
+  not a new event after each tool exchange). Nothing is removed or rewritten. The positional
+  `SYLVIA_GM_CURRENT_PLAYER_MESSAGE` control is replaced by the ledger contract's rule that, in a
+  turn started by player input, the current input is the latest unsealed user message; a turn
+  started by a player control or an automatic event has no new player input. The contract
+  limits superseding to the campaign-state keyframe and the latest-wins labels; every other
+  record is an event, and events accumulate.
+- **Narration facts.** `SYLVIA_GM_EXACT_NARRATION_FACTS` repeats every earlier fact of the
+  turn each round; when the list extends what was given since the last player message, only
+  the added facts are journaled, worded as adding to the facts already given. A list that is
+  not an extension is sent whole. The ledger contract explains the reading.
+- **Entity snapshots in journaled records.** `SYLVIA_GM_AUTOMATIC_ENGINE_TRANSITION_RESULT` and
+  `SYLVIA_GM_EXACT_NARRATION_FACTS` are journaled without the entity and Ruleset-state copies
+  the same request's campaign state carries exactly (`current_entities` per entity; in a
+  transition's `result.context`, `actor`, `completed_actor`, `lasting_state` and
+  `time_stop_state`). A copy that differs (an intermediate value when several transitions share
+  a request) is kept. The dedupe digest and the facts-extension check use the canonical record,
+  and the contract says these records report what happened while current values are in the
+  campaign state records.
+- **Fresh epoch layout:** campaign preparation (and any continuation note), then history, then other
+  records, then the campaign-state keyframe last.
+- **Campaign state.** `SYLVIA_GM_FRESH_CAMPAIGN_STATE` is sent whole as a keyframe at the start of
+  an epoch. Later changes are `SYLVIA_GM_CAMPAIGN_STATE_UPDATE` records computed against the
+  ledger's reconstruction of what the model holds: whole-value replacements of the shallowest
+  changed subtrees (engine-owned values per entity field, current scene per field, otherwise
+  top-level sections), removed paths, and fact upserts and removals by record ID. Relevance-ranked
+  fact lists and the character-knowledge lists derived from them are additive: a fact already sent
+  is not re-sent or reordered, and dropping out of the selection sends nothing. Canonical assembly
+  passes the still-active continuity record IDs per fact list as host-only metadata on the state
+  message; a held fact whose record left that set (retired, or moved to the other list) is removed
+  by record ID. A new keyframe replaces the chain when the updates since the last keyframe outgrow
+  it. Keyframe plus updates must reconstruct the canonical state (modulo the additive rule).
+- **Withdrawn records.** When `SYLVIA_PLAYER_CONTROL_RESULTS` or
+  `SYLVIA_GM_RELEVANT_CHARACTER_FILES` was in the previous request's canonical list and is absent
+  now, one sealed record under that label says none is selected for this request and earlier
+  records under it stay true history. The campaign preparation is never
+  withdrawn.
+- **Roles and the host seal.** Data records are user-role everywhere. Control records stay
+  system-role where the route keeps system messages in place (`chat_completions`, `responses`) and
+  are user-role where the route lifts them (`anthropic_messages`, `claude_code`,
+  `codex_app_server`, Gemini). Every user-role host record starts with a deterministic per-session
+  seal declared once in the ledger contract (`SYLVIA_GM_CONTEXT_LEDGER_CONTRACT`), which replaces
+  the application-data and player-message guidance. Records are classified from
+  application-owned metadata, never from text, so player speech that imitates a label stays player
+  speech. Player text that itself begins like a seal is journaled with `(player text) ` in front,
+  and the contract says it is still player speech. The contract keeps every authority property of
+  the guidance it replaces.
+- **Persistence.** Each request's new journal entries are saved as `gm_wire_journal` session
+  evidence (versioned, with context owner, epoch, generation, base count and chained hashes)
+  through the owner path that saves working-context checkpoints, and are acknowledged before the
+  request is sent. Native continuation is attached afterwards by `_native_reference`; signed or
+  private provider fields never enter the journal. A restarted owner rebuilds the journal from
+  that evidence. On `claude_code` the context records Claude Code writes itself are saved as
+  `gm_native_records` evidence for the request that produced them. The owner protocol exposes only
+  a marker for both kinds, because they repeat GM-private state. A portable or private campaign
+  export keeps every row of both kinds and its sequence but writes its content as the stub
+  `{"kind": <kind>, "omitted_from_export": true}`; every reader treats a stub as no record, so
+  after recovery the next GM request starts a journal (`journal_started`) and `claude_code`
+  collects the CLI's records again. Full database backups keep the content. Existing saves need
+  no migration.
+  A GM context without a declared owner identity uses the fallback owner
+  `{kind: gm, campaign_id, session_id}`; an owner that cannot append session evidence (bare test
+  stand-ins) keeps the journal in memory only.
+- **Declared resets.** A new working-context checkpoint or a changed context owner (campaign,
+  session, package lock, model context, route) starts a new epoch. A journaled player or narration
+  identity missing from canonical history (rewind, restore, edit) starts a new generation, as does
+  saved journal evidence that fails validation. Working-context compaction is decided exactly
+  as in the previous assembly, from the canonical request and its tools, in both modes, so the
+  ledger never compacts where the previous assembly sends. The wire decides only a rebase: when
+  the previous assembly's rule says send and the wire's excess over the fixed term passes 0.85
+  of the remaining budget (superseded journal records), the journal restarts from canonical
+  history (`journal_rebased`, a new generation and a full re-send). Right after a rebase that
+  excess is about canonical history, at most 0.70, so the next rebase is at least 0.15 of the
+  budget of superseded records away and one cannot repeat on the same request. On
+  `claude_code`, a request that would replay Claude Code context records known to be lost or
+  unknown starts a new generation (`native_records_unknown`). A changed stable instruction or tool
+  definition keeps the journal and records the prefix change. Per-round tool gating is unchanged;
+  each request records an order-sensitive tool-list fingerprint and an order-insensitive tool-set
+  fingerprint.
+- **Tails.** No request ends on a journal tail the route cannot send. On `claude_code`, when the
+  journal would end on anything other than a user-role entry (a tool result or an assistant turn),
+  the ledger appends and journals a sealed `SYLVIA_GM_CONTINUE` record; on `anthropic_messages` it
+  does the same when the journal would end on an assistant turn, which current Claude models
+  reject as a prefill. The runtime's own invented continuation prompt is never used.
+- **Claude thinking (`anthropic_messages`).** A thinking block is bound to the top-level system,
+  the tool set and every earlier message (Anthropic documentation, not verified live). The journal
+  keeps a thinking floor: assistant turns below it are reattached without thinking or
+  redacted-thinking blocks. It only moves forward within a generation, is saved in the journal
+  record that moves it and is restored on load. On models where every account enforces the
+  binding (Fable 5.2, Mythos 5.2) a changed system prefix or tool set moves it to the journal
+  length after the request's new entries, so every assistant turn in that request is stripped
+  (each was produced under the previous system and tools); thinking returned in response to
+  that request is journaled above the floor and replayed while the fingerprints stay the same.
+  On those models the first frame of any new generation or epoch (a rebase, rewind, invalid or
+  unloadable journal, compaction, owner or transport change) also moves it to the end of that
+  frame's entries: the new layout re-sends history after a different message list, so no
+  carried-over turn keeps its thinking.
+  On every model, a 400 naming a thinking signature moves it to the full journal length and the
+  request is retried once.
+- **Routes.** `claude_code` writes the frozen prefix as its system file (LF bytes) and a native
+  projection of the journal as its transcript, run from one fixed, empty working directory: each
+  earlier request's prompt group is one list-content user record followed by the context records
+  Claude Code wrote after it (collected with a fresh `--session-id`, then deleted with its session
+  file on every path), and a `No response requested.` assistant record precedes any prompt group
+  that follows a user record. The stdin prompt is the request's own prompt group. The system and
+  transcript files live in a per-step folder under the runtime home that is removed after the
+  step. Before each step the runtime first retries this process's own failed deletions, whatever
+  their age, then sweeps other leftover session files and step folders that have been unchanged
+  for 15 minutes and that no step in this process is running; it never sweeps or deletes outside
+  Sylvia's runtime home. Off Windows, where the runtime's cache folder is inside the runtime
+  home, Claude Code's MCP debug logs (tool names, a session ID and the working folder path)
+  are removed after every step as well. The first-party
+  `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
+  last system block and the last non-thinking block of the last message; other Messages-compatible
+  endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
+  request context identifier.
+- **Mode switch.** The previous assembly is the shipped default (`DEFAULT_CONTEXT_MODE`) on
+  every route except those named in `DEFAULT_CONTEXT_MODE_BY_TRANSPORT`, which lists a route
+  once its measured results support the ledger. `claude_code` and `codex_app_server` are
+  listed: they ship with the ledger. `SYLVIA_GM_CONTEXT_MODE=ledger` or `=legacy`, read once per GM
+  adapter, selects an assembly for every route. The previous assembly is byte for byte what it
+  was before the ledger existed (including no Anthropic breakpoints).
+  On `claude_code` legacy mode keeps the previous transcript and flags, with the fixed working
+  directory and LF system bytes.
+- **Tool list switch.** In the ledger assembly, per-round tool lists are the shipped default
+  (`DEFAULT_TOOL_LIST`) on every route except those named in `DEFAULT_TOOL_LIST_BY_TRANSPORT`,
+  which send one tool list for the session. `claude_code` and `codex_app_server` are listed.
+  `SYLVIA_GM_TOOL_LIST=stable` or `=rounds` selects either for every route.
+- **ChatGPT runtime thread.** On `codex_app_server` the provider keeps the Codex runtime process
+  and thread between the requests of a GM turn and between turns. At a Sylvia tool call the turn
+  is left waiting, and the next request, which brings the call's result, answers the call inside
+  that same turn (`answer`). Only a request the context ledger built keeps a thread: the ledger
+  marks it as it builds it (`LEDGER_REQUEST`), and the provider reads and clears the mark, so it
+  serves that one request. Every other request (an NPC decision, Builder, a summary) runs on a
+  fresh thread, as before kept threads. A kept thread serves a request only when the request
+  holds exactly what the thread holds; otherwise a fresh thread does, and the thread-reuse audit
+  record says why. A waiting turn is closed after 30 minutes idle, on Stop, sign-in or sign-out,
+  provider close, a chat's change away from its model, a settings reload that no longer offers
+  its model, and process exit; its owed usage report is collected first except at process exit.
+  `SYLVIA_CHATGPT_THREAD=fresh` starts a new process and thread for every request, as before kept
+  threads; unset or any other value means `answer` with the ledger and `fresh` without it, so
+  `SYLVIA_GM_CONTEXT_MODE=legacy` alone restores the whole previous behaviour on that route. Any
+  value applies only to ledger-built requests. `stable` (interrupt and continue) and
+  `answer-draft` are experimental values.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 
@@ -1583,6 +1906,8 @@ Saved scenarios supply scripted GM decisions and simple narration completion thr
 session/adapter path. The script supplies inputs when requested; it must not reproduce the logic
 that decides when those inputs are required or allowed. Scenarios can control dice results and
 span several actions/turns; test randomness must stay isolated from live campaign randomness.
+A scenario observes each committed action's whole engine result, taken from that action's receipt.
+The copy of a result kept in model history omits engine context and is not the test's source.
 The local test worker composes CampaignSessionLoop, ProviderSessionAdapter and AuthorityOwner;
 direct player steps use AuthorityOwner.player_action and its ordinary response path.
 Reusable Ruleset test cases cover mechanics and
@@ -1795,7 +2120,8 @@ A Draft and a campaign in play use the same `.sylvia-gm-campaign` archive. It co
 
 Saved thinking is an optional, explicitly selected export component under §9.2; full database
 backups retain it. An export that omits reasoning must not pretend missing provider-native
-continuation is present or fabricate a Thinking record on import.
+continuation is present or fabricate a Thinking record on import. GM wire journals and Claude
+Code's own context records travel only as stubs (§13.1.1).
 
 Startup/recovery validates database integrity, schema version, Campaign/Interview revision
 relationships, session-message references, incomplete TURN/action status, canonical ordering, and

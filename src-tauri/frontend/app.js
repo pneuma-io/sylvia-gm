@@ -78,6 +78,7 @@ const SylviaGMFrontend = (() => {
     displayHistory: null, // only the selected session's loaded display pages
     selectedTheme: 'slate',
     pendingModelGuidance: null,
+    pendingChatStart: null, // the Game Master start chosen before a model capability warning
     pendingModelMode: null,
     providerDiscovery: { offset: 0, total: 0, hasMore: false, models: [] },
     providerCapacity: null,
@@ -85,6 +86,7 @@ const SylviaGMFrontend = (() => {
     modelEditor: { route: 'api', providerId: null, modelId: null, step: 'connection' },
     savedModelNotice: null,
     pendingChatGPTModelId: null,
+    pendingClaudeModel: null,
     adminAuditEnabled: false,
     adminAuditTraces: [],
     adminAuditRawTraceCount: 0,
@@ -302,12 +304,17 @@ const SylviaGMFrontend = (() => {
     if (!value || !$('dictation-toggle')) return;
     const busy = ['requesting', 'recording', 'transcribing'].includes(value.phase);
     const recording = value.phase === 'recording';
-    const enabled = !$('player-input').disabled && state.view === 'session' && !window.__sylviaBrowserInvoke;
+    // The Linux app carries no speech runtime yet, so its button is off like the browser's.
+    const linuxHost = state.applicationInfo?.platform === 'linux';
+    const enabled = !$('player-input').disabled && state.view === 'session' &&
+      !window.__sylviaBrowserInvoke && !linuxHost;
     $('dictation-toggle').disabled = (!enabled && !recording) ||
       ['requesting', 'transcribing'].includes(value.phase) || Boolean(dictationModelJob);
     $('dictation-toggle').setAttribute('aria-pressed', String(recording));
     $('dictation-toggle').setAttribute('aria-label', window.__sylviaBrowserInvoke
-      ? 'Dictation requires the desktop application' : recording ? 'Stop dictation' : 'Start dictation');
+      ? 'Dictation requires the desktop application'
+      : linuxHost ? 'Dictation is not available in the Linux app yet'
+      : recording ? 'Stop dictation' : 'Start dictation');
     $('dictation-toggle-text').textContent = recording ? 'Stop dictation' : 'Dictate';
     if ($('dictation-status').textContent !== value.message) $('dictation-status').textContent = value.message;
     $('dictation-status').hidden = value.phase === 'idle' && !value.message;
@@ -723,6 +730,8 @@ const SylviaGMFrontend = (() => {
   let settingsReturnFocus = null;
   let tutorials = null;
   let readyCampaigns = null;
+  let characterChat = null;
+  let chatStart = null;
 
   // Keep every provider turn's renderer-owned lifecycle under its session identity.
   function ensureSessionActivity({
@@ -917,6 +926,15 @@ const SylviaGMFrontend = (() => {
       ready_campaign_catalog: () => invoke('ready_campaign_catalog'),
       start_ready_campaign: command => invoke('start_ready_campaign', { command }),
       customize_ready_campaign: command => invoke('customize_ready_campaign', { command }),
+      character_chat: command => invoke('character_chat', {
+        action: command.action, chatId: command.chat_id, operationId: command.operation_id,
+        artifactId: command.artifact_id, expectedContentSha256: command.expected_content_sha256,
+        providerId: command.provider_id, modelId: command.model_id, userName: command.user_name,
+      }),
+      send_character_chat_message: command => invoke('send_character_chat_message', {
+        chatId: command.chat_id, operationId: command.operation_id, text: command.text,
+        expectedMessageCount: command.expected_message_count,
+      }),
       campaign_creation_catalog: (includeParticipants = true) => invoke(
         'campaign_creation_catalog', { includeParticipants }
       ),
@@ -940,6 +958,8 @@ const SylviaGMFrontend = (() => {
         providerId: command.provider_id,
         modelId: command.model_id,
         displayName: command.display_name,
+        reasoningEffort: command.reasoning_effort || null,
+        speed: command.speed || null,
       }),
       rename_builder_chat: (sessionId, displayName) =>
         invoke('rename_builder_chat', { sessionId, displayName }),
@@ -1080,6 +1100,10 @@ const SylviaGMFrontend = (() => {
         characterProfileSha256: command.character_profile_sha256 || null,
         characterArtifactId: command.character_artifact_id || null,
         characterArtifactSha256: command.character_artifact_sha256 || null,
+        providerId: command.provider_id || null,
+        modelId: command.model_id || null,
+        reasoningEffort: command.reasoning_effort || null,
+        speed: command.speed || null,
       }),
       return_guided_creation_subflow: (command) => invoke('return_guided_creation_subflow', {
         operationId: command.operation_id,
@@ -1093,6 +1117,7 @@ const SylviaGMFrontend = (() => {
       provider_settings: () => invoke('provider_settings'),
       open_provider_setup: (presetId) => invoke('open_provider_setup', { presetId }),
       chatgpt_connection: (action, model = null) => invoke('chatgpt_connection', { action, model }),
+      claude_connection: (action, options = null) => invoke('claude_connection', { action, options }),
       admin_full_audit_status: () => invoke('admin_full_audit_status'),
       admin_full_audit_record: (index) => invoke('admin_full_audit_record', { index }),
       open_admin_audit_window: () => invoke('open_admin_audit_window'),
@@ -1158,9 +1183,19 @@ const SylviaGMFrontend = (() => {
         effort: command.effort,
         mode: command.mode,
       }),
+      switch_session_speed: (command) => invoke('switch_session_speed', {
+        sessionId: command.session_id,
+        speed: command.speed,
+      }),
       set_default_model: (providerId, modelId) => invoke('set_default_model', {
         providerId,
         modelId,
+      }),
+      set_chat_defaults: (command) => invoke('set_chat_defaults', {
+        providerId: command.provider_id,
+        modelId: command.model_id,
+        reasoningEffort: command.reasoning_effort,
+        speed: command.speed,
       }),
       submit_session_input: (command) => invoke('submit_session_input', {
         sessionId: command.session_id,
@@ -1245,6 +1280,7 @@ const SylviaGMFrontend = (() => {
       start_import_repair: (command) => invoke('start_import_repair', {
         repairId: command.repair_id, operationId: command.operation_id,
         providerId: command.provider_id, modelId: command.model_id,
+        reasoningEffort: command.reasoning_effort || null, speed: command.speed || null,
       }),
       create_guided_campaign_draft: (command) => invoke('create_guided_campaign_draft', {
         operationId: command.operation_id,
@@ -1300,13 +1336,15 @@ const SylviaGMFrontend = (() => {
         'model_guidance', { campaignId, modelId, overrideAccepted }
       ),
       finalize_campaign_construction: (
-        campaignId, dmProviderId, dmModelId, modelGuidanceOverride
+        campaignId, dmProviderId, dmModelId, modelGuidanceOverride, start = null
       ) => invoke(
         'finalize_campaign_construction', {
           campaignId,
           dmProviderId,
           dmModelId,
           modelGuidanceOverride,
+          reasoningEffort: start?.reasoning_effort || null,
+          speed: start?.speed || null,
         }
       ),
       catalog: (campaignId) => invoke('catalog', { campaignId }),
@@ -1618,6 +1656,7 @@ const SylviaGMFrontend = (() => {
         choice.model_id === saved?.canonical_model_id);
       if (index < 0) return;
       $('model-choice').value = String(index);
+      renderChatDefaultChoices();
       void setSelectedDefaultModel();
     });
     document.querySelectorAll('[data-chatgpt-action]').forEach((button) => {
@@ -1625,7 +1664,37 @@ const SylviaGMFrontend = (() => {
     });
     $('open-account-signin-btn').addEventListener('click', () => {
       state.pendingChatGPTModelId = '';
+      accountView = 'chatgpt';
       showSettingsTab('accounts');
+    });
+    $('open-claude-signin-btn').addEventListener('click', () => {
+      state.pendingClaudeModel = { id: '', context_window: null };
+      accountView = 'claude';
+      showSettingsTab('accounts');
+    });
+    document.querySelectorAll('[data-account-view]').forEach((button) => {
+      button.addEventListener('click', () => showAccountView(button.dataset.accountView));
+    });
+    document.querySelectorAll('[data-claude-action]').forEach((button) => {
+      button.addEventListener('click', () => updateClaudeConnection(button.dataset.claudeAction, button.dataset.claudeAccount));
+    });
+    document.querySelectorAll('[data-claude-alias]').forEach((button) => {
+      button.addEventListener('click', () => {
+        $('claude-model-id').value = button.dataset.claudeAlias;
+        selectClaudeModel();
+        $('claude-model-id').focus();
+      });
+    });
+    $('claude-model-id').addEventListener('input', selectClaudeModel);
+    $('claude-terms-btn').addEventListener('click', () => { void openClaudeTerms(); });
+    $('claude-api-route-btn').addEventListener('click', () => {
+      resetModelsPage();
+      showSettingsTab('models');
+      beginModelConnection('api');
+      if ([...$('provider-preset').options].some(option => option.value === 'anthropic')) {
+        $('provider-preset').value = 'anthropic';
+        $('provider-preset').dispatchEvent(new Event('change'));
+      }
     });
     $('account-models-btn').addEventListener('click', () => showModelsOverview());
     $('chatgpt-model-choice').addEventListener('change', selectChatGPTModel);
@@ -1645,6 +1714,14 @@ const SylviaGMFrontend = (() => {
     });
     $('provider-discovered-models').addEventListener('change', selectDiscoveredProviderModel);
     $('provider-context-window').addEventListener('input', updateConfiguredProviderCapacity);
+    $('provider-use-declared-context').addEventListener('click', () => {
+      const declared = state.providerCapacity?.declared;
+      if (!declared) return;
+      $('provider-model-advanced').open = true;
+      $('provider-context-window').value = String(declared);
+      updateConfiguredProviderCapacity();
+      $('provider-context-window').focus();
+    });
     $('provider-output-limit').addEventListener('input', () => renderProviderCapacity());
     $('provider-automatic-limits-btn').addEventListener('click', () => {
       $('provider-context-window').value = '';
@@ -1705,12 +1782,23 @@ const SylviaGMFrontend = (() => {
     $('home-new-campaign-btn').addEventListener('click', () => {
       void startCampaignBuilder();
     });
+    chatStart = window.SylviaChatStart?.create({
+      document, models: () => state.modelChoices,
+      defaults: () => state.providerSettings?.chat_defaults || {},
+    }) || null;
     readyCampaigns = window.SylviaReadyCampaigns?.create({
       document, storage: window.localStorage, uuid: () => crypto.randomUUID(),
       catalog: () => state.bridge.ready_campaign_catalog(),
       start: command => state.bridge.start_ready_campaign(command),
       customize: command => state.bridge.customize_ready_campaign(command),
-      model: () => selectedModelChoice() || defaultModelChoice(),
+      // The Game Master's opening follows the start, so its settings are chosen first.
+      model: async () => {
+        const model = selectedModelChoice() || defaultModelChoice();
+        if (!model) return null;
+        return await chooseChatStart({
+          role: 'dm', title: 'Start Game Master', action: 'Start campaign', model,
+        }) || { cancelled: true };
+      },
       customizationModel: () => defaultModelChoice(),
       error: friendlyCommandError, guidance: guidanceWarningText,
       onStarted: openReadyCampaign,
@@ -1723,6 +1811,15 @@ const SylviaGMFrontend = (() => {
       },
     });
     $('home-ready-campaign-btn').addEventListener('click', () => { void readyCampaigns?.open(); });
+    // Character chat is created on first use, so startup does no extra work.
+    $('home-character-chat-btn')?.addEventListener('click', () => {
+      characterChat ||= window.SylviaCharacterChat?.create({
+        document, uuid: () => crypto.randomUUID(), bridge: () => state.bridge,
+        models: () => state.modelChoices, defaultModel: defaultModelChoice,
+        error: friendlyCommandError,
+      }) || null;
+      void characterChat?.open();
+    });
     $('home-build-btn').addEventListener('click', () => { void startBuilderChat(); });
     $('campaign-sequel-btn').addEventListener('click', () => { void openCampaignSequel(); });
     $('campaign-sequel-preview').addEventListener('click', () => { void previewCampaignSequel(); });
@@ -1842,7 +1939,14 @@ const SylviaGMFrontend = (() => {
     });
     $('dismiss-model-guidance-btn').addEventListener('click', clearModelGuidanceWarning);
     $('model-choice').addEventListener('change', () => {
+      renderChatDefaultChoices();
       updateModelSwitchButtons();
+    });
+    ['default-effort-choice', 'default-speed-choice'].forEach((id) => {
+      $(id).addEventListener('change', () => {
+        renderChatDefaultChoices();
+        updateModelSwitchButtons();
+      });
     });
     $('chat-model-choice').addEventListener('change', () => {
       void switchSelectedSessionModel('current');
@@ -1897,6 +2001,9 @@ const SylviaGMFrontend = (() => {
         void switchSessionReasoning(mode, value === '' || (mode === 'current' && value === 'mode_default')
           ? null : value);
       });
+    });
+    $('chat-speed-current').addEventListener('change', () => {
+      void switchSessionSpeed($('chat-speed-current').value);
     });
     $('set-default-model-btn').addEventListener('click', () => {
       void setSelectedDefaultModel();
@@ -1967,8 +2074,10 @@ const SylviaGMFrontend = (() => {
     // Each tab starts at its own top; another panel's scroll offset never applies.
     const content = document.querySelector('.settings-content');
     if (content) content.scrollTop = 0;
-    chatgptPageVisible = tab === 'accounts';
+    chatgptPageVisible = tab === 'accounts' && accountView === 'chatgpt';
+    claudePageVisible = tab === 'accounts' && accountView === 'claude';
     clearTimeout(chatgptStatusTimer);
+    clearTimeout(claudeStatusTimer);
     document.querySelectorAll('[data-settings-tab]').forEach((button) => {
       const selected = button.dataset.settingsTab === tab;
       button.classList.toggle('active', selected);
@@ -1981,7 +2090,14 @@ const SylviaGMFrontend = (() => {
       panel.classList.toggle('active', selected);
       panel.hidden = !selected;
     });
+    // A waiting Models notice, such as a save that failed while Settings was closed, must be on
+    // screen. Fonts differ between systems and wrap the section above it differently, so the
+    // tab's top does not always include it; scroll only as far as showing it needs.
+    const modelsNotice = $('models-action-status');
+    if (tab === 'models' && modelsNotice?.textContent) modelsNotice.scrollIntoView?.({ block: 'nearest' });
+    if (tab === 'accounts') renderAccountView();
     if (chatgptPageVisible) void updateChatGPTConnection('status');
+    if (claudePageVisible) resumeClaudeConnection();
     state.desktopUpdater?.setVisible(tab === 'about');
     tutorials?.refresh();
     if (tab === 'dictation' && !dictationModelJob) {
@@ -1989,7 +2105,9 @@ const SylviaGMFrontend = (() => {
         // The browser never offers recording; only the desktop app can lack its speech runtime.
         $('dictation-model-status').textContent = window.__sylviaBrowserInvoke
           ? 'Dictation is only available in the Sylvia desktop app. You can keep typing here.'
-          : 'Local speech isn’t available in this copy of Sylvia. You can keep typing.';
+          : state.applicationInfo?.platform === 'linux'
+            ? 'Dictation is not available in the Linux app yet. You can keep typing.'
+            : 'Local speech isn’t available in this copy of Sylvia. You can keep typing.';
       });
     }
   }
@@ -2003,6 +2121,8 @@ const SylviaGMFrontend = (() => {
     document.querySelector('.settings-tab.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     $('close-settings-btn').focus();
     if (selectedTab === 'packages') { void refreshRulesetBrowser(); void refreshCharacterExportChoices(); }
+    // Models is where a default speed is chosen, so saved ChatGPT models learn their tiers here.
+    if (selectedTab === 'models') void refreshSavedSubscriptionCapabilities();
   }
 
   let localSupportReport = null;
@@ -2014,11 +2134,37 @@ const SylviaGMFrontend = (() => {
     resetModelsPage();
     state.desktopUpdater?.setVisible(false);
     chatgptPageVisible = false;
+    claudePageVisible = false;
     clearTimeout(chatgptStatusTimer);
+    clearTimeout(claudeStatusTimer);
     if (settingsReturnFocus && typeof settingsReturnFocus.focus === 'function') {
       settingsReturnFocus.focus();
     }
     settingsReturnFocus = null;
+  }
+
+  // The page ships the wording for Windows. A host that says it runs on Linux gets the Linux
+  // wording for the few sentences that name the operating system; anything else keeps the page's.
+  const LINUX_COPY = {
+    'key-protection': 'Saved API keys and private headers are encrypted with a key file that only '
+      + 'your Linux user account can read. They are sent only to the selected service for '
+      + 'authentication and are never put in chats or campaign backups. If they cannot be '
+      + 'unlocked, enter them again in Connection settings.',
+    'key-protection-limits': 'This protects a settings file copied on its own. It does not protect '
+      + 'against software running as your Linux user or a copy of your whole home folder, or '
+      + 'erase older plaintext copies of your settings.',
+    'unsigned-download': 'This Alpha prerelease is unsigned. Before running a download, check its '
+      + 'SHA-256 against the supplied release manifest.',
+  };
+
+  function applyPlatformCopy(platform) {
+    if (platform !== 'linux') return;
+    // The stylesheet uses this to give the Linux web view dark native controls.
+    document.documentElement.dataset.hostPlatform = 'linux';
+    for (const node of document.querySelectorAll('[data-platform-copy]')) {
+      const text = LINUX_COPY[node.dataset.platformCopy];
+      if (text) node.textContent = text;
+    }
   }
 
   async function refreshApplicationInfo() {
@@ -2039,9 +2185,10 @@ const SylviaGMFrontend = (() => {
       channel.textContent = releaseChannel === 'stable' ? 'Stable release'
         : releaseChannel ? `${releaseChannel.charAt(0).toUpperCase()}${releaseChannel.slice(1)} prerelease`
         : 'Release channel unavailable';
-      signing.textContent = info.signing_status === 'unsigned'
-        ? 'Windows publisher signature: unsigned'
-        : 'Signing status supplied by the host';
+      signing.textContent = info.signing_status !== 'unsigned' ? 'Signing status supplied by the host'
+        : info.platform === 'linux' ? 'Publisher signature: unsigned'
+        : 'Windows publisher signature: unsigned';
+      applyPlatformCopy(info.platform);
     } catch (error) {
       state.applicationInfo = null;
       version.textContent = 'Version unavailable';
@@ -2369,11 +2516,20 @@ const SylviaGMFrontend = (() => {
       openSettings('models');
       return;
     }
+    // The repair Builder's first call starts by itself, so its settings are chosen first.
+    const start = await chooseChatStart({
+      role: 'builder', title: 'Start repair Builder', action: 'Start repair', model: selected,
+    });
+    if (!start) {
+      setPackageInstallStatus('Repair not started. Nothing was sent to the model.');
+      return;
+    }
     $('repair-import-btn').disabled = true;
     try {
       const chat = await state.bridge.start_import_repair({
         repair_id: repair.repair_id, operation_id: `repair-${crypto.randomUUID()}`,
-        provider_id: selected.provider_id, model_id: selected.model_id,
+        provider_id: start.provider_id, model_id: start.model_id,
+        reasoning_effort: start.reasoning_effort, speed: start.speed,
       });
       state.pendingImportRepair = null;
       $('repair-import-btn').hidden = true;
@@ -2645,7 +2801,12 @@ const SylviaGMFrontend = (() => {
 
   function noteSavedModel(saved) {
     state.savedModelNotice = saved;
-    $('models-action-status').textContent = `${saved.name || 'Model'} saved. Your chats keep their current models.`;
+    // Say at once when the saved model's context limit is unknown, not only when a turn is refused (issue 92).
+    const choice = state.modelChoices.find((item) => item.provider_id === saved.provider_id &&
+      item.model_id === saved.canonical_model_id);
+    const contextNote = window.SylviaChatStart?.contextNote(choice) || '';
+    $('models-action-status').textContent = `${saved.name || 'Model'} saved. Your chats keep their current models.` +
+      (contextNote ? ` ${contextNote}` : '');
     $('set-added-model-default-btn').hidden = !saved.provider_id || !saved.canonical_model_id;
   }
 
@@ -2673,6 +2834,14 @@ const SylviaGMFrontend = (() => {
     const provider = state.providerSettings?.configured?.find(item => item.provider_id === providerId);
     if (provider?.preset_id === 'chatgpt_subscription') {
       state.pendingChatGPTModelId = modelId;
+      accountView = 'chatgpt';
+      showSettingsTab('accounts');
+      return;
+    }
+    if (provider?.preset_id === CLAUDE_RUNTIME_PRESET) {
+      const saved = provider.models?.find(item => item.id === modelId);
+      state.pendingClaudeModel = { id: saved?.id || '', context_window: saved?.configured_context_window || null };
+      accountView = 'claude';
       showSettingsTab('accounts');
       return;
     }
@@ -2681,7 +2850,7 @@ const SylviaGMFrontend = (() => {
     $('model-add-choices').hidden = true;
     $('provider-editor').hidden = false;
     const presets = (state.providerSettings?.presets || []).filter(preset =>
-      preset.provider_id !== 'chatgpt_subscription' &&
+      preset.provider_id !== 'chatgpt_subscription' && preset.provider_id !== CLAUDE_RUNTIME_PRESET &&
       (preset.provider_id === 'custom' || (route === 'local' ? preset.mode === 'local' : preset.mode !== 'local')));
     $('provider-preset').innerHTML = presets.map(preset =>
       `<option value="${escapeHtml(preset.provider_id)}">${escapeHtml(preset.name)}</option>`).join('');
@@ -2856,7 +3025,19 @@ const SylviaGMFrontend = (() => {
     const capacity = state.providerCapacity;
     $('provider-context-summary').textContent = capacity.effective !== null
       ? `Context available to Sylvia: ${formatTokenCapacity(capacity.effective)}${capacity.effectiveSource === 'legacy_unverified' ? ' (unverified saved limit)' : ''}.`
-      : 'Context limit not reported. You can provide a limit in Advanced model settings.';
+      : 'No context limit is known for this model, so a campaign’s first turn may be refused. ' +
+        'Enter one in Advanced model settings, Optional Sylvia cap.';
+    // A server that reports only a model maximum: offer that number as the cap, for the person to confirm by
+    // saving. Sylvia still does not take a reported maximum as the loaded limit by itself.
+    const offer = capacity.effective === null && capacity.declared !== null &&
+      capacity.runtime === null && capacity.configured === null;
+    $('provider-declared-offer').hidden = !offer;
+    if (offer) {
+      $('provider-declared-offer-text').textContent =
+        `The server reports a maximum of ${formatTokenCapacity(capacity.declared)}. ` +
+        'If it runs the model at that size, use it as Sylvia’s cap, then save.';
+      $('provider-use-declared-context').textContent = `Use ${formatTokenCapacity(capacity.declared)} as the cap`;
+    }
     $('provider-declared-context').textContent = formatTokenCapacity(capacity.declared);
     $('provider-declared-context-source').textContent = contextSourceLabel(
       capacity.declaredSource
@@ -2923,7 +3104,7 @@ const SylviaGMFrontend = (() => {
     const output = providerEffectiveOutput();
     const metadata = state.providerModelMetadata;
     $('provider-output-limit').placeholder = metadata?.declared_max_output_tokens
-      ? `Automatic: ${formatTokenCapacity(metadata.declared_max_output_tokens)}` : 'Automatic reply allowance';
+      ? `Automatic: ${formatTokenCapacity(metadata.declared_max_output_tokens)}` : 'Automatic';
     $('provider-output-summary').textContent = output
       ? `Reply limit: ${formatTokenCapacity(output)}. ` +
         (metadata?.declared_max_output_tokens ? `Model maximum: ${formatTokenCapacity(metadata.declared_max_output_tokens)}.` : 'Model maximum not reported.')
@@ -3129,6 +3310,11 @@ const SylviaGMFrontend = (() => {
       if (result.signed_in && !result.models) {
         result = { ...result, ...await state.bridge.chatgpt_connection('models') };
       }
+      if (result.saved_models_refreshed) {
+        // Saved models just learned new effort or speed options from the runtime's list.
+        await refreshProviderSettings();
+        await refreshModelChoices();
+      }
       chatgptAccountStatus = result;
       $('chatgpt-model-card').hidden = !result.signed_in;
       $('chatgpt-signin-step').textContent = result.signed_in ? '1. ChatGPT connected'
@@ -3183,6 +3369,247 @@ const SylviaGMFrontend = (() => {
     }
   }
 
+  const CLAUDE_RUNTIME_PRESET = 'claude_runtime';
+  let accountView = 'chatgpt';
+  let claudeRequestBusy = false;
+  let claudePageVisible = false;
+  let claudeStatusTimer = null;
+  let claudeAccountStatus = null;
+  let claudeInstallOutcome = false;
+
+  // The Accounts page shows one subscription flow at a time. Opening the Claude view never starts
+  // Claude Code; only its buttons do, plus the read-only poll while a download or sign-in is unfinished.
+  function showAccountView(view) {
+    if (view !== 'chatgpt' && view !== 'claude') return;
+    accountView = view;
+    if (!$('settings-panel-accounts').hidden) showSettingsTab('accounts');
+  }
+
+  function renderAccountView() {
+    document.querySelectorAll('[data-account-view]').forEach((button) =>
+      button.setAttribute('aria-pressed', button.dataset.accountView === accountView ? 'true' : 'false'));
+    document.querySelectorAll('[data-account-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.accountPanel !== accountView;
+    });
+    if (accountView === 'claude' && state.pendingClaudeModel) {
+      $('claude-model-id').value = state.pendingClaudeModel.id || '';
+      $('claude-model-context').value = state.pendingClaudeModel.context_window || '';
+      $('claude-model-advanced').open = false;
+      state.pendingClaudeModel = null;
+      selectClaudeModel();
+    }
+  }
+
+  function resumeClaudeConnection() {
+    renderClaudeStatus(claudeAccountStatus);
+    if (claudeAccountStatus?.login_pending || claudeInstalling(claudeAccountStatus)) void updateClaudeConnection('status');
+  }
+
+  function savedClaudeModel(id) {
+    return state.providerSettings?.configured?.find(item => item.preset_id === CLAUDE_RUNTIME_PRESET)
+      ?.models?.find(item => item.id === id);
+  }
+
+  function selectClaudeModel() {
+    const id = $('claude-model-id').value.trim();
+    const saved = savedClaudeModel(id);
+    $('claude-model-heading').textContent = saved ? '2. Model settings' : '2. Add a model';
+    document.querySelector('[data-claude-action="add_model"]').textContent = saved ? 'Save model changes' : 'Add model';
+    document.querySelectorAll('[data-claude-alias]').forEach((button) =>
+      button.setAttribute('aria-pressed', button.dataset.claudeAlias === id ? 'true' : 'false'));
+    $('claude-model-status').textContent = '';
+  }
+
+  function claudeAuthLabel(method) {
+    const labels = { 'claude.ai': 'Claude account', claude_ai: 'Claude account', subscription: 'Claude account',
+      console: 'Anthropic Console', api_key: 'API key', oauth_token: 'Long-lived token' };
+    return method ? labels[method] || String(method) : 'Not reported';
+  }
+
+  // Billing is stated exactly as Claude Code reports it; Sylvia never chooses or changes it.
+  function claudeBillingNote(billing) {
+    if (billing === 'subscription') return ['Uses your Claude subscription. Your plan’s usage limits apply, ' +
+      'and Sylvia never moves this account to API billing.', false];
+    if (billing === 'api') return ['Sylvia’s copy of Claude Code is signed in with an Anthropic Console account, so usage is ' +
+      'billed to that Console account, not a subscription. To use your subscription instead, sign in again here.', true];
+    return ['Claude Code didn’t report how this sign-in is billed. Sign in again before relying on it.', true];
+  }
+
+  // True while Sylvia's own download of Claude Code is still running in the owner.
+  function claudeInstalling(result) {
+    return ['checking', 'downloading', 'verifying'].includes(result?.install?.state);
+  }
+
+  function claudeInstallLine(install) {
+    const megabytes = value => Math.round((Number(value) || 0) / 1048576);
+    if (install.state === 'downloading') {
+      return `Downloading Claude Code${install.version ? ` ${install.version}` : ''} from Anthropic: ` +
+        `${megabytes(install.received)} of ${megabytes(install.total)} MB. This page will update automatically.`;
+    }
+    return install.state === 'verifying' ? 'Checking that the download is Anthropic’s signed release…'
+      : 'Asking Anthropic which version to install…';
+  }
+
+  // Renders the last explicit check; null means Claude Code has not been contacted yet.
+  function renderClaudeStatus(result) {
+    const checked = Boolean(result);
+    const install = checked && result.install || {};
+    const installing = claudeInstalling(result);
+    const installed = checked && result.installed === true;
+    const supported = installed && result.supported === true;
+    const pending = supported && result.login_pending === true;
+    const signedIn = supported && result.signed_in === true && !pending;
+    // Sylvia fetches its own copy of Claude Code on Windows only. A Linux host says so as soon
+    // as the check finds no copy, and offers no download that could only be refused.
+    const setupUnavailable = checked && !installed && !installing && state.applicationInfo?.platform === 'linux';
+    $('claude-signin-step').textContent = !checked ? '1. Set up Claude Code' : installing ? '1. Installing Claude Code'
+      : !installed ? '1. Install Claude Code' : !supported ? '1. Update Claude Code' : signedIn ? '1. Claude connected'
+        : pending ? '1. Finish sign-in in your browser' : '1. Sign in to Claude';
+    if (checked) {
+      $('claude-connection-status').textContent = installing ? claudeInstallLine(install)
+        : !installed ? 'Sylvia doesn’t have its copy of Claude Code yet.'
+          : !supported ? `Sylvia’s copy of Claude Code${result.version ? ` (${result.version})` : ''} needs updating.`
+            : signedIn ? 'Claude Code is signed in.'
+              : pending ? 'Finish sign-in in your browser. This page will update automatically.'
+                : 'Claude Code is ready. Sign in to use your account.';
+    }
+    const progress = $('claude-install-progress');
+    progress.hidden = !installing;
+    if (install.state === 'downloading' && install.total > 0) {
+      progress.max = install.total;
+      progress.value = Math.min(install.received || 0, install.total);
+    } else {
+      progress.removeAttribute('value');
+    }
+    // A finished setup's result is shown until the next button press, then normal status returns.
+    const outcome = claudeInstallOutcome && !installing && install.message;
+    const detail = setupUnavailable ? 'Sylvia can set up Claude Code on Windows only in this version.'
+      : String(outcome || (checked && typeof result.message === 'string' ? result.message : '')).trim();
+    $('claude-connection-detail').textContent = installing ? '' : detail;
+    $('claude-connection-detail').hidden = installing || !detail || detail === $('claude-connection-status').textContent;
+    $('claude-runtime-facts').hidden = !installed;
+    if (installed) {
+      $('claude-fact-version').textContent = (result.version || 'Version not reported') + (supported ? '' : ' · unsupported');
+      $('claude-fact-version').title = result.executable || '';
+      $('claude-fact-auth').textContent = signedIn ? claudeAuthLabel(result.auth_method) : pending ? 'Signing in…' : 'Not signed in';
+      $('claude-fact-billing').textContent = !signedIn ? '—' : result.billing === 'subscription' ? 'Claude subscription'
+        : result.billing === 'api' ? 'Anthropic Console API' : 'Not reported';
+    }
+    const [billingText, billingWarn] = claudeBillingNote(result?.billing);
+    $('claude-billing-note').hidden = !signedIn;
+    $('claude-billing-note').textContent = signedIn ? billingText : '';
+    $('claude-billing-note').classList.toggle('settings-note-warn', signedIn && billingWarn);
+    const statusButton = document.querySelector('[data-claude-action="status"]');
+    statusButton.textContent = checked ? 'Check again' : 'Check Claude Code';
+    statusButton.hidden = installing;
+    statusButton.classList.toggle('btn-primary', !checked);
+    statusButton.classList.toggle('btn-secondary', checked);
+    // One button installs, updates an unsupported copy, or looks for a newer release.
+    const installButton = document.querySelector('[data-claude-action="install"]');
+    installButton.hidden = !checked || installing || pending || setupUnavailable;
+    installButton.textContent = !installed ? 'Install Claude Code for Sylvia' : !supported ? 'Update Claude Code'
+      : 'Check for a newer version';
+    installButton.classList.toggle('btn-primary', !supported);
+    installButton.classList.toggle('btn-secondary', supported);
+    const [loginButton, consoleButton] = document.querySelectorAll('[data-claude-action="login"]');
+    loginButton.hidden = !supported || pending || installing;
+    loginButton.textContent = signedIn ? 'Sign in again with Claude Code' : 'Sign in with Claude Code';
+    consoleButton.hidden = loginButton.hidden || signedIn;
+    const cancelButton = document.querySelector('[data-claude-action="cancel"]');
+    cancelButton.hidden = !pending && !['checking', 'downloading'].includes(install.state);
+    cancelButton.textContent = pending ? 'Cancel sign-in' : 'Cancel download';
+    document.querySelector('[data-claude-action="logout"]').hidden = !signedIn || installing;
+    $('claude-terms-btn').hidden = !checked || supported || setupUnavailable;
+    $('claude-install-help').hidden = !checked || supported || setupUnavailable;
+    $('claude-login-help').hidden = !supported || signedIn || installing;
+    $('claude-cancel-help').hidden = cancelButton.hidden;
+    $('claude-signout-help').hidden = !signedIn;
+    $('claude-model-card').hidden = !signedIn;
+  }
+
+  // Each call follows a button press on this page, or polls read-only status while a download or
+  // sign-in is unfinished.
+  async function updateClaudeConnection(action, account = null) {
+    const status = $(action === 'add_model' ? 'claude-model-status' : 'claude-connection-status');
+    const options = {};
+    if (action === 'login' && account) options.account_type = account;
+    if (action === 'add_model') {
+      const id = $('claude-model-id').value.trim();
+      if (!id) {
+        status.textContent = 'Enter a Claude Code alias such as sonnet, or an exact model ID.';
+        $('claude-model-id').focus();
+        return;
+      }
+      if (!/^[A-Za-z0-9][A-Za-z0-9._:@/\[\]-]*$/.test(id)) {
+        status.textContent = 'A model ID has no spaces. Use an alias such as sonnet or the exact ID from Anthropic.';
+        $('claude-model-id').focus();
+        return;
+      }
+      const context = $('claude-model-context').value.trim();
+      if (context && !positiveIntegerOrNull(context)) {
+        status.textContent = 'Enter a positive whole number or leave the field empty.';
+        $('claude-model-advanced').open = true;
+        $('claude-model-context').focus();
+        return;
+      }
+      options.model = { id, context_window: positiveIntegerOrNull(context), max_output_tokens: null };
+    }
+    if (claudeRequestBusy) return;
+    claudeRequestBusy = true;
+    clearTimeout(claudeStatusTimer);
+    const buttons = [...document.querySelectorAll('[data-claude-action], #claude-terms-btn')];
+    buttons.forEach((button) => { button.disabled = true; });
+    const quietPoll = action === 'status' && (claudeAccountStatus?.login_pending || claudeInstalling(claudeAccountStatus));
+    if (action === 'install') claudeInstallOutcome = true;
+    else if (!quietPoll && action !== 'cancel') claudeInstallOutcome = false;
+    if (!quietPoll) {
+      status.textContent = action === 'status' ? 'Checking Claude Code…' : action === 'login' ? 'Starting sign-in…'
+        : action === 'install' ? 'Starting setup…' : action === 'logout' ? 'Signing out…'
+          : action === 'cancel' ? 'Cancelling…' : 'Saving…';
+    }
+    let pollAgain = false;
+    try {
+      if (!state.bridge?.claude_connection) throw new Error('Claude Code connection isn’t available in this copy of Sylvia.');
+      const result = await state.bridge.claude_connection(action, Object.keys(options).length ? options : null);
+      claudeAccountStatus = result;
+      pollAgain = Boolean(result.login_pending) || claudeInstalling(result);
+      renderClaudeStatus(result);
+      if (result.saved_model) {
+        await refreshProviderSettings();
+        await refreshModelChoices();
+        const saved = state.modelChoices.find(choice => choice.model_id === result.saved_model);
+        showModelsOverview({ provider_id: saved?.provider_id, canonical_model_id: result.saved_model,
+          name: saved?.model_name || options.model?.id || 'Model' });
+        status.textContent = 'Model saved.';
+      } else if (action === 'add_model') {
+        status.textContent = result.message || 'The model wasn’t saved.';
+      } else if (action === 'cancel' && !result.login_pending && !result.signed_in && result.supported) {
+        status.textContent = 'Sign-in cancelled.';
+      }
+    } catch (error) {
+      pollAgain = false;
+      status.textContent = String(error && error.message || error || 'Claude Code connection unavailable.');
+    } finally {
+      buttons.forEach((button) => { button.disabled = false; });
+      claudeRequestBusy = false;
+      if (claudePageVisible && pollAgain) {
+        claudeStatusTimer = setTimeout(() => void updateClaudeConnection('status'), 1500);
+      }
+    }
+  }
+
+  async function openClaudeTerms() {
+    const status = $('claude-connection-detail');
+    status.hidden = false;
+    try {
+      const result = await state.bridge.open_provider_setup(CLAUDE_RUNTIME_PRESET);
+      status.textContent = result.opened ? 'Anthropic’s terms for Claude Code opened in your browser.'
+        : `Could not open your browser. Visit ${result.url}`;
+    } catch (error) {
+      status.textContent = 'Could not open your browser. Visit https://code.claude.com/docs/en/legal-and-compliance';
+    }
+  }
+
   async function refreshProviderSettings() {
     if (!state.bridge || !state.bridge.provider_settings) return;
     const status = $('models-action-status');
@@ -3200,7 +3627,7 @@ const SylviaGMFrontend = (() => {
     const provider = configured.find((item) => item.provider_id === providerId);
     if (!provider) return;
     beginModelConnection(provider.mode === 'local' ? 'local' : 'api', provider.provider_id, provider.models?.[0]?.id);
-    if (provider.preset_id === 'chatgpt_subscription') return;
+    if (provider.preset_id === 'chatgpt_subscription' || provider.preset_id === CLAUDE_RUNTIME_PRESET) return;
     showModelEditorStep('connection');
     $('provider-settings-status').textContent = provider.credential_error || (provider.header_count
       ? `${provider.header_count} private headers saved. Leave them blank to keep them.`
@@ -3814,11 +4241,98 @@ const SylviaGMFrontend = (() => {
     chatSelect.value = chatIndex >= 0 ? String(chatIndex) : '';
     select.disabled = false;
     modelRequiredCreationButtons.forEach((button) => { button.disabled = false; });
+    renderChatDefaultChoices(true);
     updateModelSwitchButtons();
     renderChatModelPicker();
     status.textContent = defaultIndex >= 0
-      ? `New chats use ${state.modelChoices[defaultIndex].model_name || configuredDefault.model_id}.`
+      ? `New chats use ${chatDefaultsSummary(state.modelChoices[defaultIndex])}.`
       : 'Choose a default for new Builder and Game Master chats.';
+  }
+
+  // What new chats start with, in the words the Settings card uses.
+  function chatDefaultsSummary(choice) {
+    const start = window.SylviaChatStart;
+    if (!start) return choice.model_name || choice.model_id;
+    return start.summary(choice, start.inherited(choice, state.providerSettings?.chat_defaults || {}), null);
+  }
+
+  // Default effort and speed follow the model picked above; options come only from that
+  // model's capabilities. `reset` shows the saved defaults again.
+  function renderChatDefaultChoices(reset = false) {
+    const start = window.SylviaChatStart;
+    const effortSelect = $('default-effort-choice');
+    const speedSelect = $('default-speed-choice');
+    if (!effortSelect || !speedSelect) return;
+    const choice = selectedModelChoice('default');
+    if (!choice || !start) {
+      effortSelect.innerHTML = '';
+      speedSelect.innerHTML = '';
+      effortSelect.disabled = true;
+      speedSelect.disabled = true;
+      speedSelect.title = '';
+      $('default-speed-note').textContent = '';
+      return;
+    }
+    const saved = state.providerSettings?.chat_defaults || {};
+    const efforts = start.effortOptions(choice, null);
+    const speeds = start.speedOptions(choice);
+    let effort = reset ? saved.reasoning_effort || start.MODE_DEFAULT : effortSelect.value || start.MODE_DEFAULT;
+    let speed = reset ? saved.speed || start.STANDARD : speedSelect.value || start.STANDARD;
+    if (!efforts.some(([value]) => value === effort)) {
+      // A saved default this model lacks stays visible with what new chats do instead.
+      if (reset) efforts.push([effort, `${start.effortLabel(effort)} (not on this model: new chats use Mode default)`]);
+      else effort = start.MODE_DEFAULT;
+    }
+    if (!speeds.some(([value]) => value === speed)) {
+      if (reset) speeds.push([speed, `${speed} (not on this model: new chats use Standard)`]);
+      else speed = start.STANDARD;
+    }
+    const optionHtml = ([value, label]) =>
+      `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`;
+    effortSelect.innerHTML = efforts.map(optionHtml).join('');
+    effortSelect.value = effort;
+    speedSelect.innerHTML = speeds.map(optionHtml).join('');
+    speedSelect.value = speed;
+    effortSelect.disabled = false;
+    speedSelect.disabled = speeds.length < 2;
+    // The explanation is always on the control; a chosen tier also shows it in the card,
+    // because that is the choice that changes what a reply costs.
+    const note = start.speedNote(choice, speed);
+    speedSelect.title = note;
+    $('default-speed-note').textContent = speed === start.STANDARD ? '' : note;
+  }
+
+  // Models saved before speed tiers were recorded gain them from one model-list read, the
+  // first time Models settings opens. This asks the signed-in ChatGPT runtime which tiers
+  // it offers; it never calls a model and is kept out of application startup.
+  async function refreshSavedSubscriptionCapabilities() {
+    if (state.subscriptionCapabilitiesChecked || !state.bridge?.chatgpt_connection) return;
+    const provider = state.providerSettings?.configured?.find(
+      (item) => item.provider_id === 'chatgpt_subscription');
+    if (!provider?.models?.some((model) =>
+      model.transport === 'codex_app_server' && model.service_tiers == null)) return;
+    state.subscriptionCapabilitiesChecked = true;
+    try {
+      const status = await state.bridge.chatgpt_connection('status');
+      if (!status.signed_in) return;
+      const listed = await state.bridge.chatgpt_connection('models');
+      if (listed.saved_models_refreshed) {
+        await refreshProviderSettings();
+        await refreshModelChoices();
+      }
+    } catch (_) { /* Speed stays unavailable until the ChatGPT account page is opened. */ }
+  }
+
+  // Offer a new chat's model, effort and speed before a first model call that would
+  // otherwise start by itself. Returns null only when the person cancels; nothing has
+  // been sent. With no configured model there is nothing to choose, so the start goes
+  // ahead unchanged and the usual missing-provider handling applies.
+  async function chooseChatStart(request) {
+    const model = request.model || defaultModelChoice() || state.modelChoices[0] || null;
+    if (!model) return {};
+    // Without the chooser the chat still starts from the saved Settings defaults.
+    if (!chatStart) return { provider_id: model.provider_id, model_id: model.model_id };
+    return chatStart.choose({ ...request, model });
   }
 
   function chatModelModeLabel() {
@@ -3899,8 +4413,11 @@ const SylviaGMFrontend = (() => {
     const hasIdleSession = Boolean(state.activeSessionId) && !selectedSessionIsWorking() &&
       !state.reasoningPending;
     const savedDefault = state.providerSettings?.default_model;
+    const savedStart = state.providerSettings?.chat_defaults || {};
     $('set-default-model-btn').disabled = !chosenDefault ||
-      (chosenDefault.provider_id === savedDefault?.provider_id && chosenDefault.model_id === savedDefault?.model_id);
+      (chosenDefault.provider_id === savedDefault?.provider_id && chosenDefault.model_id === savedDefault?.model_id &&
+        ($('default-effort-choice')?.value || 'mode_default') === (savedStart.reasoning_effort || 'mode_default') &&
+        ($('default-speed-choice')?.value || 'standard') === (savedStart.speed || 'standard'));
     $('chat-model-choice').disabled = !state.modelChoices.length || !hasIdleSession;
     $('chat-model-picker-btn').disabled = !state.modelChoices.length || !hasIdleSession;
     if ($('chat-model-picker-btn').disabled) closeChatModelPicker();
@@ -3936,6 +4453,7 @@ const SylviaGMFrontend = (() => {
     $('chat-reasoning-current').disabled = disabled;
     $('chat-reasoning-once').disabled = disabled;
     if (disabled) closeReasoningPicker();
+    const speedName = renderSpeedPicker(reasoning ? saved : null, disabled);
     if (!reasoning) {
       $('chat-reasoning-btn').textContent = 'Reasoning unavailable';
       $('chat-reasoning-btn').title = 'Reasoning unavailable';
@@ -3967,15 +4485,72 @@ const SylviaGMFrontend = (() => {
     const scope = reasoning.scope === 'once' ? 'next reply' : reasoning.scope === 'session' ? 'this chat' : 'mode default';
     const actual = reasoningLabel(reasoning.effective_request);
     $('chat-reasoning-btn').textContent = reasoning.valid
-      ? `${actual}${reasoning.scope === 'once' ? ' · next reply' : ''}` : 'Choose a supported level';
+      ? `${actual}${reasoning.scope === 'once' ? ' · next reply' : ''}${speedName ? ` · ${speedName}` : ''}`
+      : 'Choose a supported level';
     const nextModel = saved.modelState?.once ? ` Next reply model: ${reasoning.model_id}.` : '';
     $('chat-reasoning-hint').textContent = reasoning.valid
       ? `Next reply requests ${actual} (${scope}).${nextModel} ` +
         (reasoning.supported === null ? 'Supported levels are unknown; the provider manages reasoning.' :
           'Next-reply choices clear after an attempted reply, including a stopped or failed reply.')
       : 'The saved level is unavailable for this model. Choose an available level or Mode default.';
-    $('chat-reasoning-btn').title = $('chat-reasoning-hint').textContent;
-    $('chat-reasoning-btn').setAttribute('aria-label', `Reasoning: ${$('chat-reasoning-hint').textContent}`);
+    $('chat-reasoning-btn').title = $('chat-reasoning-hint').textContent +
+      (speedName ? ` Speed: ${speedName}.` : '');
+    $('chat-reasoning-btn').setAttribute('aria-label',
+      `Reasoning: ${$('chat-reasoning-hint').textContent}${speedName ? ` Speed: ${speedName}.` : ''}`);
+  }
+
+  // This chat's speed sits with its effort. Tiers come from the answering model's
+  // capabilities; returns the requested tier's name, or '' for standard speed.
+  function renderSpeedPicker(saved, disabled) {
+    const select = $('chat-speed-current');
+    const hint = $('chat-speed-hint');
+    if (!select || !hint) return '';
+    const start = window.SylviaChatStart;
+    const speed = saved?.speed || null;
+    const choice = { speed_options: Array.isArray(speed?.supported) ? speed.supported : [] };
+    const options = start ? start.speedOptions(choice) : [['standard', 'Standard']];
+    const current = speed?.current || 'standard';
+    if (!options.some(([value]) => value === current)) {
+      options.push([current, `${current} (not offered by this reply's model)`]);
+    }
+    select.innerHTML = options.map(([value, label]) =>
+      `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
+    select.value = current;
+    select.disabled = disabled || !speed || options.length < 2;
+    if (!speed || !start) {
+      hint.textContent = '';
+      return '';
+    }
+    hint.textContent = speed.current && !speed.effective_request
+      ? 'The next reply\'s model does not offer this chat\'s speed, so that reply uses standard speed.'
+      : start.speedNote(choice, speed.effective_request || 'standard');
+    return speed.effective_request ? start.speedLabel(choice, speed.effective_request) : '';
+  }
+
+  async function switchSessionSpeed(speed) {
+    const sessionId = state.activeSessionId;
+    const saved = state.sessionReasoning;
+    if (!sessionId || saved?.sessionId !== sessionId || selectedSessionIsWorking() ||
+        state.reasoningPending || !state.bridge?.switch_session_speed) return;
+    state.reasoningPending = sessionId;
+    updateModelSwitchButtons();
+    let failed = false;
+    try {
+      const result = await state.bridge.switch_session_speed({ session_id: sessionId, speed });
+      if (state.sessionReasoning?.sessionId === sessionId && state.activeSessionId === sessionId)
+        state.sessionReasoning.speed = result.speed_state;
+    } catch (_) {
+      failed = true;
+    } finally {
+      state.reasoningPending = null;
+      updateModelSwitchButtons();
+    }
+    if (state.sessionReasoning !== saved || state.activeSessionId !== sessionId) return;
+    if (failed) {
+      $('chat-speed-hint').textContent = 'Speed could not be changed. Wait for the reply to finish, then choose an available speed.';
+    }
+    $('chat-reasoning-popover').hidden = false;
+    $('chat-reasoning-btn').setAttribute('aria-expanded', 'true');
   }
 
   async function switchSessionReasoning(mode, effort) {
@@ -4006,16 +4581,27 @@ const SylviaGMFrontend = (() => {
 
   async function setSelectedDefaultModel() {
     const selected = selectedModelChoice('default');
-    if (!selected || !state.bridge || !state.bridge.set_default_model) return;
+    if (!selected || !state.bridge ||
+        !(state.bridge.set_chat_defaults || state.bridge.set_default_model)) return;
     const status = $('model-status');
     try {
-      await state.bridge.set_default_model(selected.provider_id, selected.model_id);
+      if (state.bridge.set_chat_defaults) {
+        await state.bridge.set_chat_defaults({
+          provider_id: selected.provider_id,
+          model_id: selected.model_id,
+          reasoning_effort: $('default-effort-choice').value || 'mode_default',
+          speed: $('default-speed-choice').value || 'standard',
+        });
+      } else {
+        await state.bridge.set_default_model(selected.provider_id, selected.model_id);
+      }
       await refreshProviderSettings();
       await refreshModelChoices();
-      status.textContent = 'New Builder and Game Master chats will use this model.';
+      status.textContent = `New Builder and Game Master chats will use ${chatDefaultsSummary(selected)}. ` +
+        'Chats you already have keep their own settings.';
       $('set-added-model-default-btn').hidden = true;
     } catch (e) {
-      status.textContent = 'The default model could not be changed.';
+      status.textContent = friendlyCommandError('The defaults for new chats could not be changed', e);
     }
   }
 
@@ -4048,9 +4634,10 @@ const SylviaGMFrontend = (() => {
         await renderPlayerProjection(activity.campaignId, sessionId);
       }
       if (!selectedActivityMatches(activity)) return result;
-      status.textContent = mode === 'once'
+      status.textContent = (mode === 'once'
         ? `Next model turn will use ${selected.model_name || selected.model_id}.`
-        : `This chat now uses ${selected.model_name || selected.model_id}.`;
+        : `This chat now uses ${selected.model_name || selected.model_id}.`) +
+        (result?.speed_cleared ? ' Speed is back to Standard: this model does not offer the previous speed.' : '');
       closeChatModelPicker();
       renderChatModelPicker();
       return result;
@@ -4165,7 +4752,11 @@ const SylviaGMFrontend = (() => {
           openSettings('models');
           // Retain an already-open editor and anything the player has entered.
           if ($('provider-editor').hidden || state.modelEditor.route !== route) beginModelConnection(route);
-        } else openSettings(route);
+        } else {
+          // Account guides target the ChatGPT flow, so the switch shows it.
+          if (route === 'accounts') accountView = 'chatgpt';
+          openSettings(route);
+        }
       },
     });
   }
@@ -4196,6 +4787,9 @@ const SylviaGMFrontend = (() => {
     state.campaignOpening = null;
     state.sessionReasoning = null;
     updateModelSwitchButtons();
+    // Settings' campaign actions follow the open campaign, and Home has none.
+    $('export-campaign-btn').disabled = true;
+    updateLifecycleControls(null, null);
     $('campaign-loading-status').hidden = true;
     $('session-frame').classList.add('home-active');
     $('home-view').hidden = false;
@@ -5703,6 +6297,7 @@ const SylviaGMFrontend = (() => {
       ...participants.filter((participant) => (participant.data?.party_role || participant.kind) !== 'player_character'),
     ];
     const acting = mapActingActorId();
+    const partyStyle = panelWidget('party').style;
     const cards = ordered.map((participant) => {
       const details = participant.data || {};
       const detailSurface = state.panelProjection?.surfaces.find((item) => item.renderer === 'unit_list' &&
@@ -5752,7 +6347,17 @@ const SylviaGMFrontend = (() => {
       // Suite card: the whole card face is the inspect control; vitals, AP and weapon read at a glance.
       const shortClass = [details.class_id || details.class || entity.class_id ? panelIdentifierLabel(details.class_id || details.class || entity.class_id) : '',
         Number.isFinite(details.level ?? entity.level) ? `L${details.level ?? entity.level}` : ''].filter(Boolean).join(' · ');
-      const cardFace = `${actorTokenMarkup(participant.id, details.name)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
+      // Adventurer card (fantasy PanelWidget style): an HP medal, the class by name and level, and AC and HP as numbers.
+      const adventurer = partyStyle === 'adventurer-cards';
+      const adventurerClass = Array.isArray(details.classes) && details.classes.length ? details.classes.map((item) =>
+        `${panelIdentifierLabel(item.id || '').replace(/\b\w/g, (letter) => letter.toUpperCase())}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : shortClass;
+      const adventurerVitals = [Number.isFinite(entity.armor_class) ? `AC <b>${escapeHtml(entity.armor_class)}</b>` : '',
+        Number.isFinite(entity.hp) ? `HP <b>${escapeHtml(entity.hp)}</b>${Number.isFinite(entity.max_hp) ? `/${escapeHtml(entity.max_hp)}` : ''}` : ''].filter(Boolean);
+      const cardFace = adventurer
+        ? `${suiteMedal(participant.id, details.name, entity, 40)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
+          (adventurerClass ? `<small>${escapeHtml(adventurerClass)}</small>` : '') + '</span>' +
+          (adventurerVitals.length ? `<span class="sq-bars sq-vitals">${adventurerVitals.map((item) => `<span class="sq-num">${item}</span>`).join('')}</span>` : '') + '</span>'
+        : `${actorTokenMarkup(participant.id, details.name)}<span class="sq-main"><span class="sq-name"><strong>${escapeHtml(details.name || participant.id)}</strong>` +
         (shortClass ? `<small>${escapeHtml(shortClass)}</small>` : '') + '</span>' +
         `<span class="sq-bars">${suiteBar(entity.hp, entity.max_hp, 'hp', 'HP') || (Number.isFinite(entity.hp) ? `<span class="sq-num">HP <b>${escapeHtml(entity.hp)}</b></span>` : '')}` +
         `${suitePips(entity.ap, entity.max_ap)}${Number.isFinite(entity.ap) && !suitePips(entity.ap, entity.max_ap) ? `<span class="sq-num">AP <b>${escapeHtml(entity.ap)}</b></span>` : ''}</span>` +
@@ -5886,6 +6491,9 @@ const SylviaGMFrontend = (() => {
       return entries.length ? `<details class="character-stat-group" data-character-stat="${escapeHtml(JSON.stringify([actorId, field]))}"><summary>${escapeHtml(panelIdentifierLabel(field))}</summary>` +
         entries.map(([name, value]) => `<span>${escapeHtml(panelIdentifierLabel(name))} <b>${value}</b></span>`).join('') + '</details>' : '';
     }).join('');
+    // The fantasy character sheet draws every character without a carried firearm, caster or not.
+    if (!compact && panelWidget('unit_list').style === 'character-sheet' && !(entity.weapon && typeof entity.weapon === 'object'))
+      return grimoireMarkup(surface, actorId, { participant, entity, name, details, values });
     if (!compact) return operatorMarkup(surface, actorId, { participant, entity, name, details, level, values });
     return `<div class="${compact ? 'character-expanded-details' : 'character-hero'}" data-character-details="${escapeHtml(actorId)}"${compact ? '' : ` ${participant ? 'data-panel-entity' : 'data-character-entity'}="${escapeHtml(actorId)}"`}>` +
       (imageArt()?.button?.(actorId,name) || '') +
@@ -5924,9 +6532,17 @@ const SylviaGMFrontend = (() => {
     return other ? other.data.spell_categories : {};
   }
 
+  // Roman numerals for the fantasy sheet's numbered resource tiers (1 to 39); other numbers stay as they are.
+  function romanNumeral(number) {
+    if (!Number.isInteger(number) || number < 1 || number > 39) return String(number);
+    return 'X'.repeat(Math.floor(number / 10)) + ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][number % 10];
+  }
+
   function grimoireMarkup(surface, actorId, { participant, entity, name, details, values }) {
     const { map, casts } = mapCastActions();
     const categories = projectedSpellCategories(surface);
+    const sheet = panelWidget('unit_list');
+    const fantasy = sheet.style === 'character-sheet';
     const word = (value) => String(panelIdentifierLabel(value || '')).replace(/\b\w/g, (letter) => letter.toUpperCase());
     const initials = (key) => word(key).split(/\s+/).map((part) => part.charAt(0)).join('');
     const classes = Array.isArray(details.classes) ? details.classes.map((item) => `${word(item.id)}${Number.isFinite(item.level) ? ` ${item.level}` : ''}`).join(' / ') : '';
@@ -5962,7 +6578,9 @@ const SylviaGMFrontend = (() => {
       const available = panelActionAvailable(map, action, actorId);
       const label = action.label || panelIdentifierLabel(action.id);
       const category = typeof categories[action.params?.spell] === 'string' ? categories[action.params.spell].trim() : '';
-      const subline = [category ? word(category) : '', resource ? word(resource) : ''].filter(Boolean).join(' · ');
+      // The fantasy sheet reads level first, as the reel does: "Cantrip · Evocation".
+      const subline = (fantasy ? [resource ? word(resource) : '', category ? word(category) : '']
+        : [category ? word(category) : '', resource ? word(resource) : '']).filter(Boolean).join(' · ');
       return `<button type="button" class="grim-spell${available ? '' : ' is-off'}" data-grimoire-cast="${escapeHtml(action.id)}" data-grimoire-map="${escapeHtml(map.id)}" ` +
         (category ? `data-spell-category="${escapeHtml(category)}" ` : '') +
         `aria-label="Ready ${escapeHtml(label)}: choose a target on ${escapeHtml(map.title || 'the map')}" ${available ? '' : 'aria-disabled="true"'}>${suiteIcon(suiteActionIcon(action) || 'burstarea')}` +
@@ -5970,7 +6588,11 @@ const SylviaGMFrontend = (() => {
         `<span class="grim-spell-cost">${resourceCost(resource)}</span></button>`;
     };
     // Projected scores as projected, in projected order; membership in a projected proficiency list is highlighted.
-    const abilities = details.abilities && typeof details.abilities === 'object' ? Object.entries(details.abilities).filter(([, score]) => Number.isFinite(score)) : [];
+    // A declared ability order (a field of the character-sheet style) places those first; the rest follow as projected.
+    const abilityOrder = Array.isArray(sheet.fields.abilities) ? sheet.fields.abilities : [];
+    const abilityRank = (key) => (abilityOrder.includes(key) ? abilityOrder.indexOf(key) : abilityOrder.length);
+    const abilities = details.abilities && typeof details.abilities === 'object' ? Object.entries(details.abilities).filter(([, score]) => Number.isFinite(score))
+      .sort(([a], [b]) => abilityRank(a) - abilityRank(b)) : [];
     const savesKey = 'saving_throw_proficiencies';
     const saves = Array.isArray(details[savesKey]) ? details[savesKey] : [];
     const otherResources = Object.entries(entity.resources || {}).filter(([key]) => !familyKeys.has(key));
@@ -5979,9 +6601,9 @@ const SylviaGMFrontend = (() => {
       `<header class="grim-head"><div class="grim-plinth" role="img" aria-label="${escapeHtml(name)}">${imageArt()?.portrait(actorId,name) || `<b>${escapeHtml(actorInitials(name))}</b><small>no portrait · initials</small>`}</div>` +
       `<div class="grim-id"><small class="op-kicker">Inspecting</small><h3><strong>${escapeHtml(name)}</strong></h3><p>${escapeHtml([lineage, classes].filter(Boolean).join(' · '))}</p>` +
       `<div class="grim-vitals">${flask}${shield}${speed}</div></div></header>` + conditionPanelMarkup(entity) +
-      `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` +
+      (casts.length ? `<section class="grim-book"><span class="grim-sec">Prepared · choose, then target on the ${escapeHtml(map.title || 'map')}</span>${casts.map(spellCard).join('')}</section>` : '') +
       Array.from(families, ([prefix, items]) => `<section class="grim-slots" aria-label="${escapeHtml(word(prefix))}"><span class="grim-sec">${escapeHtml(word(prefix))}</span>` +
-        `<div class="grim-ribbon">${items.map(([number, value, key]) => `<span class="grim-tier" title="${escapeHtml(word(key))}: ${escapeHtml(value)}"><small>${escapeHtml(number)}</small>` +
+        `<div class="grim-ribbon">${items.map(([number, value, key]) => `<span class="grim-tier" title="${escapeHtml(word(key))}: ${escapeHtml(value)}"><small>${escapeHtml(fantasy ? romanNumeral(number) : number)}</small>` +
         `${'<i class="on"></i>'.repeat(Math.min(value, 6))}${value === 0 ? '<em>0</em>' : ''}</span>`).join('')}</div></section>`).join('') +
       (abilities.length ? `<div class="grim-runes" role="list" aria-label="${escapeHtml(word('abilities'))}">${abilities.map(([key, score]) =>
         `<span role="listitem" class="grim-rune${saves.includes(key) ? ' save' : ''}" title="${escapeHtml(word(key))} ${escapeHtml(score)}${saves.includes(key) ? ` · ${escapeHtml(word(savesKey))}` : ''}">` +
@@ -6239,6 +6861,14 @@ const SylviaGMFrontend = (() => {
     return selection;
   }
 
+  // An inventory chip made from an item id reads as a name: multi-word ids are already title-cased by
+  // panelIdentifierLabel, and a single-word id ("greatsword") gets its capital too. Proper names, such as
+  // "Dungeoneer's Pack", need the Ruleset package to declare them (issue 128).
+  function inventoryItemLabel(id) {
+    const label = panelIdentifierLabel(id);
+    return /^[a-z][a-z0-9]*$/.test(label) ? label[0].toUpperCase() + label.slice(1) : label;
+  }
+
   function renderInventoryPanel(data, surface) {
     const participants = data && Array.isArray(data.participants) ? data.participants : [];
     const entities = data && data.entities && typeof data.entities === 'object' ? data.entities : {};
@@ -6278,7 +6908,7 @@ const SylviaGMFrontend = (() => {
         (state.panelProjection?.surfaces.filter((item) => item.renderer === 'unit_list' && item.data?.entities?.[participant.id])
           .map((owner) => characterActionMarkup(owner, participant.id, true)).join('') || '') +
         `<div class="panel-inventory-list">${inventory.map((item) => {
-          const label = typeof item === 'string' ? panelIdentifierLabel(item) : item?.name || panelIdentifierLabel(item?.item_id || item?.id || 'Item');
+          const label = typeof item === 'string' ? inventoryItemLabel(item) : item?.name || inventoryItemLabel(item?.item_id || item?.id || 'Item');
           const count = typeof item === 'object' && Number.isFinite(item?.quantity) ? ` × ${item.quantity}` : '';
           return `<span class="panel-inventory-item">${escapeHtml(label)}${count}</span>`;
         }).join('')}</div></div>`;
@@ -7748,6 +8378,24 @@ const SylviaGMFrontend = (() => {
     return selected;
   }
 
+  // The active Ruleset's PanelSystem look (architecture contract §10.5.1): neutral when none is declared, and
+  // neutral styles when the looks table is not loaded (the neutral styles share the tactical markup).
+  const NEUTRAL_WIDGETS = { party: 'roster', unit_list: 'sheet', encounter: 'turn-list', coordinate_map: 'plain', tactical_grid: 'plain' };
+  let resolvedPanelLook = null;
+  function panelLook() {
+    const rulesetId = state.panelProjection?.ruleset_id || null;
+    if (!globalThis.SylviaPanelLooks) return null;
+    if (!resolvedPanelLook || resolvedPanelLook.key !== rulesetId)
+      resolvedPanelLook = { key: rulesetId, look: globalThis.SylviaPanelLooks.resolve(rulesetId) };
+    return resolvedPanelLook.look;
+  }
+
+  // The PanelWidget style (and its declared fields) a renderer draws with under the active look.
+  function panelWidget(renderer) {
+    const look = panelLook();
+    return look ? globalThis.SylviaPanelLooks.widget(look, renderer) : { style: NEUTRAL_WIDGETS[renderer] || 'plain', fields: {} };
+  }
+
   function panelContent(surface) {
     if (surface.renderer === 'piece_table') {
       return window.SylviaPieceTable.render(surface.data, surface.actions);
@@ -7841,7 +8489,7 @@ const SylviaGMFrontend = (() => {
       `<button type="button" class="btn btn-primary ruleset-panel-action" data-panel-action-id="${escapeHtml(selectedAction.id)}" ` +
       `${panelActionAvailable(surface, selectedAction) ? '' : 'disabled'}>${sequenceModeActive() ? 'Queue' : 'Commit'} ${escapeHtml(mapActionLabel(surface, selectedAction))}</button></div>` : '';
     return `<section class="ruleset-panel ${surface.id === ACTION_QUEUE_PANEL_ID ? 'ruleset-queue-panel' : ''} ${['tactical_grid', 'coordinate_map'].includes(surface.renderer) ? 'ruleset-map-panel' : surface.renderer === 'party' ? 'ruleset-roster-panel' : surface.renderer === 'unit_list' ? 'ruleset-character-panel' : ''}" data-panel-id="${escapeHtml(surface.id)}" ` +
-      `style="min-height:${minimum}px"><div>${header}` +
+      `data-panel-widget="${escapeHtml(panelWidget(surface.renderer).style)}" style="min-height:${minimum}px"><div>${header}` +
       `<div class="ruleset-panel-content" data-panel-size-id="${escapeHtml(surface.id)}" ` +
       `style="height:${preferred}px;min-height:${minimum}px">${mapSurface ? content.replace('<!--map-turn-end-->', contextual || endTurns.length
         ? `<span class="map-turn-end">${contextual}${endTurns.map((action) => `<button class="btn btn-secondary ruleset-panel-action map-end-turn" type="button" ` +
@@ -7849,6 +8497,29 @@ const SylviaGMFrontend = (() => {
       (mapSurface ? `<div class="map-command-deck"><div class="map-command-row">${mapActionPalette(surface)}${actions}${content.includes('<!--map-turn-end-->') ? '' : contextual}</div>${commit}</div>` :
         actions ? `<div class="ruleset-panel-actions contextual-action-bar" aria-label="Available actions">${actions}</div>` : '') +
       `</div></section>`;
+  }
+
+  // Scroll positions a panel redraw would lose: every scrolled element around the panels (the panel column) and each
+  // panel's content, by panel id.
+  function capturePanelScroll(container) {
+    const around = [];
+    for (let node = container.parentElement; node; node = node.parentElement) {
+      if (node.scrollTop || node.scrollLeft) around.push({ node, top: node.scrollTop, left: node.scrollLeft });
+    }
+    const panels = new Map(Array.from(container.querySelectorAll('[data-panel-id] .ruleset-panel-content'), (content) =>
+      [content.closest('[data-panel-id]').dataset.panelId, { top: content.scrollTop, left: content.scrollLeft }])
+      .filter(([, place]) => place.top || place.left));
+    return { around, panels };
+  }
+
+  function restorePanelScroll(container, saved) {
+    for (const [panelId, place] of saved.panels) {
+      const content = container.querySelector(`[data-panel-id="${CSS.escape(panelId)}"] .ruleset-panel-content`);
+      if (content) Object.assign(content, { scrollTop: place.top, scrollLeft: place.left });
+    }
+    for (const { node, top, left } of saved.around) {
+      if (node.isConnected) Object.assign(node, { scrollTop: top, scrollLeft: left });
+    }
   }
 
   function renderRulesetPanelProjection(projection) {
@@ -7877,10 +8548,14 @@ const SylviaGMFrontend = (() => {
       surfaceId: details.closest('[data-panel-id]')?.dataset.panelId, stat: details.dataset.characterStat,
       open: details.open, focused: document.activeElement === details.querySelector('summary'),
     })) : [];
+    // A redraw replaces every panel. Within the same campaign and session, keep where the player had scrolled: the
+    // column the panels sit in and each panel's own content (a hand choice once threw both back to the top).
+    const savedScroll = sameCharacterScope ? capturePanelScroll(container) : null;
     const nativeProjection = nativePanelProjection(projection);
     if (state.panelProjectionSource !== nativeProjection) state.panelActionChecks.clear();
     state.panelProjectionSource = nativeProjection;
     state.panelProjection = projection;
+    if (globalThis.SylviaPanelLooks) globalThis.SylviaPanelLooks.apply(document.documentElement, panelLook());
     state.queuePreviousCards = new Set(Array.from(container.querySelectorAll('[data-sequence-step]'), node => node.dataset.sequenceStep));
     const markup = gamePanels().markup(projection);
     applySidebarWidth();
@@ -8113,6 +8788,7 @@ const SylviaGMFrontend = (() => {
           height });
       });
     });
+    if (savedScroll) restorePanelScroll(container, savedScroll);
     playCommittedRigMotion(projection, container);
     // Let replacement maps paint before the shared audio and visual timeline starts.
     if (!gamePanels().presentEffects(projection, animateShots)) animateShots();
@@ -8772,7 +9448,8 @@ const SylviaGMFrontend = (() => {
   function renderSessionModelState(context) {
     const modelState = context && context.model_state;
     state.sessionReasoning = { sessionId: state.activeSessionId,
-      value: context?.reasoning_state || null, modelState };
+      value: context?.reasoning_state || null, modelState,
+      speed: context?.speed_state || null };
     renderReasoningPicker();
     const current = modelState && modelState.current;
     if (!current) return;
@@ -10248,6 +10925,10 @@ const SylviaGMFrontend = (() => {
           if (content.status === 'completed') return '';
           const explanation = content.status === 'interrupted' && content.reason_code === 'tool_limit'
             ? 'Builder reached its work limit after automatic continuation. Saved work is retained. Send a message to continue.'
+            : content.status === 'interrupted' && content.reason_code === 'repeated_step'
+            ? 'Builder stopped because it kept repeating the same step without making progress. Saved work is retained. Send a message to redirect it.'
+            : content.status === 'interrupted' && content.reason_code === 'output_limit'
+            ? 'Builder stopped because the model kept reaching its response limit. Saved work is retained. Ask for smaller steps or raise the Builder output token limit in Settings, then send a message to continue.'
             : content.status === 'interrupted' && content.reason_code === 'repeated_tool_failure'
             ? 'Builder stopped after repeated identical tool failures. Saved work is retained. Review the last tool error before continuing.'
             : content.status === 'interrupted' && content.reason_code === 'required_reference_unavailable'
@@ -11853,8 +12534,21 @@ const SylviaGMFrontend = (() => {
     if (state.builderLaunchPending.has(parentSessionId)) return;
     state.builderLaunchPending.add(parentSessionId);
     updateCharacterProfileControls();
-    setInlineStatus('Opening Builder chat…', 'construction');
     try {
+      // These purposes open an independent Builder chat whose first call starts by
+      // itself, so its settings are chosen first. Other Builder chats wait for a message.
+      let start = null;
+      if (['ruleset', 'setting', 'plan', 'player_character', 'companion'].includes(purpose)) {
+        start = await chooseChatStart({
+          role: 'builder', title: 'Start Builder chat', action: 'Start Builder',
+          model: selectedModelChoice() || defaultModelChoice(),
+        });
+        if (!start) {
+          setInlineStatus('Builder chat not started. Nothing was sent to the model.', 'construction');
+          return;
+        }
+      }
+      setInlineStatus('Opening Builder chat…', 'construction');
       const result = await state.bridge.start_guided_creation_subflow({
         operation_id: `guided-subflow-${crypto.randomUUID()}`,
         campaign_id: state.constructionDraftId,
@@ -11863,6 +12557,8 @@ const SylviaGMFrontend = (() => {
         purpose,
         visible_answer: visibleAnswer,
         trigger_message_id: triggerMessageId,
+        ...(start?.provider_id ? { provider_id: start.provider_id, model_id: start.model_id,
+          reasoning_effort: start.reasoning_effort, speed: start.speed } : {}),
         ...(profile ? { character_profile_id: profile.id,
           character_profile_sha256: profile.content_sha256 } : {}),
         ...(character ? { character_artifact_id: character.id,
@@ -12429,9 +13125,9 @@ const SylviaGMFrontend = (() => {
     if (!selected) {
       // Explain where the user is sent; the open campaign's chat status is not about Builder.
       $('models-action-status').textContent = 'Configure a provider before starting Builder';
+      // Narrow Settings scrolls as one column; opening Models keeps this reason on screen
+      // without moving focus from Close.
       openSettings('models');
-      // Narrow Settings scrolls as one column; keep the reason on screen without moving focus from Close.
-      $('models-action-status').scrollIntoView?.({ block: 'nearest' });
       return;
     }
     const nonce = Date.now();
@@ -12560,6 +13256,16 @@ const SylviaGMFrontend = (() => {
       return;
     }
     if (state.campaignConfirmationPending) return;
+    // The Game Master's opening follows this confirmation, so its settings are chosen
+    // first. Cancelling here leaves the Interview exactly as it was.
+    const gameMasterStart = await chooseChatStart({
+      role: 'dm', title: 'Start Game Master', action: 'Begin adventure', model: selected,
+    });
+    if (!gameMasterStart) {
+      setInlineStatus('Not started. Nothing was sent to the model.', 'construction');
+      return;
+    }
+    if (state.campaignConfirmationPending) return;
     state.campaignConfirmationPending = true;
     const confirmationControls = [
       $('begin-construction-btn'),
@@ -12616,8 +13322,8 @@ const SylviaGMFrontend = (() => {
           archetype_id: playerCharacterId,
           companion_ids: companionIds,
           customization_notes: lane === 'customize' ? premise : '',
-          provider_id: selected.provider_id,
-          model_id: selected.model_id,
+          provider_id: gameMasterStart.provider_id,
+          model_id: gameMasterStart.model_id,
           construction_intent: constructionIntent,
         });
       } else {
@@ -12640,7 +13346,7 @@ const SylviaGMFrontend = (() => {
       await refreshCampaignIndex();
       await openCampaign(begun.campaign_id, begun.builder_session_id || null);
       setInlineStatus('Guided campaign construction started · Builder active', 'construction');
-      await finalizeSelectedConstruction();
+      await finalizeSelectedConstruction(false, gameMasterStart);
     } catch (e) {
       setInlineStatus(friendlyCommandError(
         'Construction could not start',
@@ -12655,7 +13361,8 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  async function finalizeSelectedConstruction(modelGuidanceOverride = false) {
+  // `chosenStart` is the Game Master start already chosen for this handoff, if any.
+  async function finalizeSelectedConstruction(modelGuidanceOverride = false, chosenStart = null) {
     if (!state.activeCampaignId || !state.bridge ||
         !state.bridge.finalize_campaign_construction) return;
     const openingCampaignId = state.activeCampaignId;
@@ -12663,7 +13370,7 @@ const SylviaGMFrontend = (() => {
     let openingActivity = null;
     const stillInInterview = () => state.activeCampaignId === openingCampaignId &&
       state.activeSessionId === interviewSessionId;
-    const selected = selectedModelChoice();
+    let selected = selectedModelChoice();
     if (!selected) {
       setInlineStatus('No configured DM model', 'construction');
       return;
@@ -12678,6 +13385,26 @@ const SylviaGMFrontend = (() => {
     const handoffControlStates = handoffControls.map((control) => control.disabled);
     handoffControls.forEach((control) => { control.disabled = true; });
     try {
+    // Settle the Game Master's model, effort and speed before anything is committed.
+    // "Continue anyway" after a capability warning reuses the start chosen before it.
+    let start = chosenStart;
+    if (!start && modelGuidanceOverride && state.pendingChatStart?.campaign_id === openingCampaignId) {
+      start = state.pendingChatStart.start;
+    }
+    if (!start && !modelGuidanceOverride) {
+      start = await chooseChatStart({
+        role: 'dm', title: 'Start Game Master', action: 'Begin adventure', model: selected,
+      });
+      if (!start) {
+        if (stillInInterview()) setInlineStatus('Not started. Nothing was sent to the model.', 'construction');
+        return;
+      }
+    }
+    if (start?.provider_id) {
+      selected = state.modelChoices.find((choice) => choice.provider_id === start.provider_id &&
+        choice.model_id === start.model_id) || { provider_id: start.provider_id, model_id: start.model_id };
+    }
+    state.pendingChatStart = null;
     if (modelGuidanceOverride) {
       const pending = state.pendingModelGuidance;
       if (!pending || pending.campaign_id !== state.activeCampaignId ||
@@ -12697,6 +13424,7 @@ const SylviaGMFrontend = (() => {
         );
         if (!stillInInterview()) return;
         if (guidance.warning_required) {
+          state.pendingChatStart = start ? { campaign_id: openingCampaignId, start } : null;
           showModelGuidanceWarning(guidance, selected);
           setInlineStatus('Review the model capability warning', 'construction');
           return;
@@ -12713,7 +13441,8 @@ const SylviaGMFrontend = (() => {
         openingCampaignId,
         selected.provider_id,
         selected.model_id,
-        modelGuidanceOverride
+        modelGuidanceOverride,
+        start
       );
       handoffCommitted = true;
       // The Ready panel is rendered inside chronology. Restore it before polling can

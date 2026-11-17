@@ -549,6 +549,7 @@ class ResponsesTransport(ChatCompletionsTransport):
             chat_completion_metadata={"responses_output": retained} if retained else None,
             content=text or None,
             provider_reported_reasoning_effort=_responses_reasoning_effort(raw_response),
+            provider_reported_service_tier=_responses_service_tier(raw_response),
             tool_calls=tool_calls,
             usage=TokenUsage(
                 prompt_tokens=prompt_tokens,
@@ -610,6 +611,7 @@ class ResponsesTransport(ChatCompletionsTransport):
                 finish_reason=finish,
                 chat_completion_metadata={"responses_output": retained} if retained else None,
                 provider_reported_reasoning_effort=_responses_reasoning_effort(response),
+                provider_reported_service_tier=_responses_service_tier(response),
             )
         return None
 
@@ -630,6 +632,19 @@ def _responses_reasoning_effort(response: Any) -> str | None:
     except ValueError:
         return None
     return supported[0] if supported else None
+
+
+def _responses_service_tier(response: Any) -> str | None:
+    """Read the tier Responses says it used; it can differ from the tier we requested.
+
+    Fast mode reports `priority` on GPT-5.6 and earlier, and `default` when OpenAI
+    downgraded the request. https://developers.openai.com/api/docs/guides/fast-mode
+    (checked 2026-11-12).
+    """
+    value = getattr(response, "service_tier", None)
+    if isinstance(value, str) and 0 < len(value) <= 32 and value.isascii():
+        return value
+    return None
 
 
 # ── DIAGNOSTIC_HEADERS — subset of interesting response headers ──────
@@ -1115,6 +1130,7 @@ class OpenAICompatProvider(Provider):
         stream_usage: TokenUsage | None = None
         stream_cache_usage = CacheUsage()
         reported_effort: str | None = None
+        reported_tier: str | None = None
         inline_reasoning_filter = _InlineReasoningFilter()
         chat_metadata = ChatCompletionMetadata(
             preserve_reasoning=self._transport.preserve_reasoning,
@@ -1162,6 +1178,8 @@ class OpenAICompatProvider(Provider):
                         )
                     if parsed.provider_reported_reasoning_effort is not None:
                         reported_effort = parsed.provider_reported_reasoning_effort
+                    if parsed.provider_reported_service_tier is not None:
+                        reported_tier = parsed.provider_reported_service_tier
                     filtered = inline_reasoning_filter.filter_chunk(
                         replace(parsed, chat_completion_metadata=None)
                     )
@@ -1227,6 +1245,7 @@ class OpenAICompatProvider(Provider):
             usage_reported=stream_usage is not None,
             cache_usage=stream_cache_usage,
             provider_reported_reasoning_effort=reported_effort,
+            provider_reported_service_tier=reported_tier,
         )
         enriched = self._enrich_context_response(
             request_ctx,

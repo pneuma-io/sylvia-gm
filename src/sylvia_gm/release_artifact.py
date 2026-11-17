@@ -1,4 +1,4 @@
-"""Deterministic, integrity-verifiable Windows prerelease layouts."""
+"""Deterministic, integrity-verifiable prerelease layouts for Windows and Linux."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
 
-from sylvia_gm import __version__
+from sylvia_gm import __release_channel__, __version__
 from sylvia_gm.covered_source_delivery import (
     CoveredSourceError,
     covered_source_required,
@@ -22,7 +22,7 @@ from sylvia_gm.covered_source_delivery import (
 )
 
 PRERELEASE_VERSION = __version__
-WINDOWS_INSTALLER_VERSION = "0.3.0-4"
+RELEASE_CHANNEL = __release_channel__
 RELEASE_FORMAT_ID = "sylvia-gm-windows-release-manifest"
 RELEASE_FORMAT_VERSION = 3
 DEPENDENCY_NOTICES_SOURCE = "dependency-notices.txt"
@@ -47,9 +47,13 @@ UNSIGNED_DISCLOSURE = (
     "before running it."
 )
 
+# Plain X.Y.Z is the current form. X.Y.Z-alpha.N stays valid for earlier releases.
 _VERSION_RE = re.compile(
-    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-alpha\.([1-9][0-9]*)$"
+    r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-alpha\.([1-9][0-9]*))?$"
 )
+_CHANNEL_RE = re.compile(r"^[a-z][a-z0-9]*$")
+_RUST_CHANNEL_RE = re.compile(rb'^const RELEASE_CHANNEL: &str = "([^"\r\n]*)";\r?$', re.MULTILINE)
+RUST_CHANNEL_SOURCE = "src-tauri/src/lib.rs"
 _GIT_ID_RE = re.compile(r"^[0-9a-f]{40}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _UTC_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
@@ -83,18 +87,17 @@ _MANIFEST_KEYS = frozenset(
 )
 _ARTIFACT_KEYS = frozenset({"kind", "name", "sha256", "size_bytes"})
 _NOTICE_KEYS = frozenset({"path", "sha256", "size_bytes"})
-_PRODUCT = {
-    "architecture": "x86_64",
-    "channel": "alpha",
-    "name": "Sylvia GM",
-    "platform": "windows",
-    "version": PRERELEASE_VERSION,
-    "windows_installer_version": WINDOWS_INSTALLER_VERSION,
-}
 _SIGNING = {
     "disclosure": UNSIGNED_DISCLOSURE,
     "status": "unsigned",
 }
+LINUX_RELEASE_FORMAT_ID = "sylvia-gm-linux-release-manifest"
+LINUX_BUNDLED_NOTICES_PATH = "licenses/LINUX-BUNDLED-LIBRARIES.txt"
+BUNDLED_NOTICES_KEY = "bundled_library_notices"
+LINUX_UNSIGNED_DISCLOSURE = (
+    "This Sylvia GM Alpha prerelease is unsigned. Verify the AppImage SHA-256 against "
+    "release-manifest.json or SHA256SUMS.txt before running it."
+)
 
 
 class ReleaseArtifactError(ValueError):
@@ -125,21 +128,121 @@ def _sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _require_prerelease_version(value: str) -> re.Match[str]:
-    matched = _VERSION_RE.fullmatch(value)
+def _require_release_version(value: str, channel: str = RELEASE_CHANNEL) -> re.Match[str]:
+    """Accept X.Y.Z, or X.Y.Z-alpha.N when the declared channel is alpha."""
+
+    if not isinstance(channel, str) or not _CHANNEL_RE.fullmatch(channel):
+        raise ReleaseArtifactError("Release channel is not a lowercase channel name")
+    matched = _VERSION_RE.fullmatch(value) if isinstance(value, str) else None
     if matched is None:
-        raise ReleaseArtifactError("Release version is not a semantic Alpha prerelease version")
+        raise ReleaseArtifactError("Release version is not X.Y.Z or X.Y.Z-alpha.N")
+    if matched.group(4) is not None and channel != "alpha":
+        raise ReleaseArtifactError("Release version prerelease part does not match the channel")
     return matched
 
 
 def _uv_normalized_version(value: str) -> str:
-    matched = _require_prerelease_version(value)
-    return f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}a{matched.group(4)}"
+    matched = _require_release_version(value)
+    core = f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}"
+    return core if matched.group(4) is None else f"{core}a{matched.group(4)}"
 
 
-def _expected_windows_installer_version(value: str) -> str:
-    matched = _require_prerelease_version(value)
-    return f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}-{matched.group(4)}"
+def windows_installer_version(value: str) -> str:
+    """NSIS needs a numeric prerelease: X.Y.Z-alpha.N becomes X.Y.Z-N; X.Y.Z is unchanged."""
+
+    matched = _require_release_version(value)
+    core = f"{matched.group(1)}.{matched.group(2)}.{matched.group(3)}"
+    return core if matched.group(4) is None else f"{core}-{matched.group(4)}"
+
+
+WINDOWS_INSTALLER_VERSION = windows_installer_version(PRERELEASE_VERSION)
+_PRODUCT = {
+    "architecture": "x86_64",
+    "channel": RELEASE_CHANNEL,
+    "name": "Sylvia GM",
+    "platform": "windows",
+    "version": PRERELEASE_VERSION,
+    "windows_installer_version": WINDOWS_INSTALLER_VERSION,
+}
+
+
+@dataclass(frozen=True, slots=True)
+class ReleasePlatform:
+    """Everything that differs between the release layouts of two operating systems."""
+
+    format_id: str
+    format_versions: tuple[int, ...]
+    product: Mapping[str, str]
+    artifact_suffix: Mapping[str, str]
+    required_kinds: frozenset[str]
+    required_kinds_message: str
+    qualification_keys: frozenset[str]
+    toolchain_keys: frozenset[str]
+    disclosure: str
+    # Where the notices for bundled system libraries sit in the layout, for a platform whose
+    # artifact carries them; such a layout must hold the file and its manifest record.
+    bundled_notices_path: str | None = None
+    # Artifact kinds a person starts directly; the layout keeps them marked executable.
+    executable_kinds: frozenset[str] = frozenset()
+
+    @property
+    def signing(self) -> dict[str, str]:
+        return {"disclosure": self.disclosure, "status": "unsigned"}
+
+
+# Both descriptions read this module's values when called, never a copy taken at import.
+def windows_release_platform() -> ReleasePlatform:
+    """The Windows layout: one NSIS installer, optionally an MSI and a portable ZIP."""
+
+    return ReleasePlatform(
+        format_id=RELEASE_FORMAT_ID,
+        format_versions=(2, RELEASE_FORMAT_VERSION),
+        product=_PRODUCT,
+        artifact_suffix=_ARTIFACT_SUFFIX,
+        required_kinds=_REQUIRED_ARTIFACT_KINDS,
+        required_kinds_message="Release must contain exactly one NSIS installer",
+        qualification_keys=_QUALIFICATION_KEYS,
+        toolchain_keys=_TOOLCHAIN_KEYS,
+        disclosure=UNSIGNED_DISCLOSURE,
+    )
+
+
+def linux_release_platform() -> ReleasePlatform:
+    """The Linux layout: one AppImage.
+
+    Its toolchain record adds the build machine's system and C library, because those decide
+    the oldest distribution the AppImage runs on.
+    """
+
+    return ReleasePlatform(
+        format_id=LINUX_RELEASE_FORMAT_ID,
+        format_versions=(RELEASE_FORMAT_VERSION,),
+        product={
+            "architecture": "x86_64",
+            "channel": RELEASE_CHANNEL,
+            "name": "Sylvia GM",
+            "platform": "linux",
+            "version": PRERELEASE_VERSION,
+        },
+        artifact_suffix={"appimage": ".appimage"},
+        required_kinds=frozenset({"appimage"}),
+        required_kinds_message="Release must contain exactly one AppImage",
+        qualification_keys=frozenset({"ubuntu_22_04", "ubuntu_24_04"}),
+        toolchain_keys=_TOOLCHAIN_KEYS | {"appimage_tools_sha256", "build_system", "glibc"},
+        disclosure=LINUX_UNSIGNED_DISCLOSURE,
+        bundled_notices_path=LINUX_BUNDLED_NOTICES_PATH,
+        executable_kinds=frozenset({"appimage"}),
+    )
+
+
+def _rust_release_channel(source: bytes) -> str:
+    matches = _RUST_CHANNEL_RE.findall(source)
+    if len(matches) != 1:
+        raise ReleaseArtifactError("Rust release channel declaration is missing or ambiguous")
+    try:
+        return cast(bytes, matches[0]).decode("ascii")
+    except UnicodeDecodeError as error:
+        raise ReleaseArtifactError("Rust release channel is not ASCII") from error
 
 
 def _package_version(document: Mapping[str, object], name: str, source: str) -> str:
@@ -157,10 +260,11 @@ def _package_version(document: Mapping[str, object], name: str, source: str) -> 
 
 
 def validate_version_sources(root: Path) -> str:
-    """Require one coherent prerelease identity across every release input."""
+    """Require one coherent version and declared channel across every release input."""
 
     root = root.resolve()
     try:
+        rust_channel = _rust_release_channel((root / RUST_CHANNEL_SOURCE).read_bytes())
         pyproject = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
         cargo = tomllib.loads((root / "src-tauri/Cargo.toml").read_text(encoding="utf-8"))
         tauri = json.loads((root / "src-tauri/tauri.conf.json").read_text(encoding="utf-8"))
@@ -177,10 +281,12 @@ def validate_version_sources(root: Path) -> str:
         raise ReleaseArtifactError("Release version sources cannot be read") from error
     if any(not isinstance(value, str) for value in versions.values()):
         raise ReleaseArtifactError("Release version source is not text")
+    if rust_channel != RELEASE_CHANNEL:
+        raise ReleaseArtifactError("Python and Rust declare different release channels")
     expected = cast(str, versions["python_runtime"])
-    _require_prerelease_version(expected)
-    if _expected_windows_installer_version(expected) != WINDOWS_INSTALLER_VERSION:
-        raise ReleaseArtifactError("Windows installer version does not match the prerelease")
+    _require_release_version(expected)
+    if windows_installer_version(expected) != WINDOWS_INSTALLER_VERSION:
+        raise ReleaseArtifactError("Windows installer version does not match the release")
     if set(cast(dict[str, str], versions).values()) != {expected}:
         raise ReleaseArtifactError("Release version sources do not match exactly")
     uv_version = _package_version(uv_lock, "sylvia-gm", "uv.lock")
@@ -203,14 +309,17 @@ def _safe_leaf(name: str) -> str:
     return name
 
 
-def _validated_artifacts(artifacts: Sequence[ReleaseArtifact]) -> tuple[ReleaseArtifact, ...]:
+def _validated_artifacts(
+    artifacts: Sequence[ReleaseArtifact], platform: ReleasePlatform | None = None
+) -> tuple[ReleaseArtifact, ...]:
+    platform = platform or windows_release_platform()
     if not artifacts:
         raise ReleaseArtifactError("Release has no installer artifacts")
     names: set[str] = set()
     kinds: set[str] = set()
     validated: list[ReleaseArtifact] = []
     for artifact in artifacts:
-        expected_suffix = _ARTIFACT_SUFFIX.get(artifact.kind)
+        expected_suffix = platform.artifact_suffix.get(artifact.kind)
         if expected_suffix is None:
             raise ReleaseArtifactError("Release artifact kind is unsupported")
         try:
@@ -233,8 +342,8 @@ def _validated_artifacts(artifacts: Sequence[ReleaseArtifact]) -> tuple[ReleaseA
         names.add(folded)
         kinds.add(artifact.kind)
         validated.append(ReleaseArtifact(source=source, kind=artifact.kind))
-    if not _REQUIRED_ARTIFACT_KINDS.issubset(kinds):
-        raise ReleaseArtifactError("Release must contain exactly one NSIS installer")
+    if not platform.required_kinds.issubset(kinds):
+        raise ReleaseArtifactError(platform.required_kinds_message)
     return tuple(sorted(validated, key=lambda item: item.source.name.casefold()))
 
 
@@ -360,13 +469,23 @@ def assemble_release_layout(
     dependency_notices_sha256: str,
     dependency_notice_companions_directory: Path | None = None,
     version: str = PRERELEASE_VERSION,
+    platform: ReleasePlatform | None = None,
+    bundled_notices_path: Path | None = None,
 ) -> dict[str, object]:
-    """Atomically assemble one canonical unsigned prerelease directory."""
+    """Atomically assemble one canonical unsigned prerelease directory (Windows by default)."""
 
-    _require_prerelease_version(version)
+    platform = platform or windows_release_platform()
+    if (bundled_notices_path is None) != (platform.bundled_notices_path is None):
+        raise ReleaseArtifactError(
+            "Bundled library notices are required for this platform and not accepted otherwise"
+        )
+    bundled_notices = (
+        read_dependency_notices(bundled_notices_path) if bundled_notices_path is not None else None
+    )
+    _require_release_version(version)
     if version != PRERELEASE_VERSION:
-        raise ReleaseArtifactError("Release prerelease version does not match the application")
-    selected = _validated_artifacts(artifacts)
+        raise ReleaseArtifactError("Release version does not match the application")
+    selected = _validated_artifacts(artifacts, platform)
     source = _validated_mapping(
         provenance,
         name="provenance",
@@ -378,11 +497,11 @@ def assemble_release_layout(
         raise ReleaseArtifactError("Release source identity is invalid")
     if not _UTC_RE.fullmatch(source["source_timestamp_utc"]):
         raise ReleaseArtifactError("Release source timestamp is invalid")
-    tools = _validated_mapping(toolchain, name="toolchain", exact_keys=_TOOLCHAIN_KEYS)
+    tools = _validated_mapping(toolchain, name="toolchain", exact_keys=platform.toolchain_keys)
     qualified = _validated_mapping(
         qualification,
         name="qualification",
-        exact_keys=_QUALIFICATION_KEYS,
+        exact_keys=platform.qualification_keys,
     )
     if any(status not in _QUALIFICATION_STATES for status in qualified.values()):
         raise ReleaseArtifactError("Release qualification state is invalid")
@@ -422,6 +541,9 @@ def assemble_release_layout(
         for artifact in selected:
             destination = staging / artifact.source.name
             shutil.copyfile(artifact.source, destination)
+            if artifact.kind in platform.executable_kinds:
+                # copyfile copies bytes only; an AppImage that is not executable does not start.
+                destination.chmod(0o755)
             records.append(
                 {
                     "kind": artifact.kind,
@@ -436,7 +558,9 @@ def assemble_release_layout(
         notice_destination.write_bytes(notice_bytes)
         for name, blob in companions.items():
             (staging / name).write_bytes(blob)
-        (staging / "UNSIGNED.txt").write_text(UNSIGNED_DISCLOSURE + "\n", encoding="utf-8")
+        if bundled_notices is not None:
+            (staging / cast(str, platform.bundled_notices_path)).write_bytes(bundled_notices)
+        (staging / "UNSIGNED.txt").write_text(platform.disclosure + "\n", encoding="utf-8")
         manifest: dict[str, object] = {
             "artifacts": records,
             "dependency_notices": {
@@ -444,12 +568,12 @@ def assemble_release_layout(
                 "sha256": dependency_notices_sha256,
                 "size_bytes": len(notice_bytes),
             },
-            "format_id": RELEASE_FORMAT_ID,
+            "format_id": platform.format_id,
             "format_version": RELEASE_FORMAT_VERSION,
-            "product": {**_PRODUCT, "version": version},
+            "product": {**platform.product, "version": version},
             "provenance": source,
             "qualification": qualified,
-            "signing": _SIGNING,
+            "signing": platform.signing,
             "toolchain": tools,
         }
         if companions:
@@ -457,12 +581,19 @@ def assemble_release_layout(
                 {"path": name, "sha256": hashlib.sha256(blob).hexdigest(), "size_bytes": len(blob)}
                 for name, blob in companions.items()
             ]
+        if bundled_notices is not None:
+            manifest[BUNDLED_NOTICES_KEY] = {
+                "path": platform.bundled_notices_path,
+                "sha256": hashlib.sha256(bundled_notices).hexdigest(),
+                "size_bytes": len(bundled_notices),
+            }
         (staging / "release-manifest.json").write_bytes(_canonical_json_bytes(manifest))
         checksummed_names = [
             *(cast(str, record["name"]) for record in records),
             "LICENSE",
             DEPENDENCY_NOTICES_PATH,
             *companions,
+            *([cast(str, platform.bundled_notices_path)] if bundled_notices is not None else []),
             "UNSIGNED.txt",
             "release-manifest.json",
         ]
@@ -474,8 +605,16 @@ def assemble_release_layout(
         raise
 
 
-def verify_release_layout(directory: Path) -> dict[str, object]:
-    """Verify every declared byte and reject unlisted release-layout files."""
+def verify_release_layout(
+    directory: Path, platform: ReleasePlatform | None = None
+) -> dict[str, object]:
+    """Verify every declared byte and reject unlisted release-layout files.
+
+    A layout is checked as the platform the caller names (Windows by default), so a Windows
+    tool never accepts a Linux layout or the reverse.
+    """
+
+    platform = platform or windows_release_platform()
 
     try:
         resolved_directory = directory.resolve(strict=True)
@@ -496,17 +635,22 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
         raise ReleaseArtifactError("Release manifest cannot be read") from error
     if not isinstance(manifest, dict) or raw_manifest != _canonical_json_bytes(manifest):
         raise ReleaseArtifactError("Release manifest is not canonical")
-    if frozenset(manifest) != _MANIFEST_KEYS:
+    expected_keys = (
+        _MANIFEST_KEYS | {BUNDLED_NOTICES_KEY}
+        if platform.bundled_notices_path is not None
+        else _MANIFEST_KEYS
+    )
+    if frozenset(manifest) != expected_keys:
         raise ReleaseArtifactError("Release manifest fields are incomplete or unknown")
-    if manifest.get("format_id") != RELEASE_FORMAT_ID or manifest.get("format_version") not in (
-        2,
-        RELEASE_FORMAT_VERSION,
+    if (
+        manifest.get("format_id") != platform.format_id
+        or manifest.get("format_version") not in platform.format_versions
     ):
         raise ReleaseArtifactError("Release manifest format is unsupported")
     product = manifest.get("product")
-    if product != _PRODUCT:
+    if product != platform.product:
         raise ReleaseArtifactError("Release manifest version does not match the application")
-    if manifest.get("signing") != _SIGNING:
+    if manifest.get("signing") != platform.signing:
         raise ReleaseArtifactError("Release signing disclosure is invalid")
     source = _manifest_mapping(
         manifest.get("provenance"),
@@ -522,14 +666,14 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
     qualified = _manifest_mapping(
         manifest.get("qualification"),
         name="qualification",
-        exact_keys=_QUALIFICATION_KEYS,
+        exact_keys=platform.qualification_keys,
     )
     if any(status not in _QUALIFICATION_STATES for status in qualified.values()):
         raise ReleaseArtifactError("Release qualification state is invalid")
     _manifest_mapping(
         manifest.get("toolchain"),
         name="toolchain",
-        exact_keys=_TOOLCHAIN_KEYS,
+        exact_keys=platform.toolchain_keys,
     )
     records = manifest.get("artifacts")
     if not isinstance(records, list) or not records:
@@ -542,6 +686,26 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
         "release-manifest.json",
         DEPENDENCY_NOTICES_PATH,
     }
+    if platform.bundled_notices_path is not None:
+        bundled = manifest.get(BUNDLED_NOTICES_KEY)
+        if (
+            not isinstance(bundled, dict)
+            or frozenset(bundled) != _NOTICE_KEYS
+            or bundled.get("path") != platform.bundled_notices_path
+            or not isinstance(bundled.get("sha256"), str)
+            or not _SHA256_RE.fullmatch(cast(str, bundled["sha256"]))
+        ):
+            raise ReleaseArtifactError("Release bundled library notice record is invalid")
+        content = read_dependency_notices(
+            directory / platform.bundled_notices_path,
+            expected_sha256=cast(str, bundled["sha256"]),
+        )
+        size = bundled.get("size_bytes")
+        if not isinstance(size, int) or isinstance(size, bool) or size != len(content):
+            raise ReleaseArtifactError(
+                "Release bundled library notice size does not match the manifest"
+            )
+        expected_names.add(platform.bundled_notices_path)
     notice_record = cast(dict[str, object], manifest["dependency_notices"])
     if "companions" in notice_record:
         if manifest["format_version"] != RELEASE_FORMAT_VERSION:
@@ -579,12 +743,12 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
         if _sha256_file(path) != expected_sha256:
             raise ReleaseArtifactError("Release artifact hash does not match the manifest")
         kind = record.get("kind")
-        if not isinstance(kind, str) or kind not in _ARTIFACT_SUFFIX:
+        if not isinstance(kind, str) or kind not in platform.artifact_suffix:
             raise ReleaseArtifactError("Release artifact kind is invalid")
-        if path.suffix.casefold() != _ARTIFACT_SUFFIX[kind]:
+        if path.suffix.casefold() != platform.artifact_suffix[kind]:
             raise ReleaseArtifactError("Release artifact kind is invalid")
-    if not _REQUIRED_ARTIFACT_KINDS.issubset({cast(str, record["kind"]) for record in records}):
-        raise ReleaseArtifactError("Release must contain exactly one NSIS installer")
+    if not platform.required_kinds.issubset({cast(str, record["kind"]) for record in records}):
+        raise ReleaseArtifactError(platform.required_kinds_message)
     if [cast(str, record["name"]) for record in records] != sorted(
         (cast(str, record["name"]) for record in records), key=str.casefold
     ):
@@ -608,7 +772,7 @@ def verify_release_layout(directory: Path) -> dict[str, object]:
             raise ReleaseArtifactError("Release layout contains undeclared files")
     if actual_names != expected_names:
         raise ReleaseArtifactError("Release layout contains undeclared files")
-    if (directory / "UNSIGNED.txt").read_text(encoding="utf-8") != UNSIGNED_DISCLOSURE + "\n":
+    if (directory / "UNSIGNED.txt").read_text(encoding="utf-8") != platform.disclosure + "\n":
         raise ReleaseArtifactError("Release unsigned disclosure does not match")
     checksum_names = sorted(expected_names - {"SHA256SUMS.txt"}, key=str.casefold)
     if (directory / "SHA256SUMS.txt").read_bytes() != _checksums_bytes(directory, checksum_names):
@@ -621,10 +785,12 @@ def assemble_qualified_release_layout(
     source: Path,
     output: Path,
     qualification: Mapping[str, str],
+    platform: ReleasePlatform | None = None,
 ) -> dict[str, object]:
     """Copy verified installer bytes into a new layout with completed qualification state."""
 
-    manifest = verify_release_layout(source)
+    platform = platform or windows_release_platform()
+    manifest = verify_release_layout(source, platform)
     source = source.resolve(strict=True)
     records = cast(list[dict[str, object]], manifest["artifacts"])
     artifacts = tuple(
@@ -650,4 +816,10 @@ def assemble_qualified_release_layout(
             else None
         ),
         version=cast(str, product["version"]),
+        platform=platform,
+        bundled_notices_path=(
+            source / platform.bundled_notices_path
+            if platform.bundled_notices_path is not None
+            else None
+        ),
     )

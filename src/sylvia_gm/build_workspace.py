@@ -53,7 +53,7 @@ class BuildWorkspace:
             "cleanup": "retained",
         }
         if not keep:
-            # The resolved absolute target was checked above. rmtree does not follow Windows junctions.
+    # The resolved target was checked above. rmtree does not follow Windows junctions.
             try:
                 shutil.rmtree(self.path)
             except OSError:

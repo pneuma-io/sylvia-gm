@@ -154,6 +154,26 @@ A Ruleset-provided or built-in rules-neutral view of campaign play, such as Map,
 placed in the sidebar or an extra window within the active campaign's saved layout.
 _Avoid_: second campaign owner
 
+**PanelSystem**:
+The one shared host that arranges, docks, floats and operates every Ruleset's Panels. It owns
+structure and behaviour, never a game's look.
+_Avoid_: panel suite (as a look), shared game style
+
+**Panel**:
+One Game Panel a Ruleset declares in its package (`ui_surfaces`): title, icon, renderer, source,
+actions and placements.
+_Avoid_: widget, window
+
+**PanelWidget**:
+What a Panel is drawn with: a built-in renderer in a named style that Sylvia ships and a Ruleset
+chooses by name, such as `party` in the `adventurer-cards` style.
+_Avoid_: package UI code, custom renderer
+
+**PanelTheme**:
+The named base and closed set of colour and type values a Ruleset declares for its Panels, applied
+by the PanelSystem over the player's session theme. A Ruleset with none gets the neutral look.
+_Avoid_: skin, package stylesheet
+
 **Reference Availability**:
 Whether a Ruleset includes or excludes the exact rules content for a record, independently of how
 that content is resolved during play.

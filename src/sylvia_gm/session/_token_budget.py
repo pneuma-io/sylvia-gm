@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -380,11 +380,10 @@ class TokenBudget:
     def record_api_usage(self, prompt_tokens: int) -> None:
         """Calibrate estimates from actual API-reported prompt tokens."""
         self._last_prompt_tokens = prompt_tokens
-        if isinstance(self._estimator, CalibratedEstimator):
-            if self._total_used > 0:
-                self._estimator.update_from_usage(
-                    "default", prompt_tokens, self._total_used,
-                )
+        if isinstance(self._estimator, CalibratedEstimator) and self._total_used > 0:
+            self._estimator.update_from_usage(
+                "default", prompt_tokens, self._total_used,
+            )
 
     def remaining_for_history(
         self, stable_chars: int, context_chars: int, char_chars: int,
@@ -424,7 +423,7 @@ class TokenCount:
     history_tokens: int = 0
     total_tokens: int = 0
 
-    def __add__(self, other: "TokenCount") -> "TokenCount":
+    def __add__(self, other: TokenCount) -> TokenCount:
         return TokenCount(
             stable_tokens=self.stable_tokens + other.stable_tokens,
             context_tokens=self.context_tokens + other.context_tokens,

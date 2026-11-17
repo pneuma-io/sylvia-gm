@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
 const frontend = path.resolve(__dirname, '../src-tauri/frontend');
 
 test('Game panels to bottom Builder exposes conversation and composer at 390x844 and preserves desktop', async () => {
-  const browser = await chromium.launch({ headless: true, channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || 'msedge' });
+  const browser = await chromium.launch({ headless: true, channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
   try {
     for (const viewport of [{ width: 390, height: 844 }, { width: 1600, height: 1000 }]) {
       const page = await browser.newPage({ viewport });
@@ -64,7 +64,7 @@ test('Game panels to bottom Builder exposes conversation and composer at 390x844
 });
 
 test('rendered Stop reports an abnormal close and retains drafts; clean close disables the workspace', async () => {
-  const browser = await chromium.launch({ headless: true, channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || 'msedge' });
+  const browser = await chromium.launch({ headless: true, channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
   try {
     for (const code of [0, 23]) {
       const page = await browser.newPage();

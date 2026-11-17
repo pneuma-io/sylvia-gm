@@ -304,8 +304,13 @@ def test_builder_native_stream_bridge_persists_both_responses_privately(tmp_path
         assert all("provider_response_id" not in message for message in prepared)
         assert "opaque-signature" not in json.dumps(reconstructed)
         reads.clear()
-        _builder_native_request(reconstructed, transport="responses", read=read)
-        assert reads == []
+        responses = _builder_native_request(reconstructed, transport="responses", read=read)
+        # The owner may load chat metadata for this transport; private reasoning and
+        # Anthropic signatures still cannot enter an unrelated request shape.
+        assert set(reads) <= {item["response_id"] for item in index}
+        assert "PRIVATE SYNTHETIC" not in json.dumps(responses)
+        assert "opaque-signature" not in json.dumps(responses)
+        reads.clear()
         deepseek = _builder_native_request(
             reconstructed, transport="chat_completions", read=read, resend_reasoning=True,
         )

@@ -6,7 +6,7 @@ from tests.lite_fixture_archive import archive_closed_case
 
 
 def _params(case, destination):
-    return case.parameters | {"target": "hero", "targets": ["hero"], "target_distance": 0,
+    return case.parameters | {"target": "hero", "targets": [], "target_distance": 0,
         "spell_grant": "wizard", "travel_destination": destination}
 
 

@@ -11,7 +11,7 @@ to convert an AgentMode enum to its toolset list.
 
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from sylvia_gm.agent._mode import AgentMode
@@ -36,7 +36,7 @@ _MODE_TOOLSETS: dict[str, list[str]] = {
 }
 
 
-def resolve_mode_toolsets(mode: "AgentMode") -> list[str]:
+def resolve_mode_toolsets(mode: AgentMode) -> list[str]:
     """Return the enabled toolset names for a given AgentMode.
 
     Args:

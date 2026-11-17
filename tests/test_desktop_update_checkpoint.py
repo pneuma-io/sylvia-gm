@@ -16,6 +16,9 @@ from sylvia_gm.application.desktop_update.checkpoint import RESTORE_CONFIRMATION
 from sylvia_gm.application.desktop_update.manifest import UpdateError
 from sylvia_gm.domain.errors import OwnerConflict
 from sylvia_gm.infrastructure.owner_lock import DatabaseOwnerLock, authority_lock_identity
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 
 def setup_checkpoint(tmp_path):

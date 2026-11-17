@@ -7,7 +7,7 @@ DEFAULT_OUTPUT_ALLOWANCE = 4096
 
 def output_allowance(model: Any, *, builder: bool = False) -> int | None:
     """Return an enforceable app allowance, or None for runtime-managed output."""
-    if getattr(model, "transport", None) == "codex_app_server":
+    if getattr(model, "transport", None) in {"codex_app_server", "claude_code"}:
         return None
     value = getattr(model, "max_output_tokens", None)
     allowance = (

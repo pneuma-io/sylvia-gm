@@ -12,6 +12,7 @@ Provides:
 
 from __future__ import annotations
 
+import contextlib
 import math
 from dataclasses import dataclass
 from typing import Any
@@ -71,10 +72,8 @@ def resolve_aoe(
             continue
         positioned.append((eid, pos))
         if "x" in pos and "y" in pos:
-            try:
+            with contextlib.suppress(ValueError, TypeError):
                 grid_entities.append((eid, int(pos["x"]), int(pos["y"])))
-            except (ValueError, TypeError):
-                pass
 
     # Use grid if we have grid positions for most entities
     if len(grid_entities) >= len(positioned) * 0.5 and len(grid_entities) >= 2:
@@ -116,20 +115,16 @@ def resolve_aoe_bands(
         List of entity IDs within the AoE.
     """
     # Band ordering: close < near < far < distant
-    BAND_ORDER: dict[str, int] = {"close": 0, "near": 1, "far": 2, "distant": 3}
-    BAND_ORDER_REVERSE: dict[int, str] = {v: k for k, v in BAND_ORDER.items()}
+    band_order: dict[str, int] = {"close": 0, "near": 1, "far": 2, "distant": 3}
 
-    origin_idx = BAND_ORDER.get(origin_band.lower(), 0)
+    origin_idx = band_order.get(origin_band.lower(), 0)
 
     # Resolve aoe_size to a band index
     if isinstance(aoe_size, (int, float)):
         size_idx = int(aoe_size)
     else:
         size_str = str(aoe_size).lower()
-        if size_str in BAND_ORDER:
-            size_idx = BAND_ORDER[size_str]
-        else:
-            size_idx = 1  # default to near
+        size_idx = band_order.get(size_str, 1)  # default to near
 
     shape = aoe_shape.lower()
     hits: list[str] = []
@@ -139,7 +134,7 @@ def resolve_aoe_bands(
             continue
 
         band_str = pos.get("band", "close").lower()
-        band_idx = BAND_ORDER.get(band_str, 0)
+        band_idx = band_order.get(band_str, 0)
 
         if shape == "burst":
             # Burst hits everything within size_idx bands
@@ -184,7 +179,7 @@ def resolve_aoe_grid(
         List of entity IDs within the AoE.
     """
     # Resolve size to feet
-    BAND_TO_FEET: dict[str, int] = {
+    band_to_feet: dict[str, int] = {
         "close": 10,
         "near": 30,
         "far": 60,
@@ -195,7 +190,7 @@ def resolve_aoe_grid(
         radius_ft = int(size)
     else:
         size_str = str(size).lower()
-        radius_ft = BAND_TO_FEET.get(size_str, 30)
+        radius_ft = band_to_feet.get(size_str, 30)
 
     shape = shape.lower()
     hits: list[str] = []
@@ -215,20 +210,18 @@ def resolve_aoe_grid(
                 hits.append(eid)
         elif shape == "cone":
             # Cone: within radius_ft distance AND within 45° arc
-            if dist <= radius_ft:
-                # Simple: check if target is "in front" (positive x from origin)
-                if dx >= 0:
-                    angle = abs(math.atan2(dy, dx))
-                    if angle <= math.pi / 4:
-                        hits.append(eid)
+            # Check whether the target is in front (positive x from origin).
+            if dist <= radius_ft and dx >= 0:
+                angle = abs(math.atan2(dy, dx))
+                if angle <= math.pi / 4:
+                    hits.append(eid)
         elif shape == "line":
             # Line: within 5 ft of a line from origin extending radius_ft
             if dist <= radius_ft:
                 # Check lateral distance from the x-axis line
                 lateral = abs(dy) * 5  # convert squares to feet
-                if lateral <= 5:  # 5 ft wide line
-                    if dx >= 0:
-                        hits.append(eid)
+                if lateral <= 5 and dx >= 0:  # 5 ft wide line
+                    hits.append(eid)
         else:
             # Unknown shape — skip
             pass

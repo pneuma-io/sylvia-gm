@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
-use std::sync::atomic::{AtomicBool, AtomicI64, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, AtomicI64, AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
@@ -24,6 +24,17 @@ use panel_windows::PanelWindows;
 
 const HANDSHAKE_TRANSCRIPT: &[u8] = b"sylvia-gm-f6-local-owner-handshake-v1";
 const MAX_MESSAGE_BYTES: usize = 67_108_864;
+// The bundled authority sits beside the desktop executable under its platform's file name.
+const OWNER_EXECUTABLE: &str = if cfg!(windows) { "sylvia-gm-owner.exe" } else { "sylvia-gm-owner" };
+
+// A development build runs the authority from the checkout's own Python environment.
+fn development_python(environment: &Path) -> PathBuf {
+    if cfg!(windows) {
+        environment.join("Scripts").join("python.exe")
+    } else {
+        environment.join("bin").join("python")
+    }
+}
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -93,20 +104,18 @@ impl OwnerBridge {
         }
 
         if cfg!(debug_assertions) && !portable {
-            let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            let environment = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?
-                .join(".venv")
-                .join("Scripts")
-                .join("python.exe");
-            return Self::spawn_python(&python, database);
+                .join(".venv");
+            return Self::spawn_python(&development_python(&environment), database);
         }
 
         let executable = std::env::current_exe()
             .map_err(|_| "Sylvia GM executable path is unavailable".to_string())?
             .parent()
             .ok_or_else(|| "Sylvia GM executable directory is unavailable".to_string())?
-            .join("sylvia-gm-owner.exe");
+            .join(OWNER_EXECUTABLE);
         let application = std::env::current_exe()
             .map_err(|_| "Sylvia GM executable path is unavailable".to_string())?;
         let context = if !cfg!(all(windows, target_arch = "x86_64"))
@@ -580,6 +589,19 @@ fn desktop_update_launch_context(
     }))
 }
 
+// Every file dialog belongs to the window that asked for it. A Linux AppImage runs with its own
+// read-only mount as the working folder, and must keep it because its web view finds helper
+// programs relative to it; a dialog would otherwise open there, so name the home folder.
+fn file_dialog(window: &WebviewWindow) -> rfd::AsyncFileDialog {
+    let dialog = rfd::AsyncFileDialog::new().set_parent(window);
+    #[cfg(target_os = "linux")]
+    let dialog = match std::env::var_os("HOME") {
+        Some(home) => dialog.set_directory(home),
+        None => dialog,
+    };
+    dialog
+}
+
 // Drop performs no blocking protocol call. Closing the last input drops its pipe;
 // the reply reader retains the exact child and Windows job through real collection.
 // Abnormal desktop termination closes that kill-on-close job, containing its tree.
@@ -694,19 +716,20 @@ mod trusted_caller_tests {
                 "version": env!("CARGO_PKG_VERSION"),
                 "release_channel": "alpha",
                 "signing_status": "unsigned",
+                "platform": if cfg!(windows) { "windows" } else { std::env::consts::OS },
             })
         );
     }
 
     #[test]
-    fn application_info_channel_handles_stable_prerelease_and_build_metadata() {
-        for (version, expected) in [
-            ("1.0.0", "stable"),
-            ("1.0.0+build-with-dashes", "stable"),
-            ("1.0.0-alpha.2", "alpha"),
-            ("1.0.0-beta.3+build", "beta"),
-        ] {
-            assert_eq!(super::build_release_channel(version), expected);
+    fn application_info_channel_is_declared_and_agrees_with_any_version_prerelease() {
+        // A plain X.Y.Z build still reports the declared channel.
+        assert_eq!(super::RELEASE_CHANNEL, "alpha");
+        assert_eq!(application_info_projection()["release_channel"], super::RELEASE_CHANNEL);
+        let version = env!("CARGO_PKG_VERSION");
+        let precedence = version.split('+').next().unwrap_or(version);
+        if let Some((_, prerelease)) = precedence.split_once('-') {
+            assert_eq!(prerelease.split('.').next(), Some(super::RELEASE_CHANNEL));
         }
     }
 
@@ -784,19 +807,18 @@ async fn owner_request_async(
         .map_err(|_| "Sylvia GM authority worker could not complete".to_string())?
 }
 
-fn build_release_channel(version: &str) -> &str {
-    let precedence = version.split('+').next().unwrap_or(version);
-    precedence.split_once('-')
-        .and_then(|(_, prerelease)| prerelease.split('.').next())
-        .unwrap_or("stable")
-}
+// The release channel is declared, not read from the version. It must match
+// __release_channel__ in src/sylvia_gm/__init__.py; the release version check compares them.
+const RELEASE_CHANNEL: &str = "alpha";
 
 fn application_info_projection() -> Value {
     json!({
         "product_name": "Sylvia GM",
         "version": env!("CARGO_PKG_VERSION"),
-        "release_channel": build_release_channel(env!("CARGO_PKG_VERSION")),
+        "release_channel": RELEASE_CHANNEL,
         "signing_status": "unsigned",
+        // Lets the page word the few sentences that name the operating system.
+        "platform": std::env::consts::OS,
     })
 }
 
@@ -1154,6 +1176,8 @@ async fn create_builder_chat(
     provider_id: Option<String>,
     model_id: Option<String>,
     display_name: Option<String>,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -1163,6 +1187,8 @@ async fn create_builder_chat(
             "provider_id": provider_id,
             "model_id": model_id,
             "display_name": display_name,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
         }),
     )
     .await
@@ -1938,6 +1964,20 @@ async fn chatgpt_connection(
 }
 
 #[tauri::command]
+async fn claude_connection(
+    window: WebviewWindow,
+    action: String,
+    options: Option<Value>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "claude_connection",
+        json!({"action": action, "options": options}),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn admin_full_audit_record(window: WebviewWindow, index: u64) -> Result<Value, String> {
     trusted_audit_reader(&window)?;
     owner_request_async(window, "admin_full_audit_record", json!({"index": index})).await
@@ -2122,6 +2162,41 @@ async fn switch_session_reasoning(
 }
 
 #[tauri::command]
+async fn switch_session_speed(
+    window: WebviewWindow,
+    session_id: String,
+    speed: Option<String>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "switch_session_speed",
+        json!({"session_id": session_id, "speed": speed}),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn set_chat_defaults(
+    window: WebviewWindow,
+    provider_id: String,
+    model_id: String,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "set_chat_defaults",
+        json!({
+            "provider_id": provider_id,
+            "model_id": model_id,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn switch_session_model(
     window: WebviewWindow,
     session_id: String,
@@ -2186,7 +2261,7 @@ async fn install_package(
 #[tauri::command]
 async fn preview_character_card_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(source) = rfd::AsyncFileDialog::new().set_parent(&window)
+    let Some(source) = file_dialog(&window)
         .add_filter("Character Card JSON / PNG", &["json", "png"]).pick_file().await
     else { return Ok(json!({"status":"cancelled"})); };
     owner_call_async(window, "preview_character_card_file", json!({"source_path":source.path()})).await
@@ -2245,8 +2320,7 @@ async fn cancel_character_bundle_import(
 #[tauri::command]
 async fn install_package_file(window: WebviewWindow, install_id: String) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(source) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(source) = file_dialog(&window)
         .add_filter(
             "Sylvia GM Content",
             &["sylvia-gm-package", "sylvia-gm-plan", "zip"],
@@ -2280,6 +2354,8 @@ async fn start_import_repair(
     operation_id: String,
     provider_id: Option<String>,
     model_id: Option<String>,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -2287,13 +2363,14 @@ async fn start_import_repair(
         json!({
             "repair_id": repair_id, "operation_id": operation_id,
             "provider_id": provider_id, "model_id": model_id,
+            "reasoning_effort": reasoning_effort, "speed": speed,
         }),
     )
     .await
 }
 
 fn handoff_package_archive(payload: Value, destination: &Path) -> Result<Value, String> {
-    handoff_content_archive(payload, destination, "sylvia-gm-package")
+    deliver_owner_archive(payload, destination, "sylvia-gm-package", "package")
 }
 
 fn handoff_content_archive(
@@ -2301,52 +2378,97 @@ fn handoff_content_archive(
     destination: &Path,
     extension: &str,
 ) -> Result<Value, String> {
+    deliver_owner_archive(payload, destination, extension, "content")
+}
+
+/// Size and SHA-256 of a file, read in chunks.
+fn file_size_and_sha256(path: &Path) -> std::io::Result<(u64, String)> {
+    let mut input = std::fs::File::open(path)?;
+    let mut digest = Sha256::new();
+    let mut bytes = 0_u64;
+    let mut buffer = [0_u8; 64 * 1024];
+    loop {
+        let count = input.read(&mut buffer)?;
+        if count == 0 {
+            break;
+        }
+        digest.update(&buffer[..count]);
+        bytes += count as u64;
+    }
+    Ok((bytes, hex::encode(digest.finalize())))
+}
+
+/// The owner writes each export to a working copy in its data folder. The shell checks that copy against the
+/// owner's receipt, copies it to the file the person chose, checks the chosen file the same way, and then removes
+/// the working copy, whether or not the save succeeded, so no second copy of the archive stays behind.
+fn deliver_owner_archive(
+    payload: Value,
+    destination: &Path,
+    extension: &str,
+    noun: &str,
+) -> Result<Value, String> {
     if destination.extension().and_then(|value| value.to_str()) != Some(extension) {
         return Err(format!(
-            "Sylvia GM content exports require the .{extension} extension"
+            "Sylvia GM {noun} exports require the .{extension} extension"
         ));
     }
     let source_text = payload
         .get("artifact_path")
         .and_then(Value::as_str)
-        .ok_or_else(|| "Authority package export did not produce a handoff artifact".to_string())?;
+        .ok_or_else(|| format!("Authority {noun} export did not produce a handoff artifact"))?;
     let source = PathBuf::from(source_text)
         .canonicalize()
-        .map_err(|_| "Authority package export artifact is unavailable".to_string())?;
+        .map_err(|_| format!("Authority {noun} export artifact is unavailable"))?;
     if !source.is_file() || source.extension().and_then(|value| value.to_str()) != Some(extension) {
-        return Err("Authority export artifact is not a Sylvia GM package archive".to_string());
+        return Err(format!(
+            "Authority export artifact is not a Sylvia GM {noun} archive"
+        ));
     }
+    // Choosing the working copy itself as the destination keeps it: it is then the person's file.
+    if destination.canonicalize().ok().as_deref() == Some(source.as_path()) {
+        return Err(format!(
+            "Choose a place outside Sylvia GM's data folder for the {noun} archive"
+        ));
+    }
+    let delivered = deliver_checked_archive(&payload, &source, destination, noun);
+    let _ = std::fs::remove_file(&source);
+    delivered
+}
+
+fn deliver_checked_archive(
+    payload: &Value,
+    source: &Path,
+    destination: &Path,
+    noun: &str,
+) -> Result<Value, String> {
     let export = payload
         .get("export")
-        .ok_or_else(|| "Authority package export receipt is unavailable".to_string())?;
+        .ok_or_else(|| format!("Authority {noun} export receipt is unavailable"))?;
     let expected_bytes = export
         .get("byte_count")
         .and_then(Value::as_u64)
-        .ok_or_else(|| "Authority package export size is unavailable".to_string())?;
+        .ok_or_else(|| format!("Authority {noun} export size is unavailable"))?;
     let expected_sha256 = export
         .get("archive_sha256")
         .and_then(Value::as_str)
-        .ok_or_else(|| "Authority package export hash is unavailable".to_string())?;
-    let mut input = std::fs::File::open(&source)
-        .map_err(|_| "Authority package export artifact is unavailable".to_string())?;
-    let mut digest = Sha256::new();
-    let mut actual_bytes = 0_u64;
-    let mut buffer = [0_u8; 64 * 1024];
-    loop {
-        let count = input
-            .read(&mut buffer)
-            .map_err(|_| "Authority package export artifact could not be verified".to_string())?;
-        if count == 0 {
-            break;
-        }
-        digest.update(&buffer[..count]);
-        actual_bytes += count as u64;
+        .ok_or_else(|| format!("Authority {noun} export hash is unavailable"))?;
+    let exact = |path: &Path| {
+        file_size_and_sha256(path)
+            .map(|(bytes, sha256)| bytes == expected_bytes && sha256 == expected_sha256)
+            .unwrap_or(false)
+    };
+    if !exact(source) {
+        return Err(format!(
+            "Authority {noun} export artifact failed exact-byte verification"
+        ));
     }
-    if actual_bytes != expected_bytes || hex::encode(digest.finalize()) != expected_sha256 {
-        return Err("Authority package export artifact failed exact-byte verification".to_string());
+    std::fs::copy(source, destination)
+        .map_err(|_| format!("Sylvia GM could not save the selected {noun} archive"))?;
+    if !exact(destination) {
+        return Err(format!(
+            "The saved {noun} archive does not match the export; export it again"
+        ));
     }
-    std::fs::copy(&source, destination)
-        .map_err(|_| "Sylvia GM could not save the selected package archive".to_string())?;
     Ok(json!({
         "status": "exported",
         "file_name": destination.file_name().and_then(|value| value.to_str()),
@@ -2361,8 +2483,7 @@ async fn export_package_candidate_file(
     candidate_id: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Package", &["sylvia-gm-package"])
         .set_file_name("ruleset-package.sylvia-gm-package")
         .save_file()
@@ -2390,8 +2511,7 @@ async fn export_campaign_plan_file(
     expected_content_sha256: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Campaign Plan", &["sylvia-gm-plan"])
         .set_file_name("campaign-plan.sylvia-gm-plan")
         .save_file()
@@ -2607,8 +2727,7 @@ async fn ingest_builder_sources(
     ingestion_id: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(sources) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(sources) = file_dialog(&window)
         .add_filter(
             "Builder sources",
             &["txt", "md", "json", "yaml", "yml", "csv", "pdf"],
@@ -2759,6 +2878,10 @@ async fn start_guided_creation_subflow(
     character_profile_sha256: Option<String>,
     character_artifact_id: Option<String>,
     character_artifact_sha256: Option<String>,
+    provider_id: Option<String>,
+    model_id: Option<String>,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window.clone(),
@@ -2775,6 +2898,10 @@ async fn start_guided_creation_subflow(
             "character_profile_sha256": character_profile_sha256,
             "character_artifact_id": character_artifact_id,
             "character_artifact_sha256": character_artifact_sha256,
+            "provider_id": provider_id,
+            "model_id": model_id,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
         }),
     )
     .await
@@ -2913,6 +3040,57 @@ async fn customize_ready_campaign(window: WebviewWindow, command: Value) -> Resu
 }
 
 #[tauri::command]
+#[allow(clippy::too_many_arguments)]
+async fn character_chat(
+    window: WebviewWindow,
+    action: String,
+    chat_id: Option<String>,
+    operation_id: Option<String>,
+    artifact_id: Option<String>,
+    expected_content_sha256: Option<String>,
+    provider_id: Option<String>,
+    model_id: Option<String>,
+    user_name: Option<String>,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "character_chat",
+        json!({
+            "action": action,
+            "chat_id": chat_id,
+            "operation_id": operation_id,
+            "artifact_id": artifact_id,
+            "expected_content_sha256": expected_content_sha256,
+            "provider_id": provider_id,
+            "model_id": model_id,
+            "user_name": user_name,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
+async fn send_character_chat_message(
+    window: WebviewWindow,
+    chat_id: String,
+    operation_id: String,
+    text: String,
+    expected_message_count: i64,
+) -> Result<Value, String> {
+    owner_call_async(
+        window,
+        "send_character_chat_message",
+        json!({
+            "chat_id": chat_id,
+            "operation_id": operation_id,
+            "text": text,
+            "expected_message_count": expected_message_count,
+        }),
+    )
+    .await
+}
+
+#[tauri::command]
 async fn start_guided_campaign(
     window: WebviewWindow,
     _state: State<'_, OwnerBridge>,
@@ -2980,6 +3158,8 @@ async fn finalize_campaign_construction(
     dm_provider_id: String,
     dm_model_id: String,
     model_guidance_override: bool,
+    reasoning_effort: Option<String>,
+    speed: Option<String>,
 ) -> Result<Value, String> {
     owner_call_async(
         window,
@@ -2989,6 +3169,8 @@ async fn finalize_campaign_construction(
             "dm_provider_id": dm_provider_id,
             "dm_model_id": dm_model_id,
             "model_guidance_override": model_guidance_override,
+            "reasoning_effort": reasoning_effort,
+            "speed": speed,
         }),
     )
     .await
@@ -3234,71 +3416,121 @@ async fn export_campaign(
 }
 
 fn handoff_export_archive(payload: Value, destination: &Path) -> Result<Value, String> {
-    if destination.extension().and_then(|value| value.to_str()) != Some("sylvia-gm-campaign") {
-        return Err("Sylvia GM exports require the .sylvia-gm-campaign extension".to_string());
-    }
-    let source_text = payload
-        .get("artifact_path")
-        .and_then(Value::as_str)
-        .ok_or_else(|| "Authority export did not produce a handoff artifact".to_string())?;
-    let source = PathBuf::from(source_text)
-        .canonicalize()
-        .map_err(|_| "Authority export artifact is unavailable".to_string())?;
-    if !source.is_file()
-        || source.extension().and_then(|value| value.to_str()) != Some("sylvia-gm-campaign")
-    {
-        return Err("Authority export artifact is not an Sylvia GM campaign archive".to_string());
-    }
-    std::fs::copy(&source, destination)
-        .map_err(|_| "Sylvia GM could not save the selected campaign archive".to_string())?;
-    Ok(json!({
-        "status": "exported",
-        "file_name": destination.file_name().and_then(|value| value.to_str()),
-        "export": payload.get("export").cloned().unwrap_or(Value::Null),
-    }))
+    deliver_owner_archive(payload, destination, "sylvia-gm-campaign", "campaign")
 }
 
 #[cfg(test)]
 mod selected_file_handoff_tests {
-    use super::handoff_export_archive;
-    use serde_json::json;
+    use super::{handoff_content_archive, handoff_export_archive};
+    use serde_json::{json, Value};
+    use sha2::{Digest, Sha256};
     use std::fs;
+    use std::path::{Path, PathBuf};
     use std::time::{SystemTime, UNIX_EPOCH};
 
-    #[test]
-    fn selected_export_handoff_copies_exact_bytes_without_leaking_private_path() {
+    fn fixture_root(name: &str) -> PathBuf {
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .expect("clock follows Unix epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("sylvia-gm-handoff-{nonce}"));
-        fs::create_dir_all(&root).expect("create handoff fixture directory");
-        let private_source = root.join("private.sylvia-gm-campaign");
+        let root = std::env::temp_dir().join(format!("sylvia-gm-handoff-{name}-{nonce}"));
+        fs::create_dir_all(root.join("exports")).expect("create handoff fixture directory");
+        root
+    }
+
+    fn receipt(path: &Path, bytes: &[u8]) -> Value {
+        json!({
+            "artifact_path": path,
+            "export": {
+                "campaign_id": "campaign-portable",
+                "archive_sha256": hex::encode(Sha256::digest(bytes)),
+                "byte_count": bytes.len(),
+            },
+        })
+    }
+
+    #[test]
+    fn selected_export_handoff_copies_exact_bytes_and_removes_the_working_copy() {
+        let root = fixture_root("campaign");
+        let working = root
+            .join("exports")
+            .join("export-file-1.sylvia-gm-campaign");
         let selected_destination = root.join("selected.sylvia-gm-campaign");
         let archive_bytes = b"sealed portable campaign fixture";
-        fs::write(&private_source, archive_bytes).expect("write private owner artifact");
+        fs::write(&working, archive_bytes).expect("write private owner artifact");
 
-        let result = handoff_export_archive(
-            json!({
-                "artifact_path": private_source,
-                "export": {
-                    "campaign_id": "campaign-portable",
-                    "archive_sha256": "fixture-hash",
-                    "byte_count": archive_bytes.len(),
-                },
-            }),
-            &selected_destination,
-        )
-        .expect("copy owner artifact to selected destination");
+        let result =
+            handoff_export_archive(receipt(&working, archive_bytes), &selected_destination)
+                .expect("copy owner artifact to selected destination");
 
         assert_eq!(
             fs::read(&selected_destination).expect("read selected destination"),
             archive_bytes
         );
+        assert!(!working.exists(), "no second copy stays in the data folder");
         assert_eq!(result["status"], "exported");
         assert_eq!(result["file_name"], "selected.sylvia-gm-campaign");
         assert_eq!(result["export"]["campaign_id"], "campaign-portable");
         assert!(result.get("artifact_path").is_none());
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn plan_and_package_handoffs_also_remove_the_working_copy() {
+        let root = fixture_root("content");
+        for extension in ["sylvia-gm-plan", "sylvia-gm-package"] {
+            let working = root.join("exports").join(format!("export-1.{extension}"));
+            let selected = root.join(format!("selected.{extension}"));
+            fs::write(&working, b"content archive").expect("write working copy");
+            handoff_content_archive(receipt(&working, b"content archive"), &selected, extension)
+                .expect("deliver content archive");
+            assert_eq!(
+                fs::read(&selected).expect("read selected"),
+                b"content archive"
+            );
+            assert!(!working.exists(), "{extension}: working copy removed");
+        }
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn a_working_copy_that_fails_its_receipt_is_not_saved_and_is_still_removed() {
+        let root = fixture_root("mismatch");
+        let working = root
+            .join("exports")
+            .join("export-file-2.sylvia-gm-campaign");
+        let selected_destination = root.join("selected.sylvia-gm-campaign");
+        fs::write(&working, b"changed bytes").expect("write working copy");
+
+        let error =
+            handoff_export_archive(receipt(&working, b"original bytes"), &selected_destination)
+                .expect_err("a working copy that differs from its receipt is refused");
+
+        assert!(error.contains("exact-byte verification"), "{error}");
+        assert!(
+            !selected_destination.exists(),
+            "nothing is written to the chosen place"
+        );
+        assert!(
+            !working.exists(),
+            "the refused working copy does not accumulate"
+        );
+        fs::remove_dir_all(root).expect("remove handoff fixture directory");
+    }
+
+    #[test]
+    fn choosing_the_working_copy_itself_keeps_it() {
+        let root = fixture_root("same");
+        let working = root
+            .join("exports")
+            .join("export-file-3.sylvia-gm-campaign");
+        fs::write(&working, b"archive").expect("write working copy");
+
+        let error = handoff_export_archive(receipt(&working, b"archive"), &working)
+            .expect_err("the working copy cannot be its own destination");
+
+        assert!(error.contains("outside Sylvia GM's data folder"), "{error}");
+        assert_eq!(fs::read(&working).expect("working copy kept"), b"archive");
         fs::remove_dir_all(root).expect("remove handoff fixture directory");
     }
 }
@@ -3327,8 +3559,7 @@ async fn export_campaign_file(
     if confirmed != rfd::MessageDialogResult::Ok {
         return Ok(json!({"status": "cancelled"}));
     }
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Campaign", &["sylvia-gm-campaign"])
         .set_file_name(&suggested)
         .save_file()
@@ -3373,8 +3604,7 @@ async fn recover_campaign_file(
     recovery_id: String,
 ) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(source) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(source) = file_dialog(&window)
         .add_filter("Sylvia GM Campaign", &["sylvia-gm-campaign"])
         .pick_file()
         .await
@@ -3442,8 +3672,7 @@ async fn cancel_local_report(window: WebviewWindow, preview_id: String) -> Resul
 #[tauri::command]
 async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<Value, String> {
     trusted_caller(&window)?;
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia local report JSON", &["json"])
         .set_file_name("sylvia-local-report.json")
         .save_file()
@@ -3471,8 +3700,7 @@ async fn save_local_report(window: WebviewWindow, preview_id: String) -> Result<
 async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String> {
     trusted_caller(&window)?;
     // Audit has a passive spoilers notice; only the ordinary save chooser is needed here.
-    let Some(destination) = rfd::AsyncFileDialog::new()
-        .set_parent(&window)
+    let Some(destination) = file_dialog(&window)
         .add_filter("Sylvia GM Audit JSON", &["json"])
         .set_file_name("sylvia-gm-admin-audit.json")
         .save_file()
@@ -3494,6 +3722,47 @@ async fn export_admin_audit_file(window: WebviewWindow) -> Result<Value, String>
     }))
 }
 
+/// Shows an error box and waits until it is dismissed.
+///
+/// On Linux a dialog is drawn by the GTK main loop. `rfd` queues its dialogs for that loop, so
+/// a blocking box asked for on the thread that runs the loop would wait for itself and never
+/// appear. On that thread the box is shown directly with GTK, which runs the loop while the
+/// box is open. Every other caller, and every other platform, uses `rfd`.
+fn error_box(title: &str, description: impl Into<String>) {
+    let description = description.into();
+    #[cfg(target_os = "linux")]
+    if gtk::is_initialized_main_thread() {
+        use gtk::prelude::*;
+        let dialog = gtk::MessageDialog::new(
+            None::<&gtk::Window>,
+            gtk::DialogFlags::MODAL,
+            gtk::MessageType::Error,
+            gtk::ButtonsType::Ok,
+            title,
+        );
+        dialog.set_title(title);
+        dialog.set_secondary_text(Some(&description));
+        dialog.run();
+        dialog.hide();
+        // SAFETY: the dialog was created here, on the GTK thread, and is not used again.
+        unsafe { dialog.destroy() };
+        while gtk::events_pending() {
+            gtk::main_iteration();
+        }
+        return;
+    }
+    rfd::MessageDialog::new()
+        .set_title(title)
+        .set_description(description)
+        .set_level(rfd::MessageLevel::Error)
+        .show();
+}
+
+/// The exit code of the exit request the app last let through. Tauri's runtime ends its event loop with
+/// `ControlFlow::Exit`, which exits the process with 0, so a code passed to `AppHandle::exit` (1 after
+/// "owner close failed") was lost; `RunEvent::Exit` applies it instead.
+static GRANTED_EXIT_CODE: AtomicI32 = AtomicI32::new(0);
+
 pub fn run() {
     let portable = std::env::current_exe()
         .map_err(|error| format!("Sylvia GM executable path is unavailable: {error}"))
@@ -3507,11 +3776,7 @@ pub fn run() {
     let portable = match portable {
         Ok(portable) => portable,
         Err(error) => {
-            rfd::MessageDialog::new()
-                .set_title("Sylvia GM - storage unavailable")
-                .set_description(error)
-                .set_level(rfd::MessageLevel::Error)
-                .show();
+            error_box("Sylvia GM - storage unavailable", error);
             return;
         }
     };
@@ -3543,7 +3808,7 @@ pub fn run() {
             )
             .map_err(std::io::Error::other)?;
             if let Some(parent) = database.parent() {
-                std::fs::create_dir_all(parent)?;
+                desktop_storage::create_data_directory(parent)?;
                 app.manage(dictation::Dictation::new(parent.join("dictation-models/base-ebe41f70")));
             }
             let startup = desktop_update_start_arguments(&std::env::args_os().skip(1).collect::<Vec<_>>())
@@ -3557,11 +3822,10 @@ pub fn run() {
                 } else {
                     "Sylvia cannot open the selected data folder. Close any other Sylvia copy using that same folder, then try again. A different installed or portable copy keeps its own data."
                 };
-                rfd::MessageDialog::new()
-                    .set_title(if interrupted { "Sylvia GM - update repair required" } else { "Sylvia GM - selected data unavailable" })
-                    .set_description(description)
-                    .set_level(rfd::MessageLevel::Error)
-                    .show();
+                error_box(
+                    if interrupted { "Sylvia GM - update repair required" } else { "Sylvia GM - selected data unavailable" },
+                    description,
+                );
                 std::io::Error::other(error)
             })?;
             let recovery_only = bridge.recovery_only;
@@ -3594,9 +3858,10 @@ pub fn run() {
                             if result == Ok(0) {
                                 if let Some(window) = exit_app.get_webview_window("main") { let _ = window.close(); }
                             } else {
-                                rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
-                                    .set_description("The owner did not close cleanly. Keep saved campaign data and application files intact; this was not a clean shutdown.")
-                                    .set_level(rfd::MessageLevel::Error).show();
+                                error_box(
+                                    "Sylvia GM - owner close failed",
+                                    "The owner did not close cleanly. Keep saved campaign data and application files intact; this was not a clean shutdown.",
+                                );
                                 if exit_app.state::<OwnerBridge>().poll_owner_exit().ok().flatten().is_some() {
                                     exit_app.exit(1);
                                 }
@@ -3621,8 +3886,7 @@ pub fn run() {
                             Ok(Some(_)) => {
                                 api.prevent_close();
                                 if owner.close_requested.swap(false, Ordering::AcqRel) {
-                                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
-                                        .set_description(&error).set_level(rfd::MessageLevel::Error).show();
+                                    error_box("Sylvia GM - owner close failed", &error);
                                     panel_app.exit(1);
                                 }
                                 return;
@@ -3635,9 +3899,10 @@ pub fn run() {
                                     }
                                 } else {
                                     if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
-                                    rfd::MessageDialog::new().set_title("Sylvia GM - close not completed")
-                                        .set_description(format!("{error}. Sylvia is staying open because the owner has not been collected. Keep saved campaign data and application files in place."))
-                                        .set_level(rfd::MessageLevel::Error).show();
+                                    error_box(
+                                        "Sylvia GM - close not completed",
+                                        format!("{error}. Sylvia is staying open because the owner has not been collected. Keep saved campaign data and application files in place."),
+                                    );
                                 }
                                 return;
                             }
@@ -3744,6 +4009,7 @@ pub fn run() {
             model_choices,
             provider_settings,
             chatgpt_connection,
+            claude_connection,
             admin_full_audit_status,
             admin_full_audit_record,
             open_admin_audit_window,
@@ -3756,7 +4022,9 @@ pub fn run() {
             remove_provider_settings,
             switch_session_model,
             switch_session_reasoning,
+            switch_session_speed,
             set_default_model,
+            set_chat_defaults,
             install_package,
             install_package_file,
             preview_character_card_file,
@@ -3773,6 +4041,8 @@ pub fn run() {
             ready_campaign_catalog,
             start_ready_campaign,
             customize_ready_campaign,
+            character_chat,
+            send_character_chat_message,
             start_guided_campaign,
             create_guided_campaign_draft,
             advance_guided_campaign_draft,
@@ -3818,9 +4088,10 @@ pub fn run() {
                 if matches!(collected, Some(status) if status != 0) && *code != Some(1) {
                     api.prevent_exit();
                     owner.close_requested.store(false, Ordering::Release);
-                    rfd::MessageDialog::new().set_title("Sylvia GM - owner close failed")
-                        .set_description("The owner exited unsuccessfully. Saved campaign data and application files have been retained; this was not a clean shutdown.")
-                        .set_level(rfd::MessageLevel::Error).show();
+                    error_box(
+                        "Sylvia GM - owner close failed",
+                        "The owner exited unsuccessfully. Saved campaign data and application files have been retained; this was not a clean shutdown.",
+                    );
                     app.exit(1);
                 } else if collected.is_none() {
                     api.prevent_exit();
@@ -3831,17 +4102,26 @@ pub fn run() {
                             }
                         } else {
                             if error != OWNER_CLOSE_NO_ACK { owner.close_requested.store(false, Ordering::Release); }
-                            rfd::MessageDialog::new().set_title("Sylvia GM - exit not completed")
-                                .set_description(format!("{error}. Sylvia retains the owner and saved data; exit has been stopped."))
-                                .set_level(rfd::MessageLevel::Error).show();
+                            error_box(
+                                "Sylvia GM - exit not completed",
+                                format!("{error}. Sylvia retains the owner and saved data; exit has been stopped."),
+                            );
                         }
                     }
+                } else if let Some(granted) = code {
+                    GRANTED_EXIT_CODE.store(*granted, Ordering::Release);
                 }
             }
             if matches!(event, tauri::RunEvent::Exit) {
                 app.state::<dictation::Dictation>().close();
                 let owner = app.state::<OwnerBridge>();
                 let _ = owner.poll_owner_exit();
+                let granted = GRANTED_EXIT_CODE.load(Ordering::Acquire);
+                if granted != 0 {
+                    // Tauri would finish with exit code 0 after this callback: do its cleanup and keep the code.
+                    app.cleanup_before_exit();
+                    std::process::exit(granted);
+                }
             }
         });
 }

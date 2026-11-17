@@ -168,8 +168,10 @@ def test_large_current_read_gives_bounded_exact_read_recovery():
     memory = _saved_memory()
     owner = SimpleNamespace(
         _operation=nullcontext,
+        desktop_snapshot=lambda _, **_options: SimpleNamespace(continuity=memory, state={}, revision=200),
         _store=SimpleNamespace(
             snapshot=lambda _: SimpleNamespace(continuity=memory, state={}, revision=200),
+            desktop_snapshot=lambda _: SimpleNamespace(continuity=memory, state={}, revision=200),
             accepted_campaign_plan=lambda _: None,
         ),
     )

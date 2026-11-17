@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+from contextlib import suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -52,11 +53,9 @@ class Changelog:
                     for line in f:
                         line = line.strip()
                         if line:
-                            try:
+                            # Skip a corrupt line while retaining valid history records.
+                            with suppress(json.JSONDecodeError):
                                 self._entries.append(json.loads(line))
-                            except json.JSONDecodeError:
-                                # Corrupt line — skip but warn
-                                pass
         return self._entries
 
     def get_entries(self, limit: int = 50) -> list[dict[str, Any]]:

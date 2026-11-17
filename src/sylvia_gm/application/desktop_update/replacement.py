@@ -7,8 +7,10 @@ import os
 import shutil
 import stat
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from enum import StrEnum
 from pathlib import Path
+from typing import Final
 
 from .manifest import (
     ARTIFACT_LIMIT,
@@ -20,6 +22,41 @@ from .manifest import (
     payload_path,
 )
 from .storage import atomic_receipt, checked_file, directory_identity, ensure_directory
+
+
+class ReplacementPhase(StrEnum):
+    RETAINING = "retaining"
+    PREPARED = "prepared"
+    APPLYING = "applying"
+    AWAITING_RESTART = "awaiting_restart"
+    ROLLING_BACK = "rolling_back"
+    ROLLED_BACK = "rolled_back"
+    CONFIRMED = "confirmed"
+
+
+REPLACEMENT_MOVES: Final[Mapping[ReplacementPhase, frozenset[ReplacementPhase]]] = {
+    ReplacementPhase.RETAINING: frozenset({ReplacementPhase.PREPARED}),
+    ReplacementPhase.PREPARED: frozenset(
+        {ReplacementPhase.APPLYING, ReplacementPhase.ROLLING_BACK}
+    ),
+    ReplacementPhase.APPLYING: frozenset(
+        {
+            ReplacementPhase.APPLYING,
+            ReplacementPhase.AWAITING_RESTART,
+            ReplacementPhase.ROLLING_BACK,
+        }
+    ),
+    ReplacementPhase.AWAITING_RESTART: frozenset(
+        {ReplacementPhase.APPLYING, ReplacementPhase.CONFIRMED, ReplacementPhase.ROLLING_BACK}
+    ),
+    ReplacementPhase.ROLLING_BACK: frozenset(
+        {ReplacementPhase.ROLLING_BACK, ReplacementPhase.ROLLED_BACK}
+    ),
+    ReplacementPhase.ROLLED_BACK: frozenset({ReplacementPhase.ROLLING_BACK}),
+    ReplacementPhase.CONFIRMED: frozenset(
+        {ReplacementPhase.CONFIRMED, ReplacementPhase.ROLLING_BACK}
+    ),
+}
 
 
 def file_matches(path: Path, row: PayloadFile) -> bool:
@@ -153,6 +190,10 @@ class PortableReplacement:
             raise UpdateError("unsafe_staging", "The application or update folder changed.")
 
     def _save(self, phase: str) -> None:
+        self._move_phase(phase)
+
+    def _move_phase(self, phase: str) -> None:
+        phase = phase.value if isinstance(phase, ReplacementPhase) else phase
         self._directories()
         atomic_receipt(
             self._journal,
@@ -185,10 +226,10 @@ class PortableReplacement:
         if shutil.disk_usage(self.operation).free < needed + 16 * 1024 * 1024:
             raise UpdateError("disk_full", "There is not enough space to retain the previous app.")
         self.previous.mkdir()
-        self._save("retaining")
+        self._save(ReplacementPhase.RETAINING.value)
         for row in self._old:
             _copy(self.live / row.path, self.previous / row.path, row)
-        self._save("prepared")
+        self._save(ReplacementPhase.PREPARED.value)
 
     def _restore_receipt(self) -> str:
         self._directories()
@@ -201,12 +242,12 @@ class PortableReplacement:
             or row["version"] != self.manifest.version.text
             or row["phase"]
             not in (
-                "prepared",
-                "applying",
-                "awaiting_restart",
-                "rolling_back",
-                "rolled_back",
-                "confirmed",
+                ReplacementPhase.PREPARED,
+                ReplacementPhase.APPLYING,
+                ReplacementPhase.AWAITING_RESTART,
+                ReplacementPhase.ROLLING_BACK,
+                ReplacementPhase.ROLLED_BACK,
+                ReplacementPhase.CONFIRMED,
             )
             or not isinstance(row["old"], list)
             or not 3 <= len(row["old"]) <= 4097
@@ -250,13 +291,17 @@ class PortableReplacement:
         """The native helper supplies retained process-handle checks, never renderer booleans."""
         self._barrier(processes_exited)
         phase = self._restore_receipt()
-        if phase not in {"prepared", "applying", "awaiting_restart"}:
+        if phase not in {
+            ReplacementPhase.PREPARED,
+            ReplacementPhase.APPLYING,
+            ReplacementPhase.AWAITING_RESTART,
+        }:
             raise UpdateError(
                 "invalid_phase", "This replacement cannot be applied in its current state."
             )
         old = {row.path: row for row in self._old}
         new = {row.path: row for row in self.manifest.files}
-        self._save("applying")
+        self._save(ReplacementPhase.APPLYING.value)
         for row in self.manifest.files:
             self._barrier(processes_exited)
             target = self.live / row.path
@@ -290,7 +335,7 @@ class PortableReplacement:
             os.replace(target, retired)
         for row in self.manifest.files:
             _require_file(self.live / row.path, row)
-        self._save("awaiting_restart")
+        self._save(ReplacementPhase.AWAITING_RESTART.value)
 
     def rollback(
         self, processes_exited: Callable[[], bool], check_data_compatibility: Callable[[], None]
@@ -303,11 +348,11 @@ class PortableReplacement:
         new = {row.path: row for row in self.manifest.files}
         # A completed apply consumed every staged source. An absent new-only file at
         # that point is a later change, not an interrupted move we may silently ignore.
-        if phase in {"awaiting_restart", "confirmed"}:
+        if phase in {ReplacementPhase.AWAITING_RESTART, ReplacementPhase.CONFIRMED}:
             for name, row in new.items():
                 if name not in old:
                     _require_file(self.live / name, row)
-        self._save("rolling_back")
+        self._save(ReplacementPhase.ROLLING_BACK.value)
         for row in self._old:
             self._barrier(processes_exited)
             target = self.live / row.path
@@ -340,16 +385,16 @@ class PortableReplacement:
             os.replace(target, retained)
         for row in self._old:
             _require_file(self.live / row.path, row)
-        self._save("rolled_back")
+        self._save(ReplacementPhase.ROLLED_BACK.value)
 
     def confirm(self) -> None:
         """Record a separately verified startup without changing application or user files."""
         phase = self._restore_receipt()
-        if phase not in {"awaiting_restart", "confirmed"}:
+        if phase not in {ReplacementPhase.AWAITING_RESTART, ReplacementPhase.CONFIRMED}:
             raise UpdateError(
                 "invalid_phase", "This replacement has not reached restart confirmation."
             )
-        self._save("confirmed")
+        self._save(ReplacementPhase.CONFIRMED.value)
 
     def verify_rollback(self) -> None:
         """Confirm the retained old inventory, including absence of new-only live files."""

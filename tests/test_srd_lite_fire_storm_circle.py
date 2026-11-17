@@ -21,7 +21,7 @@ def circle_runtime():
     pool = data.get('parameter_declarations', {})
     for tool in data['tools'].values():
         tool['parameters'] = [deepcopy(pool[item]) if isinstance(item, str) else item
-                              for item in tool['parameters']]
+                              for item in tool.get("parameters", [])]
     if os.environ.get('FIRE_CIRCLE_PATCH') == '1':
         # Rebuild the raw factory boundary before the package compiler factors calls.
         data['tools'].update(_area_cover_tools())

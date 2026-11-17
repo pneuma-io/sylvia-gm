@@ -11,7 +11,6 @@ from sylvia_gm.application.bundled_packages import (
     bundled_rift_authority,
 )
 from sylvia_gm.application.plan_state_admission import validate_starting_declarations
-from sylvia_gm.domain.starting_state import parse_state_schemas
 from sylvia_gm.application.setting_character_requirements import (
     CHARACTER_REQUIREMENTS_PATH,
     parse_setting_character_requirements,
@@ -30,6 +29,7 @@ from sylvia_gm.domain.package_library import (
     closure_sha256,
     parse_campaign_setting_knowledge_bytes,
 )
+from sylvia_gm.domain.starting_state import parse_state_schemas
 
 if TYPE_CHECKING:
     from sylvia_gm.application.authority import AuthorityOwner

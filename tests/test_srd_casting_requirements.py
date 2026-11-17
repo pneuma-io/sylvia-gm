@@ -112,6 +112,45 @@ def test_unknown_required_component_does_not_default_to_available():
     assert state == before
 
 
+def test_combat_cast_defaults_somatic_available_without_supplying_it():
+    state, data, parameters = _spell_case("fire_bolt")
+    parameters.pop("somatic_component_available", None)
+    parameters["verbal_component_available"] = True
+    result = _run("cast_spell", state, participant_data=data, **parameters)
+    assert result.result["status"] == "committed"
+
+
+def test_long_cast_defaults_somatic_at_start_and_continuation_but_preserves_false():
+    state, data, parameters = _spell_case("mending")
+    state["sylvia.srd-lite.bg3.combat"].update(
+        encounter_active=False, turn_active=False, active_actor=None, phase="exploration",
+    )
+    begin = {key: parameters[key] for key in (
+        "spell", "caster", "caster_state", "slot_resource", "verbal_component_available",
+        "material_component_available", "material_item_ids",
+    )}
+    _run("begin_srd_spell_cast", state, participant_data=data, **begin)
+    before = deepcopy(state)
+    with pytest.raises(RulesetPreconditionRejected, match="Somatic component"):
+        _run(
+            "continue_srd_spell_cast", state, caster_state="hero", uninterrupted=True,
+            verbal_component_available=True, somatic_component_available=False,
+            material_component_available=True,
+        )
+    assert state == before
+    _run(
+        "continue_srd_spell_cast", state, caster_state="hero", uninterrupted=True,
+        elapsed_rounds=1, verbal_component_available=True, material_component_available=True,
+    )
+    hero = state["sylvia.srd-lite.bg3.entities"]["hero"]
+    previous = before["sylvia.srd-lite.bg3.entities"]["hero"]
+    assert (
+        hero["extended_casting"]["progress_rounds"]
+        == previous["extended_casting"]["progress_rounds"] + 1
+    )
+    assert hero["resources"] == previous["resources"]
+
+
 def test_missing_spell_grant_has_an_actionable_rejection_without_dynamic_key_failure():
     state, data, parameters = _spell_case("fire_bolt")
     data.pop("spellcasting_grants")

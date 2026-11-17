@@ -8,14 +8,41 @@ import subprocess
 import sys
 import uuid
 from collections.abc import Callable, Mapping
+from enum import StrEnum
 from pathlib import Path
-from typing import Protocol
+from typing import Final, Protocol
 
 from .manifest import Manifest, PayloadFile, UpdateError, Version, bounded_json
 from .payload import verify_artifact
 from .replacement import _copy, file_matches
 from .runtime import system_child_libraries
 from .storage import atomic_receipt, checked_file, directory_identity, ensure_directory
+
+
+class InstalledPhase(StrEnum):
+    PREPARED = "prepared"
+    APPLYING = "applying"
+    AWAITING_RESTART = "awaiting_restart"
+    ROLLING_BACK = "rolling_back"
+    ROLLED_BACK = "rolled_back"
+    CONFIRMED = "confirmed"
+
+
+INSTALLED_MOVES: Final[Mapping[InstalledPhase, frozenset[InstalledPhase]]] = {
+    InstalledPhase.PREPARED: frozenset({InstalledPhase.APPLYING, InstalledPhase.ROLLING_BACK}),
+    InstalledPhase.APPLYING: frozenset(
+        {InstalledPhase.APPLYING, InstalledPhase.AWAITING_RESTART, InstalledPhase.ROLLING_BACK}
+    ),
+    InstalledPhase.AWAITING_RESTART: frozenset(
+        {InstalledPhase.APPLYING, InstalledPhase.CONFIRMED, InstalledPhase.ROLLING_BACK}
+    ),
+    InstalledPhase.ROLLING_BACK: frozenset(
+        {InstalledPhase.ROLLING_BACK, InstalledPhase.ROLLED_BACK}
+    ),
+    InstalledPhase.ROLLED_BACK: frozenset({InstalledPhase.ROLLING_BACK}),
+    InstalledPhase.CONFIRMED: frozenset({InstalledPhase.CONFIRMED, InstalledPhase.ROLLING_BACK}),
+}
+
 
 # Match the current Tauri product/identifier and its default publisher fallback, not a search.
 UNINSTALL_KEY = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\Sylvia GM"
@@ -104,17 +131,20 @@ def run_nsis(artifact: Path, live: Path) -> int:
     }
     environment.update(TEMP=str(temporary), TMP=str(temporary))
     try:
-        with system_child_libraries(), subprocess.Popen(
-            nsis_command_line(artifact, live),
-            executable=str(artifact),
-            shell=False,
-            stdin=subprocess.DEVNULL,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            cwd=artifact.parent,
-            env=environment,
-            creationflags=subprocess.CREATE_NO_WINDOW,
-        ) as process:
+        with (
+            system_child_libraries(),
+            subprocess.Popen(
+                nsis_command_line(artifact, live),
+                executable=str(artifact),
+                shell=False,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                cwd=artifact.parent,
+                env=environment,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            ) as process,
+        ):
             return process.wait()  # No forced termination or artificial installer time limit.
     except OSError as error:
         raise UpdateError(
@@ -192,6 +222,10 @@ class InstalledReplacement:
         verify_artifact(self.artifacts / "previous-installer/artifact.verified", self.previous)
 
     def _save(self, phase: str) -> None:
+        self._move_phase(phase)
+
+    def _move_phase(self, phase: str) -> None:
+        phase = phase.value if isinstance(phase, InstalledPhase) else phase
         atomic_receipt(
             self._journal,
             {
@@ -213,12 +247,12 @@ class InstalledReplacement:
             or row["previous_version"] != self.previous.version.text
             or row["phase"]
             not in {
-                "prepared",
-                "applying",
-                "awaiting_restart",
-                "rolling_back",
-                "rolled_back",
-                "confirmed",
+                InstalledPhase.PREPARED,
+                InstalledPhase.APPLYING,
+                InstalledPhase.AWAITING_RESTART,
+                InstalledPhase.ROLLING_BACK,
+                InstalledPhase.ROLLED_BACK,
+                InstalledPhase.CONFIRMED,
             }
         ):
             raise UpdateError("invalid_journal", "Installed recovery needs reconciliation.")
@@ -254,7 +288,7 @@ class InstalledReplacement:
             < sum(row.size for row in self.manifest.files) + 16 * 1024**2
         ):
             raise UpdateError("disk_full", "There is not enough space to apply this update safely.")
-        self._save("prepared")
+        self._save(InstalledPhase.PREPARED.value)
 
     def _retire(
         self, source: Manifest, keep: Manifest, directory: str, processes_exited: Callable[[], bool]
@@ -295,12 +329,16 @@ class InstalledReplacement:
 
     def apply(self, processes_exited: Callable[[], bool]) -> None:
         self._check((self.previous.version, self.manifest.version))
-        if self._phase() not in {"prepared", "applying", "awaiting_restart"}:
+        if self._phase() not in {
+            InstalledPhase.PREPARED,
+            InstalledPhase.APPLYING,
+            InstalledPhase.AWAITING_RESTART,
+        }:
             raise UpdateError("invalid_phase", "This installer cannot apply in its current state.")
         if not processes_exited():
             raise UpdateError("application_busy", "Close all owned processes before updating.")
         self._mixed_files()
-        self._save("applying")
+        self._save(InstalledPhase.APPLYING.value)
         needed = not self._matches(self.manifest) or self.registration.read().get(
             "DisplayVersion"
         ) not in registered_versions(self.manifest.version)
@@ -316,7 +354,7 @@ class InstalledReplacement:
                 "installation_incomplete", "Installed files failed final verification."
             )
         self._retire(self.previous, self.manifest, "retired", processes_exited)
-        self._save("awaiting_restart")
+        self._save(InstalledPhase.AWAITING_RESTART.value)
 
     def rollback(
         self, processes_exited: Callable[[], bool], compatibility: Callable[[], None]
@@ -327,7 +365,7 @@ class InstalledReplacement:
             raise UpdateError("application_busy", "Close all owned processes before recovery.")
         compatibility()  # A deliberate recovery path, never a normal downgrade offer.
         self._mixed_files()
-        self._save("rolling_back")
+        self._save(InstalledPhase.ROLLING_BACK.value)
         needed = not self._matches(self.previous) or self.registration.read().get(
             "DisplayVersion"
         ) not in registered_versions(self.previous.version)
@@ -342,15 +380,15 @@ class InstalledReplacement:
         if not self._matches(self.previous):
             raise UpdateError("recovery_failed", "Recovered application files failed verification.")
         self._retire(self.manifest, self.previous, "failed-new", processes_exited)
-        self._save("rolled_back")
+        self._save(InstalledPhase.ROLLED_BACK.value)
 
     def confirm(self) -> None:
         self._check((self.manifest.version,))
-        if self._phase() not in {"awaiting_restart", "confirmed"}:
+        if self._phase() not in {InstalledPhase.AWAITING_RESTART, InstalledPhase.CONFIRMED}:
             raise UpdateError(
                 "invalid_phase", "This installer has not reached restart confirmation."
             )
-        self._save("confirmed")
+        self._save(InstalledPhase.CONFIRMED.value)
 
     def helper_payload(self) -> tuple[Path, PayloadFile]:
         row = next((row for row in self.previous.files if row.path == "sylvia-gm-owner.exe"), None)
@@ -363,7 +401,7 @@ class InstalledReplacement:
     def verify_rollback(self) -> None:
         """Require the exact previous registered copy before acknowledging recovery."""
         self._check((self.previous.version,))
-        if self._phase() != "rolled_back" or not self._matches(self.previous):
+        if self._phase() != InstalledPhase.ROLLED_BACK or not self._matches(self.previous):
             raise UpdateError("recovery_incomplete", "Installed recovery has not finished.")
         old = {row.path for row in self.previous.files}
         for row in self.manifest.files:

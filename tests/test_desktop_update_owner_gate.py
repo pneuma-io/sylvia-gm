@@ -5,6 +5,9 @@ import pytest
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.infrastructure.launch_handshake import derive_owner_response
 from sylvia_gm.interfaces.local_owner import LocalOwnerSupervisor
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 
 OPERATION = "a" * 32
 

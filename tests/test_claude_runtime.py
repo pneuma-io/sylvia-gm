@@ -1,0 +1,1228 @@
+"""Native-runtime admission, canonical history and process-owned failure checks."""
+
+from __future__ import annotations
+
+import asyncio
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from sylvia_gm.agent._provider_resolver import ConfiguredProviderResolver
+from sylvia_gm.config import claude_settings
+from sylvia_gm.config._resolver import ConfigError
+from sylvia_gm.config.provider_settings import (
+    discover_provider_models,
+    provider_settings,
+    validate_provider_model,
+)
+from sylvia_gm.domain.authority import WriterRole
+from sylvia_gm.domain.session import SessionRecord
+from sylvia_gm.provider import _claude, _claude_runtime
+from sylvia_gm.provider._base import ModelInfo, ProviderConfig
+from sylvia_gm.provider._claude import ClaudeProvider, prepare_request
+from sylvia_gm.provider._claude_runtime import ClaudeConnection
+from sylvia_gm.provider._exceptions import (
+    AuthenticationError,
+    IncompleteProviderStreamError,
+    InvalidResponseError,
+    ModelNotFoundError,
+    ProviderConnectionError,
+    ProviderError,
+    ProviderTimeoutError,
+    RateLimitError,
+    TokenLimitError,
+)
+from sylvia_gm.provider._factory import ProviderFactory
+from sylvia_gm.provider._output_policy import output_allowance
+
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "inspect",
+            "description": "Inspect a door",
+            "parameters": {
+                "type": "object",
+                "properties": {"target": {"type": "string"}},
+                "required": ["target"],
+            },
+        },
+    }
+]
+
+
+#: A model name Sylvia has no documented window for, so nothing is known until one is reported.
+UNLISTED = "custom"
+
+
+def model(name: str = "opus") -> ModelInfo:
+    return ModelInfo(
+        id=f"claude-runtime/{name}",
+        name="Claude",
+        provider_name="Claude",
+        provider_key="claude_runtime",
+        provider_mode="subscription",
+        transport="claude_code",
+        provider_model_id=name,
+        max_output_tokens=None,
+    )
+
+
+@pytest.mark.parametrize(("name", "expected"), [
+    ("opus", 1_000_000), ("sonnet", 1_000_000), ("haiku", 1_000_000), ("fable", 1_000_000),
+    ("claude-opus-5-5", 1_000_000), ("claude-sonnet-5-5", 1_000_000),
+    ("claude-haiku-5-5", 1_000_000), ("claude-fable-5-2", 1_000_000),
+    # Claude Code's own suffix for the same window.
+    ("sonnet[1m]", 1_000_000), ("claude-opus-5-5[1m]", 1_000_000),
+    # Only exact names: anything else is unknown and keeps the cautious figure.
+    ("default", None), ("Opus", None), ("opus ", None), ("claude-sonnet-4-5", None),
+    ("claude-opus-5", None), ("claude-sonnet-5-5-20261001", None), ("custom", None),
+    ("[1m]", None), ("", None), (None, None), (1_000_000, None),
+])
+def test_the_documented_window_is_known_only_for_exact_names_and_aliases(name, expected):
+    assert _claude_runtime.documented_context_window(name) == expected
+
+
+def test_a_listed_model_is_planned_within_its_documented_window_from_the_first_request(
+    tmp_path, monkeypatch,
+):
+    adapter, _ = provider(tmp_path, monkeypatch, [])
+    info = adapter.model_info
+    assert info.runtime_context_window == info.context_window == 1_000_000
+    # A catalog figure, not one the runtime reported.
+    assert info.runtime_context_source == info.context_window_source == "model_catalog"
+    assert info.runtime_context_observed_at == "2026-11-17"
+    assert planning_capacity(adapter) == 1_000_000
+
+    unlisted, _ = provider(tmp_path, monkeypatch, [], UNLISTED)
+    assert unlisted.model_info.context_window is None
+    assert unlisted.model_info.context_window_source == "unknown"
+    assert planning_capacity(unlisted) == 200_000
+
+
+@pytest.mark.parametrize(("saved", "expected", "source", "mismatch"), [
+    (200_000, 200_000, "user_configured", False),
+    (999_999, 999_999, "user_configured", False),
+    # A saved allowance cannot raise the documented figure either.
+    (2_000_000, 1_000_000, "model_catalog", True),
+])
+def test_a_saved_allowance_caps_the_documented_window_and_cannot_raise_it(
+    tmp_path, monkeypatch, saved, expected, source, mismatch,
+):
+    info = model()
+    info.configured_context_window = info.context_window = saved
+    info.context_window_source = "user_configured"
+    adapter = ClaudeProvider(tmp_path / "runtime", info)
+    assert info.context_window == expected and info.context_window_source == source
+    assert info.configured_context_window == saved
+    assert info.configured_runtime_mismatch is mismatch
+    assert planning_capacity(adapter) == expected
+
+
+def test_a_window_already_saved_with_the_model_is_left_as_it_is(tmp_path):
+    info = model()
+    info.runtime_context_window = info.context_window = 400_000
+    info.runtime_context_source = info.context_window_source = "runtime_reported"
+    info.runtime_context_observed_at = "2026-11-01T00:00:00+00:00"
+    ClaudeProvider(tmp_path / "runtime", info)
+    assert info.runtime_context_window == info.context_window == 400_000
+    assert info.runtime_context_source == "runtime_reported"
+    assert info.runtime_context_observed_at == "2026-11-01T00:00:00+00:00"
+
+
+def test_a_gm_turn_of_tool_calls_is_planned_within_the_documented_window_throughout(
+    tmp_path, monkeypatch,
+):
+    """Every GM request ends in a tool call, so no result record ever names a window."""
+    step = streamed_call_without_arguments([""])
+    adapter, connection = provider(tmp_path, monkeypatch, step + step)
+    records = []
+
+    class Audit:
+        async def on_request(self, context):
+            records.append((context.request_json or {}).get("method"))
+
+    adapter.hooks.register(Audit())
+    for _ in range(2):
+        assert planning_capacity(adapter) == 1_000_000
+        response = asyncio.run(adapter.generate([{"role": "user", "content": "Go."}], END_TURN))
+        assert response.finish_reason == "tool_calls"
+    assert planning_capacity(adapter) == 1_000_000
+    assert adapter.model_info.runtime_context_source == "model_catalog"
+    assert records == ["claude/native_step", "claude/native_step"]
+
+
+def test_a_refusal_withdraws_the_documented_window_for_the_rest_of_the_providers_life(
+    tmp_path, monkeypatch, caplog,
+):
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, connection = provider(
+        tmp_path, monkeypatch, [refusal, refusal, *narrated({"claude-opus-5-5": 1_000_000})],
+    )
+    info = adapter.model_info
+    assert planning_capacity(adapter) == 1_000_000
+    with caplog.at_level("WARNING"), pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    # One request was sent and refused; the provider sent nothing again by itself.
+    assert len(connection.writes) == 2
+    assert info.runtime_context_window is None and info.context_window is None
+    assert info.context_window_source == "unknown" and planning_capacity(adapter) == 200_000
+    assert "context window of 1000000 tokens (model_catalog)" in caplog.text
+
+    # A second refusal changes nothing more, and neither the documented figure nor one
+    # reported later is used again.
+    caplog.clear()
+    with caplog.at_level("WARNING"), pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    assert "refused a request planned" not in caplog.text
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.context_window is None and planning_capacity(adapter) == 200_000
+
+
+def test_a_refused_request_is_shortened_against_the_smaller_figure_and_sent_once_more(
+    tmp_path, monkeypatch,
+):
+    """The caller's shorten-and-retry step after a refusal: one summary, one resend, no loop."""
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, connection = provider(
+        tmp_path, monkeypatch, [refusal, *narrated({}), *narrated({})],
+    )
+    saved = []
+
+    async def save(record) -> None:
+        saved.append(record)
+
+    working = WorkingContextProvider(adapter, save=save, pin_first_user=False)
+    history = [{"role": "system", "content": "Only saved campaign facts are authoritative."}]
+    for index in range(4):
+        history += [{"role": "user", "content": f"Player step {index}. " + "x" * 2000},
+                    {"role": "assistant", "content": f"Narration {index}. " + "y" * 2000}]
+    history.append({"role": "user", "content": "I open the door."})
+    assert working.budget_terms(history, None, {})["capacity"] == 1_000_000
+
+    response = asyncio.run(working.generate(history))
+    assert response.content == "Open."
+    # Refused request, one summary request, one resend: three steps and no more.
+    assert len(connection.writes) == 6
+    assert len(saved) == 1 and saved[0]["covered_exchanges"] == 8
+    assert working.budget_terms(history, None, {})["capacity"] == 200_000
+    assert adapter.model_info.context_window is None
+
+
+def tool_history() -> list[dict]:
+    return [
+        {"role": "system", "content": "Only saved campaign facts are authoritative."},
+        {"role": "user", "content": "Inspect the door."},
+        {
+            "role": "assistant",
+            "content": "I check it.",
+            "tool_calls": [
+                {
+                    "id": "call_saved",
+                    "type": "function",
+                    "function": {"name": "inspect", "arguments": '{"target":"door"}'},
+                }
+            ],
+        },
+        {"role": "tool", "tool_call_id": "call_saved", "content": "The door is open."},
+    ]
+
+
+class Connection:
+    """SDK events at the native process boundary; game operations never run here."""
+
+    def __init__(self, events: list[dict | Exception]) -> None:
+        self.events = iter(events)
+        self.writes = []
+        self.closed = False
+        self.arguments = []
+
+    def start(self):
+        pass
+
+    def write(self, event):
+        self.writes.append(event)
+
+    def next_event(self, timeout):
+        try:
+            event = next(self.events)
+        except StopIteration:
+            raise ProviderConnectionError("native EOF") from None
+        if isinstance(event, Exception):
+            raise event
+        return event
+
+    def close(self):
+        self.closed = True
+
+
+def step_folder(arguments):
+    """The per-step folder holding the system and transcript files (never the cwd)."""
+    return Path(arguments[arguments.index("--system-prompt-file") + 1]).parent
+
+
+def assert_step_removed(connection, tmp_path):
+    """The cwd is one fixed, empty folder; the step's private files are gone."""
+    assert connection.workspace == tmp_path / "runtime" / "workspace"
+    assert list(connection.workspace.iterdir()) == []
+    assert connection.step.parent == tmp_path / "runtime" / "steps"
+    assert not connection.step.exists()
+
+
+def provider(tmp_path, monkeypatch, events, name="opus"):
+    connection = Connection(events)
+    monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
+
+    def factory(executable, workspace, arguments, environment):
+        connection.arguments = arguments
+        connection.workspace = workspace
+        connection.step = step_folder(arguments)
+        connection.environment = environment
+        return connection
+
+    adapter = ClaudeProvider(tmp_path / "runtime", model(name), connection_factory=factory)
+    return adapter, connection
+
+
+def native_call(name="inspect", arguments=None):
+    return {
+        "type": "control_request",
+        "request_id": "rpc-call",
+        "request": {
+            "subtype": "mcp_message",
+            "server_name": "sylvia",
+            "message": {
+                "jsonrpc": "2.0",
+                "id": 3,
+                "method": "tools/call",
+                "params": {"name": name, "arguments": arguments or {"target": "door"}},
+            },
+        },
+    }
+
+
+def native_message(*blocks):
+    """A real Messages stream, including completed native signatures and tool inputs."""
+    events = []
+    for index, block in enumerate(blocks):
+        kind = block["type"]
+        initial = {**block}
+        field = {"text": "text", "thinking": "thinking"}.get(kind)
+        if field:
+            initial[field] = ""
+        elif kind == "tool_use":
+            initial["input"] = {}
+        events.append({"type": "content_block_start", "index": index, "content_block": initial})
+        if field:
+            events.append(
+                {
+                    "type": "content_block_delta",
+                    "index": index,
+                    "delta": {"type": field + "_delta", field: block[field]},
+                }
+            )
+        elif kind == "tool_use":
+            events.append(
+                {
+                    "type": "content_block_delta",
+                    "index": index,
+                    "delta": {
+                        "type": "input_json_delta",
+                        "partial_json": json.dumps(block["input"]),
+                    },
+                }
+            )
+        events.append({"type": "content_block_stop", "index": index})
+    events.append({"type": "message_stop"})
+    return [{"type": "stream_event", "event": event} for event in events]
+
+
+def test_native_history_keeps_roles_pairs_and_does_not_mutate_source(tmp_path):
+    source = tool_history()
+    before = json.dumps(source)
+    system, records, prompt, tools = prepare_request(source, TOOLS, "opus", tmp_path)
+    assert system == source[0]["content"]
+    assert [r["message"]["role"] for r in records] == ["user", "assistant", "user"]
+    assert records[1]["message"]["content"][1] == {
+        "type": "tool_use",
+        "id": "call_saved",
+        "name": "mcp__sylvia__inspect",
+        "input": {"target": "door"},
+    }
+    result = records[2]["message"]["content"][0]
+    assert result["type"] == "tool_result" and result["tool_use_id"] == "call_saved"
+    assert result["content"] == "The door is open."
+    assert prompt["isSynthetic"] is True
+    assert "not player speech" in prompt["message"]["content"]
+    assert tools[0]["name"] == "inspect"
+    assert json.dumps(source) == before
+    _, history, player, _ = prepare_request(
+        source + [{"role": "user", "content": "/fast"}], TOOLS, "opus", tmp_path
+    )
+    assert len(history) == 3 and player["message"] == {"role": "user", "content": "/fast"}
+
+
+def test_unknown_roles_are_rejected(tmp_path):
+    with pytest.raises(InvalidResponseError):
+        prepare_request([{"role": "surprise", "content": "private"}], None, "opus", tmp_path)
+
+
+def test_application_owned_input_uses_native_non_user_marker(tmp_path):
+    _, _, prompt, _ = prepare_request(
+        [
+            {"role": "user", "_application_data": True, "content": "Application-owned source"},
+        ],
+        None,
+        "opus",
+        tmp_path,
+    )
+    assert prompt["isSynthetic"] is True
+    assert prompt["message"]["content"] == "Application-owned source"
+
+
+def test_stream_returns_one_admitted_tool_only_after_child_collection(tmp_path, monkeypatch):
+    events = native_message(
+        {"type": "text", "text": "Checking."},
+        {
+            "type": "tool_use",
+            "id": "call_owned",
+            "name": "mcp__sylvia__inspect",
+            "input": {"target": "door"},
+        },
+    ) + [native_call()]
+    adapter, connection = provider(tmp_path, monkeypatch, events)
+
+    async def run():
+        chunks = []
+        async for chunk in adapter.generate_stream([{"role": "user", "content": "Check."}], TOOLS):
+            if chunk.tool_call_delta:
+                assert connection.closed
+            chunks.append(chunk)
+        return chunks
+
+    chunks = asyncio.run(run())
+    assert chunks[0].content == "Checking."
+    assert next(c for c in chunks if c.tool_call_delta).tool_call_delta["id"] == "call_owned"
+    assert chunks[-1].finish_reason == "tool_calls"
+    assert all(w.get("response", {}).get("request_id") != "rpc-call" for w in connection.writes)
+    assert (
+        "--safe-mode" in connection.arguments and "--no-session-persistence" in connection.arguments
+    )
+    assert connection.arguments[connection.arguments.index("--tools") + 1] == ""
+    assert_step_removed(connection, tmp_path)
+
+
+END_TURN = [{"type": "function", "function": {
+    "name": "end_turn", "description": "End the turn", "parameters": {"type": "object"},
+}}]
+
+
+def streamed_call_without_arguments(fragments):
+    """A tool use as Claude streams it for an operation that takes no arguments.
+
+    The start block carries ``input: {}``; the argument deltas that follow are empty strings,
+    or there are none at all.
+    """
+    events = [
+        {"type": "content_block_start", "index": 0,
+         "content_block": {"type": "text", "text": ""}},
+        {"type": "content_block_delta", "index": 0,
+         "delta": {"type": "text_delta", "text": "Next step is ending the turn."}},
+        {"type": "content_block_stop", "index": 0},
+        {"type": "content_block_start", "index": 1, "content_block": {
+            "type": "tool_use", "id": "call_end", "name": "mcp__sylvia__end_turn", "input": {}}},
+        *({"type": "content_block_delta", "index": 1,
+           "delta": {"type": "input_json_delta", "partial_json": fragment}}
+          for fragment in fragments),
+        {"type": "content_block_stop", "index": 1},
+        {"type": "message_stop"},
+    ]
+    call = native_call("end_turn", {"unused": True})
+    call["request"]["message"]["params"]["arguments"] = {}
+    return [{"type": "stream_event", "event": event} for event in events] + [call]
+
+
+@pytest.mark.parametrize("fragments", [[""], ["", ""], [], ["{}"], ["{", "}"]])
+def test_an_operation_without_arguments_is_returned_like_any_other(
+    tmp_path, monkeypatch, fragments,
+):
+    adapter, connection = provider(
+        tmp_path, monkeypatch, streamed_call_without_arguments(fragments),
+    )
+    response = asyncio.run(adapter.generate([{"role": "user", "content": "Attack."}], END_TURN))
+    assert response.content == "Next step is ending the turn."
+    assert [(call.id, call.name, call.arguments) for call in response.tool_calls] == [
+        ("call_end", "end_turn", "{}"),
+    ]
+    assert response.finish_reason == "tool_calls" and connection.closed
+
+
+class RefusalAudit:
+    def __init__(self):
+        self.records = []
+
+    async def on_request(self, context):
+        if (context.request_json or {}).get("method") == "claude/invalid_response":
+            self.records.append(context.request_json)
+
+
+@pytest.mark.parametrize(("events", "tools", "expected"), [
+    # Arguments that are not JSON: the event being read and the failure's kind, no content.
+    (streamed_call_without_arguments(["{"]), END_TURN, {
+        "reason": "malformed_event", "event": "stream_event", "subtype": "content_block_stop",
+        "exception": "JSONDecodeError", "permission_denials": [], "pending_tool_uses": [],
+    }),
+    # A call Claude Code makes that the model's stream did not announce with these arguments.
+    (streamed_call_without_arguments([""])[:-1] + [native_call("end_turn", {"extra": 1})],
+     END_TURN, {
+        "reason": "uncorrelated_call", "event": "control_request", "subtype": "tools/call",
+        "exception": None, "permission_denials": [],
+        "pending_tool_uses": ["mcp__sylvia__end_turn"],
+    }),
+    # Claude Code ended the step without making the announced call, and says it was denied.
+    (streamed_call_without_arguments([""])[:-1] + [{
+        "type": "result", "subtype": "success", "is_error": False, "result": "",
+        "permission_denials": [{"tool_name": "mcp__sylvia__end_turn", "tool_input": {"x": "y"}}],
+    }], END_TURN, {
+        "reason": "operation_not_admitted", "event": "result", "subtype": "success",
+        "exception": None, "permission_denials": ["mcp__sylvia__end_turn"],
+        "pending_tool_uses": ["mcp__sylvia__end_turn"],
+    }),
+    # Claude Code started with other tools than this request's.
+    ([{"type": "system", "subtype": "init", "tools": ["Bash"]}], END_TURN, {
+        "reason": "tools_not_exposed", "event": "system", "subtype": "init",
+        "exception": None, "permission_denials": [], "pending_tool_uses": [],
+    }),
+])
+def test_a_refused_response_says_which_check_refused_it_and_nothing_of_its_content(
+    tmp_path, monkeypatch, caplog, events, tools, expected,
+):
+    adapter, connection = provider(tmp_path, monkeypatch, events)
+    audit = RefusalAudit()
+    adapter.hooks.register(audit)
+    with caplog.at_level("WARNING"), pytest.raises(InvalidResponseError):
+        asyncio.run(adapter.generate([{"role": "user", "content": "Attack."}], tools))
+    assert [record["params"] for record in audit.records] == [expected]
+    assert audit.records[0]["direction"] == "receive"
+    assert f"'reason': '{expected['reason']}'" in caplog.text
+    assert "ending the turn" not in str(audit.records) + caplog.text
+    assert connection.closed
+
+
+@pytest.mark.parametrize("name,arguments", [("Bash", {}), ("inspect", {"target": "wrong"})])
+def test_unadvertised_or_uncorrelated_calls_never_escape(tmp_path, monkeypatch, name, arguments):
+    events = [
+        {
+            "type": "assistant",
+            "message": {
+                "content": [
+                    {
+                        "type": "tool_use",
+                        "id": "owned",
+                        "name": "mcp__sylvia__inspect",
+                        "input": {"target": "door"},
+                    }
+                ]
+            },
+        },
+        native_call(name, arguments),
+    ]
+    adapter, connection = provider(tmp_path, monkeypatch, events)
+    with pytest.raises(InvalidResponseError):
+        asyncio.run(adapter.generate([{"role": "user", "content": "Check"}], TOOLS))
+    assert connection.closed
+
+
+@pytest.mark.parametrize(
+    "event,error",
+    [
+        ({"api_error_status": 401}, AuthenticationError),
+        ({"api_error_status": 429}, RateLimitError),
+        ({"type": "rate_limit_event", "rate_limit_info": {"status": "rejected"}}, RateLimitError),
+        ({"api_error_status": 404}, ModelNotFoundError),
+        ({"errors": ["prompt is too long"]}, TokenLimitError),
+        ({"errors": ["private data and sk-secret"]}, ProviderError),
+    ],
+)
+def test_native_failures_are_safe_and_never_resubmitted(tmp_path, monkeypatch, event, error):
+    adapter, connection = provider(
+        tmp_path,
+        monkeypatch,
+        [
+            {"type": "result", "subtype": "error_during_execution", "is_error": True, **event},
+        ],
+    )
+    with pytest.raises(error) as caught:
+        asyncio.run(adapter.generate([{"role": "user", "content": "Check"}]))
+    assert "sk-secret" not in str(caught.value)
+    assert len(connection.writes) == 2 and connection.closed
+
+
+def test_text_and_reported_usage_have_no_estimated_bill(tmp_path, monkeypatch):
+    adapter, connection = provider(
+        tmp_path,
+        monkeypatch,
+        native_message({"type": "text", "text": "Open."})
+        + [
+            {
+                "type": "result",
+                "subtype": "success",
+                "is_error": False,
+                "result": "Open.",
+                "total_cost_usd": 300,
+                "usage": {
+                    "input_tokens": 10,
+                    "cache_read_input_tokens": 20,
+                    "cache_creation_input_tokens": 3,
+                    "output_tokens": 4,
+                },
+            },
+        ],
+    )
+    response = asyncio.run(adapter.generate(tool_history()))
+    assert response.content == "Open."
+    assert response.usage.prompt_tokens == 33 and response.usage.total_tokens == 37
+    assert response.usage_reported is True
+    assert not hasattr(response, "total_cost_usd") and connection.closed
+
+
+def narrated(window_by_model):
+    """A narrated reply whose result record reports the windows Claude Code uses."""
+    usage = {
+        name: {"inputTokens": 10, "outputTokens": 4, "contextWindow": window}
+        for name, window in window_by_model.items()
+    }
+    return native_message({"type": "text", "text": "Open."}) + [{
+        "type": "result", "subtype": "success", "is_error": False, "result": "Open.",
+        "usage": {"input_tokens": 10, "output_tokens": 4}, "modelUsage": usage,
+    }]
+
+
+def planning_capacity(adapter) -> int:
+    from sylvia_gm.agent._working_context import WorkingContextProvider
+
+    async def save(_record) -> None:
+        return None
+
+    working = WorkingContextProvider(adapter, save=save, pin_first_user=False)
+    return working.budget_terms([{"role": "user", "content": "Check"}], None, {})["capacity"]
+
+
+def test_the_window_claude_code_reports_is_planned_with_from_the_next_request(
+    tmp_path, monkeypatch,
+):
+    adapter, _ = provider(
+        tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}), UNLISTED,
+    )
+    info = adapter.model_info
+    assert info.context_window is None and planning_capacity(adapter) == 200_000
+
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window == info.context_window == 1_000_000
+    assert info.runtime_context_source == info.context_window_source == "runtime_reported"
+    assert info.runtime_context_observed_at is not None
+    assert planning_capacity(adapter) == 1_000_000
+
+
+def test_the_reported_counts_and_window_are_audited_without_the_price_estimate(
+    tmp_path, monkeypatch,
+):
+    events = narrated({"claude-opus-5-5": 1_000_000})
+    events[-1]["modelUsage"]["claude-opus-5-5"].update(costUSD=0.25, webSearchRequests="none")
+    events[-1]["modelUsage"]["not-a-row"] = "ignored"
+    adapter, _ = provider(tmp_path, monkeypatch, events)
+    seen = []
+
+    class Audit:
+        async def on_request(self, context):
+            seen.append(context.request_json)
+
+    adapter.hooks.register(Audit())
+    asyncio.run(adapter.generate(tool_history()))
+    assert [record["method"] for record in seen] == [
+        "claude/native_step", "claude/result_model_usage",
+    ]
+    assert seen[1] == {
+        "direction": "receive",
+        "method": "claude/result_model_usage",
+        "params": {"model": "opus", "model_usage": {"claude-opus-5-5": {
+            "inputTokens": 10, "outputTokens": 4, "contextWindow": 1_000_000,
+        }}},
+    }
+
+
+def test_a_saved_context_allowance_still_caps_the_reported_window(tmp_path, monkeypatch):
+    adapter, _ = provider(
+        tmp_path, monkeypatch, narrated({"claude-opus-5-5": 1_000_000}), UNLISTED,
+    )
+    info = adapter.model_info
+    info.configured_context_window = info.context_window = 200_000
+    info.context_window_source = "user_configured"
+
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window == 1_000_000
+    assert info.context_window == 200_000 and info.context_window_source == "user_configured"
+    assert info.configured_runtime_mismatch is False
+    assert planning_capacity(adapter) == 200_000
+
+
+@pytest.mark.parametrize(("reported", "resolved", "expected"), [
+    # Several models in one record: only the one Claude says it selected counts.
+    ({"claude-haiku-5-5": 200_000, "claude-opus-5-5": 1_000_000}, "claude-opus-5-5", 1_000_000),
+    ({"claude-haiku-5-5": 200_000, "claude-opus-5-5": 1_000_000}, None, None),
+    ({"claude-opus-5-5": 0}, None, None),
+    ({"claude-opus-5-5": True}, None, None),
+    ({"claude-opus-5-5": "1000000"}, None, None),
+    ({}, None, None),
+])
+def test_only_a_plain_figure_for_the_selected_model_is_used(
+    tmp_path, monkeypatch, reported, resolved, expected,
+):
+    events = narrated(reported)
+    if resolved is not None:
+        events.insert(0, {"type": "system", "subtype": "init", "tools": [], "model": resolved})
+    adapter, _ = provider(tmp_path, monkeypatch, events, UNLISTED)
+    asyncio.run(adapter.generate(tool_history()))
+    assert adapter.model_info.runtime_context_window == expected
+    assert adapter.model_info.context_window == expected
+
+
+def test_a_request_claude_refuses_as_too_large_withdraws_the_reported_window(
+    tmp_path, monkeypatch, caplog,
+):
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, connection = provider(
+        tmp_path, monkeypatch,
+        narrated({"claude-opus-5-5": 1_000_000}) + [refusal]
+        + narrated({"claude-opus-5-5": 1_000_000}),
+        UNLISTED,
+    )
+    info = adapter.model_info
+    asyncio.run(adapter.generate(tool_history()))
+    assert planning_capacity(adapter) == 1_000_000
+    steps = len(connection.writes)
+
+    # The account is not given the window Claude Code reported. The provider sends nothing
+    # again by itself; planning returns to the figure used when no window is known, so the
+    # caller's shorten-and-retry step works against that.
+    with caplog.at_level("WARNING"), pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    assert len(connection.writes) == steps + 2
+    assert info.runtime_context_window is None and info.context_window is None
+    assert info.runtime_context_source == info.context_window_source == "unknown"
+    assert planning_capacity(adapter) == 200_000
+    assert "refused a request planned within a context window of 1000000" in caplog.text
+    assert "(runtime_reported)" in caplog.text
+
+    # The same figure reported again is not trusted for the rest of this provider's life.
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.context_window is None and planning_capacity(adapter) == 200_000
+
+
+def test_a_refusal_keeps_a_saved_allowance_and_one_without_a_reported_window_changes_nothing(
+    tmp_path, monkeypatch,
+):
+    refusal = {"type": "result", "subtype": "error_during_execution", "is_error": True,
+               "errors": ["prompt is too long"]}
+    adapter, _ = provider(
+        tmp_path, monkeypatch, [refusal, *narrated({"x": 1_000_000}), refusal], UNLISTED,
+    )
+    info = adapter.model_info
+    info.configured_context_window = info.context_window = 600_000
+    info.context_window_source = "user_configured"
+    with pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    # Nothing had been reported, so a later report is still used, under the saved allowance.
+    asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window == 1_000_000 and info.context_window == 600_000
+    with pytest.raises(TokenLimitError):
+        asyncio.run(adapter.generate(tool_history()))
+    assert info.runtime_context_window is None
+    assert info.context_window == 600_000 and info.context_window_source == "user_configured"
+
+
+def test_signed_thinking_stays_private_and_survives_tool_continuation(tmp_path, monkeypatch):
+    events = native_message(
+        {"type": "thinking", "thinking": "private native reasoning", "signature": "signed-value"},
+        {
+            "type": "tool_use",
+            "id": "signed-call",
+            "name": "mcp__sylvia__inspect",
+            "input": {"target": "door"},
+        },
+    )
+    # Native MCP work can be admitted while the final message event is still in flight.
+    events.insert(-1, native_call())
+    adapter, _ = provider(tmp_path, monkeypatch, events)
+    response = asyncio.run(adapter.generate([{"role": "user", "content": "Check"}], TOOLS))
+    assert response.anthropic_content[0] == {
+        "type": "thinking",
+        "thinking": "private native reasoning",
+        "signature": "signed-value",
+    }
+    assert response.anthropic_content[1]["name"] == "inspect"
+    assert response.content is None
+    history = [
+        {"role": "assistant", "content": None, "anthropic_content": response.anthropic_content},
+        {"role": "tool", "tool_call_id": "signed-call", "content": "Open"},
+    ]
+    _, records, _, _ = prepare_request(history, TOOLS, "opus", tmp_path)
+    assert records[0]["message"]["content"][0]["signature"] == "signed-value"
+    assert records[0]["message"]["content"][1]["name"] == "mcp__sylvia__inspect"
+
+
+def test_runtime_eof_and_timeout_close_ephemeral_state(tmp_path, monkeypatch):
+    for events, error in [
+        ([], IncompleteProviderStreamError),
+        ([ProviderTimeoutError("silent")], ProviderTimeoutError),
+    ]:
+        adapter, connection = provider(tmp_path, monkeypatch, events)
+        with pytest.raises(error):
+            asyncio.run(adapter.generate([{"role": "user", "content": "Check"}]))
+        assert connection.closed
+        assert_step_removed(connection, tmp_path)
+
+
+def test_environment_selects_sylvias_profile_and_no_tokens_or_harness_overrides(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "do-not-forward")
+    monkeypatch.setenv("CLAUDE_CODE_OAUTH_TOKEN", "do-not-forward")
+    monkeypatch.setenv("ANTHROPIC_PROFILE", "do-not-forward")
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", "the-persons-own-profile")
+    monkeypatch.setenv("ANTHROPIC_CONFIG_DIR", "the-persons-own-console-profile")
+    monkeypatch.setenv("CLAUDE_CODE_SIMPLE", "1")
+    environment = _claude_runtime.native_environment(tmp_path)
+    assert environment["CLAUDE_CONFIG_DIR"] == str(tmp_path / "profile")
+    assert environment["ANTHROPIC_CONFIG_DIR"] == str(tmp_path / "anthropic")
+    assert environment["CLAUDE_CODE_TMPDIR"] == str(tmp_path / "temp")
+    # Off Windows the runtime's logs and state would otherwise land in the person's own home.
+    if sys.platform == "win32":
+        assert not {"XDG_CACHE_HOME", "XDG_STATE_HOME"} & environment.keys()
+    else:
+        assert environment["XDG_CACHE_HOME"] == str(tmp_path / "cache")
+        assert environment["XDG_STATE_HOME"] == str(tmp_path / "state")
+    # Claude Code's own updater writes to the shared per-user installation.
+    assert environment["DISABLE_UPDATES"] == environment["DISABLE_AUTOUPDATER"] == "1"
+    assert (
+        not {
+            "ANTHROPIC_API_KEY",
+            "CLAUDE_CODE_OAUTH_TOKEN",
+            "ANTHROPIC_PROFILE",
+            "CLAUDE_CODE_SIMPLE",
+        }
+        & environment.keys()
+    )
+
+
+def test_only_sylvias_installed_copy_is_found(tmp_path, monkeypatch):
+    name = _claude_runtime.executable_name()
+    elsewhere = tmp_path / "person" / ".local" / "bin"
+    elsewhere.mkdir(parents=True)
+    (elsewhere / name).write_bytes(b"the person's own Claude Code")
+    monkeypatch.setenv("PATH", str(elsewhere))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path / "person"))
+    monkeypatch.setenv("HOME", str(tmp_path / "person"))
+    home = tmp_path / "claude-runtime"
+    assert _claude_runtime.find_runtime(home) is None
+    for folder in ["2.1.322", "2.1.1000", "2.1.999.partial", "notes"]:
+        (home / "install" / folder).mkdir(parents=True)
+        (home / "install" / folder / name).write_bytes(b"copy")
+    assert _claude_runtime.find_runtime(home) == home / "install" / "2.1.1000" / name
+
+
+def test_missing_copy_asks_for_setup_instead_of_using_another(tmp_path):
+    adapter = ClaudeProvider(tmp_path / "runtime", model())
+    with pytest.raises(ProviderConnectionError, match="Set up Claude Code for Sylvia"):
+        asyncio.run(adapter.generate([{"role": "user", "content": "Check"}]))
+
+
+@pytest.mark.parametrize("version", ["2.1.100 (Claude Code)", "not an official runtime"])
+def test_unsupported_runtime_is_not_used(monkeypatch, version):
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(a, 0, version, "")
+    )
+    with pytest.raises(ProviderConnectionError):
+        _claude_runtime.runtime_version(Path(sys.executable), Path("runtime"))
+
+
+def test_status_discards_private_fields(monkeypatch):
+    monkeypatch.setattr(
+        subprocess,
+        "run",
+        lambda *a, **k: subprocess.CompletedProcess(
+            a,
+            0,
+            json.dumps(
+                {
+                    "loggedIn": True,
+                    "authMethod": "claude.ai",
+                    "email": "private@example.invalid",
+                    "token": "sk-private",
+                    "subscriptionType": "private-plan",
+                }
+            ),
+            "",
+        ),
+    )
+    assert _claude_runtime.authentication_status(Path(sys.executable), Path("runtime")) == {
+        "signed_in": True,
+        "auth_method": "claude.ai",
+        "billing": "subscription",
+    }
+
+
+def test_native_login_cancel_and_logout_stay_in_sylvias_profile(tmp_path, monkeypatch):
+    commands = []
+    environments = []
+
+    class LoginChild:
+        ended = False
+
+        def poll(self):
+            return 0 if self.ended else None
+
+        def terminate(self):
+            self.ended = True
+
+        def wait(self, timeout):
+            return 0
+
+    child = LoginChild()
+
+    def launch(command, **options):
+        commands.append(command)
+        environments.append(options["env"])
+        assert options["stdin"] == options["stdout"] == options["stderr"] == subprocess.DEVNULL
+        return child
+
+    def run(command, **options):
+        commands.append(command)
+        environments.append(options["env"])
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(claude_settings, "find_runtime", lambda _: Path(sys.executable))
+    monkeypatch.setattr(claude_settings, "runtime_version", lambda *_: "2.1.322")
+    monkeypatch.setattr(
+        claude_settings,
+        "authentication_status",
+        lambda *_: {
+            "signed_in": False,
+            "auth_method": "none",
+            "billing": "unknown",
+        },
+    )
+    monkeypatch.setattr(subprocess, "Popen", launch)
+    monkeypatch.setattr(subprocess, "run", run)
+    pending = claude_settings.claude_settings_action(tmp_path, "login", {"account_type": "api"})
+    assert pending["login_pending"] is True
+    assert commands[0][-3:] == ["auth", "login", "--console"]
+    assert "--safe-mode" in commands[0]
+    cancelled = claude_settings.claude_settings_action(tmp_path, "cancel")
+    assert cancelled["login_pending"] is False and child.ended
+    assert len(commands) == 1 and not (tmp_path / "config.yaml").exists()
+    claude_settings.claude_settings_action(tmp_path, "logout")
+    assert commands[1][-2:] == ["auth", "logout"]
+    profile = str(tmp_path.resolve() / "claude-runtime" / "profile")
+    assert [e["CLAUDE_CONFIG_DIR"] for e in environments] == [profile, profile]
+    with pytest.raises(ProviderConnectionError, match="options are invalid"):
+        claude_settings.claude_settings_action(tmp_path, "status", {"executable": sys.executable})
+
+
+def test_setup_is_required_before_sign_in_or_models(tmp_path):
+    status = claude_settings.claude_settings_action(tmp_path, "status")
+    assert status["installed"] is False and status["install"]["state"] == "idle"
+    assert "own copy of Claude Code" in status["message"]
+    for action in ["login", "logout", "add_model"]:
+        with pytest.raises(ProviderConnectionError, match="own copy of Claude Code"):
+            claude_settings.claude_settings_action(tmp_path, action)
+
+
+def test_cancelling_a_waiting_native_stream_collects_the_child(tmp_path, monkeypatch):
+    script = tmp_path / "partial_runtime.py"
+    frames = native_message({"type": "text", "text": "Partial"})[:2]
+    script.write_text(
+        "import json,sys,time\n"
+        + "\n".join(f"print({json.dumps(frame)!r}, flush=True)" for frame in frames)
+        + "\ntime.sleep(60)\n",
+        encoding="utf-8",
+    )
+    connections = []
+
+    def factory(executable, workspace, arguments, environment):
+        connection = ClaudeConnection(Path(sys.executable), workspace, [str(script)], environment)
+        connections.append(connection)
+        return connection
+
+    monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
+    adapter = ClaudeProvider(tmp_path / "runtime", model(), connection_factory=factory)
+
+    async def cancel():
+        stream = adapter.generate_stream([{"role": "user", "content": "Check"}])
+        assert (await anext(stream)).content == "Partial"
+        waiting = asyncio.create_task(anext(stream))
+        await asyncio.sleep(0.02)
+        waiting.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await waiting
+        await stream.aclose()
+
+    asyncio.run(cancel())
+    assert connections[0]._process.poll() is not None
+    # Only the fixed empty cwd and the empty step parent remain; no step files outlive it.
+    runtime = tmp_path / "runtime"
+    assert sorted(p.name for p in runtime.iterdir()) == ["steps", "workspace"]
+    assert [p for p in runtime.rglob("*") if p.is_file()] == []
+
+
+def test_setup_saves_separate_runtime_and_resolves_after_reopen(tmp_path, monkeypatch):
+    monkeypatch.setattr(claude_settings, "find_runtime", lambda _: Path(sys.executable))
+    monkeypatch.setattr(claude_settings, "runtime_version", lambda *_: "2.1.322")
+    monkeypatch.setattr(
+        claude_settings,
+        "authentication_status",
+        lambda *_: {
+            "signed_in": True,
+            "auth_method": "claude.ai",
+            "billing": "subscription",
+        },
+    )
+    status = claude_settings.claude_settings_action(
+        tmp_path,
+        "add_model",
+        {
+            "model": {
+                "id": "opus",
+                "context_window": None,
+                "max_output_tokens": None,
+            }
+        },
+    )
+    assert status["saved_model"] == "claude-runtime/opus"
+    settings = provider_settings(tmp_path / "config.yaml")
+    assert settings["configured"][0]["preset_id"] == "claude_runtime"
+    assert settings["configured"][0]["credential_configured"] is False
+    assert "executable" not in (tmp_path / "config.yaml").read_text(encoding="utf-8")
+    resolver = ConfiguredProviderResolver(tmp_path / "config.yaml")
+    choice = resolver.model_choices()[0]
+    assert choice["output_budget_mode"] == "runtime_managed"
+    # A listed name is saved with its documented window, shown as a catalog figure.
+    assert choice["context_window"] == 1_000_000
+    saved = settings["configured"][0]["models"][0]
+    assert saved["runtime_context_window"] == 1_000_000
+    assert saved["runtime_context_source"] == "model_catalog"
+    assert saved["configured_context_window"] is None
+    assert output_allowance(model()) is None
+    for role in [WriterRole.DM, WriterRole.BUILDER]:
+        record = SessionRecord(
+            "session",
+            "campaign" if role is WriterRole.DM else None,
+            role,
+            "claude_runtime",
+            status["saved_model"],
+        )
+        assert resolver(record).model_info.transport == "claude_code"
+
+
+def test_native_route_cannot_accept_api_keys_or_fallback():
+    for kwargs in [
+        {"credentials_list": [{"value": "private"}]},
+        {"fallback_providers": [ProviderConfig("other", "responses", "https://example.invalid")]},
+    ]:
+        with pytest.raises(ValueError):
+            ProviderFactory.create(
+                ProviderConfig(
+                    "claude_runtime",
+                    "claude_code",
+                    "https://claude.ai",
+                    runtime_home="runtime",
+                    models=[model()],
+                    **kwargs,
+                )
+            )
+
+
+def test_no_http_discovery_or_probe_for_claude(tmp_path):
+    with pytest.raises(ConfigError, match="HTTP discovery"):
+        discover_provider_models(
+            tmp_path / "config.yaml", provider_id="claude_runtime", base_url=None, credential=None
+        )
+    with pytest.raises(ConfigError, match="HTTP probe"):
+        validate_provider_model(
+            tmp_path / "config.yaml",
+            provider_id="claude_runtime",
+            base_url=None,
+            credential=None,
+            model_id="opus",
+            transport="claude_code",
+        )
+
+
+def test_owned_process_cancellation_does_not_touch_unrelated_process(tmp_path):
+    script = tmp_path / "runtime.py"
+    script.write_text("import time\ntime.sleep(60)\n", encoding="utf-8")
+    other = subprocess.Popen([sys.executable, str(script)], **_claude_runtime.process_options())
+    connection = ClaudeConnection(Path(sys.executable), tmp_path, [str(script)], dict(os.environ))
+    try:
+        connection.start()
+        process = connection._process
+        connection.close()
+        connection.close()
+        assert process.poll() is not None
+        assert other.poll() is None
+    finally:
+        other.terminate()
+        other.wait(timeout=5)
+
+
+def test_malformed_native_process_stream_is_rejected(tmp_path):
+    script = tmp_path / "runtime.py"
+    script.write_text("print('not JSON', flush=True)\n", encoding="utf-8")
+    connection = ClaudeConnection(Path(sys.executable), tmp_path, [str(script)], dict(os.environ))
+    try:
+        connection.start()
+        with pytest.raises(InvalidResponseError):
+            connection.next_event(3)
+    finally:
+        connection.close()
+
+
+def test_claude_owner_command_preserves_safe_rejection(tmp_path):
+    from tests.test_alpha_f6d_owner_process import _launch, _read, _shutdown, _write
+
+    process, input_stream, output_stream = _launch(tmp_path / "owner.sqlite3")
+    try:
+        _write(
+            input_stream,
+            {
+                "id": "claude-rejection",
+                "method": "claude_connection",
+                "params": {"action": "unavailable-action"},
+            },
+        )
+        reply = _read(output_stream)
+        assert reply["ok"] is False
+        assert reply["error"]["message"] == "This Claude connection action is unavailable."
+    finally:
+        _shutdown(process, input_stream, output_stream)
+
+
+def test_game_tool_commit_survives_interruption_and_reopen(tmp_path, monkeypatch):
+    from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+    from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
+    from sylvia_gm.application.authority import AuthorityOwner
+    from tests.test_alpha_f4_generic_sessions import _clockwork_campaign
+
+    connections = []
+
+    class ToolConnection(Connection):
+        def __init__(self, *args):
+            super().__init__(
+                [
+                    {
+                        "type": "control_request",
+                        "request_id": "list",
+                        "request": {
+                            "subtype": "mcp_message",
+                            "server_name": "sylvia",
+                            "message": {"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+                        },
+                    }
+                ]
+            )
+            self.workspace = args[1]
+            history = step_folder(args[2]) / "history.jsonl"
+            self.records = [json.loads(line) for line in history.read_text().splitlines()]
+            connections.append(self)
+
+        def write(self, event):
+            super().write(event)
+            result = (
+                event.get("response", {})
+                .get("response", {})
+                .get("mcp_response", {})
+                .get("result", {})
+            )
+            if "tools" not in result:
+                return
+            if len(connections) == 1:
+                alias = next(t["name"] for t in result["tools"] if t["name"].endswith("_advance"))
+                self.events = iter(
+                    [
+                        {
+                            "type": "assistant",
+                            "message": {
+                                "content": [
+                                    {
+                                        "type": "tool_use",
+                                        "id": "one-advance",
+                                        "name": "mcp__sylvia__" + alias,
+                                        "input": {"steps": 1},
+                                    }
+                                ]
+                            },
+                        },
+                        native_call(alias, {"steps": 1}),
+                    ]
+                )
+            else:
+                self.events = iter([ProviderTimeoutError("Synthetic narration interruption")])
+
+    monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
+    database = tmp_path / "campaign.sqlite3"
+    calls = []
+    with AuthorityOwner.open(database, "owner-claude", disconnect_grace_seconds=1.0) as owner:
+        _clockwork_campaign(
+            owner,
+            campaign_id="claude-campaign",
+            writer=WriterRole.DM,
+            turn_id="claude-turn",
+            calls=calls,
+        )
+        owner.create_agent_session(
+            campaign_id="claude-campaign",
+            role=WriterRole.DM,
+            provider_id="claude_runtime",
+            model_id="claude-runtime/opus",
+            session_id="claude-session",
+        )
+        adapter = ClaudeProvider(tmp_path / "runtime", model(), connection_factory=ToolConnection)
+        loop = ProviderSessionAdapter(owner, adapter, owner_id="owner-claude")
+        with pytest.raises(ProviderTimeoutError):
+            CampaignSessionLoop(owner).run(
+                SessionRunRequest(
+                    session_id="claude-session",
+                    turn_id="claude-turn",
+                    attempt_id="claude-attempt",
+                    message_id="claude-input",
+                    user_text="Advance the clock once.",
+                ),
+                loop.for_turn("claude-turn"),
+            )
+        assert calls == [1]
+        assert len(connections) == 2 and all(c.closed for c in connections)
+        results = [
+            record["message"]["content"]
+            for record in connections[1].records
+            if record["type"] == "user" and isinstance(record["message"]["content"], list)
+        ]
+        assert any(block.get("type") == "tool_result" for blocks in results for block in blocks)
+        saved = owner.session_context("claude-session").messages
+        assert "SYLVIA_GM_RUNTIME_CONTINUE" not in str(saved)
+        original_events = owner.snapshot("claude-campaign").events
+    with AuthorityOwner.open(database, "owner-claude-reopened") as owner:
+        assert owner.snapshot("claude-campaign").events == original_events
+        assert owner.session_context("claude-session").messages == saved
+        assert calls == [1]

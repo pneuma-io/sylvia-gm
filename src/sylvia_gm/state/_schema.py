@@ -49,7 +49,13 @@ def validate_state(state: dict[str, Any], schema: dict[str, Any] | None = None) 
     validator_class = jsonschema.validators.validator_for(schema)
     validator = validator_class(schema)
     for err in validator.iter_errors(state):
-        errors.append(f"Schema error: {err.message} (path: {'/'.join(str(p) for p in err.absolute_path)})")
+        errors.append(
+            f'Schema error: '
+            f'{err.message}'
+            f' (path: '
+            f"{'/'.join(str(p) for p in err.absolute_path)}"
+            f')'
+        )
 
     # Custom validators
     errors.extend(validate_all(state))

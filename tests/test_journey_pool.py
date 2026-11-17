@@ -7,6 +7,7 @@ import pytest
 from scripts import journey_pool
 from scripts.check_supported_journeys import PYTHON_JOURNEYS
 from scripts.journey_pool import balanced_assignments, partition_reports
+from tests.runner_checkouts import install_runs_on_plugin, record_no_platform_exclusions
 
 
 def test_case_key_keeps_parameter_delimiters_out_of_class_names():
@@ -82,6 +83,7 @@ def test_overlapping_collected_cases_fail_before_workers_start(
     def collect(command, **kwargs):
         calls.append(command)
         assert "--collect-only" in command, "Overlapping cases must not launch test workers"
+        record_no_platform_exclusions(kwargs)
         return subprocess.CompletedProcess(command, 0, "tests/test_shared.py::test_one\n", "")
 
     monkeypatch.setattr(journey_pool, "subprocess", SimpleNamespace(run=collect))
@@ -104,6 +106,7 @@ def test_real_pool_runs_disjoint_collected_cases_once(tmp_path, monkeypatch):
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     tests = root / "tests"
     tests.mkdir()
     (tests / "__init__.py").write_text("")
@@ -138,10 +141,18 @@ def test_real_pool_runs_disjoint_collected_cases_once(tmp_path, monkeypatch):
         assert timings[-1]["seconds"] >= timings[0]["seconds"]
 
 
-def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_path, monkeypatch):
+@pytest.mark.parametrize(
+    ("setting", "retained"),
+    [(None, False), ("0", False), ("1", True)],
+    ids=["default", "explicit-remove", "explicit-keep"],
+)
+def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(
+    tmp_path, monkeypatch, capsys, setting, retained,
+):
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     tests = root / "tests"
     tests.mkdir()
     (tests / "__init__.py").write_text("")
@@ -155,7 +166,11 @@ def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_
     destination = tmp_path / "evidence"
     destination.mkdir()
     monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
-    monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "0")
+    # Keeping passed tests' scratch is only ever the caller's explicit choice.
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", setting)
     results = journey_pool.run_balanced_gate(
         root,
         destination,
@@ -166,11 +181,52 @@ def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(tmp_
         None,
     )
     assert not results["outcomes"][0]
-    assert not list((destination / "attempts").rglob("success.sqlite3"))
+    kept = list((destination / "attempts").rglob("success.sqlite3"))
+    assert len(kept) == (1 if retained else 0)
     failed = list((destination / "attempts").rglob("failed.sqlite3"))
     assert len(failed) == 1 and failed[0].read_bytes() == b"preserve failed evidence"
+    assignments = json.loads((destination / "pool-assignments.json").read_text())
+    assert assignments["retain_successful_fixtures"] is retained
     cases = list(ET.parse(destination / "outcomes.xml").iter("testcase"))
     assert len(cases) == 2 and sum(case.find("failure") is not None for case in cases) == 1
+    # The console names the failed case and the log that holds its full output.
+    failed_lines = [line for line in capsys.readouterr().out.splitlines()
+                    if line.startswith("FAILED CASE")]
+    assert failed_lines == [
+        "FAILED CASE tests.test_outcomes::test_failure [failure] AssertionError: "
+        "intentional negative runner control assert False "
+        "(full output in shared-shard-0.log)"
+    ]
+
+
+def test_report_failures_name_failed_errored_and_unregistered_skipped_cases():
+    root = ET.Element("testsuites")
+    suite = ET.SubElement(root, "testsuite")
+    ET.SubElement(suite, "testcase", classname="tests.case", name="test_passed")
+    failed = ET.SubElement(suite, "testcase", classname="tests.case", name="test_failed")
+    ET.SubElement(failed, "failure", message="AssertionError: first line\n  second line")
+    errored = ET.SubElement(suite, "testcase", classname="tests.case", name="test_errored")
+    ET.SubElement(errored, "error", message="failed on setup")
+    skipped = ET.SubElement(suite, "testcase", classname="tests.case", name="test_skipped")
+    ET.SubElement(skipped, "skipped", message="not registered")
+    assert journey_pool.report_failures(root) == [
+        "FAILED CASE tests.case::test_failed [failure] AssertionError: first line second line",
+        "FAILED CASE tests.case::test_errored [error] failed on setup",
+        "FAILED CASE tests.case::test_skipped [skipped] not registered",
+    ]
+
+
+def test_pool_refuses_an_unknown_retention_setting_before_collecting(tmp_path, monkeypatch):
+    monkeypatch.setenv("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "yes")
+    monkeypatch.setattr(journey_pool, "subprocess", SimpleNamespace(
+        run=lambda *args, **kwargs: pytest.fail("An unknown setting must stop before collection"),
+    ))
+    destination = tmp_path / "evidence"
+    with pytest.raises(ValueError, match="must be 0 or 1"):
+        journey_pool.run_balanced_gate(
+            tmp_path / "source", destination, {"one": ["tests/test_one.py"]}, ["one"], 1, 0.0, None,
+        )
+    assert not destination.exists()
 
 
 def test_real_collection_and_workers_import_the_selected_source_before_ambient_packages(
@@ -180,6 +236,7 @@ def test_real_collection_and_workers_import_the_selected_source_before_ambient_p
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
     (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
     owned = root / "src/qa_source_binding"
     owned.mkdir(parents=True)
     (owned / "__init__.py").write_text("IDENTITY = 'selected-source'\n")
@@ -210,3 +267,82 @@ def test_real_collection_and_workers_import_the_selected_source_before_ambient_p
         None,
     )
     assert results["binding"][0]
+
+
+@pytest.mark.parametrize("include_historical", [False, True])
+def test_real_pool_collects_new_behavior_once_and_reports_historical_exclusion(
+    tmp_path, monkeypatch, include_historical,
+):
+    from scripts.check_catalog import PRODUCT_CASE_EXCLUSIONS
+
+    historical = next(iter(PRODUCT_CASE_EXCLUSIONS))
+    module, historical_function = historical.split("::")
+    root = tmp_path / "source"
+    (root / "scripts").mkdir(parents=True)
+    (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
+    tests = root / "tests"
+    tests.mkdir()
+    (tests / "__init__.py").write_text("")
+    (root / module).write_text(
+        "def test_existing_behavior():\n    assert True\n"
+        "def test_future_behavior():\n    assert True\n"
+        f"def {historical_function}():\n    assert True\n"
+    )
+    destination = tmp_path / "evidence"
+    destination.mkdir()
+    monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
+    results = journey_pool.run_balanced_gate(
+        root, destination, {"gm-turn": [module]}, ["gm-turn"], 1, 0.0, None,
+        include_historical=include_historical,
+    )
+    assert results["gm-turn"][0]
+    assignments = json.loads((destination / "pool-assignments.json").read_text())
+    executed = [nodeid for bucket in assignments["tasks"] for _, nodeid in bucket]
+    assert len(executed) == len(set(executed)) == (3 if include_historical else 2)
+    assert module + "::test_future_behavior" in executed
+    assert (historical in executed) is include_historical
+    excluded = json.loads((destination / "gm-turn-excluded-cases.json").read_text())
+    assert excluded == ([] if include_historical else [
+        {"nodeid": historical, "reason": PRODUCT_CASE_EXCLUSIONS[historical], "kind": "historical"},
+    ])
+    cases = list(ET.parse(destination / "gm-turn.xml").iter("testcase"))
+    assert len(cases) == len(executed) and all(not list(case) for case in cases)
+
+
+def test_real_pool_excludes_other_platform_cases_by_exact_id(tmp_path, monkeypatch):
+    from tests.runner_checkouts import OTHER_PLATFORM
+
+    root = tmp_path / "source"
+    (root / "scripts").mkdir(parents=True)
+    (root / "scripts/journey_case_timings.json").write_text('{"seconds":{}}')
+    install_runs_on_plugin(root)
+    tests = root / "tests"
+    tests.mkdir()
+    (tests / "__init__.py").write_text("")
+    (tests / "test_marked.py").write_text(
+        "import pytest\n"
+        f"@pytest.mark.runs_on('{OTHER_PLATFORM}', reason='Elsewhere semantics')\n"
+        "def test_elsewhere():\n    raise AssertionError('must never run on this platform')\n"
+        "def test_behavior():\n    assert True\n"
+    )
+    destination = tmp_path / "evidence"
+    destination.mkdir()
+    monkeypatch.setenv("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1")
+    results = journey_pool.run_balanced_gate(
+        root, destination, {"marked": ["tests/test_marked.py"]}, ["marked"], 1, 0.0, None,
+    )
+    assert results["marked"][0]
+    assignments = json.loads((destination / "pool-assignments.json").read_text())
+    assert [nodeid for bucket in assignments["tasks"] for _, nodeid in bucket] == [
+        "tests/test_marked.py::test_behavior",
+    ]
+    assert json.loads((destination / "marked-excluded-cases.json").read_text()) == [{
+        "nodeid": "tests/test_marked.py::test_elsewhere",
+        "reason": f"Runs only on {OTHER_PLATFORM}: Elsewhere semantics",
+        "kind": "platform",
+        "platforms": [OTHER_PLATFORM],
+    }]
+    cases = list(ET.parse(destination / "marked.xml").iter("testcase"))
+    assert [case.get("name") for case in cases] == ["test_behavior"]
+    assert not list(cases[0])

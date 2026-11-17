@@ -15,6 +15,7 @@ import pytest
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.domain.authority import ActionStatus, WriterRole
 from sylvia_gm.provider._base import ProviderResponse, ProviderStreamChunk, ToolCall
+from tests.gm_context_contract import callable_tool_names
 from tests.test_alpha_f6e_owner_session_transport import _OwnerHarness
 from tests.test_builder_library import LibraryProvider
 from tests.qa_attached_request import request_attached
@@ -217,7 +218,8 @@ class _CombatProvider(LibraryProvider):
                 "FC-13: an operation offered by the current GM tool surface was rejected "
                 "as unavailable by execution", last_tool,
             )
-        names = [item["function"]["name"] for item in tools or []]
+        # Choose only from the tools that can be called this round, as a model reads them.
+        names = callable_tool_names(messages, tools)
         preparation = next((name for name in names if name.endswith("_prepare_srd_creature")), None)
         attack = next(
             (name for name in names if name.endswith("_resolve_adjudicated_creature_attack")), None,

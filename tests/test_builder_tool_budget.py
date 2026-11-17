@@ -1,4 +1,4 @@
-"""Builder continues useful work beyond one allowance, retaining bounded, recoverable stops."""
+"""Builder works until its request is done, stopping only when it stops making progress."""
 
 from __future__ import annotations
 
@@ -12,12 +12,13 @@ import pytest
 from sylvia_gm.agent._builder_reference_copy_tool import builder_reference_copy_tool
 from sylvia_gm.agent._builder_session import _builder_reference_tool, stream_builder_turn
 from sylvia_gm.agent._mode import AgentMode
-from sylvia_gm.agent._runner import AgentLoopError, AgentRunner
+from sylvia_gm.agent._runner import AgentLoopError, AgentRunner, _BuilderLoopGuard
 from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
 from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.application.builder_references import BuilderReferences
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.provider._base import FakeProvider, ProviderResponse, ProviderStreamChunk, ToolCall
+from sylvia_gm.provider._exceptions import ProviderOutputLimitError
 from sylvia_gm.tools._spec import ToolSpec
 from sylvia_gm.tools._toolsets import ToolsetName
 
@@ -97,7 +98,7 @@ async def test_builder_stops_repeating_the_same_failure(tmp_path: Path, streamin
                 )
             ]
         )
-        for i in range(AgentRunner.MAX_TOOL_LOOP + 1)
+        for i in range(5)
     ]
     provider = AuthoringProvider(responses=responses)
     runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
@@ -399,12 +400,50 @@ def test_saved_builder_stops_oversized_reference_without_another_model_request(t
     assert (workspace / "profile.md").read_text() == "Existing character work"
 
 
-def test_saved_builder_explains_tool_limit_and_resumes_without_repeating_write(
-    tmp_path,
-    monkeypatch,
-):
-    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
-    monkeypatch.setattr(AgentRunner, "MAX_TOOL_CONTINUATIONS", 0)
+def test_saved_builder_works_far_past_the_former_round_allowance_in_one_turn(tmp_path):
+    rounds = 100
+    workspace = tmp_path / "draft"
+    workspace.mkdir()
+    (workspace / "reference.md").write_text("\n".join(f"Rule {i}" for i in range(rounds)))
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(tool_calls=[ToolCall(
+                id=f"read-{i}", name="read_file",
+                arguments=json.dumps({"path": "reference.md", "offset": i + 1, "limit": 1}),
+            )])
+            for i in range(rounds)
+        ]
+        + [
+            ProviderResponse(tool_calls=[ToolCall(
+                id="save", name="write_file",
+                arguments='{"path":"draft.md","content":"Finished draft"}',
+            )]),
+            ProviderResponse(content="Saved the draft."),
+        ]
+    )
+    with AuthorityOwner.open(tmp_path / "authority.sqlite3", "first") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        loop = CampaignSessionLoop(owner)
+        loop.run_builder(
+            SessionRunRequest("builder", "turn", "long", "input", "Read it all, then save"),
+            lambda data: stream_builder_turn(
+                provider, context=data.history, message_id="input",
+                user_text="Read it all, then save", workspace=workspace,
+                control=data.control, complete=lambda _: None,
+            ), lambda: (),
+        )
+        loop.assert_idle("builder")
+        messages = owner.session_context("builder").messages
+        terminal = next(m.content for m in messages
+                        if m.content.get("kind") == "builder_attempt_terminal")
+        assert terminal["status"] == "completed"
+        assert len([m for m in messages if m.content.get("tool_name") == "read_file"]) == rounds
+    assert (workspace / "draft.md").read_text() == "Finished draft"
+    assert len(provider.calls) == rounds + 2
+
+
+def test_saved_builder_explains_a_repeated_step_and_resumes_without_repeating_write(tmp_path):
+    repeats = _BuilderLoopGuard.IDENTICAL_ROUNDS
     provider = AuthoringProvider(
         responses=[
             ProviderResponse(
@@ -416,6 +455,12 @@ def test_saved_builder_explains_tool_limit_and_resumes_without_repeating_write(
                     )
                 ]
             )
+        ]
+        + [
+            ProviderResponse(tool_calls=[ToolCall(
+                id=f"read-{i}", name="read_file", arguments='{"path":"draft.md"}',
+            )])
+            for i in range(repeats + 2)
         ]
     )
     database = tmp_path / "authority.sqlite3"
@@ -431,19 +476,20 @@ def test_saved_builder_explains_tool_limit_and_resumes_without_repeating_write(
                 control=provider_input.control, complete=lambda _: None,
             )
 
-        with pytest.raises(CommandRejected, match="tool-use limit"):
+        with pytest.raises(CommandRejected, match="repeating the same step"):
             loop.run_builder(
-                SessionRunRequest("builder", "turn", "limited", "input", "Save the draft"),
+                SessionRunRequest("builder", "turn", "stuck", "input", "Save the draft"),
                 run, lambda: (),
             )
         loop.assert_idle("builder")
         assert (workspace / "draft.md").read_text() == "Saved once"
+        assert len(provider.calls) == 1 + repeats
     with AuthorityOwner.open(database, "reopened") as owner:
         messages = owner.session_context("builder").messages
         terminal = next(m.content for m in messages
                         if m.content.get("kind") == "builder_attempt_terminal")
         assert terminal["status"] == "interrupted"
-        assert terminal["reason_code"] == "tool_limit"
+        assert terminal["reason_code"] == "repeated_step"
         receipts = [m.content for m in messages if m.content.get("tool_name") == "write_file"]
         assert len(receipts) == 1
         provider = AuthoringProvider(responses=[
@@ -464,23 +510,48 @@ def test_saved_builder_explains_tool_limit_and_resumes_without_repeating_write(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("streaming", [False, True])
-async def test_builder_continuation_still_has_a_total_limit(tmp_path, monkeypatch, streaming):
-    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 2)
+async def test_builder_stops_repeating_the_same_successful_step(tmp_path, streaming):
+    repeats = _BuilderLoopGuard.IDENTICAL_ROUNDS
     (tmp_path / "reference.md").write_text("A valid reference")
     provider = AuthoringProvider(responses=[ProviderResponse(tool_calls=[ToolCall(
         id=f"read-{index}", name="read_file", arguments='{"path":"reference.md"}',
-    )]) for index in range(7)])
+    )]) for index in range(repeats + 3)])
     runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
-    with pytest.raises(AgentLoopError):
+    with pytest.raises(AgentLoopError) as stopped:
         if streaming:
             await runner.turn_stream("Read the reference.", asyncio.Queue())
         else:
             await runner.turn("Read the reference.")
-    assert len(provider.calls) == 6
+    assert stopped.value.reason == "repeated_step"
+    assert len(provider.calls) == repeats
 
 
-def test_saved_builder_automatically_continues_without_repeating_write(tmp_path, monkeypatch):
-    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
+@pytest.mark.asyncio
+@pytest.mark.parametrize("streaming", [False, True])
+async def test_a_changed_step_between_repeats_is_progress(tmp_path, streaming):
+    repeats = _BuilderLoopGuard.IDENTICAL_ROUNDS
+    (tmp_path / "reference.md").write_text("First\nSecond")
+    provider = AuthoringProvider(
+        responses=[
+            ProviderResponse(tool_calls=[ToolCall(
+                id=f"read-{index}", name="read_file",
+                arguments=json.dumps(
+                    {"path": "reference.md", "offset": 1 + index % 2, "limit": 1}
+                ),
+            )])
+            for index in range(repeats * 3)
+        ]
+        + [ProviderResponse(content="Compared both lines.")]
+    )
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
+    if streaming:
+        await runner.turn_stream("Compare the lines.", asyncio.Queue())
+    else:
+        assert (await runner.turn("Compare the lines.")).dm_response == "Compared both lines."
+    assert len(provider.calls) == repeats * 3 + 1
+
+
+def test_saved_builder_automatically_continues_without_repeating_write(tmp_path):
     provider = AuthoringProvider(responses=[
         ProviderResponse(tool_calls=[ToolCall(
             id="save", name="write_file", arguments='{"path":"draft.md","content":"Saved once"}',
@@ -510,8 +581,7 @@ def test_saved_builder_automatically_continues_without_repeating_write(tmp_path,
         assert len(provider.calls) == 2
 
 
-def test_stop_during_automatic_continuation_preserves_saved_work(tmp_path, monkeypatch):
-    monkeypatch.setattr(AgentRunner, "MAX_TOOL_LOOP", 1)
+def test_stop_during_automatic_continuation_preserves_saved_work(tmp_path):
     continued = threading.Event()
 
     class WaitingProvider(AuthoringProvider):
@@ -562,3 +632,149 @@ def test_stop_during_automatic_continuation_preserves_saved_work(tmp_path, monke
         assert (workspace / "draft.md").read_text() == "Saved before Stop"
         assert len([m for m in owner.session_context("builder").messages
                     if m.content.get("tool_name") == "write_file"]) == 1
+
+
+class CutOffProvider(FakeProvider):
+    """Stream one scripted response per request; "length" ends a response the provider cut off."""
+
+    def __init__(self, scripts):
+        super().__init__()
+        self._scripts = list(scripts)
+
+    async def generate_stream(self, messages, tools=None, **_kwargs):
+        self.calls.append({"messages": [dict(message) for message in messages], "tools": tools})
+        for chunk in self._scripts.pop(0):
+            yield chunk
+
+
+def _call(call_id, name, arguments, *, finish="tool_calls"):
+    return [
+        ProviderStreamChunk(tool_call_delta={
+            "index": 0, "id": call_id, "function": {"name": name, "arguments": arguments},
+        }),
+        ProviderStreamChunk(finish_reason=finish),
+    ]
+
+
+def _text(text, *, finish="stop"):
+    return [ProviderStreamChunk(content=text), ProviderStreamChunk(finish_reason=finish)]
+
+
+def _is_continue_signal(message):
+    return message["role"] == "user" and message["content"].startswith(
+        "SYLVIA_GM_BUILDER_CONTINUE "
+    )
+
+
+@pytest.mark.asyncio
+async def test_cut_off_tool_call_never_runs_and_builder_continues_in_smaller_steps(tmp_path):
+    provider = CutOffProvider([
+        # The allowance ran out inside the file content, so the arguments never closed.
+        _call("cut", "write_file", '{"path":"big.md","content":"Part one. Pa', finish="length"),
+        _call("first", "write_file", '{"path":"part-one.md","content":"Part one."}'),
+        _call("second", "write_file", '{"path":"part-two.md","content":"Part two."}'),
+        _text("Saved the work in two smaller files."),
+    ])
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
+    events = asyncio.Queue()
+    await runner.turn_stream("Write the big file.", events)
+
+    assert not (tmp_path / "big.md").exists()
+    assert (tmp_path / "part-one.md").read_text() == "Part one."
+    assert (tmp_path / "part-two.md").read_text() == "Part two."
+    assert len(provider.calls) == 4
+    # The request after the cut-off ends with the application's signal, not a tool exchange.
+    assert _is_continue_signal(provider.calls[1]["messages"][-1])
+    history = runner.history_snapshot()
+    called = [call["id"] for message in history for call in message.get("tool_calls", [])]
+    assert called == ["first", "second"]
+    observed = [events.get_nowait() for _ in range(events.qsize())]
+    assert [event.data for event in observed if event.type == "tool_call"] == [
+        "write_file", "write_file",
+    ]
+    assert observed[-1].type == "done"
+
+
+@pytest.mark.asyncio
+async def test_a_completed_response_renews_the_cut_off_allowance(tmp_path):
+    limit = AgentRunner.MAX_OUTPUT_LIMIT_CONTINUATIONS
+    (tmp_path / "notes.md").write_text("Notes")
+    cut = _call("cut", "write_file", '{"path":"big.md","content":"Too lo', finish="length")
+    provider = CutOffProvider(
+        [cut] * limit
+        + [_call("read", "read_file", '{"path":"notes.md"}')]
+        + [cut] * limit
+        + [_text("Finished.")]
+    )
+    runner = AgentRunner(AgentMode.BUILDER_FREEFORM, provider, None, project_root=tmp_path)
+    await runner.turn_stream("Keep going.", asyncio.Queue())
+    assert len(provider.calls) == 2 * limit + 2
+    assert not (tmp_path / "big.md").exists()
+
+
+def _run_saved_builder(owner, provider, workspace, *, attempt="attempt"):
+    CampaignSessionLoop(owner).run_builder(
+        SessionRunRequest("builder", "turn", attempt, "input", "Describe the setting"),
+        lambda data: stream_builder_turn(
+            provider, context=data.history, message_id="input",
+            user_text="Describe the setting", workspace=workspace,
+            control=data.control, complete=lambda _: None,
+        ), lambda: (),
+    )
+
+
+def test_saved_builder_keeps_cut_off_prose_and_finishes_the_reply(tmp_path):
+    provider = CutOffProvider([
+        _text("The harbour town sits under", finish="length"),
+        _text(" a ring of old watchtowers."),
+    ])
+    database = tmp_path / "authority.sqlite3"
+    with AuthorityOwner.open(database, "first") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        _run_saved_builder(owner, provider, tmp_path / "draft")
+    assert len(provider.calls) == 2
+    # The model sees its own cut-off text, then the application's signal to carry on.
+    partial, signal = provider.calls[1]["messages"][-2:]
+    assert (partial["role"], partial["content"]) == ("assistant", "The harbour town sits under")
+    assert _is_continue_signal(signal)
+    assert "_application_data" not in signal
+    with AuthorityOwner.open(database, "reopened") as owner:
+        messages = owner.session_context("builder").messages
+        assert [m.content["text"] for m in messages if m.kind.value == "talk"] == [
+            "The harbour town sits under", " a ring of old watchtowers.",
+        ]
+        # The signal is a working instruction for the model, never a saved player message.
+        assert [m.content["text"] for m in messages if m.kind.value == "user"] == [
+            "Describe the setting",
+        ]
+        terminal = next(m.content for m in messages
+                        if m.content.get("kind") == "builder_attempt_terminal")
+        assert terminal["status"] == "completed"
+
+
+def test_saved_builder_reports_a_model_that_keeps_reaching_its_response_limit(tmp_path):
+    limit = AgentRunner.MAX_OUTPUT_LIMIT_CONTINUATIONS
+    provider = CutOffProvider(
+        [_call("save", "write_file", '{"path":"draft.md","content":"Kept"}')]
+        + [_call("cut", "write_file", '{"path":"big.md","content":"Too lo', finish="length")]
+        * (limit + 1)
+        + [_text("Must not be requested.")]
+    )
+    database = tmp_path / "authority.sqlite3"
+    workspace = tmp_path / "draft"
+    with AuthorityOwner.open(database, "first") as owner:
+        owner.create_builder_chat(provider_id="test", model_id="test", session_id="builder")
+        with pytest.raises(ProviderOutputLimitError):
+            _run_saved_builder(owner, provider, workspace)
+    assert len(provider.calls) == 1 + limit + 1
+    assert (workspace / "draft.md").read_text() == "Kept"
+    assert not (workspace / "big.md").exists()
+    with AuthorityOwner.open(database, "reopened") as owner:
+        messages = owner.session_context("builder").messages
+        terminal = next(m.content for m in messages
+                        if m.content.get("kind") == "builder_attempt_terminal")
+        assert terminal["status"] == "interrupted"
+        assert terminal["reason_code"] == "output_limit"
+        assert [m.content["tool_name"] for m in messages if "tool_name" in m.content] == [
+            "write_file",
+        ]

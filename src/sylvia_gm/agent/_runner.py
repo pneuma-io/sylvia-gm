@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import itertools
 import json
 import logging
 import os
 import re
-from collections.abc import Callable, Sequence
+from collections.abc import AsyncIterator, Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
@@ -30,7 +31,11 @@ from sylvia_gm.builder._tools import (
     INTERVIEW_TOOL_DEFINITIONS,
     PUBLIC_WEB_TOOL_DEFINITION,
 )
-from sylvia_gm.provider._base import ModelInfo, Provider
+from sylvia_gm.provider._base import ModelInfo, Provider, ProviderStreamChunk
+from sylvia_gm.provider._exceptions import (
+    ProviderContinuationRequiredError,
+    ProviderOutputLimitError,
+)
 from sylvia_gm.provider._tool_delta import parse_tool_call_delta
 from sylvia_gm.provider._usage_tracker import SessionUsageTracker
 from sylvia_gm.ruleset.schema import RulesetFile
@@ -83,35 +88,21 @@ from sylvia_gm.tools._toolsets import ToolsetName
 
 
 @dataclass
-class _BuilderLoopBudget:
-    """Continue the same tool history within a hard cap, stopping repeated failed rounds."""
+class _BuilderLoopGuard:
+    """Let a Builder turn run until its work is done, stopping only when it stops progressing.
 
-    rounds_per_segment: int
-    continuations: int
-    previous_failure: str | None = None
-    repeated_failures: int = 0
+    There is no round allowance. Real work changes the call or its result from one round to
+    the next, so an exactly repeated round is the sign of a stuck model.
+    """
+
+    # The same all-failed round this many times in a row ends the turn.
+    IDENTICAL_FAILURES = 3
+    # The same round with the same results this many times in a row ends the turn.
+    IDENTICAL_ROUNDS = 6
+
+    previous_round: str | None = None
+    repeated_rounds: int = 0
     unreadable_references: dict[str, int] = field(default_factory=dict)
-
-    @property
-    def total_rounds(self) -> int:
-        return self.rounds_per_segment * (1 + self.continuations)
-
-    def before_round(self, messages: list[dict[str, Any]], iteration: int) -> None:
-        if iteration and iteration % self.rounds_per_segment == 0:
-            messages.append(
-                {
-                    "role": "system",
-                    "content": (
-                        "Sylvia Builder automatic continuation of the current user request. "
-                        f"{self.total_rounds - iteration} model/tool rounds remain. "
-                        "Reuse references and completed tool results already in this conversation. "
-                        "Do not repeat committed writes or publication. Prioritize the remaining "
-                        "authoring, validation and requested save. "
-                        "Ask only for missing user choices; "
-                        "if blocked, explain the specific unresolved problem."
-                    ),
-                }
-            )
 
     def finish_tool(self, call: dict[str, Any], result: Any) -> None:
         """Stop blocked source work before another tool can act on it."""
@@ -144,34 +135,51 @@ class _BuilderLoopBudget:
             "package_file_oversized",
             "package_corrupt",
         }:
-            raise AgentLoopError(self.total_rounds, reason="required_reference_unavailable")
+            raise AgentLoopError("required_reference_unavailable")
         if result.get("success") is True:
             self.unreadable_references.pop(path, None)
         elif result.get("code") in {"reference_unavailable", "reference_copy_unavailable"}:
             self.unreadable_references[path] = self.unreadable_references.get(path, 0) + 1
             if self.unreadable_references[path] >= 3:
-                raise AgentLoopError(self.total_rounds, reason="repeated_reference_failure")
+                raise AgentLoopError("repeated_reference_failure")
 
     def finish_round(self, calls: list[dict[str, Any]], results: list[Any]) -> None:
-        if not results or not all(
-            isinstance(result, dict) and result.get("success") is False for result in results
-        ):
-            self.previous_failure = None
-            self.repeated_failures = 0
+        """Count consecutive rounds whose calls and results are exactly the same."""
+        if not results:
+            self.previous_round = None
+            self.repeated_rounds = 0
             return
-        failures = []
+        outcomes = []
         for call, result in zip(calls, results, strict=True):
             arguments = call["function"]["arguments"]
             with contextlib.suppress(json.JSONDecodeError):
                 arguments = json.loads(arguments or "{}")
-            failures.append((call["function"]["name"], arguments, result))
-        failure = json.dumps(failures, sort_keys=True, default=str)
-        self.repeated_failures = (
-            self.repeated_failures + 1 if failure == self.previous_failure else 1
+            outcomes.append((call["function"]["name"], arguments, result))
+        current = json.dumps(outcomes, sort_keys=True, default=str)
+        self.repeated_rounds = self.repeated_rounds + 1 if current == self.previous_round else 1
+        self.previous_round = current
+        failed = all(
+            isinstance(result, dict) and result.get("success") is False for result in results
         )
-        self.previous_failure = failure
-        if self.repeated_failures >= 3:
-            raise AgentLoopError(self.total_rounds, reason="repeated_tool_failure")
+        if failed and self.repeated_rounds >= self.IDENTICAL_FAILURES:
+            raise AgentLoopError("repeated_tool_failure")
+        if self.repeated_rounds >= self.IDENTICAL_ROUNDS:
+            raise AgentLoopError("repeated_step")
+
+
+# Follows a response the provider cut off at its output allowance. Messages transports need a
+# conversation turn here, so the label marks it as the application's signal, not player speech.
+_OUTPUT_LIMIT_NOTICE: dict[str, Any] = {
+    "role": "user",
+    "_application_data": True,
+    "content": (
+        "SYLVIA_GM_BUILDER_CONTINUE (application-owned continuation signal, not player speech): "
+        "Your previous response reached its length limit and was cut off. Text it had already "
+        "produced is kept and was shown to the user; do not repeat it. None of its tool calls "
+        "ran. Continue the same work from where it stopped. If you were writing a large file "
+        "or tool input, split it into several smaller tool calls."
+    ),
+}
 
 
 logger = logging.getLogger(__name__)
@@ -182,25 +190,35 @@ logger = logging.getLogger(__name__)
 
 
 class AgentLoopError(RuntimeError):
-    """Interrupt a bounded Builder turn without discarding its completed work."""
+    """Interrupt a Builder turn that has stopped progressing, keeping its completed work."""
 
-    def __init__(self, max_iterations: int, *, reason: str = "tool_limit") -> None:
-        self.reason = reason
-        self.user_message = (
+    _USER_MESSAGES = {
+        "required_reference_unavailable": (
             "Builder stopped because a selected source file is too large or damaged. "
             "Saved work was kept. Check the selected source content before continuing."
-            if reason == "required_reference_unavailable" else
+        ),
+        "repeated_reference_failure": (
             "Builder stopped because the same source could not be read after several attempts. "
             "Saved work was kept. Review the source error before continuing."
-            if reason == "repeated_reference_failure" else
+        ),
+        "repeated_tool_failure": (
             "Builder stopped after repeated identical tool failures; saved work was kept. "
             "Review the last tool error before continuing."
-            if reason == "repeated_tool_failure"
-            else "Builder reached its tool-use limit after automatic continuation; "
+        ),
+        "repeated_step": (
+            "Builder stopped because it kept repeating the same step without making progress; "
+            "saved work was kept. Send a message to redirect it."
+        ),
+        "empty_response": (
+            "Builder stopped because the model kept returning empty responses; "
             "saved work was kept. Send a message to continue."
-        )
-        super().__init__(f"{self.user_message} (Round allowance: {max_iterations}.)")
-        self.max_iterations = max_iterations
+        ),
+    }
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+        self.user_message = self._USER_MESSAGES[reason]
+        super().__init__(self.user_message)
 
 
 class ContextExhaustedError(RuntimeError):
@@ -273,9 +291,9 @@ class AgentRunner:
     rejects DM_SESSION. Use agent._session_loop.CampaignSessionLoop for gameplay.
     """
 
-    # Reference lookup, authoring, and validation need room within one bounded Builder turn.
-    MAX_TOOL_LOOP = 32
-    MAX_TOOL_CONTINUATIONS = 2
+    # A response cut off by its output allowance is continued this many times in a row
+    # before the turn reports the limit to the user.
+    MAX_OUTPUT_LIMIT_CONTINUATIONS = 3
     _activity_progress: Callable[[str, str | None], None]
     _activity_retry: bool
 
@@ -293,6 +311,27 @@ class AgentRunner:
             failed = getattr(result, "success", None) is False
         self._activity_retry = self._activity_retry or failed
         self._activity_progress("working", None)
+
+    async def _builder_stream(
+        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None,
+    ) -> AsyncIterator[ProviderStreamChunk]:
+        """Stream one Builder response, ending a cut-off response with a "length" chunk.
+
+        The working-context provider reports a response cut off at its output allowance as
+        an error; other providers send the finish reason. The turn loop handles one shape.
+        """
+        try:
+            async for chunk in self._provider.generate_stream(
+                messages=messages,
+                tools=tools,
+                **self._builder_stream_options(),
+            ):
+                yield chunk
+        except ProviderContinuationRequiredError:
+            # A native continuation Sylvia cannot perform is not an ordinary cut-off.
+            raise
+        except ProviderOutputLimitError:
+            yield ProviderStreamChunk(finish_reason="length")
 
     def _builder_stream_options(self) -> dict[str, Any]:
         """Apply the visible Builder budget and selected-model reasoning options."""
@@ -651,9 +690,10 @@ class AgentRunner:
         was_truncated_retry = False
 
         # ── Tool-call loop (shared structure, mode-aware at key points) ──
-        budget = _BuilderLoopBudget(self.MAX_TOOL_LOOP, self.MAX_TOOL_CONTINUATIONS)
-        for _iteration in range(budget.total_rounds):
-            budget.before_round(messages, _iteration)
+        # The loop has no round allowance; the guard ends a turn that stops progressing.
+        guard = _BuilderLoopGuard()
+        empty_responses = 0
+        for _iteration in itertools.count():
             self._activity_provider_started()
             # DM mode: use overflow-aware generate on first iteration
             if self._mode == AgentMode.DM_SESSION and _iteration == 0:
@@ -785,7 +825,7 @@ class AgentRunner:
                         }
                     )
                     self._history.append(messages[-1])
-                    budget.finish_tool(assistant_msg["tool_calls"][-1], tool_result)
+                    guard.finish_tool(assistant_msg["tool_calls"][-1], tool_result)
 
                     # ── Widget tracking: ask_question tool carries widget payload ──
                     if tc.name == "ask_question" and isinstance(tool_result, dict):
@@ -805,16 +845,18 @@ class AgentRunner:
                             tool_calls_made,
                             messages=self._build_visible_messages(),
                         )
-                budget.finish_round(
+                guard.finish_round(
                     assistant_msg["tool_calls"],
                     [outcome[3] for outcome in tool_outcomes],
                 )
+                empty_responses = 0
                 continue
 
-            # Empty response — nudge
+            # Empty response — nudge, but never loop on a model that keeps returning nothing.
+            empty_responses += 1
+            if empty_responses >= 3:
+                raise AgentLoopError("empty_response")
             messages.append({"role": "user", "content": "Please continue."})
-
-        raise AgentLoopError(budget.total_rounds)
 
     async def turn_stream(
         self,
@@ -822,7 +864,6 @@ class AgentRunner:
         event_queue: asyncio.Queue[StreamEvent],
         *,
         between_iterations: Callable[[], str | None] | None = None,
-        retry_on_length: bool = True,
         application_prompt: str | None = None,
     ) -> None:
         """Process a turn with streaming SSE output.
@@ -846,7 +887,6 @@ class AgentRunner:
                     user_message,
                     event_queue,
                     between_iterations=between_iterations,
-                    retry_on_length=retry_on_length,
                     application_prompt=application_prompt,
                 )
         except asyncio.CancelledError:
@@ -868,7 +908,6 @@ class AgentRunner:
         event_queue: asyncio.Queue[StreamEvent],
         *,
         between_iterations: Callable[[], str | None] | None = None,
-        retry_on_length: bool = True,
         application_prompt: str | None = None,
     ) -> None:
         """Internal stream implementation.  Callers MUST go through
@@ -932,14 +971,15 @@ class AgentRunner:
         turn_complete = False
         has_ask_question = False
 
-        budget = _BuilderLoopBudget(self.MAX_TOOL_LOOP, self.MAX_TOOL_CONTINUATIONS)
-        for iteration in range(budget.total_rounds):
+        # The loop has no round allowance; the guard ends a turn that stops progressing.
+        guard = _BuilderLoopGuard()
+        output_limit_continuations = 0
+        for iteration in itertools.count():
             if turn_complete:
                 logger.debug(
                     f"turn_stream: breaking outer loop, turn_complete=True, iteration={iteration}"
                 )
                 break
-            budget.before_round(messages, iteration)
             # ── Streaming accumulation ──
             full_content = ""
             full_reasoning = ""
@@ -962,11 +1002,7 @@ class AgentRunner:
                 logger.debug(f"turn_stream: builder user messages ({len(user_msgs)}): {user_msgs}")
 
             self._activity_provider_started()
-            async for chunk in self._provider.generate_stream(
-                messages=messages,
-                tools=tools,
-                **self._builder_stream_options(),
-            ):
+            async for chunk in self._builder_stream(messages, tools):
                 self._activity_progress("working", None)
                 if chunk.chat_completion_metadata is not None:
                     native_chat_metadata = chunk.chat_completion_metadata
@@ -1042,6 +1078,32 @@ class AgentRunner:
                 any(n == "ask_question" for n in tool_names),
             )
 
+            # A response cut off by its output allowance continues in the same turn instead
+            # of ending it. Text already shown stays; none of its tool calls run, because a
+            # cut-off call can carry incomplete arguments.
+            if finish_reason in {"length", "max_tokens"}:
+                output_limit_continuations += 1
+                if output_limit_continuations > self.MAX_OUTPUT_LIMIT_CONTINUATIONS:
+                    raise ProviderOutputLimitError("The model reached its response limit")
+                logger.warning(
+                    "Builder response reached its output limit; continuing (%d of %d).",
+                    output_limit_continuations,
+                    self.MAX_OUTPUT_LIMIT_CONTINUATIONS,
+                )
+                if full_content and not _has_ask_question_delta:
+                    partial = {
+                        "role": "assistant",
+                        "content": full_content,
+                        "provider_response_id": private_response_id,
+                    }
+                    self._history.append(partial)
+                    messages.append(partial)
+                self._history.append(dict(_OUTPUT_LIMIT_NOTICE))
+                messages.append(dict(_OUTPUT_LIMIT_NOTICE))
+                self._activity_retry = True
+                continue
+            output_limit_continuations = 0
+
             # Snapshot native fields separately before public history or tool processing.
             # Readable chunks already emitted remain available if the stream is interrupted.
             continuation: dict[str, Any] = {}
@@ -1057,31 +1119,6 @@ class AgentRunner:
                     data=json.dumps(continuation, ensure_ascii=False, allow_nan=False),
                     meta={"response_id": private_response_id},
                 ))
-
-            # Truncation detected — compress and re-stream
-            if finish_reason == "length":
-                if not retry_on_length:
-                    raise RuntimeError("Provider response reached its output limit")
-                logger.warning(
-                    "Streaming turn received finish_reason='length' — compressing and retrying."
-                )
-                await self._turn_stream_with_overflow_recovery(
-                    messages,
-                    tools,
-                    event_queue,
-                )
-                # Recovery handled the re-stream; skip normal post-processing
-                await event_queue.put(
-                    StreamEvent(
-                        type="done",
-                        meta={
-                            "tool_calls_made": tool_calls_made,
-                            "state_changed": len(tool_calls_made) > 0,
-                            "was_truncated_retry": True,
-                        },
-                    )
-                )
-                return
 
             # ── Branch: text response (no tool calls) ──
             if not accumulated_tool_calls:
@@ -1254,7 +1291,7 @@ class AgentRunner:
                 )
 
                 try:
-                    budget.finish_tool(tc, tool_result)
+                    guard.finish_tool(tc, tool_result)
                 except AgentLoopError as error:
                     # Complete the provider protocol without executing the rest of this batch.
                     for pending in accumulated_tool_calls[len(round_results) :]:
@@ -1269,7 +1306,7 @@ class AgentRunner:
                         messages.append(skipped)
                     raise
 
-            budget.finish_round(accumulated_tool_calls, round_results)
+            guard.finish_round(accumulated_tool_calls, round_results)
 
             # ── After all tool calls: check for done / truncation ──
             if accumulated_tool_calls and between_iterations is not None:
@@ -1281,10 +1318,6 @@ class AgentRunner:
 
             if not accumulated_tool_calls:
                 break  # No tool calls, stream finished
-
-        else:
-            if not turn_complete:
-                raise AgentLoopError(budget.total_rounds)
 
         if has_ask_question:
             logger.info(
@@ -2325,60 +2358,6 @@ class AgentRunner:
                 ]
             serializable.append(entry)
         save_history(self._history_path, serializable, mode="builder")
-
-    async def _turn_stream_with_overflow_recovery(
-        self,
-        messages: list[dict[str, Any]],
-        tools: list[dict[str, Any]] | None,
-        event_queue: asyncio.Queue,
-    ) -> bool:
-        """Re-run the streaming turn with compressed messages after truncation.
-
-        Called from _turn_stream_impl when finish_reason="length" is detected.
-        Discards the already-seen truncated stream, compresses history,
-        and re-streams from scratch. The user sees only the final stream.
-
-        Returns:
-            True if recovery was attempted (compression occurred).
-        """
-        logger.warning("Streaming truncation detected — compressing and retrying")
-        try:
-            compressed_messages, was_compressed = await self._compress_and_retry(
-                messages,
-                tools,
-            )
-            if not was_compressed:
-                return False
-
-            # Re-stream with compressed messages
-            full_reasoning = ""
-            private_response_id = f"provider-response-{uuid4().hex}"
-            self._activity_provider_started()
-            async for chunk in self._provider.generate_stream(
-                messages=compressed_messages,
-                tools=tools,
-                **self._builder_stream_options(),
-            ):
-                if chunk.reasoning_content:
-                    full_reasoning += chunk.reasoning_content
-                    await event_queue.put(
-                        StreamEvent(type="reasoning", data=chunk.reasoning_content,
-                                    meta={"response_id": private_response_id})
-                    )
-                if chunk.content:
-                    await event_queue.put(StreamEvent(type="content", data=chunk.content))
-            return True
-        except ContextExhaustedError:
-            logger.error("Context exhausted during streaming retry")
-            await event_queue.put(
-                StreamEvent(
-                    type="error",
-                    data="The session has grown too large for this model. "
-                    "Consider starting a new chapter or switching to a model "
-                    "with a larger context window.",
-                )
-            )
-            return False
 
     # ── Tool Registry Helpers ───────────────────────────────────
 

@@ -1,0 +1,116 @@
+# Historical protocol 1 selection
+
+This is the 10 November 2026 pilot plan, retained as history. Its API-only Claude route,
+fixture and scoring rules are superseded for new work by [protocol v2](README.md). Original
+trial records retain their original source and grades. Do not execute this old plan as a new run.
+
+# First live comparison
+
+Selected on 10 November 2026. This is a developer pilot on the three implemented gameplay
+scenarios, followed by a decision about the next OCG sample. It does not complete the larger
+scenario, adventure or player-calibration roadmap.
+
+## Models and connections
+
+Use the latest generally available member of each named OpenAI and Anthropic family. The current
+public catalogs list:
+
+| Family | Candidate ID | Intended Sylvia connection |
+| --- | --- | --- |
+| Astra | `gpt-6-astra` | ChatGPT account |
+| Sol | `gpt-6.1-sol` | ChatGPT account |
+| Terra | `gpt-6.1-terra` | ChatGPT account |
+| Luna | `gpt-6-luna` | ChatGPT account |
+| Fable | `claude-fable-5-2` | Anthropic API using included subscription credits |
+| Opus | `claude-opus-5-5` | Anthropic API using included subscription credits |
+| Sonnet | `claude-sonnet-5-5` | Anthropic API using included subscription credits |
+| Haiku | `claude-haiku-5-5` | Anthropic API using included subscription credits |
+
+Catalog presence is not proof of account access. Record the actual advertised model, its exact
+canonical Sylvia ID, connection and transport before execution. Mythos 5.2 has restricted access
+through Anthropic's verification programs; check account availability and record the result rather
+than silently treating Fable as a Mythos result. If a required family is unavailable, bring the
+access choice to Daniel. Do not silently replace Sylvia with an external agent harness.
+
+Start the OCG pilot with GLM-5.3-Flash, DeepSeek V4.1 Flash and Qwen3.8 Flash. This samples three
+families and two native API formats. If account-region settings block DeepSeek, record that access
+failure before considering MiMo-V2.6-Flash as a separately named pilot choice. Do not change account
+privacy settings to make it pass. Any model through OCG is a separate setup from its direct route.
+
+Use Sylvia's GM defaults for each model. Record the effective request controls, context and output
+allowances. Equal reasoning labels are not assumed to mean equal computation across families.
+Fast mode is off. No prompts or checks are tuned for an individual model.
+
+## Fixed experiment
+
+1. Qualify the supported account/API route using the synthetic fixture. Qualification observations
+   stay separate from comparison scores.
+2. Freeze one named pack and verify it before each run. The first funded sample uses `selftest-v1`.
+   Keep this exact artifact for later
+   batches. Use the same application/content bytes, scenario versions and paired-dice policy.
+3. Run T1 healing, T2 secret and T3 save/reopen recall twice per setup: six runs per model. Use at
+   most two manual retries and sixteen Sylvia provider calls per run. Preserve unsuccessful first
+   attempts and any transport-level retry qualification.
+4. Compare starting-observation, player-message and first provider-input hashes. Inspect differences
+   before interpreting setups as equal challenges. Model-generated continuations can diverge.
+5. Keep incomplete or unattributed failures explicit. Do not replace missing data, redistribute
+   untested story weight or invent a headline rank. Two repetitions are a feasibility sample.
+
+The full general-access family sample plus three OCG choices would mean 66 scored runs. A smaller
+funded batch can use four ChatGPT models, three Go flash models and Haiku through Go: eight setups
+and 48 planned scored runs, subject to inference qualification. Record actual funding/access choices
+privately and keep unavailable families visibly pending. A later direct Haiku run is a separate
+route comparison. Mythos access is separately restricted. Stop on exhausted allowance; retain missing
+matched runs as untested and resume when the supported allowance renews. Do not fill in another model.
+
+The current Sylvia discovery parser misses the newer Go catalog's nested `limit` metadata. This
+pilot enters each published 1,000,000-token context size through Advanced settings as an explicit
+operating cap, separately retaining the declared `provider_metadata` value. An advertised limit
+alone does not establish Sylvia's effective working limit. Runtime confirmation remains unknown.
+All four Go setups retain the existing 4,096-token output
+fallback. Their reasoning control is unrecognized by this Sylvia version and remains unset.
+Report truncation or unknown effort as a harness limitation; do not infer a model's general
+capability from it. Improving discovery or changing the output allowance needs a new setup/batch.
+
+Compare the first GM request separately from preparation/compaction calls. Qualification can retain
+a private Full Audit to inspect exact differences; raw audits do not belong in the shared report.
+Sylvia's Codex route places application data differently and adds fixed data/control instructions.
+If complete request hashes differ, verify the shared GM instructions, campaign preparation, state,
+rules guide, response format, canonical dialogue and tool schemas. Record the remaining role/control
+differences. The resulting comparison concerns Sylvia setups; it does not isolate a foundation
+model from its transport and serving instructions.
+
+## Spending and privacy
+
+Do not buy credits, enable automatic reload or reset a usage limit. Existing balances may be used
+only when the account owner has explicitly selected that funding policy. ChatGPT must use Sylvia's
+managed account connection. Claude requires a supported API key and selected funding; a Claude app login
+alone does not establish that route. Defer any unfunded API runs and retain those families as pending.
+Haiku through Go is a separately identified setup.
+For OCG, disable Extra Usage or verify that no paid balance and no automatic top-up can fund it.
+Keep the account balance and funding verification in private work records. The benchmark request
+bound is not a monetary spending cap.
+
+Keep keys, account configuration and raw Full Audit traces out of Git and the comparison report.
+Enable Full Audit for the selected synthetic campaign before tested actions. Retain only the small
+necessary results and reproducible fixture artifact with the delivery.
+
+## OCG decision after the pilot
+
+Report supported route/tool behavior, checker outcomes, interruptions, waits, and measured usage
+where available. Separate access/transport failures from model behavior. Decide whether the next
+OCG work should widen the model set, increase repetitions, deepen gameplay scenarios or repair a
+specific integration. These three scenarios cannot support an overall player recommendation.
+
+## Catalog and funding sources
+
+Checked 10 November 2026:
+
+- [OpenAI model catalog](https://developers.openai.com/api/docs/models)
+- [Anthropic model overview](https://platform.claude.com/docs/en/models/overview)
+- [Fable and Mythos 5.2 availability](https://www.anthropic.com/claude-fable-and-mythos-5-2)
+- [Claude API credits for subscribers](https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers)
+- [OpenCode Go models, endpoints and Extra Usage](https://dev.opencode.ai/docs/console/go/)
+
+Public catalogs must be rechecked if execution occurs after this selection date. Saved local
+catalogs and prices do not establish live entitlement or an available balance.

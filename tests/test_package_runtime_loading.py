@@ -13,6 +13,12 @@ from sylvia_gm.runtime._schema_validator import validate_ruleset, validate_rules
 from tests.test_alpha_f3_package_execution import _runtime_yaml
 
 
+@pytest.fixture(autouse=True)
+def validate_without_disk_cache(monkeypatch):
+    """These checks observe parser calls and altered validation bounds directly."""
+    monkeypatch.delenv("SYLVIA_RUNTIME_CACHE_DIR", raising=False)
+
+
 @pytest.mark.parametrize('authoring', [False, True])
 def test_runtime_checks_source_and_expanded_parameter_shape_without_a_duplicate_scan(
     monkeypatch, authoring,

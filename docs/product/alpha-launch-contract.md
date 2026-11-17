@@ -88,6 +88,26 @@ the mode default on future replies, including existing chats; do not rewrite or 
 Preserve valid explicit preferences and make unsupported selections actionable rather than
 silently ignoring them. This is AR-20's selected requirement, not an implemented-capability claim.
 
+Settings holds one set of defaults for new Builder and GM chats: the model, a reasoning effort and
+a speed. A new chat copies them once, when it is created. A default that the chat's model does not
+support falls back to the mode default effort or to standard speed. Changing Settings later never
+changes an existing chat, and changing a chat never changes Settings, apart from the explicit
+`--global` model switch above. Where a new chat's first model call would start by itself (the GM
+opening after campaign setup or a ready campaign, import repair, and the independent Builder chats
+the Interview opens for a Ruleset, Setting, Plan, Player Character or Companion), the player is
+first shown the model, effort and speed and may change them or cancel; nothing is sent until they
+confirm. Every other new chat waits for its first message, where the message-box controls serve
+the same purpose.
+
+Speed is a provider's own processing tier, separate from effort, model identity and token
+allowance. Offer it only where the exact connection documents or advertises it: the tiers the
+ChatGPT runtime lists for a subscription model, OpenAI API Fast and Flex, and Anthropic API fast
+mode, each for the listed models only. Everywhere else, say that the connection has no speed
+choice. Send the provider's own value, show what was requested, and never promise a faster reply or
+claim the provider used that tier. A chat's speed belongs to this device's settings rather than to
+campaign data, and a model change clears a speed the new model does not offer. Daniel selected
+these defaults and the choice before a first model call on 11 November 2026.
+
 The ChatGPT account connection is implemented through the owner-side Codex app-server route.
 The earlier post-Alpha/planning-only description is historical: PES-82 selected implementation
 while preserving Sylvia's tool and content authority. Capture the subscription-runtime audit
@@ -95,6 +115,27 @@ data that is available and label downstream details the runtime does not expose.
 current provider compatibility and exact-candidate acceptance remain separate from implementation.
 OpenAI API-key authentication remains supported. Additional provider sign-ins need their own
 supported route; undocumented subscription-token extraction is not selected.
+
+The selected Claude account route uses Sylvia's own copy of the unmodified official Claude Code
+executable (version 0.5 requirement, 12 November 2026). Settings > Accounts downloads that copy
+from Anthropic's release channel, checks Anthropic's published checksum and Windows code
+signature, and provides sign-in, cancel, sign-out and manual model registration. The copy, its
+profile and its sign-in stay in the owner data directory; Sylvia never uses, replaces or changes
+a Claude Code the person already has, and no setting selects another executable. The binary owns
+authentication; Sylvia never implements Claude.ai OAuth or
+reads, copies or stores subscription tokens. Native subscription and separately selected Console
+billing remain distinct from the existing Anthropic API-key provider, with no silent fallback.
+Sylvia owns canonical GM/Builder history and executes validated game tools. It stops each native
+inference step before returning an admitted tool request to its normal game loop. Native-runtime
+processes are an explicit exception to the local inference-server lifecycle paragraph above.
+Missing/old runtimes, unavailable models, expired sign-in and quota failures retain saved work and
+give explicit outcomes. Sylvia does not bundle or redistribute Claude Code and updates its copy
+only when the person asks; Claude Code's own installer and updater are never run. No shared
+subscription service or Portal route is included. Automatic setup is Windows only. Agreeing to
+Anthropic's terms for products that run Claude Code remains an owner decision before release.
+A source PR and synthetic/native-protocol checks do not establish genuine-account
+or installed-release acceptance. See the [setup, terms and evidence note](../research/claude-dedicated-instance-2026-11-12.md)
+and the earlier [native runtime evidence](../research/claude-native-runtime-2026-11-11.md).
 
 ### 1.1 Release gates
 
@@ -862,6 +903,17 @@ overflow. Other transports retain pre-send fit checks with authoritative countin
 Exact counts are claimed only from authoritative usage or a supported authoritative counter; estimates
 and unavailable runtime controls remain visibly distinguished. Runtime rejection or a request for
 compaction preserves work and uses the explicit working-context recovery path, with no model fallback.
+
+A Builder turn keeps working until the request is done, as coding agents such as Codex do. There is
+no limit on the number of tool rounds and the player is never asked to send a message merely to let
+unfinished work carry on. The turn ends when the Builder finishes, asks the player a question, the
+player presses Stop, the provider fails, or the Builder has plainly stopped making progress: the
+same step repeated without change, or a selected source that cannot be read. When a Builder response
+is cut off by its response limit, Sylvia keeps the text already shown, runs none of that response's
+tool calls and has the model continue in smaller steps within the same turn. It does this up to
+three times in a row; a fourth cut-off in a row ends the turn with an explanation. Every stop keeps
+saved work and says why it stopped. This is continuation of the same request with the same model,
+not a retry of a failed request or a provider switch, and the GM rule below is unchanged.
 
 - readable reasoning supplied by the provider is saved with its turn and available only through a
   separately collapsed Thinking entry inside the activity group. Opening activity does not reveal

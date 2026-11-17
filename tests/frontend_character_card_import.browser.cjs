@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');const path=require('node:path');const {chromium}=require('playwright');
 const frontend=path.resolve(__dirname,'../src-tauri/frontend');
 test('card preview is escaped, explicit, guarded against duplicate clicks and refreshes general-source discovery',async()=>{
- const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const browser=await chromium.launch({headless:true,channel:process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined),args:['--disable-gpu']});
  try {const page=await browser.newPage({viewport:{width:1280,height:900}});
  await page.route('https://sylvia-card.test/**',async route=>{
   const name=new URL(route.request().url()).pathname.slice(1)||'app.html';
@@ -58,7 +58,7 @@ test('card preview is escaped, explicit, guarded against duplicate clicks and re
 
 
 test('campaign picker and rendered Ready summary use the package-friendly Lite name with exact saved bindings',async()=>{
- const browser=await chromium.launch({headless:true,channel:'msedge',args:['--disable-gpu']});
+ const browser=await chromium.launch({headless:true,channel:process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined),args:['--disable-gpu']});
  try {
   const page=await browser.newPage({viewport:{width:1280,height:900}});
   await page.route('https://sylvia-setup-name.test/**',async route=>{

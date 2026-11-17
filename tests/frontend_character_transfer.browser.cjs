@@ -68,7 +68,8 @@ async function stop(page,child){
 
 test('export, preview, cancel, refused import, recovery and refresh through the source WebUI',
   {timeout:600000},async()=>{
-  const root=process.env.SYLVIA_CHARACTER_TRANSFER_ROOT;
+  const root=process.env.SYLVIA_CHARACTER_TRANSFER_ROOT || (process.env.SYLVIA_QA_FIXTURE_ROOT &&
+    path.join(process.env.SYLVIA_QA_FIXTURE_ROOT,'character-transfer-webui'));
   assert.ok(root,'Select a fresh disposable SYLVIA_CHARACTER_TRANSFER_ROOT');
   assert.equal(fs.existsSync(root),false,'Never reuse or remove an existing data root');
   fs.mkdirSync(path.join(root,'downloads'),{recursive:true});

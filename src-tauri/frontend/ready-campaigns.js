@@ -9,6 +9,7 @@
     let request = null;
     let busy = false;
     let warning = false;
+    let choosing = false;
     let customRequest = null;
     const storageKey = 'sylvia-ready-campaign-pending';
     const persist = value => {
@@ -26,8 +27,14 @@
           !Array.isArray(fields) || fields.length !== 5 ||
           fields.some(field => typeof field !== 'string' || !field)) return null;
         const [template_id, expected_content_sha256, display_name, provider_id, model_id] = fields;
+        // The Game Master effort and speed chosen for this start travel with every retry.
+        const chosen = {};
+        for (const field of ['reasoning_effort', 'speed']) {
+          if (typeof value[field] === 'string' && value[field]) chosen[field] = value[field];
+        }
         return { operation_id: value.operation_id, template_id, expected_content_sha256,
-          display_name, provider_id, model_id, model_guidance_override: value.model_guidance_override === true };
+          display_name, provider_id, model_id, ...chosen,
+          model_guidance_override: value.model_guidance_override === true };
       } catch (_) { return null; }
     };
     const pendingCustomization = value => {
@@ -129,19 +136,30 @@
     }
     async function start() {
       const row = selected();
-      if (busy || customRequest) return;
+      if (busy || choosing || customRequest) return;
       if (!request) {
         if (!row) return;
-        const model = options.model();
+        const displayName = node('ready-campaign-name').value.trim();
+        if (!displayName) { status('Enter a campaign name.'); return; }
+        // The model, effort and speed are settled before anything is created or sent.
+        choosing = true;
+        let model;
+        try { model = await options.model(); } finally { choosing = false; }
         if (!model) {
           status('Choose a configured model before starting. You can configure a provider in Settings, then return here.');
           return;
         }
-        const displayName = node('ready-campaign-name').value.trim();
-        if (!displayName) { status('Enter a campaign name.'); return; }
+        if (model.cancelled) {
+          status('Start cancelled. Nothing was created or sent to the model.');
+          return;
+        }
+        if (busy || request || customRequest) return;
         request = { basis: JSON.stringify([
           row.id, row.content_sha256, displayName, model.provider_id, model.model_id,
         ]), operation_id: `ready-${options.uuid()}` };
+        for (const field of ['reasoning_effort', 'speed']) {
+          if (typeof model[field] === 'string' && model[field]) request[field] = model[field];
+        }
         warning = false;
       }
       request.model_guidance_override = warning || request.model_guidance_override === true;

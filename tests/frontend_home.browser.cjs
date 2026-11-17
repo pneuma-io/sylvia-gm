@@ -251,6 +251,34 @@ test('Home navigation keeps session selection and drafts, and dialogs cancel cle
   } finally { await browser.close(); }
 });
 
+test('Campaign data offers no export or campaign actions on Home', { timeout: 60000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await openHome(browser, { width: 1400, height: 900 });
+    const campaignData = () => page.evaluate(() => ({
+      exportEnabled: !document.getElementById('export-campaign-btn').disabled,
+      renameEnabled: !document.getElementById('rename-campaign-btn').disabled,
+      archiveEnabled: !document.getElementById('archive-campaign-btn').disabled,
+      context: document.getElementById('settings-campaign-context').textContent,
+    }));
+    await page.locator('.home-continue').click();
+    await page.waitForFunction(() => !document.getElementById('export-campaign-btn').disabled);
+    assert.equal((await campaignData()).exportEnabled, true, 'an open campaign can be exported');
+
+    // Home has no open campaign: the export would have nothing to act on, so it must not be
+    // offered (it used to stay enabled from the last campaign and do nothing when pressed).
+    await goHome(page);
+    assert.deepEqual(await campaignData(), {
+      exportEnabled: false, renameEnabled: false, archiveEnabled: false,
+      context: 'Select a campaign to export, rename, archive, or delete.',
+    });
+    await page.locator('.home-continue').click();
+    await page.waitForFunction(() => !document.getElementById('export-campaign-btn').disabled);
+    assert.match((await campaignData()).context, /^Selected: The Lantern Road/);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('Home archive, restore, keyboard focus and narrow layout', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {
@@ -259,11 +287,11 @@ test('Home archive, restore, keyboard focus and narrow layout', { timeout: 60000
     // tutorial suite), then the Continue card.
     await page.locator('#home-new-campaign-btn').focus();
     const order = [];
-    for (let i = 0; i < 7; i += 1) {
+    for (let i = 0; i < 8; i += 1) {
       if (i) await page.keyboard.press('Tab');
       order.push(await page.evaluate(() => document.activeElement.id || document.activeElement.className));
     }
-    assert.deepEqual(order, ['home-new-campaign-btn', 'home-ready-campaign-btn', 'home-build-btn',
+    assert.deepEqual(order, ['home-new-campaign-btn', 'home-ready-campaign-btn', 'home-character-chat-btn', 'home-build-btn',
       'home-settings-btn', 'home-tutorials-btn', 'home-get-started-btn', 'btn btn-primary home-continue']);
     assert.notEqual(await page.locator('.home-continue').evaluate((node) => getComputedStyle(node).outlineStyle), 'none',
       'focused controls show a visible outline');

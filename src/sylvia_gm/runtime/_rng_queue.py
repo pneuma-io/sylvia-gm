@@ -347,10 +347,7 @@ class RNGQueue:
         once in canonical order.
         """
         rng: random.Random
-        if self.seed is not None:
-            rng = random.Random(self.seed)
-        else:
-            rng = random.Random()
+        rng = random.Random(self.seed) if self.seed is not None else random.Random()
 
         self.entries.clear()
         for _ in range(self.size):

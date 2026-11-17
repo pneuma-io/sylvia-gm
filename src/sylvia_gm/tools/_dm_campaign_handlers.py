@@ -25,10 +25,9 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -171,7 +170,7 @@ def tool_write_act_changelog(params: dict[str, Any], _context: Any) -> dict[str,
     session_dir.mkdir(parents=True, exist_ok=True)
     log_path = session_dir / f"act-{act}-changelog.md"
 
-    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    stamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     block = f"\n- **{stamp}** — {entry.strip()}\n"
 
     try:
@@ -228,7 +227,7 @@ def tool_advance_act(params: dict[str, Any], _context: Any) -> dict[str, Any]:
 
     # Atomic status.json update (mirror _folder._update_status fields)
     status["current_act"] = to_act
-    status["modified"] = datetime.now(timezone.utc).isoformat()
+    status["modified"] = datetime.now(UTC).isoformat()
     status.setdefault("created", status["modified"])
     status.setdefault("campaign_slug", root.name)
 

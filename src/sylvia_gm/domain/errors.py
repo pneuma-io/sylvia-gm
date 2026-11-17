@@ -139,17 +139,23 @@ class MechanicsRejected(CommandRejected):  # noqa: N818 - domain contract name
         field_paths: tuple[str, ...] = (),
         validation_issues: tuple[MechanicsValidationIssue, ...] = (),
         state_changed: bool = False,
+        refusal_reasons: tuple[str, ...] = (),
     ) -> None:
         super().__init__(message, code=code)
         self.field_paths = field_paths
         self.validation_issues = validation_issues[:64]
         self.state_changed = state_changed
+        self.refusal_reasons = refusal_reasons[:64]
+        if any(not isinstance(reason, str) or not reason or reason != reason.strip()
+               or len(reason) > 500 or any(ord(character) < 32 for character in reason)
+               for reason in self.refusal_reasons):
+            raise ValueError("Ruleset precondition reasons are not model-safe")
 
 
 class RulesetPreconditionRejected(MechanicsRejected):  # noqa: N818
     """An admitted Ruleset's bounded, model-safe precondition rejection."""
 
-    def __init__(self, safe_reason: str) -> None:
+    def __init__(self, safe_reason: str, *, reasons: tuple[str, ...] = ()) -> None:
         if (
             not isinstance(safe_reason, str)
             or not safe_reason
@@ -162,5 +168,6 @@ class RulesetPreconditionRejected(MechanicsRejected):  # noqa: N818
             safe_reason,
             code="ruleset_precondition_failed",
             state_changed=False,
+            refusal_reasons=tuple(dict.fromkeys((safe_reason, *reasons))),
         )
         self.safe_reason = safe_reason

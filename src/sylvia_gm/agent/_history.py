@@ -19,7 +19,8 @@ DM_MAX_HISTORY_LINES = 50
 BUILDER_MAX_HISTORY_LINES = 200
 
 
-def save_history(history_path: Path | None, history: list[dict[str, Any]], *, mode: str = "dm") -> None:
+def save_history(
+    history_path: Path | None, history: list[dict[str, Any]], *, mode: str = "dm") -> None:
     """Write the most recent messages to the history file.
 
     Args:
@@ -43,7 +44,7 @@ def load_history(history_path: Path | None) -> list[dict[str, Any]]:
         return []
 
     messages: list[dict[str, Any]] = []
-    with open(history_path, "r", encoding="utf-8") as f:
+    with open(history_path, encoding="utf-8") as f:
         for line_num, line in enumerate(f, 1):
             line = line.strip()
             if not line:

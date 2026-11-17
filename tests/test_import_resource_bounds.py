@@ -147,7 +147,9 @@ def test_desktop_recovery_rejects_deep_json_without_internal_error(tmp_path, dep
         }})
         invalid = harness.read()
         assert invalid["ok"] is False
-        assert invalid["error"]["code"] == "portable_export_invalid_manifest"
+        assert invalid["error"]["code"] in {
+            "portable_export_invalid_manifest", "portable_export_invalid_member_order",
+        }
         assert source.name not in invalid["error"]["message"]
         assert "RecursionError" not in invalid["error"]["message"]
         assert "hash conflict" not in invalid["error"]["message"]

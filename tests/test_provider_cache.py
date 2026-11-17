@@ -184,6 +184,121 @@ async def test_chatgpt_drains_owned_usage_after_tool_shutdown(tmp_path):
     assert response.cache_usage.cache_write_tokens == 10
 
 
+TOOL_CALL = {
+    "method": "item/tool/call",
+    "params": {"namespace": "sylvia", "tool": "choose", "callId": "one", "arguments": {}},
+}
+CHOOSE = [{
+    "type": "function",
+    "function": {"name": "choose", "description": "Choose", "parameters": {"type": "object"}},
+}]
+
+
+class InterruptibleRuntime(SyntheticRuntime):
+    """Like the real runtime: usage for a tool-call request arrives only after an interrupt."""
+
+    def __init__(self, events, after_interrupt):
+        super().__init__(events)
+        self.after_interrupt = list(after_interrupt)
+
+    def call(self, method, params):
+        if method == "turn/interrupt":
+            assert params == {"threadId": "synthetic-thread", "turnId": "synthetic-turn"}
+            self.events.extend(self.after_interrupt)
+        return super().call(method, params)
+
+
+INTERRUPTED = {
+    "method": "turn/completed",
+    "params": {"threadId": "synthetic-thread", "turn": {"status": "interrupted"}},
+}
+
+
+@pytest.mark.asyncio
+async def test_chatgpt_collects_usage_for_a_tool_call_by_interrupting_the_turn(
+    tmp_path, monkeypatch,
+):
+    """Issue 78: the runtime holds the report until the tool call resolves or is interrupted.
+
+    That is the path with a new runtime thread per request (``SYLVIA_CHATGPT_THREAD=fresh``).
+    """
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "fresh")
+    runtime = InterruptibleRuntime([TOOL_CALL], [
+        usage_event({"inputTokens": 900, "outputTokens": 90, "totalTokens": 990},
+                    turn="other-turn"),
+        usage_event({"inputTokens": 64, "outputTokens": 6, "totalTokens": 70,
+                     "cachedInputTokens": 48}),
+        INTERRUPTED,
+    ])
+    response = await provider_for(runtime, tmp_path).generate(
+        [{"role": "user", "content": "Test"}], tools=CHOOSE,
+    )
+    assert [call.name for call in response.tool_calls] == ["choose"]
+    assert response.usage_reported and response.usage.prompt_tokens == 64
+    assert response.cache_usage.cache_read_tokens == 48
+    assert response.cache_usage.hit_ratio == 0.75
+    assert runtime.calls.count("turn/interrupt") == 1
+    assert runtime.closed
+
+
+@pytest.mark.asyncio
+async def test_chatgpt_interrupted_turn_without_a_report_returns_at_once(tmp_path, monkeypatch):
+    import time
+
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "fresh")
+    runtime = InterruptibleRuntime([TOOL_CALL], [INTERRUPTED])
+    started = time.monotonic()
+    response = await provider_for(runtime, tmp_path).generate(
+        [{"role": "user", "content": "Test"}], tools=CHOOSE,
+    )
+    assert time.monotonic() - started < 0.9
+    assert [call.name for call in response.tool_calls] == ["choose"]
+    assert not response.usage_reported and runtime.closed
+
+
+@pytest.mark.asyncio
+async def test_chatgpt_silent_runtime_after_interrupt_waits_a_bounded_time(tmp_path, monkeypatch):
+    import time
+
+    from sylvia_gm.provider import _chatgpt
+
+    monkeypatch.setattr(_chatgpt, "_USAGE_REPORT_SECONDS", 0.2)
+    runtime = InterruptibleRuntime([TOOL_CALL], [])
+    started = time.monotonic()
+    response = await provider_for(runtime, tmp_path).generate(
+        [{"role": "user", "content": "Test"}], tools=CHOOSE,
+    )
+    assert 0.2 <= time.monotonic() - started < 2
+    assert [call.name for call in response.tool_calls] == ["choose"]
+    assert not response.usage_reported and runtime.closed
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fails_in", ["interrupt", "event"])
+async def test_chatgpt_runtime_failure_while_collecting_usage_keeps_the_tool_call(
+    tmp_path, fails_in
+):
+    from sylvia_gm.provider._codex_rpc import CodexConnectionError
+
+    class Runtime(SyntheticRuntime):
+        def call(self, method, params):
+            if method == "turn/interrupt" and fails_in == "interrupt":
+                raise CodexConnectionError("The Codex runtime rejected this operation.")
+            return super().call(method, params)
+
+        def next_event(self):
+            if self.events:
+                return self.events.pop(0)
+            raise CodexConnectionError("The ChatGPT runtime stopped before completing.")
+
+    runtime = Runtime([TOOL_CALL])
+    response = await provider_for(runtime, tmp_path).generate(
+        [{"role": "user", "content": "Test"}], tools=CHOOSE,
+    )
+    assert [call.name for call in response.tool_calls] == ["choose"]
+    assert not response.usage_reported and runtime.closed
+
+
 def test_cache_audit_and_totals_distinguish_unknown_zero_and_partial_coverage():
     from sylvia_gm.provider._admin_audit import _usage_projection
     from sylvia_gm.provider._base import CacheUsage, ProviderResponse, TokenUsage

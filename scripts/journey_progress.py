@@ -4,14 +4,23 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from contextlib import contextmanager
 from functools import wraps
 from pathlib import Path
 
 
+# Capture worker-owned destinations before tests install environment-access guards.
+_TIMING_PATHS = {
+    name: os.environ.get(name)
+    for name in ("SYLVIA_JOURNEY_TIMINGS", "SYLVIA_JOURNEY_FIXTURE_TIMINGS")
+}
+_current_case: str | None = None
+
+
 def record(row, variable="SYLVIA_JOURNEY_TIMINGS"):
-    if target := os.environ.get(variable):
+    if target := _TIMING_PATHS.get(variable):
         with Path(target).open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(row, separators=(",", ":")) + "\n")
 
@@ -27,7 +36,7 @@ def phase(name):
             {
                 "phase": name,
                 "seconds": time.perf_counter() - started,
-                "case": os.environ.get("PYTEST_CURRENT_TEST"),
+                "case": _current_case,
             },
             "SYLVIA_JOURNEY_FIXTURE_TIMINGS",
         )
@@ -45,11 +54,18 @@ def timed(name):
     return decorate
 
 
+def emit(text):
+    """Print a receipt; a console that cannot encode it gets escapes, never an aborted session."""
+    encoding = getattr(sys.stdout, "encoding", None) or "utf-8"
+    print(text.encode(encoding, "backslashreplace").decode(encoding), flush=True)
+
+
 def pytest_runtest_logstart(nodeid, location):
-    print(
+    global _current_case
+    _current_case = nodeid
+    emit(
         "\nJOURNEY "
-        + json.dumps({"event": "start", "case": nodeid, "monotonic": time.monotonic()}),
-        flush=True,
+        + json.dumps({"event": "start", "case": nodeid, "monotonic": time.monotonic()})
     )
 
 
@@ -63,6 +79,6 @@ def pytest_runtest_logreport(report):
     }
     record(row)
     if report.when == "teardown" or report.failed or report.skipped:
-        print("\nJOURNEY " + json.dumps(row), flush=True)
+        emit("\nJOURNEY " + json.dumps(row))
     if report.failed:
-        print(str(report.longrepr), flush=True)
+        emit(str(report.longrepr))

@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
 test('review, cancellation, source conflicts and uncertain append retries use the selected campaign',
   { timeout: 30000 }, async () => {
     const browser = await chromium.launch({ headless: true,
-      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || 'msedge' });
+      channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
     try {
       const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
       page.setDefaultTimeout(5000);

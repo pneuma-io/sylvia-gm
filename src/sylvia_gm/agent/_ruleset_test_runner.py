@@ -20,6 +20,7 @@ from sylvia_gm.agent._ruleset_test_provider import RulesetTestProvider, Scenario
 from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionInputKind, SessionRunRequest
 from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
 from sylvia_gm.domain.authority import (
+    ActionReceipt,
     Participant,
     ParticipantValidationStatus,
     StateValue,
@@ -66,6 +67,29 @@ def _plain(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_plain(child) for child in value]
     return value
+
+
+def _with_engine_results(
+    tool_results: list[dict[str, Any]], receipts: tuple[Any, ...]
+) -> list[dict[str, Any]]:
+    """Report each committed action's whole engine result, as its receipt holds it.
+
+    The session keeps a committed result in model history without its `context`. A saved
+    scenario checks the Ruleset's mechanics, so it must still see the values an action
+    produced, including an earlier action in a turn that commits several.
+    """
+    engine_results = {
+        receipt.action_id: _plain(receipt.result)
+        for receipt in receipts
+        if isinstance(receipt, ActionReceipt)
+    }
+    return [
+        {**item, "result": {**item["result"], "result": engine_results[action_id]}}
+        if item["result"].get("status") == "action_committed"
+        and (action_id := item["result"].get("action_id")) in engine_results
+        else item
+        for item in tool_results
+    ]
 
 
 class ScenarioDice(random.Random):
@@ -250,7 +274,9 @@ def run_scenario(archive: bytes, scenario: dict[str, Any], directory: Path) -> d
                             provider.observe(adapter.for_turn(turn_id)),
                         )
                         provider.assert_finished()
-                        tool_results = provider.tool_results
+                        tool_results = _with_engine_results(
+                            provider.tool_results, result.receipts
+                        )
                         if result.interruption is not None:
                             raise ScenarioScriptError("The campaign turn did not finish.")
                         if result.receipts:

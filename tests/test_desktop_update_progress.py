@@ -11,6 +11,9 @@ import pytest
 from sylvia_gm.application.desktop_update import helper, progress
 from sylvia_gm.application.desktop_update.checkpoint import acquire_update_data_lock
 from sylvia_gm.application.desktop_update.manifest import UpdateError
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_preparation import fixture
 
@@ -78,7 +81,7 @@ def test_failed_dialog_creation_refuses_readiness_and_lost_window_refuses_later_
     assert lost.value.code == "progress_lost"
 
 
-@pytest.mark.skipif(not hasattr(ctypes, "WINFUNCTYPE"), reason="Windows callback ABI")
+@pytest.mark.runs_on("win32", reason="Windows callback ABI")
 def test_task_dialog_packing_callback_timer_and_own_window_close_rules_without_native_calls(
     monkeypatch,
 ):
@@ -132,6 +135,7 @@ def test_task_dialog_packing_callback_timer_and_own_window_close_rules_without_n
 
 
 def main_fixture(tmp_path, monkeypatch, factory, execute):
+    monkeypatch.setattr(helper, "__version__", "0.3.0-alpha.1")
     update, _, backup, _, _, database = fixture(tmp_path)
     update.prepare(backup, lambda: True)
     events = []
@@ -170,6 +174,7 @@ def main_fixture(tmp_path, monkeypatch, factory, execute):
     return update, result, [json.loads(row) for row in output.getvalue().splitlines()], events
 
 
+@pytest.mark.runs_on("win32", reason="Windows update release target")
 def test_missing_presentation_never_acknowledges_readiness_or_calls_apply(tmp_path, monkeypatch):
     def unavailable(*_):
         raise UpdateError("progress_unavailable", "No status window")
@@ -181,6 +186,7 @@ def test_missing_presentation_never_acknowledges_readiness_or_calls_apply(tmp_pa
     assert events == ["handles-closed"]
 
 
+@pytest.mark.runs_on("win32", reason="Windows update release target")
 def test_post_commit_error_is_durable_and_releases_helper_ownership_before_error_ui(
     tmp_path, monkeypatch,
 ):

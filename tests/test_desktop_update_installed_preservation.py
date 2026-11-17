@@ -14,6 +14,9 @@ from sylvia_gm.application.desktop_update.manifest import UpdateError
 from sylvia_gm.application.desktop_update.preparation import PreparedUpdate
 from sylvia_gm.application.desktop_update.recovery import KEEP_DATA, RecoveryOperation
 from sylvia_gm.application.desktop_update.storage import UpdateStore
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_drafts import snapshot
 from tests.test_desktop_update_installed import installation, release
 from tests.test_desktop_update_manifest import accept_stub, envelope

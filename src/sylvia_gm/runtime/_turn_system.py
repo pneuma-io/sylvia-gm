@@ -6,8 +6,6 @@ the ruleset YAML, and this engine enforces it at runtime.
 
 from __future__ import annotations
 
-from typing import Any
-
 from sylvia_gm.ruleset.schema import TurnSystemConfig
 from sylvia_gm.runtime._types import ResourcePoolState, TurnState
 
@@ -101,12 +99,8 @@ class TurnSystem:
         for resource_name, resource_config in actor_config.resources.items():
             if resource_config.refresh == trigger:
                 # Resolve count from source if specified, else use count
-                if resource_config.source:
-                    # TODO: Resolve entity.speed at runtime
-                    # For now, use a placeholder
-                    count = 30  # Will be resolved from entity data
-                else:
-                    count = resource_config.count or 0
+                # Retain the existing source placeholder until entity data resolution is selected.
+                count = 30 if resource_config.source else resource_config.count or 0
 
                 self.state.current_resources[resource_name] = ResourcePoolState(
                     remaining=count,

@@ -29,6 +29,7 @@ from sylvia_gm.agent._provider_session import (
     _missing_required_arguments,
     _native_content_for_text_operation,
     _normalize_state_references,
+    _plain_json,
     _project_response_blocks,
     _require_checked_campaign_file_narration,
     _resolve_provider_tool_alias,
@@ -58,6 +59,8 @@ from sylvia_gm.domain.authority import (
     ActionReceipt,
     ActionStatus,
     CampaignContinuityView,
+    CampaignDisplaySnapshot,
+    LifecycleState,
     CanonicalEvent,
     CanonicalEventType,
     EventVisibility,
@@ -96,6 +99,7 @@ from sylvia_gm.provider._openai_compat import (
     OpenAICompatProvider,
     _InlineReasoningFilter,
 )
+from tests.gm_context_contract import callable_tool_names
 from tests.test_builder_library import install_character_packages
 
 
@@ -159,6 +163,10 @@ class _ScriptedProvider(Provider):
 
 
 class _BlockingProvider(_ScriptedProvider):
+    def __init__(self, rounds: list[list[ProviderStreamChunk]]) -> None:
+        super().__init__(rounds)
+        self.started = threading.Event()
+
     async def generate_stream(
         self,
         messages: list[dict[str, Any]],
@@ -167,11 +175,64 @@ class _BlockingProvider(_ScriptedProvider):
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
         self.calls.append((messages.copy(), tools))
+        self.started.set()
         try:
             await asyncio.sleep(10)
             yield ProviderStreamChunk(content="MUST NOT ARRIVE")
         finally:
             self.cancelled.set()
+
+
+class _ControlledTimeoutLoop(asyncio.SelectorEventLoop):
+    """Exercise real asyncio deadlines with virtual time, independent of host load."""
+
+    def __init__(self, clock: SimpleNamespace) -> None:
+        self._test_clock = clock
+        super().__init__()
+
+    def time(self) -> float:
+        return self._test_clock.now
+
+    def _run_once(self) -> None:
+        if not self._ready:
+            deadlines = [handle.when() for handle in self._scheduled if not handle.cancelled()]
+            if deadlines:
+                self._test_clock.now = max(self.time(), min(deadlines))
+        super()._run_once()
+
+
+#: These tests pin the previous GM wire shape (system-role data records, the state record by
+#: its unsealed label, the player message as the final user message). They run under the
+#: legacy switch, which restores that assembly byte for byte. The same scenarios run in ledger
+#: mode in tests/test_gm_context_contract.py, which checks the wire invariant on every request.
+LEGACY_WIRE_SHAPE_PINS = frozenset({
+    "test_resolved_correction_is_absent_after_automatic_transition",
+    "test_stream_adapter_round_trips_exact_catalog_action_and_talk",
+    "test_model_selected_start_combat_resolves_the_already_declared_player_attack",
+    "test_gm_decision_boundary_cannot_finalize_campaign_file_before_turn_progression",
+    "test_exact_narration_facts_survive_followup_tool_rounds",
+    "test_player_wording_cannot_change_the_engine_supplied_tool_surface",
+    "test_completed_turn_keeps_recorded_native_tool_history_for_the_next_turn",
+    "test_ignored_required_prose_keeps_every_legal_tool_choice",
+    "test_required_tool_recovery_keeps_the_current_action_as_the_latest_user_message",
+    "test_campaign_file_update_cannot_precede_a_batched_ruleset_result",
+    "test_broad_glance_uses_the_ruleset_surface_without_a_host_editorial_inference",
+    "test_same_gm_searches_reads_updates_and_narrates_in_one_tool_loop",
+    "test_forced_campaign_file_review_reports_an_empty_required_tool_response_exactly",
+    "test_resume_reuses_held_narration_and_releases_it_only_after_disposition",
+    "test_resume_narrates_after_an_accepted_tool_only_campaign_file_update",
+    "test_campaign_start_keeps_the_ruleset_supplied_tool_surface",
+    "test_campaign_start_projects_selected_party_and_high_level_footing",
+    "test_explicit_refusal_then_unrelated_play_keeps_the_player_action_in_control",
+    "test_post_mechanics_recovery_restores_the_live_rounds_exact_narration_facts",
+    "test_direct_action_response_starts_new_provider_work_after_completed_opening",
+})
+
+
+@pytest.fixture(autouse=True)
+def _pinned_wire_shape(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    if request.node.originalname in LEGACY_WIRE_SHAPE_PINS:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
 
 
 def _next_action_event(events: object) -> ProviderEvent:
@@ -284,21 +345,8 @@ def test_dm_respects_the_configured_output_allowance(
 
 
 def test_anthropic_single_required_tool_transaction_uses_zero_temperature() -> None:
-    provider = _ScriptedProvider([[ProviderStreamChunk(content="{}", finish_reason="stop")]])
-    provider.model_info = ModelInfo(
-        id="opencode_go/minimax-m3",
-        name="MiniMax M3",
-        provider_name="OpenCode Go",
-        provider_key="opencode_go",
-        provider_mode="byok",
-        transport="anthropic_messages",
-        provider_model_id="minimax-m3",
-    )
-    adapter = ProviderSessionAdapter(
-        cast(AuthorityOwner, object()),
-        provider,
-        owner_id="owner-minimax-required-tool",
-    )
+    """A sole required Anthropic tool asks for temperature 0 and a forced call; the wire
+    request carries each only where the model accepts it (never on current Claude models)."""
     tools = [
         {
             "type": "function",
@@ -309,24 +357,46 @@ def test_anthropic_single_required_tool_transaction_uses_zero_temperature() -> N
             },
         }
     ]
-
-    tuple(
-        adapter._stream_round(  # noqa: SLF001
-            [],
-            tools,
-            control=ProviderControl(),
-            tool_choice="required",
+    forced = {"type": "tool", "name": "update_campaign_file"}
+    for wire_model, thinking, wire_temperature, wire_choice in (
+        ("minimax-m3", {"thinking": {"type": "adaptive"}}, 0, forced),
+        ("claude-sonnet-4-6", {}, 0, forced),
+        ("claude-haiku-5-5", {}, None, forced),
+        ("claude-opus-5-5", {}, None, None),
+    ):
+        provider = _ScriptedProvider([[ProviderStreamChunk(content="{}", finish_reason="stop")]])
+        provider.model_info = ModelInfo(
+            id="synthetic/" + wire_model,
+            name=wire_model,
+            provider_name="Synthetic",
+            provider_key="synthetic",
+            provider_mode="byok",
+            transport="anthropic_messages",
+            provider_model_id=wire_model,
         )
-    )
+        adapter = ProviderSessionAdapter(
+            cast(AuthorityOwner, object()),
+            provider,
+            owner_id="owner-anthropic-required-tool",
+        )
 
-    assert provider.request_kwargs == [
-        {
-            "max_tokens": 4096,
-            "thinking": {"type": "adaptive"},
-            "tool_choice": "required",
-            "temperature": 0,
-        }
-    ]
+        tuple(
+            adapter._stream_round(  # noqa: SLF001
+                [],
+                tools,
+                control=ProviderControl(),
+                tool_choice="required",
+            )
+        )
+
+        assert provider.request_kwargs == [
+            {"max_tokens": 4096, **thinking, "tool_choice": "required", "temperature": 0}
+        ]
+        wire = AnthropicMessagesTransport().format_request(
+            wire_model, [], tools, True, **provider.request_kwargs[0]
+        )
+        assert wire.get("temperature") == wire_temperature, wire_model
+        assert wire.get("tool_choice") == wire_choice, wire_model
 
 
 def test_provider_tool_alias_resolution_stays_within_the_current_catalog() -> None:
@@ -955,8 +1025,15 @@ class _OwnerProjection:
     def desktop_snapshot(self, campaign_id: str, *, display_only: bool = False) -> object:
         return self.snapshot(campaign_id)
 
-    def model_context_snapshot(self, campaign_id: str) -> tuple[object, None]:
-        return self.snapshot(campaign_id), None
+    def model_context_snapshot(self, campaign_id: str) -> tuple[CampaignDisplaySnapshot, None]:
+        snapshot = self.snapshot(campaign_id)
+        return CampaignDisplaySnapshot(
+            campaign_id=campaign_id, display_name=snapshot.display_name,
+            lifecycle=LifecycleState.ACTIVE, writer=WriterRole.DM,
+            revision=snapshot.revision, package_lock=PackageLock(entries=()),
+            state=snapshot.state, participants=snapshot.participants,
+            actions=(), events=snapshot.events, turns={}, continuity=snapshot.continuity,
+        ), None
 
     def canonical_replay(self, campaign_id: str, *, acknowledged_sequence: int) -> object:
         assert campaign_id == "campaign-provider"
@@ -1113,9 +1190,9 @@ def test_player_turn_input_preserves_ic_and_explicitly_labels_ooc(
 def test_dialogue_uses_party_control_not_character_schema_kind(
     data: dict[str, str], expected: str
 ) -> None:
-    snapshot = SimpleNamespace(participants=(SimpleNamespace(
+    snapshot, _ = _OwnerProjection(participants=(SimpleNamespace(
         participant_id="companion-chloe", kind="player_character", data=data,
-    ),))
+    ),)).model_context_snapshot("campaign-provider")
     _, blocks = _project_response_blocks(
         ({"kind": "npc_dialogue", "speaker_id": "companion-chloe", "text": "Wait."},),
         snapshot,
@@ -1125,11 +1202,11 @@ def test_dialogue_uses_party_control_not_character_schema_kind(
 
 
 def test_dialogue_prefers_persisted_companion_role_to_conflicting_character_data() -> None:
-    snapshot = SimpleNamespace(participants=(SimpleNamespace(
+    snapshot, _ = _OwnerProjection(participants=(SimpleNamespace(
         participant_id="companion-hex",
         kind="player_character",
         data={"name": "Hex", "party_role": "player_character"},
-    ),))
+    ),)).model_context_snapshot("campaign-provider")
 
     _, blocks = _project_response_blocks(
         ({"kind": "npc_dialogue", "speaker_id": "companion-hex", "text": "Ready."},),
@@ -1192,7 +1269,8 @@ def test_provider_spoken_words_normalize_without_rewriting_or_guessing() -> None
         {"kind": "npc_utterance", "speaker_id": "anonymous", "spoken_words": "Then the edge."},
     ]
     admitted = _validated_raw_response_blocks(blocks)
-    text, projected = _project_response_blocks(admitted, SimpleNamespace())
+    snapshot, _ = _OwnerProjection(participants=()).model_context_snapshot("campaign-provider")
+    text, projected = _project_response_blocks(admitted, snapshot)
     assert [block["text"] for block in projected] == [
         "Rowan studies the ground.", 'From the center. I call it "home base".',
         "He pauses.", "Then the edge.",
@@ -1257,6 +1335,13 @@ def test_old_dialogue_shape_is_rejected_before_write_then_same_gm_corrects_it(
     assert len(provider.calls) == 2
     for messages, _tools in provider.calls:
         assert messages[0] == {"role": "system", "content": "UNCHANGED OLD GM"}
+        context_controls = [message for message in messages
+                            if str(message.get("content", "")).startswith(
+                                "SYLVIA_GM_CONTEXT_CONTRACT v97 "
+                            )]
+        assert len(context_controls) == 1
+        assert "GM-private facts are yours alone." in context_controls[0]["content"]
+        assert "prose is held as an unsettled draft" in context_controls[0]["content"]
         format_controls = [
             message for message in messages if message["role"] == "system"
             and str(message.get("content", "")).startswith("SYLVIA_GM_RESPONSE_FORMAT")
@@ -3055,13 +3140,14 @@ def test_gm_boundary_asks_model_then_engine_advances_to_player() -> None:
                     if call_index == 1
                     else player_attack.name
                 )
-                assert tools is not None and len(tools) == 1
+                # One callable tool each round; with one tool list more may be listed.
+                (callable_name,) = callable_tool_names(messages, tools)
                 yield ProviderStreamChunk(
                     tool_call_delta={
                         "index": 0,
                         "id": f"call-{call_index}-{operation}",
                         "function": {
-                            "name": tools[0]["function"]["name"],
+                            "name": callable_name,
                             "arguments": "{}",
                         },
                     },
@@ -3534,7 +3620,10 @@ def test_player_wording_never_forces_an_available_mechanic() -> None:
     assert owner.revision == 4
 
 
-def test_exact_narration_facts_survive_followup_tool_rounds() -> None:
+def test_exact_narration_facts_survive_followup_tool_rounds(monkeypatch) -> None:
+    audits = []
+    monkeypatch.setattr(_OwnerProjection, "record_admin_full_audit",
+                        lambda self, payload: audits.append(payload), raising=False)
     provider = _ScriptedProvider(
         [
             [
@@ -3587,8 +3676,10 @@ def test_exact_narration_facts_survive_followup_tool_rounds() -> None:
                 "status": "committed",
                 "result": {
                     "status": "committed",
+                    "result_card": {"title": "Attack", "outcome": "miss"},
                     "context": {
                         "_attack_outcome": "miss",
+                        "_internal_blob": "diagnostics" * 10000,
                         "_attack_roll": {"total": 4, "modifier": 3},
                         "_target_id": "rift-player-character",
                     },
@@ -3645,6 +3736,19 @@ def test_exact_narration_facts_survive_followup_tool_rounds() -> None:
     assert exact_facts[-1].count('"tool":"advance"') == 2
     assert "Continue this same GM turn from these committed results" in exact_facts[-1]
     assert "finish with the Campaign File disposition" in exact_facts[-1]
+
+    mechanic = next(m for m in final_messages if m.get("tool_call_id") == "call-attack")
+    receipt = json.loads(mechanic["content"])
+    assert receipt["action_id"] == first_action.action_command.action_id
+    assert receipt["result"] == {"status": "committed", "result_card": {
+        "title": "Attack", "outcome": "miss",
+    }}
+    assert len(mechanic["content"].encode()) < 4096
+    assert "_internal_blob" not in json.dumps(final_messages)
+    audit = next(a for a in audits if a["action_id"] == receipt["action_id"])
+    assert audit["result"]["context"]["_internal_blob"] == "diagnostics" * 10000
+    canonical = owner.events[0].safe_payload["result"]
+    assert audit["result"] == canonical
 
 
 def test_later_mechanic_failure_never_denies_an_earlier_commit() -> None:
@@ -7285,13 +7389,16 @@ def test_campaign_file_correction_keeps_its_alias_when_the_catalog_narrows() -> 
 
     assert attempts == [invalid, corrected]
     assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [narration]
-    first_tools = provider.calls[0][1] or []
-    correction_tools = provider.calls[1][1] or []
-    assert _tool_operations(first_tools) == [
+    # What the GM may call each round (with one tool list the correction lists more).
+    first_tools = callable_tool_names(*provider.calls[0])
+    correction_tools = callable_tool_names(*provider.calls[1])
+    assert _tool_operations({"function": {"name": name}} for name in first_tools) == [
         "advance",
         "update_campaign_file",
     ]
-    assert _tool_operations(correction_tools) == ["update_campaign_file"]
+    assert _tool_operations({"function": {"name": name}} for name in correction_tools) == [
+        "update_campaign_file"
+    ]
     assert provider.request_kwargs[1]["tool_choice"] == "required"
 
 
@@ -12521,17 +12628,26 @@ def test_stream_adapter_cancels_blocked_async_provider_without_fallback() -> Non
         owner_id="owner-provider",
     )
 
+    cancellation_started: list[float] = []
+    missing_start: list[str] = []
+
     def cancel() -> None:
-        time.sleep(0.08)
+        if not provider.started.wait(5):
+            missing_start.append("Provider did not reach admission")
+        cancellation_started.append(time.monotonic())
         control.cancel()
 
     canceller = threading.Thread(target=cancel)
     canceller.start()
-    started = time.monotonic()
-    with pytest.raises(CommandRejected, match="cancelled"):
-        tuple(adapter.for_turn("turn-provider")(_provider_input(control)))
-    canceller.join()
-    assert time.monotonic() - started < 2.0
+    try:
+        with pytest.raises(CommandRejected, match="cancelled"):
+            tuple(adapter.for_turn("turn-provider")(_provider_input(control)))
+    finally:
+        control.cancel()
+        canceller.join(5)
+    assert not canceller.is_alive()
+    assert not missing_start
+    assert time.monotonic() - cancellation_started[0] < 2.0
     assert provider.cancelled.wait(1.0)
     assert len(provider.calls) == 1
     print("F4 PROVIDER ADAPTER", "stop=cancelled", "fallback=none")
@@ -12767,6 +12883,116 @@ def test_post_mechanics_recovery_continues_same_gm_through_campaign_file_before_
     assert provider.request_kwargs[0]["tool_choice"] == "required"
 
 
+def test_post_mechanics_recovery_restores_the_live_rounds_exact_narration_facts() -> None:
+    """Saved model results omit engine context, so Retry restores the live round's facts."""
+
+    source = _provider_input(user_text="I check the clock, then push it on.")
+    user = source.history.messages[0]
+    rolls = [
+        {"_d20_test": 8, "_modifier": 5, "_adjusted_total": 13, "_outcome": "success"},
+        {"_attack_roll": 13, "_attack_adjusted_total": 18, "_damage_roll": [2, 3],
+         "_damage_modifier": 3},
+    ]
+
+    def call(index: int) -> list[ProviderStreamChunk]:
+        return [ProviderStreamChunk(
+            tool_call_delta={"index": 0, "id": f"call-live-{index}", "function": {
+                "name": "advance",
+                "arguments": '{"steps":1,"actor":"rift-player-character","actor_state":"ready"}',
+            }},
+            finish_reason="tool_calls",
+        )]
+
+    owner = _OwnerProjection()
+    live = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner),
+        _ScriptedProvider([call(0), call(1), [
+            ProviderStreamChunk(content="The clock ticks on.", finish_reason="stop"),
+        ]]),
+        owner_id="owner-provider",
+    ).for_turn("turn-provider")(source)
+    saved: list[SessionMessage] = [user]
+    committed: list[str] = []
+    for event in live:
+        if event.kind is ProviderEventKind.ACTION:
+            assert event.action_command is not None
+            action_id = event.action_command.action_id
+            context = rolls[len(committed)]
+            committed.append(action_id)
+            owner.events = (
+                *owner.events,
+                CanonicalEvent(
+                    sequence=len(owner.events) + 1, event_type=CanonicalEventType.TOOL_RESULT,
+                    turn_id="turn-provider", action_id=action_id,
+                    safe_payload={"status": "committed",
+                                  "result": {"status": "committed", "context": context}},
+                    visibility=EventVisibility.PLAYER_SAFE,
+                ),
+                CanonicalEvent(
+                    sequence=len(owner.events) + 2,
+                    event_type=CanonicalEventType.ACTION_COMMITTED,
+                    turn_id="turn-provider", action_id=action_id,
+                    safe_payload={"status": "committed"},
+                    visibility=EventVisibility.PLAYER_SAFE,
+                ),
+            )
+        elif event.evidence is not None and event.evidence.get("kind") in {
+            "provider_tool_calls", "provider_tool_results",
+        }:
+            saved.append(SessionMessage(
+                session_id=source.session.session_id, sequence=len(saved) + 1,
+                message_id=f"evidence-{len(saved)}", kind=SessionMessageKind.EVIDENCE,
+                content=cast(dict[str, object], _plain_json(event.evidence)),
+            ))
+            if len(committed) == len(rolls) and event.evidence["kind"] == "provider_tool_results":
+                break  # The provider is lost after both mechanics committed.
+
+    live_facts = [
+        fact
+        for message in saved
+        for fact in cast(list[dict[str, object]], message.content.get("narration_facts", []))
+    ]
+    assert [fact["tool"] for fact in live_facts] == ["advance", "advance"]
+    assert live_facts[0]["d20_test"] == 8 and live_facts[1]["damage_roll"] == [2, 3]
+    saved_rows = [
+        str(row["content"])
+        for message in saved
+        if message.content.get("kind") == "provider_tool_results"
+        for row in cast(list[dict[str, object]], message.content["results"])
+    ]
+    assert len(saved_rows) == 2 and all('"context"' not in row for row in saved_rows)
+
+    provider = _ScriptedProvider(
+        [[ProviderStreamChunk(content="The clock settles.", finish_reason="stop")]]
+    )
+    resumed = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner), provider, owner_id="owner-provider",
+    ).for_turn("turn-provider")(SessionProviderInput(
+        session=source.session,
+        history=SessionContext(session=source.session, messages=tuple(saved)),
+        catalog=(*source.catalog, _campaign_file_tool(allow_unchanged=True)),
+        control=source.control,
+        basis_message_id=user.message_id,
+        recovery_kind="post_mechanics_narration",
+        retry_action_receipt=ActionReceipt(
+            campaign_id="campaign-provider", action_id=committed[-1],
+            status=ActionStatus.COMMITTED,
+            result={"status": "committed", "context": rolls[-1]}, resulting_revision=4,
+        ),
+    ))
+    for _event in resumed:
+        if provider.calls:
+            break
+
+    marker = "SYLVIA_GM_EXACT_NARRATION_FACTS "
+    facts_text = next(
+        str(message["content"]) for message in provider.calls[0][0]
+        if str(message.get("content", "")).startswith(marker)
+    )
+    # The earlier check's die is no longer only in its replayed card.
+    assert json.loads(facts_text.split("\n")[1]) == live_facts
+
+
 def test_retry_adapter_reconstructs_authoritative_context_and_never_exposes_tools() -> None:
     provider = _ScriptedProvider(
         [
@@ -12950,8 +13176,9 @@ def test_anthropic_stream_preserves_tool_identity_and_argument_index() -> None:
 
 
 def test_anthropic_single_required_tool_choice_names_the_only_operation() -> None:
+    # A model that accepts forcing and temperature; current models get neither.
     request = AnthropicMessagesTransport().format_request(
-        "claude-test",
+        "claude-sonnet-4-6",
         [{"role": "user", "content": "Advance the required engine transition."}],
         [
             {
@@ -12974,7 +13201,7 @@ def test_anthropic_single_required_tool_choice_names_the_only_operation() -> Non
 
 def test_anthropic_multiple_required_tool_choices_preserve_model_choice() -> None:
     request = AnthropicMessagesTransport().format_request(
-        "claude-test",
+        "claude-sonnet-4-6",
         [{"role": "user", "content": "Choose the required engine transition."}],
         [
             {
@@ -13068,6 +13295,9 @@ def test_configured_provider_choices_are_safe_catalog_metadata(
             "reasoning_source",
             "reasoning_control",
             "reasoning_mode_defaults",
+            "speed_options",
+            "speed_control",
+            "speed_source",
             "capability_registry_version",
             "capability_tier_id",
             "capability_evidence_sha256",
@@ -13537,7 +13767,11 @@ def test_openai_stream_captures_usage_from_final_chunk_without_choices() -> None
     }
 
 
-def test_openai_compatible_timeout_detects_stream_inactivity() -> None:
+def test_openai_compatible_timeout_detects_stream_inactivity(monkeypatch) -> None:
+    from sylvia_gm.provider import _openai_compat
+
+    clock = SimpleNamespace(now=0.0)
+    monkeypatch.setattr(_openai_compat, "_time", SimpleNamespace(monotonic=lambda: clock.now))
     class SlowStream:
         def __aiter__(self) -> SlowStream:
             return self
@@ -13578,17 +13812,23 @@ def test_openai_compatible_timeout_detects_stream_inactivity() -> None:
                 _ = [
                     chunk
                     async for chunk in provider.generate_stream(
-                        [{"role": "user", "content": "Hello"}], timeout=0.01
+                        [{"role": "user", "content": "Hello"}], timeout=1.0
                     )
                 ]
         finally:
             await provider.close()
 
-    asyncio.run(exercise())
+    with asyncio.Runner(loop_factory=lambda: _ControlledTimeoutLoop(clock)) as runner:
+        runner.run(exercise())
+    assert clock.now == pytest.approx(1.0)
 
 
 @pytest.mark.parametrize("terminal", [True, False])
-def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal) -> None:
+def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal, monkeypatch) -> None:
+    from sylvia_gm.provider import _openai_compat
+
+    clock = SimpleNamespace(now=0.0)
+    monkeypatch.setattr(_openai_compat, "_time", SimpleNamespace(monotonic=lambda: clock.now))
     class ActiveStream:
         def __init__(self) -> None:
             self._remaining = 4
@@ -13600,7 +13840,7 @@ def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal) ->
             if self._remaining == 0:
                 raise StopAsyncIteration
             self._remaining -= 1
-            await asyncio.sleep(0.04)
+            await asyncio.sleep(4.0)
             return SimpleNamespace(
                 choices=[
                     SimpleNamespace(
@@ -13646,19 +13886,22 @@ def test_openai_compatible_timeout_resets_when_stream_chunks_arrive(terminal) ->
             return [
                 chunk.content
                 async for chunk in provider.generate_stream(
-                    [{"role": "user", "content": "Hello"}], timeout=0.1
+                    [{"role": "user", "content": "Hello"}], timeout=10.0
                 )
             ]
         finally:
             await provider.close()
 
-    # The whole stream lasts longer than 0.1s, but no individual chunk does.
-    if terminal:
-        assert asyncio.run(exercise()) == ["token"] * 4
-    else:
-        from sylvia_gm.provider._exceptions import IncompleteProviderStreamError
-        with pytest.raises(IncompleteProviderStreamError):
-            asyncio.run(exercise())
+    # Sixteen virtual seconds exceed a total deadline of ten. Each four-second
+    # gap remains below the inactivity deadline; missing terminal evidence still fails.
+    with asyncio.Runner(loop_factory=lambda: _ControlledTimeoutLoop(clock)) as runner:
+        if terminal:
+            assert runner.run(exercise()) == ["token"] * 4
+        else:
+            from sylvia_gm.provider._exceptions import IncompleteProviderStreamError
+            with pytest.raises(IncompleteProviderStreamError):
+                runner.run(exercise())
+    assert clock.now == pytest.approx(16.0)
 
 
 @pytest.mark.parametrize(
@@ -13869,3 +14112,61 @@ def test_automatic_transition_with_required_judgment_fails_before_action_or_infe
         tuple(adapter.for_turn("turn-provider")(provider_input))
     assert captured.value.code == "invalid_engine_transition_surface"
     assert provider.calls == []
+
+
+def test_player_boundary_control_lets_an_ordered_player_action_finish() -> None:
+    """The control must not tell the GM to stop before a turn end the player asked for.
+
+    The fixed GM contract says ordered chat actions, such as attacking and then ending the
+    turn, are carried out in order with one combined response. This control arrives after the
+    first step commits; when it only said "narrate and stop", a GM that read it last narrated
+    the attack and left the player's turn open.
+    """
+    from sylvia_gm.agent._provider_session import _player_boundary_narration_message
+
+    boundary = ModelDecisionBoundary(
+        owner=ModelDecisionOwner.PLAYER,
+        actor_id="hero",
+        actor_name="Hero",
+        actor_state={},
+        campaign_revision=7,
+    )
+    message = _player_boundary_narration_message(
+        boundary,
+        current_player_action="I attack the guard with my mace, then I end my turn.",
+        committed_operations=["resolve_combat_attack"],
+        player_intent_pending=False,
+    )
+    content = str(message["content"])
+    assert message["role"] == "system"
+    assert '"current_player_action":"I attack the guard with my mace, then I end my turn."' in (
+        content
+    )
+    ordered = (
+        "If current_player_action states further steps in order that are not yet committed, "
+        "such as ending the turn after the attack, and every step before them is committed, "
+        "carry out the next stated step now with its currently exposed operation before you "
+        "narrate; stop instead if an earlier step failed or needs a decision or Reaction."
+    )
+    assert ordered in content
+    # The ordered step is read before the instruction to narrate and stop, and the control
+    # still forbids choosing anything the player did not state.
+    assert content.index(ordered) < content.index("Narrate the committed outcome and stop")
+    assert "Never choose a new action, target, tactic" in content
+
+
+@pytest.mark.parametrize(("setting", "expected"), [
+    (None, "legacy"), ("ledger", "ledger"), ("legacy", "legacy"), ("unrecognised", "legacy"),
+])
+def test_gm_adapter_ships_the_previous_assembly_and_the_switch_selects_the_ledger(
+    monkeypatch: pytest.MonkeyPatch, setting: str | None, expected: str,
+) -> None:
+    """What a player gets without any setting, and what SYLVIA_GM_CONTEXT_MODE changes."""
+    if setting is None:
+        monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", setting)
+    adapter = ProviderSessionAdapter(
+        cast(AuthorityOwner, object()), _ScriptedProvider([]), owner_id="owner-default-mode"
+    )
+    assert adapter._context_mode == expected  # noqa: SLF001

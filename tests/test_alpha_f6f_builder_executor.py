@@ -358,7 +358,7 @@ def test_builder_can_read_but_cannot_mutate_owner_managed_source_paths(tmp_path:
     search = runner._tool_search_files(  # noqa: SLF001 - root search hides purge quarantine
         {"pattern": "PENDING SOURCE", "target": "content"}
     )
-    assert search == {"success": True, "matches": [], "count": 0}
+    assert search == {"success": True, "matches": [], "count": 0, "skipped_oversized_files": 0}
 
 
 def test_builder_web_search_is_separate_and_parses_bounded_results(

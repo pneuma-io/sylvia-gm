@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import atexit
 import threading
-import webbrowser
 from pathlib import Path
 
+from sylvia_gm.config._host_browser import open_in_browser
 from sylvia_gm.config.provider_settings import (
     provider_settings,
     refresh_subscription_reasoning,
@@ -62,7 +62,7 @@ def chatgpt_settings_action(
     account = _account(storage_root)
     if action == "login":
         login = account.begin_login()
-        if not webbrowser.open(str(login["auth_url"]), new=2):
+        if not open_in_browser(str(login["auth_url"])):
             account.cancel_login()
             raise CodexConnectionError(
                 "The sign-in browser could not open. Check your default browser."
@@ -76,7 +76,11 @@ def chatgpt_settings_action(
     status = account.status()
     if action in {"models", "add_model"}:
         models = account.models()
-        refresh_subscription_reasoning(storage_root / "config.yaml", models)
+        # True when saved models gained newly advertised effort or speed options, so the
+        # owner can reload its model catalog without the user re-adding anything.
+        status["saved_models_refreshed"] = refresh_subscription_reasoning(
+            storage_root / "config.yaml", models,
+        )
         status["models"] = models
         if action == "add_model":
             if not isinstance(model, dict) or set(model) != {
@@ -109,14 +113,20 @@ def chatgpt_settings_action(
             prior_runtime = prior.get("runtime_context_window")
             if isinstance(prior_runtime, int) and (
                 runtime is None
-                or prior.get("runtime_context_source") == "runtime_reported" and prior_runtime < runtime
+                or prior.get(
+                "runtime_context_source") == "runtime_reported" and prior_runtime < runtime
             ):
                 runtime = prior_runtime
                 runtime_source = prior.get("runtime_context_source")
                 runtime_observed = prior.get("runtime_context_observed_at")
-            output_reference = selected.get("output_reference_tokens") or prior.get("declared_max_output_tokens")
+            output_reference = (
+                selected.get("output_reference_tokens") or prior.get("declared_max_output_tokens")
+            )
             capacity = model["context_window"] if model["context_window"] is not None else runtime
-            output = model["max_output_tokens"] if model["max_output_tokens"] is not None else output_reference
+            output = (
+                model[
+                "max_output_tokens"] if model["max_output_tokens"] is not None else output_reference
+            )
             if (
                 model["context_window"] is not None and (
                     isinstance(model["context_window"], bool)
@@ -153,6 +163,7 @@ def chatgpt_settings_action(
                 supports_tools=True,
                 supported_reasoning_efforts=selected.get("supported_reasoning_efforts"),
                 default_reasoning_effort=selected.get("default_reasoning_effort"),
+                service_tiers=selected.get("service_tiers"),
             )
             status["saved_model"] = saved["canonical_model_id"]
     return status

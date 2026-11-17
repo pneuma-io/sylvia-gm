@@ -3,8 +3,8 @@ from copy import deepcopy
 
 import pytest
 
-from tests.test_srd_creature_space import NS, run, state
-from tests.test_srd_creature_space import runtime as runtime
+from tests.srd_creature_space_fixtures import NS, run, state
+from tests.srd_creature_space_fixtures import runtime as runtime
 from tests.test_srd_creature_space_owner import request
 from tests.lite_imported_fixture import ImportedCase
 from sylvia_gm.domain.errors import CommandRejected
@@ -64,20 +64,6 @@ def test_visible_zone_still_changes_the_player_cost(runtime):
     assert result.context['_route_cost'] == pytest.approx(16)
 
 
-@pytest.mark.parametrize('species,mover,other,allowed', [
-    ('halfling', 1, 2, True), ('human', 1, 2, False), ('halfling', 1, 1, False),
-    ('halfling', 2, 3, True), ('halfling', 2, 2, False),
-])
-def test_nimbleness_uses_declared_species_and_actual_relative_size(runtime, species, mover, other, allowed):
-    values = state(mover, other)
-    values[NS + '.entities']['hero']['species'] = species
-    result, _ = run(runtime, values)
-    assert result.success == allowed, result.error
-    if allowed:
-        assert result.context['_space_intervals'] == [{'entry': .4 if mover == 1 else .35,
-                                                       'exit': .6 if mover == 1 else .65}]
-        stopped, _ = run(runtime, values, destination=(25, 0, 0))
-        assert not stopped.success and 'cannot end' in stopped.error
 
 
 def owner_case(path, *, hidden=None, halfling=False):

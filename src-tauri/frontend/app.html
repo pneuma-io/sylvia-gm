@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="app.css">
 <link rel="stylesheet" href="tutorials.css">
 <link rel="stylesheet" href="tile-table.css">
+<link rel="stylesheet" href="character-chat.css">
 </head>
 <body data-theme="slate">
 
@@ -113,6 +114,25 @@
     </div>
   </dialog>
 
+  <!-- Shown before a new chat whose first model call would otherwise start by itself. -->
+  <dialog id="chat-start-dialog" class="chat-start-dialog" aria-labelledby="chat-start-title">
+    <h2 id="chat-start-title">Start chat</h2>
+    <p id="chat-start-lead"></p>
+    <label for="chat-start-model">Model</label>
+    <select id="chat-start-model"></select>
+    <p class="chat-start-note chat-start-context-note" id="chat-start-context-note" role="status" hidden></p>
+    <label for="chat-start-effort">Reasoning effort</label>
+    <select id="chat-start-effort"></select>
+    <label for="chat-start-speed">Speed</label>
+    <select id="chat-start-speed" aria-describedby="chat-start-speed-note"></select>
+    <p class="chat-start-note" id="chat-start-speed-note" role="status"></p>
+    <p class="chat-start-note">Nothing is sent to the model until you start. You can change these later from the chat’s message box.</p>
+    <div class="chat-start-actions">
+      <button class="btn btn-primary" id="chat-start-confirm" type="button">Start</button>
+      <button class="btn btn-secondary" id="chat-start-cancel" type="button">Cancel</button>
+    </div>
+  </dialog>
+
   <!-- Home command centre - campaign orientation without the play sidebar. -->
   <main class="home-view" id="home-view" hidden>
     <header class="home-header">
@@ -126,6 +146,10 @@
           <button class="btn btn-secondary" id="home-ready-campaign-btn" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
             Ready campaigns
+          </button>
+          <button class="btn btn-secondary" id="home-character-chat-btn" type="button" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+            Character chat
           </button>
           <button class="btn btn-secondary" id="home-build-btn" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4"/></svg>
@@ -516,12 +540,15 @@
               Reasoning: Provider default
             </button>
             <div class="chat-model-popover chat-reasoning-popover" id="chat-reasoning-popover"
-                 role="dialog" aria-label="Reasoning effort" hidden>
-              <label for="chat-reasoning-current">This chat</label>
+                 role="dialog" aria-label="Reasoning effort and speed" hidden>
+              <label for="chat-reasoning-current">Effort · this chat</label>
               <select id="chat-reasoning-current" aria-describedby="chat-reasoning-hint"></select>
-              <label for="chat-reasoning-once">Next reply only</label>
+              <label for="chat-reasoning-once">Effort · next reply only</label>
               <select id="chat-reasoning-once" aria-describedby="chat-reasoning-hint"></select>
               <p class="chat-model-hint" id="chat-reasoning-hint" role="status"></p>
+              <label for="chat-speed-current">Speed · this chat</label>
+              <select id="chat-speed-current" aria-describedby="chat-speed-hint"></select>
+              <p class="chat-model-hint" id="chat-speed-hint" role="status"></p>
             </div>
           </div>
             </div>
@@ -648,7 +675,7 @@
                 role="tab" data-settings-tab="accounts" aria-selected="false"
                 aria-controls="settings-panel-accounts">
           <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="7" r="3.2"/><path d="M3.8 17c.9-3.2 3.3-4.8 6.2-4.8s5.3 1.6 6.2 4.8"/></svg>
-          <span>ChatGPT account</span>
+          <span>Accounts</span>
         </button>
         <div class="settings-nav-group" aria-hidden="true">Preferences</div>
         <button class="settings-tab" id="settings-tab-appearance" type="button"
@@ -704,17 +731,28 @@
             <section class="settings-section model-choice-panel" aria-labelledby="model-default-heading">
               <h3 class="settings-eyebrow" id="model-default-heading">Default for new chats</h3>
               <div class="settings-card">
-                <label for="model-choice">Model</label>
-                <div class="settings-inline-field">
-                  <select id="model-choice" disabled>
-                    <option value="">Loading configured models…</option>
-                  </select>
+                <div class="chat-default-fields">
+                  <div class="chat-default-model">
+                    <label for="model-choice">Model</label>
+                    <select id="model-choice" disabled>
+                      <option value="">Loading configured models…</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="default-effort-choice">Reasoning effort</label>
+                    <select id="default-effort-choice" disabled></select>
+                  </div>
+                  <div>
+                    <label for="default-speed-choice">Speed</label>
+                    <select id="default-speed-choice" disabled aria-describedby="default-speed-note"></select>
+                  </div>
                   <div class="provider-actions model-switch-actions">
                     <button class="btn btn-primary btn-sm" id="set-default-model-btn"
-                            type="button" disabled>Save default</button>
+                            type="button" disabled>Save defaults</button>
                   </div>
                 </div>
-                <p class="provider-field-help">Existing chats keep their model. To change one, use the model menu in its message box.</p>
+                <p class="provider-field-help" id="default-speed-note"></p>
+                <p class="provider-field-help">New chats start with these; existing chats keep their own. Change either from a chat’s message box.</p>
                 <div class="model-status" id="model-status" role="status">Loading model settings…</div>
               </div>
             </section>
@@ -745,6 +783,7 @@
             <p class="settings-eyebrow">Connect a service</p>
             <div class="model-connection-choices">
               <button class="model-connection-choice" id="open-account-signin-btn" type="button"><strong>ChatGPT subscription</strong><span>Sign in with your account. No API key.</span></button>
+              <button class="model-connection-choice" id="open-claude-signin-btn" type="button"><strong>Claude subscription</strong><span>Sylvia sets up its own copy of Claude Code. Sign in with your own account. No API key.</span></button>
               <button class="model-connection-choice" type="button" data-model-route="api"><strong>API service</strong><span>A hosted service such as OpenAI or OpenRouter, or a custom endpoint. Uses an API key.</span></button>
               <button class="model-connection-choice" type="button" data-model-route="local"><strong>Local model server</strong><span>A model server you already run, on this or another computer.</span></button>
             </div>
@@ -840,6 +879,8 @@
                       aria-label="Models found"></select>
               </div>
               <p id="provider-context-summary" class="provider-field-help"></p>
+              <p id="provider-declared-offer" class="provider-field-help provider-declared-offer" hidden><span id="provider-declared-offer-text"></span>
+                <button class="btn btn-secondary btn-sm" id="provider-use-declared-context" type="button"></button></p>
               <p id="provider-output-summary" class="provider-field-help"></p>
               <details id="provider-model-advanced" class="provider-advanced-fields">
               <summary>Advanced model settings</summary>
@@ -877,16 +918,16 @@
                   <label class="provider-capacity-fact" for="provider-output-limit">
                     <span>Optional reply cap</span>
                     <input id="provider-output-limit" type="number" min="1" max="10000000"
-                           inputmode="numeric" placeholder="Provider-supported maximum">
+                           inputmode="numeric" placeholder="Automatic">
                     <small>Blank uses the known model maximum. Covers reasoning, tool arguments and narration
                       for GM replies.</small>
                   </label>
                   <label class="provider-capacity-fact" for="provider-builder-output-limit">
                     <span>Builder response budget</span>
                     <input id="provider-builder-output-limit" type="number" min="1" max="10000000"
-                           inputmode="numeric" placeholder="Default: 32000, capped by output limit">
+                           inputmode="numeric" placeholder="Default: 32000">
                     <small>Covers thinking and file-writing tool arguments. Blank keeps the saved budget, or
-                      the default for a new model.</small>
+                      the default for a new model. Never more than the reply limit.</small>
                   </label>
                 </div>
                 <p class="provider-capacity-warning" id="provider-capacity-warning" hidden></p>
@@ -921,10 +962,10 @@
                 Campaign history stays on this computer, but messages and relevant campaign content, including Builder
                 source material, are sent to the selected service. Remote services keep that data under their own
                 privacy and retention terms; saving locally does not prevent the transmission.</p>
-              <p>Saved API keys and private headers are protected by Windows for your user account. They are sent only to
+              <p data-platform-copy="key-protection">Saved API keys and private headers are protected by Windows for your user account. They are sent only to
                 the selected service for authentication and are never put in chats or campaign backups. If Windows cannot
                 unlock them, enter them again in Connection settings.</p>
-              <p>This protects a settings file copied outside your Windows account. It does not protect against software
+              <p data-platform-copy="key-protection-limits">This protects a settings file copied outside your Windows account. It does not protect against software
                 running as your Windows user, or erase older plaintext copies of your settings.</p>
             </details>
           </div>
@@ -934,10 +975,15 @@
                  aria-labelledby="settings-tab-accounts" data-settings-panel="accounts" hidden>
           <button class="settings-back" id="account-models-btn" type="button">Back to your models</button>
           <header class="settings-page-head">
-            <h2>ChatGPT account</h2>
-            <p class="settings-lead">Use your ChatGPT subscription in Sylvia. You sign in through your browser; no API key is needed.</p>
+            <h2>Accounts</h2>
+            <p class="settings-lead">Use a subscription you already have. Each account signs in through its own official app and your browser; no API key is needed.</p>
             <button type="button" class="btn btn-secondary" id="image-art-settings-btn">Image generation settings</button>
           </header>
+          <div class="account-switch" role="group" aria-label="Account">
+            <button type="button" data-account-view="chatgpt" aria-pressed="true">ChatGPT</button>
+            <button type="button" data-account-view="claude" aria-pressed="false">Claude</button>
+          </div>
+          <div class="account-view" id="account-view-chatgpt" data-account-panel="chatgpt">
           <div class="tutorial-entry"><button type="button" class="btn btn-secondary btn-sm" data-tutorial-offer="subscription">Need help connecting your ChatGPT subscription?</button></div>
           <p class="settings-note">Codex manages the sign-in. Messages and relevant campaign or Builder content go to OpenAI
             through Codex. Data use and retention depend on your ChatGPT plan and account or workspace settings; API data
@@ -982,6 +1028,85 @@
               <p class="provider-field-help">Saving returns you to Your models, where you can make it the default for new chats.</p>
             </div>
           </section>
+          </div>
+
+          <div class="account-view" id="account-view-claude" data-account-panel="claude" hidden>
+          <p class="settings-note">Sylvia runs its own copy of Claude Code, Anthropic&rsquo;s official app, exactly as Anthropic
+            publishes it. That copy, its settings and its sign-in stay in Sylvia&rsquo;s own folder, so any Claude Code you
+            already use is never changed. Sylvia never reads or stores the sign-in details. Messages and relevant campaign or
+            Builder content go to Anthropic through Claude Code, and usage counts against the account you sign in with here.</p>
+          <section class="settings-section" aria-labelledby="claude-signin-step">
+            <h3 class="settings-eyebrow" id="claude-signin-step">1. Set up Claude Code</h3>
+            <div class="settings-card" id="claude-connection-card">
+              <div class="model-status settings-status-line" id="claude-connection-status" role="status" aria-live="polite">Not checked yet. Sylvia starts Claude Code only when you ask.</div>
+              <progress id="claude-install-progress" aria-label="Claude Code download progress" hidden></progress>
+              <p class="provider-field-help" id="claude-connection-detail" hidden></p>
+              <dl class="account-facts" id="claude-runtime-facts" hidden>
+                <div><dt>Claude Code</dt><dd id="claude-fact-version"></dd></div>
+                <div><dt>Signed in with</dt><dd id="claude-fact-auth"></dd></div>
+                <div><dt>Billing</dt><dd id="claude-fact-billing"></dd></div>
+              </dl>
+              <p class="settings-note" id="claude-billing-note" role="status" hidden></p>
+              <div class="provider-actions">
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="status">Check Claude Code</button>
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="install" hidden>Install Claude Code for Sylvia</button>
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="login" hidden>Sign in with Claude Code</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-action="login" data-claude-account="api" hidden>Sign in with a Console account</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-action="cancel" hidden>Cancel sign-in</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-action="logout" hidden>Sign out</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="claude-terms-btn" hidden>Anthropic&rsquo;s terms</button>
+              </div>
+              <p class="provider-field-help" id="claude-install-help" hidden>Sylvia downloads Claude Code from Anthropic (about
+                350 MB), checks that Anthropic signed it, and keeps it in Sylvia&rsquo;s own folder. Nothing else on this computer
+                is installed or changed. Claude Code is Anthropic&rsquo;s software, used under Anthropic&rsquo;s terms.</p>
+              <p class="provider-field-help" id="claude-login-help" hidden>Claude Code opens Anthropic&rsquo;s sign-in page in your
+                browser. Use your Claude subscription, or sign in with an Anthropic Console account to pay per use instead.</p>
+              <p class="provider-field-help" id="claude-cancel-help" hidden>Cancel stops only what Sylvia started. Any other
+                Claude Code on this computer is unaffected.</p>
+              <p class="provider-field-help" id="claude-signout-help" hidden>Signing out or switching accounts here affects only
+                Sylvia&rsquo;s copy. Any other Claude Code on this computer stays signed in.</p>
+            </div>
+          </section>
+          <section class="settings-section" id="claude-model-card" aria-labelledby="claude-model-heading" hidden>
+            <h3 class="settings-eyebrow" id="claude-model-heading">2. Add a model</h3>
+            <div class="settings-card">
+              <label for="claude-model-id">Model alias or exact model ID</label>
+              <input id="claude-model-id" type="text" spellcheck="false" autocomplete="off" maxlength="200"
+                     placeholder="For example: sonnet" aria-describedby="claude-model-help">
+              <div class="account-suggestions" role="group" aria-label="Claude Code aliases">
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-alias="opus">opus</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-alias="sonnet">sonnet</button>
+                <button class="btn btn-secondary btn-sm" type="button" data-claude-alias="fable">fable</button>
+              </div>
+              <p class="provider-field-help" id="claude-model-help">Aliases follow Claude Code&rsquo;s current model for that name.
+                Sylvia doesn&rsquo;t fetch a model list: Claude Code checks access when the model first runs, so saving a model
+                doesn&rsquo;t confirm your account can use it.</p>
+              <details id="claude-model-advanced" class="provider-advanced-fields">
+                <summary>Advanced model settings</summary>
+                <label for="claude-model-context">Context allowance (tokens, optional)</label>
+                <input id="claude-model-context" type="number" min="1" max="10000000" step="1" placeholder="Managed by Claude Code">
+                <p class="provider-field-help">Only guides Sylvia&rsquo;s context planning. Claude Code manages reply length;
+                  Sylvia shows no token, cost or usage figures for this account.</p>
+              </details>
+              <p id="claude-model-status" class="inline-feedback" role="status"></p>
+              <div class="provider-actions">
+                <button class="btn btn-primary btn-sm" type="button" data-claude-action="add_model">Add model</button>
+              </div>
+              <p class="provider-field-help">Saving returns you to Your models, where you can make it the default for new chats.</p>
+            </div>
+          </section>
+          <section class="settings-section" aria-labelledby="claude-api-heading">
+            <h3 class="settings-eyebrow" id="claude-api-heading">Paying per use instead</h3>
+            <div class="settings-card settings-row">
+              <div>
+                <strong>Anthropic API</strong>
+                <p>A separate connection that uses a Claude Console API key and bills that Console account. Sylvia never
+                  switches between your subscription and the API on its own.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" type="button" id="claude-api-route-btn">Set up Anthropic API</button>
+            </div>
+          </section>
+          </div>
         </section>
 
         <section class="settings-panel" id="settings-panel-appearance" role="tabpanel"
@@ -1316,7 +1441,7 @@
                 <p id="application-signing">Unsigned Alpha prerelease</p>
               </div>
             </div>
-            <p class="settings-note settings-note-warn">This Alpha prerelease is unsigned, so Windows may warn about an
+            <p class="settings-note settings-note-warn" data-platform-copy="unsigned-download">This Alpha prerelease is unsigned, so Windows may warn about an
               unfamiliar publisher. Before running an installer, check its SHA-256 against the supplied release manifest.</p>
           </section>
           <section class="settings-section desktop-updates" id="desktop-updates"
@@ -1402,6 +1527,7 @@
   </section>
 </div>
 
+<script src="panel-looks.js"></script>
 <script src="panel-workspace.js"></script>
 <script src="shot-playback.js"></script>
 <script src="panel-host.js"></script>
@@ -1413,7 +1539,9 @@
 <script src="dictation.js"></script>
 <script src="support-report.js"></script>
 <script src="local-diagnostics.js"></script>
+<script src="chat-start.js"></script>
 <script src="ready-campaigns.js"></script>
+<script src="character-chat.js"></script>
 <script src="tutorials.js"></script>
 <script src="desktop-updates.js"></script>
 <script src="desktop-drafts.js"></script>

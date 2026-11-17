@@ -530,13 +530,14 @@ class _TruncatedBuilderProvider(_ScriptedProvider):
         timeout: float = 120.0,
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
-        del messages, tools, timeout, kwargs
+        del tools, timeout, kwargs
         self.calls += 1
+        self.last_messages = [dict(message) for message in messages]
         yield ProviderStreamChunk(
             content=(
-                "TRUNCATED BUILDER PROSE MUST NOT PERSIST"
+                "CUT-OFF BUILDER PROSE STAYS,"
                 if self.calls == 1
-                else "AUTOMATIC RETRY MUST NOT RUN"
+                else " AND THE REPLY IS FINISHED."
             ),
             reasoning_content="PRIVATE TRUNCATED REASONING",
             finish_reason="length" if self.calls == 1 else "stop",
@@ -2856,7 +2857,7 @@ def test_builder_steering_reaches_the_next_provider_call_after_a_tool_boundary(
         harness.close()
 
 
-def test_builder_truncation_drops_incomplete_prose_without_automatic_retry(
+def test_builder_truncation_keeps_shown_prose_and_continues_the_same_turn(
     tmp_path: Path,
 ) -> None:
     provider = _TruncatedBuilderProvider()
@@ -2878,8 +2879,14 @@ def test_builder_truncation_drops_incomplete_prose_without_automatic_retry(
         )
         reply = harness.read()
         assert reply["id"] == "submit-builder-truncation"
-        assert reply["ok"] is False
-        assert provider.calls == 1
+        assert reply["ok"] is True
+        assert provider.calls == 2
+        # The continuing request carries the cut-off text and the application's signal.
+        assert [message["role"] for message in provider.last_messages[-2:]] == [
+            "assistant", "user",
+        ]
+        assert provider.last_messages[-2]["content"] == "CUT-OFF BUILDER PROSE STAYS,"
+        assert provider.last_messages[-1]["content"].startswith("SYLVIA_GM_BUILDER_CONTINUE ")
 
         context = harness.request(
             "context-builder-truncation",
@@ -2887,11 +2894,17 @@ def test_builder_truncation_drops_incomplete_prose_without_automatic_retry(
             {"session_id": session_id},
         )
         assert context["provisional"] == []
-        assert [message["kind"] for message in context["messages"]] == ["user", "evidence"]
+        assert [message["kind"] for message in context["messages"]] == [
+            "user", "talk", "talk", "evidence",
+        ]
+        assert [
+            message["content"]["text"] for message in context["messages"]
+            if message["kind"] == "talk"
+        ] == ["CUT-OFF BUILDER PROSE STAYS,", " AND THE REPLY IS FINISHED."]
+        assert context["messages"][-1]["content"]["status"] == "completed"
         serialized = json.dumps(context)
-        assert "TRUNCATED BUILDER PROSE" not in serialized
         assert "PRIVATE TRUNCATED REASONING" not in serialized
-        assert "AUTOMATIC RETRY" not in serialized
+        assert "SYLVIA_GM_BUILDER_CONTINUE" not in serialized
     finally:
         harness.close()
 
@@ -3438,12 +3451,22 @@ def test_no_rules_dm_receives_plan_without_builder_file_or_ruleset_tools(
             and str(message.get("content", "")).strip() in {"Begin the story", "Begin."}
             for message in start_messages
         )
-        assert any(
-            message.get("role") == "system"
-            and "application-owned, not player speech" in str(message.get("content", ""))
+        from sylvia_gm.agent._context_ledger import LEGACY_MODE, context_mode
+
+        lifecycle = [
+            message for message in start_messages
+            if "application-owned, not player speech" in str(message.get("content", ""))
             and "campaign_start" in str(message.get("content", ""))
-            for message in start_messages
-        )
+        ]
+        if context_mode() == LEGACY_MODE:
+            assert any(message.get("role") == "system" for message in lifecycle)
+        else:
+            # The context ledger sends application data as sealed user-role host records.
+            assert lifecycle and all(
+                message.get("role") == "user"
+                and str(message["content"]).startswith("[host-seal ")
+                for message in lifecycle
+            )
 
         result = harness.request(
             "submit-dm-plan-tools",
@@ -3965,7 +3988,11 @@ def test_stop_overtakes_pending_owner_submission_and_cancels_provider(tmp_path: 
         harness.close()
 
 
-def test_owner_manual_retry_reuses_action_and_resettles_campaign_file(tmp_path: Path) -> None:
+@pytest.mark.parametrize("context_mode", ["ledger", "legacy"])
+def test_owner_manual_retry_reuses_action_and_resettles_campaign_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, context_mode: str,
+) -> None:
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     provider = _FailThenRetryProvider()
     harness = _OwnerHarness(tmp_path / "authority.sqlite3", provider)
     try:
@@ -4036,10 +4063,22 @@ def test_owner_manual_retry_reuses_action_and_resettles_campaign_file(tmp_path: 
             for name in retry_tool_names
         )
         retry_messages = json.dumps(provider.calls[1][0])
-        assert [message for message in provider.calls[1][0] if message["role"] == "user"] == [
-            {"role": "user", "content": "Continue."},
-        ]
-        assert "SYLVIA_GM_CURRENT_PLAYER_MESSAGE" in retry_messages
+        if context_mode == "legacy":
+            assert [message for message in provider.calls[1][0]
+                    if message["role"] == "user"] == [{"role": "user", "content": "Continue."}]
+            assert "SYLVIA_GM_CURRENT_PLAYER_MESSAGE" in retry_messages
+        else:
+            # Ledger mode: host records are sealed user-role records; the player's exact
+            # input is the only unsealed user message, and the ledger contract replaces the
+            # positional current-message control.
+            from tests.gm_context_contract import unsealed
+
+            player = [message for message in provider.calls[1][0]
+                      if message["role"] == "user"
+                      and unsealed(message["content"]) == message["content"]]
+            assert player == [{"role": "user", "content": "Continue."}]
+            assert "SYLVIA_GM_CONTEXT_LEDGER_CONTRACT" in retry_messages
+            assert "SYLVIA_GM_CURRENT_PLAYER_MESSAGE" not in retry_messages
         assert "Transport Plan retry" in retry_messages
         assert "Campaign State is the GM-screen ledger" in retry_messages
         assert "SYLVIA_GM_CANONICAL_RETRY_DATA" not in retry_messages

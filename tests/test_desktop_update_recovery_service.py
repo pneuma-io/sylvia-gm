@@ -10,6 +10,9 @@ from sylvia_gm.application.desktop_update.manifest import UpdateError, Version
 from sylvia_gm.application.desktop_update.recovery_service import RecoveryService
 from sylvia_gm.infrastructure.launch_handshake import derive_owner_response
 from sylvia_gm.interfaces import owner_process
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_startup import prepared
 

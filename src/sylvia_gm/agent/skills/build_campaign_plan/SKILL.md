@@ -220,6 +220,21 @@ Never invent a package hash, Ruleset capability, Setting path, validation result
 receipt. If requested material is absent, tell the user exactly what is missing. Mark mechanics the
 Ruleset does not encode as explicit GM adjudications instead of pretending they are engine features.
 
+### No Ruleset Plans
+
+A No Ruleset campaign has no Setting package, so its Plan carries its own world. Write the same
+format-2 Plan to the campaign workspace as `campaign-plan.json` with a readable `campaign-plan.md`.
+Set `bindings.ruleset` and `bindings.campaign_setting` to `null` and `package_closure_sha256` to
+the empty closure `4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945`. Declare each
+person, place and useful item once in `initial_state.entities` with
+`"source_ref": {"id": "<id>", "path": "entities/<id>"}` and a `state` holding `name`, optional
+`visibility`/`known_by` (default private), and story attributes. For an item, give `description`
+(what it is), `purpose` (what it does, in story terms) and `location` (where it is or who has
+it). Use those `entities/<id>` paths for `starting_location`, `setting_references` and act
+`setting_refs`. Leave `mechanics`, `party_placements`, a fixed player character and required
+companions out, keep secrets as inline `fact` records, and plan no combat, rolls or checks.
+Sylvia validates the Plan when the campaign starts and seeds those entities as Campaign State.
+
 ## Fixed draft layout
 
 Keep these persistent workspace files:

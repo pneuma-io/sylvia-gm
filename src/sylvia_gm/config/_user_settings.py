@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import os
+import sys
 import tempfile
 import threading
 from collections.abc import Mapping
@@ -16,6 +17,12 @@ from sylvia_gm.config._credential_protection import protect_credentials
 from sylvia_gm.config._resolver import ConfigError
 
 CONFIG_LOCK = threading.RLock()
+if sys.platform == "linux":
+    _MIGRATION_RETRY = (
+        "retry after saved-credential protection and settings-file access are available."
+    )
+else:
+    _MIGRATION_RETRY = "retry after Windows protection and settings-file access are available."
 
 
 def protected_document(document: Mapping[str, object]) -> dict[str, Any]:
@@ -91,6 +98,6 @@ def read_user_settings(path: Path) -> dict[str, Any]:
         except (OSError, ConfigError):
             raise ConfigError(
                 "Saved credential migration did not complete. The original settings are unchanged; "
-                "retry after Windows protection and settings-file access are available."
+                + _MIGRATION_RETRY
             ) from None
         return protected

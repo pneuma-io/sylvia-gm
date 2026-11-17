@@ -5,6 +5,8 @@ from __future__ import annotations
 import threading
 from collections.abc import Callable
 
+from sylvia_gm import __release_channel__
+
 from .manifest import (
     OFFICIAL_RELEASES,
     Manifest,
@@ -71,9 +73,16 @@ def discover(
             version = Version.parse(tag[1:])
         except UpdateError:
             continue
-        if version <= current or version.channel != current.channel:
+        if version.prerelease:
+            channel: str | None = version.channel
+        elif release["prerelease"]:
+            # A plain vX.Y.Z tag flagged as a prerelease belongs to the declared non-stable channel.
+            channel = __release_channel__ if __release_channel__ != "stable" else None
+        else:
+            channel = "stable"
+        if version <= current or channel != __release_channel__:
             continue
-        if bool(version.prerelease) != release["prerelease"]:
+        if version.prerelease and not release["prerelease"]:
             raise UpdateError("invalid_metadata", "The official release channel is inconsistent.")
         candidates.append((version, release))
     if not candidates:

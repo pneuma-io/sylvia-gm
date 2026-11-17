@@ -766,12 +766,18 @@ def test_participant_tool_contract_stays_identical_when_current_offers_change(is
     assert second_messages[1] == first_messages[-1]
 
 
+_STATE_RECORD = "SYLVIA_GM_FRESH_CAMPAIGN_STATE (application-owned"
+
+
+@pytest.mark.parametrize("context_mode", ["ledger", "legacy"])
 def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructions(
-    isolated_game, tmp_path,
+    isolated_game, tmp_path, monkeypatch, context_mode,
 ):
+    from sylvia_gm.agent._context_ledger import UPDATE_LABEL, host_seal, seal_prefix
     from sylvia_gm.provider._chatgpt import ChatGPTProvider
     from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
 
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     owner, session, _ = isolated_game
     captured = []
 
@@ -801,16 +807,33 @@ def test_fresh_gm_state_follows_history_without_entering_chatgpt_base_instructio
     assert json.dumps(starts[0]["dynamicTools"], sort_keys=True) == json.dumps(
         starts[1]["dynamicTools"], sort_keys=True)
     assert starts[0]["baseInstructions"] == starts[1]["baseInstructions"]
-    assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in starts[0]["baseInstructions"]
-    for items in injected:
-        assert items[-1]["content"][0]["text"].startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
-        assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
-        assert "HAND_SENTINEL" not in json.dumps(items)
+    if context_mode == "legacy":
+        assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in starts[0]["baseInstructions"]
+        for items in injected:
+            assert items[-1]["content"][0]["text"].startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+            assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
+            assert "HAND_SENTINEL" not in json.dumps(items)
+    else:
+        # The ledger contract names the record labels; the state record itself never enters
+        # the base instructions. The keyframe follows history, then the second request only
+        # appends: the committed choice arrives as a sealed state update.
+        seal = seal_prefix(host_seal(session.session_id))
+        assert _STATE_RECORD not in starts[0]["baseInstructions"]
+        assert injected[0][-1]["content"][0]["text"].startswith(
+            seal + "SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        assert injected[1][: len(injected[0])] == injected[0]
+        assert injected[1][-1]["content"][0]["text"].startswith(seal + UPDATE_LABEL)
+        for items in injected:
+            assert "PLAYER_CONVERSATION_SENTINEL" in json.dumps(items[:-1])
+            assert "HAND_SENTINEL" not in json.dumps(items)
     assert injected[0][-1] != injected[1][-1]
 
 
+@pytest.mark.parametrize("context_mode", ["ledger", "legacy"])
 @pytest.mark.parametrize("route", ["chatgpt", "openrouter"])
-def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tmp_path, route):
+def test_real_serializers_interleave_owned_contexts_and_reopen(
+    isolated_game, tmp_path, route, monkeypatch, context_mode,
+):
     """Capture actual App Server RPC or SDK HTTP JSON, with no external inference."""
     import httpx
 
@@ -818,6 +841,7 @@ def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tm
     from sylvia_gm.provider._openai_compat import OpenAICompatProvider
     from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
 
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
     owner, session, database = isolated_game
     frames = []
 
@@ -948,8 +972,88 @@ def test_real_serializers_interleave_owned_contexts_and_reopen(isolated_game, tm
     else:
         assert frames[0]["baseInstructions"] == frames[4]["baseInstructions"]
         assert frames[1]["baseInstructions"] == frames[5]["baseInstructions"]
-        assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in frames[4]["baseInstructions"]
+        if context_mode == "legacy":
+            assert "SYLVIA_GM_FRESH_CAMPAIGN_STATE" not in frames[4]["baseInstructions"]
+        else:
+            assert _STATE_RECORD not in frames[4]["baseInstructions"]
+            # The later GM request extends the first one.
+            assert frames[4]["messages"][: len(frames[0]["messages"])] == frames[0]["messages"]
     assert "a:1" in json.dumps(frames[5]) and "a:5" in json.dumps(frames[5])
+
+
+def test_an_npc_decision_right_after_a_gm_round_runs_on_a_fresh_chatgpt_thread(
+    isolated_game, tmp_path, monkeypatch,
+):
+    """Only the request the context ledger built keeps a runtime thread.
+
+    The GM round's turn is left waiting in a kept thread. The NPC decision that follows on
+    the same provider and the same runtime loop is not a ledger request: it starts its own
+    thread, which closes when it ends, and leaves the GM's thread where it was.
+    """
+    from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+    from sylvia_gm.provider import _chatgpt
+    from sylvia_gm.provider._chatgpt import ChatGPTProvider
+    from tests.test_pes82_chatgpt_failures import SyntheticRuntime, provider_for
+
+    for name in ("SYLVIA_GM_CONTEXT_MODE", "SYLVIA_CHATGPT_THREAD"):
+        monkeypatch.delenv(name, raising=False)  # the shipped defaults
+    monkeypatch.setattr(_chatgpt, "_USAGE_SETTLE_SECONDS", 0.01)
+    monkeypatch.setattr(_chatgpt, "_USAGE_REPORT_SECONDS", 0.05)
+    owner, session, _ = isolated_game
+    runtimes = []
+
+    class Runtime(SyntheticRuntime):
+        def call(self, method, params):
+            if method == "thread/start":
+                self.tools = [tool["name"] for namespace in params["dynamicTools"]
+                              for tool in namespace["tools"]]
+            if method == "turn/start":
+                if "select_actor_action" in self.tools:
+                    tool, arguments = "select_actor_action", {"action_id": "a:0"}
+                else:
+                    tool = next(n for n in self.tools if n.endswith("_update_campaign_file"))
+                    arguments = {}
+                self.events = [{"id": len(runtimes) + 6, "method": "item/tool/call", "params": {
+                    "namespace": "sylvia", "tool": tool, "callId": "call-" + tool,
+                    "arguments": arguments}}]
+            return super().call(method, params)
+
+    def connect(*_args, **_kwargs):
+        runtimes.append(Runtime([]))
+        return runtimes[-1]
+
+    model = provider_for(SyntheticRuntime([]), tmp_path).model_info
+    provider = ChatGPTProvider(tmp_path, model, connection_factory=connect)
+    adapter = ProviderSessionAdapter(owner, provider, owner_id="isolated-test",
+        gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL")
+    source = gm_input(owner, session)
+    tools, _ = adapter._provider_tools(source.catalog)
+    list(adapter._stream_round(adapter._messages(source), tools, control=source.control,
+                               provider_input=source))
+    [gm] = runtimes
+    [kept] = list(_chatgpt._KEPT_THREADS._idle)
+    assert kept.connection is gm and kept.pending is not None and not gm.closed
+
+    request = owner.actor_decision_request("tokens", turn_id="turn")
+    # Even a mark left in the caller's context reaches no request: each round clears its own
+    # copy when it starts, and only the ledger build inside a round sets it.
+    stray = LEDGER_REQUEST.set(True)
+    try:
+        events = iter(run_actor_decision(owner, provider, source, request,
+            owner_id="isolated-test", stream=adapter._stream_round))
+        try:
+            event = next(events)
+            assert event.action_command.parameters["choice"] == "a:0"
+        finally:
+            events.close()
+    finally:
+        LEDGER_REQUEST.reset(stray)
+    gm_runtime, npc = runtimes
+    assert npc.calls.count("thread/start") == 1 and npc.closed
+    assert "turn/interrupt" in npc.calls  # the fresh path's usage collection, as on main
+    assert list(_chatgpt._KEPT_THREADS._idle) == [kept] and not gm_runtime.closed
+    assert gm_runtime.calls.count("thread/start") == 1 and "turn/start" in gm_runtime.calls
+    assert LEDGER_REQUEST.get() is False
 
 
 @pytest.mark.parametrize("isolated_game", [{"housekeeping": True}], indirect=True)
@@ -1241,6 +1345,64 @@ def test_cancellation_during_inference_discards_the_proposal(isolated_game):
     with pytest.raises(AuthorityError):
         list(events)
     assert owner.snapshot("tokens").revision == 0
+
+
+class ProseFirstActorProvider(IsolatedFlowProvider):
+    """Claude Opus 5.5 cannot be forced to call a tool, so it may first answer in prose."""
+
+    def __init__(self, prose_rounds):
+        super().__init__("anthropic_messages", "claude-opus-5-5")
+        self.prose_rounds = prose_rounds
+        self.requests = []
+
+    async def generate_stream(self, messages, tools=None, timeout=120, **kwargs):
+        self.requests.append(
+            self.transport.format_request(
+                self.model_info.wire_model_id, messages, tools, True, **kwargs
+            )
+        )
+        if len(self.requests) <= self.prose_rounds:
+            yield ProviderStreamChunk(
+                content="Seat A ponders the tokens.",
+                anthropic_content=[{"type": "text", "text": "Seat A ponders the tokens."}],
+                finish_reason="stop",
+            )
+            return
+        assert messages[-1]["content"].startswith("SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION")
+        async for chunk in super().generate_stream(messages[:-1], tools, timeout, **kwargs):
+            yield chunk
+
+
+def test_actor_prose_without_a_call_gets_one_correction(isolated_game):
+    owner, session, _ = isolated_game
+    provider = ProseFirstActorProvider(prose_rounds=1)
+    events, _ = actor_events(owner, session, provider)
+    try:
+        event = next(events)
+        owner.execute_action(event.action_command)
+        list(events)
+    finally:
+        events.close()
+
+    assert owner.snapshot("tokens").revision == 1
+    first, second = provider.requests
+    assert "tool_choice" not in first and "temperature" not in first
+    assert second["messages"][-1]["role"] == "user"
+    assert second["messages"][-1]["content"].startswith("SYLVIA_GM_REQUIRED_TOOL_CALL_CORRECTION")
+    assert "Seat A ponders" not in json.dumps(second)
+
+
+def test_actor_prose_after_its_correction_is_rejected(isolated_game):
+    owner, session, _ = isolated_game
+    provider = ProseFirstActorProvider(prose_rounds=2)
+    events, _ = actor_events(owner, session, provider)
+    try:
+        with pytest.raises(AuthorityError, match="must propose one offered action"):
+            list(events)
+    finally:
+        events.close()
+    assert owner.snapshot("tokens").revision == 0
+    assert len(provider.requests) == 2
 
 
 def test_binding_rejects_wrong_turn_provider_and_stopped_session(isolated_game):

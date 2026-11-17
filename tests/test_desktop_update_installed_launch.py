@@ -1,17 +1,19 @@
 """Injected Windows launch refusals, not actual denied ACL or OS-consent evidence."""
 
 import json
-import sys
 from contextlib import contextmanager
 
 import pytest
 
 from sylvia_gm.application.desktop_update import installed
 from sylvia_gm.application.desktop_update.manifest import UpdateError
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_installed import installation
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="Windows installer launch contract")
+@pytest.mark.runs_on("win32", reason="Windows installer launch contract")
 @pytest.mark.parametrize("winerror", [5, 1223], ids=["access-denied", "consent-cancelled"])
 def test_refused_installer_launch_keeps_old_copy_and_never_retries_or_elevates(
     tmp_path, monkeypatch, winerror

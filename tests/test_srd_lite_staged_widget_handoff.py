@@ -17,13 +17,13 @@ def native():
         return yaml.load(archive.read('packages/sylvia.srd-lite.bg3/runtime/ruleset.yaml'), Loader=yaml.CSafeLoader)
 
 
-def test_native_absent_saved_slow_roll_reproduces_unresolved_text(native):
+def test_native_absent_saved_slow_roll_restores_null(native):
     leaf = native['tools']['resolve_srd_slow_cast_failure']
     restore = next(e for rows in _lists(leaf['effects']) for e in rows
         if e.get('set') == {'field':'_slow_cast_failure_roll','value':'_slow_cast_event.slow_cast.roll'})
     frame = ExecutionContext(vars={'_slow_cast_failure_roll':None,'_slow_cast_event':{'slow_cast':{'roll':None}}})
     execute_effects([restore],frame)
-    assert frame.vars['_slow_cast_failure_roll'] == '_slow_cast_event.slow_cast.roll'
+    assert frame.vars['_slow_cast_failure_roll'] is None
 
 
 @pytest.mark.parametrize('roll',(None,{'sides':4,'count':1,'results':[1],'total':1,'modifier':0},

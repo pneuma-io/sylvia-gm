@@ -74,7 +74,10 @@ def validate_plan_spatial_scenes(
 
     state, paths = _plan_state(payload)
     for surface in surfaces:
-        if surface.renderer not in {"tactical_grid", "coordinate_map"} or not isinstance(surface.source, Mapping):
+        if (
+            surface.renderer not in {
+            "tactical_grid", "coordinate_map"} or not isinstance(surface.source, Mapping)
+        ):
             continue
         source_kind = surface.source.get("kind")
         if source_kind == "object":

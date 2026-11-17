@@ -5,25 +5,33 @@ from types import SimpleNamespace
 
 import pytest
 
-from sylvia_gm import __version__
-from sylvia_gm.application.desktop_update import service
+from sylvia_gm.application.desktop_update import launch, service
 from sylvia_gm.application.desktop_update.controller import UpdateController
 from sylvia_gm.application.desktop_update.launch import Installation
 from sylvia_gm.application.desktop_update.manifest import UpdateError, Version
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+)
 from tests.test_desktop_update_lifecycle import ReleaseFixture
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_preparation import fixture
 
 
+@pytest.fixture(autouse=True)
+def synthetic_old_installation(monkeypatch):
+    monkeypatch.setattr(launch, "__version__", "0.3.0-alpha.1")
+    monkeypatch.setattr(service, "__version__", "0.3.0-alpha.1")
+
+
 def setup(tmp_path):
     update, _, backup, _, _, _ = fixture(tmp_path)
     context = {
-        "live": str(update.live), "data_root": str(update.root), "version": __version__,
+        "live": str(update.live), "data_root": str(update.root), "version": "0.3.0-alpha.1",
         "target": "windows-x86_64", "distribution": "portable",
     }
     installation = Installation.from_launch(context, update.root)
     controller = UpdateController(
-        root=update.root / ".application-updates", current=Version.parse(__version__),
+        root=update.root / ".application-updates", current=Version.parse("0.3.0-alpha.1"),
         target="windows-x86_64", distribution="portable", transport=ReleaseFixture(),
         verify=accept_stub,
     )
@@ -105,14 +113,16 @@ def test_abort_and_shutdown_cannot_close_database_during_admitted_checkpoint(tmp
 
     def held(target):
         entered.set()
-        assert resume.wait(5), "release controlled backup"
+        assert resume.wait(30), "release controlled backup"
         original(target)
 
     boundary._backup_database = held
     closing = threading.Thread(target=boundary.close)
     try:
         prepare(boundary, controller, update.identity)
-        assert entered.wait(3)
+        # Preparation extracts and copies the release before its backup; under load that
+        # alone can take several seconds, so these bounds only catch a stuck worker.
+        assert entered.wait(30)
         with pytest.raises(UpdateError) as blocked:
             boundary.abort_preparation(update.identity)
         assert blocked.value.code == "update_busy" and reservations == {update.identity}
@@ -120,7 +130,7 @@ def test_abort_and_shutdown_cannot_close_database_during_admitted_checkpoint(tmp
         closing.join(0.05)
         assert closing.is_alive(), "owner close must wait before closing its database"
         resume.set()
-        closing.join(5)
+        closing.join(30)
         assert not closing.is_alive()
         assert controller.state()["phase"] == "cancelled"
         assert controller.state()["error_code"] == "application_busy"

@@ -231,14 +231,27 @@ def test_current_direct_response_never_reuses_a_completed_prior_disposition(
         ("player", True),
     ],
 )
+@pytest.mark.parametrize("context_mode", ["legacy", "ledger"])
 def test_full_direct_response_cycles_keep_variable_task_data_out_of_fixed_instructions(
     tmp_path,
+    monkeypatch,
     route,
     recovery,
     boundary_kind,
     narrate_after_disposition,
+    context_mode,
 ):
+    """Variable turn data never enters the fixed instructions, in either request assembly.
+
+    Legacy mode keeps the previous projection's shape (current state last, directives in the
+    instructions). In ledger mode the same properties hold for the frozen prefix; directives
+    and the current state arrive as sealed host records after the conversation.
+    """
     import httpx
+
+    from tests.gm_context_contract import unsealed
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
 
     from sylvia_gm.provider._chatgpt import ChatGPTProvider
     from sylvia_gm.provider._openai_compat import OpenAICompatProvider
@@ -478,12 +491,24 @@ def test_full_direct_response_cycles_keep_variable_task_data_out_of_fixed_instru
         ]
     rounds = 2 if boundary_kind == "gm" else 1
     assert len(frames) == 2 * rounds
+    def leading_system(messages):
+        lead = []
+        for message in messages:
+            if message["role"] != "system":
+                break
+            lead.append(message["content"])
+        return lead
+
     instructions = [
         frame["baseInstructions"]
         if route == "chatgpt"
         else "\n\n".join(
             message["content"] for message in frame["messages"] if message["role"] == "system"
         )
+        if context_mode == "legacy"
+        # In ledger mode in-place routes keep controls as system records in the conversation;
+        # the fixed instructions are the frozen prefix ahead of it.
+        else "\n\n".join(leading_system(frame["messages"]))
         for frame in frames
     ]
     assert instructions[:rounds] == instructions[rounds:]
@@ -499,10 +524,27 @@ def test_full_direct_response_cycles_keep_variable_task_data_out_of_fixed_instru
         last = frame["messages"][-1]["content"]
         if route == "chatgpt":
             last = last[0]["text"]
-        assert last.startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        if context_mode == "legacy":
+            assert last.startswith("SYLVIA_GM_FRESH_CAMPAIGN_STATE")
+        else:
+            assert last != unsealed(last)  # a sealed host record
+            assert unsealed(last).startswith(
+                ("SYLVIA_GM_FRESH_CAMPAIGN_STATE", "SYLVIA_GM_CAMPAIGN_STATE_UPDATE"))
     assert [frame.get("tools", []) for frame in frames[:rounds]] == [
         frame.get("tools", []) for frame in frames[rounds:]
     ]
+    if context_mode == "ledger":
+        # Directives are sealed host records in the conversation, not fixed instructions.
+        directives = [json.dumps(frame["messages"]) for frame in frames]
+        assert all("SYLVIA_GM_CONTEXT_LEDGER_CONTRACT" in text for text in instructions)
+        if boundary_kind == "gm":
+            assert "SYLVIA_GM_DECISION_REQUEST" in directives[0]
+            assert "SYLVIA_GM_PLAYER_BOUNDARY_NARRATION" in directives[1]
+        elif boundary_kind == "player":
+            assert "SYLVIA_GM_PLAYER_BOUNDARY_NARRATION" in directives[0]
+        if narrate_after_disposition:
+            assert "SYLVIA_GM_CAMPAIGN_FILE_UPDATED_NARRATION" in directives[rounds - 1]
+        return
     if boundary_kind == "gm":
         assert "SYLVIA_GM_DECISION_REQUEST" in instructions[0]
         assert "SYLVIA_GM_PLAYER_BOUNDARY_NARRATION" in instructions[1]

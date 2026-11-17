@@ -213,7 +213,9 @@ def test_failed_player_action_reopens_with_origin_and_without_reexecution(tmp_pa
         receipt = owner.player_action(**request)
         failed = owner.snapshot("campaign")
         assert receipt.status is ActionStatus.FAILED
-        assert receipt.result == {"status": "failed", "code": "tool_execution_failed"}
+        assert receipt.result["status"] == "failed"
+        assert receipt.result["code"] == "tool_execution_failed"
+        assert "declared inputs" in receipt.result["reason"]
         assert failed.state == before.state
         assert failed.mutations == before.mutations
         (marker,) = [item for item in failed.consequences if item.action_id == "failed-move"]

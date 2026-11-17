@@ -3,10 +3,10 @@
 from sylvia_gm.config._resolver import ConfigError
 from sylvia_gm.config.loader import (
     AppConfig,
-    SylviaGMConfig,
     LoggingConfig,
     ProviderDef,
     RulesetConfig,
+    SylviaGMConfig,
     TTSConfig,
     load_config,
 )

@@ -10,7 +10,7 @@ from sylvia_gm.domain.authority import ActionStatus
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.spatial import SpatialEngine, SpatialValidationError
 from tests.lite_imported_fixture import ImportedCase
-from tests.test_srd_creature_space import state
+from tests.srd_creature_space_fixtures import state
 from tests.test_srd_creature_space_owner import NS, MAP, request
 from tests.test_srd_creature_space_terrain_routes import preview_cost
 

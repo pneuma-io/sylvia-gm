@@ -119,7 +119,7 @@ async function openShell(browser) {
 }
 
 test('model menu fits the composer with both sidebars at narrow desktop widths', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.evaluate(() => window.settingsTest.closeSettings());
@@ -251,7 +251,7 @@ test('automatic model limits preserve overrides and reset for a different identi
 });
 
 test('service setup guidance and discovery failures preserve form values and saved choices', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.evaluate(() => {
@@ -451,7 +451,7 @@ test('first use and contextual session feedback remain visible without the statu
 });
 
 test('character limits count emoji like the owner and preserve oversized input for correction', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page } = await openShell(browser);
     const result = await page.evaluate(() => {
@@ -488,7 +488,7 @@ test('character limits count emoji like the owner and preserve oversized input f
 });
 
 test('unavailable saved models never appear as a configured default for the current chat', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     const missing = { provider_id: 'removed-service', model_id: 'removed-service/saved-model' };
@@ -522,8 +522,48 @@ test('unavailable saved models never appear as a configured default for the curr
 });
 
 
+// Issue 92: a custom server that reports only a model maximum leaves the usable limit unknown, and a
+// campaign's first turn can be refused. The editor says so and offers the reported maximum as the cap,
+// which the person confirms by saving; nothing is taken as the loaded limit by itself.
+test('an unknown context limit is explained and the reported maximum is offered as the cap', { timeout: 30000 }, async () => {
+  const browser = await chromium.launch({ headless: true,
+    channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined) });
+  try {
+    const { page, errors } = await openShell(browser);
+    await page.evaluate(() => {
+      window.fixture.discoveryModels = [{ id: 'served-model', name: 'Served model', declared_context_window: 400000,
+        declared_context_source: 'provider_metadata', transport: 'chat_completions', supports_tools: true }];
+    });
+    await page.locator('#add-model-btn').click();
+    await page.locator('[data-model-route="api"]').click();
+    await page.locator('#provider-credential').fill('synthetic-key');
+    await page.locator('#provider-continue-btn').click();
+    await page.locator('#provider-discovered-models').selectOption('0');
+    assert.match(await page.locator('#provider-context-summary').textContent(), /No context limit is known.*first turn may be refused/);
+    assert.equal(await page.locator('#provider-declared-offer').isVisible(), true);
+    assert.match(await page.locator('#provider-declared-offer-text').textContent(), /reports a maximum of 400,000 tokens/);
+    assert.equal(await page.locator('#provider-context-window').inputValue(), '', 'nothing is filled in without the person');
+
+    await page.locator('#provider-use-declared-context').click();
+    assert.equal(await page.locator('#provider-context-window').inputValue(), '400000');
+    assert.equal(await page.locator('#provider-model-advanced').evaluate(node => node.open), true, 'the cap is shown where it can be changed');
+    assert.equal(await page.locator('#provider-effective-context').textContent(), '400,000 tokens');
+    assert.match(await page.locator('#provider-context-summary').textContent(), /Context available to Sylvia: 400,000 tokens/);
+    assert.equal(await page.locator('#provider-declared-offer').isVisible(), false);
+    assert.equal(await page.evaluate(() => window.fixture.calls.filter(c => c.kind === 'save').length), 0, 'offering saves nothing');
+
+    await page.locator('#save-provider-btn').click();
+    await page.waitForFunction(() => window.fixture.calls.some(c => c.kind === 'save'));
+    const saved = await page.evaluate(() => window.fixture.calls.find(c => c.kind === 'save'));
+    assert.equal(saved.configured_context_window, 400000);
+    assert.equal(saved.declared_context_window, 400000);
+    assert.equal(saved.runtime_context_window ?? null, null, 'the reported maximum is not passed off as the loaded runtime');
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('invalid manual limits identify their field and preserve automatic blanks', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.locator('[data-edit-model="alpha"]').click();
@@ -561,7 +601,7 @@ test('invalid manual limits identify their field and preserve automatic blanks',
 
 
 test('current and legacy Lite package choices show SRD Lite without changing their identities', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     await page.evaluate(async () => {
@@ -596,7 +636,7 @@ test('current and legacy Lite package choices show SRD Lite without changing the
 
 
 test('saved character choices retain exact bindings while displaying the friendly Lite name', async () => {
-  const browser = await chromium.launch({ channel: 'msedge', headless: true });
+  const browser = await chromium.launch({ channel: process.env.SYLVIA_TEST_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined), headless: true });
   try {
     const { page, errors } = await openShell(browser);
     const result = await page.evaluate(() => {

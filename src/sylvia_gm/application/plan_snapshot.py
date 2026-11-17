@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import io
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
 from functools import lru_cache
+from typing import TYPE_CHECKING
 
 from sylvia_gm.application.plan_network_admission import validate_plan_networks
 from sylvia_gm.application.plan_spatial_admission import validate_plan_spatial_scenes
@@ -93,12 +93,21 @@ def _admitted_snapshot_facts(package_snapshot: bytes):
         primary = next(item for item in admitted.manifests if item.role is PackageRole.PRIMARY)
         settings = []
         for setting in campaign_setting_entries(admitted.package_lock):
-            files = tuple(item for item in admitted.files if item.manifest.package_id == setting.package_id)
+            files = (
+                tuple(
+                item for item in admitted.files if item.manifest.package_id == setting.package_id)
+            )
             paths = frozenset(item.file.path for item in files)
-            knowledge_file = next((item for item in files if item.file.path == CAMPAIGN_SETTING_KNOWLEDGE_PATH), None)
+            knowledge_file = (
+                next(
+                (item for item in files if item.file.path == CAMPAIGN_SETTING_KNOWLEDGE_PATH), None)
+            )
             knowledge_ids = frozenset()
             if knowledge_file is not None:
-                knowledge = parse_campaign_setting_knowledge_bytes(b"".join(admitted.iter_file_chunks(knowledge_file)))
+                knowledge = (
+                    parse_campaign_setting_knowledge_bytes(
+                    b"".join(admitted.iter_file_chunks(knowledge_file)))
+                )
                 knowledge_ids = frozenset(item.identity for item in knowledge.facts)
             settings.append((setting, paths, knowledge_ids))
         return primary, tuple(settings), closure_sha256(admitted.package_lock)

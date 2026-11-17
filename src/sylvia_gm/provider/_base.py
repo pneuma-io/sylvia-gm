@@ -8,7 +8,7 @@ retry configuration, and provider configuration.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -87,6 +87,8 @@ class ProviderResponse:
     """Private signed/tool continuation fields, never canonical conversation history."""
     provider_reported_reasoning_effort: str | None = None
     """Response metadata reported by the provider, never copied from our request."""
+    provider_reported_service_tier: str | None = None
+    """The speed tier the provider says it used; it may differ from the one requested."""
 
 
 @dataclass
@@ -102,6 +104,7 @@ class ProviderStreamChunk:
     chat_completion_metadata: dict[str, Any] | None = field(default=None, repr=False)
     """Private signed/tool continuation fields, never canonical conversation history."""
     provider_reported_reasoning_effort: str | None = None
+    provider_reported_service_tier: str | None = None
 
 
 @asynccontextmanager
@@ -113,6 +116,18 @@ async def closing_provider_stream(stream: AsyncIterator[ProviderStreamChunk]):
         close = getattr(stream, "aclose", None)
         if close is not None:
             await close()
+
+
+@dataclass(frozen=True)
+class SpeedOption:
+    """One provider-native speed tier a model advertises, with the provider's own wording."""
+
+    id: str
+    name: str
+    description: str = ""
+
+    def projection(self) -> dict[str, str]:
+        return {"id": self.id, "name": self.name, "description": self.description}
 
 
 @dataclass
@@ -148,7 +163,8 @@ class ModelInfo:
     """Sylvia's completion allowance; None is valid for runtime-managed output.
 
     GM requests use this allowance; Builder has its separate capped allowance below.
-    Admission reserves only an enforceable request allowance. Codex manages its own output budget.
+    Admission reserves only an enforceable request allowance.
+    Native runtimes own their output budget.
     This value never changes the context capacity or substitutes for a missing capacity fact.
     """
     builder_output_tokens: int = 32_000
@@ -156,7 +172,7 @@ class ModelInfo:
     cost_per_1k_tokens: float = 0.0
     transport: Literal[
         "chat_completions", "responses", "anthropic_messages", "codex_app_server",
-        "gemini_generate_content"
+        "gemini_generate_content", "claude_code"
     ] = "chat_completions"
     """Wire protocol needed to reach this model.
 
@@ -173,6 +189,10 @@ class ModelInfo:
     default_reasoning_effort: str | None = None
     reasoning_control: str | None = None
     reasoning_source: str = "unknown"
+    speed_options: tuple[SpeedOption, ...] | None = None
+    """Native speed tiers this route documents or advertises; None means no known choice."""
+    speed_control: str | None = None
+    speed_source: str = "unknown"
 
     def __post_init__(self) -> None:
         """Keep legacy constructors honest without pretending their value was runtime-detected."""
@@ -364,6 +384,30 @@ class Provider(ABC):
         Must be idempotent — calling twice is safe.
         """
         ...
+
+    async def release_idle(self) -> None:
+        """Close anything this provider keeps open between requests.
+
+        Never raises for a provider that keeps nothing. This default keeps nothing, so it
+        does nothing; it is deliberately not abstract. The provider stays usable afterwards:
+        the next request opens whatever it needs.
+        """
+        return
+
+
+async def release_provider_idle(provider: object) -> None:
+    """Forward one ``release_idle`` call to a wrapped provider that offers it.
+
+    Wrappers use this so a wrapped object without the call (such as a test double that is
+    not a :class:`Provider`) is left alone instead of failing the release.
+    """
+
+    release = getattr(provider, "release_idle", None)
+    if not callable(release):
+        return
+    result = release()
+    if isinstance(result, Awaitable):
+        await result
 
 
 class ProviderTransport(ABC):

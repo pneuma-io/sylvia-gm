@@ -21,6 +21,10 @@ from sylvia_gm.infrastructure.owner_lock import (
     OwnerConflict,
     authority_lock_identity,
 )
+from tests.desktop_update_move_checks import (
+    assert_desktop_update_moves as assert_desktop_update_moves,
+    seed_update_phase as seed_update_phase,
+)
 from tests.test_desktop_update_manifest import accept_stub
 from tests.test_desktop_update_preparation import fixture
 from tests.test_desktop_update_replacement import assert_tree
@@ -306,9 +310,11 @@ def test_ambiguous_recovery_launch_never_automatically_repeats(tmp_path):
 
 
 @pytest.mark.parametrize("phase", ["rolling_back", "rollback_ready", "rollback_awaiting_restart"])
-def test_ordinary_boot_is_fenced_before_migration_through_all_recovery_phases(tmp_path, phase):
+def test_ordinary_boot_is_fenced_before_migration_through_all_recovery_phases(
+    tmp_path, phase, seed_update_phase,
+):
     update, _, installation, _, database = prepared(tmp_path)
-    update.store.save(update.identity, phase, update.manifest.version.text)
+    seed_update_phase(update.store, update.identity, phase, update.manifest.version.text)
     before = database.read_bytes()
     with pytest.raises(UpdateError) as blocked:
         authorize_startup(

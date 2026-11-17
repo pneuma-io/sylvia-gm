@@ -6,6 +6,18 @@ def request_attached(
     harness, identity, method, params, *, campaign_id, attempt_id, provider_session_id=None,
 ):
     """Renew narration by campaign, or Builder provider work by its independent session."""
+    target = send_attached(
+        harness, identity, method, params, campaign_id=campaign_id, attempt_id=attempt_id,
+        provider_session_id=provider_session_id,
+    )
+    assert target["ok"] is True, target
+    return target["result"]
+
+
+def send_attached(
+    harness, identity, method, params, *, campaign_id, attempt_id, provider_session_id=None,
+):
+    """Keep the attachment renewed until the request replies; return the raw reply."""
     provider_work = provider_session_id is not None
     lease_owner = provider_session_id if provider_work else campaign_id
     heartbeat_method = "provider_stream_heartbeat" if provider_work else "stream_heartbeat"
@@ -15,7 +27,7 @@ def request_attached(
             "Narration attachment is unavailable", "Narration attempt is not actively attached",
         }
     )
-    stopped, lock = Event(), Lock()
+    stopped, lock, answered = Event(), Lock(), Event()
     identities, replies = [], {}
     generation = None
     successful = 0
@@ -23,6 +35,13 @@ def request_attached(
     harness.send(identity, {"method": method, "params": params})
 
     def renew():
+        """One heartbeat in flight, like the renderer.
+
+        The owner creates the attempt's lease after it admits the request, so early
+        heartbeats are refused. Until one is acknowledged, ask again straight away, not
+        after the renderer's 2 s period: a request that finishes between 2 and 4 s would
+        otherwise see only refusals.
+        """
         while not stopped.is_set():
             with lock:
                 heartbeat_id = identity + "-heartbeat-" + str(len(identities))
@@ -30,8 +49,12 @@ def request_attached(
                 payload = {"campaign_id": lease_owner, "attempt_id": attempt_id}
                 if generation is not None:
                     payload["attachment_generation"] = generation
+                answered.clear()
             harness.send(heartbeat_id, {"method": heartbeat_method, "params": payload})
-            stopped.wait(2.0)
+            while not answered.wait(0.05):
+                if stopped.is_set():
+                    return
+            stopped.wait(2.0 if successful else 0.05)
 
     def accept(reply):
         nonlocal generation, successful
@@ -48,6 +71,7 @@ def request_attached(
             # The same benign race exists when the frontend first attaches or
             # the request finishes before its last queued heartbeat is handled.
             assert reply["error"]["message"] in unavailable, reply
+        answered.set()  # Only after the generation is recorded for the next heartbeat.
 
     worker = Thread(target=renew, daemon=True)
     worker.start()
@@ -75,5 +99,4 @@ def request_attached(
                     harness._pending_replies[incoming["id"]] = incoming
         if len(identities) > 1:
             assert successful, "No ordinary attachment heartbeat was acknowledged"
-    assert target["ok"] is True, target
-    return target["result"]
+    return target

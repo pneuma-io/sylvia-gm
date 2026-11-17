@@ -25,6 +25,15 @@ test('Loadout uses the selected entity and the owning Character surface actions'
  api.synchronizePanelActor('autodrone_alpha');assert.equal(api.state.characterInspection.id,'autodrone_alpha');
  assert.match(api.renderInventoryPanel(loadout.data,loadout),/<strong>Autodrone Alpha<\/strong>/);
 });
+// Inventory chips made from item ids read as names: a single-word id gets its capital, as multi-word ids already
+// do. Proper names (apostrophes) need the Ruleset package to declare them; that part of issue 128 stays open.
+test('Inventory chips give single-word item ids a capital, like multi-word ids',()=>{
+ const {api,loadout}=setup('vesper');
+ loadout.data.entities.vesper.inventory=['greatsword','flail','dungeoneers_pack','chain_mail','gp',
+  {item_id:'javelin',quantity:4},{name:'Named by the owner'},'Already Named','18_gp'];
+ const chips=[...api.renderInventoryPanel(loadout.data,loadout).matchAll(/<span class="panel-inventory-item">([^<]*)<\/span>/g)].map(match=>match[1]);
+ assert.deepEqual(chips,['Greatsword','Flail','Dungeoneers Pack','Chain Mail','Gp','Javelin \u00d7 4','Named by the owner','Already Named','18 Gp']);
+});
 test('Legacy Stance receipt displays Character without rewriting the native receipt',()=>{
  const {api}=setup('hex'),card={version:1,title:'Stance',summary:[{label:'Actor',value:'Hex',emphasis:false}],details:[],actions:[]};
  assert.match(api.rulesetCardMarkup(card,''),/>Character<\/span>/);assert.equal(card.summary[0].label,'Actor');

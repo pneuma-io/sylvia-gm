@@ -18,6 +18,7 @@ from sylvia_gm.provider._base import (
     ProviderResponse,
     ProviderStreamChunk,
     closing_provider_stream,
+    release_provider_idle,
 )
 from sylvia_gm.provider._hooks import HookContext
 
@@ -125,11 +126,15 @@ class _CompletedResponseObserver:
         self.retry_attempt = context.retry_attempt
         if self._exchange_id is not None and context.request_json is not None:
             request = _plain(context.request_json)
-            runtime = context.provider_key == "chatgpt_subscription"
+            runtime = context.provider_key in {"chatgpt_subscription", "claude_runtime"}
+            runtime_layer = (
+                "claude_code_boundary" if context.provider_key == "claude_runtime"
+                else "codex_app_server_boundary"
+            )
             self._sink(
                 {
                     "kind": "provider_runtime_exchange" if runtime else "provider_wire_request",
-                    "input_stage": "codex_app_server_boundary"
+                    "input_stage": runtime_layer
                     if runtime
                     else "provider_specific_wire_request",
                     "exchange_id": self._exchange_id,
@@ -139,7 +144,7 @@ class _CompletedResponseObserver:
                     "request": request,
                     "serialization": _serialization_projection(
                         request,
-                        layer="codex_app_server_boundary"
+                        layer=runtime_layer
                         if runtime
                         else "provider_client_request_representation",
                     ),
@@ -334,6 +339,7 @@ class AdminAuditedProvider(Provider):
         tool_call_deltas: list[object] = []
         finish_reason: str | None = None
         reported_effort: str | None = None
+        reported_tier: str | None = None
         status = "completed"
         try:
             with self._provider.hooks.scoped(observer):
@@ -355,6 +361,8 @@ class AdminAuditedProvider(Provider):
                             finish_reason = chunk.finish_reason
                         if chunk.provider_reported_reasoning_effort is not None:
                             reported_effort = chunk.provider_reported_reasoning_effort
+                        if chunk.provider_reported_service_tier is not None:
+                            reported_tier = chunk.provider_reported_service_tier
                         yield chunk
         except BaseException as error:
             status = "interrupted" if type(error).__name__ == "CancelledError" else "failed"
@@ -375,6 +383,7 @@ class AdminAuditedProvider(Provider):
                         "tool_call_deltas": tool_call_deltas,
                         "finish_reason": finish_reason,
                         "provider_reported_reasoning_effort": reported_effort,
+                        "provider_reported_service_tier": reported_tier,
                     },
                     "usage": _usage_projection(completed),
                     "retry_count": observer.retry_attempt,
@@ -383,3 +392,6 @@ class AdminAuditedProvider(Provider):
 
     async def close(self) -> None:
         await self._provider.close()
+
+    async def release_idle(self) -> None:
+        await release_provider_idle(self._provider)

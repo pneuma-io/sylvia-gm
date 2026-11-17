@@ -12,6 +12,7 @@ SUPPORTED_PROTOCOLS = frozenset(
         "anthropic_messages",
         "gemini_generate_content",
         "codex_app_server",
+        "claude_code",
     }
 )
 

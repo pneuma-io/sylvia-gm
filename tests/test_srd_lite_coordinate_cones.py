@@ -8,7 +8,7 @@ import pytest
 import yaml
 from scripts.srd_lite_coordinate_areas import bind_coordinate_cones
 from tests import test_srd_lite_vertical_cones as previous
-from tests.test_srd_lite_mass_cure_geometry import NAMESPACE, _calls
+from tests.srd_lite_mass_cure_geometry_fixtures import NAMESPACE, _calls
 
 from sylvia_gm.runtime import RulesetRuntime
 
@@ -27,7 +27,7 @@ def cones():
         if name not in closure:
             tool = deepcopy(data["tools"][name])
             tool["parameters"] = [
-                deepcopy(pool[row]) if isinstance(row, str) else row for row in tool["parameters"]
+                deepcopy(pool[row]) if isinstance(row, str) else row for row in tool.get("parameters", [])
             ]
             closure[name] = tool
             pending.extend(_calls(tool["effects"]))

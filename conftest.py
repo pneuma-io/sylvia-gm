@@ -1,0 +1,73 @@
+"""Give direct pytest runs the same import and fixture defaults as the journey runner."""
+
+import os
+import sys
+import tempfile
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parent
+sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
+if "SYLVIA_QA_FIXTURE_ROOT" not in os.environ:
+    owned = ROOT.parent / f"{ROOT.name}-checks"
+    owned.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault(
+        "SYLVIA_QA_FIXTURE_ROOT", tempfile.mkdtemp(prefix="pytest-", dir=owned)
+    )
+os.environ.setdefault(
+    "SYLVIA_RUNTIME_CACHE_DIR",
+    str(Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"]) / "runtime-cache"),
+)
+# Match the normal runner: optional evidence archival is an explicit selection.
+os.environ.setdefault("SYLVIA_RETAIN_SUCCESSFUL_FIXTURES", "0")
+if sys.platform == "linux":
+    # Saved-credential tests and the owner processes they start must never read or
+    # create the real user's credential key, so always replace any inherited value.
+    _fixture_root = Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"])
+    _fixture_root.mkdir(parents=True, exist_ok=True)
+    os.environ["XDG_STATE_HOME"] = tempfile.mkdtemp(prefix="xdg-state-", dir=_fixture_root)
+if "SRD_LITE_CANDIDATE" not in os.environ:
+    from scripts.journey_fixture_inputs import prepare_candidate
+
+    prepare_candidate(os.environ, ROOT, Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"]))
+
+
+def pytest_configure(config):
+    """Keep direct pytest's disposable data inside this invocation's work item."""
+    if config.option.basetemp is None:
+        attempts = Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"]) / "attempts"
+        attempts.mkdir(parents=True, exist_ok=True)
+        config.option.basetemp = tempfile.mkdtemp(prefix="pytest-", dir=attempts)
+
+
+@pytest.fixture(autouse=True)
+def _own_kept_runtime_threads(monkeypatch):
+    """Give each test its own pool of kept ChatGPT runtime threads, and close it afterwards.
+
+    The ChatGPT connection keeps its runtime thread by default, so a test that makes a
+    ChatGPT provider would otherwise leave its stand-in runtime and idle timer in the
+    process-wide pool for every later test in the same process.
+    """
+    from sylvia_gm.provider import _chatgpt
+
+    pool = _chatgpt._KeptThreads()
+    monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", pool)
+    yield
+    pool.close_all()
+
+
+def pytest_collection_modifyitems(items):
+    """Known failures still execute; an unexpected pass fails until the entry is reviewed.
+
+    Cases marked ``runs_on`` for another platform skip with a fixed reason, and the journey
+    runner excludes them by exact ID (see scripts/platform_exclusions.py).
+    """
+    import pytest
+    from scripts.known_test_defects import KNOWN_DEFECTS, failure_reason
+    from scripts.platform_exclusions import apply_runs_on
+
+    for item in items:
+        if item.nodeid in KNOWN_DEFECTS:
+            item.add_marker(pytest.mark.xfail(strict=True, reason=failure_reason(item.nodeid)))
+    apply_runs_on(items)

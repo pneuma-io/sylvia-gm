@@ -151,6 +151,7 @@ def test_picker_and_builder_use_setting_copy_without_installing_source(tmp_path)
     from tests.test_builder_references import open_character_interview
 
     rules, reference, setting = snapshot_drafts()
+    setting = replace(setting, record={**setting.record, "id": "pneuma.snapshot-world"})
     second = replace(setting, record={**setting.record, "id": "pneuma.second-world"})
     with AuthorityOwner.open(tmp_path / "picker.db", "snapshot-picker") as owner:
         with materialize_package_archive((rules, reference, setting)) as first_archive:
@@ -164,7 +165,7 @@ def test_picker_and_builder_use_setting_copy_without_installing_source(tmp_path)
         assert settings[second.record["id"]]["candidate_id"] == other.candidate_id
         draft = open_character_interview(
             owner,
-            choice["selection_id"],
+            settings[second.record["id"]]["candidate_id"],
             second.record["id"],
             None,
         )

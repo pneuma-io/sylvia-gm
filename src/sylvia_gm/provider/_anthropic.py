@@ -11,6 +11,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import re
 import time as _time
 from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
@@ -50,6 +51,97 @@ from sylvia_gm.provider._hooks import HookContext
 from sylvia_gm.provider._retry_after import retry_after_seconds
 
 logger = logging.getLogger(__name__)
+
+# Claude models known to accept a forced tool_choice ({"type": "any"} / {"type": "tool"}) and
+# `temperature` on anthropic-version 2023-06-01. Checked 2026-11-14 against Anthropic's model
+# migration, tool-use and thinking/effort documentation (platform.claude.com):
+# - Forced tool_choice returns HTTP 400 on Claude Fable 5.1 / 5.2, Mythos 5.1 / 5.2, Opus 5.5
+#   and Sonnet 5.5. Fable 5, Opus 5 and earlier, Sonnet 5 and earlier and Haiku 5.5 accept it.
+# - Any temperature returns HTTP 400 on Fable 5 / 5.1 / 5.2, Mythos, Opus 5.5 / 5 / 4.8 / 4.7
+#   and Sonnet 5; Sonnet 5.5 and Haiku 5.5 reject any value except the default.
+# Every other claude-* id, including models released after this table, gets neither, so a new
+# model costs at most a missing-call correction round instead of a hard 400. Non-Claude models
+# on this transport (MiniMax and other compatible endpoints) keep both unchanged.
+_CLAUDE_FORCED_TOOL_CHOICE = frozenset(
+    {
+        "claude-fable-5",
+        "claude-opus-5",
+        "claude-opus-4-8",
+        "claude-opus-4-7",
+        "claude-opus-4-6",
+        "claude-opus-4-5",
+        "claude-opus-4-1",
+        "claude-opus-4",
+        "claude-sonnet-5",
+        "claude-sonnet-4-6",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4",
+        "claude-haiku-5-5",
+        "claude-haiku-4-5",
+    }
+)
+_CLAUDE_TEMPERATURE = frozenset(
+    {
+        "claude-opus-4-6",
+        "claude-opus-4-5",
+        "claude-opus-4-1",
+        "claude-opus-4",
+        "claude-sonnet-4-6",
+        "claude-sonnet-4-5",
+        "claude-sonnet-4",
+        "claude-haiku-4-5",
+    }
+)
+_DATED_SUFFIX = re.compile(r"[-@]\d{8}$")
+
+
+def _claude_model_id(model_id: str) -> str | None:
+    """Return the bare Claude id (provider prefix and date suffix removed), or None."""
+    bare = _DATED_SUFFIX.sub("", model_id.strip().casefold().rsplit("/", 1)[-1])
+    return bare if bare.startswith("claude-") else None
+
+
+def accepts_forced_tool_choice(model_id: str) -> bool:
+    """Whether this wire model may be sent tool_choice "any" or a named tool."""
+    claude_id = _claude_model_id(model_id)
+    return claude_id is None or claude_id in _CLAUDE_FORCED_TOOL_CHOICE
+
+
+def accepts_temperature(model_id: str) -> bool:
+    """Whether this wire model may be sent a non-default temperature."""
+    claude_id = _claude_model_id(model_id)
+    return claude_id is None or claude_id in _CLAUDE_TEMPERATURE
+
+
+# Preserved thinking, from Anthropic's documentation as read on 2026-11-15 (not checked
+# against the live service): a thinking block is bound to the
+# top-level system, the tool set (full definitions, order-insensitive) and every earlier
+# message. Replaying one after any of those changed is HTTP 400 where the binding is enforced:
+# every account on these models; on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 only accounts
+# created from 31 August 2026, which Sylvia cannot know, so those rely on the reactive strip.
+_CLAUDE_THINKING_BINDING_EVERY_ACCOUNT = frozenset({"claude-fable-5-2", "claude-mythos-5-2"})
+
+
+def binds_thinking_for_every_account(model_id: str) -> bool:
+    """Whether every account on this wire model rejects a thinking block replayed after the
+    system prompt or tool set changed."""
+    return _claude_model_id(model_id) in _CLAUDE_THINKING_BINDING_EVERY_ACCOUNT
+
+
+def rejects_replayed_thinking(error: BaseException) -> bool:
+    """A 400 that names a thinking block's signature as invalid or bound elsewhere.
+
+    Matched narrowly on the documented wording (``Invalid `signature` in `thinking` block``,
+    a signature bound to a different conversation); never matched against a live response.
+    """
+    if not isinstance(error, InvalidRequestError):
+        return False
+    text = str(error).casefold()
+    return (
+        "signature" in text
+        and "thinking" in text
+        and ("invalid" in text or "different" in text or "does not match" in text)
+    )
 
 
 def _content_block_dict(block: Any) -> dict[str, Any]:
@@ -230,7 +322,7 @@ class AnthropicMessagesTransport(ProviderTransport):
             "max_tokens": kwargs.get("max_tokens", 4096),
             "stream": stream,
         }
-        if "temperature" in kwargs:
+        if "temperature" in kwargs and accepts_temperature(model_id):
             request["temperature"] = kwargs["temperature"]
         if "extra_headers" in kwargs:
             request["extra_headers"] = kwargs["extra_headers"]
@@ -238,6 +330,10 @@ class AnthropicMessagesTransport(ProviderTransport):
             request["thinking"] = kwargs["thinking"]
         if "output_config" in kwargs:
             request["output_config"] = kwargs["output_config"]
+        if "speed" in kwargs:
+            # Fast mode is a top-level body field the pinned SDK does not type yet.
+            # https://platform.claude.com/docs/en/build-with-claude/fast-mode (2026-11-12).
+            request["extra_body"] = {"speed": kwargs["speed"]}
 
         if system_text_or_blocks:
             request["system"] = system_text_or_blocks
@@ -255,7 +351,9 @@ class AnthropicMessagesTransport(ProviderTransport):
                     }
                 )
             request["tools"] = anthropic_tools
-            if kwargs.get("tool_choice") == "required":
+            # Without forcing, the API default "auto" applies and the session's
+            # missing-required-call correction recovers a prose reply.
+            if kwargs.get("tool_choice") == "required" and accepts_forced_tool_choice(model_id):
                 request["tool_choice"] = (
                     {"type": "tool", "name": anthropic_tools[0]["name"]}
                     if len(anthropic_tools) == 1
@@ -536,6 +634,14 @@ class AnthropicProvider(Provider):
         self._timeout_config = timeout_config or TimeoutConfig()
         self._default_headers = dict(default_headers or {})
         self._transport = AnthropicMessagesTransport()
+        from sylvia_gm.agent._context_ledger import LEDGER_MODE, context_mode
+
+        # First-party Anthropic only: other Messages-compatible endpoints are left untouched.
+        # The previous request assembly sends no breakpoints, as before.
+        self._cache_breakpoints = (
+            model_info.provider_key == "anthropic"
+            and context_mode(transport="anthropic_messages") == LEDGER_MODE
+        )
         self._consecutive_connection_errors = 0
         self._closed = False
 
@@ -623,7 +729,7 @@ class AnthropicProvider(Provider):
         request_options.pop("_retry_attempt", None)
         max_tokens = request_options.pop("max_tokens", self._max_tokens)
         request_options.pop("max_output_tokens", None)
-        return self._transport.format_request(
+        return self._format(
             model_id=self._model_info.wire_model_id,
             messages=messages,
             tools=tools,
@@ -631,6 +737,10 @@ class AnthropicProvider(Provider):
             max_tokens=max_tokens,
             **request_options,
         )
+
+    def _format(self, **arguments: Any) -> dict[str, Any]:
+        request = self._transport.format_request(**arguments)
+        return with_cache_breakpoints(request) if self._cache_breakpoints else request
 
     # ── Hook context helpers ──────────────────────────────────────
 
@@ -712,7 +822,7 @@ class AnthropicProvider(Provider):
             if isinstance(raw_retry_attempt, int) and not isinstance(raw_retry_attempt, bool)
             else 0
         )
-        request_dict = self._transport.format_request(
+        request_dict = self._format(
             model_id=self._model_info.wire_model_id,
             messages=messages,
             tools=tools,
@@ -811,7 +921,7 @@ class AnthropicProvider(Provider):
             if isinstance(raw_retry_attempt, int) and not isinstance(raw_retry_attempt, bool)
             else 0
         )
-        request_dict = self._transport.format_request(
+        request_dict = self._format(
             model_id=self._model_info.wire_model_id,
             messages=messages,
             tools=tools,
@@ -966,6 +1076,55 @@ class AnthropicProvider(Provider):
             return
         self._closed = True
         await self._client.close()
+
+
+_EPHEMERAL = {"type": "ephemeral"}
+_THINKING_BLOCKS = frozenset({"thinking", "redacted_thinking"})
+
+
+def with_cache_breakpoints(request: dict[str, Any]) -> dict[str, Any]:
+    """Mark the reusable prefix for the first-party Messages API prompt cache.
+
+    Breakpoints go on the last tool definition, the last system block and the last
+    non-thinking block of the last message. Thinking blocks never carry one. The request is
+    copied; native continuation blocks are not modified in place.
+    """
+    marked = dict(request)
+    tools = marked.get("tools")
+    if isinstance(tools, list) and tools:
+        tools = [dict(tool) for tool in tools]
+        tools[-1]["cache_control"] = dict(_EPHEMERAL)
+        marked["tools"] = tools
+    system = marked.get("system")
+    if isinstance(system, str) and system:
+        marked["system"] = [{"type": "text", "text": system, "cache_control": dict(_EPHEMERAL)}]
+    elif isinstance(system, list) and system and isinstance(system[-1], dict):
+        blocks = [dict(block) if isinstance(block, dict) else block for block in system]
+        blocks[-1]["cache_control"] = dict(_EPHEMERAL)
+        marked["system"] = blocks
+    messages = marked.get("messages")
+    if isinstance(messages, list) and messages:
+        # Every text message uses the block form, so a message serializes the same way
+        # whether or not it is the one carrying the moving breakpoint.
+        messages = [
+            {**message, "content": [{"type": "text", "text": message["content"]}]}
+            if isinstance(message, dict) and isinstance(message.get("content"), str)
+            and message["content"] else message
+            for message in messages
+        ]
+        last = messages[-1]
+        if isinstance(last, dict) and isinstance(last.get("content"), list):
+            last = dict(last)
+            blocks = [dict(block) if isinstance(block, dict) else block
+                      for block in last["content"]]
+            for block in reversed(blocks):
+                if isinstance(block, dict) and block.get("type") not in _THINKING_BLOCKS:
+                    block["cache_control"] = dict(_EPHEMERAL)
+                    break
+            last["content"] = blocks
+            messages[-1] = last
+        marked["messages"] = messages
+    return marked
 
 
 def _captured_error() -> Exception:

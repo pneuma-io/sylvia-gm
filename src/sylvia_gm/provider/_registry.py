@@ -304,7 +304,7 @@ class ProviderRegistry:
         Routes through ProviderFactory instead of hardcoding OpenAICompatProvider.
         """
         cache_key = (provider_key, model_info.id)
-        if cache_key in self._providers:
+        if cache_key in self._providers and model_info.transport != "claude_code":
             return self._providers[cache_key]
 
         cfg = self._provider_configs.get(provider_key)
@@ -330,7 +330,10 @@ class ProviderRegistry:
             default_model=model_info.id,
         )
         provider = ProviderFactory.create(config)
-        self._providers[cache_key] = provider
+        # Native Claude steps own a process and an event-loop lock. Give each resolved
+        # session its own adapter so concurrent campaigns do not share that state.
+        if model_info.transport != "claude_code":
+            self._providers[cache_key] = provider
         return provider
 
     # ── auto-discovery ────────────────────────────────────────────────

@@ -183,7 +183,11 @@ PACKAGE_RUNTIME_SCHEMA: dict[str, Any] = {
             "oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": True}]
         },
         "model_decision_boundary": {"type": "object", "additionalProperties": True,
-            "description": "Actor control may declare preparation {queue_field,intent,actor_parameter,prompt}; queued character events precede play and use the ordinary mechanics/choice path."},
+            "description": (
+                "Actor control may declare preparation {queue_field,intent,actor_parameter,prompt"
+                "}; queued character events precede play and use the ordinary mechanics/choice "
+                "path."
+            )},
         "model_decision_scope": {"type": "object", "additionalProperties": True},
     },
     "additionalProperties": False,
