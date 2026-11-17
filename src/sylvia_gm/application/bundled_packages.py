@@ -116,6 +116,7 @@ def _package_payload(root: Path) -> dict[str, bytes]:
     """Read one checked-in package with checkout-independent text bytes."""
 
     source_names = (
+        "assets",
         "campaigns",
         "characters",
         "companions",

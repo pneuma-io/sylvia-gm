@@ -29,3 +29,15 @@ He genuinely believes Riftborn are victims as much as threats — souls displace
 ## Behind the Screen
 
 Voss's anti-Riftborn policies are genuine, but they're also politically useful. Keeping Riftborn marginalized keeps the Warrens contained, keeps the Returners at Waystation, keeps Thornwall's settled population comfortable. Voss doesn't think of it this way — but his politics and his power are mutually reinforcing, and he's never had to examine that too closely. A campaign that forces him to confront the consequences of his policies — the lives destroyed, the families separated — might break him. Or it might make him double down.
+
+## Appearance and artwork
+
+An elderly human default with fair aged skin, a broad long rectangular face, heavy white brows, grey-blue eyes and neatly combed receding white hair with clean sideburns. Forest-green, gold-brown and ivory fine formal layers and flat shoes convey his public status. Both hands are empty; his expression is formal and patient. No private grief, new house emblem or relation to Castellan Voss is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/089a253bc56c34e991e9924fcac71517a137f9069975332a733e710e4c0987d3.png)
+
+[Full-body reference](../assets/characters/4138ae482571e711fe134164d44389424032679d3222a894fefdf8c6f6139e3d.png)
+
+[Multiview reference sheet](../assets/characters/d8d5d609d6de9bd52d36490c9d31dffc7d83e83e45360fd9b915d614cd119301.png)

@@ -21,3 +21,15 @@ He's a villain in the council's eyes and a folk hero in the Warrens — the guar
 ## Hook
 
 Gareth has called a moot — a gathering of all Jackal bands. He wants to unite them into a single organization under his command. Half the bands support him. Half would rather burn the network down than answer to a king. The moot is in three weeks. Whatever happens, the trade routes are about to change.
+
+## Appearance and artwork
+
+A stocky mature human default with warm brown skin, square heavy jaw, brown eyes, a shaved scalp and short auburn beard. Worn mail and brown riding leathers, a plain muted red sash and flat riding boots keep his disciplined public role clear. A sword stays sheathed at his left hip and both hands are empty. The design depicts no violence, invented heraldry or moot outcome.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/43dbb9d1d66d32b1225c8dba07c92784ea6a1f682e1ac0146229ee75382b80c9.png)
+
+[Full-body reference](../assets/characters/f1429453050d4fbe618a54bb84edf6bcb228cf83598d93cc45b1ea21dee8a5e7.png)
+
+[Multiview reference sheet](../assets/characters/f47cedd06e0ffc380397f0dad9940ff1391ae68b4569af8e8e6d45d53fdee114.png)

@@ -21,3 +21,15 @@ Glass is calm, diplomatic, and perpetually tired. He's the buffer between the Ch
 ## Hook
 
 Glass has been meeting with Athenaeum scholars in secret — not for diplomacy, but for research. He's been comparing Church doctrine with Warden inscriptions, looking for evidence. What he's found: the inscriptions are older than the Wardens. Much older. He doesn't know what that means yet. He's afraid to find out.
+
+## Appearance and artwork
+
+A mature heavyset human default with fair warm skin, a round face, blue-grey eyes, thinning sandy hair and a neat greying beard. Blue-grey, oatmeal and umber plain diplomatic layers, a narrow belt and flat shoes accompany a patient tired half-smile. Both hands are empty. His private research remains hidden and no religious emblem or power is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/26b8f257c6d0a3bed9f0023d185ee5440469df80607997fda7aab0fa343a26c1.png)
+
+[Full-body reference](../assets/characters/7252ed208681c4b6060f3ebd15bc7214df1cb4e4df6ebca1999dcccd04d537a9.png)
+
+[Multiview reference sheet](../assets/characters/714e6286c20b11659081120e5451268413ed2dac958472e4129569e8a613c9be.png)

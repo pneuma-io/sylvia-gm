@@ -44,6 +44,33 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
+    "image-art": [
+        "tests/test_image_art.py",
+        "tests/test_image_art_export.py",
+        "tests/test_image_subscription.py",
+        "tests/test_character_visuals.py",
+        "tests/test_character_art_import.py",
+        "tests/test_character_transfer.py",
+        "tests/test_character_art_editing.py",
+        "tests/test_character_art_pending_reuse.py",
+        "tests/test_character_art_workflow.py",
+        "tests/test_character_art_publication.py",
+        "tests/test_image_art_session_handoff.py",
+        "tests/test_ready_character_art.py",
+        "tests/test_character_art_handoff.py",
+        "tests/test_bundled_character_art.py",
+        "tests/test_prepared_enemy_art.py",
+        "tests/test_inherited_character_art.py",
+        "tests/test_plan_character_art.py",
+        "tests/test_authored_character_art.py",
+        "tests/test_image_hooks.py",
+        "tests/test_authored_design_inputs.py",
+        "tests/test_gm_character_art_tools.py",
+        "tests/test_image_png_background.py",
+        "tests/test_prepared_group_art.py",
+        "tests/test_required_plan_character_art.py",
+        "tests/test_setting_art_styles.py",
+    ],
     "python-quality": ["tests/test_python_quality.py"],
     "launch-lite-compatibility": [
         "tests/test_launch_lite_safety.py",
@@ -320,6 +347,7 @@ PYTHON_JOURNEYS = {
         'tests/test_tactical_grid_frontend.py',
     ],
     "interruption-and-recovery": [
+        "tests/test_draft_candidate_recovery.py",
         "tests/test_fc_recovery_composition.py",
         "tests/test_session_history_pages.py",
         "tests/test_session_message_reads.py",
@@ -633,6 +661,10 @@ PYTHON_JOURNEYS = {
 FULL_ONLY_JOURNEYS = frozenset({"full-only-slow"})
 
 UI_JOURNEY = [
+    "tests/frontend_image_art.browser.cjs",
+    "tests/frontend_character_transfer.browser.cjs",
+    "tests/frontend_character_transfer_bridge.test.cjs",
+    "tests/frontend_image_art_surfaces.browser.cjs",
     "tests/frontend_campaign_rules_update.browser.cjs",
     "tests/frontend_character_equipment.test.cjs",
     "tests/frontend_character_selection.test.cjs",

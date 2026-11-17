@@ -45,3 +45,15 @@ The most common Rift-born seepage: raw, violet-tinged protoplasm that pools wher
 
 ## Actions
 **Pseudopod.** +3 to hit, 4 (1d6 + 1) bludgeoning + 7 (2d6) acid. Before dealing damage, nonmagical metal armor worn by the target takes a permanent -1 penalty to its AC. Armor destroyed if penalty reaches -5.
+
+## Appearance and artwork
+
+An editable faceless violet-protoplasm Ooze default: one low oily pool with a single raised blunt attached ridge, smoky aubergine/lilac translucence and nested inward fluid shelves beneath wet slate skin. No animal face/limbs, victim or memory-erasure demonstration; ordinary oily-pool/wet-rock disguise while motionless remains.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/fdf10834c9e6b262bca07faaf18e4e2baca5ffe548af557c6540a9e45194e749.png)
+
+[Full-body reference](../../assets/characters/c70b34b3abec0aaff482dc0fbdc58f6ec4640340071d2a773d0d3264952faa7e.png)
+
+[Multiview reference sheet](../../assets/characters/0a4ac36c4418ecc3d809e271b6755b436b88ee446fd63fce8cbb2b84c28bcd51.png)

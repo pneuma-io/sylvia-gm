@@ -38,3 +38,15 @@ The greatest of the Warden constructs still active — a colossus built to prote
 **Multiattack.** Two fist attacks.
 **Fist.** +7 to hit, reach 5 ft., one target. 11 (2d6 + 4) bludgeoning.
 **Shield.** When a creature makes an attack against the wearer of the amulet, the guardian grants a +2 bonus to AC if within 5 ft.
+
+## Appearance and artwork
+
+A towering Large editable Warden construct default with pale dressed-stone slabs, dark aged-bronze braces, one rectangular head and two amber eye slits. Two heavy fists and broad column-like legs stay grounded. Nested inward chest arches suggest architectural depth inside an intact body. No held weapon, command-rod, amulet wearer, specific Door or new ability is introduced.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/e2ca4820aa4b939a616d896cb32a7d7a524df354f2453700d4ab631be283fbb0.png)
+
+[Full-body reference](../../assets/characters/c906d371a6119f52245905661ea12875362f8a3a6472a652c3d0e08ebb88161a.png)
+
+[Multiview reference sheet](../../assets/characters/fd0816bd02ea9a7aebbaf462e8ced3566562f15ad70e4e30983af0f0fdb311e1.png)

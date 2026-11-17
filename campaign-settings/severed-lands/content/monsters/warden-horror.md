@@ -48,3 +48,15 @@ A Warden creation that even they came to fear — a flesh-construct stitched tog
 ## Actions
 **Multiattack.** Two longsword attacks.
 **Longsword.** +6 to hit, 8 (1d8 + 4) slashing.
+
+## Appearance and artwork
+
+An adult-proportioned composite humanoid construct with a bald mature head, dull grey/violet eyes and intact ash-grey/olive skin panels joined by closed healed stitch seams. Two arms and legs retain ordinary five-fingered hands. Dark steel plate and charcoal undercloth accompany a lowered right-hand longsword and left-arm unmarked heater shield. Restrained opaline folds remain beside intact seams; no victim identity is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/e55119c2e5b66795508f21e14807fbb5a8b292e9a594dab4155bdd2392aa9cea.png)
+
+[Full-body reference](../../assets/characters/ef1eaee61684e640c861c423b719c10ea963113c7c0d5edce665234da6c5cc3b.png)
+
+[Multiview reference sheet](../../assets/characters/6a25114897e22d39ffeffc29157fee83d2cf65332d1a1dd3e643a8f1c1e8084a.png)

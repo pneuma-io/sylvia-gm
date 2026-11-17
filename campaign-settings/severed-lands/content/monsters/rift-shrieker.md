@@ -34,3 +34,15 @@ A Rift-touched fungal sentinel that grows in clusters near Anchor Door fragments
 
 ## Actions
 **Shriek.** When bright light or a creature is within 30 feet, the rift shrieker emits a piercing shriek audible up to 300 feet. Continues until the disturbance moves out of range and for 1d4 rounds after.
+
+## Appearance and artwork
+
+An editable single Shrieker default remains ordinary-looking fungus: low umber/mauve dome cap with cream scalloped rim, pale buff thick stalk and connected mycelial base. Natural subdued violet-grey gills repeat inward. No face, limbs, visible alarm effect or added trait; its authored fungal disguise remains.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/48d506740664c87b9c65e36c9b0770d61159aac06f01e617f9cee6f7f492d2a0.png)
+
+[Full-body reference](../../assets/characters/5229a0e30f464ca8c9bc16c7aa120e2e5cb09ba56cfbfe520e6dad8e09844537.png)
+
+[Multiview reference sheet](../../assets/characters/b1655f6293a01f1bc21466db35be980cfb60c1f29f71ee4c660b8185274b19f1.png)

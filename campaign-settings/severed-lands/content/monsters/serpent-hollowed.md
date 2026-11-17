@@ -43,3 +43,15 @@ A Hollowed whose body has elongated and flattened through prolonged Rift exposur
 **Multiattack.** Two scimitar attacks.
 **Scimitar.** +3 to hit, 4 (1d6 + 1) slashing.
 **Shortbow.** +3 to hit, range 80/320 ft., 4 (1d6 + 1) piercing + 7 (2d6) poison.
+
+## Appearance and artwork
+
+An anonymous adult humanoid upper body with olive-grey fine scales, angular face, amber eyes and short blue-black hair merges into one broad flattened serpentine coil, without human legs. Two arms retain a lowered right-hand scimitar and empty left hand; a plain shortbow sits behind the left shoulder. An opaque moss cross-wrap covers the chest/upper hips. Nested scale contours and opal-violet folds create inner depth in the single continuous tail. No former human name, ancestry or new ability is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/4db27bd7f9556103889d0f3175d978bd9e8358813db0ecc0028c6009556c8a3c.png)
+
+[Full-body reference](../../assets/characters/c165e34331bed4b400087a66d58c5ce8bd5b053cb1b91d1ca3e63b9425281223.png)
+
+[Multiview reference sheet](../../assets/characters/76a1f84b66d5fc2801c98ee726c8fd20b95f08b7b19c0101c64aad3d7e46f556.png)

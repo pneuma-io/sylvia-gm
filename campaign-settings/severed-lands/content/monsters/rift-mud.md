@@ -34,3 +34,15 @@ A sluggish but relentless elemental formed where Rift pools saturate soil after 
 ## Actions
 **Fists.** +3 to hit, reach 5 ft., one target. 4 (1d6 + 1) bludgeoning.
 **Mud Breath (Recharge 6).** 15-ft. cone. DC 11 Dex save or restrained 1 min. Repeat save each turn.
+
+## Appearance and artwork
+
+An editable small faceless mud elemental default: one wet brown/olive clay-and-peat mound with two blunt attached slurry lobes and a pooled base. Nested sediment folds recede into dark inner chambers, with restrained cool-violet seams. No victims, organs, face or winged mephit anatomy; ordinary motionless mud-mound disguise remains.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/7936b97574b42192794556870ec6372af5c2dddfbe8f559229afdb877f328549.png)
+
+[Full-body reference](../../assets/characters/a27b2a60faeb1bb151733660fb9fd157d9653da353af303f9c931cc91a339547.png)
+
+[Multiview reference sheet](../../assets/characters/53b37c7a701ca72e30db82b8e6ba091b815a89c79b775373b5d54ad56f485e5b.png)

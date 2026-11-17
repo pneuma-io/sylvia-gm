@@ -19,3 +19,15 @@ Dorn is the council member most likely to break ranks on Riftborn issues. He res
 ## Hook
 
 Dorn's foremen have been reporting theft — Warden-grade metals disappearing from the foundries, small quantities, impossible to trace. Dorn suspects House Merrick. The truth is worse: someone is forging Warden weapons in the Warrens, and they're getting their materials from Dorn's own supply chain.
+
+## Appearance and artwork
+
+A heavy-built mature human default with light olive skin, a broad square face, blunt nose, brown eyes, receding dark hair and a short square greying beard. Charcoal, russet and cream merchant layers and sturdy flat boots convey practical prosperity. Both hands are empty. The image reveals no metal-theft evidence, new artifact or invented house heraldry.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/9b7cd5e63c12a730076d9d959053ba621a717b5eec8863834c437c34f4e03af7.png)
+
+[Full-body reference](../assets/characters/66dd0f5cacc14eed7ab20ee4e4d6925368196ad920a73f0615bfa5c22c4578cc.png)
+
+[Multiview reference sheet](../assets/characters/f9e026a2e24ddc23dd555ca6993d9a04d518e403c9ee71d46c766d7ee501f53b.png)

@@ -4,11 +4,16 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 function harness({ files = [{ name: 'selected.txt' }], failure, reply } = {}) {
-  const calls = [], inputs = [];
+  const calls = [], inputs = [], links = [];
   const document = {
     addEventListener() {},
     body: { appendChild() {} },
     createElement(kind) {
+      if (kind === 'a') {
+        const link = { clicked: false, click() { link.clicked = true; }, remove() {} };
+        links.push(link);
+        return link;
+      }
       assert.equal(kind, 'input');
       const events = {};
       const input = {
@@ -35,7 +40,7 @@ function harness({ files = [{ name: 'selected.txt' }], failure, reply } = {}) {
     },
   };
   vm.runInNewContext(fs.readFileSync(require.resolve('../src-tauri/frontend/webui-bridge.js'), 'utf8'), context);
-  return { invoke: context.window.__sylviaBrowserInvoke, calls, inputs };
+  return { invoke: context.window.__sylviaBrowserInvoke, calls, inputs, links };
 }
 
 test('lost upload response explains uncertain saved work without retry or false cancellation', async () => {
@@ -102,3 +107,30 @@ for (const code of ['outcome_unknown', 'webui_unavailable', 'command_rejected'])
     assert.equal(h.calls.length, 1);
   });
 }
+
+test('Character File import uploads one chosen Sylvia character file for preview only', async () => {
+  const h = harness({ files: [{ name: 'vela.sylvia-gm-character' }] });
+  assert.equal((await h.invoke('preview_character_bundle_file')).status, 'done');
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.calls[0].url, '/api/upload/character_bundle');
+  assert.equal(h.inputs[0].accept, '.sylvia-gm-character');
+  assert.equal(h.inputs[0].multiple, false);
+  assert.deepEqual(JSON.parse(h.calls[0].options.body.fields[0][1]), {});
+});
+
+test('Character File export sends the selected identity and downloads the owner-bound file', async () => {
+  const reply = { status: 'exported', download: '/api/download/one', filename: 'sylvia.sylvia-gm-character',
+    export: { image_count: 1, archive_sha256: 'b'.repeat(64) } };
+  const h = harness({ reply: { ok: true, async json() { return { ok: true, result: reply }; } } });
+  const selected = { exportId: 'export-character-one', artifactId: 'vela-0123456789abcdef',
+    expectedContentSha256: 'a'.repeat(64), kind: 'character_profile' };
+  assert.deepEqual(await h.invoke('export_character_file', { ...selected, suggestedName: 'Vela' }), reply);
+  const body = JSON.parse(h.calls[0].options.body);
+  assert.equal(h.calls[0].url, '/api/command');
+  assert.equal(body.method, 'export_character_file');
+  assert.deepEqual(body.params, selected, 'The desktop-only file name never reaches the owner');
+  assert.equal(h.links.length, 1);
+  assert.equal(h.links[0].href, '/api/download/one');
+  assert.equal(h.links[0].download, 'sylvia.sylvia-gm-character');
+  assert.equal(h.links[0].clicked, true);
+});

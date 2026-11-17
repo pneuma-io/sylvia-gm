@@ -50,3 +50,15 @@ A column of violet-white flame that burns cold — the Rift's energy expressing 
 
 **Multiattack.** The elemental makes two touch attacks.
 **Touch.** Melee Weapon Attack: +6 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) fire damage. If the target is a creature or a flammable object, it ignites. Until a creature takes an action to douse the fire, the target takes 5 (1d10) fire damage at the start of each of its turns.
+
+## Appearance and artwork
+
+A faceless editable Large Rift Fire default: one upright violet-white flame column with a pale core, deep violet/blue shadows and inward-folded flame chambers. Attached tongues and sparse shimmering ash stay within one volume. Its cold-flame lore, fire-damage mechanics and water susceptibility remain unchanged; no humanoid body, named Door or new power is added.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/8cc6d28e7c6e209d58582c36325edf06af1414fcd9aabc9d65538e518f8e34ee.png)
+
+[Full-body reference](../../assets/characters/7b2b9dac507fbc4c8cbc75ee624b1fbd81275836ec154eeb100993897df3a61e.png)
+
+[Multiview reference sheet](../../assets/characters/29b4ff040e7909af8e7fe57ca702b6f5fa039e3b37b4f36481660c309c7a0f98.png)

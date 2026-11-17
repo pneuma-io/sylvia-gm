@@ -15,3 +15,15 @@ Briar knows the Margin's edge better than anyone — which plants are safe, whic
 ## Personality
 
 Briar is practical, independent, and completely comfortable in the Margin's borderlands. She treats foraging like a conversation with the forest — the Margin tells you what's available if you listen. Most people don't listen. Briar does.
+
+## Appearance and artwork
+
+A lean adult human default with bronze-brown skin, a long cheekboned face, hazel eyes and two slim dark braids down her back. Olive, ochre and grey-brown practical layers and flat boots suit edge foraging. A closed canvas bag sits at her left hip and a small knife stays sheathed at her right; both hands are empty. No specific herb, deeper expedition or magical trait is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/caefe90ec95a044ae7e0238c5c47ae1b5840a27125be4beb6eae6f7ce2925f94.png)
+
+[Full-body reference](../assets/characters/b447f9d200432620ed11291b171bb03664aa59784ed900d8c95fa2e01dbb8f7e.png)
+
+[Multiview reference sheet](../assets/characters/0d1c3422f95b8c72ae8e7e5d126b1d9424cb507b72e1d75a6cd709ae2c21b499.png)

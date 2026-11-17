@@ -21,3 +21,15 @@ Trask is energetic, direct, and terrible at hiding her ambitions. She's the only
 ## Hook
 
 Trask's Nexus negotiations have been discovered — not by the council, but by the Jackals. The Tollmen are demanding a cut of the new route's revenue in exchange for not informing Lord Voss. Trask needs the situation resolved quietly. She's willing to pay — in gold, in trade concessions, in political favors — to anyone who can make the Tollmen go away.
+
+## Appearance and artwork
+
+A young adult human default with cool fair freckled skin, a narrow diamond face, bright grey-green eyes and a sharp copper-red bob. Marine-blue, ivory and muted rust tailored council layers over trousers and practical low-heeled boots suit her energetic public manner. Both hands are empty. The design assigns no naval rank or house emblem and reveals no private negotiations.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/4f7ec221de00acc2752a86bc7257d6e20165eae9df0b9a4ee00279999fc12778.png)
+
+[Full-body reference](../assets/characters/f50ea982b74750f2a3008b80c7963ca34480d50ef5b7bc8547329c6eb5c645d1.png)
+
+[Multiview reference sheet](../assets/characters/91922d8492a8a62e2eb0bd1f0e43beb85379cc702422bfceafde3d42d4f7ead2.png)

@@ -30,3 +30,15 @@ A Rift-touched reptile whose petrifying gaze channels the Veil's boundary-lockin
 
 ## Actions
 **Bite.** +5 to hit, 10 (2d6 + 3) piercing + 7 (2d6) poison.
+
+## Appearance and artwork
+
+A squat eight-legged reptile with four pairs of short stout clawed legs, a low continuous lizard torso, one broad blunt head and a heavy tapered tail. Moss-olive and slate scales contrast with a dull ochre underside. Two amber eyes have nested angular gold-violet iris structure beneath a heavy brow. Stepped keratin chevrons along neck and spine give the living growth a recursive rhythm. This is a living reptile; its gaze ability is not represented by an added beam or power.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/d4acc50174e717788b062d63dce8e5f3c701db6fbac0100586aca95fee465fdb.png)
+
+[Full-body reference](../../assets/characters/b18e7d0fc23682f762cedf742426549d808b1c99ff1484eea4af81284d9ef79d.png)
+
+[Multiview reference sheet](../../assets/characters/558e1cfdd7f40d586f3057dd598837d677e52ec4979019ca975b43755f2779d4.png)

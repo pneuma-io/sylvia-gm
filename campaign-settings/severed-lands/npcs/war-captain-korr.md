@@ -23,3 +23,15 @@ He respects strength. A party that fights well might earn his acknowledgment —
 ## Behind the Screen
 
 Korr has information about the missing Anchor Doors — something his scouts found in the deep Cairnfields. He's sent a message to Waystation requesting a meeting with V. What he wants in exchange, and whether he's negotiating in good faith, is up to the DM. He might be a warlord seeking legitimacy. He might be a soldier who's found something that scares even him.
+
+## Appearance and artwork
+
+A mature human-like editable default with deep bronze skin, a strong angular face, brown eyes, a small black topknot and a short neat beard. A powerful upright build wears plain ash-grey half-plate over maroon and charcoal layers. A greatsword remains sheathed diagonally on his back, hilt above the right shoulder. His measured expression does not reveal private plans, homeworld or ancestry.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/fbc3eef1295f3500f0f44b6ccd8ce3443d1f924090abaf2686d8d37761f35867.png)
+
+[Full-body reference](../assets/characters/3dd0bfe2c6116448cfb401ca5f0ee7a3169cd10dbd78a39bc31c3159434bcce9.png)
+
+[Multiview reference sheet](../assets/characters/24668e959050fc56757ae4002414dc46635108eda2a4130e00685ff93c71fc18.png)

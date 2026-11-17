@@ -151,6 +151,8 @@ RELATION_UNIQUE_KEYS: Mapping[str, tuple[tuple[str, ...], ...]] = {
         ("package_id", "version", "content_sha256", "kind"),
     ),
     "package_blobs": (("blob_sha256",),),
+    "image_requests": (("operation_id",),),
+    "image_selections": (("scope_id", "target_id", "purpose"),),
     "package_blob_chunks": (("blob_sha256", "chunk_order"),),
     "package_staging_chunks": (("install_id", "file_order", "chunk_order"),),
 }
@@ -383,6 +385,7 @@ def verify_recovery_receipts(connection: sqlite3.Connection) -> None:
                     campaign_archive.PREDECESSOR_SOURCE_AUTHORITY_SCHEMA_VERSION,
                     campaign_archive.PRE_REASONING_SOURCE_AUTHORITY_SCHEMA_VERSION,
                     campaign_archive.PRE_EFFORT_SOURCE_AUTHORITY_SCHEMA_VERSION,
+                    campaign_archive.PRE_IMAGE_SOURCE_AUTHORITY_SCHEMA_VERSION,
                     campaign_archive.SOURCE_AUTHORITY_SCHEMA_VERSION,
                 }
                 or payload["source_authority_schema_identity_sha256"]
@@ -467,7 +470,18 @@ def _row_status(
     if not hits:
         return "insert"
     expected = tuple(row[column] for column in columns)
-    if len(hits) != 1 or next(iter(hits.values())) != expected or table not in _REUSABLE_TABLES:
+    existing = next(iter(hits.values()))
+    equivalent = existing == expected
+    if not equivalent and table == "package_candidates":
+        # Activation tracks local usage of an otherwise identical candidate. Reuse
+        # preserves the recipient's marker and requires every other field to match.
+        status = columns.index("status")
+        equivalent = (
+            existing[status] in ("validated", "activated")
+            and expected[status] in ("validated", "activated")
+            and all(existing[i] == expected[i] for i in range(len(columns)) if i != status)
+        )
+    if len(hits) != 1 or not equivalent or table not in _REUSABLE_TABLES:
         raise CommandRejected(
             "Portable recovery collision conflicts with existing authority",
             code="portable_recovery_collision",

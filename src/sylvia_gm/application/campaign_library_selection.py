@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
+from sylvia_gm.application.bundled_character_art import bundled_source_visuals
 from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_plan_sources import (
     CampaignPlanToolAuthority,
@@ -177,7 +178,7 @@ def read_required_plan_characters(
     *,
     require_complete: bool = False,
 ) -> tuple[ReusableParticipant, ...]:
-    """Admit complete Setting files against the selected Ruleset's participant schemas."""
+    """Admit exact Setting files and reuse shared art only when embedded visuals are absent."""
     references = _required_character_references(policy)
     identities = [ref.character_id for _, ref in references]
     if len(set(identities)) != len(identities):
@@ -209,6 +210,15 @@ def read_required_plan_characters(
                 problem = str(error)
                 validation_errors = getattr(error, "diagnostics", ())
                 continue
+            if participant.visuals is None:
+                visuals = bundled_source_visuals(
+                    sources.setting.package_id, reference.path, source.encode("utf-8"),
+                    subject_name=participant.name,
+                    campaign_setting_ids=frozenset({sources.setting.package_id}),
+                )
+                if visuals is not None:
+                    # Shared art is an association; preserve the authored file's identity.
+                    participant = replace(participant, visuals=visuals)
             participants.append(participant)
             break
         else:
@@ -455,6 +465,11 @@ def materialize_library_party(
         )
         if item.source_migration is not None:
             selected_party[-1]["character_file"]["source_migration"] = item.source_migration
+        visuals = owner._store.images.published_visuals(
+            item.artifact_id, item.content_sha256
+        ) or item.visuals
+        if visuals is not None:
+            selected_party[-1]["character_file"]["visuals"] = visuals
     state = materialize_starting_world(
         selection.plan.plan,
         entity_reference=selection.entity_reference,

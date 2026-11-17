@@ -17,3 +17,15 @@ The Inkwell surfaced recently in the Thornwall market, selling maps. They looked
 ## Personality
 
 The Inkwell is distracted, brilliant, and increasingly difficult to communicate with. The Hollowing is progressing — they lose track of conversations, respond to things no one else said, stare at empty corners for minutes at a time. But their maps remain flawless. Whatever the Rift is showing them, it's real. The question is whether the Inkwell is mapping the Hollows or something the Hollows is becoming.
+
+## Appearance and artwork
+
+An older androgynous human editable default with a thin stooped build, cool olive skin, a long hollow-cheeked face, fully violet irises and short iron-grey hair around a high balding crown. Faded midnight-blue, dull orange, olive and grey clothes remain ordinary. A closed map case sits at their left hip and a tightly rolled blank-backed sheet in their right hand reveals no route or private discovery.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/3c5e95421cb21fb01be29bf91a485dd484afeeecad0344ed43584782dbc7d5ea.png)
+
+[Full-body reference](../assets/characters/e8a2d9559987d194bc46be8d51d08a8e69e0141be9e4ff8a79d1fc3f090facf1.png)
+
+[Multiview reference sheet](../assets/characters/c80c35080c9e0bf62c372452b56d835114182d1fdd43725f7212685ba1871aca.png)

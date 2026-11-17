@@ -35,3 +35,15 @@ A cluster of violet-capped mushrooms that sprout exclusively near active Rift po
 ## Actions
 **Multiattack.** 1d4 Rotting Touch attacks.
 **Rotting Touch.** +2 to hit, 4 (1d8) necrotic.
+
+## Appearance and artwork
+
+An editable active Violet Fungus default: one connected cluster of plum-violet caps on pale-lilac stems, two larger front caps, smaller rear growth and a shared hyphal base. Nested under-cap lamellae give inward Rift depth; active glow/movement does not replace its normal motionless fungus disguise. No eyes, humanoid limbs, extra attack or harvesting outcome is added.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/a13d96012a15cd4439fba70ff8161377f9332d60b06e0a96147da7468b127430.png)
+
+[Full-body reference](../../assets/characters/9814fb1e359d0f4d3f35434f770525adc0a43cfe8b6abe4a211735d7f4991405.png)
+
+[Multiview reference sheet](../../assets/characters/762ef02bc49bab91d597e4ae5ba34319c084b19f5964ac2329cf1d7d83960492.png)

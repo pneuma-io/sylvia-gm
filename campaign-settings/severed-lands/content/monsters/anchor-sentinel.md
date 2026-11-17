@@ -32,3 +32,15 @@ A minor construct left behind by the Wardens to watch over a dormant Anchor Door
 **Bite.** +1 to hit, 2 (1d6 - 1) piercing.
 **Eye Rays.** The sentinel shoots up to two of the following magical eye rays at one or two creatures within 90 feet: 1. Confusion Ray (WIS save or can't take reactions, roll d8 for behavior). 2. Paralyzing Ray (CON save or paralyzed 1 min). 3. Fear Ray (WIS save or frightened 1 min). 4. Wounding Ray (CON save or 16 (3d10) necrotic). Recharges 5-6.
 **Create Food and Water.** The sentinel magically creates enough food and water to sustain one Medium creature for 24 hours.
+
+## Appearance and artwork
+
+A hovering limbless editable default with one ivory-stone round shell in a dull bronze ring, a central violet eye, four small amber lens-eyes on attached stone brackets and one bite aperture. Cracks reveal nested inward ring chambers and restrained mineral channels. Its shadow establishes hovering; no new ray, satellite, Door location or mechanical classification is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/a582fc1fe00bd0fe5093a676b48af4c3fd4523affa1d3f4550ff2fb5fb62c31a.png)
+
+[Full-body reference](../../assets/characters/4fd3f7e265b415a06577c30630ab0a096f298a9f9e0459d17d12de247ac9e30c.png)
+
+[Multiview reference sheet](../../assets/characters/c83b9bc148eb859faaa366be0de7c191199139a90bfa8e3d193f9ee92f16851f.png)

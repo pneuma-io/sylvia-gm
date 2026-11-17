@@ -2,7 +2,9 @@
 
 from sylvia_gm.interfaces import _local_diagnostics, webui
 
-DISPATCH = ('action_sequence',
+DISPATCH = ('image_art', 'preview_character_bundle_file',
+ 'confirm_character_bundle_import', 'cancel_character_bundle_import', 'export_character_file',
+ 'action_sequence',
  'admin_full_audit_record',
  'admin_full_audit_status',
  'adopt_campaign_rules_update',
@@ -122,7 +124,8 @@ DISPATCH = ('action_sequence',
  'trash_campaign',
  'validate_provider_model')
 
-WEBUI = ('action_sequence',
+WEBUI = ('image_art', 'confirm_character_bundle_import', 'cancel_character_bundle_import',
+ 'action_sequence',
  'admin_full_audit_record',
  'admin_full_audit_status',
  'adopt_campaign_rules_update',
@@ -344,7 +347,8 @@ DIAGNOSTICS = ('action_sequence',
  'trash_campaign',
  'validate_provider_model')
 
-EXPORTS = {'backup_authority': ('backups', '.sqlite3'),
+EXPORTS = {'export_character_file': ('exports', '.sylvia-gm-character'),
+ 'backup_authority': ('backups', '.sqlite3'),
  'export_campaign_file': ('exports', '.sylvia-gm-campaign'),
  'export_campaign_plan_file': ('exports', '.sylvia-gm-plan'),
  'export_package_candidate_file': ('exports', '.sylvia-gm-package')}
@@ -363,7 +367,7 @@ def test_command_registry_preserves_exact_protocol_sets():
 
     names = {name for name, command in COMMAND_REGISTRY.items() if command.handler is not None}
     assert names == set(DISPATCH)
-    assert len(names) == 119
+    assert len(names) == 124
     assert webui.COMMANDS == frozenset(WEBUI)
     assert webui.EXPORTS == EXPORTS
     assert webui.WRAPPED == frozenset(WRAPPED)

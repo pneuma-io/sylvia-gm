@@ -42,6 +42,7 @@ from sylvia_gm.application.campaign_plan_sources import (
     validate_retained_campaign_plan,
 )
 from sylvia_gm.application.character_profiles import (
+    CharacterProfile,
     load_character_profile,
     profile_from_snapshot,
     save_character_profile,
@@ -593,21 +594,28 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                     )
         builder_result: BuilderTurnResult | None = None
         repair_character: tuple[str, str] | None = None
+        repair_profile: tuple[str, str] | None = None
         for message in context.messages:
             receipt = message.content.get("result")
             if (
                 message.kind is SessionMessageKind.EVIDENCE
                 and message.content.get("kind") == "builder_tool_result"
-                and message.content.get("tool_name") == "open_character_draft"
+                and message.content.get("tool_name") in {
+                    "open_character_draft", "open_character_profile",
+                }
                 and isinstance(receipt, Mapping)
                 and receipt.get("success") is True
                 and isinstance(receipt.get("source_artifact_id"), str)
                 and isinstance(receipt.get("source_content_sha256"), str)
             ):
-                repair_character = (
+                opened_source = (
                     str(receipt["source_artifact_id"]),
                     str(receipt["source_content_sha256"]),
                 )
+                if message.content["tool_name"] == "open_character_profile":
+                    repair_profile = opened_source
+                else:
+                    repair_character = opened_source
 
         def resolve_source_profile(requested: SafePayload | None) -> SafePayload | None:
             """Bind provenance to retained or verified content, never model text."""
@@ -663,13 +671,42 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             """Save unbound content without selecting or mutating a campaign."""
             from sylvia_gm.application.character_profiles import validate_character_profile
 
-            canonical = canonical_json_bytes(validate_character_profile(data))
+            profile = dict(validate_character_profile(data))
+            artwork_source = repair_profile
+            if artwork_source is None and isinstance(pinned_profile, Mapping):
+                artwork_source = (
+                    str(pinned_profile["artifact_id"]), str(pinned_profile["content_sha256"]),
+                )
+            artwork_target = artwork_source[0] if artwork_source is not None else None
+            artwork_source_sha = artwork_source[1] if artwork_source is not None else None
+            if profile.get("format_version") == 2 and profile.get("visuals") is None:
+                artwork = ctx.application_owner.image_art_service().visuals_for_publication(
+                    session_id, str(profile["name"]), source_target_id=artwork_target,
+                )
+                if artwork is not None:
+                    profile["visuals"] = artwork
+            canonical = canonical_json_bytes(profile)
             saved = save_character_profile(
                 ctx.storage_root,
                 operation_id=f"{session_id}:{hashlib.sha256(canonical).hexdigest()}",
-                source=data,
+                source=canonical,
             )
-            return saved.catalog_payload()
+            biography = profile.get("biography", {})
+            appearance = (
+                biography.get("appearance") or biography.get("description")
+                if isinstance(biography, Mapping) else None
+            ) or profile.get("authored_profile") or profile["summary"]
+            artwork = ctx.application_owner.image_art_service().ensure_character_art(
+                session_id, name=str(profile["name"]), appearance=str(appearance),
+                target_id=artwork_target,
+                source_content_sha256=artwork_source_sha,
+            )
+            ctx.application_owner.image_art_service().bind_publication(
+                session_id, saved.artifact_id, saved.content_sha256, name=str(profile["name"]),
+                source_target_id=artwork_target,
+                source_content_sha256=artwork_source_sha,
+            )
+            return {**saved.catalog_payload(), "artwork": artwork}
 
         def import_profile(data: bytes) -> SafePayload:
             from sylvia_gm.application.character_card_import import save_character_card_import
@@ -679,20 +716,39 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 f'{hashlib.sha256(data).hexdigest()}'
             ), source=data)
 
+        def read_profile(identity: str, digest: str) -> CharacterProfile:
+            source = load_character_profile(ctx.storage_root, identity, digest)
+            ctx.application_owner.image_art_service().restore_profile(
+                session_id, source, ctx.storage_root,
+            )
+            return source
+
+        def opened_profile(identity: str, digest: str) -> None:
+            nonlocal repair_profile
+            repair_profile = (identity, digest)
+
+        pinned_profile = (saved_references or {}).get("character_profile")
+        if pinned_profile is not None:
+            ctx.application_owner.image_art_service().restore_profile(
+                session_id, profile_from_snapshot(pinned_profile), ctx.storage_root,
+            )
+
         from sylvia_gm.agent._character_profile_tools import character_profile_tools
+        from sylvia_gm.agent._image_art_tools import image_art_builder_tools
 
         profile_tools = (
             character_profile_tools(
                 _builder_workspace(ctx.storage_root, context.session),
                 save=publish_profile,
                 import_source=import_profile,
-                read=lambda identity, digest: load_character_profile(
-                    ctx.storage_root, identity, digest
-                ),
+                read=read_profile,
+                on_open=opened_profile,
             )
             if context.session.campaign_id is None
             else ()
         )
+
+        profile_tools += image_art_builder_tools(ctx.application_owner, session_id)
 
         def publish_ruleset_candidate(
             archive: BinaryIO,
@@ -718,6 +774,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             schema_id: str | None = None,
             setting_data: SafePayload | None = None,
             source_profile: SafePayload | None = None,
+            visuals: SafePayload | None = None,
         ) -> SafePayload:
             if (
                 participant_package is None
@@ -733,6 +790,18 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
             declaration = declarations[0]
             source_profile = resolve_source_profile(source_profile)
+            artwork_source = repair_character
+            if artwork_source is None and source_profile is not None:
+                artwork_source = (
+                    str(source_profile["artifact_id"]), str(source_profile["content_sha256"]),
+                )
+            artwork_target = artwork_source[0] if artwork_source is not None else None
+            artwork_source_sha = artwork_source[1] if artwork_source is not None else None
+            if visuals is None:
+                visuals = ctx.application_owner.image_art_service().visuals_for_publication(
+                    session_id, str(participant.get("name", "")),
+                    source_target_id=artwork_target,
+                )
             content_basis = canonical_json_bytes(
                 {
                     "session_id": session_id,
@@ -743,6 +812,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                     "entity_state": entity_state,
                     "setting_data": setting_data,
                     "source_profile": source_profile,
+                    "visuals": visuals,
                 }
             )
             operation_suffix = hashlib.sha256(content_basis).hexdigest()[:24]
@@ -760,13 +830,24 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 setting_data=setting_data,
                 setting_character_schema=participant_setting_schema,
                 source_profile=source_profile,
+                visuals=visuals,
+            )
+            artwork = ctx.application_owner.image_art_service().ensure_character_art(
+                session_id, name=saved.name, appearance=authored_profile,
+                target_id=artwork_target,
+                source_content_sha256=artwork_source_sha,
+            )
+            ctx.application_owner.image_art_service().bind_publication(
+                session_id, saved.artifact_id, saved.content_sha256, name=saved.name,
+                source_target_id=artwork_target,
+                source_content_sha256=artwork_source_sha,
             )
             if context.session.campaign_id is None:
                 label = "Character" if role == "player_character" else "Companion"
                 ctx.application_owner.rename_builder_chat(
                     session_id, f"{saved.name} · {label}"[:120].strip(), automatic=True
                 )
-            return participant_catalog_payload(ctx.application_owner, saved)
+            return {**participant_catalog_payload(ctx.application_owner, saved), "artwork": artwork}
 
         def read_participant(
             *, artifact_id: str, expected_content_sha256: str, schema_id: str | None = None,
@@ -793,9 +874,22 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             if len(declarations) != 1:
                 raise CommandRejected("Choose one of this Ruleset's participant schema IDs")
             repair_character = (source.artifact_id, source.content_sha256)
+            visuals = ctx.application_owner._store.images.published_visuals(
+                source.artifact_id, source.content_sha256,
+            ) or source.visuals
+            ctx.application_owner.image_art_service().restore_visuals(
+                session_id, source.artifact_id, visuals, name=source.name,
+                asset_reader=lambda path: ctx.application_owner._store.package_file_bytes(
+                    participant_campaign_setting.package_id,
+                    participant_campaign_setting.version,
+                    participant_campaign_setting.content_sha256,
+                    path, maximum_bytes=16 * 1024 * 1024,
+                ),
+            )
             return {
                 "schema_id": declarations[0].schema_id,
                 "summary": source.summary, "authored_profile": source.authored_profile,
+                **({"visuals": visuals} if visuals is not None else {}),
                 "participant": dict(source.participant),
                 "entity_state": dict(authored_character_state(
                     source.entity_state, declarations[0]
@@ -835,6 +929,14 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 package=participant_package, declaration=declarations[0],
                 campaign_setting=participant_campaign_setting,
                 setting_character_schema=participant_setting_schema,
+                visuals=ctx.application_owner._store.images.published_visuals(
+                    source.artifact_id, source.content_sha256,
+                ) or source.visuals,
+            )
+            ctx.application_owner._store.images.bind_publication(
+                ctx.application_owner._store.images.publication_operations(
+                    source.artifact_id, source.content_sha256,
+                ), saved.artifact_id, saved.content_sha256,
             )
             if context.session.campaign_id is None:
                 label = "Character" if saved.role == "player_character" else "Companion"
@@ -870,6 +972,9 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 ctx.application_owner, source.package_lock, setting_id=str(setting["id"]),
             )
 
+        def read_image_asset(reference: Mapping[str, Any]) -> bytes:
+            return ctx.application_owner.image_art_service().package_asset(session_id, reference)
+
         def check_plan() -> SafePayload:
             source = source_selection.candidate()
             selected_authority = selected_plan_authority()
@@ -879,6 +984,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 ctx.application_owner, _builder_workspace(ctx.storage_root, context.session),
                 candidate_id=source.candidate_id, expected_authority=selected_authority,
                 require_complete_characters=completing_required_characters,
+                image_asset_reader=read_image_asset,
             )
 
         def check_setting(*, package_id: str, version: str, title: str) -> SafePayload:
@@ -889,6 +995,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 ctx.application_owner, _builder_workspace(ctx.storage_root, context.session),
                 candidate_id=source.candidate_id,
                 package_id=package_id, version=version, title=title,
+                image_asset_reader=read_image_asset,
             )
 
         def publish_plan() -> tuple[CampaignPlanDraft, SafePayload]:
@@ -902,6 +1009,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
             with materialize_plan_snapshot_draft(
                 ctx.application_owner, workspace, candidate_id=source.candidate_id,
                 expected_authority=selected_authority,
+                image_asset_reader=read_image_asset,
             ) as materialized:
                 effective_candidate = source
                 if materialized.closure_sha256 != source.closure_sha256:
@@ -944,6 +1052,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
                 ctx.application_owner, _builder_workspace(ctx.storage_root, context.session),
                 candidate_id=source.candidate_id,
                 package_id=package_id, version=version, title=title,
+                image_asset_reader=read_image_asset,
             ) as materialized:
                 suffix = hashlib.sha256(
                     f"{session_id}:{materialized.closure_sha256}".encode()

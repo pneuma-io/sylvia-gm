@@ -36,3 +36,15 @@ A Rift-touched shapeshifter that fell through the Veil from a world where identi
 ## Actions
 **Multiattack.** Two melee attacks.
 **Slam.** +6 to hit, 7 (1d6 + 4) bludgeoning.
+
+## Appearance and artwork
+
+One editable neutral adult humanoid presentation for Rift Doppelganger: pearl-grey/lilac skin, bald head, pale-violet eyes and a long calm face with shallow inward soft contour folds. Plain grey/plum/charcoal clothes and empty five-fingered hands identify no named victim, disguise or homeland. This reference does not claim the shapeshifter's biological true form.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/5a74d24d8c163f3b6b4e7ff75c98cf8bedf2c24dda767ae07e7b1c19a831e33b.png)
+
+[Full-body reference](../../assets/characters/a6c8ce01fb2b0adf40c6f237aa6ca339408abb14759e4e34dead4a7c0fcfd774.png)
+
+[Multiview reference sheet](../../assets/characters/920ea531c1eb3de71743358468db9545c044f78520675c83e461eda116051ec0.png)

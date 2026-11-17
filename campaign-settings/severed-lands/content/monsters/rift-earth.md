@@ -48,3 +48,15 @@ A grinding, shifting mass of stone and soil animated by Rift energy pooled in th
 
 **Multiattack.** The elemental makes two slam attacks.
 **Slam.** Melee Weapon Attack: +8 to hit, reach 10 ft., one target. Hit: 14 (2d8 + 5) bludgeoning damage.
+
+## Appearance and artwork
+
+A hulking asymmetrical mass of ironstone, pale feldspar and compact charcoal soil, with two blunt arm formations, two short supporting pillars and a low crag ridge continuous with the shoulders. It has no human face. Muted teal mineral glass and amber quartz lie within fracture seams. Stone strata fold around deep nested shoulder and chest cavities with impossible internal distance, while the whole mass remains connected and heavy. This is an editable visual form, without assigning a manufactured origin.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/47741902436bdd4d8578fb4635331e94e6ae291c6e591fde9092846f9b2f4b71.png)
+
+[Full-body reference](../../assets/characters/840023615c3f160826354f26fa95bb08f977f0a3bf697fa0eece9961d903a66d.png)
+
+[Multiview reference sheet](../../assets/characters/c02a194886198f88d15eac15a5594f30782efec7862d62dc0d559299bf077414.png)

@@ -94,7 +94,7 @@ def test_cleanup_releases_receipts_and_downloads_even_when_owner_exit_is_abnorma
         ui.requests["retained-request"] = ("same-payload", pending)
         ui.download_directory = tempfile.TemporaryDirectory(dir=tmp_path)
         download_root = Path(ui.download_directory.name)
-        ui.downloads["selected-export"] = download_root / "export.bin"
+        ui.downloads["selected-export"] = (download_root / "export.bin", "export.bin")
         with pytest.raises(webui.WebUIError, match="exit 23"):
             await ui.cleanup(ui.app)
         assert owner.process is None

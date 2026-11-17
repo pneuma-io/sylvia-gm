@@ -21,3 +21,15 @@ Vex is silent, observant, and absolutely certain of her own competence. She comm
 ## Hook
 
 Vex's scouts found something in the deep Cairnfields — a Warden structure, intact, humming with active energy. She's kept it from Korr. She's deciding what to do with it. A Warden weapon in the Silent Wing's hands would shift the balance of power in the Cairnfields permanently.
+
+## Appearance and artwork
+
+An adult human-like editable default with cool-brown skin, an elongated oval face, amber-brown eyes and close auburn hair brushed back. A lean athletic build wears plain slate-grey half-plate, navy riding layers, covered throat and ordinary harness straps. Her greatsword stays sheathed on her back, hilt above the left shoulder. A closed-mouth watchful expression preserves silence without revealing the private structure or assigning ancestry.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/2d5c3771215ef8a04c19052c129cd9e769236500d5ad4ea2fb26d854f7514f65.png)
+
+[Full-body reference](../assets/characters/ca70eaec4b2486775db9a27d8d27dbb0aace8c5bec91ec7d0bc4f43baa59d992.png)
+
+[Multiview reference sheet](../assets/characters/0281182996c461fb383767731cee3da08367253bc1cbf263eecc680589abc41f.png)

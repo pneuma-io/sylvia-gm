@@ -36,3 +36,15 @@ A creature that lurks at the edges of Rift pools, scavenging the remains of crea
 ## Actions
 **Bite.** +3 to hit, 3 (1d4 + 1) piercing.
 **Spear.** +3 to hit, 4 (1d6 + 1) piercing.
+
+## Appearance and artwork
+
+A squat intact crustacean/mammalian amalgam default with one mammalian muzzle beneath a layered blue-grey brow shell, two amber eyes, small fur-edged ears, grey-brown fur and teal chitin. Two arms retain a right spear-gripping hand and left pincer forearm with a strapped driftwood shield. Two bent legs have broad webbed feet; one flattened segmented tail completes the body. Nested shell shelves and fur loops carry restrained purple-green inner depth. No consumed individual, new ability or personal origin is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c4e631113612ec2d1cd8f994e2bb6bd1c1c0f3da5061615e99b0b7a801ee461a.png)
+
+[Full-body reference](../../assets/characters/fcaaf24285644b05b2d0f55eef189ba2b1531ec207a9871bb617e7b829e129a2.png)
+
+[Multiview reference sheet](../../assets/characters/c1b2bcbfc4dd99a97e80cb8137042dc8002a1b9f280bd963c26102c2a2916bd6.png)

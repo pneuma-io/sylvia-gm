@@ -30,6 +30,20 @@ def _handler(topic: str, name: str) -> Handler:
 
 
 _COMMANDS = (
+    Command('image_art', _handler('packages', 'handle_image_art'), True, False),
+    Command(
+        'preview_character_bundle_file', _handler('packages', 'handle_character_bundle'),
+        False, False,
+    ),
+    Command(
+        'confirm_character_bundle_import', _handler('packages', 'handle_character_bundle'),
+        True, False,
+    ),
+    Command(
+        'cancel_character_bundle_import', _handler('packages', 'handle_character_bundle'),
+        True, False,
+    ),
+    Command('export_character_file', _handler('packages', 'handle_character_bundle'), False, False),
     Command('handshake_status', _handler('campaigns', 'handle_handshake_status'), False, True),
     Command('campaign_index', _handler('campaigns', 'handle_campaign_index'), True, True),
     Command(

@@ -37,3 +37,15 @@ A Riftborn creature whose body is encased in violet-tinged chitin plates grown f
 **Multiattack.** Two gythka attacks or two chatkcha attacks.
 **Gythka.** +3 to hit, 5 (1d8 + 1) slashing. If holding two-handed, additional 1d8.
 **Chatkcha.** Ranged Weapon Attack: +4 to hit, range 30/120 ft., 5 (1d6 + 2) slashing.
+
+## Appearance and artwork
+
+An intelligent insectile editable default with one mantis-like head, two compound eyes, paired mandibles and two antennae. Four arms and two legs give a six-limbed silhouette; three-clawed hands and feet stay consistent. Violet-tinged crystalline chitin forms nested mineral lamellae. The primary right hand holds one gythka at the right side, a chatkcha stays sheathed at the left belt, and the other three hands are empty. This adds no mechanic or named origin.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/873dfdc5c0bbe7b4f30d3a9f23a2753d95e8d90a3e7a0e15b81b8b633ed51342.png)
+
+[Full-body reference](../../assets/characters/f3dacdcf4bc1fe5efe7ba4b2cdaf1d1a66bbde033daab041dad847e980b11b12.png)
+
+[Multiview reference sheet](../../assets/characters/8813f94f636cb0f82aa6122698900703ebb749344da47a2e347b00f20fa326c4.png)

@@ -50,3 +50,15 @@ The Elder Riftbeast — a living cataclysm born from the Rift itself, or perhaps
 **Horns.** +19 to hit, reach 10 ft., 32 (4d10 + 10) piercing.
 **Tail.** +19 to hit, reach 20 ft., 24 (4d6 + 10) bludgeoning. DC 20 STR save or knocked prone.
 **Frightful Presence.** 120 ft., DC 17 WIS save or frightened 1 minute.
+
+## Appearance and artwork
+
+An editable Elder Riftbeast default is a huge charcoal/grey-olive reptilian predator with old-gold eyes, one tooth-lined jaw, two swept dark-ivory horns, two four-digit clawed forearms, two three-toed hind legs and one heavy tail. Dark umber/olive-black layered reflective carapace has bronze edges and nested inward lamellae/reflections between selected plates. No origin, named world, god identity, extra head/limb or new power is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/3827c53b3bcaf3f0ab89a33a3de11203fe574b21433c7ea47167c169a18652ea.png)
+
+[Full-body reference](../../assets/characters/3897a0c6f9b75aac829d635d47ed33656e5a3f6328ac326c03442ebe8e400b86.png)
+
+[Multiview reference sheet](../../assets/characters/ac9362fb88f46f86bad8575b04d02f40da11e0564441177640ae1bd6e80feec0.png)

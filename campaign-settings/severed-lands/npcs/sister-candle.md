@@ -21,3 +21,15 @@ Candle is intense, focused, and very young. She's been a Rememberer for less tha
 ## Hook
 
 Candle found the pack — denning near an Anchor Clearing in the deep Margin. She's asking for help. She's not asking for mercy. The pack leader is an advanced riftwolf — larger than any she's seen, with phase-step capability and Rift-touched intelligence. She thinks it remembers her. She thinks it's been waiting.
+
+## Appearance and artwork
+
+A clearly adult human-like editable default with deep copper-brown skin, a compact athletic build, an angular face, grey eyes and close-cropped black coils. Plain worn steel over burgundy travel layers and an ochre scarf frame a tired focused expression. Her sword stays sheathed at her left hip and her small hand-bound ledger closed at her right. Private names and the hunt's outcome remain unseen.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/d2bc90d6035676978db7e86282b65c39d1e17624ce59863cc42ed1b3331d782a.png)
+
+[Full-body reference](../assets/characters/ae643e74e854575ca9dc8a6532ea119bec1416feb0cc07d398f82f8e10870e42.png)
+
+[Multiview reference sheet](../assets/characters/6bbad9b62a3296f7b00b355059d44ded06ea86938465918013b87e0afdc2d78a.png)

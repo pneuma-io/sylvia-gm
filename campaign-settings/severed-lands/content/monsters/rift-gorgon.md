@@ -36,3 +36,15 @@ A Rift-touched iron-plated bull whose petrifying breath is a concentrated burst 
 **Gore.** +8 to hit, 18 (2d12 + 5) piercing.
 **Hooves.** +8 to hit, 16 (2d10 + 5) bludgeoning.
 **Petrifying Breath.** 30-foot cone, DC 13 CON save. On a failed save, begins to turn to stone and is restrained. Must repeat save at end of its next turn, becoming petrified on a failure or ending on success. Recharges 5-6.
+
+## Appearance and artwork
+
+An editable iron-plated bull default with olive-gold eyes, two curved horns, four cloven-hoofed legs and one dark tufted tail. Nested inward iron ribs and restrained violet seam depth alter the plating while the bull's outer anatomy remains clear. No rider, machine mechanism, victim identity or added power is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/6e5995af9048b0e96bba2cba593b5a5c4b51d3c8438328b45a895c72646b0653.png)
+
+[Full-body reference](../../assets/characters/cdcd7e99dd9431ae158ab3e72bb97a0f4c05d77f003ab061ef2a24758a7b99f2.png)
+
+[Multiview reference sheet](../../assets/characters/40741eac3b15e54a93c24ae1c48a95b1138ea1efb3419128fd723ddeb58321d8.png)

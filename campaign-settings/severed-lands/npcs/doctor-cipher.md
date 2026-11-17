@@ -23,3 +23,15 @@ She's charming in a way that's hard to resist. She listens. She validates concer
 ## Hook
 
 Cipher's Pool Stabilizer is ready for a full test. She needs a Rift pool large enough to matter — one of the major pools in the Hollows or the Deep Rift in the Cairnfields. She's recruiting escorts. She's also recruiting subjects to stand near the pool during activation, "in case of unexpected resonance." The pay is generous. The risk is absolute.
+
+## Appearance and artwork
+
+A mature slender human default with cool medium-dark brown skin, a long angular face, grey eyes, sleek black hair with scattered silver in a short low ponytail and plain clear rectangular glasses. Mauve and slate scholar layers, charcoal trousers and flat boots remain practical. A closed notebook pouch sits at the back belt; both hands are empty. The design depicts no victim, successful Pool Stabilizer, new mutation or power.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/764723ba2beec5f4258396dec6c5dfbe08f7a3f501f2c739b323994315808ce8.png)
+
+[Full-body reference](../assets/characters/a9938a723f0ee5954c966ddc3a3f0662322d2fdee5e80507232319b90adef5b4.png)
+
+[Multiview reference sheet](../assets/characters/5dfe13456fbb54f51f253810209db991fa743593d121956b7ec3cd3b0766464b.png)

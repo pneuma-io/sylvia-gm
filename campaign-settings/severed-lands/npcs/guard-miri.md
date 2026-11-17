@@ -17,3 +17,15 @@ Her brother was Riftborn — arrived ten years ago, no memories, died in a Hollo
 ## Personality
 
 Quiet, dutiful, and carrying a private grief. Miri does her job. She doesn't make waves. She just makes sure the Gate is slightly less terrifying than it could be.
+
+## Appearance and artwork
+
+An adult human default with warm olive skin, broad face, brown eyes and neatly cropped dark curls. Plain navy-grey wool over a dull chain shirt, high closed collar, belt, charcoal trousers and flat brown boots suit her gate work. Both hands are empty. Her brother's ring and chain remain concealed under the uniform; no insignia or new rank is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/70fce1498520ff8f15f70dafa1b57e7217193ce53f7012d787cfcddd56445d05.png)
+
+[Full-body reference](../assets/characters/6b2c5c96713949d3aec33c7fb326dca0341f8328fd839caafb1ac3c37a4565cd.png)
+
+[Multiview reference sheet](../assets/characters/9c087b9ea3463b8784c6dd8e8f6df5c19e18df4ed06974cbbc59557a4c5a6d85.png)

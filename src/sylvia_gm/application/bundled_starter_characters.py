@@ -105,6 +105,7 @@ def bundled_starter_participants(
                         authored_profile=row["authored_profile"],
                         participant=row["participant"],
                         entity_state=row["entity_state"],
+                        visuals=row.get("visuals"),
                         package=package,
                         declaration=declaration,
                         campaign_setting=campaign_setting,

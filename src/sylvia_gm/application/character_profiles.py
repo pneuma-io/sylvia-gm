@@ -23,6 +23,7 @@ from sylvia_gm.application.reusable_library_deletion import (
 from sylvia_gm.domain.authority import SafePayload
 from sylvia_gm.domain.content_validation import ContentShapeError, validate_content_shape
 from sylvia_gm.domain.errors import CommandRejected, RulesetDiagnostic
+from sylvia_gm.domain.image_art import validate_character_visuals
 from sylvia_gm.domain.package_library import canonical_json_bytes
 
 MAX_PROFILE_BYTES = 256 * 1024
@@ -112,6 +113,7 @@ def validate_character_profile(source: bytes | str) -> SafePayload:
     )
     validate_content_shape(definition, value, file="character-profile.json")
     if definition == "character_profile_v2":
+        validate_character_visuals(value.get("visuals"))
         sections = (
             ("relationships", value.get("relationships", [])),
             ("dialogue_examples", value.get("dialogue_examples", [])),

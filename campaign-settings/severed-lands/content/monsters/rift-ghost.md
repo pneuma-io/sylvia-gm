@@ -58,3 +58,15 @@ The most complete form of Rift Echo — a personality imprint so detailed it bel
 **Etherealness.** The rift ghost enters the Ethereal Plane from the Material Plane, or vice versa. Its possessions are not transformed.
 **Possession.** One humanoid the rift ghost can see within 5 feet must succeed on a DC 13 Charisma saving throw or be possessed. The rift ghost then disappears and the target is incapacitated. The rift ghost controls the body but doesn't deprive the target of awareness. The rift ghost can't be targeted by any attack, spell, or other effect and retains its alignment. The possession lasts until the body drops to 0 HP, the rift ghost ends it as a bonus action, or the rift ghost is turned or forced out. The target can repeat the save at the start of each of its turns.
 **Horrifying Visage.** Each non-Rift-touched creature within 60 feet that can see the rift ghost must succeed on a DC 13 Wisdom saving throw or be frightened for 1 minute. If the save fails by 5+, the target also ages 1d4 × 10 years. The target can repeat the save at the end of each of its turns.
+
+## Appearance and artwork
+
+One editable mature humanlike Ghost presentation with a rounded medium-brown face, brown eyes, salt-and-pepper curls and short greying beard. Cream/cerulean/brown practical clothes and two booted feet remain complete above a soft hover shadow. Fading outer edges and nested coat-contour echoes suggest an imperfect personality imprint, without naming a prior identity, death event, alignment or possession host.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c571a5169fff5da5cc19f3d60f0f3612e809743ea36d0295c42311e84fafc42c.png)
+
+[Full-body reference](../../assets/characters/1b1a64ba3304c5f546c4c15ce4e9c296137b179b9e784b5d930a0726ea0fbe69.png)
+
+[Multiview reference sheet](../../assets/characters/19d1c9c55a70809b65a548332eb638f13cfef9edc9dfd74917201d5526bcde2d.png)

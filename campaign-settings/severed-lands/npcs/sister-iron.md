@@ -29,3 +29,15 @@ She's aware that the Church is growing faster than she can guide it. She's aware
 ## Hook
 
 Iron has announced that the Doors will speak again — within the year. She doesn't know to whom or where. She only knows what the fragment told her. Every faction is watching. Some are already positioning to be the recipient. Some are positioning to prevent it.
+
+## Appearance and artwork
+
+An elderly human editable default with deep warm-brown skin, a broad lined face, umber eyes and grey-white curls in a small low bun. Her sturdy slightly stooped figure wears plain saffron, deep blue and cream layers with flat shoes. Weathered empty hands are gently clasped at her waist. A patient smile conveys conviction without proving her revelation or adding religious regalia.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/4872845afbad33fdc3433477ec173d707db8c8eff4d8cbcbb773900932202d62.png)
+
+[Full-body reference](../assets/characters/cc54bc2624b19b1b7165145ee64310d7b0569cc4420e0924af6d9a563656885c.png)
+
+[Multiview reference sheet](../assets/characters/609602dbf4debcdcb3aeb9a6e3c5a7ea4056d856ba1a520709a2b760f89ad03a.png)

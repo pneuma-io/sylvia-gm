@@ -118,6 +118,26 @@
       "ammunition_expended": {
         "arrow": 0
       }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human default with fair freckled sun-reddened skin, moss-green eyes, square face, cropped ash-blond hair/grey temples and friendly blunt smile. Soft vermilion shirt, mustard wool waistcoat, navy trousers and brown boots are unarmored; both hands support one plain greataxe at left upper side, with its shaft crossing the front. No shield, home, faction or campaign history is assigned.",
+      "frame": {
+        "x": 0.5,
+        "y": 0.0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/ccb6103460d0ca42e2681926f0c8c76647c0aea510e876e8a57d0ee0b3136356.png",
+        "sha256": "ccb6103460d0ca42e2681926f0c8c76647c0aea510e876e8a57d0ee0b3136356"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/5072477bca009cc85c831a3a7b57e435a669464903c72a64a4808e9c9c391b71.png",
+        "sha256": "5072477bca009cc85c831a3a7b57e435a669464903c72a64a4808e9c9c391b71"
+      },
+      "portrait": {
+        "path": "assets/characters/575ce86c06b66985353d9d737156d9128de1a50a08d451a4b4abdc358cd8ba13.png",
+        "sha256": "575ce86c06b66985353d9d737156d9128de1a50a08d451a4b4abdc358cd8ba13"
+      }
     }
   },
   {
@@ -289,6 +309,26 @@
           "main_hand": null,
           "off_hand": null
         }
+      }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human default: deep warm brown skin, amber-brown eyes, rounded heart-shaped face/dimples and short dense copper-auburn curls. Russet leather jerkin over dusty teal blouse, coral neckerchief, indigo waist panels and charcoal trousers; right lowered dagger, left empty hand, one lute strapped at left back/hip. No shield or named faith/history.",
+      "frame": {
+        "x": 0.5,
+        "y": 0.0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/707778ba7bc3e6bccfc84d389672e337fa5ef72ec56e142fd72001a4ea7a2294.png",
+        "sha256": "707778ba7bc3e6bccfc84d389672e337fa5ef72ec56e142fd72001a4ea7a2294"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/ee62c21cd75bcdb676d5de7c2fbdb9f977e25f16b0928849af4770c66c509df2.png",
+        "sha256": "ee62c21cd75bcdb676d5de7c2fbdb9f977e25f16b0928849af4770c66c509df2"
+      },
+      "portrait": {
+        "path": "assets/characters/b5c407c1e2ac384a129c5042aeecdc5fd096ce9416d46ba64eb3bbe3f503aa9b.png",
+        "sha256": "b5c407c1e2ac384a129c5042aeecdc5fd096ce9416d46ba64eb3bbe3f503aa9b"
       }
     }
   },
@@ -465,6 +505,26 @@
           "main_hand": null,
           "off_hand": null
         }
+      }
+    },
+    "visuals": {
+      "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+      "frame": {
+        "x": 0.6,
+        "y": 0.0,
+        "zoom": 1.2
+      },
+      "full_body": {
+        "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+        "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+        "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
+      },
+      "portrait": {
+        "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+        "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
       }
     }
   },
@@ -663,6 +723,26 @@
           "off_hand": null
         }
       }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human default: cinnamon skin, grey-green eyes, round face/amused smile and blue-black curls in a small loose upper knot. Reddish leather armor, flax/dusk-blue clothes and ochre hood-down cape; right plain quarterstaff/Druidic Focus, left oval wooden shield, belt-carried sickle and herb pouch. No antlers, species change, named faith or Warden allegiance.",
+      "frame": {
+        "x": 0.55,
+        "y": 0.1,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/f784f33bb7fbe524cc22c9690ea0da1b8af388a177561525bd0024c6c2bf18a2.png",
+        "sha256": "f784f33bb7fbe524cc22c9690ea0da1b8af388a177561525bd0024c6c2bf18a2"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/36f0aa4bcdcf9819c670875d4e72f858eb58a1bfdc8899a5fd69ab65a5e6acff.png",
+        "sha256": "36f0aa4bcdcf9819c670875d4e72f858eb58a1bfdc8899a5fd69ab65a5e6acff"
+      },
+      "portrait": {
+        "path": "assets/characters/b4359fc441ed4a2509ad926e1378664424835a9778f42bafadc6a4f50fec762b.png",
+        "sha256": "b4359fc441ed4a2509ad926e1378664424835a9778f42bafadc6a4f50fec762b"
+      }
     }
   },
   {
@@ -799,6 +879,26 @@
       "ammunition_expended": {
         "arrow": 0
       }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
+      "frame": {
+        "x": 0.5,
+        "y": 0.0,
+        "zoom": 1.2
+      },
+      "full_body": {
+        "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+        "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+        "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+      },
+      "portrait": {
+        "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+        "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
+      }
     }
   },
   {
@@ -916,6 +1016,26 @@
       },
       "ammunition_expended": {
         "arrow": 0
+      }
+    },
+    "visuals": {
+      "appearance": "Editable young adult Human default with golden-medium skin, triangular face/grey-brown eyes and short asymmetric plum-black crop, no pale streak. Unarmored indigo/cream wrap clothes, ochre belt, charcoal culottes and soft shoes; right ordinary spear, left empty hand, closed flute case/dagger at left waist. No shield, martial-order identity, aura or campaign history.",
+      "frame": {
+        "x": 0.6,
+        "y": 0.0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/317a52baad16f1fcdf2c2c3982f59db37e593c99464927b9d9b7dee524220424.png",
+        "sha256": "317a52baad16f1fcdf2c2c3982f59db37e593c99464927b9d9b7dee524220424"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/eaec95afdd8e43b83a87da8f085468ec45d37df99a8ee4904ac3f9c6caa571af.png",
+        "sha256": "eaec95afdd8e43b83a87da8f085468ec45d37df99a8ee4904ac3f9c6caa571af"
+      },
+      "portrait": {
+        "path": "assets/characters/8457c301882303ba2aab16b0f13dfb01891d8a9d2c72b59622eacc575f66b657.png",
+        "sha256": "8457c301882303ba2aab16b0f13dfb01891d8a9d2c72b59622eacc575f66b657"
       }
     }
   },
@@ -1077,6 +1197,26 @@
       },
       "ammunition_expended": {
         "arrow": 0
+      }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human with rich dark-brown skin, broad square full-cheeked face, hazel-brown eyes, close black coils and earnest smile. Dark teal unmarked tabard over long-sleeved knee-length chain mail, cream padded layer, charcoal trousers and brown boots. One longsword and plain wooden shield; small wrapped unmarked symbol.",
+      "frame": {
+        "x": 0.55,
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/2081418ddffe0ac9b975a5c7f22edfa745686e4b5476e56355f80418e4dbe7cc.png",
+        "sha256": "2081418ddffe0ac9b975a5c7f22edfa745686e4b5476e56355f80418e4dbe7cc"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/eec1cd6fcf873f0ac294c794bbff6b1b7b688962ec62d28f9e260e32e0971a9f.png",
+        "sha256": "eec1cd6fcf873f0ac294c794bbff6b1b7b688962ec62d28f9e260e32e0971a9f"
+      },
+      "portrait": {
+        "path": "assets/characters/415cdd1c21c0a5c4d8dd09213ea95024c04bac17d69faf29334e51fd34244c23.png",
+        "sha256": "415cdd1c21c0a5c4d8dd09213ea95024c04bac17d69faf29334e51fd34244c23"
       }
     }
   },
@@ -1240,6 +1380,26 @@
       "ammunition_expended": {
         "arrow": 0
       }
+    },
+    "visuals": {
+      "appearance": "Editable wiry adult Human with olive skin, narrow long-nosed face, light-brown eyes, smile lines and short sandy-brown hair. Moss linen and ochre neckerchief under russet studded leather, slate trousers and soft brown boots. One tall longbow held relaxed with both hands, quiver and sheathed short blades.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/3621997132bfaac3f547b345c546abc3f62eefb4fafabc529ff1011e519d3758.png",
+        "sha256": "3621997132bfaac3f547b345c546abc3f62eefb4fafabc529ff1011e519d3758"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/31181c3c18d8c33bc86eb9ab318c1565982e01aba2eca647b8299d0d88749a2e.png",
+        "sha256": "31181c3c18d8c33bc86eb9ab318c1565982e01aba2eca647b8299d0d88749a2e"
+      },
+      "portrait": {
+        "path": "assets/characters/ca2716260c64510fe4d19cf0362db37d36dd34d9d2ec7300cc3daaca0b35838e.png",
+        "sha256": "ca2716260c64510fe4d19cf0362db37d36dd34d9d2ec7300cc3daaca0b35838e"
+      }
     }
   },
   {
@@ -1370,6 +1530,26 @@
       },
       "ammunition_expended": {
         "arrow": 0
+      }
+    },
+    "visuals": {
+      "appearance": "Editable short adult Human with rosy-brown skin, amber eyes, small angular chin, broad nose, uneven near-black bob/fringe and quick grin. Lilac shirt under plain brown leather, dove-grey trousers and ankle boots. One shortbow held low, spare sheathed shortsword and closed tools pouch.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200.png",
+        "sha256": "54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377.png",
+        "sha256": "bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377"
+      },
+      "portrait": {
+        "path": "assets/characters/7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25.png",
+        "sha256": "7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25"
       }
     }
   },
@@ -1522,6 +1702,26 @@
           "main_hand": null,
           "off_hand": null
         }
+      }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human with medium golden skin, softly round face, honey-brown upturned eyes, short round black curls and bright open smile. Coral-pink cloth robe, deep-plum tunic, cream trousers and teal woven sash, all unarmored. One plain spear, small nonemissive stone focus, plain book pouch.",
+      "frame": {
+        "x": 0.5,
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/512f075aee4775912a2a226937e830973ea04536a7d9929802c1fe9efaca359e.png",
+        "sha256": "512f075aee4775912a2a226937e830973ea04536a7d9929802c1fe9efaca359e"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/146b06c053ef5fe758cad6589a93ede42d94b37d612ce009cdec87ff565bf774.png",
+        "sha256": "146b06c053ef5fe758cad6589a93ede42d94b37d612ce009cdec87ff565bf774"
+      },
+      "portrait": {
+        "path": "assets/characters/1cc3202e75b82421749083166dbf4f24a9b369612c82730801d67aaf627f14b5.png",
+        "sha256": "1cc3202e75b82421749083166dbf4f24a9b369612c82730801d67aaf627f14b5"
       }
     }
   },
@@ -1676,6 +1876,26 @@
           "main_hand": null,
           "off_hand": null
         }
+      }
+    },
+    "visuals": {
+      "appearance": "Editable adult Human with cool medium-brown skin, long oval face, steel-blue eyes, smooth ash-grey chin bob/short bangs and courteous smile. Long indigo leather coat over wine-red linen, ochre sash and dark trousers. One lowered plain dagger, closed tan notebook, plain rod focus and book pouch; no patron iconography.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/70afb25d27939dcdb96478be708f0f38a2c82ea595a01e97acbc77eee7ccffa9.png",
+        "sha256": "70afb25d27939dcdb96478be708f0f38a2c82ea595a01e97acbc77eee7ccffa9"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/e591601ea0d1c64b792e75d2838669899c4393cb3658894dac856dbcc2e973f0.png",
+        "sha256": "e591601ea0d1c64b792e75d2838669899c4393cb3658894dac856dbcc2e973f0"
+      },
+      "portrait": {
+        "path": "assets/characters/17085bfff9e0721770d70841c4ec4d72d5e7c953a4610680a05af719645ec14e.png",
+        "sha256": "17085bfff9e0721770d70841c4ec4d72d5e7c953a4610680a05af719645ec14e"
       }
     }
   },
@@ -1860,6 +2080,26 @@
           "main_hand": null,
           "off_hand": null
         }
+      }
+    },
+    "visuals": {
+      "appearance": "Editable elderly Human with deep-brown skin, broad build, bald crown/silver side curls, short silver moustache/chin beard, half-moon spectacles and kind lined face. Cream unarmored robe with azure edging and rust shoulder shawl. Plain wooden quarterstaff-focus, closed dark-blue spellbook and compact scholar pack.",
+      "frame": {
+        "x": 0.6,
+        "y": 0,
+        "zoom": 1.1
+      },
+      "full_body": {
+        "path": "assets/characters/aae40560804d23f2e53ad1d180f8e886e647e1196586130a8bde0c94438aaf9c.png",
+        "sha256": "aae40560804d23f2e53ad1d180f8e886e647e1196586130a8bde0c94438aaf9c"
+      },
+      "reference_sheet": {
+        "path": "assets/characters/2adc7370771eb176fd044e81e802b68416ae29d758c95c4ad8ce40c584595498.png",
+        "sha256": "2adc7370771eb176fd044e81e802b68416ae29d758c95c4ad8ce40c584595498"
+      },
+      "portrait": {
+        "path": "assets/characters/f21bb36b1823ec36ba1ac9a26b3cba7eb4521b714d8b923fb617f9b0cacfe175.png",
+        "sha256": "f21bb36b1823ec36ba1ac9a26b3cba7eb4521b714d8b923fb617f9b0cacfe175"
       }
     }
   }

@@ -17,3 +17,15 @@ The Archivist is Hollowed — Speaker stage, violet eyes, speech that fragments 
 ## Personality
 
 The Archivist is imperious, precise, and carrying a sadness she doesn't discuss. The Spire is her life's work. The books are her responsibility. She'll be here until the last page crumbles, and she's made peace with that.
+
+## Appearance and artwork
+
+A visibly mature elf editable default with warm brown skin, an angular lined face, pointed ears, fully violet irises and straight silver-grey hair tucked behind the ears. Burgundy, cream and pine-green scholarly layers retain a spare upright silhouette. A closed ochre book rests in her left hand; the right is empty. Subtle displaced outer contours suggest Veil instability without revealing her order, age, books or Spire secrets.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/caa3317d5c4d6a1c9849ff5a83735b7dc371155425e6033c607b22068fa64845.png)
+
+[Full-body reference](../assets/characters/7915f869f11238a77961d400053516b9b57565eeecf3327f6e0b857109f5620c.png)
+
+[Multiview reference sheet](../assets/characters/99fb1da6ca1ae3ba06977fbad986d9e2ada2f301fd3b1a5b06c93121887aaa3d.png)

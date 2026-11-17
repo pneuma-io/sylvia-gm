@@ -17,3 +17,15 @@ She's also the Athenaeum's unofficial archivist of forbidden research. When a sc
 ## Personality
 
 Vesper is quiet, precise, and utterly devoted to the collection. She treats books like living things. She treats dangerous books like dangerous animals — respect them, don't provoke them, know when to back away.
+
+## Appearance and artwork
+
+A mature spare human default with pale olive skin, a narrow oval face, brown eyes, clear round glasses and a neat dark bob finely greying at the temples. Blue-grey, umber and cream practical scholar layers and flat shoes suit her library role. Her left forearm carries one closed unmarked ordinary book; her right hand is empty. She remains distinct from the other Vesper profiles and her private archive is not revealed.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/5ff207ed1c190b8a3be972cbe06fe1b7eebe8544e20984abe979765e968d476e.png)
+
+[Full-body reference](../assets/characters/ecc17300cea28f39456f8d3aa4e8d82cf9cda5f72ae81ecf93cbe9167f5ceedc.png)
+
+[Multiview reference sheet](../assets/characters/9daec9c8bc76a963ccb8dfa7d487725f6a4c5b45d9682905cd02ae8155013458.png)

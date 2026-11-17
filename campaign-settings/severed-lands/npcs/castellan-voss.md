@@ -23,3 +23,15 @@ He's also dying. A Rift-touched lung condition, contracted during an expedition 
 ## Hook
 
 Voss's successor must be elected by the sworn knights. Two candidates have emerged: a traditionalist who wants to preserve the Lodge's methods, and a reformer who wants to train more knights faster. The vote is in three months. Voss is trying to stay alive long enough to see it through — and trying not to let either candidate realize how little time he has left.
+
+## Appearance and artwork
+
+A mature strong human default with deep weathered tan skin, a broad angular face, dark eyes, cropped greying hair and a short coarse beard. Worn steel and muted teal armor layers accompany a bronze Warden gauntlet worn on his right hand, a sheathed sword at his left hip and a shield strapped to his back. Both hands hold nothing. The artifact designs add no ability or translated inscription; his illness stays private and he is distinct from House Voss.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/b1b2c697cfdfc9f005589815bf1f72a3e7b485e59ad1940db748dc3c71eb414a.png)
+
+[Full-body reference](../assets/characters/9fe93fafceaf7ce508eb7e57421850589feb4f028f915131992355013e0a56df.png)
+
+[Multiview reference sheet](../assets/characters/a1604826e477bcbdaa8a555556bd19715f57830df05cf075c92d27c97c8c60d8.png)

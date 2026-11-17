@@ -40,3 +40,15 @@ A Rift-touched xorn — a trilateral elemental predator whose affinity for preci
 **Multiattack.** Three claw attacks and one bite.
 **Bite.** +6 to hit, 13 (3d6 + 3) piercing.
 **Claw.** +6 to hit, 6 (1d6 + 3) slashing.
+
+## Appearance and artwork
+
+A squat trilateral barrel-bodied stone elemental with three radial arms, three tripod legs and one upward-facing mouth at the top. Broad hands and feet end in blunt stone claws, and each radial side carries one small amber eye. Warm dark basalt and ochre plates contain smoky quartz, copper veins and nested geode shelves with restrained violet-green depth. These selected proportions and eye details are editable defaults; no new ability or individual identity is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/21efdcec0f38e1a5aa50b87126b18eea965bb7f35721ff6d300ca783e459bb6b.png)
+
+[Full-body reference](../../assets/characters/b1e069d22813ab5cee9657da76516d4e3ac55494fbbf86bfceef4c2f7924856a.png)
+
+[Multiview reference sheet](../../assets/characters/17e26660721732450b261ee6bbe8af35529a785b8359eebe401267c7eaeebe08.png)

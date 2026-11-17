@@ -21,3 +21,15 @@ Maw is calm, direct, and unnervingly at ease in the Hollows. She treats phasing 
 ## Hook
 
 Maw and the Breathless are overdue — three days past their expected return from a deep run. The other crews are dividing their territory. But something's been coming out of the Hollows at night that leaves tracks matching the Breathless' boots. The tracks don't move like human tracks.
+
+## Appearance and artwork
+
+A small-stature mature human-like Riftborn woman default with deep umber skin, high cheekbones, copper-brown eyes and close-cut black hair. An ash-grey scavenger jacket and teal wrap shirt accompany brown trousers, treaded work boots, a right-hip rope coil and left-hip pouch. Both hands are empty. Her calm presence, unexplained survival and unresolved tracks hook gain no invented anatomy or origin.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/f8fddf7ffdbf0a581f37589c2987551993349828e52c55d6aa9d62d32aa071c5.png)
+
+[Full-body reference](../assets/characters/94167cce6aece563250181e44107509075c448afdebc2d7f410f1fb78dbf9a3f.png)
+
+[Multiview reference sheet](../assets/characters/d11cc5b2257f0e1204f48130bcb28a1d21a0b770ac9ef59a0f2654495a8ff8cc.png)

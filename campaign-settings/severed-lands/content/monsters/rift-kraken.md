@@ -47,3 +47,15 @@ A Rift-touched leviathan from a drowned world that fell through the Rift into th
 **Tentacle.** +18 to hit, reach 30 ft., 20 (3d6 + 10) bludgeoning. Grappled (escape DC 20).
 **Fling.** Large or smaller creatures grappled are thrown up to 60 feet in a random direction and knocked prone. If striking a solid surface, target takes 1d6 bludgeoning per 10 feet thrown.
 **Lightning Storm.** Magically creates three bolts of lightning, each striking a point the rift kraken can see within 120 feet. Each creature within 10 feet must make DC 23 DEX save, taking 22 (4d10) lightning (half on success). Recharges 5-6.
+
+## Appearance and artwork
+
+An editable cephalopod-like Kraken default: one blue-black/slate mantle and head with two warm amber eyes, eight connected arms with sucker rows and nested inward organic/ring structures. Eight arms and two eyes define this visual presentation only. The wake ecosystem remains authored context; no fauna identity, victim, named drowned world or proof of the eye rumour is invented.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/760edf4b40397e549abaadf3838cb68f9b042b8930ec92de487f76aa8a19c6ec.png)
+
+[Full-body reference](../../assets/characters/6e2ecda5fb7ff571e2be57881c856f6bbe209d08c49ad2b1a61b4d64623956c6.png)
+
+[Multiview reference sheet](../../assets/characters/95424548b9156919c642b77fd6852ef985ef3b2f4b67c2559f22722927b66e48.png)

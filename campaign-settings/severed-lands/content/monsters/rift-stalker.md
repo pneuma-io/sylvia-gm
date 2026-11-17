@@ -47,3 +47,15 @@ A Rift-touched predator that hunts by sensing the Veil-residue in its prey — e
 ## Actions
 **Multiattack.** Two slam attacks.
 **Slam.** +6 to hit, 10 (2d6 + 3) bludgeoning.
+
+## Appearance and artwork
+
+Owner-selected nonliteral GM reference: one abstract almost-clear air/Veil envelope with faint nested eddy contours and restrained grey-violet/blue-green edge glints. This does not define underlying anatomy or depict an in-world visibility effect. The Stalker remains permanently invisible, without a known face, body or new ability.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c624f309cde9a6a55baff77f7d2124fe98e6928c0a93260e77a2c7ec4b62781c.png)
+
+[Full-body reference](../../assets/characters/c912e1fc62eda77e3de04c72a4a725128a9963b657504053a71601506ba0b959.png)
+
+[Multiview reference sheet](../../assets/characters/97e135caacf992cabcb86eb108963616ae417352799ba87f12d08807fe783ecb.png)

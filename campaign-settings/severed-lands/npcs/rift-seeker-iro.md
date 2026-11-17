@@ -15,3 +15,15 @@ Iro occasionally serves as a translator between the Raiders and outsiders — on
 ## Personality
 
 Iro is calm, melancholy, and carrying the weight of his people's choices. He loves the Raiders. They're his family, his heritage, his blood. He also believes they're wrong — about the Eternal Battle, about violence as purpose, about everything. He can't change them. He can barely stand to watch. But he stays, because someone has to speak for them, and he's the only one who can.
+
+## Appearance and artwork
+
+A lean mature Riftborn man with deep teak-brown skin, an angular long face, quietly sad dark brown eyes, a clean-shaven jaw and a closely shaved head. Ordinary humanoid proportions and rounded ears are editable visual defaults, not a biological ancestry claim. Worn midnight-blue wrap vest over a pale sand tunic, muted sage shoulder scarf, loose dark slate trousers, cloth ankle wraps and dark walking boots. A water flask and small cloth travel bundle rest at the left hip. Hands empty and relaxed, with composed melancholy bearing. This is the named pacifist Iro, not the generic memory-hunting Rift Seeker creature.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/74250fd3d19e2ffa06bdd0b91be1f634dae2b33f7d3f5e444dd9c59126bdc4cd.png)
+
+[Full-body reference](../assets/characters/e5136a64ae35b2a54728bb3c00425a21f5d452f778d62d2212ccf4bc45c757b3.png)
+
+[Multiview reference sheet](../assets/characters/e1cc99b916a5156128f1d9dbc25f061426fbf5bc54a7ec80f1b19418bd77f93f.png)

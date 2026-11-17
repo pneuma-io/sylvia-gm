@@ -38,3 +38,15 @@ A floating, gas-filled fungal orb native to the deeper reaches of the Hollows. I
 
 ## Actions
 **Touch.** +0 to hit, 1 poison damage.
+
+## Appearance and artwork
+
+An editable gas-filled fungal Spore default: one ochre/cream inflated orb with russet peeling fungal plates, one central folded eye-like fungal cup and several short rounded cup-ended stalk buds. Nested mycelial lamellae suggest Rift depth and beholder resemblance without functional eyes, rays or new powers. No threatened spore burst or hallucination scene is depicted.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c1952b84dda5959d5b1baf90e50998c448ec0ba48e753c11f9c5c2cc6b830206.png)
+
+[Full-body reference](../../assets/characters/f17144708c4c0e54e7a0766c3b034ed10da7394d1731dc590b07f9aa6f6e511c.png)
+
+[Multiview reference sheet](../../assets/characters/89054e87f2d566c0e45152e3b4d4077d5ad58211fb73981405a2022c5c47d918.png)

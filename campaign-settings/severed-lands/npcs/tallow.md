@@ -17,3 +17,15 @@ Tallow has asked the Returners for an escort into the Deep Rift — the massive 
 ## Personality
 
 Tallow is intense, articulate, and frightened in a way she's trying very hard to hide. The Veil is her life's work — her art, her discipline, her way of understanding the world. If the Veil is changing, everything she's built her identity around is changing with it. She needs answers. She's afraid of what the answers might be.
+
+## Appearance and artwork
+
+A clearly adult human-like female Riftborn default with pale-gold freckled skin, oval face, grey-blue eyes and short ash-blonde curls. Deep teal travel layers, off-white linen, a sage wrap, slate trousers, cloth sash and flat shoes accompany a closed right-hip bag. Both hands are empty. Her intensity and concealed fear remain expressive traits; no original world, prophecy or new magical effect is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/ffd06a4f1a5865f8d42f5bcf19d8ec97394798bdac6663b50353239ae6774699.png)
+
+[Full-body reference](../assets/characters/432eaa3ef0eac3627ea7c7c6351bfaf13d9d7bdf64fb246b5eea5ca0ba7ad961.png)
+
+[Multiview reference sheet](../assets/characters/058788e861af3e134ba17bff04559be7ac35c52cb73b9d7d11bdb6c6c4b6600e.png)

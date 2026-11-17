@@ -44,3 +44,15 @@ A shapechanging Riftborn from a world of spirits and hungry gods. The oni fell t
 **Claw (rift oni Form Only).** +7 to hit, reach 5 ft., one target. 8 (1d8 + 4) slashing.
 **Glaive.** +7 to hit, reach 10 ft., one target. 15 (2d10 + 4) slashing, or 9 (1d10 + 4) in Small/Medium form.
 **Change Shape.** The rift oni magically polymorphs into a Small or Medium humanoid, a Large giant, or back to true form. Stats unchanged except size. Equipment not transformed.
+
+## Appearance and artwork
+
+An editable unmasked Oni giant-form default: lean blue-grey angular face, gold eyes, two short ivory horns and shoulder-length white hair. Iron chain mail, indigo/ash long coat with nested inner folds, slate trousers/black boots. Glaive stays in left hand, right clawed hand empty. No named stolen identity, deity, culture or additional body/flight anatomy.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/8934ae1f6efcfd361734ecadddda652afdbebaa2364d8e429fccda102d893b28.png)
+
+[Full-body reference](../../assets/characters/92f83c67dd46d6a8b0e496d8490ad9dbff695ac06c5d41302e613f47f4cfb63a.png)
+
+[Multiview reference sheet](../../assets/characters/3880a01cf8b8299b071c7ec8ee183e6ea0a13ac89b119d5bfdaab6bd0ea45124.png)

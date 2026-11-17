@@ -17,3 +17,15 @@ She knows which items are stolen, which are fake, and which are dangerous. She d
 ## Personality
 
 Kestrel is sharp, theatrical, and absolutely in control of her auction floor. She treats every sale like a performance. The performance is always good. The buyers keep coming back.
+
+## Appearance and artwork
+
+A tall full-figured Human woman with copper skin, angular cheekbones, blue-grey eyes, arched brows and long jet-black hair in a high ponytail falling behind the right shoulder. Mustard-ochre tailored merchant vest over charcoal-green sleeves and a matching long skirt, rust-red woven waist sash and polished dark shoes. A plain brass handbell is carried in the left hand; the right hand makes a controlled open auctioneer gesture. Assured theatrical half smile.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/bf25b41704ca837b145c19d05d4bd5efbc212d06b552bc722d83bbed71c127a7.png)
+
+[Full-body reference](../assets/characters/e742ad9bf271c3307dad88dec3e9f6fcf378a340f6609aa28aca89ff30a1b0d5.png)
+
+[Multiview reference sheet](../assets/characters/ea1e41b31751e59818fb34a59fdf5975a8e7c567e6118221849e37fb9fad383c.png)

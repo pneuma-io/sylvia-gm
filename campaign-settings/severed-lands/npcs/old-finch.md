@@ -15,3 +15,15 @@ So he contributes the way he can. Finch holds court in a corner of the Warrens c
 ## Personality
 
 Finch is cranky, warm, and full of stories. He'll talk for hours if you let him. Most of the stories are true. The ones that aren't are better than the ones that are.
+
+## Appearance and artwork
+
+An elderly human-like default with fair weathered ruddy skin, narrow cheekboned face, grey-blue eyes, receding wispy grey hair and a small uneven moustache. Faded rust, olive and oatmeal layers and soft shoes accompany an ordinary wooden armchair. The complete reference stays seated with relaxed hands and feet resting, respecting his authored limited mobility without inventing a diagnosis, missing limb or restored patrol ability.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/ce225e39b0d1aa7231ff2d892fd869e72f1cae1533c262a5574562133782183c.png)
+
+[Full-body reference](../assets/characters/99ebb79d318e70242b808288cbb11425cd212cb06256e9ea80261a97fe1029be.png)
+
+[Multiview reference sheet](../assets/characters/d88568d0b683377d79705b17aca48df938fd9062f2fe0fc9afcd1f94e2dbe99d.png)

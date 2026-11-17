@@ -17,3 +17,15 @@ Salt's network extends beyond the Warrens — she has informants in Thornwall pr
 ## Personality
 
 Salt is cheerful, grandmotherly, and utterly amoral about the information trade. She treats secrets like produce — some are fresh, some are past their sell-by date, all of them have a price. She genuinely likes people. She just likes knowing things about them more. She keeps a pot of tea going at all hours. Visitors are always offered a cup. No one knows if the tea is safe. Everyone drinks it anyway.
+
+## Appearance and artwork
+
+A short stout elderly Human woman with cool light olive skin, a broad rounded face, selected soft age lines, pale green eyes and silver-grey curls in a low bun. A warm knowing smile. Auburn-brown wrap dress, muted lavender shawl, dark closed button shoes, copper stud earrings and a closed purse at the left waist. She carries a plain cream cup and saucer with both hands. The tea's safety and the full extent of her information network remain unresolved.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/f0b2d699cb53c40df749f67ad09c12d7c657cba6acc818b84cd1defc876171b6.png)
+
+[Full-body reference](../assets/characters/1d7408f4571b8982d4d9089b7bc16fde80ca1a8bec8861596b191fc71e56040a.png)
+
+[Multiview reference sheet](../assets/characters/22ce57eedeb3c007ef5e5094bdf025a56dd971082b1e893533e01350215b387f.png)

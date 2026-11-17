@@ -42,3 +42,15 @@ Where the Rift meets deep cold, it crystallizes into a jagged, moving glacier of
 ## Actions
 **Claws.** +3 to hit, 3 (1d4 + 1) slashing + 2 (1d4) cold.
 **Frost Breath.** 15-foot cone, DC 10 DEX save or 5 (2d4) cold. Recharges 6.
+
+## Appearance and artwork
+
+An editable active Ice default: one connected faceless jagged glacier shard of pale blue-grey ice, violet active frost and nested translucent internal facets. Two attached hooked material edges suggest claws without humanoid anatomy. It hovers as one complete mass; the normal motionless ice-shard disguise and authored mechanics remain unchanged. No trapped victim, wings or new ability is added.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/69062a285c7822da967a34aff6615da8bf20d6d85658148249de3794b999bdd0.png)
+
+[Full-body reference](../../assets/characters/9b618c41b97f945f38fed5ce7132945bd8efade56dcbc0f9dd21ebd378754d33.png)
+
+[Multiview reference sheet](../../assets/characters/fe95d5b5d1a8ca66ee6bccc878f40caee14faf603ef38279fb67c562a2ad4975.png)

@@ -125,3 +125,38 @@ def handle_export_package_candidate(ctx: DispatchContext, params: Mapping[str, A
     if ctx.method == "export_package_candidate_file":
         return {"export": result, "artifact_path": str(target.resolve(strict=True))}
     return result
+
+
+def handle_character_bundle(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
+    from sylvia_gm.application.character_transfer import (
+        cancel_character_preview,
+        confirm_character_preview,
+        export_character_file,
+        stage_character_preview,
+    )
+    try:
+        if ctx.method == "preview_character_bundle_file":
+            return stage_character_preview(
+                ctx.storage_root, Path(_required_text(params, "source_path")),
+            )
+        if ctx.method == "confirm_character_bundle_import":
+            return confirm_character_preview(
+                ctx.application_owner, ctx.storage_root, _required_text(params, "source_sha256"),
+            )
+        if ctx.method == "cancel_character_bundle_import":
+            return cancel_character_preview(
+                ctx.storage_root, _required_text(params, "source_sha256"),
+            )
+        return export_character_file(
+            ctx.application_owner, ctx.storage_root,
+            export_id=_required_artifact_id(params, "export_id"),
+            artifact_id=_required_text(params, "artifact_id"),
+            expected_content_sha256=_required_text(params, "expected_content_sha256"),
+            kind=_required_text(params, "kind"),
+        )
+    except (ValueError, OSError) as error:
+        raise CommandRejected(str(error), code="character_bundle_invalid") from error
+
+
+def handle_image_art(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
+    return ctx.application_owner.image_art_action(dict(params))

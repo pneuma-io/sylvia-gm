@@ -15,3 +15,15 @@ Linden is the researcher who documented the Door's first flicker — three secon
 ## Personality
 
 Obsessive, brilliant, and perpetually sleep-deprived. Linden treats the Door like a conversation partner who only speaks in fragments. They've filled seventeen notebooks with observations. They're on their eighteenth.
+
+## Appearance and artwork
+
+A tall slender Riftborn adult of androgynous appearance with pale olive skin, a long narrow oval face, tired blue-green eyes and thin round steel spectacles. Straight ash-blond chin-length hair is tucked behind ordinary rounded ears and gathered at the nape. Cream work coat over a russet sleeveless wrap vest, loose grey trousers, plain belt and dark ankle boots. One closed slate-blue notebook under the left arm and a short charcoal pencil in the right hand. Intent sleep-deprived bearing, without assigned ancestry or magical powers.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/1b7f183f0b41a600457709f180fb1fbca7f97916d162f0091a59e2700c4d5a54.png)
+
+[Full-body reference](../assets/characters/9cf4c497d16131c9f27d2f8654e38ff1743d63ac0b7c229757ed53700c14b3b5.png)
+
+[Multiview reference sheet](../assets/characters/274d408073ba972a47faa8c80fe30fc0dcf370e86f595d0e9eec3abd2a75bedc.png)

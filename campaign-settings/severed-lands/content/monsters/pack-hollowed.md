@@ -34,3 +34,15 @@ A Hollowed that hunts in coordinated packs, their Rift-twisted minds linked by a
 **Bite.** +4 to hit, 4 (1d4 + 2) piercing.
 **Spear.** +4 to hit, 5 (1d6 + 2) piercing, or 6 (1d8 + 2) two-handed.
 **Longbow.** +3 to hit, range 150/600 ft., 5 (1d8 + 1) piercing.
+
+## Appearance and artwork
+
+An adult humanlike editable Pack Hollowed default with grey-brown skin, watchful violet irises, rough silver-grey curls and narrow angular features. Nested closed temple/neck/wrist ridges carry restrained refraction. Ochre hide over slate and olive clothes accompanies a left shield, right spear and back longbow/quiver. Former ancestry and shared-exposure event stay unresolved; no psychic beam or new ability is added.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/78834c750f3cd39a2c66681fe6837a8e93b125664f833974e08bb627ec5c7fe0.png)
+
+[Full-body reference](../../assets/characters/bc1e76b3e2d408d50202e5c5215715ad7746b182e3a5a3ab999736e07df8f332.png)
+
+[Multiview reference sheet](../../assets/characters/a7c3e1bb5517c612ac7197f04a31c42a8eba3814a4c2afef51322fb38b8d107a.png)

@@ -36,3 +36,15 @@ A defensive mechanism installed around Anchor Doors by the Wardens — a constru
 ## Actions
 **Smother.** +5 to hit, reach 5 ft., one Medium or smaller target. Grappled (escape DC 13). While grappled, target is restrained, blinded, and at risk of suffocating. Rug can smother one at a time.
 **Squeeze.** When smothering, bonus action: 10 (2d6 + 3) bludgeoning to grappled creature.
+
+## Appearance and artwork
+
+An activated low, broad stone cage construct with a heavy base ring and two thick interlocking arched hoops around an empty capture space. Pale weathered grey masonry, squared rune-plates and restrained worn bronze joints. Recessed angular incisions suggest recursive violet-blue depth within the stone surfaces. It has no humanoid head, face or limbs. Its normal-rug motionless disguise is distinct from this activated form.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/5ec7c6184ee61f8c88b90dcdda68f5c47b11f90cbfa7efc128560ead786ddf24.png)
+
+[Full-body reference](../../assets/characters/4c0d2031fc9b7512af712071dbe9017d24410cfb775c61faaab90f5bcc9d54cb.png)
+
+[Multiview reference sheet](../../assets/characters/5cc1704a02441cdb6fb3d16e31873327fad36d706c070aca605774bf43e5a28e.png)

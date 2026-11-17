@@ -17,3 +17,15 @@ The Prophet is the most visible Hollowed in Thornwall. He's also the reason many
 ## Personality
 
 The Prophet is beyond normal conversation. He responds to questions with fragments that may or may not be answers. He recognizes people who've spoken to him before — his eyes track them — but he doesn't acknowledge them directly. He's not gone. He's just listening to something the rest of Thornwall can't hear.
+
+## Appearance and artwork
+
+An adult human default with deep warm-brown skin, a broad oblong face, short dense black coils and clean chin. Both irises are fully violet, with ordinary pupils and natural white sclera, without glow. Ochre, faded blue and olive simple clothes and flat shoes accompany an utterly still attentive listening stance with empty hands. His Speaker stage is preserved without inventing prophecy imagery or a curse.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/a399b671f1f0602e3e176b241ee7516062152eaea126e6eb15b37193dc325c54.png)
+
+[Full-body reference](../assets/characters/9b7c9074a84a681592e1f8014eb3fa3397dd36916cf03a50f523ce200dc2adc4.png)
+
+[Multiview reference sheet](../assets/characters/97f8eb8728bca26d3f4f878a4a8e2b1c1ba3cd0873e9434e8cbdc37e2d827f34.png)

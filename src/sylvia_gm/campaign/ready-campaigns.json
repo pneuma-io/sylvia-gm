@@ -3,7 +3,7 @@
   "provenance": {
     "adventures": "Existing bundled Severed Lands Campaign Plans; story preparation unchanged.",
     "characters": "Existing SRD starters and Tavin Bell; independent prepared role/level editions.",
-    "starter_source_sha256": "40fe46595f4b4b70d7188e96877e71a50c5342e8d4027f44026a4b265268a716",
+    "starter_source_sha256": "24894ee7314b6c8e2e451bea0cf2fcdec169237478fce00eb560bbf0d808be2e",
     "rules": "Contained SRD Lite 0.3.24; retained SRD 5.2.1 class and creation references.",
     "notices": [
       "LICENSING-STATUS.md",
@@ -250,9 +250,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
+              },
+              "portrait": {
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
+              }
+            }
           },
-          "content_sha256": "d081b91298cb5dac106fd15cd287038accdba00d69889dee59cef9d013f90b49"
+          "content_sha256": "7ec32c8362f444aab7cca42d0b379256c84ed359795691c7f563d317532039b8"
         }
       ]
     },
@@ -471,9 +491,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
+              "frame": {
+                "x": 0.5,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+                "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+                "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+              },
+              "portrait": {
+                "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+                "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
+              }
+            }
           },
-          "content_sha256": "12d4ce7cb5a2312dd3fc5672610ec84e818d7cbca7b6667a13c96f15dd048118"
+          "content_sha256": "3ddd9764318406a37cd879e2465b4ab860dbd8637fb07c7b680cfbae58f7fbe0"
         },
         {
           "role": "companion",
@@ -715,9 +755,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
+              },
+              "portrait": {
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
+              }
+            }
           },
-          "content_sha256": "c3ede65103fd97b323fa802e0796ce7deceb50ef979636cc5910ca9e50307274"
+          "content_sha256": "4059c37699eb3aa205e653f3dc9fae90d757819e7f6d7346f3dbade2aabfbe95"
         }
       ]
     },
@@ -926,9 +986,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable short adult Human with rosy-brown skin, amber eyes, small angular chin, broad nose, uneven near-black bob/fringe and quick grin. Lilac shirt under plain brown leather, dove-grey trousers and ankle boots. One shortbow held low, spare sheathed shortsword and closed tools pouch.",
+              "frame": {
+                "x": 0.6,
+                "y": 0,
+                "zoom": 1.1
+              },
+              "full_body": {
+                "path": "assets/characters/54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200.png",
+                "sha256": "54c90ff6b7917e82397e5c64953f575295af58b726b1140f682d295dc2b98200"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377.png",
+                "sha256": "bcd6e765b1701717c07d5bad6002a8f36fefd4affe857d5770f5a7274b027377"
+              },
+              "portrait": {
+                "path": "assets/characters/7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25.png",
+                "sha256": "7e39ee1d1a6174ab699846afeb9f9d0f4606e07db700cb38dadfbb892b2efa25"
+              }
+            }
           },
-          "content_sha256": "1f95454629494f037a1d0fda82a9703323e3c82c5dede890a55cfa8b992319f6"
+          "content_sha256": "aaa4a26986edabb4ac50cfebd34cccce91d5490b93e65bc10746287a733f7675"
         },
         {
           "role": "companion",
@@ -1128,9 +1208,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
+              "frame": {
+                "x": 0.5,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+                "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+                "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+              },
+              "portrait": {
+                "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+                "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
+              }
+            }
           },
-          "content_sha256": "1fdba2d792f0b9e63f18a925056f90ab2ffe48a3232d387173992de5f7e2e618"
+          "content_sha256": "b187c5fc9b42a74eaaba00c9996d693913645f15957df7682e74bf3cd600469a"
         },
         {
           "role": "companion",
@@ -1372,9 +1472,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
+              },
+              "portrait": {
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
+              }
+            }
           },
-          "content_sha256": "c3ede65103fd97b323fa802e0796ce7deceb50ef979636cc5910ca9e50307274"
+          "content_sha256": "4059c37699eb3aa205e653f3dc9fae90d757819e7f6d7346f3dbade2aabfbe95"
         }
       ]
     },
@@ -1608,9 +1728,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable adult Human default: deep warm brown skin, amber-brown eyes, rounded heart-shaped face/dimples and short dense copper-auburn curls. Russet leather jerkin over dusty teal blouse, coral neckerchief, indigo waist panels and charcoal trousers; right lowered dagger, left empty hand, one lute strapped at left back/hip. No shield or named faith/history.",
+              "frame": {
+                "x": 0.5,
+                "y": 0.0,
+                "zoom": 1.1
+              },
+              "full_body": {
+                "path": "assets/characters/707778ba7bc3e6bccfc84d389672e337fa5ef72ec56e142fd72001a4ea7a2294.png",
+                "sha256": "707778ba7bc3e6bccfc84d389672e337fa5ef72ec56e142fd72001a4ea7a2294"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/ee62c21cd75bcdb676d5de7c2fbdb9f977e25f16b0928849af4770c66c509df2.png",
+                "sha256": "ee62c21cd75bcdb676d5de7c2fbdb9f977e25f16b0928849af4770c66c509df2"
+              },
+              "portrait": {
+                "path": "assets/characters/b5c407c1e2ac384a129c5042aeecdc5fd096ce9416d46ba64eb3bbe3f503aa9b.png",
+                "sha256": "b5c407c1e2ac384a129c5042aeecdc5fd096ce9416d46ba64eb3bbe3f503aa9b"
+              }
+            }
           },
-          "content_sha256": "c5137d76c495da3ccca80643a5a0e6edc98d985faf7056dc3a8645739ee86096"
+          "content_sha256": "1070fe5742ae31ebd8c6e7e41d75b6c17bf93f45f48fc020c09a5995124118c0"
         },
         {
           "role": "companion",
@@ -1789,9 +1929,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable adult Human default with light olive-grey tan skin, long broad-jawed clean-shaven face, slate-brown eyes and close dark buzz cut/high temples. Practical chain-mail hauberk over burgundy cloth, charcoal trousers/brown boots; both hands on one plain greatsword at right front, no shield, plate, heraldry or named military history.",
+              "frame": {
+                "x": 0.5,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6.png",
+                "sha256": "94aca41d42c19342d606f663be32f1e9932dfa1f2210638fc2e08647ec7072d6"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09.png",
+                "sha256": "4a290901d684fc6539367237dac546773e29e9f9c48e7c932fc47fe144dd8b09"
+              },
+              "portrait": {
+                "path": "assets/characters/2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0.png",
+                "sha256": "2edc97ad8ab8538c8ee98113c7b9fcd7b6f660b557327a23f32669a7244f03f0"
+              }
+            }
           },
-          "content_sha256": "30eea6478cc30917f3a2ccb6a7f57a9adc69bc99909972955cfe1382a5b732b2"
+          "content_sha256": "113614767224c2754f016ac3be88ce8f500f77d0dac207d45cbd068e6819ccae"
         },
         {
           "role": "companion",
@@ -2010,9 +2170,29 @@
               "climb_speed": 0,
               "swim_speed": 0
             },
-            "setting_data": {}
+            "setting_data": {},
+            "visuals": {
+              "appearance": "Editable mature Human default with deep brown skin, patient dark eyes, broad rectangular face, close grey natural coils, clean-shaven cheeks and age creases. Short iron chain shirt over cream/indigo-grey clothes, right lowered mace, left plain round shield and an unmarked wrapped symbol token. No named faith, home, allegiance or history assigned.",
+              "frame": {
+                "x": 0.6,
+                "y": 0.0,
+                "zoom": 1.2
+              },
+              "full_body": {
+                "path": "assets/characters/0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f.png",
+                "sha256": "0113a8d4e5824dbec4f9ad4f50269410f891bb67aaafde0b7ba4050f8cf47b5f"
+              },
+              "reference_sheet": {
+                "path": "assets/characters/2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c.png",
+                "sha256": "2addb33062f216c06009598cbb341536be500eedc4d61f7221ae02c613c8360c"
+              },
+              "portrait": {
+                "path": "assets/characters/243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328.png",
+                "sha256": "243365bc611de376487d71a8d54ab9394c9c66c286fb8bcf6a2ea05ea8ca0328"
+              }
+            }
           },
-          "content_sha256": "d081b91298cb5dac106fd15cd287038accdba00d69889dee59cef9d013f90b49"
+          "content_sha256": "7ec32c8362f444aab7cca42d0b379256c84ed359795691c7f563d317532039b8"
         }
       ]
     }

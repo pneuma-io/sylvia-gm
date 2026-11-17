@@ -17,3 +17,15 @@ She's been translating Warden inscriptions that the Athenaeum couldn't crack. Th
 ## Personality
 
 Salt-Ash is intense, fragmented, and fighting to stay coherent. The Hollowing is progressive — she knows she's losing language, losing linear thought, losing the ability to distinguish between research and revelation. She's racing her own deterioration, trying to finish her work before the Hollowing finishes her.
+
+## Appearance and artwork
+
+A mature human default with cool deep-brown skin, a long fine-cheekboned face, short white natural hair and fully violet irises without glow. Plum, pale grey and navy practical scholar layers and flat shoes retain ordinary human anatomy. Her right hand carries one closed plain notebook and her left is empty. The image adds no readable research, resolved warning, prophecy or new transformation.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/3da661c514ba7bf9253e75d4a04c7ee4b375701cbcc0625249edbe968de588c2.png)
+
+[Full-body reference](../assets/characters/f0ae4e3a3b66a47925d29d87dafad9635e5088c481d07f56f670436ba46699b6.png)
+
+[Multiview reference sheet](../assets/characters/36c24c513a04bfb62153dff67a06fff27f88c3df94a83e6e6b9356650ffbb80f.png)

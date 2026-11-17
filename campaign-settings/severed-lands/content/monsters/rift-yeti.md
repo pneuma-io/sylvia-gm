@@ -39,3 +39,15 @@ A Rift-touched yeti whose natural cold-adaptation has been amplified into someth
 **Multiattack.** Chilling Gaze + two claw attacks.
 **Chilling Gaze.** One creature within 30 feet must succeed on DC 13 CON save or take 10 (3d6) cold damage and be paralyzed for 1 minute. Repeat save at end of each turn, ending on success.
 **Claw.** +6 to hit, 7 (1d6 + 4) slashing + 3 (1d6) cold.
+
+## Appearance and artwork
+
+A massive upright off-white yeti with permanently frosted fur, broad shoulders, long heavy arms, grey-blue primate-like face, pale amber eyes and two short backward-curving slate horns. Two large five-fingered clawed hands and two broad five-toed bare feet remain visible. Nested fernlike Rift-ice laminations grow within its coat, preserving one living body. Horns and selected proportions are editable visual defaults; no clan, gear or new ability is assigned.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/8ebd6753ecc7886f35e90acb055c537df61d5ba2fe1175fcd2d76cd008269fda.png)
+
+[Full-body reference](../../assets/characters/e709bcfc1ec963be89a922b1d73359049d40bb22d0b5983ed72fdc683cb2ae3f.png)
+
+[Multiview reference sheet](../../assets/characters/39f7b7038a2dbadccbb60bc605cf8aae93c0d7b887528a8de37b6ee3d38799b0.png)

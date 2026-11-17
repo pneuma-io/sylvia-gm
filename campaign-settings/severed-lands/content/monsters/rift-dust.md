@@ -40,3 +40,15 @@ A choking, sentient dust storm that accumulates where the Rift has ground stone 
 ## Actions
 **Claws.** +4 to hit, 4 (1d4 + 2) slashing.
 **Blinding Breath.** 15-foot cone, DC 10 DEX save or blinded for 1 minute. Recharges 6.
+
+## Appearance and artwork
+
+A faceless editable Small Rift Dust default: one broad ochre-grey particulate cloud with nested eroded laminae and cool mineral refraction. Two attached hooked edge lobes end in irregular hooked grain points, a visual expression of its authored claws without a humanoid body or added mechanic. No ember, flame, wing or inhalation victim is depicted.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/29a7058cc9f1d287de3ec68204fccfb8db402ba5f41249d30f36c2215d3206c0.png)
+
+[Full-body reference](../../assets/characters/4aafd6509f6915ac5d841b120282f49ef63576562bfe204df8b8e911ab5bb41c.png)
+
+[Multiview reference sheet](../../assets/characters/ebbeed246877ee202bbbf487e0077743efa5d2a368dda342e76c61b5fcc3ee0c.png)

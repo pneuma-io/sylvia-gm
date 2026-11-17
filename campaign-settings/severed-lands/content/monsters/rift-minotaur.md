@@ -33,3 +33,15 @@ A Rift-touched minotaur whose labyrinth-sense has been warped by Veil exposure i
 ## Actions
 **Greataxe.** +6 to hit, 17 (2d12 + 4) slashing.
 **Gore.** +6 to hit, 13 (2d8 + 4) piercing.
+
+## Appearance and artwork
+
+An editable bull-headed minotaur default: charcoal-umber fur, pale broad muzzle, copper-brown eyes, two outward/upward horns with nested inward labyrinth grain, short black mane, two arms, two hoofed legs and one tufted tail. Plain dark leather/ochre-grey wraps; one iron greataxe held with both hands. No deity, rank or new traversal ability is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/5534986e26b7e68b9d6a7e19a2967f91eaf68621b1efab9fcb12bcf522211d2d.png)
+
+[Full-body reference](../../assets/characters/d467bc0961385932adfe4425e03ad906dc4b1d2816d907f3a5a626d6da4d6748.png)
+
+[Multiview reference sheet](../../assets/characters/5113182ba98f4f0d8ccb965875c25469569fd35260f61f859de6f2dc778967a0.png)

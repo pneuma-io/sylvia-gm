@@ -46,3 +46,15 @@ A towering construct of black iron forged in the Wardens' deep-foundries beneath
 **Multiattack.** Two slam attacks.
 **Slam.** +13 to hit, 20 (3d8 + 7) bludgeoning.
 **Poison Breath.** 15-foot cone, DC 19 CON save or 45 (10d8) poison (half on success). Recharges 6.
+
+## Appearance and artwork
+
+A towering solid black-iron construct with squared shoulders, compact angular head, inset dark eye slots, vent-like mouth and two heavy arms and legs. Five-fingered hands remain empty. Faint cool blue-green abstract anchor-runes occupy etched shoulder, chest and forearm bands; nested depth stays within fixed cuts. There is no wearer, furnace chest or added weapon.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/4b0a629f51c0431f5dfe4a89bf138a312f7c88c719581b704383e9f073712dd1.png)
+
+[Full-body reference](../../assets/characters/f2d63c83ef514553c82e27cb8046456924610b14e69c7d273a35ec057fa1e1d6.png)
+
+[Multiview reference sheet](../../assets/characters/1ef4bbce4b31045b0b199239fb86409214ffee01ccb6b1741a9bd6784e02ab5f.png)

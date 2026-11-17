@@ -35,3 +35,15 @@ A haze of hot ash and embers animated by a Rift spark that found fuel in the aft
 
 ## Actions
 **Touch.** +4 to hit, reach 5 ft., one target. 7 (2d6) fire. If the target is a creature or flammable object, it ignites. Until a creature takes an action to douse, the target takes 3 (1d6) fire at the end of each of its turns.
+
+## Appearance and artwork
+
+A faceless editable Small Rift Cinder default: one squat hot-ash haze with charcoal flake layers and irregular orange-gold embers. Nested inward ash folds contain ember-lit depth without eye patterns or a humanoid body. Its low form adds no flight, new power, readable language or depicted victim.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/1108d39972cb373dfd07e5ed66745dba152e58823bb73d5cdbda173604e7b21b.png)
+
+[Full-body reference](../../assets/characters/72bcf23f3f437c89497b8f75fce0c626e970ef42e4702dbf5be134df2de74639.png)
+
+[Multiview reference sheet](../../assets/characters/2ff37b5c7e0ec3b07e38006b07521b37eab746ea1b767a42dc823afde5b4b70a.png)

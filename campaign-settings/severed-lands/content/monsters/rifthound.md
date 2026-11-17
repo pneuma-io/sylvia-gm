@@ -39,3 +39,15 @@ A Rift-touched canine that hunts in the margins between settled lands and Rift-s
 **Bite.** +4 to hit, 4 (1d4 + 2) piercing.
 **Scimitar.** +4 to hit, 5 (1d6 + 2) slashing.
 **Sleep Gaze.** One creature within 30 feet must succeed on DC 10 WIS save or fall unconscious for 10 minutes or until damaged. Immune for 24 hours on success.
+
+## Appearance and artwork
+
+The selected reference is an adult jackal-humanoid hybrid with sandy-gold fur, dark saddle/ear backs, tall pointed ears, amber eyes, long muzzle and black-tipped tail. Two arms and digitigrade legs retain clawed hands and canine paws. Fine nested fur/ear ridges carry muted teal-violet inner depth. An umber tunic, slate trousers and plain belt accompany a lowered right-hand scimitar; the left hand is empty. This is a living creature; the specific human form and personal history remain unspecified.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/6e8f51f83efd33bb031b74e449bf69d86b6fdd92a0d28453f59909328b4a07ad.png)
+
+[Full-body reference](../../assets/characters/5abfba695d0bace0329e1a100906b3c6804411976dc057150cc7ad6712ed2c55.png)
+
+[Multiview reference sheet](../../assets/characters/19cf919799277bed010f51b9315a99405725dd06e94a38f3212832a7ef6e3d89.png)

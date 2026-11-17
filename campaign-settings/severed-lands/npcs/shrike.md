@@ -17,3 +17,15 @@ She's been watching Gareth's unification push with interest. The Red Banner is t
 ## Personality
 
 Shrike is professional, calculating, and utterly unsentimental about her work. Banditry is a trade, not an identity. She treats it accordingly — fair rates, minimal violence, consistent results. Her raiders respect her. The merchants she hits respect her. That's rarer than it sounds.
+
+## Appearance and artwork
+
+An adult human woman default with warm medium-brown skin, angular cheek/jaw shape, dark grey eyes and short asymmetrical black hair. A dark leather jerkin, rust-plum shirt, olive short cape, charcoal trousers and flat calf boots accompany a right-hip sheathed utility knife. Both hands remain empty. Her professional restraint is retained without canine traits, band trophies or a borrowed faction emblem.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/dc51b6a6ff4c132b3cd981039eb94df541e6d4d9b53b2495787d4926c3918139.png)
+
+[Full-body reference](../assets/characters/6a8218b3f3acbeda91a1f2a4de34b377864b10d6305e2a76edae77fa69ec9795.png)
+
+[Multiview reference sheet](../assets/characters/7cf82a72d6ff354d8ce0042748120d125790838c9e8e1708770801f15e45475d.png)

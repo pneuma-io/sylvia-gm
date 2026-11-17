@@ -34,3 +34,15 @@ A mass of prehensile, Rift-infused vines that lash out from the canopy of the Ve
 
 ## Actions
 **Constrict.** +4 to hit, reach 10 ft., one target. 9 (2d6 + 2) bludgeoning, and Large or smaller target is grappled (escape DC 12). Until grapple ends, target restrained, blight can't constrict another.
+
+## Appearance and artwork
+
+One connected coiled tangle of living dark-green/brown vines with sweeping loops, fine tendrils, olive heart-shaped leaves and backward thorns. Clear amber sap and recurring leaf-vein/tendril folds supply restrained inner depth. Its resting shape remains an ordinary vine tangle, without a face, victim or detached appendage.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/362b9117431ac0c1b5db3e7342e3a2bed8857b5b0424ca5270c708eb186071ae.png)
+
+[Full-body reference](../../assets/characters/9cf290ffead6b5c749f4f640a2ce094192ad804a096f29d9dbf4a890bc6d92a1.png)
+
+[Multiview reference sheet](../../assets/characters/07d74918dc457730de6bfd5a42ff7326be64998bf941e3ecf45d65b89f1e01ff.png)

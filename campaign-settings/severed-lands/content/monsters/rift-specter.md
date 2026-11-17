@@ -52,3 +52,15 @@ A Rift Echo of betrayal — formed when someone was murdered by those they trust
 
 ## Actions
 **Life Drain.** +4 to hit, 10 (3d6) necrotic. DC 10 CON save or max HP reduced by damage taken until long rest. Dies if max HP reaches 0.
+
+## Appearance and artwork
+
+An editable anonymous adult Specter default: translucent pallid grey-lavender narrow face, pale-grey eyes, ink-violet swept hair, plain blue-grey spectral garment and two empty five-digit hands. One connected fading ragged hem and inward repeated garment veils suggest incorporeality. No deceased/killer identity, injury cause, relationship, weapon or added power is established.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/a3c3f274253f6b90bba846b1c7c3c0496d8968fffab1506d5e809e91bf77d21d.png)
+
+[Full-body reference](../../assets/characters/76a04d4fa657e42f6f13c09b706d9d2f53765c8f9c6df76c0eb77a1cb37f959e.png)
+
+[Multiview reference sheet](../../assets/characters/91515fe572e39ee4e6bc97de775d00e7021ec08f93c420211de923f912241293.png)

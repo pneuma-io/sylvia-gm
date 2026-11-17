@@ -35,3 +35,15 @@ A Hollowed adapted to the darkness of the underdeep — their eyes have atrophie
 ## Actions
 **Multiattack.** Two claw attacks.
 **Claw.** +5 to hit, reach 5 ft., one target. 6 (1d6 + 3) slashing.
+
+## Appearance and artwork
+
+A powerful stooped humanoid editable default with a bald blunt head, two pale sightless orbs and long clawed arms. Milky translucent skin reveals fine violet-cyan vein loops beneath it. Plain charcoal and grey-brown cloth keeps torso and pelvis covered; broad clawed feet remain grounded. Its specific eyes stay pupil-less, without assigning a new ancestry, victim or supernatural ability.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c501ad2377e63a0887c039f6e81717c6ca91065f781236e80f6c08e61c379062.png)
+
+[Full-body reference](../../assets/characters/01ded4b53c97f191b8135c977a20a1c0854dc8c137e89e91e2142f29c7bdda76.png)
+
+[Multiview reference sheet](../../assets/characters/eb0acb6b170db07c791df9cfc8b46b0c2bb6e8de4bf0f172f0bfd2a96c564b54.png)

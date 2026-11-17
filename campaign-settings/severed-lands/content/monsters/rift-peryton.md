@@ -36,3 +36,15 @@ A Rift-touched peryton whose shadow has been severed from its body by Veil expos
 **Multiattack.** One gore and one talons.
 **Gore.** +5 to hit, reach 5 ft., one target. 7 (1d8 + 3) piercing.
 **Talons.** +5 to hit, reach 5 ft., one target. 8 (2d4 + 3) piercing.
+
+## Appearance and artwork
+
+An editable Peryton default: one russet stag-like head with golden eyes, pointed ears and two branched dark antlers on a charcoal/russet avian body, cream throat, two feathered wings, two taloned raptor legs and one feather tail. Nested inward antler grain and secondary-feather arcs carry structural Rift detail. Projected shadow is omitted to avoid inventing the unidentified last prey; the authored severed-shadow rule remains.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/1347931694edc171cdc0d3b2fb47dcf8918a040cf5c31a925324b516f7c2a1e8.png)
+
+[Full-body reference](../../assets/characters/3a2ec3c4b85cdf163757d42641b285547718c4462a5eb292f024402d82677d6d.png)
+
+[Multiview reference sheet](../../assets/characters/44f5d5aac10c59fbba49fb53fa87c1a8ce32de5ecde7d98764b6ad4471bfc2dd.png)

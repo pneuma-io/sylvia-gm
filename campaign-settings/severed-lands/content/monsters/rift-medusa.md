@@ -33,3 +33,15 @@ A Rift-touched medusa whose serpentine hair is shot through with writhing Veil-e
 **Multiattack.** Snake hair + shortsword, or longbow.
 **Snake Hair.** +5 to hit, 4 (1d4 + 2) piercing + 14 (4d6) poison.
 **Shortsword.** +5 to hit, 5 (1d6 + 2) piercing.
+
+## Appearance and artwork
+
+An editable adult Medusa default with cool olive-brown skin, pale-jade eyes and a connected crown of serpentine locks folded through translucent violet Veil channels. Hair-lock count is not a rule; the selected crown arrangement guides later views. Wine/indigo layers cover two humanlike arms and two booted legs; a shortsword stays in the right hand, left empty. No victim, prior identity, mirror power or origin is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/a7631a43006c9cbdd7b9b246b4d3b5392bbe038e381a6411fabcb95c2e246fce.png)
+
+[Full-body reference](../../assets/characters/e3938c3e0b7c131b3e969c5cd665e2363919e0ea688c46d10e3de840c7f44f77.png)
+
+[Multiview reference sheet](../../assets/characters/9a1125d26876dab5c5b6aa519bcdefb3cac27e541e522133a0810e6feb25b3d6.png)

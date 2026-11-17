@@ -23,3 +23,15 @@ He's not a villain in waiting. Merrick has never blackmailed anyone, never sold 
 ## Hook
 
 Merrick's Hollowed informant has gone silent — three weeks with no contact. This has never happened before. Merrick is genuinely concerned — not for the informant's safety, but because a silent informant means something is happening in the Hollows that even the Hollowed don't understand. He's willing to share information with anyone who can find out what.
+
+## Appearance and artwork
+
+A tall slender mature human default with cool medium-brown skin, long narrow face, aquiline nose, attentive dark eyes and smooth swept-back dark hair silvering at the temples. Ink-blue, plum and pale grey tailored layers remain understated. His hands are empty and expression patient and curious. No private files, informants, blackmail or supernatural knowledge are revealed.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/9bcf0054da185b48889674f594103cf3f884eb0c1ff997959d50fd584a8d5532.png)
+
+[Full-body reference](../assets/characters/5612d3d1b0ee447114849f9ec3de2b7d51c22174c6f9af40369a88fa56a01a02.png)
+
+[Multiview reference sheet](../assets/characters/bd7cb0911868ef99e8aceac4e9acea45ac38c5bf8e9a95746cd1e65545958dc9.png)

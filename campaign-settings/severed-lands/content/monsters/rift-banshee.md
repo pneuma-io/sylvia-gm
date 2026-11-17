@@ -56,3 +56,15 @@ A Rift Echo — the death-imprint of an elven woman whose grief was so profound 
 **Corrupting Touch.** +4 to hit, 12 (3d6 + 2) necrotic.
 **Horrifying Visage.** Each non-Rift-touched within 60 ft. must make DC 13 WIS save or be frightened for 1 minute.
 **Wail.** The rift banshee releases a mournful wail. All non-Rift-touched creatures within 30 feet that can hear must make DC 13 CON save. On failure, drop to 0 HP. On success, take 10 (3d6) psychic damage. Recharges on a rest of any kind.
+
+## Appearance and artwork
+
+An adult elven woman editable Rift Echo default with long silver-white hair, sorrowful pale-violet eyes and a narrow spectral grey-lavender face. A full teal dress, grey shawl and wrapped feet float above an ordinary shadow. Selected background-visible translucent edges and nested cloth-contour echoes suggest incorporeal memory without duplicating her face or revealing the loss that created her.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/ae051830664f82b6ef97d3472e048239976f98a714554c8b39ff124c56621d03.png)
+
+[Full-body reference](../../assets/characters/61a14a5d88a58f0068c0594eae9d6867429c4209619d33d5f21da66c3eb3f497.png)
+
+[Multiview reference sheet](../../assets/characters/b2b561499f3b1fdf74d4dea8247f5076faa723d5f34f8cf5118f9c68e91182d9.png)

@@ -39,6 +39,7 @@ import uuid
 from collections.abc import Mapping, Sequence
 from typing import cast
 
+from sylvia_gm.agent._image_art_tools import call_image_art_tool, image_art_model_tools
 from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.agent._session_loop import ProviderActionFeedback
 from sylvia_gm.agent._stateless_mcp import (
@@ -1259,6 +1260,7 @@ def prepare_round_catalog(
     state.discovery_id = f"mcp-discovery-{uuid.uuid4().hex}"
     state.current_catalog = provider_input.current_catalog(state.discovery_id)
     if provider_input.session.role is WriterRole.DM:
+        state.current_catalog = (*state.current_catalog, *image_art_model_tools(self._owner))
         queue_tools = action_sequence_model_tools(self._owner)
         if queue_tools and self._owner.snapshot(state.campaign_id).package_lock.entries:
             state.current_catalog = (
@@ -1273,7 +1275,7 @@ def prepare_round_catalog(
         state.current_catalog = tuple(
             tool
             for tool in state.current_catalog
-            if tool.category in {"reference", "narrative_state"}
+            if tool.category in {"reference", "narrative_state", "image_generation"}
         )
     if provider_input.control.cancelled:
         raise CommandRejected("Agent session provider work was cancelled")
@@ -1876,6 +1878,20 @@ def execute_tool_batch(
         state.missing = _missing_required_arguments(state.parameters, validation_schema)
         if state.missing:
             record_missing_tool_fields(self, state, provider_input, turn_id=turn_id)
+            continue
+        if (
+            state.catalog_tool.package_id == "sylvia.application"
+            and state.catalog_tool.capability.startswith("image_art.")
+        ):
+            try:
+                state.local_tool_results[state.assembly.call_id] = call_image_art_tool(
+                    self._owner, provider_input.session.session_id,
+                    state.catalog_tool.name, state.parameters,
+                )
+            except ValueError as error:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "success": False, "error": str(error),
+                }
             continue
         if (
             state.catalog_tool.package_id == "sylvia.application"

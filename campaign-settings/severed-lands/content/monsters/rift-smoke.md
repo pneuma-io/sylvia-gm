@@ -35,3 +35,15 @@ A writhing column of dark smoke shot through with violet threads — Rift discha
 ## Actions
 **Claws.** +4 to hit, reach 5 ft., one target. 4 (1d4 + 2) slashing.
 **Cinder Breath (Recharge 6).** 15-ft. cone. DC 10 Dex save or blinded until end of its next turn.
+
+## Appearance and artwork
+
+An editable Smoke reference is one connected dark blue-grey/charcoal column with violet threads, rounded upper billow, two connected clawlike side curl-lobes and tapered lower plume. Nested smoke folds remain smoke, with thin translucent edges. No eyes, solid body or wings; ordinary motionless smoke disguise remains.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/5d06ade6a7b9c06f5971ad44e4bc9ec5fd9bda7efd71c3de5b936a896044b5b6.png)
+
+[Full-body reference](../../assets/characters/5e59b6aebb5196a1e61dfe40c57148d6d8f7c63d862a02657d9adeb9fff7b14c.png)
+
+[Multiview reference sheet](../../assets/characters/3dfdf18be81cca0b1ef7cda1d9f2707e46f99a589f00f196390192c8ed235895.png)

@@ -38,3 +38,15 @@ A scalding cloud formed where Rift water meets extreme heat — geothermal vents
 ## Actions
 **Claws.** +2 to hit, 2 (1d4) slashing + 2 (1d4) fire.
 **Steam Breath.** 15-foot cone, DC 10 DEX, 4 (1d8) fire. Recharges 6.
+
+## Appearance and artwork
+
+An editable Steam default is one white/pearl-grey connected cloud with broad upper billows, two clawlike side curls and wispy lower condensation. Nested cool opalescent billow depths may suggest indistinct anonymous falling shadow-marks, without identifying a creature, world or victim. No solid mephit anatomy, face or new visibility/attack effect is established.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/0b183ecbe59d453c6bd62e25d983d019f0a8cde0e5af50ff66ed96eb85e43b19.png)
+
+[Full-body reference](../../assets/characters/60afb5fd083263d0e89fce0ae3cd4d430d1c9fd2d176a8646b7548c46fa9586f.png)
+
+[Multiview reference sheet](../../assets/characters/1b84516b0b6f7a1a31421c6bb34417ac45f3f10fb3f0f4fd98c68ffec9bf2e7a.png)

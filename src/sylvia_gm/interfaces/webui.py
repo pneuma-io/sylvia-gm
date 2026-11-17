@@ -21,7 +21,7 @@ from contextlib import suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 from aiohttp import web
 
@@ -44,6 +44,7 @@ EXPORTS = {
     "export_campaign_file": ("exports", ".sylvia-gm-campaign"),
     "export_package_candidate_file": ("exports", ".sylvia-gm-package"),
     "export_campaign_plan_file": ("exports", ".sylvia-gm-plan"),
+    "export_character_file": ("exports", ".sylvia-gm-character"),
     "backup_authority": ("backups", ".sqlite3"),
 }
 WRAPPED = frozenset(
@@ -298,6 +299,19 @@ def browser_command(method: str, raw: dict) -> tuple[str, dict]:
     return method, params
 
 
+def _character_download_filename(name: object) -> str:
+    """Offer the exported character's name as a portable filename, never as a path."""
+    words = (
+        "".join(char for char in word if char.isalnum() or char in "-_")
+        for word in (name if isinstance(name, str) else "").split()
+    )
+    base = "-".join(word for word in words if word)[:64] or "character"
+    device = len(base) == 4 and base[:3].upper() in {"COM", "LPT"} and base[-1].isnumeric()
+    if base.upper() in {"CON", "PRN", "AUX", "NUL"} or device:
+        base = "character-" + base
+    return base + ".sylvia-gm-character"
+
+
 class LocalWebUI:
     """Serve one local user's UI; the child remains the only application owner."""
 
@@ -326,7 +340,7 @@ class LocalWebUI:
         self.shutdown_task: asyncio.Task | None = None
         self.requests: OrderedDict[str, tuple[str, asyncio.Task]] = OrderedDict()
         self.receipt_sizes: dict[str, int] = {}
-        self.downloads: dict[str, Path] = {}
+        self.downloads: dict[str, tuple[Path, str]] = {}
         self.download_directory: tempfile.TemporaryDirectory | None = None
         self.export_lock = asyncio.Lock()
         self.app = web.Application(client_max_size=MAX_BYTES, middlewares=[self.guard])
@@ -620,6 +634,12 @@ class LocalWebUI:
             result = await self.owner.call(
                 "backup_database" if method == "backup_authority" else method, params
             )
+            receipt = result.get("export", result) if isinstance(result, dict) else result
+            filename = (
+                _character_download_filename(receipt.get("name"))
+                if method == "export_character_file" and isinstance(receipt, dict)
+                else "sylvia" + suffix
+            )
             if self.download_directory is None:
                 self.download_directory = tempfile.TemporaryDirectory(
                     prefix=".webui-download-", dir=self.owner.data_root
@@ -633,23 +653,28 @@ class LocalWebUI:
                 # data folder would otherwise stay there, one full archive per export.
                 source.unlink(missing_ok=True)
             if len(self.downloads) >= 128:
-                self.downloads.pop(next(iter(self.downloads))).unlink(missing_ok=True)
-            self.downloads[token] = path
+                self.downloads.pop(next(iter(self.downloads)))[0].unlink(missing_ok=True)
+            self.downloads[token] = (path, filename)
         # Drop native artifact paths before handing anything to the browser.
         return {
             "status": "exported",
             "download": "/api/download/" + token,
-            "filename": "sylvia" + suffix,
-            "file_name": "sylvia" + suffix,
-            "export": result.get("export", result) if isinstance(result, dict) else result,
+            "filename": filename,
+            "file_name": filename,
+            "export": receipt,
         }
 
     async def download(self, request: web.Request) -> web.StreamResponse:
-        path = self.downloads.get(request.match_info["identity"])
-        if path is None or not path.is_file():
+        download = self.downloads.get(request.match_info["identity"])
+        if download is None or not download[0].is_file():
             raise web.HTTPNotFound()
+        path, filename = download
         response = web.FileResponse(path)
-        response.headers["Content-Disposition"] = f'attachment; filename="sylvia{path.suffix}"'
+        response.headers["Content-Disposition"] = (
+            f'attachment; filename="{filename}"'
+            if filename.isascii()
+            else "attachment; filename*=UTF-8''" + quote(filename, safe="")
+        )
         return response
 
     async def _file_command(self, method: str, params: dict) -> Any:
@@ -673,8 +698,11 @@ class LocalWebUI:
 
     async def upload(self, request: web.Request) -> web.Response:
         kind = request.match_info["kind"]
-        if kind not in {"package", "recovery", "builder", "character"}:
+        if kind not in {"package", "recovery", "builder", "character", "character_bundle"}:
             raise web.HTTPNotFound()
+        maximum_bytes = (
+            MAX_BYTES + MAX_UPLOAD_PARAMS_BYTES if kind == "character_bundle" else MAX_UPLOAD_BYTES
+        )
         reader = await request.multipart()
         params: dict = {}
         received_params = False
@@ -703,9 +731,9 @@ class LocalWebUI:
                         if not chunk:
                             break
                         total += len(chunk)
-                        if total > MAX_UPLOAD_BYTES:
+                        if total > maximum_bytes:
                             raise web.HTTPRequestEntityTooLarge(
-                                max_size=MAX_UPLOAD_BYTES, actual_size=total
+                                max_size=maximum_bytes, actual_size=total
                             )
                         text.extend(chunk[:remaining])
                         if len(text) > MAX_UPLOAD_PARAMS_BYTES:
@@ -737,9 +765,9 @@ class LocalWebUI:
                     with target.open("xb") as output:
                         while chunk := await part.read_chunk(65536):
                             total += len(chunk)
-                            if total > MAX_UPLOAD_BYTES:
+                            if total > maximum_bytes:
                                 raise web.HTTPRequestEntityTooLarge(
-                                    max_size=MAX_UPLOAD_BYTES, actual_size=total
+                                    max_size=maximum_bytes, actual_size=total
                                 )
                             output.write(chunk)
                     paths.append(target)
@@ -761,6 +789,7 @@ class LocalWebUI:
                     "package": "install_package_file",
                     "recovery": "recover_campaign_file",
                     "character": "preview_character_card_file",
+                    "character_bundle": "preview_character_bundle_file",
                 }[kind]
                 _, safe = browser_command(method, params)
                 result = await self._file_command(method, {**safe, "source_path": str(paths[0])})

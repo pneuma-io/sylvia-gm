@@ -17,3 +17,15 @@ Recently, the map has been wrong. Routes that should be stable are phasing unpre
 ## Personality
 
 The Cartographer is obsessive, brilliant, and terrified. The map has been their life's work. Watching it become unreliable is like watching a language lose its grammar. They communicate through notes slipped under doors. They never meet anyone in person. Their handwriting has gotten shakier.
+
+## Appearance and artwork
+
+A concealed figure in a deep teal hooded cloak with ochre stitching and worn edges, a cream scarf and layered map-patterned ivory cloth panels. The raised hood's opening is featureless shadow-black, revealing no eyes, skin, face, mask, gender or species. Both hands remain gloved. Brown leather straps support clustered rolled map tubes and a right-side satchel; a rolled scroll is held at the chest. Dark practical boots and loose lower garments. The identity remains unknown in every view.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/6209621496d366252629053860089fef16915e89fa687a5e7cc2f6c2f68c9fe5.png)
+
+[Full-body reference](../assets/characters/5d8d852a39d9600759f5333e11f3397a289aabb133cb3a55cf8fe1e5d7fdc25d.png)
+
+[Multiview reference sheet](../assets/characters/bb4be3b3ac29858af47f061806118183ce2aa5a50e02cdf2e5b30216f49a5442.png)

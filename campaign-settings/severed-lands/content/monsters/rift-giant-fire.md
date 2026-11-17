@@ -39,3 +39,15 @@ A fire giant Riftborn from a world of volcanic forge-cities. Its body radiates u
 **Multiattack.** The giant makes two greatsword attacks.
 **Greatsword.** Melee Weapon Attack: +11 to hit, reach 10 ft., one target. Hit: 28 (6d6 + 7) slashing damage.
 **Rock.** Ranged Weapon Attack: +11 to hit, range 60/240 ft., one target. Hit: 29 (4d10 + 7) bludgeoning damage.
+
+## Appearance and artwork
+
+An editable adult Fire Giant default with warm dark copper-brown living skin, amber eyes, a square mature face and copper hair/beard. Blackened plate with copper edging, a dark red tabard and nested inward metal fluting surrounds a solid giant body; small violet heat flickers stay at selected armor gaps. A greatsword stays in the right hand, left empty. No recovered craft, new weapon power or named homeworld is revealed.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/5bb5f62119852d3d00d5c019f481a19d31599291c2e92628f920759c76cf64fc.png)
+
+[Full-body reference](../../assets/characters/da607ee0ed4d71562b7539b9291805a3cd36cbbfbabda526bb2d4e12e770e720.png)
+
+[Multiview reference sheet](../../assets/characters/692962fd4aae392c6e0eb5f65d95166c0808747f0fec69a6619b37f46860b2b6.png)

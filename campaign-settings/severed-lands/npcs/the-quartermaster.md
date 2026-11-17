@@ -19,3 +19,15 @@ The Quartermaster is efficient, unsentimental, and capable of identifying any we
 ## Hook
 
 Equipment has been going missing from the armory — small items, impossible to trace, but the Quartermaster notices everything. Someone in Waystation is stockpiling. The Quartermaster suspects the Radicals. They're building a case. They need someone to help them prove it — someone who isn't a Returner, who doesn't have loyalties the Quartermaster can't predict.
+
+## Appearance and artwork
+
+A compact strong Riftborn adult of androgynous appearance with medium tawny-brown skin, a broad weathered face, heavy straight brows, slate-grey eyes and close-cropped coarse dark hair evenly flecked with grey. High-collared dark blue-grey wool coat with a split hem, taupe work vest, charcoal trousers and scuffed heavy boots. A plain leather belt carries a small iron key ring at the right hip and a repair-tool pouch at the left. A closed flat inventory ledger is held low under one arm. Severe composed bearing; no assigned regiment, medal or revealed home-world ancestry. Narrow intersecting scars mark the right cheek; no cause is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/859b91e39bc702819d3254d94537d37089c2c5e918479b7194b788f353f9f441.png)
+
+[Full-body reference](../assets/characters/834536dc2f9f4c3d79918c6b0477994972e102be03f9a7f6ddf48804b8f01a2a.png)
+
+[Multiview reference sheet](../assets/characters/24b7557fbb508859e85370dc8895684b40a5ddf4114030ec07e1daea81031434.png)

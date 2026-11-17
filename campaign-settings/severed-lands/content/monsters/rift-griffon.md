@@ -33,3 +33,15 @@ A Rift-touched griffon — eagle and lion fused, then further altered by decades
 **Multiattack.** Beak + claws.
 **Beak.** +6 to hit, 8 (1d8 + 4) piercing.
 **Claws.** +6 to hit, 11 (2d6 + 4) slashing.
+
+## Appearance and artwork
+
+An eagle-lion griffon with one ivory-feathered head, charcoal hooked beak, amber eyes, two taloned eagle forelegs, two tawny lion hind legs, two broad feathered wings and a tufted lion tail. Ivory chest feathers grade into umber wing coverts above deep tawny hindquarters. A faint violet shimmer catches selected feathers. A few primary vanes fold into recursive nested fans around narrow hollows before rejoining the main feather shape, giving impossible depth within otherwise living wings.
+
+This prepared appearance is an editable visual default; the creature's mechanics and lore above remain authoritative.
+
+[Portrait](../../assets/characters/c7710cf287d1db46dd536bb92ef2f52f69d4d659ff89347f57b8c4321b9433c6.png)
+
+[Full-body reference](../../assets/characters/20411ed29642455552d4065a5bf7cad332b2732a3409a04f71635e22cfe780cc.png)
+
+[Multiview reference sheet](../../assets/characters/68b199b1932ca82283f933a07b207bc866cef394c6213987cef5b0f47a6a2c8d.png)

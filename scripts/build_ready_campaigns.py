@@ -123,6 +123,7 @@ def prepare() -> bytes:
                 "participant": participant,
                 "entity_state": complete,
                 "setting_data": setting,
+                **({"visuals": row["visuals"]} if row.get("visuals") is not None else {}),
             }
             characters.append(
                 {

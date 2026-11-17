@@ -8,6 +8,7 @@ from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from sylvia_gm.application.package_character_art import ImageAssetReader, include_character_art
 from sylvia_gm.application.package_materialization import (
     MaterializedPackageArchive,
     NormalizedPackageDraft,
@@ -123,6 +124,7 @@ def materialize_setting_draft(
     package_id: str,
     version: str,
     title: str,
+    image_asset_reader: ImageAssetReader | None = None,
 ) -> MaterializedPackageArchive:
     """Admit one complete world and its contained rules before anything enters the picker."""
     workspace = workspace.resolve()
@@ -147,4 +149,4 @@ def materialize_setting_draft(
         payloads=files,
         ruleset=ruleset,
     )
-    return materialize_package_archive((*drafts, world))
+    return materialize_package_archive((*drafts, include_character_art(world, image_asset_reader)))

@@ -17,3 +17,15 @@ He's also the Quarter's unofficial welcome wagon — he spots new arrivals befor
 ## Personality
 
 Rook is resourceful, generous, and quietly proud of what the Quarter has become. He treats every new arrival like a future neighbor. Most of them become one.
+
+## Appearance and artwork
+
+An adult human-like default with warm bronze skin, a broad heart-shaped face, green-brown eyes and a simple dark asymmetric bob. Rust, ivory and dark blue merchant layers, olive trousers and flat boots accompany a modest welcoming smile. One closed satchel hangs at his right hip from his left shoulder; both hands are empty. No unknown ancestry, world, office or charm power is assigned.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/5f574c609a3e7fa9dfe522dba88973bb8929bad31d0991b8300071cccfb3c00c.png)
+
+[Full-body reference](../assets/characters/7eeb4fdec9c9a6a43fc30d7bd7b759d313eadedcbde843f063335ddcc6ccd5e9.png)
+
+[Multiview reference sheet](../assets/characters/e020019c31eb756f2877f7cc3ccda1daec539bcbe65c3acfdcbfd2e979d5be92.png)

@@ -21,3 +21,15 @@ She carries a Rift-touched spear that's absorbed the energy of every riftbeast i
 ## Hook
 
 Tide-Mother has requested a meeting with the Returners — something she hasn't done in twenty years. The Margin is changing. The growth is accelerating. Something is feeding the Rift pools, and she doesn't know what. She's willing to grant outsiders access to the deep canopy — something the Scaled have never done — in exchange for answers.
+
+## Appearance and artwork
+
+An ancient sturdy reptilian editable default with heavy olive bark-like scales, a broad snout, amber eyes and one thick tapering tail. Worn skull ridges, five clawed fingers and three prominent forward toes remain consistent. Old scars on her left cheek and left forearm have a faint blue-violet sheen. Plain russet, cream and grey-green layers accompany the spear held loosely in her right hand. Consensus leadership gains no crown or new power.
+
+This prepared appearance is an editable visual default; the character's authored identity, mechanics and lore above remain authoritative.
+
+[Portrait](../assets/characters/a7f225e518e47e9a3e879f1456c98ab3ef79e0b14391b1a5eae507a741e5bcab.png)
+
+[Full-body reference](../assets/characters/86daeea4d49bb5915f2a9c7d97f36ffe28b41579d988322f23f97e1701139902.png)
+
+[Multiview reference sheet](../assets/characters/6b2bc23e52fcb3f7d33fd6f18fabc48e1a3559559fad197167be09d839457c63.png)
