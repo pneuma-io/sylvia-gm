@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
-use std::sync::atomic::{AtomicBool, AtomicI64, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicI32, AtomicI64, AtomicU64, Ordering};
 use std::sync::{mpsc, Arc, Mutex};
 use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, State, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
@@ -3427,6 +3427,11 @@ fn error_box(title: &str, description: impl Into<String>) {
         .show();
 }
 
+/// The exit code of the exit request the app last let through. Tauri's runtime ends its event loop with
+/// `ControlFlow::Exit`, which exits the process with 0, so a code passed to `AppHandle::exit` (1 after
+/// "owner close failed") was lost; `RunEvent::Exit` applies it instead.
+static GRANTED_EXIT_CODE: AtomicI32 = AtomicI32::new(0);
+
 pub fn run() {
     let portable = std::env::current_exe()
         .map_err(|error| format!("Sylvia GM executable path is unavailable: {error}"))
@@ -3767,12 +3772,20 @@ pub fn run() {
                             );
                         }
                     }
+                } else if let Some(granted) = code {
+                    GRANTED_EXIT_CODE.store(*granted, Ordering::Release);
                 }
             }
             if matches!(event, tauri::RunEvent::Exit) {
                 app.state::<dictation::Dictation>().close();
                 let owner = app.state::<OwnerBridge>();
                 let _ = owner.poll_owner_exit();
+                let granted = GRANTED_EXIT_CODE.load(Ordering::Acquire);
+                if granted != 0 {
+                    // Tauri would finish with exit code 0 after this callback: do its cleanup and keep the code.
+                    app.cleanup_before_exit();
+                    std::process::exit(granted);
+                }
             }
         });
 }
