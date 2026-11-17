@@ -116,6 +116,22 @@ def partition_reports(expected, reports, processes_ok):
     return rows, passed, unexpected
 
 
+def report_failures(report):
+    """One console line per case a JUnit report does not accept, so a failure is named."""
+    lines = []
+    for case in report.iter("testcase"):
+        if accepted_case(case):
+            continue
+        outcome = next(
+            (child for child in case if child.tag in ("failure", "error", "skipped")), None
+        )
+        kind = "unaccepted outcome" if outcome is None else outcome.tag
+        message = "" if outcome is None else " ".join((outcome.get("message") or "").split())
+        case_id = case.get("classname", "") + "::" + case.get("name", "")
+        lines.append(f"FAILED CASE {case_id} [{kind}] {message[:400]}".rstrip())
+    return lines
+
+
 def remaining_timeout(deadline):
     return None if deadline is None else max(0.001, deadline - time.monotonic())
 
@@ -511,15 +527,25 @@ def run_balanced_gate(
         outcomes = [future.result() for future in pending]
     reports = []
     processes_ok = True
-    for successful, xml, _log in outcomes:
+    for successful, xml, log in outcomes:
         processes_ok &= successful
         if not xml.is_file():
             processes_ok = False
+            print(f"FAIL {log.stem} wrote no report; read {log.name}", flush=True)
             continue
         try:
-            reports.append(ET.parse(xml).getroot())
+            report = ET.parse(xml).getroot()
         except ET.ParseError:
             processes_ok = False
+            print(f"FAIL {log.stem} wrote a malformed report; read {log.name}", flush=True)
+            continue
+        reports.append(report)
+        failures = report_failures(report)
+        for line in failures:
+            print(f"{line} (full output in {log.name})", flush=True)
+        if not successful and not failures:
+            print(f"FAIL {log.stem} exited with no failed case in its report; "
+                  f"read {log.name}", flush=True)
     rows, passed, unexpected = partition_reports(expected, reports, processes_ok)
     results = {}
     for name, cases in rows.items():

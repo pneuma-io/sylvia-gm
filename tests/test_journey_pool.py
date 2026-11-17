@@ -147,7 +147,7 @@ def test_real_pool_runs_disjoint_collected_cases_once(tmp_path, monkeypatch):
     ids=["default", "explicit-remove", "explicit-keep"],
 )
 def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(
-    tmp_path, monkeypatch, setting, retained,
+    tmp_path, monkeypatch, capsys, setting, retained,
 ):
     root = tmp_path / "source"
     (root / "scripts").mkdir(parents=True)
@@ -189,6 +189,31 @@ def test_real_pool_retains_failed_scratch_and_releases_successful_case_data(
     assert assignments["retain_successful_fixtures"] is retained
     cases = list(ET.parse(destination / "outcomes.xml").iter("testcase"))
     assert len(cases) == 2 and sum(case.find("failure") is not None for case in cases) == 1
+    # The console names the failed case and the log that holds its full output.
+    failed_lines = [line for line in capsys.readouterr().out.splitlines()
+                    if line.startswith("FAILED CASE")]
+    assert failed_lines == [
+        "FAILED CASE tests.test_outcomes::test_failure [failure] AssertionError: "
+        "intentional negative runner control assert False "
+        "(full output in shared-shard-0.log)"
+    ]
+
+
+def test_report_failures_name_failed_errored_and_unregistered_skipped_cases():
+    root = ET.Element("testsuites")
+    suite = ET.SubElement(root, "testsuite")
+    ET.SubElement(suite, "testcase", classname="tests.case", name="test_passed")
+    failed = ET.SubElement(suite, "testcase", classname="tests.case", name="test_failed")
+    ET.SubElement(failed, "failure", message="AssertionError: first line\n  second line")
+    errored = ET.SubElement(suite, "testcase", classname="tests.case", name="test_errored")
+    ET.SubElement(errored, "error", message="failed on setup")
+    skipped = ET.SubElement(suite, "testcase", classname="tests.case", name="test_skipped")
+    ET.SubElement(skipped, "skipped", message="not registered")
+    assert journey_pool.report_failures(root) == [
+        "FAILED CASE tests.case::test_failed [failure] AssertionError: first line second line",
+        "FAILED CASE tests.case::test_errored [error] failed on setup",
+        "FAILED CASE tests.case::test_skipped [skipped] not registered",
+    ]
 
 
 def test_pool_refuses_an_unknown_retention_setting_before_collecting(tmp_path, monkeypatch):

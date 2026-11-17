@@ -654,6 +654,24 @@ def test_runner_removes_passed_scratch_unless_asked_to_keep_it(
     assert len(failed) == 1 and failed[0].read_bytes() == b"preserve failed evidence"
 
 
+def test_browser_failures_are_named_with_their_diagnostics(gate):
+    output = (
+        "TAP version 13\n# Subtest: suite\n"
+        "    # Subtest: inner passes\n    ok 1 - inner passes\n"
+        "      ---\n      duration_ms: 1\n      ...\n"
+        "    # Subtest: inner fails\n    not ok 2 - inner fails\n"
+        "      ---\n      error: |-\n        1 !== 2\n      ...\n    1..2\n"
+        "not ok 1 - suite\n  ---\n  error: '1 subtest failed'\n  ...\n"
+        "# tests 2\n# pass 1\n# fail 1\n"
+    )
+    assert gate.tap_failures(output) == [
+        "FAILED BROWSER TEST\n    not ok 2 - inner fails\n"
+        "      ---\n      error: |-\n        1 !== 2\n      ...",
+        "FAILED BROWSER TEST\nnot ok 1 - suite\n  ---\n  error: '1 subtest failed'\n  ...",
+    ]
+    assert gate.tap_failures(output.replace("not ok", "ok")) == []
+
+
 def test_runner_refuses_an_unknown_retention_setting_before_any_check(
     gate, tmp_path, monkeypatch, capsys,
 ):
