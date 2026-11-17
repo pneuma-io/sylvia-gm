@@ -3381,6 +3381,8 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
   line-height: 1.45;
 }
 .provider-capacity-warning[hidden] { display: none; }
+.provider-declared-offer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.provider-declared-offer[hidden] { display: none; }
 @media (max-width: 720px) {
   .provider-capacity-grid { grid-template-columns: 1fr; }
 }
@@ -3855,6 +3857,9 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
 .chat-start-dialog label { display: block; margin-top: .8rem; color: var(--text-dim); font-size: .82rem; }
 .chat-start-dialog select { width: 100%; min-width: 0; margin-top: .25rem; }
 .chat-start-note { color: var(--text-dim); font-size: .8rem; overflow-wrap: anywhere; }
+/* The same quiet amber as the model editor's capacity warning. */
+.chat-start-context-note { padding: 7px 9px; border-left: 3px solid #8f7130; background: rgba(143, 113, 48, 0.12); }
+.chat-start-context-note[hidden] { display: none; }
 .chat-start-actions { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: flex-end; margin-top: 1rem; }
 
 /* Settings: model, effort, speed and Save share one row, and wrap when the card is narrow. */

@@ -1664,6 +1664,14 @@ const SylviaGMFrontend = (() => {
     });
     $('provider-discovered-models').addEventListener('change', selectDiscoveredProviderModel);
     $('provider-context-window').addEventListener('input', updateConfiguredProviderCapacity);
+    $('provider-use-declared-context').addEventListener('click', () => {
+      const declared = state.providerCapacity?.declared;
+      if (!declared) return;
+      $('provider-model-advanced').open = true;
+      $('provider-context-window').value = String(declared);
+      updateConfiguredProviderCapacity();
+      $('provider-context-window').focus();
+    });
     $('provider-output-limit').addEventListener('input', () => renderProviderCapacity());
     $('provider-automatic-limits-btn').addEventListener('click', () => {
       $('provider-context-window').value = '';
@@ -2516,7 +2524,12 @@ const SylviaGMFrontend = (() => {
 
   function noteSavedModel(saved) {
     state.savedModelNotice = saved;
-    $('models-action-status').textContent = `${saved.name || 'Model'} saved. Your chats keep their current models.`;
+    // Say at once when the saved model's context limit is unknown, not only when a turn is refused (issue 92).
+    const choice = state.modelChoices.find((item) => item.provider_id === saved.provider_id &&
+      item.model_id === saved.canonical_model_id);
+    const contextNote = window.SylviaChatStart?.contextNote(choice) || '';
+    $('models-action-status').textContent = `${saved.name || 'Model'} saved. Your chats keep their current models.` +
+      (contextNote ? ` ${contextNote}` : '');
     $('set-added-model-default-btn').hidden = !saved.provider_id || !saved.canonical_model_id;
   }
 
@@ -2735,7 +2748,19 @@ const SylviaGMFrontend = (() => {
     const capacity = state.providerCapacity;
     $('provider-context-summary').textContent = capacity.effective !== null
       ? `Context available to Sylvia: ${formatTokenCapacity(capacity.effective)}${capacity.effectiveSource === 'legacy_unverified' ? ' (unverified saved limit)' : ''}.`
-      : 'Context limit not reported. You can provide a limit in Advanced model settings.';
+      : 'No context limit is known for this model, so a campaign’s first turn may be refused. ' +
+        'Enter one in Advanced model settings, Optional Sylvia cap.';
+    // A server that reports only a model maximum: offer that number as the cap, for the person to confirm by
+    // saving. Sylvia still does not take a reported maximum as the loaded limit by itself.
+    const offer = capacity.effective === null && capacity.declared !== null &&
+      capacity.runtime === null && capacity.configured === null;
+    $('provider-declared-offer').hidden = !offer;
+    if (offer) {
+      $('provider-declared-offer-text').textContent =
+        `The server reports a maximum of ${formatTokenCapacity(capacity.declared)}. ` +
+        'If it runs the model at that size, use it as Sylvia’s cap, then save.';
+      $('provider-use-declared-context').textContent = `Use ${formatTokenCapacity(capacity.declared)} as the cap`;
+    }
     $('provider-declared-context').textContent = formatTokenCapacity(capacity.declared);
     $('provider-declared-context-source').textContent = contextSourceLabel(
       capacity.declaredSource
