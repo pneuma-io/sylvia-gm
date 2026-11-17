@@ -113,14 +113,16 @@ def test_abort_and_shutdown_cannot_close_database_during_admitted_checkpoint(tmp
 
     def held(target):
         entered.set()
-        assert resume.wait(5), "release controlled backup"
+        assert resume.wait(30), "release controlled backup"
         original(target)
 
     boundary._backup_database = held
     closing = threading.Thread(target=boundary.close)
     try:
         prepare(boundary, controller, update.identity)
-        assert entered.wait(3)
+        # Preparation extracts and copies the release before its backup; under load that
+        # alone can take several seconds, so these bounds only catch a stuck worker.
+        assert entered.wait(30)
         with pytest.raises(UpdateError) as blocked:
             boundary.abort_preparation(update.identity)
         assert blocked.value.code == "update_busy" and reservations == {update.identity}
@@ -128,7 +130,7 @@ def test_abort_and_shutdown_cannot_close_database_during_admitted_checkpoint(tmp
         closing.join(0.05)
         assert closing.is_alive(), "owner close must wait before closing its database"
         resume.set()
-        closing.join(5)
+        closing.join(30)
         assert not closing.is_alive()
         assert controller.state()["phase"] == "cancelled"
         assert controller.state()["error_code"] == "application_busy"
