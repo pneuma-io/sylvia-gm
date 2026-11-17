@@ -6580,6 +6580,14 @@ const SylviaGMFrontend = (() => {
     return selection;
   }
 
+  // An inventory chip made from an item id reads as a name: multi-word ids are already title-cased by
+  // panelIdentifierLabel, and a single-word id ("greatsword") gets its capital too. Proper names, such as
+  // "Dungeoneer's Pack", need the Ruleset package to declare them (issue 128).
+  function inventoryItemLabel(id) {
+    const label = panelIdentifierLabel(id);
+    return /^[a-z][a-z0-9]*$/.test(label) ? label[0].toUpperCase() + label.slice(1) : label;
+  }
+
   function renderInventoryPanel(data, surface) {
     const participants = data && Array.isArray(data.participants) ? data.participants : [];
     const entities = data && data.entities && typeof data.entities === 'object' ? data.entities : {};
@@ -6619,7 +6627,7 @@ const SylviaGMFrontend = (() => {
         (state.panelProjection?.surfaces.filter((item) => item.renderer === 'unit_list' && item.data?.entities?.[participant.id])
           .map((owner) => characterActionMarkup(owner, participant.id, true)).join('') || '') +
         `<div class="panel-inventory-list">${inventory.map((item) => {
-          const label = typeof item === 'string' ? panelIdentifierLabel(item) : item?.name || panelIdentifierLabel(item?.item_id || item?.id || 'Item');
+          const label = typeof item === 'string' ? inventoryItemLabel(item) : item?.name || inventoryItemLabel(item?.item_id || item?.id || 'Item');
           const count = typeof item === 'object' && Number.isFinite(item?.quantity) ? ` × ${item.quantity}` : '';
           return `<span class="panel-inventory-item">${escapeHtml(label)}${count}</span>`;
         }).join('')}</div></div>`;
