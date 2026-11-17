@@ -18,7 +18,7 @@ import json
 import os
 import threading
 import time
-from collections.abc import AsyncGenerator, AsyncIterator, Callable
+from collections.abc import AsyncGenerator, AsyncIterator, Callable, Iterable, Mapping
 from contextlib import suppress
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -67,15 +67,46 @@ _USAGE_SETTLE_SECONDS = 0.3
 #: How long to wait for that report after the interrupt. It normally arrives at once.
 _USAGE_REPORT_SECONDS = 1.0
 
-#: Environment switch, read when a provider is created. Every value keeps runtime threads.
-#: "stable" interrupts the turn at a tool call (as without the switch) and continues the
-#: thread with a further turn. "answer" leaves the turn waiting and, when the next request
-#: brings the call's result, answers the call inside that same turn. "answer-draft" is
+#: Environment switch, read when a provider is created.
+#: "fresh" starts a new runtime process and thread for every request and interrupts the turn
+#: at a tool call (the behaviour before kept threads). "answer" keeps the thread and leaves
+#: the turn waiting at a tool call; the next request, which brings the call's result,
+#: answers the call inside that same turn. "stable" keeps the thread but interrupts the turn
+#: at a tool call and continues with a further turn (experimental). "answer-draft" is
 #: "answer" that also answers when the owner dropped the text the model streamed before its
-#: call (an unsettled draft the thread then still holds); an experiment, to be measured.
+#: call, so the thread still holds that draft (experimental).
+#: Unset, or any other value: "answer" with the context ledger, "fresh" without it, so
+#: ``SYLVIA_GM_CONTEXT_MODE=legacy`` alone restores the whole previous behaviour.
+#: The mode applies only to requests the context ledger built (``LEDGER_REQUEST``); every
+#: other request takes the fresh path whatever the switch says.
 _THREAD_SWITCH = "SYLVIA_CHATGPT_THREAD"
+_FRESH_THREADS = "fresh"
+_DEFAULT_THREAD_MODE = "answer"
 _THREAD_MODES = {"stable": "interrupt", "answer": "answer", "answer-draft": "answer"}
 _DRAFT_KEEPING_VALUE = "answer-draft"
+
+
+def thread_setting(environ: Mapping[str, str] | None = None) -> str:
+    """The ``SYLVIA_CHATGPT_THREAD`` value that applies: one of ``_THREAD_MODES`` or fresh."""
+    value = (os.environ if environ is None else environ).get(_THREAD_SWITCH, "")
+    setting = value.strip().casefold()
+    if setting == _FRESH_THREADS or setting in _THREAD_MODES:
+        return setting
+    from sylvia_gm.agent._context_ledger import LEDGER_MODE, context_mode
+
+    # A kept thread only pays with requests that extend the previous one (the ledger).
+    ledger = context_mode(environ, transport="codex_app_server") == LEDGER_MODE
+    return _DEFAULT_THREAD_MODE if ledger else _FRESH_THREADS
+
+
+def _ledger_request() -> bool:
+    """Whether the context ledger built this request. Reading it clears it: one request."""
+    from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+
+    marked = LEDGER_REQUEST.get()
+    LEDGER_REQUEST.set(False)
+    return marked
+
 #: Idle runtime threads kept open at once; the least recently used is closed first.
 _KEPT_THREAD_LIMIT = 4
 #: A kept thread left unused this long is closed.
@@ -346,9 +377,9 @@ class _KeptThread:
             return None
         return None
 
-    def close_quietly(self, pool: _KeptThreads | None = None) -> None:
+    def close_quietly(self, pool: _KeptThreads | None = None, *, collect: bool = True) -> None:
         _stop_timers([self])
-        figures = self.collect_owed_usage()
+        figures = self.collect_owed_usage() if collect else None
         if figures is not None and pool is not None:
             pool.abandon(self.home, self.ordinal, figures)
         with suppress(Exception):
@@ -499,8 +530,13 @@ class _KeptThreads:
         return released
 
     def close_all(self) -> None:
+        """Close every kept thread at once, at process exit.
+
+        No later request can record a waiting turn's usage then, so none is collected: the
+        app closes without waiting on the runtime.
+        """
         for kept in self.release():
-            kept.close_quietly(self)
+            kept.close_quietly(self, collect=False)
 
 
 _KEPT_THREADS = _KeptThreads()
@@ -514,6 +550,35 @@ def _close_kept_threads_for(home: Path) -> None:
 
 def _close_all_kept_threads() -> None:
     _KEPT_THREADS.close_all()
+
+
+def kept_thread_models() -> frozenset[str]:
+    """The models that kept threads are held for, in any home."""
+    with _KEPT_THREADS._lock:  # noqa: SLF001
+        return frozenset(kept.model for kept in _KEPT_THREADS._idle)  # noqa: SLF001
+
+
+def release_kept_threads(models: Iterable[str]) -> threading.Thread | None:
+    """Close the kept threads of these models, in every home, without waiting on them.
+
+    For a chat's model change, after which its old model's thread would only wait for its
+    idle limit, and for a settings reload that no longer offers a model. (A reload that
+    still offers it keeps its threads: they are held here, not on the replaced provider,
+    and its replacement continues them.) Each waiting turn's usage is still collected, on a
+    background thread (returned, so a caller may wait for it), and held for its home's next
+    request.
+    """
+    released = [kept for model in set(models) for kept in _KEPT_THREADS.release(model=model)]
+    if not released:
+        return None
+
+    def close() -> None:
+        for kept in released:
+            kept.close_quietly(_KEPT_THREADS)
+
+    closing = threading.Thread(target=close, name="sylvia-chatgpt-release", daemon=True)
+    closing.start()
+    return closing
 
 
 add_account_change_listener(_close_kept_threads_for)
@@ -536,6 +601,9 @@ class _Request:
     dynamic_tools: list[dict[str, Any]]
     timeout: float
     options: dict[str, object]
+    #: The kept-thread mode for this request: the switch's, or None (fresh) when the
+    #: context ledger did not build it.
+    thread_mode: str | None = None
     generation: int = 0
     #: This request's number among its home's requests (``_KeptThreads.next_ordinal``).
     ordinal: int = 0
@@ -566,7 +634,7 @@ class ChatGPTProvider(Provider):
         self._lock = asyncio.Lock()
         self._active: CodexConnection | None = None
         self._last_response = ProviderResponse()
-        switch = os.environ.get(_THREAD_SWITCH, "")
+        switch = thread_setting()
         self._thread_mode = _THREAD_MODES.get(switch)
         self._stable_threads = self._thread_mode is not None
         self._keeps_dropped_draft = switch == _DRAFT_KEEPING_VALUE
@@ -970,6 +1038,7 @@ class ChatGPTProvider(Provider):
         timeout: float = 120,
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
+        marked = _ledger_request()
         async with self._lock:
             timing = LifecycleTiming()
             dynamic, items, system_instructions = app_server_request(
@@ -993,8 +1062,10 @@ class ChatGPTProvider(Provider):
                 else [],
                 timeout=timeout,
                 options=kwargs,
+                thread_mode=self._thread_mode if marked else None,
             )
-            kept = await self._take_kept_thread(request) if self._stable_threads else None
+            mode = request.thread_mode
+            kept = await self._take_kept_thread(request) if mode is not None else None
             reuse: dict[str, object] = {
                 "continued": kept is not None,
                 "held_items": len(kept.items) if kept is not None else 0,
@@ -1002,7 +1073,7 @@ class ChatGPTProvider(Provider):
                 "retried_fresh": False,
                 "kept": False,
             }
-            if self._thread_mode == "answer":
+            if mode == "answer":
                 reuse["answered_in_place"] = bool(kept is not None and kept.pending)
             finished = False
             try:
@@ -1044,8 +1115,8 @@ class ChatGPTProvider(Provider):
                         cancelled = error
                 if request.status is not None:
                     receipt = timing.snapshot(request.status)
-                    if self._stable_threads:
-                        if self._thread_mode == "answer":
+                    if mode is not None:
+                        if mode == "answer":
                             # In order. "previous" (or "earlier", with how many requests
                             # before) is a response whose call this request answered, or whose
                             # waiting turn was closed unanswered; never this response's.
@@ -1071,7 +1142,8 @@ class ChatGPTProvider(Provider):
         """Run one turn on a fresh runtime thread, or on the kept thread it continues.
 
         The child is closed when the attempt ends, unless the turn ended in a tool call with
-        stable threads on; ``request.keep`` then names the thread for the caller to keep.
+        a kept-thread mode on for this request; ``request.keep`` then names the thread for the
+        caller to keep.
         """
         kwargs = request.options
         timeout = request.timeout
@@ -1235,7 +1307,7 @@ class ChatGPTProvider(Provider):
                     )
                     response.tool_calls = [ToolCall(id=call_id, name=name, arguments=arguments)]
                     response.finish_reason = "tool_calls"
-                    if self._thread_mode == "answer" and event.get("id") is not None:
+                    if request.thread_mode == "answer" and event.get("id") is not None:
                         # Leave the turn waiting on this call. The runtime starts nothing
                         # until the call is answered, and reports this response's usage
                         # then, so this request ends without a usage report of its own.
@@ -1250,7 +1322,7 @@ class ChatGPTProvider(Provider):
                         )
                         # A kept thread must have ended its turn; one still awaiting the
                         # call's result is stopped like any other.
-                        keep = self._stable_threads and (
+                        keep = request.thread_mode is not None and (
                             interrupt == "ended" or (
                                 interrupt == "interrupted"
                                 and await self._await_interrupted_turn_end(

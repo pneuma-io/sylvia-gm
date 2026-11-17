@@ -215,6 +215,9 @@ class Audit:
 def pool(monkeypatch: pytest.MonkeyPatch):
     kept = _chatgpt._KeptThreads()
     monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", kept)
+    # These tests call the provider as the context ledger does: each request is a ledger
+    # request, the only kind that may keep a thread (see the marker tests below).
+    monkeypatch.setattr(_chatgpt, "_ledger_request", lambda: True)
     monkeypatch.setattr(_chatgpt, "_USAGE_SETTLE_SECONDS", 0.01)
     yield kept
     kept.close_all()
@@ -237,16 +240,44 @@ def provider_for(runtime: Runtime, home: Path) -> tuple[ChatGPTProvider, Audit]:
     return provider, audit
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize("switch", [None, "", "off", "Stable"])
-async def test_without_the_switch_each_request_starts_its_own_process_and_thread(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads,
-    switch: str | None,
+@pytest.mark.parametrize(("thread", "context", "expected"), [
+    # The shipped default: the answered kept thread, with the ledger this route ships.
+    (None, None, "answer"),
+    ("", None, "answer"),
+    ("anything", None, "answer"),
+    # The previous assembly alone restores the whole previous behaviour.
+    (None, "legacy", "fresh"),
+    ("", "legacy", "fresh"),
+    # An explicit value decides, in either direction.
+    ("fresh", None, "fresh"),
+    (" Fresh ", "ledger", "fresh"),
+    ("answer", "legacy", "answer"),
+    ("stable", None, "stable"),
+    ("Answer-Draft", None, "answer-draft"),
+])
+def test_the_thread_switch_and_its_default(
+    thread: str | None, context: str | None, expected: str,
 ) -> None:
-    if switch is None:
-        monkeypatch.delenv("SYLVIA_CHATGPT_THREAD", raising=False)
-    else:
-        monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", switch)
+    environ = {
+        **({"SYLVIA_CHATGPT_THREAD": thread} if thread is not None else {}),
+        **({"SYLVIA_GM_CONTEXT_MODE": context} if context is not None else {}),
+    }
+    assert _chatgpt.thread_setting(environ) == expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(("thread", "context"), [
+    ("fresh", None), ("FRESH", "ledger"), (None, "legacy"),
+])
+async def test_without_a_kept_thread_each_request_starts_its_own_process_and_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads,
+    thread: str | None, context: str | None,
+) -> None:
+    for name, value in (("SYLVIA_CHATGPT_THREAD", thread), ("SYLVIA_GM_CONTEXT_MODE", context)):
+        if value is None:
+            monkeypatch.delenv(name, raising=False)
+        else:
+            monkeypatch.setenv(name, value)
     runtime = Runtime(tool_turn("call-1"), tool_turn("call-2"))
     provider, audit = provider_for(runtime, tmp_path)
     await provider.generate(FIRST, tools=TOOLS)
@@ -259,14 +290,66 @@ async def test_without_the_switch_each_request_starts_its_own_process_and_thread
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("thread", [None, "answer", "stable"])
+async def test_only_a_request_the_ledger_built_may_keep_a_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, thread: str | None,
+) -> None:
+    from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+
+    kept = _chatgpt._KeptThreads()
+    monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", kept)
+    monkeypatch.setattr(_chatgpt, "_USAGE_SETTLE_SECONDS", 0.01)
+    monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    if thread is None:
+        monkeypatch.delenv("SYLVIA_CHATGPT_THREAD", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", thread)
+    from tests.test_chatgpt_answer_in_place import AnswerRuntime, Waiting, asks
+
+    runtime = (
+        Runtime(tool_turn("call-1"), tool_turn("call-2")) if thread == "stable"
+        else AnswerRuntime(Waiting([asks("call-1", 7)]), Waiting([asks("call-2", 8)]))
+    )
+    provider, audit = provider_for(runtime, tmp_path)
+    # Not built by the ledger (an NPC decision, Builder): the fresh path, as before kept
+    # threads, whatever the switch says.
+    await provider.generate(FIRST, tools=TOOLS)
+    assert runtime.alive() == [] and len(kept) == 0 and audit.reuse == []
+    # Built by the ledger: the switch's mode. The mark serves this one request.
+    LEDGER_REQUEST.set(True)
+    await provider.generate(FIRST, tools=TOOLS)
+    assert LEDGER_REQUEST.get() is False
+    assert len(runtime.alive()) == 1 and len(kept) == 1 and audit.reuse[0]["kept"] is True
+    kept.close_all()
+
+
+@pytest.mark.asyncio
 async def test_the_switch_is_read_when_the_provider_is_created(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads,
 ) -> None:
-    monkeypatch.delenv("SYLVIA_CHATGPT_THREAD", raising=False)
+    monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "fresh")
     runtime = Runtime(tool_turn())
     provider, _ = provider_for(runtime, tmp_path)
     monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "stable")
     await provider.generate(FIRST, tools=TOOLS)
+    assert runtime.alive() == [] and len(pool) == 0
+
+
+@pytest.mark.asyncio
+async def test_with_no_switch_set_a_tool_call_leaves_its_turn_waiting_in_a_kept_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads,
+) -> None:
+    monkeypatch.delenv("SYLVIA_CHATGPT_THREAD", raising=False)
+    monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
+    from tests.test_chatgpt_answer_in_place import AnswerRuntime, Waiting, asks
+
+    runtime = AnswerRuntime(Waiting([asks("call-1", 7)]))
+    provider, audit = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    [connection] = runtime.connections
+    assert connection.alive and len(pool) == 1 and connection.methods("turn/interrupt") == []
+    assert audit.reuse[0]["answered_in_place"] is False and audit.reuse[0]["kept"] is True
+    await provider.close()
     assert runtime.alive() == [] and len(pool) == 0
 
 

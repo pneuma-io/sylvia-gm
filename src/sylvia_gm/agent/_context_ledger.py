@@ -197,9 +197,12 @@ CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
 #: The tool list a route uses when ``SYLVIA_GM_TOOL_LIST`` does not name one. A route ships
 #: with per-round lists unless it is named here. A route is moved to one list, by its
 #: transport name, once a measured run on that route supports it.
-#: ``claude_code``: see ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``; measured together.
+#: ``claude_code`` and ``codex_app_server``: see ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``;
+#: measured together.
 DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
-DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {"claude_code": STABLE_TOOL_LIST}
+DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
+    "claude_code": STABLE_TOOL_LIST, "codex_app_server": STABLE_TOOL_LIST,
+}
 
 
 def stable_tool_list(
@@ -220,10 +223,14 @@ def stable_tool_list(
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
 #: A route ships with the previous assembly unless it is named here. A route is moved to the
 #: context ledger, by its transport name, once a measured run on that route supports it.
-#: ``claude_code`` (a Claude subscription through Claude Code): a measured fight ended every
-#: turn in ledger mode, read most later input from the provider cache and was no slower.
+#: ``claude_code`` (a Claude subscription through Claude Code) and ``codex_app_server`` (a
+#: ChatGPT subscription through the Codex runtime, which also keeps its runtime thread): a
+#: measured fight ended every turn in ledger mode with one tool list, read most later input
+#: from the provider cache and was no slower.
 DEFAULT_CONTEXT_MODE = LEGACY_MODE
-DEFAULT_CONTEXT_MODE_BY_TRANSPORT: Mapping[str, str] = {"claude_code": LEDGER_MODE}
+DEFAULT_CONTEXT_MODE_BY_TRANSPORT: Mapping[str, str] = {
+    "claude_code": LEDGER_MODE, "codex_app_server": LEDGER_MODE,
+}
 
 
 def context_mode_setting(environ: Mapping[str, str] | None = None) -> str | None:
@@ -1001,6 +1008,12 @@ class WireFrame:
 CURRENT_WIRE_FRAME: ContextVar[dict[str, Any] | None] = ContextVar(
     "sylvia_gm_current_wire_frame", default=None
 )
+
+#: Set by the ledger for the one ChatGPT request it has just built, and cleared by the
+#: provider as it reads it: only such a request may keep a runtime thread. Every other
+#: request (an NPC decision, Builder, a summary) runs on a fresh thread. Each stream round
+#: runs in its own task with a copy of the context, and clears it when it starts.
+LEDGER_REQUEST: ContextVar[bool] = ContextVar("sylvia_gm_ledger_request", default=False)
 
 
 def _prefix_fingerprint(stable: Sequence[Mapping[str, Any]]) -> str:

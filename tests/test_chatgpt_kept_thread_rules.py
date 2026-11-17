@@ -725,6 +725,21 @@ async def test_a_request_stopped_while_answering_does_not_wait_to_collect_usage(
     assert runtime.alive() == [] and len(answering) == 0
 
 
+@pytest.mark.asyncio
+async def test_closing_the_app_does_not_wait_on_a_waiting_turn(
+    tmp_path: Path, answering: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    """At process exit no later request can record usage, so none is collected."""
+    runtime = AnswerRuntime(waiting_that_reports_when_interrupted())
+    provider, _ = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    [connection] = runtime.connections
+    assert connection.alive and len(answering) == 1
+    answering.close_all()
+    assert connection.methods("turn/interrupt") == []
+    assert runtime.alive() == [] and len(answering) == 0
+
+
 def test_a_held_report_names_how_many_requests_before_it_belongs(tmp_path: Path) -> None:
     held_pool = _chatgpt._KeptThreads()
     home, other = tmp_path / "a", tmp_path / "b"
@@ -749,6 +764,76 @@ def test_a_held_report_names_how_many_requests_before_it_belongs(tmp_path: Path)
     held = held_pool.take_abandoned(home, 999)
     assert len(held) == _chatgpt._ABANDONED_REPORT_LIMIT  # noqa: SLF001
     assert held[-1]["input"] == _chatgpt._ABANDONED_REPORT_LIMIT + 4  # noqa: SLF001
+
+
+# ---- what nothing will continue ----------------------------------------------------------
+
+def _switch(provider: Any, monkeypatch: pytest.MonkeyPatch, *, to: str) -> None:
+    """A chat's model change, through the owner's own step after the switch is saved."""
+    from types import SimpleNamespace
+
+    from sylvia_gm.interfaces import owner_process
+
+    monkeypatch.setattr(owner_process, "selected_model_info",
+                        lambda session, _choices: provider.model_info)
+    prior = SimpleNamespace(provider_id="chatgpt_subscription", model_id=provider.model_info.id)
+    updated = SimpleNamespace(provider_id="chatgpt_subscription", model_id=to)
+    owner_process._release_previous_model_threads(prior, updated, ())  # type: ignore[arg-type]
+
+
+def _reload(offered: frozenset[str]) -> None:
+    from sylvia_gm.interfaces import owner_process
+
+    owner_process._release_unoffered_model_threads(offered)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("closer", [
+    "sign_out", "provider_close", "model_switch", "reload_without_the_model",
+])
+async def test_nothing_is_left_kept_once_nothing_could_continue_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    pool: _chatgpt._KeptThreads,  # noqa: F811
+    closer: str,
+) -> None:
+    for name in ("SYLVIA_CHATGPT_THREAD", "SYLVIA_GM_CONTEXT_MODE"):
+        monkeypatch.delenv(name, raising=False)  # the shipped defaults
+    runtime = AnswerRuntime(Waiting([asks("call-1", 7)]))
+    provider, _ = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    assert len(pool) == 1 and len(runtime.alive()) == 1
+    if closer == "sign_out":
+        account = Runtime().factory(tmp_path)
+        account.start()
+        account.call("account/logout", {})
+        account.close()
+    elif closer == "provider_close":
+        await provider.close()
+    elif closer == "model_switch":
+        _switch(provider, monkeypatch, to="chatgpt-subscription/another-model")
+    else:
+        _reload(frozenset({"another-model"}))
+    assert len(pool) == 0
+    deadline = time.monotonic() + 5
+    while runtime.alive() and time.monotonic() < deadline:
+        await asyncio.sleep(0.01)  # a release closes its threads in the background
+    assert runtime.alive() == []
+
+
+@pytest.mark.asyncio
+async def test_a_reload_that_still_offers_the_model_keeps_its_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+    pool: _chatgpt._KeptThreads,  # noqa: F811
+) -> None:
+    """The pool, not the replaced provider, holds the thread; the replacement continues it."""
+    for name in ("SYLVIA_CHATGPT_THREAD", "SYLVIA_GM_CONTEXT_MODE"):
+        monkeypatch.delenv(name, raising=False)
+    runtime = AnswerRuntime(Waiting([asks("call-1", 7)]))
+    provider, _ = provider_for(runtime, tmp_path)
+    await provider.generate(FIRST, tools=TOOLS)
+    _reload(frozenset({provider.model_info.wire_model_id}))
+    _switch(provider, monkeypatch, to=provider.model_info.id)  # not a change of model
+    assert len(pool) == 1 and len(runtime.alive()) == 1
 
 
 # ---- the account ------------------------------------------------------------------------

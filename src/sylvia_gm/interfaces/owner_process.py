@@ -1529,6 +1529,7 @@ def _switch_session_model(
         provider_id=selection["provider_id"],
         model_id=selection["model_id"],
     )
+    _release_previous_model_threads(prior, updated, choices)
     if mode == "global":
         try:
             set_default_model_settings(
@@ -1567,6 +1568,30 @@ def _switch_session_model(
         "speed_state": speed,
         "speed_cleared": speed_cleared,
     }
+
+
+def _release_previous_model_threads(
+    prior: SessionRecord, updated: SessionRecord, choices: Sequence[Mapping[str, object]],
+) -> None:
+    """A chat that leaves a ChatGPT model leaves nothing for its kept thread to continue."""
+    if (prior.provider_id, prior.model_id) == (updated.provider_id, updated.model_id):
+        return
+    previous = selected_model_info(prior, choices)
+    if previous is not None and previous.transport == "codex_app_server":
+        from sylvia_gm.provider._chatgpt import release_kept_threads
+
+        release_kept_threads([previous.wire_model_id])
+
+
+def _release_unoffered_model_threads(offered: frozenset[str]) -> None:
+    """After a settings reload, close kept threads of ChatGPT models no longer offered.
+
+    The reload replaces the providers without closing them. A thread of a model still
+    offered is kept for the replacement provider, which continues it.
+    """
+    from sylvia_gm.provider._chatgpt import kept_thread_models, release_kept_threads
+
+    release_kept_threads(kept_thread_models() - offered)
 
 
 def _switch_session_reasoning(
@@ -1932,6 +1957,7 @@ def run(
         replacement = ConfiguredProviderResolver(owner_config_path)
         with resolver_lock:
             configured_resolver = replacement
+        _release_unoffered_model_threads(replacement.subscription_models)
 
     try:
         launch = _read_message(input_stream)

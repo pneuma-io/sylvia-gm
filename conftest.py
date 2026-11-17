@@ -5,6 +5,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parent
 sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
 if "SYLVIA_QA_FIXTURE_ROOT" not in os.environ:
@@ -37,6 +39,22 @@ def pytest_configure(config):
         attempts = Path(os.environ["SYLVIA_QA_FIXTURE_ROOT"]) / "attempts"
         attempts.mkdir(parents=True, exist_ok=True)
         config.option.basetemp = tempfile.mkdtemp(prefix="pytest-", dir=attempts)
+
+
+@pytest.fixture(autouse=True)
+def _own_kept_runtime_threads(monkeypatch):
+    """Give each test its own pool of kept ChatGPT runtime threads, and close it afterwards.
+
+    The ChatGPT connection keeps its runtime thread by default, so a test that makes a
+    ChatGPT provider would otherwise leave its stand-in runtime and idle timer in the
+    process-wide pool for every later test in the same process.
+    """
+    from sylvia_gm.provider import _chatgpt
+
+    pool = _chatgpt._KeptThreads()
+    monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", pool)
+    yield
+    pool.close_all()
 
 
 def pytest_collection_modifyitems(items):
