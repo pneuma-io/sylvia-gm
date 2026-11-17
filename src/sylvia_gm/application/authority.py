@@ -4529,9 +4529,10 @@ class AuthorityOwner:
         )
         return campaign
 
-    def catalog(self, campaign_id: str) -> tuple[CatalogTool, ...]:
+    def catalog(self, campaign_id: str, *, include_unexposed: bool = False) -> tuple[CatalogTool, ...]:
+        """Read declarations; fixed projection may also request temporarily unavailable tools."""
         with self._operation():
-            return self._catalog(campaign_id)
+            return self._catalog(campaign_id, include_unexposed=include_unexposed)
 
     def ruleset_gm_operating_guide(self, campaign_id: str) -> str | None:
         """Read the locked primary Ruleset's GM guide, or Sylvia's No Ruleset guide."""
@@ -4568,7 +4569,8 @@ class AuthorityOwner:
         return guide
 
     def _catalog(
-        self, campaign_id: str, *, include_character_updates: bool = False
+        self, campaign_id: str, *, include_character_updates: bool = False,
+        include_unexposed: bool = False,
     ) -> tuple[CatalogTool, ...]:
         self._ensure_campaign_not_transitioning(campaign_id)
         lock, state, turn_status, writer, lifecycle, declarations = (
@@ -4588,7 +4590,7 @@ class AuthorityOwner:
                 continue
             # Shared bookkeeping remains readable during combat; execution still performs
             # ordinary predicate admission in _admitted_tool before any mutation.
-            if not (
+            if not include_unexposed and not (
                 include_character_updates
                 and "x-sylvia-gm-character-update" in declaration.input_schema
             ) and not declaration_admitted(
@@ -4608,7 +4610,7 @@ class AuthorityOwner:
             ):
                 effective_behavior = (
                     tool.model_behavior
-                    if state_predicates_match(tool.model_behavior_state_predicates, state)
+                    if include_unexposed or state_predicates_match(tool.model_behavior_state_predicates, state)
                     else ModelToolBehavior.OPTIONAL
                 )
                 available.append(replace(tool, model_behavior=effective_behavior))

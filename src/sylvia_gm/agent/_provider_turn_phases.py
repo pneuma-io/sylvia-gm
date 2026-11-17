@@ -697,6 +697,23 @@ def reject_unavailable_tool(
         ),
     }
     state.local_tool_failures.add(state.assembly.call_id)
+    if self._fixed_tool_list and self._ledger_active(provider_input):
+        record_fixed_tool_refusal(self, state, provider_input,
+                                  turn_id=turn_id, reason="not_callable")
+
+
+def record_fixed_tool_refusal(
+    self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
+    *, turn_id: str, reason: str,
+) -> None:
+    """Count each refused call once; the same category also stays in saved tool evidence."""
+    state.local_tool_results[state.assembly.call_id]["fixed_tool_refusal"] = reason
+    recorder = getattr(self._owner, "record_admin_full_audit", None)
+    if callable(recorder):
+        recorder({"kind": "gm_fixed_tool_refusal", "reason": reason,
+                  "campaign_id": state.campaign_id, "session_id": provider_input.session.session_id,
+                  "turn_id": turn_id, "inference_id": state.inference_id,
+                  "call_id": state.assembly.call_id, "tool_name": state.assembly.name})
 
 
 def reject_invalid_tool_json(
@@ -1774,6 +1791,9 @@ def execute_tool_batch(
                     raise ValueError("History parameters must be an object")
                 working, _bridge = self._working_contexts[provider_input.session.session_id]
                 if not working.history_retrieval_enabled or not working.records:
+                    if self._fixed_tool_list and self._ledger_active(provider_input):
+                        reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
+                        continue
                     raise ValueError("Historical reads are unavailable in this transaction")
                 state.local_tool_results[state.assembly.call_id] = working.read_history(
                     history_parameters,
@@ -1814,6 +1834,29 @@ def execute_tool_batch(
             }
             state.local_tool_failures.add(state.assembly.call_id)
             continue
+        if self._fixed_tool_list and self._ledger_active(provider_input):
+            from ._fixed_tool_projection import unavailable_values
+
+            ledger = self._ledger_store().get(provider_input.session.session_id)
+            fixed_schema: dict[str, Any] = {}
+            if ledger is not None:
+                fixed_schema = next((
+                    tool["function"]["parameters"] for tool in (ledger.fixed_tools or ())
+                    if tool["function"]["name"] == resolved_tool[0]
+                ), {})
+            issues = unavailable_values(
+                state.parameters, state.catalog_tool.input_schema, fixed_schema)
+            if issues:
+                state.local_tool_results[state.assembly.call_id] = {
+                    "status": "rejected", "code": "fixed_tool_argument_unavailable",
+                    "state_changed": False, "validation": {"issues": issues},
+                    "instruction": ("Choose from each field's allowed_values "
+                                    "and retry the call once."),
+                }
+                state.local_tool_failures.add(state.assembly.call_id)
+                record_fixed_tool_refusal(self, state, provider_input, turn_id=turn_id,
+                                          reason="argument_value")
+                continue
         scope = state.parameters.pop(
             _PREPARATION_INTENT_ARGUMENT,
             _UNSPECIFIED_PREPARATION_INTENT,

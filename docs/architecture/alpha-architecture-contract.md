@@ -1662,6 +1662,26 @@ the ledger resets. Builder and participant requests do not use it.
   (`DEFAULT_TOOL_LIST`) on every route except those named in `DEFAULT_TOOL_LIST_BY_TRANSPORT`,
   which send one tool list for the session. `claude_code` and `codex_app_server` are listed.
   `SYLVIA_GM_TOOL_LIST=stable` or `=rounds` selects either for every route.
+  `SYLVIA_GM_TOOL_LIST=fixed` is an opt-in third value, used only with the ledger. It lists
+  the complete campaign catalog from the first GM request, in deterministic name order,
+  including tools not currently exposed and the application reference, Campaign File,
+  action-sequence and history tools. Package capabilities and permanent refusals still apply.
+  Catalog admission predicates, exposure, participant IDs, castable spell choices and narrative
+  eligibility do not alter these definitions. A restart rebuilds the same definitions from the
+  pinned packages. The older modes and every route default remain unchanged.
+  Repeated identical simple property schemas may use local `$defs`/`$ref` entries when
+  that reduces serialized bytes. Descriptions, types, bounds and static enums are preserved;
+  execution still validates the original package schema. Ruleset package bytes are not rewritten.
+  In fixed mode, the sealed `SYLVIA_GM_CALLABLE_TOOLS` conversation record also names current
+  argument choices and available narrative fields. It is appended only when its content changes,
+  never placed in the fixed system prefix or tool definitions. The turn loop still admits only
+  the current round's tools and checks current enum choices before executing a mutation; the
+  engine retains all argument and state checks. Refusals give the current operations or allowed
+  values for correction. Saved tool results mark `fixed_tool_refusal` as `not_callable` or
+  `argument_value`; Full Audit emits one `gm_fixed_tool_refusal` per refused call with that
+  `reason`, session, turn, inference and call ID. Count the audit events (or deduplicated saved
+  tool results), not the replayed conversation copies. Live casting accuracy and cache savings
+  remain unmeasured until a separately authorized provider run.
 - **ChatGPT runtime thread.** On `codex_app_server` the provider keeps the Codex runtime process
   and thread between the requests of a GM turn and between turns. At a Sylvia tool call the turn
   is left waiting, and the next request, which brings the call's result, answers the call inside

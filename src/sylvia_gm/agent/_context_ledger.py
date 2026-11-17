@@ -194,6 +194,7 @@ ADDITIVE_MAP_PATHS: tuple[tuple[str, ...], ...] = (("GM_PRIVATE_CURRENT", "chara
 #: ``ContextLedger.sent_tools``); ``rounds`` sends the list the turn loop offers each round.
 TOOL_LIST_ENV = "SYLVIA_GM_TOOL_LIST"
 STABLE_TOOL_LIST = "stable"
+FIXED_TOOL_LIST = "fixed"
 ROUND_TOOL_LISTS = "rounds"
 CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
 
@@ -213,14 +214,20 @@ def stable_tool_list(
 ) -> bool:
     """Whether ledger mode sends one tool list for the session on *transport*.
 
-    ``SYLVIA_GM_TOOL_LIST=stable`` or ``=rounds`` decides for every route. Without it (or
-    with any other value) the route's shipped default applies.
+    ``SYLVIA_GM_TOOL_LIST=stable``, ``=fixed`` or ``=rounds`` decides for every route.
+    Without it (or with any other value) the route's shipped default applies.
     """
     value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
     setting = value.strip().casefold()
-    if setting not in {STABLE_TOOL_LIST, ROUND_TOOL_LISTS}:
+    if setting not in {STABLE_TOOL_LIST, ROUND_TOOL_LISTS, FIXED_TOOL_LIST}:
         setting = DEFAULT_TOOL_LIST_BY_TRANSPORT.get(transport or "", DEFAULT_TOOL_LIST)
-    return setting == STABLE_TOOL_LIST
+    return setting in {STABLE_TOOL_LIST, FIXED_TOOL_LIST}
+
+
+def fixed_tool_list(environ: Mapping[str, str] | None = None) -> bool:
+    """The full, state-independent catalog is opt-in; route defaults stay unchanged."""
+    value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
+    return value.strip().casefold() == FIXED_TOOL_LIST
 
 
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
@@ -1153,13 +1160,16 @@ class ContextLedger:
         context_owner: Mapping[str, Any] | None,
         transport: str | None,
         one_tool_list: bool = False,
+        fixed_tools: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         self.session_id = session_id
         self.context_owner = dict(context_owner) if context_owner is not None else None
         self.transport = transport
         self.seal = host_seal(session_id)
         #: Send every tool sent so far instead of the list offered this round.
-        self.one_tool_list = one_tool_list
+        self.one_tool_list = one_tool_list or fixed_tools is not None
+        self.fixed_tools = (copy.deepcopy([dict(tool) for tool in fixed_tools])
+                            if fixed_tools is not None else None)
         #: The tools sent so far in first-sent order; ``None`` until read from saved records.
         self._tool_list: list[dict[str, Any]] | None = None
         self.state: JournalState | None = None
@@ -1191,6 +1201,8 @@ class ContextLedger:
         definition is sent with that definition. Which tools can be called is unchanged:
         the turn loop still accepts only the offered ones.
         """
+        if self.fixed_tools is not None:
+            return self.fixed_tools
         if not self.one_tool_list:
             return offered
         merged, _added, _replaced = merged_tool_list(
@@ -1420,7 +1432,10 @@ class ContextLedger:
             # A replaced definition changes the tool set like a changed list in the previous
             # mode, so the thinking floor below moves the same way.
             tool_list, tools_added, tools_replaced = merged_tool_list(
-                self._sent_so_far(history_records), offered_tools)
+                self._sent_so_far(history_records),
+                self.fixed_tools if self.fixed_tools is not None else offered_tools)
+            if self.fixed_tools is not None:
+                tool_list = copy.deepcopy(self.fixed_tools)
             tools = tool_list or offered_tools
         state_messages = [
             m for m in hosts if str(m.get("content", "")).startswith(STATE_LABEL + " ")
@@ -1458,8 +1473,13 @@ class ContextLedger:
         if self.one_tool_list and tool_list:
             # Tell the model which listed tools can be called now, only when that changed.
             content = callable_record(tool_list, offered_tools)
+            if self.fixed_tools is not None:
+                from ._fixed_tool_projection import argument_choices_record
+
+                content += argument_choices_record(tool_list, offered_tools)
             if (last_of_label(CALLABLE_LABEL) or {}).get("h") != _sha(content):
-                appended.append({"m": self._host_message({"role": "system"}, content),
+                role = "user" if self.fixed_tools is not None else "system"
+                appended.append({"m": self._host_message({"role": role}, content),
                                  "c": "latest", "l": CALLABLE_LABEL, "h": _sha(content)})
         if state_messages:
             self._append_state(state, appended, str(state_messages[-1].get("content", "")),
