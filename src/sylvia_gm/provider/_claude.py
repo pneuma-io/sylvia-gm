@@ -8,7 +8,7 @@ import logging
 import re
 import threading
 import uuid
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -41,6 +41,7 @@ from sylvia_gm.provider._claude_native import (
     NativeCollection,
     NativeRoute,
     collect,
+    collect_answer,
     delete_session,
     remove_debug_logs,
     remove_step_folder,
@@ -181,6 +182,20 @@ def _text_blocks(content: Any) -> list[dict[str, Any]]:
     raise InvalidResponseError("Claude cannot represent this Sylvia input.")
 
 
+def _answers(message: dict[str, Any] | None, answer: Mapping[str, Any]) -> bool:
+    """Is ``answer`` (a kept process's stored tool-result message) the answer to ``message``?"""
+    if message is None or message.get("role") != "user":
+        return False
+    content, stored = message.get("content"), answer.get("content")
+    return (
+        isinstance(content, list) and bool(content) and isinstance(content[0], dict)
+        and content[0].get("type") == "tool_result"
+        and isinstance(stored, list) and bool(stored) and isinstance(stored[0], dict)
+        and stored[0].get("type") == "tool_result"
+        and stored[0].get("tool_use_id") == content[0].get("tool_use_id")
+    )
+
+
 def _is_prompt_entry(message: dict[str, Any]) -> bool:
     content = message.get("content")
     return message.get("role") == "user" and not (
@@ -264,6 +279,19 @@ def _native_projection(
         group = end
         while group > start and _is_prompt_entry(history[group - 1]):
             group -= 1
+        answer = route.native_answers.get(end) if end != len(history) else None
+        if answer is not None and _answers(history[group - 1] if group > start else None, answer):
+            # A kept process answered this request's call in place: its conversation holds
+            # the one tool-result message it stored (the result and the sealed records), not
+            # the result, a filler and a separate prompt. Replay exactly that.
+            for message in history[start:group - 1]:
+                add_message(message)
+            add("user", {"message": json.loads(json.dumps(answer))})
+            for saved in route.native_records.get(end, ()):
+                add("attachment", {key: saved[key] for key in
+                                   ("attachment", "rendered", "renderedRole") if key in saved})
+            start = end
+            continue
         for message in history[start:group]:
             add_message(message)
         content = [block for m in history[group:end] for block in _text_blocks(m["content"])]
@@ -640,7 +668,7 @@ class ClaudeProvider(Provider):
                 )
             async for chunk in self._run_events(
                 connection, step, route, kept.config, kept.session_id, prompt, timeout,
-                keep=True,
+                keep=True, answered_call=kept.call_id if kind == "answer" else None,
             ):
                 yield chunk
             finished = True
@@ -883,12 +911,15 @@ class ClaudeProvider(Provider):
         timeout: float,
         *,
         keep: bool,
+        answered_call: str | None = None,
     ) -> AsyncIterator[ProviderStreamChunk]:
         """Read one native reply to its end, a Sylvia tool call or a result.
 
         ``prompt`` is what was written to stdin for this step, if anything was (it is absent
         when a waiting call was answered); the CLI's context records follow it in the session
-        file and are collected. With ``keep`` the process is left open for the next request.
+        file and are collected. ``answered_call`` names the call a kept process's waiting turn
+        was answered on; the message it stored for that answer is collected instead. With
+        ``keep`` the process is left open for the next request.
         """
         response = step.response
         native_state = _AnthropicStreamContent()
@@ -980,6 +1011,7 @@ class ClaudeProvider(Provider):
                         await self._collect(
                             route, config, session_id, prompt, flushed, delete=not keep,
                         )
+                        await self._collect_answer(route, config, session_id, answered_call)
                         response.tool_calls = [call]
                         response.finish_reason = "tool_calls"
                         if native_content is not None:
@@ -1146,6 +1178,7 @@ class ClaudeProvider(Provider):
                 if not keep:
                     await self._close_owned(connection)
                 await self._collect(route, config, session_id, prompt, flushed, delete=not keep)
+                await self._collect_answer(route, config, session_id, answered_call)
             response.content = "".join(text_parts) or None
             self._last_response = response
             await self.hooks.fire_on_response(
@@ -1185,6 +1218,31 @@ class ClaudeProvider(Provider):
                 wait_for_flush, config, session_id, prompt["message"]["content"]
             )
         )
+
+    async def _collect_answer(
+        self, route: NativeRoute | None, config: Path, session_id: str, call_id: str | None,
+    ) -> None:
+        """Save the tool-result message a kept process stored for the call it was answered on.
+
+        A later fresh process replays it in place of the per-step form, so its request extends
+        what the kept process sent. Never fatal; when it cannot be found nothing is saved, and
+        a fresh start replays the per-step form (one cache miss from that point).
+        """
+        if route is None or route.on_collected is None or not call_id:
+            return
+        result = await asyncio.to_thread(collect_answer, config, session_id, call_id)
+        if result.status != "collected":
+            logger.warning(
+                "The message Claude Code stored for an answered call was not found (%s); a "
+                "fresh start replays the per-step form.", result.reason,
+            )
+            return
+        try:
+            await route.on_collected(result)
+        except asyncio.CancelledError:
+            raise
+        except Exception:  # noqa: BLE001 - saving evidence never fails the player's step
+            logger.warning("Claude runtime answer record could not be saved.", exc_info=True)
 
     async def _collect(
         self,
