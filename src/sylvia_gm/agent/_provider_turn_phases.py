@@ -1576,6 +1576,7 @@ def stream_provider_round(
     for chunk in self._stream_round(
         state.inference_messages,
         state.tools,
+        aliases=state.aliases,
         control=provider_input.control,
         provider_input=provider_input,
         tool_choice="required" if state.provider_tool_call_required else None,

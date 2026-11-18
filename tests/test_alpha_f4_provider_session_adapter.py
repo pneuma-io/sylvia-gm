@@ -399,6 +399,79 @@ def test_anthropic_single_required_tool_transaction_uses_zero_temperature() -> N
         assert wire.get("tool_choice") == wire_choice, wire_model
 
 
+@pytest.mark.parametrize("reuse_retired_name", [False, True])
+def test_legacy_history_preserves_one_pin_and_quotes_retired_operations(reuse_retired_name):
+    from sylvia_gm.agent._provider_session import _tool_alias
+    from sylvia_gm.domain.authority import PackageLockEntry, PackageRole
+
+    tool = ModelMechanicsTool("synthetic.rules", "1", "a" * 64, "move", "piece.move", {})
+    retired = replace(tool, name="old_score", capability="piece.score")
+    renamed = replace(tool, package_version="2", package_sha256="b" * 64)
+    # Sharing a name with a different capability does not give the new operation the old result.
+    different = replace(renamed, name=retired.name, capability="other.score")
+    available = {_tool_alias(renamed): renamed}
+    if reuse_retired_name:
+        available[_tool_alias(different)] = different
+
+    def lock(t):
+        pin = PackageLockEntry(
+            t.package_id, t.package_version, t.package_sha256, PackageRole.PRIMARY, 0, (), ()
+        )
+        return SimpleNamespace(package_lock=SimpleNamespace(entries=(pin,)))
+
+    locks = [lock(tool)]
+    owner = SimpleNamespace(package_lock_lineage=lambda _campaign: locks)
+    adapter = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner), _ScriptedProvider([]), owner_id="legacy"
+    )
+    provider_input = SimpleNamespace(session=SimpleNamespace(campaign_id="game"))
+    calls = [
+        {
+            "id": str(i),
+            "type": "function",
+            "function": {"name": _tool_alias(t), "arguments": '{"piece":"green"}'},
+        }
+        for i, t in enumerate((tool, retired))
+    ]
+    results = [
+        {
+            "role": "tool",
+            "tool_call_id": c["id"],
+            "name": c["function"]["name"],
+            "content": "green moved" if c["id"] == "0" else "score 7",
+        }
+        for c in reversed(calls)
+    ]
+    history = [
+        {
+            "role": "assistant",
+            "_native_reference": {"response_id": "old-batch"},
+            "content": "I check the board.",
+            "tool_calls": calls,
+        },
+        *results,
+    ]
+    original = json.dumps(history).encode()
+    # A one-pin campaign may also have temporarily unavailable tools. Preserve its exact bytes.
+    assert (
+        json.dumps(adapter._legacy_adopted_history(history, provider_input, {})).encode()
+        == original
+    )
+    locks.append(lock(renamed))
+    message, result = adapter._legacy_adopted_history(history, provider_input, available)
+    assert "_native_reference" not in message
+    assert message["tool_calls"] == [
+        {**calls[0], "function": {**calls[0]["function"], "name": _tool_alias(renamed)}}
+    ]
+    assert result == {**results[1], "name": _tool_alias(renamed)}
+    assert message["content"].startswith("I check the board.\nEarlier tool calls")
+    quoted = json.loads(message["content"].split(" (historical data): ", 1)[1])
+    assert quoted == [{"call": calls[1]["function"], "result": "score 7"}]
+    (text_only,) = adapter._legacy_adopted_history(history, provider_input, {})
+    assert "tool_calls" not in text_only and "green moved" in text_only["content"]
+    assert json.dumps(history).encode() == original
+
+
 def test_provider_tool_alias_resolution_stays_within_the_current_catalog() -> None:
     end_turn = ModelMechanicsTool(
         package_id="synthetic.rules",

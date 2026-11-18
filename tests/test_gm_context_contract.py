@@ -729,6 +729,63 @@ def _evidence_kinds(database: Path, session: str) -> list[str]:
                 if m.kind is SessionMessageKind.EVIDENCE]
 
 
+def test_legacy_tool_history_after_package_adoption(tmp_path, monkeypatch):
+    """A regular legacy turn replays the old ability check under the newly advertised alias."""
+    import io
+
+    from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+    from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.application.bundled_packages import bundled_srd_archive
+    from tests.test_campaign_rules_update import adopt
+    from tests.test_gm_memory_casting_hotfix import create_cleric_save
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
+    fixture = Path(__file__).parent / "fixtures/alpha5-lite.sylvia-gm-package"
+    database = create_cleric_save(tmp_path / "legacy.sqlite3", fixture.read_bytes())
+    gm = ContractGM()
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1) as owner:
+        adapter = ProviderSessionAdapter(owner, gm, owner_id="hotfix-owner")
+
+        def play(turn_id):
+            gm.steps.extend([_check("hero", "perception"), settle("The steps are quiet.")])
+            start = len(gm.calls)
+            request = SessionRunRequest(
+                "gm", turn_id, turn_id + "-attempt", turn_id + "-input", "I look for tracks."
+            )
+            result = CampaignSessionLoop(owner).run(request, adapter.for_turn(turn_id))
+            assert result.interruption is None and gm.position == len(gm.steps)
+            assert len(gm.calls) == start + 2
+            return gm.calls[start:]
+
+        before = play("casting-turn")
+        saved_call = next(c for m in before[1]["messages"] for c in m.get("tool_calls", ()))
+        saved_result = next(
+            m for m in before[1]["messages"] if m.get("tool_call_id") == saved_call["id"]
+        )
+        old_alias = saved_call["function"]["name"]
+        assert old_alias.endswith("_ability_check")
+        owner.complete_turn("casting", "casting-turn")
+        package = owner.install_package_archive(io.BytesIO(bundled_srd_archive()), install_id="new")
+        preview = owner.preview_campaign_rules_update("casting", package.candidate_id)
+        assert preview["compatible"], preview["conflicts"]
+        adopt(owner, preview)
+        owner.open_turn("casting", "after-adoption")
+        for request in play("after-adoption"):
+            (alias,) = [n for n in request["tools"] if n.endswith("_ability_check")]
+            assert old_alias != alias and old_alias not in request["tools"]
+            calls = [c for m in request["messages"] for c in m.get("tool_calls", ())]
+            assert {c["function"]["name"] for c in calls} <= set(request["tools"])
+            assert {**saved_call, "function": {**saved_call["function"], "name": alias}} in calls
+            assert {**saved_result, "name": alias} in request["messages"]
+        # Adaptation is confined to the provider's request.
+        assert any(
+            c["function"]["name"] == old_alias
+            for m in owner.session_context("gm").messages
+            for c in m.content.get("assistant", {}).get("tool_calls", ())
+        )
+
+
 class ChatGPTContractGM(ContractGM):
     """The scripted GM as a ChatGPT subscription model, so that route's defaults apply."""
 
