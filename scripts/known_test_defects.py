@@ -13,15 +13,6 @@ class KnownDefect:
 
 
 KNOWN_DEFECTS: dict[str, KnownDefect] = {
-    "tests/test_campaign_plan_skill_examples.py::test_builder_retrieves_a_complete_valid_example_from_its_advertised_references": KnownDefect(
-        "The advertised worked Plan reference has stale package bindings",
-        "Load the Plan skill's combat/multi-act examples and compare/admit their bindings against the bundled source closure.",
-    ),
-    'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
-        "The Builder's advertised Plan example fails its declared content schema",
-        'Build the advertised Plan example against its retained synthetic source Setting, then validate before saving its inherited copies.',
-        category='suspected retained contract discrepancy',
-    ),
 }
 
 
