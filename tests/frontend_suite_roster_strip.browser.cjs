@@ -26,7 +26,9 @@ async function open(browser, viewport, member = null) {
     await route.fulfill({ body, contentType: name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css'
       : name.endsWith('.png') ? 'image/png' : 'text/html' });
   });
-  await page.goto('https://sylvia-strip.test/app.html');
+  // The page is served from disk by the route above; under a complete run's load its first
+  // load can take longer than the 5 s action timeout (issue 122).
+  await page.goto('https://sylvia-strip.test/app.html', { timeout: 30000 });
   await page.evaluate(([source, member]) => {
     const projection = JSON.parse(JSON.stringify(source));
     delete projection.layout; // a fresh workspace: the suite default arrangement
