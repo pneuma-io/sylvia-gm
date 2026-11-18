@@ -106,7 +106,8 @@ def capture_content_references(
         ),
         None,
     )
-    selected_setting = next(
+    # An explicitly retained candidate owns the Setting identity across catalog refreshes.
+    selected_setting = None if isinstance(setting_candidate_id, str) else next(
         (
             item
             for item in (selected or {}).get("compatible_settings", ())
