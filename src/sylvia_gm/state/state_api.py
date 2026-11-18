@@ -321,8 +321,7 @@ class StateAPI:
         current[parts[-1]] = value
         self._store.mark_dirty()
 
-        # T5.5: Log state write
-        logger.debug("state_write key=%s.%s entity_id=%s", field_path, entity_id)
+        logger.debug("state_write key=%s entity_id=%s", field_path, entity_id)
 
         # Changelog
         self._changelog.append(

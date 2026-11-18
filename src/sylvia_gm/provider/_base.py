@@ -316,18 +316,18 @@ class ProviderConfig:
     base_url: str  # endpoint URL
     runtime_home: str = ""  # owner-selected private profile for managed subscription runtime
     default_headers: dict[str, str] = field(default_factory=dict)
-    credentials_list: list[dict[str, str]] = field(default_factory=list)
-    # credentials_list elements: {"type": "api_key", "value": "sk-..."}
+    api_key: str = field(default="", repr=False)
     models: list[ModelInfo] = field(default_factory=list)
     default_model: str = ""
     timeout: float = 60.0
     max_tokens: int = 4096
-    fallback_providers: list[ProviderConfig] = field(default_factory=list)
     retry_config: RetryConfig | None = None  # None → use provider default
 
 
 class Provider(ABC):
     """Abstract base class for all LLM providers."""
+
+    model_info: ModelInfo | None = None
 
     def __init__(self) -> None:
         from sylvia_gm.provider._hooks import HookManager

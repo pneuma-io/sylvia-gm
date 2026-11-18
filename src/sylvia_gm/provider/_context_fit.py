@@ -128,7 +128,7 @@ class ContextFittingProvider(Provider):
     ) -> None:
         super().__init__()
         self._provider = provider
-        self.model_info = getattr(provider, "model_info", None)
+        self.model_info = provider.model_info
         self.hooks = provider.hooks
         self._audit_context: dict[str, object] = {}
         self._minimum_context_window = minimum_context_window

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from sylvia_gm.domain.authority import ModelToolBehavior, WriterRole
@@ -70,15 +69,6 @@ def _narration_repeats_previous_player_response(state: ProviderTurnState) -> boo
 def _required_tool_call_is_missing(state: ProviderTurnState) -> bool:
     return bool(
         state.provider_tool_call_required and (not state.obligations.force_campaign_file_update)
-    )
-
-
-def _narration_needs_private_correction(
-    state: ProviderTurnState, _looks_like_private_deliberation: Callable[[str], bool]
-) -> bool:
-    return bool(
-        not state.obligations.force_campaign_file_update
-        and _looks_like_private_deliberation(state.narration)
     )
 
 

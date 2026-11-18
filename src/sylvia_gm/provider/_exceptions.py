@@ -4,8 +4,8 @@ All provider-layer errors inherit from ProviderError and carry an ErrorCategory
 describing the failure. Recovery policy belongs to the caller. Desktop sessions
 do not automatically retry ordinary inference failures or switch providers. Explicit
 working-context recovery may compact and resubmit before visible output; see the product
-contract and agent._provider_resolver. Optional _failover and _fallback_chain
-helpers interpret these categories only when a caller explicitly uses them.
+contract and agent._provider_resolver. Transport retry helpers
+interpret these categories only when a caller explicitly uses them.
 """
 
 from __future__ import annotations

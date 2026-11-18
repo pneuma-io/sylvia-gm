@@ -39,7 +39,6 @@ from sylvia_gm.provider._base import (
     ToolCall,
 )
 from sylvia_gm.provider._chat_metadata import ChatCompletionMetadata
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
     IncompleteProviderStreamError,
@@ -53,7 +52,7 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
     is_context_rejection,
 )
-from sylvia_gm.provider._failover import retry_with_backoff
+from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._hooks import HookContext
 from sylvia_gm.provider._native_output import (
     DoneTrackingStream,
@@ -702,8 +701,6 @@ class OpenAICompatProvider(Provider):
     Works with OpenCode Go, OpenRouter, Anthropic (via proxy), and Ollama.
     All share the same chat/completions wire protocol.
 
-    Supports both the original ``api_key`` constructor (for backward compat)
-    and the new ``credential_pool`` constructor (for key rotation).
     """
 
     MAX_CONSECUTIVE_CONNECTION_ERRORS = 3
@@ -715,7 +712,6 @@ class OpenAICompatProvider(Provider):
         model_info: ModelInfo | None = None,
         retry_config: RetryConfig | None = None,
         http_client: httpx.AsyncClient | None = None,
-        credential_pool: CredentialPool | None = None,
         timeout_config: TimeoutConfig | None = None,
         default_headers: dict[str, str] | None = None,
     ) -> None:
@@ -723,17 +719,16 @@ class OpenAICompatProvider(Provider):
 
         Args:
             base_url: API base URL (e.g. ``https://api.opencode.go/v1``).
-            api_key: API key (plain text). Deprecated in favor of credential_pool.
+            api_key: API key (plain text).
             model_info: Metadata for the model this provider serves.
             retry_config: Retry parameters. Uses defaults if None.
             http_client: Optional shared httpx client.
-            credential_pool: New-style credential pool for key rotation.
             timeout_config: Optional timeout configuration.
         """
         super().__init__()
 
         self._base_url = base_url
-        self._model_info = model_info or ModelInfo(
+        self.model_info = model_info or ModelInfo(
             id="unknown",
             name="Unknown",
             provider_name="BYOK",
@@ -760,7 +755,7 @@ class OpenAICompatProvider(Provider):
             "dashscope.aliyuncs.com",
             "dashscope-us.aliyuncs.com",
         }
-        preserve_reasoning = hostname in replay_hosts or self._model_info.provider_key in {
+        preserve_reasoning = hostname in replay_hosts or self.model_info.provider_key in {
             "openrouter",
             "deepseek",
             "moonshot",
@@ -771,11 +766,11 @@ class OpenAICompatProvider(Provider):
             "alibaba",
         }
         preserve_content = (
-            hostname == "api.mistral.ai" or self._model_info.provider_key == "mistral"
+            hostname == "api.mistral.ai" or self.model_info.provider_key == "mistral"
         )
         self._transport: ChatCompletionsTransport = (
             ResponsesTransport()
-            if self._model_info.transport == "responses"
+            if self.model_info.transport == "responses"
             else ChatCompletionsTransport(
                 preserve_reasoning=preserve_reasoning, preserve_content=preserve_content
             )
@@ -785,13 +780,7 @@ class OpenAICompatProvider(Provider):
         self._consecutive_connection_errors = 0
         self._closed = False
 
-        # Resolve credential pool: credential_pool > api_key > error
-        if credential_pool is not None:
-            self._credential_pool = credential_pool
-        elif api_key is not None:
-            self._credential_pool = CredentialPool([Credential(type="api_key", value=api_key)])
-        else:
-            raise ValueError("Either api_key or credential_pool is required")
+        self._api_key = api_key or ""
 
         # Session-scoped client — created ONCE, reused for all requests
         self._client = self._build_client(http_client)
@@ -811,16 +800,12 @@ class OpenAICompatProvider(Provider):
         """Close and recreate HTTP client to clear stale connections."""
         logger.warning(
             "Recycling connection pool for %s after %d consecutive errors",
-            self._model_info.provider_name,
+            self.model_info.provider_name,
             self._consecutive_connection_errors,
         )
         await self._client.close()
         self._client = self._build_client()
         self._consecutive_connection_errors = 0
-
-    @property
-    def model_info(self) -> ModelInfo:
-        return self._model_info
 
     def provider_request_representation(
         self,
@@ -836,7 +821,7 @@ class OpenAICompatProvider(Provider):
         request_options.pop("_retry_attempt", None)
         self._response_continuation_options(request_options)
         return self._transport.format_request(
-            model_id=self._model_info.wire_model_id,
+            model_id=self.model_info.wire_model_id,
             messages=self._wire_messages(messages),
             tools=tools,
             stream=stream,
@@ -849,10 +834,10 @@ class OpenAICompatProvider(Provider):
         """Apply documented route restrictions without modifying saved neutral messages."""
         from urllib.parse import urlsplit
 
-        selected = _local_model_messages(self._model_info, messages)
+        selected = _local_model_messages(self.model_info, messages)
         if (
             urlsplit(self._base_url).hostname == "api.groq.com"
-            or self._model_info.provider_key == "groq"
+            or self.model_info.provider_key == "groq"
         ):
             return [
                 {key: value for key, value in message.items() if key != "name"}
@@ -872,7 +857,7 @@ class OpenAICompatProvider(Provider):
             options["extra_body"] = {
                 **(extra if isinstance(extra, dict) else {}), "session_id": context_id,
             }
-        if self._model_info.transport != "responses" or urlsplit(self._base_url).hostname not in {
+        if self.model_info.transport != "responses" or urlsplit(self._base_url).hostname not in {
             "api.openai.com",
             "api.x.ai",
         }:
@@ -891,8 +876,8 @@ class OpenAICompatProvider(Provider):
         request_json: dict[str, Any] | None = None,
     ) -> HookContext:
         return HookContext(
-            provider_key=self._model_info.provider_key,
-            model_id=self._model_info.id,
+            provider_key=self.model_info.provider_key,
+            model_id=self.model_info.id,
             message_count=len(messages),
             tool_count=len(tools) if tools else 0,
             request_json=request_json,
@@ -961,7 +946,7 @@ class OpenAICompatProvider(Provider):
         retry_attempt = cast(int, kwargs.pop("_retry_attempt", 0))
         self._response_continuation_options(kwargs)
         request_dict = self._transport.format_request(
-            model_id=self._model_info.wire_model_id,
+            model_id=self.model_info.wire_model_id,
             messages=self._wire_messages(messages),
             tools=tools,
             stream=False,
@@ -978,22 +963,21 @@ class OpenAICompatProvider(Provider):
 
         async def _call() -> ProviderResponse:
             # Rotate API key for this request
-            credential = await self._credential_pool.get_credential()
             # OpenAI-compatible local servers such as LM Studio do not require
             # authentication, but the OpenAI SDK still requires a non-empty
             # internal API-key value before it will construct a request.
-            self._client.api_key = credential.value or _CREDENTIALLESS_API_KEY
+            self._client.api_key = self._api_key or _CREDENTIALLESS_API_KEY
 
             try:
                 endpoint = (
                     self._client.responses.create
-                    if self._model_info.transport == "responses"
+                    if self.model_info.transport == "responses"
                     else self._client.chat.completions.create
                 )
                 completion = await asyncio.wait_for(endpoint(**request_dict), timeout=timeout)
             except TimeoutError:
                 raise ProviderTimeoutError(
-                    f"Request to {self._model_info.provider_name} timed out after {timeout}s"
+                    f"Request to {self.model_info.provider_name} timed out after {timeout}s"
                 ) from None
             except APITimeoutError as exc:
                 raise ProviderTimeoutError("Provider request timed out") from exc
@@ -1005,7 +989,7 @@ class OpenAICompatProvider(Provider):
                 self._transport._raise_from_openai_error(exc, self._retry_config.retryable_statuses)
 
             # Parse response
-            response = self._transport.parse_response(completion, self._model_info.id)
+            response = self._transport.parse_response(completion, self.model_info.id)
             return response
 
         t0 = _time.monotonic()
@@ -1076,7 +1060,7 @@ class OpenAICompatProvider(Provider):
         retry_attempt = cast(int, kwargs.pop("_retry_attempt", 0))
         self._response_continuation_options(kwargs)
         request_dict = self._transport.format_request(
-            model_id=self._model_info.wire_model_id,
+            model_id=self.model_info.wire_model_id,
             messages=self._wire_messages(messages),
             tools=tools,
             stream=True,
@@ -1092,16 +1076,15 @@ class OpenAICompatProvider(Provider):
         await self.hooks.fire_on_request(request_ctx)
 
         # Rotate API key for this stream
-        credential = await self._credential_pool.get_credential()
         # Keep credentialless local endpoints usable without persisting or
         # projecting a fabricated user credential.
-        self._client.api_key = credential.value or _CREDENTIALLESS_API_KEY
+        self._client.api_key = self._api_key or _CREDENTIALLESS_API_KEY
 
         t0 = _time.monotonic()
         try:
             endpoint = (
                 self._client.responses.create
-                if self._model_info.transport == "responses"
+                if self.model_info.transport == "responses"
                 else self._client.chat.completions.create
             )
             response = await asyncio.wait_for(endpoint(**request_dict), timeout=timeout)
@@ -1110,13 +1093,13 @@ class OpenAICompatProvider(Provider):
             enriched = self._enrich_context_error(
                 request_ctx,
                 ProviderTimeoutError(
-                    f"Stream request to {self._model_info.provider_name} timed out after {timeout}s"
+                    f"Stream request to {self.model_info.provider_name} timed out after {timeout}s"
                 ),
                 duration_ms,
             )
             await self.hooks.fire_on_error(enriched)
             raise ProviderTimeoutError(
-                f"Stream request to {self._model_info.provider_name} timed out after {timeout}s"
+                f"Stream request to {self.model_info.provider_name} timed out after {timeout}s"
             ) from None
         except APITimeoutError as exc:
             raise ProviderTimeoutError("Provider stream request timed out") from exc
@@ -1191,7 +1174,7 @@ class OpenAICompatProvider(Provider):
                     ):
                         yield filtered
             if not terminal_seen or (
-                self._model_info.transport != "responses"
+                self.model_info.transport != "responses"
                 and tracker is not None
                 and not tracker.done
             ):
@@ -1201,7 +1184,7 @@ class OpenAICompatProvider(Provider):
         except TimeoutError:
             duration_ms = (_time.monotonic() - t0) * 1000.0
             timeout_error = ProviderTimeoutError(
-                f"Stream from {self._model_info.provider_name} was inactive for {timeout}s"
+                f"Stream from {self.model_info.provider_name} was inactive for {timeout}s"
             )
             enriched = self._enrich_context_error(request_ctx, timeout_error, duration_ms)
             await self.hooks.fire_on_error(enriched)

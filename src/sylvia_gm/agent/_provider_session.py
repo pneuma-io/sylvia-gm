@@ -76,6 +76,7 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
+from sylvia_gm.provider._chatgpt_model_facts import uses_gm_narration_hint
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
 
@@ -85,7 +86,6 @@ from ._provider_turn_decisions import (
     _campaign_file_must_be_settled,
     _campaign_file_needs_narration,
     _held_campaign_file_narration_is_needed,
-    _narration_needs_private_correction,
     _narration_repeats_previous_player_response,
     _required_tool_call_is_missing,
     _required_tool_correction_was_abandoned,
@@ -125,21 +125,11 @@ _GM_MODEL_NARRATION_BLOCK = (
 )
 # Add routes only after verifying their canonical and upstream runtime identities.
 # Display names and unknown aliases are deliberately not used for selection.
-_GM_MODEL_NARRATION_BLOCKS: Mapping[tuple[str, str, str], str] = {
-    ("chatgpt_subscription", (
-        f'chatgpt-subscription/'
-        f'{model_id}'
-    ), model_id): _GM_MODEL_NARRATION_BLOCK
-    for model_id in ("gpt-6.1-sol", "gpt-6-sol", "gpt-5.6-sol")
-}
-
-
 def _model_gm_narration_block(provider: Provider) -> str | None:
-    model = getattr(provider, "model_info", None)
-    return _GM_MODEL_NARRATION_BLOCKS.get((
-        getattr(model, "provider_key", ""), getattr(model, "id", ""),
-        getattr(model, "wire_model_id", ""),
-    ))
+    model = provider.model_info
+    if model is None or not uses_gm_narration_hint(model):
+        return None
+    return _GM_MODEL_NARRATION_BLOCK
 
 
 @dataclass
@@ -263,28 +253,14 @@ def _contains_serialized_tool_call(text: str) -> bool:
 
 
 def _looks_like_private_deliberation(text: str) -> bool:
-    """Recognize high-confidence planning prose that must never reach the player channel."""
-
-    lines = tuple(line.strip().casefold() for line in text.splitlines() if line.strip())
-    if not lines:
-        return False
-    strong_starts = (
+    """Detect provider prose that describes the player request as an instruction."""
+    planning_starts = (
         "the player wants ",
         "the player's declared action ",
         "the declared player action ",
         "the user wants ",
-        "actually, let me think",
-        "i think i'll have ",
-        "i should show:",
-        "i'll prepare ",
-        "i will prepare ",
     )
-    if any(line.startswith(strong_starts) for line in lines):
-        return True
-    if lines[0].startswith("the ") and " check succeeded with a total" in lines[0]:
-        return True
-    planning_starts = ("i think ", "let me ", "i should ", "i need to ")
-    return sum(line.startswith(planning_starts) for line in lines) >= 2
+    return any(line.strip().casefold().startswith(planning_starts) for line in text.splitlines())
 
 
 def _forced_single_tool_call_from_json(
@@ -1809,10 +1785,7 @@ class ProviderSessionAdapter:
                     code="provider_serialized_tool_call",
                 )
             if _looks_like_private_deliberation(narration):
-                raise CommandRejected(
-                    "Provider returned private deliberation as Retry narration",
-                    code="provider_private_deliberation",
-                )
+                logger.warning("Provider returned private deliberation as Retry narration")
             if not narration:
                 raise CommandRejected(
                     "Provider completed Retry without player-visible narration",
@@ -1975,17 +1948,17 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned prose where a tool call was required",
                         code="provider_required_tool_call_missing",
                     )
-                if _narration_needs_private_correction(state, _looks_like_private_deliberation):
+                if (
+                    not state.obligations.force_campaign_file_update
+                    and _looks_like_private_deliberation(state.narration)
+                ):
                     if (
                         state.private_deliberation_corrections_used
                         < state.max_private_deliberation_corrections
                     ):
                         retry_private_deliberation(self, state, provider_input, turn_id=turn_id)
                         continue
-                    raise CommandRejected(
-                        "Provider repeatedly returned private deliberation as narration",
-                        code="provider_private_deliberation",
-                    )
+                    logger.warning("Provider repeatedly returned private deliberation as narration")
                 if _campaign_file_needs_narration(state):
                     yield from record_held_narration(self, state, provider_input, turn_id=turn_id)
                     return

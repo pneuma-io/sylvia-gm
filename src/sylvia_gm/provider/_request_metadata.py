@@ -74,7 +74,7 @@ class SessionBoundRequestMetadataProvider(Provider):
         super().__init__()
         self._provider = provider
         self._headers = dict(headers)
-        self.model_info = getattr(provider, "model_info", None)
+        self.model_info = provider.model_info
         self.hooks = provider.hooks
         self._base_url = getattr(provider, "_base_url", None)
 

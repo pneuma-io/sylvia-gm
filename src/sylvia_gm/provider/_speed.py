@@ -13,6 +13,8 @@ from dataclasses import dataclass, replace
 from urllib.parse import urlsplit
 
 from sylvia_gm.domain.errors import CommandRejected
+from sylvia_gm.provider._openai_model_facts import openai_model_facts
+from sylvia_gm.provider._claude_model_facts import claude_model_facts
 from sylvia_gm.provider._base import ModelInfo, SpeedOption
 
 STANDARD_SPEED = "standard"
@@ -24,20 +26,6 @@ _TIER_ID = re.compile(r"[a-z][a-z0-9_-]{0,31}")
 # `service_tier` values: https://developers.openai.com/api/docs/guides/fast-mode and
 # https://developers.openai.com/api/docs/guides/flex-processing (checked 2026-11-12).
 _OPENAI_SOURCE = "https://developers.openai.com/api/docs/pricing"
-_OPENAI_FAST = frozenset({
-    "gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-luna", "gpt-6-sol",
-    "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5.4", "gpt-5.4-mini",
-    "gpt-5.2", "gpt-5.1", "gpt-5", "gpt-5-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4o",
-    "gpt-4o-mini",
-})
-_OPENAI_FLEX = frozenset({
-    "gpt-6-astra", "gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-luna", "gpt-6-sol",
-    "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-5.5", "gpt-5.5-pro", "gpt-5.4",
-    "gpt-5.4-pro", "gpt-5.4-mini", "gpt-5.4-nano", "gpt-5.2", "gpt-5.1", "gpt-5",
-    "gpt-5-mini", "gpt-5-nano",
-})
-# The same aliases the reasoning table already treats as their documented model.
-_OPENAI_ALIASES = {"gpt-5.6": "gpt-5.6-sol", "gpt-5.5-2026-04-23": "gpt-5.5"}
 _OPENAI_FAST_OPTION = SpeedOption(
     "fast", "Fast",
     "Requests OpenAI Fast mode. Billed at a higher per-token rate; OpenAI may still serve "
@@ -52,7 +40,6 @@ _OPENAI_FLEX_OPTION = SpeedOption(
 # https://platform.claude.com/docs/en/build-with-claude/fast-mode (checked 2026-11-12).
 # Only models whose fast mode needs no beta header or separately provisioned access.
 _ANTHROPIC_SOURCE = "https://platform.claude.com/docs/en/build-with-claude/fast-mode"
-_ANTHROPIC_FAST = frozenset({"claude-opus-5-5", "claude-fable-5-2", "claude-mythos-5-2"})
 _ANTHROPIC_FAST_OPTION = SpeedOption(
     "fast", "Fast",
     "Requests Anthropic fast mode. Billed at a higher per-token rate and limited "
@@ -101,14 +88,14 @@ def configure_speed(model: ModelInfo, base_url: str) -> ModelInfo:
         "responses",
         "chat_completions",
     }:
-        documented_id = _OPENAI_ALIASES.get(wire_id, wire_id)
+        facts = openai_model_facts(wire_id)
         options = tuple(
             option
             for option, supported in (
-                (_OPENAI_FAST_OPTION, _OPENAI_FAST),
-                (_OPENAI_FLEX_OPTION, _OPENAI_FLEX),
+                (_OPENAI_FAST_OPTION, facts.fast),
+                (_OPENAI_FLEX_OPTION, facts.flex),
             )
-            if documented_id in supported
+            if supported
         )
         if options:
             return replace(
@@ -117,7 +104,7 @@ def configure_speed(model: ModelInfo, base_url: str) -> ModelInfo:
             )
     if (
         secure and endpoint.hostname == "api.anthropic.com"
-        and model.transport == "anthropic_messages" and wire_id in _ANTHROPIC_FAST
+        and model.transport == "anthropic_messages" and claude_model_facts(wire_id).fast
     ):
         return replace(
             model, speed_options=(_ANTHROPIC_FAST_OPTION,), speed_control="anthropic",

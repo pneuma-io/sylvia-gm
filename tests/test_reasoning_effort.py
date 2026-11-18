@@ -15,7 +15,6 @@ from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._anthropic import AnthropicMessagesTransport
 from sylvia_gm.provider._base import ModelInfo, Provider, ProviderResponse, ProviderStreamChunk
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._openai_compat import (
     ChatCompletionsTransport,
     OpenAICompatProvider,
@@ -100,7 +99,7 @@ async def test_response_effort_reaches_audit_without_guessing_from_request(strea
 
     base = OpenAICompatProvider(
         base_url="https://synthetic.invalid/v1", model_info=info,
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic-key")]),
+        api_key="synthetic-key",
     )
     await base._client.close()
     base._client = openai.AsyncOpenAI(
@@ -128,6 +127,21 @@ async def test_response_effort_reaches_audit_without_guessing_from_request(strea
         assert selection["provider_reported_effective"] is None
     finally:
         await provider.close()
+
+
+@pytest.mark.parametrize("model_id", (
+    "claude-fable-5-2", "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5",
+))
+def test_current_claude_api_models_send_native_effort(model_id):
+    info = model(model_id, "anthropic_messages", "https://api.anthropic.com/v1")
+    assert info.supported_reasoning_efforts == ("low", "medium", "high", "xhigh", "max")
+    for role, effort in (("dm", "high"), ("builder", "xhigh")):
+        request = AnthropicMessagesTransport().format_request(
+            info.wire_model_id, [], [], True, max_tokens=8192,
+            **select_reasoning(info, role).options(),
+        )
+        assert request["output_config"] == {"effort": effort}
+        assert request["thinking"] == {"type": "adaptive"}
 
 
 def test_native_anthropic_and_minimax_do_not_fabricate_xhigh():

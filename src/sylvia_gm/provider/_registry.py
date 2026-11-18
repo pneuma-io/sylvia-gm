@@ -325,7 +325,7 @@ class ProviderRegistry:
             base_url=str(cfg["base_url"]),
             runtime_home=str(cfg.get("runtime_home", "")),
             default_headers={str(key): str(value) for key, value in header_items},
-            credentials_list=[{"type": "api_key", "value": str(cfg["api_key"])}],
+            api_key=str(cfg["api_key"]),
             models=[model_info],
             default_model=model_info.id,
         )

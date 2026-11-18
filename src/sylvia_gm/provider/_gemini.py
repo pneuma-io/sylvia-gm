@@ -21,7 +21,6 @@ from sylvia_gm.provider._base import (
     TokenUsage,
     ToolCall,
 )
-from sylvia_gm.provider._credentials import CredentialPool
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
     IncompleteProviderStreamError,
@@ -46,14 +45,14 @@ class GeminiProvider(Provider):
         *,
         base_url: str,
         model_info: ModelInfo,
-        credential_pool: CredentialPool,
+        api_key: str,
         http_client: httpx.AsyncClient | None = None,
         default_headers=None,
     ):
         super().__init__()
         self.model_info = model_info
         self._base_url = base_url.rstrip("/")
-        self._credentials = credential_pool
+        self._api_key = api_key
         self._client = http_client or httpx.AsyncClient(follow_redirects=False)
         self._headers = dict(default_headers or {})
 
@@ -150,7 +149,7 @@ class GeminiProvider(Provider):
         return request
 
     async def _request(self, messages, tools, stream, timeout, options):
-        credential = await self._credentials.get_credential()
+
         headers = dict(self._headers)
         headers.update(options.get("extra_headers") or {})
         from sylvia_gm.provider._protocol_routes import is_opencode_inference
@@ -159,9 +158,9 @@ class GeminiProvider(Provider):
             headers = {
                 key: value for key, value in headers.items() if key.lower() != "x-goog-api-key"
             }
-            headers["Authorization"] = f"Bearer {credential.value}"
+            headers["Authorization"] = f"Bearer {self._api_key}"
         else:
-            headers.setdefault("x-goog-api-key", credential.value)
+            headers.setdefault("x-goog-api-key", self._api_key)
         headers.setdefault("Content-Type", "application/json")
         method = "streamGenerateContent" if stream else "generateContent"
         model = quote(self.model_info.wire_model_id.removeprefix("models/"), safe="")

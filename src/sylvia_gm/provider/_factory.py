@@ -1,73 +1,19 @@
-"""ProviderFactory — single entry point for provider construction.
-
-Reads ProviderConfig and builds the correct provider chain:
-- SingleProvider if only one endpoint configured
-- FallbackChain if fallback list configured
-- Always wraps a CredentialPool if multiple keys
-
-Configured provider resolution routes through here.
-"""
+"""Construct a provider for the configured transport."""
 
 from __future__ import annotations
 
-import logging
 
 from sylvia_gm.provider._base import (
     ModelInfo,
     Provider,
     ProviderConfig,
 )
-from sylvia_gm.provider._credentials import Credential, CredentialPool
-from sylvia_gm.provider._fallback_chain import FallbackChain
 
-logger = logging.getLogger(__name__)
 
 
 class ProviderFactory:
-    """Creates provider instances from ProviderConfig.
-
-    This is the single entry point for all provider construction.
-    ProviderRegistry and configured owner-side resolution route through here.
-
-    Usage::
-
-        config = ProviderConfig(
-            provider_key="opencode_go",
-            transport="chat_completions",
-            base_url="https://opencode.ai/zen/go/v1",
-            credentials_list=[{"type": "api_key", "value": "sk-..."}],
-            models=[model_info],
-            default_model="opencode-go/deepseek-v4",
-        )
-        provider = ProviderFactory.create(config)
-    """
-
     @staticmethod
     def create(config: ProviderConfig) -> Provider:
-        """Build a provider chain from config.
-
-        Returns:
-        - SingleProvider if only one endpoint configured
-        - FallbackChain if fallback list configured
-        - The provider always wraps a CredentialPool
-        """
-        # 1. Build credential pool
-        credentials = (
-            [
-                Credential(
-                    type=c.get("type", "api_key"),
-                    value=c.get("value", ""),
-                    label=c.get("label", ""),
-                )
-                for c in config.credentials_list
-            ]
-            if config.credentials_list
-            else [Credential(type="none", value="")]
-        )
-
-        pool = CredentialPool(credentials)
-
-        # 2. Determine model info
         model_info = (
             config.models[0]
             if config.models
@@ -81,27 +27,6 @@ class ProviderFactory:
             )
         )
 
-        # 3. Build the primary provider
-        primary = ProviderFactory._build_single_provider(
-            config=config,
-            credential_pool=pool,
-            model_info=model_info,
-        )
-
-        # 4. Wrap in FallbackChain if configured
-        if config.fallback_providers:
-            sub_providers = [ProviderFactory.create(fc) for fc in config.fallback_providers]
-            return FallbackChain([primary] + sub_providers)
-
-        return primary
-
-    @staticmethod
-    def _build_single_provider(
-        config: ProviderConfig,
-        credential_pool: CredentialPool,
-        model_info: ModelInfo,
-    ) -> Provider:
-        """Build a single provider instance from transport type."""
         from sylvia_gm.provider._base import PROVIDER_RETRY_DEFAULTS
 
         transport = config.transport
@@ -116,11 +41,10 @@ class ProviderFactory:
 
             if (config.provider_key != "claude_runtime" or not config.runtime_home
                     or config.default_headers
-                    or any(c.get("value") for c in config.credentials_list)
-                    or config.fallback_providers):
+                    or config.api_key):
                 raise ValueError(
                     "Claude requires its native runtime connection "
-                    "without API credentials or fallback"
+                    "without API credentials"
                 )
             return ClaudeProvider(Path(config.runtime_home), model_info)
 
@@ -143,7 +67,7 @@ class ProviderFactory:
 
             return GeminiProvider(
                 base_url=base_url,
-                credential_pool=credential_pool,
+                api_key=config.api_key,
                 model_info=model_info,
                 default_headers=config.default_headers,
             )
@@ -152,7 +76,7 @@ class ProviderFactory:
 
             return OpenAICompatProvider(
                 base_url=base_url,
-                credential_pool=credential_pool,
+                api_key=config.api_key,
                 model_info=model_info,
                 retry_config=retry_config,
                 default_headers=config.default_headers,
@@ -162,7 +86,7 @@ class ProviderFactory:
 
             return AnthropicProvider(
                 base_url=base_url,
-                credential_pool=credential_pool,
+                api_key=config.api_key,
                 model_info=model_info,
                 timeout=config.timeout,
                 max_tokens=config.max_tokens,

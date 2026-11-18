@@ -193,7 +193,7 @@ class AdminAuditedProvider(Provider):
         self._provider_id = provider_id
         self._model_id = model_id
         self._selection_mode = selection_mode
-        self.model_info = getattr(provider, "model_info", None)
+        self.model_info = provider.model_info
         self._audit_context: dict[str, object] = {}
 
     def _exchange_id(self) -> str:

@@ -1566,7 +1566,7 @@ def reclaim(connection: sqlite3.Connection) -> ReclamationResult:
 def verify_package_authority(connection: sqlite3.Connection) -> None:
     """Reconcile all F3 immutable bytes, closure, lineage, and safe record invariants."""
 
-    invalid = "Authority stored package integrity does not match F3"
+    invalid = "Saved package records failed an integrity check"
     try:
         for row in connection.execute("SELECT * FROM package_staging"):
             parsed = _parse(str(row["manifest_json"]))

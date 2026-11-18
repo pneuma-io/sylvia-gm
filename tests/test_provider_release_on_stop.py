@@ -45,7 +45,6 @@ from sylvia_gm.provider._base import (
 )
 from sylvia_gm.provider._context_fit import ContextFittingProvider
 from sylvia_gm.provider._exceptions import ProviderConnectionError, ProviderTimeoutError
-from sylvia_gm.provider._fallback_chain import FallbackChain
 from sylvia_gm.provider._reasoning import ReasoningSelection, TurnReasoningProvider
 from sylvia_gm.provider._request_metadata import SessionBoundRequestMetadataProvider
 from tests.test_alpha_f4_generic_sessions import _clockwork_campaign
@@ -562,7 +561,6 @@ def _wrappers(inner: Provider) -> dict[str, Provider]:
             inner, headers={"x-example": "1"}
         ),
         "working_context": WorkingContextProvider(inner, records=[], save=_no_save),
-        "fallback_chain": FallbackChain([inner]),
     }
 
 
@@ -574,7 +572,6 @@ def _wrappers(inner: Provider) -> dict[str, Provider]:
         "admin_audit",
         "session_request_metadata",
         "working_context",
-        "fallback_chain",
     ],
 )
 def test_every_wrapper_forwards_release_once(wrapper: str) -> None:
@@ -588,7 +585,7 @@ def test_every_wrapper_forwards_release_once(wrapper: str) -> None:
 
 def test_the_full_gm_chain_forwards_release_to_the_concrete_provider() -> None:
     inner = _KeepingProvider()
-    chain: Provider = FallbackChain([inner])
+    chain: Provider = inner
     chain = SessionBoundRequestMetadataProvider(chain, headers={"x-example": "1"})
     chain = AdminAuditedProvider(chain, sink=lambda _record: None, session_id="s", role="dm")
     chain = TurnReasoningProvider(chain, ReasoningSelection(None, None, None, None, "mode_default"))
@@ -598,14 +595,3 @@ def test_the_full_gm_chain_forwards_release_to_the_concrete_provider() -> None:
     asyncio.run(chain.release_idle())
 
     assert inner.release_calls == 1
-
-
-def test_fallback_chain_releases_every_provider_even_when_one_fails() -> None:
-    failing = _KeepingProvider(release_error=RuntimeError("first failed"))
-    second = _KeepingProvider()
-    third = _SilentProvider()
-
-    with pytest.raises(RuntimeError, match="first failed"):
-        asyncio.run(FallbackChain([failing, second, third]).release_idle())
-
-    assert failing.release_calls == 1 and second.release_calls == 1

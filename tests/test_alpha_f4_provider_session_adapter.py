@@ -2179,6 +2179,18 @@ def test_stream_adapter_round_trips_exact_catalog_action_and_talk(
     print("F4 PROVIDER ADAPTER", "tool=advance", "revision=4->5", "talk=streamed")
 
 
+@pytest.mark.parametrize("narration", [
+    "I think they know about the vault now.\nI need to leave before the moon turns.",
+    "Let me tell you how the Gray Fleet burned.\nI should have seen it coming.",
+    "The Perception check succeeded with a total of 17. You spot a trapdoor.",
+    "Je crois que le guet arrive. La porte reste ouverte.",
+])
+def test_storytelling_is_not_classified_as_private_deliberation(narration: str) -> None:
+    from sylvia_gm.agent._provider_session import _looks_like_private_deliberation
+
+    assert not _looks_like_private_deliberation(narration)
+
+
 @pytest.mark.parametrize(
     "leaked",
     (
@@ -2186,7 +2198,7 @@ def test_stream_adapter_round_trips_exact_catalog_action_and_talk(
         "Actually, let me think about this more carefully. I should show three clues first.",
         "The player's declared action is a broad, light look around. I should describe only "
         "what is plainly visible. No Ruleset tool is needed.\n\nNow I will narrate it.",
-        "I'll prepare the opening scene now.",
+        "The user wants an opening scene.",
     ),
 )
 def test_private_deliberation_in_content_is_repaired_before_talk(leaked: str) -> None:
