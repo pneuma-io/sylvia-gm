@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+import threading
 from dataclasses import replace
 
 import pytest
@@ -1176,7 +1177,15 @@ def test_ooc_and_stop_redirect_leave_pending_npcs_until_gameplay_resumes(
     if stop_pending:
         pending = IsolatedFlowProvider("anthropic_messages", "minimax-m3")
         stopped = []
-        pending.before_proposal = lambda: stopped.append(loop.stop(session.session_id))
+        stop_finished = threading.Event()
+
+        def stop() -> None:
+            try:
+                stopped.append(loop.stop(session.session_id))
+            finally:
+                stop_finished.set()
+
+        pending.before_proposal = stop
         result = loop.run(
             SessionRunRequest(
                 session.session_id,
@@ -1187,6 +1196,9 @@ def test_ooc_and_stop_redirect_leave_pending_npcs_until_gameplay_resumes(
             ),
             session_provider(pending),
         )
+        # Stop runs on the provider's thread. Cancelling wakes the turn, which can return
+        # before Stop itself has finished there.
+        assert stop_finished.wait(10)
         assert result.interruption == stopped[0].interruption
         assert pending.actor_calls == ["a"]
         assert owner.snapshot("tokens").revision == 0
@@ -1230,6 +1242,66 @@ def test_ooc_and_stop_redirect_leave_pending_npcs_until_gameplay_resumes(
     )
     assert resumed.actor_calls == ["a", "a", "b", "c"]
     assert owner.snapshot("tokens").revision == 4
+
+
+@pytest.mark.parametrize("stop_path", ["stop", "stop_agent_session"])
+def test_stop_finishing_after_the_stopped_turn_has_returned_still_stops_the_session(
+    isolated_game, monkeypatch, stop_path
+):
+    """Issue 130: Stop cancels the turn; the turn's own unwind may record the terminal and
+    return first. Stop must then complete: no conflicting second terminal, session stopped.
+    """
+    owner, session, _ = isolated_game
+    loop = CampaignSessionLoop(owner)
+    adapter = ProviderSessionAdapter(
+        owner,
+        provider := IsolatedFlowProvider("anthropic_messages", "minimax-m3"),
+        owner_id="isolated-test",
+        gm_system_prompt="GM_PRIVATE_INSTRUCTIONS_SENTINEL",
+        campaign_plan={"structure": [{"id": "one", "title": "GM_PLAN_SENTINEL"}],
+                       "objectives": []},
+    )
+    turn_returned, stop_finished = threading.Event(), threading.Event()
+    stopped, raised = [], []
+    original = CampaignSessionLoop._record_interrupted_terminal
+
+    def record_after_the_turn_returns(self, *args, **kwargs):
+        if threading.current_thread() is not threading.main_thread():
+            # Stop, on the provider's thread: let the turn finish unwinding and return first.
+            assert turn_returned.wait(10)
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(
+        CampaignSessionLoop, "_record_interrupted_terminal", record_after_the_turn_returns,
+    )
+
+    def stop() -> None:
+        try:
+            stopped.append(getattr(loop, stop_path)(session.session_id))
+        except BaseException as error:  # noqa: BLE001 - reported below
+            raised.append(error)
+        finally:
+            stop_finished.set()
+
+    provider.before_proposal = stop
+    try:
+        result = loop.run(
+            SessionRunRequest(session.session_id, "turn", "pending", "start-input",
+                              "PLAYER_CONVERSATION_SENTINEL: Continue the token game."),
+            adapter.for_turn("turn"),
+        )
+    finally:
+        turn_returned.set()
+    assert stop_finished.wait(10)
+    assert raised == [] and len(stopped) == 1
+    assert result.interruption is not None
+    context = owner.session_context(session.session_id)
+    assert context.session.status.value == "stopped"
+    terminals = [m for m in context.messages
+                 if m.content.get("kind") == "session_attempt_terminal"]
+    assert len(terminals) == 1
+    assert terminals[0].content["failure_category"] == "user_cancelled"
+    assert terminals[0].content["activity_timing"]  # the run's frozen timing, not {}
 
 
 @pytest.mark.parametrize(
