@@ -409,22 +409,28 @@ def test_legacy_history_preserves_one_pin_and_quotes_retired_operations(reuse_re
     renamed = replace(tool, package_version="2", package_sha256="b" * 64)
     # Sharing a name with a different capability does not give the new operation the old result.
     different = replace(renamed, name=retired.name, capability="other.score")
-    available = {_tool_alias(renamed): renamed}
-    if reuse_retired_name:
-        available[_tool_alias(different)] = different
+    declarations = {"1": [tool, retired], "2": [renamed, different] if reuse_retired_name else [renamed]}
 
-    def lock(t):
+    def lock(t, previous=None):
         pin = PackageLockEntry(
             t.package_id, t.package_version, t.package_sha256, PackageRole.PRIMARY, 0, (), ()
         )
-        return SimpleNamespace(package_lock=SimpleNamespace(entries=(pin,)))
+        return SimpleNamespace(
+            lock_id=t.package_version, campaign_id="game", predecessor_lock_id=previous,
+            package_lock=SimpleNamespace(entries=(pin,)),
+        )
 
     locks = [lock(tool)]
-    owner = SimpleNamespace(package_lock_lineage=lambda _campaign: locks)
+    owner = SimpleNamespace(
+        current_package_lock=lambda _campaign: locks[-1],
+        package_lock_lineage=lambda _campaign: locks,
+        package_record=lambda _id, version, _sha: {
+            "tools": [{"name": t.name, "capability": t.capability} for t in declarations[version]]
+        },
+    )
     adapter = ProviderSessionAdapter(
         cast(AuthorityOwner, owner), _ScriptedProvider([]), owner_id="legacy"
     )
-    provider_input = SimpleNamespace(session=SimpleNamespace(campaign_id="game"))
     calls = [
         {
             "id": str(i),
@@ -454,11 +460,11 @@ def test_legacy_history_preserves_one_pin_and_quotes_retired_operations(reuse_re
     original = json.dumps(history).encode()
     # A one-pin campaign may also have temporarily unavailable tools. Preserve its exact bytes.
     assert (
-        json.dumps(adapter._legacy_adopted_history(history, provider_input, {})).encode()
+        json.dumps(adapter._legacy_adopted_history(history, "game")).encode()
         == original
     )
-    locks.append(lock(renamed))
-    message, result = adapter._legacy_adopted_history(history, provider_input, available)
+    locks.append(lock(renamed, previous="1"))
+    message, result = adapter._legacy_adopted_history(history, "game")
     assert "_native_reference" not in message
     assert message["tool_calls"] == [
         {**calls[0], "function": {**calls[0]["function"], "name": _tool_alias(renamed)}}
@@ -467,8 +473,28 @@ def test_legacy_history_preserves_one_pin_and_quotes_retired_operations(reuse_re
     assert message["content"].startswith("I check the board.\nEarlier tool calls")
     quoted = json.loads(message["content"].split(" (historical data): ", 1)[1])
     assert quoted == [{"call": calls[1]["function"], "result": "score 7"}]
-    (text_only,) = adapter._legacy_adopted_history(history, provider_input, {})
-    assert "tool_calls" not in text_only and "green moved" in text_only["content"]
+    # Host and current-package calls in a mixed batch keep their own result metadata.
+    for name in ("read_session_history", _tool_alias(renamed)):
+        intact = {**calls[0], "function": {**calls[0]["function"], "name": name}}
+        unchanged_result = {k: v for k, v in results[1].items() if k != "name"}
+        mixed = [{**history[0], "tool_calls": [intact, calls[1]]}, results[0], unchanged_result]
+        mixed_message, kept_result = adapter._legacy_adopted_history(mixed, "game")
+        assert mixed_message["tool_calls"] == [intact]
+        assert kept_result == unchanged_result
+    retired_pair = [{**history[0], "tool_calls": [calls[1]]}, results[0]]
+    (text_only,) = adapter._legacy_adopted_history(retired_pair, "game")
+    assert "tool_calls" not in text_only and "score 7" in text_only["content"]
+    # A pre-manifest pin still identifies a surviving call by its digest.
+    read_record = owner.package_record
+    def missing_old_manifest(package, version, sha):
+        if version == "1":
+            raise CommandRejected("Manifest unavailable", code="package_unavailable")
+        return read_record(package, version, sha)
+
+    owner.package_record = missing_old_manifest
+    reopened = ProviderSessionAdapter(cast(AuthorityOwner, owner), _ScriptedProvider([]), owner_id="legacy")
+    preserved = reopened._legacy_adopted_history(history, "game")
+    assert preserved[0]["tool_calls"] == [message["tool_calls"][0], calls[1]]
     assert json.dumps(history).encode() == original
 
 
@@ -1083,9 +1109,9 @@ class _OwnerProjection:
             )
         )
 
-    def package_lock_lineage(self, campaign_id: str) -> tuple[()]:
+    def current_package_lock(self, campaign_id: str):
         assert campaign_id == "campaign-provider"
-        return ()
+        return SimpleNamespace(lock_id="fixture-lock", predecessor_lock_id=None)
 
     def snapshot(self, campaign_id: str) -> object:
         assert campaign_id == "campaign-provider"

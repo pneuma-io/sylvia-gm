@@ -18,7 +18,7 @@ import re
 import uuid
 import weakref
 from collections.abc import AsyncIterator, Awaitable, Iterable, Iterator, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any, cast
 
 from sylvia_gm.agent._campaign_memory import select_campaign_memory
@@ -66,6 +66,7 @@ from sylvia_gm.domain.authority import (
     ModelDecisionBoundary,
     ModelToolBehavior,
     NarrationStream,
+    PackageLockEntry,
     ProseChannel,
     RetryNarrationInput,
     SafePayload,
@@ -75,6 +76,7 @@ from sylvia_gm.domain.authority import (
     validate_response_blocks,
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
+from sylvia_gm.domain.package_library import PackageLockRecord
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
@@ -412,15 +414,15 @@ def _persisted_campaign_file_mutation_attempted(
 
 
 def _tool_alias(tool: ModelMechanicsTool) -> str:
-    slug = re.sub(r"[^A-Za-z0-9_]", "_", tool.name).strip("_") or "tool"
+    return _package_tool_alias(
+        tool.package_id, tool.package_version, tool.package_sha256, tool.name, tool.capability,
+    )
+
+
+def _package_tool_alias(package_id: str, version: str, sha256: str, name: str, capability: str) -> str:
+    slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"
     identity = json.dumps(
-        [
-            tool.package_id,
-            tool.package_version,
-            tool.package_sha256,
-            tool.name,
-            tool.capability,
-        ],
+        [package_id, version, sha256, name, capability],
         ensure_ascii=True,
         separators=(",", ":"),
     )
@@ -430,9 +432,9 @@ def _tool_alias(tool: ModelMechanicsTool) -> str:
 
 def _legacy_tool_exchange(
     assistant: dict[str, object], calls: list[dict[str, Any]], results: list[dict[str, object]],
-    offered: set[str], successors: Mapping[str, str],
+    changes: Mapping[str, str | None],
 ) -> list[dict[str, object]]:
-    """Keep surviving pairs structured and quote unavailable operations as historical data."""
+    """Keep surviving pairs structured and quote retired operations as historical data."""
     result_by_id = {result["tool_call_id"]: result for result in results}
     kept_calls = []
     names_by_id = {}
@@ -440,11 +442,14 @@ def _legacy_tool_exchange(
     for call in calls:
         function = call["function"]
         name = function["name"]
-        current = name if name in offered else successors.get(name)
+        if name not in changes:
+            kept_calls.append(call)
+            continue
+        current = changes[name]
+        names_by_id[call["id"]] = current
         if current is None:
             retired.append({"call": function, "result": result_by_id[call["id"]]["content"]})
         else:
-            names_by_id[call["id"]] = current
             kept_calls.append({**call, "function": {**function, "name": current}})
 
     # Native continuations can encode the original alias. Rebuild this request from
@@ -459,7 +464,11 @@ def _legacy_tool_exchange(
         message["content"] = f"{message['content']}\n{note}" if message.get("content") else note
     replayed = [message]
     for result in results:
-        current = names_by_id.get(result["tool_call_id"])
+        call_id = result["tool_call_id"]
+        if call_id not in names_by_id:
+            replayed.append(result)
+            continue
+        current = names_by_id[call_id]
         if current is not None:
             replayed.append({**result, "name": current} if "name" in result else result)
     return replayed
@@ -1673,6 +1682,7 @@ class ProviderSessionAdapter:
         self._owner_id = owner_id
         self._provider = provider
         self._working_contexts: dict[str, Any] = {}
+        self._legacy_alias_changes: dict[str, dict[str, str | None]] = {}
         # Read once per adapter. The previous request assembly is the shipped default;
         # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
         self._context_mode = context_mode(
@@ -1832,7 +1842,6 @@ class ProviderSessionAdapter:
             for chunk in self._stream_round(
                 messages,
                 [],
-                aliases={},
                 control=retry_control,
                 provider_input=provider_input,
             ):
@@ -3885,42 +3894,79 @@ class ProviderSessionAdapter:
             prepared.append(message)
         return prepared
 
+    def _declared_tool_aliases(self, pin: PackageLockEntry) -> dict[tuple[str, str, str], str]:
+        record = self._owner.package_record(pin.package_id, pin.version, pin.sha256)
+        return {
+            (pin.package_id, tool["name"], tool["capability"]): _package_tool_alias(
+                pin.package_id, pin.version, pin.sha256, tool["name"], tool["capability"],
+            )
+            for tool in cast(list[dict[str, Any]], record["tools"])
+        }
+
+    def _legacy_alias_replacements(self, current: PackageLockRecord) -> Mapping[str, str | None]:
+        if current.lock_id not in self._legacy_alias_changes:
+            lineage = self._owner.package_lock_lineage(current.campaign_id)
+            # An immutable lock fixes the declarations and its predecessor chain. Only
+            # earlier declared aliases can be remapped or retired; host tools pass through.
+            current_aliases = {
+                operation: alias for pin in current.package_lock.entries
+                for operation, alias in self._declared_tool_aliases(pin).items()
+            }
+            current_names = set(current_aliases.values())
+            by_id = {lock.lock_id: lock for lock in lineage}
+            prior_pins = set()
+            predecessor = current.predecessor_lock_id
+            while predecessor is not None:
+                prior = by_id[predecessor]
+                prior_pins.update(prior.package_lock.entries)
+                predecessor = prior.predecessor_lock_id
+            changes = {}
+            for pin in prior_pins.difference(current.package_lock.entries):
+                try:
+                    past = self._declared_tool_aliases(pin)
+                except CommandRejected as error:
+                    if error.code != "package_unavailable":
+                        raise
+                    # Pre-manifest saves can retain only a pin. A matching digest still
+                    # proves a surviving operation; do not guess what other aliases meant.
+                    past = {
+                        (package, name, capability): _package_tool_alias(
+                            package, pin.version, pin.sha256, name, capability,
+                        )
+                        for package, name, capability in current_aliases if package == pin.package_id
+                    }
+                for operation, old_alias in past.items():
+                    if old_alias not in current_names:
+                        changes[old_alias] = current_aliases.get(operation)
+            self._legacy_alias_changes[current.lock_id] = changes
+        return self._legacy_alias_changes[current.lock_id]
+
     def _legacy_adopted_history(
-        self, messages: list[dict[str, object]], provider_input: SessionProviderInput,
-        aliases: Mapping[str, ModelMechanicsTool], *, history_tool_enabled: bool = False,
+        self, messages: list[dict[str, object]], campaign_id: str,
     ) -> list[dict[str, object]]:
-        """Render saved exchanges against the tools offered in this legacy round."""
-        offered = set(aliases)
-        if history_tool_enabled:
-            offered.add("read_session_history")
-        pending = []
-        for index, message in enumerate(messages):
-            if "_native_reference" in message and message.get("tool_calls"):
-                calls = cast(list[dict[str, Any]], message["tool_calls"])
-                if any(call["function"]["name"] not in offered for call in calls):
-                    pending.append((index, calls))
+        # _messages adds this reference to every persisted call/result exchange before
+        # selecting resumed or completed history, independently of the provider transport.
+        pending = [
+            (index, cast(list[dict[str, Any]], message["tool_calls"]))
+            for index, message in enumerate(messages)
+            if "_native_reference" in message and message.get("tool_calls")
+        ]
         if not pending:
             return messages
-        lineage = self._owner.package_lock_lineage(provider_input.session.campaign_id)
-        if len(lineage) < 2:
+        current = self._owner.current_package_lock(campaign_id)
+        if current.predecessor_lock_id is None:
             return messages
-
-        # Recompute exact aliases from prior pins. The digest includes the full
-        # operation name and capability, even when the displayed suffix is truncated.
-        earlier = {pin for lock in lineage[:-1] for pin in lock.package_lock.entries}
-        successors = {
-            _tool_alias(replace(tool, package_version=pin.version, package_sha256=pin.sha256)): name
-            for name, tool in aliases.items()
-            for pin in earlier if pin.package_id == tool.package_id
-        }
+        changes = self._legacy_alias_replacements(current)
         projected = list(messages)
         for index, calls in reversed(pending):
+            if not any(call["function"]["name"] in changes for call in calls):
+                continue
             end = index + 1 + len(calls)
             results = messages[index + 1:end]
             result_ids = {r.get("tool_call_id") for r in results if r.get("role") == "tool"}
             if len(results) == len(calls) and result_ids == {call["id"] for call in calls}:
                 projected[index:end] = _legacy_tool_exchange(
-                    messages[index], calls, results, offered, successors,
+                    messages[index], calls, results, changes,
                 )
         return projected
 
@@ -3934,7 +3980,6 @@ class ProviderSessionAdapter:
         tool_choice: str | None = None,
         history_allowed: bool = False,
         provider_override: Provider | None = None,
-        aliases: Mapping[str, ModelMechanicsTool] | None = None,
     ) -> Iterable[ProviderStreamChunk]:
         output: queue.Queue[object] = queue.Queue()
         loop = _PROVIDER_ASYNC_RUNTIME.loop()
@@ -3954,11 +3999,10 @@ class ProviderSessionAdapter:
                 self._ledger_hooks(provider_input, provider, bridge)
                 if ledger else (None, None, None, None, None)
             )
-            if not ledger and aliases is not None and provider_input.session.role is WriterRole.DM:
-                messages = self._legacy_adopted_history(
-                    messages, provider_input, aliases,
-                    history_tool_enabled=bool(records) and history_allowed,
-                )
+            if not ledger and provider_input.session.role is WriterRole.DM:
+                campaign_id = provider_input.session.campaign_id
+                if campaign_id is not None:
+                    messages = self._legacy_adopted_history(messages, campaign_id)
             working = WorkingContextProvider(
                 provider, records=records, record_owner=self._gm_context_owner(provider_input),
                 request_context_id=self._gm_request_context_id(provider_input),
