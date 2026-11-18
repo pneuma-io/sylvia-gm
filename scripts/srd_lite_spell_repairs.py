@@ -57,7 +57,57 @@ def repair_creature_space_skips_spell_forces(runtime):
     raise ValueError("Creature-space body loop was not found")
 
 
-REPAIRS = (repair_spell_force_scene_bodies, repair_creature_space_skips_spell_forces)
+def repair_area_concentration_card_rows(runtime):
+    """Issue 166: one concentration save shows as one card row carrying its recorded roll.
+
+    Area damage pushed a text row and a second caption row with the same label for the
+    same saving throw. The text row now carries the equation and the caption row is gone.
+    """
+    for name in ("resolve_spell_area_save_damage_target", "resolve_srd_dragon_breath_target"):
+        tool = runtime["tools"][name]
+        (block,) = [
+            effect
+            for effects in lists(tool["effects"])
+            for effect in effects
+            if effect.get("condition") == "_area_target_concentration_save_roll != null"
+        ]
+        rows = block["on_true"]
+        pushes = [e for e in rows if e.get("list_push", {}).get("list") == "_spell_detail_rows"]
+        if len(pushes) == 1 and "equation" in pushes[0]["list_push"]["value"]:
+            continue
+        text, visual = pushes
+        if text["list_push"]["value"].get("value") != "_area_concentration_text":
+            raise ValueError("Area concentration text row changed: " + name)
+        caption_export = {"_visual_concentration_caption": "_info_projection_message"}
+        (caption,) = [e for e in rows if e.get("export_context") == caption_export]
+        text["list_push"]["value"]["equation"] = visual["list_push"]["value"]["equation"]
+        rows.remove(caption)
+        rows.remove(visual)
+
+
+def repair_spell_display_names(runtime):
+    """Issue 166: card titles use the approved roster's names, not PDF extraction artifacts.
+
+    The SRD text extraction reads the small-caps heading as "Acid SplASh"; the approved launch
+    roster (content/launch-roster.json) and catalogue name it "Acid Splash". It is the only
+    runtime spell name with this artifact.
+    """
+    definitions = runtime["definitions"]
+    for table, row in (
+        (definitions["srd_lite_spell_display_names"], "acid_splash"),
+        (definitions["spell_casting"]["acid_splash"], "name"),
+    ):
+        if table[row] not in {"Acid SplASh", "Acid Splash"}:
+            raise ValueError("Acid Splash display name changed")
+        table[row] = "Acid Splash"
+
+
+REPAIRS = (
+    repair_spell_force_scene_bodies,
+    repair_creature_space_skips_spell_forces,
+    repair_area_concentration_card_rows,
+    repair_spell_display_names,
+)
 
 
 def apply_repairs(runtime):

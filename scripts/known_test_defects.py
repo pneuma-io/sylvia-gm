@@ -80,11 +80,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
         category='suspected retained contract discrepancy',
     ),
-    'tests/test_integrated_worker_seams.py::test_area_damage_card_exposes_the_actual_concentration_roll': KnownDefect(
-        'An area-damage card emits two concentration rows for one actual saving throw',
-        'Damage the real concentrating caster with the admitted area action and inspect its actual result-card concentration rows.',
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_srd_lite_defense_boundaries.py::test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens[False]': KnownDefect(
         'The actual Guiding Bolt attack lacks retained target-AC evidence for the Shield boundary',
         'Cast Guiding Bolt against the admitted Wizard, inspect the saved scalar attack, then attempt the selected Shield/decline and reopen continuation.',

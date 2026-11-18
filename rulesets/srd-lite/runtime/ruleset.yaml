@@ -27111,7 +27111,7 @@ definitions:
       material_consumed: false
       material_has_cost: false
       material_parts: []
-      name: Acid SplASh
+      name: Acid Splash
       range: 60 feet
       ritual: false
       school: evocation
@@ -32405,7 +32405,7 @@ definitions:
     fire_bolt: Fire Bolt
     ray_of_frost: Ray of Frost
     shocking_grasp: Shocking Grasp
-    acid_splash: Acid SplASh
+    acid_splash: Acid Splash
     poison_spray: Poison Spray
     sacred_flame: Sacred Flame
     eldritch_blast: Eldritch Blast
@@ -81381,16 +81381,6 @@ tools:
           value:
             label: _area_concentration_label
             value: _area_concentration_text
-      - call: format_srd_information_projection
-        params:
-          message: Concentration · DC {_area_target_concentration_save_dc} · {_area_target_concentration_save_outcome}
-        export_context:
-          _visual_concentration_caption: _info_projection_message
-      - list_push:
-          list: _spell_detail_rows
-          value:
-            label: _area_concentration_label
-            value: _visual_concentration_caption
             equation:
               die_sides: 20
               roll: _area_target_concentration_save_roll.total
@@ -157548,16 +157538,6 @@ tools:
           value:
             label: _area_concentration_label
             value: _area_concentration_text
-      - call: format_srd_information_projection
-        params:
-          message: Concentration · DC {_area_target_concentration_save_dc} · {_area_target_concentration_save_outcome}
-        export_context:
-          _visual_concentration_caption: _info_projection_message
-      - list_push:
-          list: _spell_detail_rows
-          value:
-            label: _area_concentration_label
-            value: _visual_concentration_caption
             equation:
               die_sides: 20
               roll: _area_target_concentration_save_roll.total
