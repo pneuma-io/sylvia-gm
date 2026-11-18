@@ -392,7 +392,7 @@ def test_confirmed_campaign_reopens_after_a_committed_participant_update(tmp_pat
             (canonical_json_bytes({**advanced, "level": 3}).decode(), campaign_id),
         )
     with (
-        pytest.raises(SchemaIdentityError, match="construction integrity"),
+        pytest.raises(SchemaIdentityError, match="construction records failed an integrity check"),
         AuthorityOwner.open(path, owner_id="test"),
     ):
         pass

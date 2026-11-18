@@ -185,7 +185,7 @@ async def test_every_http_preset_automatic_allowance_stream_tool_result_and_cont
             transport=protocol,
             base_url=definition["base_url"] or "https://fixture.test/v1",
             models=[model],
-            credentials_list=[{"type": "api_key", "value": "synthetic-key"}]
+            api_key="synthetic-key"
             if definition["credential_required"]
             else [],
             retry_config=RetryConfig(max_retries=0),

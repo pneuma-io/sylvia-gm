@@ -11,7 +11,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import re
 import time as _time
 from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
@@ -29,7 +28,6 @@ from sylvia_gm.provider._base import (
     TokenUsage,
     ToolCall,
 )
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
     IncompleteProviderStreamError,
@@ -46,71 +44,23 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
     is_context_rejection,
 )
-from sylvia_gm.provider._failover import retry_with_backoff
 from sylvia_gm.provider._hooks import HookContext
+from sylvia_gm.provider._model_facts import claude_model_facts, claude_model_id
+from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._retry_after import retry_after_seconds
 
 logger = logging.getLogger(__name__)
 
-# Claude models known to accept a forced tool_choice ({"type": "any"} / {"type": "tool"}) and
-# `temperature` on anthropic-version 2023-06-01. Checked 2026-11-14 against Anthropic's model
-# migration, tool-use and thinking/effort documentation (platform.claude.com):
-# - Forced tool_choice returns HTTP 400 on Claude Fable 5.1 / 5.2, Mythos 5.1 / 5.2, Opus 5.5
-#   and Sonnet 5.5. Fable 5, Opus 5 and earlier, Sonnet 5 and earlier and Haiku 5.5 accept it.
-# - Any temperature returns HTTP 400 on Fable 5 / 5.1 / 5.2, Mythos, Opus 5.5 / 5 / 4.8 / 4.7
-#   and Sonnet 5; Sonnet 5.5 and Haiku 5.5 reject any value except the default.
-# Every other claude-* id, including models released after this table, gets neither, so a new
-# model costs at most a missing-call correction round instead of a hard 400. Non-Claude models
-# on this transport (MiniMax and other compatible endpoints) keep both unchanged.
-_CLAUDE_FORCED_TOOL_CHOICE = frozenset(
-    {
-        "claude-fable-5",
-        "claude-opus-5",
-        "claude-opus-4-8",
-        "claude-opus-4-7",
-        "claude-opus-4-6",
-        "claude-opus-4-5",
-        "claude-opus-4-1",
-        "claude-opus-4",
-        "claude-sonnet-5",
-        "claude-sonnet-4-6",
-        "claude-sonnet-4-5",
-        "claude-sonnet-4",
-        "claude-haiku-5-5",
-        "claude-haiku-4-5",
-    }
-)
-_CLAUDE_TEMPERATURE = frozenset(
-    {
-        "claude-opus-4-6",
-        "claude-opus-4-5",
-        "claude-opus-4-1",
-        "claude-opus-4",
-        "claude-sonnet-4-6",
-        "claude-sonnet-4-5",
-        "claude-sonnet-4",
-        "claude-haiku-4-5",
-    }
-)
-_DATED_SUFFIX = re.compile(r"[-@]\d{8}$")
-
-
-def _claude_model_id(model_id: str) -> str | None:
-    """Return the bare Claude id (provider prefix and date suffix removed), or None."""
-    bare = _DATED_SUFFIX.sub("", model_id.strip().casefold().rsplit("/", 1)[-1])
-    return bare if bare.startswith("claude-") else None
-
-
 def accepts_forced_tool_choice(model_id: str) -> bool:
     """Whether this wire model may be sent tool_choice "any" or a named tool."""
-    claude_id = _claude_model_id(model_id)
-    return claude_id is None or claude_id in _CLAUDE_FORCED_TOOL_CHOICE
+    claude_id = claude_model_id(model_id)
+    return claude_id is None or claude_model_facts(claude_id).forced_tool_choice
 
 
 def accepts_temperature(model_id: str) -> bool:
     """Whether this wire model may be sent a non-default temperature."""
-    claude_id = _claude_model_id(model_id)
-    return claude_id is None or claude_id in _CLAUDE_TEMPERATURE
+    claude_id = claude_model_id(model_id)
+    return claude_id is None or claude_model_facts(claude_id).temperature
 
 
 # Preserved thinking, from Anthropic's documentation as read on 2026-11-15 (not checked
@@ -119,13 +69,10 @@ def accepts_temperature(model_id: str) -> bool:
 # message. Replaying one after any of those changed is HTTP 400 where the binding is enforced:
 # every account on these models; on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 only accounts
 # created from 31 August 2026, which Sylvia cannot know, so those rely on the reactive strip.
-_CLAUDE_THINKING_BINDING_EVERY_ACCOUNT = frozenset({"claude-fable-5-2", "claude-mythos-5-2"})
-
-
 def binds_thinking_for_every_account(model_id: str) -> bool:
     """Whether every account on this wire model rejects a thinking block replayed after the
     system prompt or tool set changed."""
-    return _claude_model_id(model_id) in _CLAUDE_THINKING_BINDING_EVERY_ACCOUNT
+    return claude_model_facts(model_id).binds_thinking
 
 
 def rejects_replayed_thinking(error: BaseException) -> bool:
@@ -610,12 +557,14 @@ class AnthropicProvider(Provider):
     layer is the sole retry authority.
     """
 
+    model_info: ModelInfo
+
     MAX_CONSECUTIVE_CONNECTION_ERRORS = 3
 
     def __init__(
         self,
         base_url: str,
-        credential_pool: CredentialPool,
+        api_key: str,
         model_info: ModelInfo,
         retry_config: RetryConfig | None = None,
         timeout: float = 60.0,
@@ -626,8 +575,8 @@ class AnthropicProvider(Provider):
         super().__init__()
 
         self._base_url = base_url
-        self._credential_pool = credential_pool
-        self._model_info = model_info
+        self._api_key = api_key
+        self.model_info = model_info
         self._retry_config = retry_config or RetryConfig()
         self._timeout = timeout
         self._max_tokens = max_tokens
@@ -681,7 +630,6 @@ class AnthropicProvider(Provider):
 
     def _credential_request_options(
         self,
-        credential: Credential,
         headers: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Tell the SDK when no authentication is intended, preserving custom headers."""
@@ -691,10 +639,10 @@ class AnthropicProvider(Provider):
 
         if is_opencode_inference(self._base_url):
             self._client.api_key = ""
-            self._client.auth_token = credential.value
+            self._client.auth_token = self._api_key
             return {"extra_headers": {**(headers or {}), "X-Api-Key": anthropic.omit}}
-        self._client.api_key = credential.value
-        if not credential.value and not any(
+        self._client.api_key = self._api_key
+        if not self._api_key and not any(
             name.lower() == "x-api-key" for name in self._default_headers
         ):
             return {"extra_headers": {**(headers or {}), "X-Api-Key": anthropic.omit}}
@@ -704,16 +652,12 @@ class AnthropicProvider(Provider):
         """Close and recreate HTTP client to clear stale connections."""
         logger.warning(
             "Recycling connection pool for %s after %d consecutive errors",
-            self._model_info.provider_name,
+            self.model_info.provider_name,
             self._consecutive_connection_errors,
         )
         await self._client.close()
         self._client = self._build_client()
         self._consecutive_connection_errors = 0
-
-    @property
-    def model_info(self) -> ModelInfo:
-        return self._model_info
 
     def provider_request_representation(
         self,
@@ -730,7 +674,7 @@ class AnthropicProvider(Provider):
         max_tokens = request_options.pop("max_tokens", self._max_tokens)
         request_options.pop("max_output_tokens", None)
         return self._format(
-            model_id=self._model_info.wire_model_id,
+            model_id=self.model_info.wire_model_id,
             messages=messages,
             tools=tools,
             stream=stream,
@@ -753,8 +697,8 @@ class AnthropicProvider(Provider):
         request_json: dict[str, Any] | None = None,
     ) -> HookContext:
         return HookContext(
-            provider_key=self._model_info.provider_key,
-            model_id=self._model_info.id,
+            provider_key=self.model_info.provider_key,
+            model_id=self.model_info.id,
             message_count=len(messages),
             tool_count=len(tools) if tools else 0,
             request_json=request_json,
@@ -823,7 +767,7 @@ class AnthropicProvider(Provider):
             else 0
         )
         request_dict = self._format(
-            model_id=self._model_info.wire_model_id,
+            model_id=self.model_info.wire_model_id,
             messages=messages,
             tools=tools,
             stream=False,
@@ -842,9 +786,8 @@ class AnthropicProvider(Provider):
         async def _call() -> ProviderResponse:
             import anthropic
 
-            credential = await self._credential_pool.get_credential()
             auth_options = self._credential_request_options(
-                credential, request_dict.get("extra_headers")
+                request_dict.get("extra_headers")
             )
 
             try:
@@ -865,7 +808,7 @@ class AnthropicProvider(Provider):
             except anthropic.APIConnectionError as exc:
                 raise ProviderConnectionError(f"Anthropic connection error: {exc}") from exc
 
-            return self._transport.parse_response(raw_response, self._model_info.id)
+            return self._transport.parse_response(raw_response, self.model_info.id)
 
         t0 = _time.monotonic()
         try:
@@ -922,7 +865,7 @@ class AnthropicProvider(Provider):
             else 0
         )
         request_dict = self._format(
-            model_id=self._model_info.wire_model_id,
+            model_id=self.model_info.wire_model_id,
             messages=messages,
             tools=tools,
             stream=True,
@@ -938,9 +881,8 @@ class AnthropicProvider(Provider):
         )
         await self.hooks.fire_on_request(request_ctx)
 
-        credential = await self._credential_pool.get_credential()
         auth_options = self._credential_request_options(
-            credential, request_dict.get("extra_headers")
+            request_dict.get("extra_headers")
         )
 
         t0 = _time.monotonic()

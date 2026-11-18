@@ -4477,7 +4477,7 @@ class AuthorityOwner:
             ) from error
         if command.source_handoff_id is not None or command.session_id is not None:
             raise CommandRejected(
-                "F4 handoff applies only to an existing campaign",
+                "Campaign handoff requires an existing campaign.",
                 code="existing_campaign_handoff_only",
             )
         if not lifecycle_writer_is_legal(command.lifecycle, command.writer):

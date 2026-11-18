@@ -11,7 +11,6 @@ import pytest
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._anthropic import AnthropicMessagesTransport, AnthropicProvider
 from sylvia_gm.provider._base import ModelInfo, ProviderStreamChunk
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._exceptions import (
     AuthenticationError,
     IncompleteProviderStreamError,
@@ -186,7 +185,7 @@ async def test_audit_distinguishes_incomplete_stream_from_completed_invalid_argu
 
     base = AnthropicProvider(
         base_url="http://synthetic.invalid/v1",
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),
+        api_key="synthetic",
         model_info=ModelInfo(id="synthetic", name="Synthetic", provider_name="Synthetic",
                             provider_key="custom", provider_mode="byok", context_window=8192,
                             transport="anthropic_messages"),
@@ -252,7 +251,7 @@ async def test_anthropic_optional_auth_reaches_real_sdk_transport(
 
     provider = AnthropicProvider(
         base_url="http://127.0.0.1:58333/v1",
-        credential_pool=CredentialPool([Credential(type=credential_type, value=key)]),
+        api_key=key,
         default_headers=headers,
         model_info=ModelInfo(id="synthetic", name="Synthetic", provider_name="Synthetic",
                             provider_key="custom", provider_mode="byok", context_window=8192,
@@ -305,7 +304,7 @@ async def test_anthropic_read_timeout_after_streaming_is_a_provider_failure():
 
     provider = AnthropicProvider(
         base_url="https://synthetic.invalid",
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),
+        api_key="synthetic",
         model_info=ModelInfo(
             id="synthetic/model",
             name="Synthetic",

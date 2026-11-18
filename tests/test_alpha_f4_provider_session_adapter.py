@@ -2282,6 +2282,18 @@ def test_stream_adapter_round_trips_exact_catalog_action_and_talk(
     print("F4 PROVIDER ADAPTER", "tool=advance", "revision=4->5", "talk=streamed")
 
 
+@pytest.mark.parametrize("narration", [
+    "I think they know about the vault now.\nI need to leave before the moon turns.",
+    "Let me tell you how the Gray Fleet burned.\nI should have seen it coming.",
+    "The Perception check succeeded with a total of 17. You spot a trapdoor.",
+    "Je crois que le guet arrive. La porte reste ouverte.",
+])
+def test_storytelling_is_not_classified_as_private_deliberation(narration: str) -> None:
+    from sylvia_gm.agent._provider_session import _looks_like_private_deliberation
+
+    assert not _looks_like_private_deliberation(narration)
+
+
 @pytest.mark.parametrize(
     "leaked",
     (
@@ -2289,7 +2301,7 @@ def test_stream_adapter_round_trips_exact_catalog_action_and_talk(
         "Actually, let me think about this more carefully. I should show three clues first.",
         "The player's declared action is a broad, light look around. I should describe only "
         "what is plainly visible. No Ruleset tool is needed.\n\nNow I will narrate it.",
-        "I'll prepare the opening scene now.",
+        "The user wants an opening scene.",
     ),
 )
 def test_private_deliberation_in_content_is_repaired_before_talk(leaked: str) -> None:
@@ -2322,6 +2334,41 @@ def test_private_deliberation_in_content_is_repaired_before_talk(leaked: str) ->
         event.text or "" for event in events if event.kind is ProviderEventKind.TALK
     )
     assert not any(event.kind is ProviderEventKind.PRIVATE_REASONING for event in events)
+
+
+def test_private_deliberation_correction_exhaustion_preserves_the_turn(tmp_path) -> None:
+    from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
+
+    diagnosis = LocalDiagnostics(tmp_path)
+    planning = "The player wants answers."
+    narration = planning + "\nThe stranger raises a lantern."
+
+    def record_warning(code: str) -> None:
+        diagnosis.record("provider_warning", operation="submit_session_input", error_code=code)
+
+    provider = _ScriptedProvider([
+        [ProviderStreamChunk(content=narration, finish_reason="stop")] for _ in range(3)
+    ])
+
+    events = tuple(
+        ProviderSessionAdapter(
+            cast(AuthorityOwner, _OwnerProjection()), provider, owner_id="owner-provider",
+            record_warning=record_warning,
+        ).for_turn("turn-provider")(_provider_input(user_text="I follow the trail."))
+    )
+    report = diagnosis.preview(kind="app_problem", reproduction="", feedback="")
+    diagnosis.close()
+
+    assert len(provider.calls) == 3
+    assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [
+        "The stranger raises a lantern.",
+    ]
+    assert "provider_private_deliberation" in report["content"]
+    assert planning not in report["content"]
+    warning = next(row for row in json.loads(report["content"])["diagnostics"]
+                   if row["event"] == "provider_warning")
+    assert warning["severity"] == "warning"
+    assert warning["operation"] == "submit_session_input"
 
 
 def test_committed_mechanic_empty_completion_is_reprompted_in_the_same_turn() -> None:

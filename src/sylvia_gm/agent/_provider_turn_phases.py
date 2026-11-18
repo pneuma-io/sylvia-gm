@@ -1047,9 +1047,22 @@ def prepare_campaign_file_revision(
         None,
     )
     state.revised_raw_blocks = None
-    if isinstance(state.revised_narration, list):
+    if isinstance(state.revised_narration, str):
+        state.revised_narration = self._filter_private_deliberation(state.revised_narration)
+    elif isinstance(state.revised_narration, list):
         try:
-            state.revised_raw_blocks = _validated_raw_response_blocks(state.revised_narration)
+            blocks = _validated_raw_response_blocks(state.revised_narration)
+            retained: list[SafePayload] = []
+            for response_block in blocks:
+                if response_block["kind"] == "npc_dialogue":
+                    retained.append(response_block)
+                    continue
+                text = self._filter_private_deliberation(str(response_block["text"]))
+                if text.strip():
+                    retained.append({**response_block, "text": text})
+            if not retained:
+                raise ValueError("Provider returned no player-facing response blocks")
+            state.revised_raw_blocks = tuple(retained)
             state.revised_narration = ""
         except ValueError:
             state.revised_raw_blocks = None
@@ -1971,6 +1984,7 @@ def execute_tool_batch(
             attached_narration = (
                 "".join(state.assistant_text) if _buffered_narration_can_be_replaced(state) else ""
             )
+            attached_narration = self._filter_private_deliberation(attached_narration)
             if attached_narration.strip():
                 if _contains_serialized_tool_call(attached_narration):
                     state.local_tool_results[state.assembly.call_id] = {

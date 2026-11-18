@@ -19,7 +19,12 @@ from sylvia_gm.provider._base import (
     closing_provider_stream,
     release_provider_idle,
 )
-from sylvia_gm.provider._model_defaults import documented_model_defaults
+from sylvia_gm.provider._model_facts import (
+    claude_model_facts,
+    documented_model_defaults,
+    documented_openai_id,
+    openai_model_facts,
+)
 from sylvia_gm.provider._speed import SpeedSelection, select_speed
 
 
@@ -93,38 +98,19 @@ def configure_reasoning(model: ModelInfo, base_url: str) -> ModelInfo:
             )
         # Exact model policies, not a GPT-name heuristic for arbitrary compatible endpoints.
         # https://developers.openai.com/api/docs/models/gpt-5.2 (checked 2026-09-22).
-        supported = {
-            "gpt-5.2": ("none", "low", "medium", "high", "xhigh"),
-            "gpt-5.5": ("none", "low", "medium", "high", "xhigh"),
-            "gpt-5.5-2026-04-23": ("none", "low", "medium", "high", "xhigh"),
-            "gpt-5.6-sol": ("none", "low", "medium", "high", "xhigh", "max"),
-            "gpt-5.6": ("none", "low", "medium", "high", "xhigh", "max"),
-        }.get(wire_id)
-        if supported is not None:
-            documented_id = (
-                "gpt-5.6-sol"
-                if wire_id == "gpt-5.6"
-                else "gpt-5.5"
-                if wire_id == "gpt-5.5-2026-04-23"
-                else wire_id
-            )
+        facts = openai_model_facts(wire_id)
+        if facts.efforts is not None:
+            documented_id = documented_openai_id(wire_id)
             return replace(
                 model,
-                supported_reasoning_efforts=supported,
-                default_reasoning_effort="none" if wire_id == "gpt-5.2" else "medium",
+                supported_reasoning_efforts=facts.efforts,
+                default_reasoning_effort=facts.default_effort,
                 reasoning_control="openai",
                 reasoning_source=f"https://developers.openai.com/api/docs/models/{documented_id}",
             )
     if endpoint.hostname == "api.anthropic.com" and model.transport == "anthropic_messages":
         # https://platform.claude.com/docs/en/build-with-claude/effort (2026-09-22).
-        supported = {
-            "claude-opus-4-6": ("low", "medium", "high", "max"),
-            "claude-sonnet-4-6": ("low", "medium", "high", "max"),
-            "claude-opus-4-7": ("low", "medium", "high", "xhigh", "max"),
-            "claude-opus-4-8": ("low", "medium", "high", "xhigh", "max"),
-            "claude-opus-5": ("low", "medium", "high", "xhigh", "max"),
-            "claude-sonnet-5": ("low", "medium", "high", "xhigh", "max"),
-        }.get(wire_id)
+        supported = claude_model_facts(wire_id).efforts
         if supported is not None:
             return replace(
                 model,
@@ -278,7 +264,7 @@ class TurnReasoningProvider(Provider):
         self._provider = provider
         self.selection = selection
         self.speed = speed or SpeedSelection(None, None, None, "provider_default")
-        self.model_info = getattr(provider, "model_info", None)
+        self.model_info = provider.model_info
         self.hooks = provider.hooks
         self._base_url = getattr(provider, "_base_url", None)
         self.set_audit_context({})
@@ -385,7 +371,7 @@ def bind_session_reasoning(
     requested = session.reasoning_effort_once or session.reasoning_effort
     scope = ("once" if session.reasoning_effort_once is not None else
              "session" if session.reasoning_effort is not None else "mode_default")
-    model = getattr(provider, "model_info", None)
+    model = provider.model_info
     return TurnReasoningProvider(
         provider,
         select_reasoning(model, session.role.value, requested, scope=scope),

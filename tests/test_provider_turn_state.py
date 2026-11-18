@@ -43,19 +43,12 @@ def test_turn_decisions_keep_short_circuit_reads_before_flags_are_assigned():
 
 def test_private_narration_decision_does_not_read_or_classify_forced_disposition():
     state = ProviderTurnState()
-    calls = []
-
-    def classify(text):
-        calls.append(text)
-        return True
-
     state.obligations.force_campaign_file_update = True
-    assert not _narration_needs_private_correction(state, classify)
-    assert calls == []
+    assert not _narration_needs_private_correction(state)
     state.obligations.force_campaign_file_update = False
     with pytest.raises(UnboundLocalError, match="narration"):
-        _narration_needs_private_correction(state, classify)
-    assert calls == []
-    state.narration = "held private reasoning"
-    assert _narration_needs_private_correction(state, classify)
-    assert calls == ["held private reasoning"]
+        _narration_needs_private_correction(state)
+    state.narration = "The player wants answers."
+    assert _narration_needs_private_correction(state)
+    state.narration = "The stranger raises a lantern."
+    assert not _narration_needs_private_correction(state)

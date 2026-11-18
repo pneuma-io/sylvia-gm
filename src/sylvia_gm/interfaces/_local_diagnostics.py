@@ -46,6 +46,7 @@ EVENTS = frozenset(
         "owner_failed",
         "command_completed",
         "request_rejected",
+        "provider_warning",
         "renderer_error",
         "renderer_rejection",
     }
@@ -55,6 +56,7 @@ ERROR_CODES = frozenset(
         "command_rejected",
         "internal_error",
         "provider_error",
+        "provider_private_deliberation",
         "context_compaction_failed",
         "stale_character",
         "display_load_cancelled",
@@ -238,7 +240,7 @@ class LocalDiagnostics:
             "outcome": outcome,
             "severity": "error"
             if outcome == "error"
-            else ("warning" if event == "owner_interrupted" else "info"),
+            else ("warning" if event in {"owner_interrupted", "provider_warning"} else "info"),
             "error_code": _choice(fields.get("error_code"), ERROR_CODES, "other_rejection"),
             "error_type": error_type,
             "duration_ms": _number(fields.get("duration_ms"), 24 * 60 * 60 * 1000),

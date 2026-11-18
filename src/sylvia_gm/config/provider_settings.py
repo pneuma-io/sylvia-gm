@@ -29,7 +29,7 @@ from sylvia_gm.provider._context_capacity import (
     ResolvedContextCapacity,
     resolve_context_capacity,
 )
-from sylvia_gm.provider._model_defaults import documented_model_defaults, documented_model_ids
+from sylvia_gm.provider._model_facts import documented_model_defaults, documented_model_ids
 from sylvia_gm.provider._protocol_routes import model_protocol
 
 ProviderTransport = Literal[

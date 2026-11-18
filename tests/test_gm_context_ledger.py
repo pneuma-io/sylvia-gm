@@ -665,7 +665,6 @@ def test_breakpoints_only_on_the_first_party_route_in_ledger_mode(
     pytest.importorskip("anthropic")
     from sylvia_gm.provider._anthropic import AnthropicProvider
     from sylvia_gm.provider._base import ModelInfo
-    from sylvia_gm.provider._credentials import Credential, CredentialPool
 
     if mode is None:
         monkeypatch.delenv("SYLVIA_GM_CONTEXT_MODE", raising=False)
@@ -673,7 +672,7 @@ def test_breakpoints_only_on_the_first_party_route_in_ledger_mode(
         monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", mode)
     provider = AnthropicProvider(
         base_url="https://fixture.invalid",
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),
+        api_key="synthetic",
         model_info=ModelInfo(id="fixture", name="Fixture", provider_key=provider_key,
                              provider_name="Fixture", provider_mode="byok",
                              transport="anthropic_messages"),

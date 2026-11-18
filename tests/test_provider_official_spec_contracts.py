@@ -83,7 +83,7 @@ async def test_opencode_factory_uses_documented_inference_paths_and_bearer(
             if base_style == "historical"
             else definition["base_url"],
             models=[model],
-            credentials_list=[{"type": "api_key", "value": "synthetic-key"}],
+            api_key="synthetic-key",
             retry_config=RetryConfig(max_retries=0),
         )
     )
@@ -299,7 +299,7 @@ def test_flat_reported_cache_usage_is_preserved():
 
 
 def test_server_retry_after_is_not_shortened_to_application_backoff_cap():
-    from sylvia_gm.provider._failover import _build_delay
+    from sylvia_gm.provider._retry import _build_delay
 
     assert _build_delay(1, RetryConfig(max_delay=30), retry_after=75) == 75
 
@@ -908,7 +908,7 @@ async def test_stream_cancellation_closes_transport_without_resubmission():
 
 @pytest.mark.asyncio
 async def test_retry_after_503_is_honored_without_real_wait(monkeypatch):
-    from sylvia_gm.provider import _failover
+    from sylvia_gm.provider import _retry
 
     requests = []
     delays = []
@@ -916,7 +916,7 @@ async def test_retry_after_503_is_honored_without_real_wait(monkeypatch):
     async def sleep(delay):
         delays.append(delay)
 
-    monkeypatch.setattr(_failover.asyncio, "sleep", sleep)
+    monkeypatch.setattr(_retry.asyncio, "sleep", sleep)
 
     def handle(request):
         requests.append(request)
@@ -1218,7 +1218,6 @@ async def test_actual_anthropic_stream_cache_totals_survive_success_and_refusal(
     from anthropic import AsyncAnthropic
 
     from sylvia_gm.provider._anthropic import AnthropicProvider
-    from sylvia_gm.provider._credentials import Credential, CredentialPool
 
     contexts = []
 
@@ -1258,7 +1257,7 @@ async def test_actual_anthropic_stream_cache_totals_survive_success_and_refusal(
     )
     provider = AnthropicProvider(
         base_url="https://fixture.invalid",
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),
+        api_key="synthetic",
         model_info=ModelInfo(
             id="fixture",
             name="Fixture",

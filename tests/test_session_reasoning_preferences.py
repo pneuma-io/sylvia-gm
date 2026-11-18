@@ -149,5 +149,5 @@ def test_invalid_preference_is_atomic_and_stored_preferences_are_hash_bound(tmp_
         assert owner.session_context("chat") == before
     with sqlite3.connect(path) as connection:
         connection.execute("UPDATE standalone_builder_chats SET reasoning_effort = 'low'")
-    with pytest.raises(RuntimeError, match="stored integrity"):
+    with pytest.raises(RuntimeError, match="failed an integrity check"):
         AuthorityOwner.open(path, "tampered")

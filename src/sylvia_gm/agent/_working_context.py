@@ -229,7 +229,7 @@ class WorkingContextProvider(Provider):
     ) -> None:
         super().__init__()
         self._provider = provider
-        self.model_info = getattr(provider, "model_info", None)
+        self.model_info = provider.model_info
         self.records = [dict(r) for r in records if _valid_checkpoint(r)
                         and (record_owner is None or r.get("context_owner") == record_owner)]
         self._record_owner = dict(record_owner) if record_owner is not None else None

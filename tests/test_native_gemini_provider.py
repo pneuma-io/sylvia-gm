@@ -7,7 +7,6 @@ import pytest
 
 from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.provider._base import ModelInfo
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._exceptions import IncompleteProviderStreamError, RateLimitError
 
 
@@ -26,7 +25,7 @@ def make_provider(handle):
     return GeminiProvider(
         base_url="https://fixture.test/v1beta",
         model_info=model,
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic-key")]),
+        api_key="synthetic-key",
         http_client=httpx.AsyncClient(transport=httpx.MockTransport(handle)),
     )
 

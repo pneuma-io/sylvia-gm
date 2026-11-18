@@ -1,4 +1,5 @@
 use super::{OwnerBridge, OWNER_CLOSE_NO_ACK, OWNER_CLOSE_PENDING, OWNER_CLOSE_PIPE_CLOSED};
+use serde_json::json;
 use std::os::windows::io::{AsHandle, AsRawHandle, OwnedHandle};
 use std::path::PathBuf;
 use std::process::Command;
@@ -19,6 +20,18 @@ mode, delay, code, marker, release = sys.argv[1:]
 launch = json.loads(sys.stdin.readline())
 response = hmac.new(bytes.fromhex(launch["secret_hex"]), b"sylvia-gm-f6-local-owner-handshake-v1", hashlib.sha256).hexdigest()
 print(json.dumps({"type": "ready", "ok": True, "response_hex": response}), flush=True)
+if mode == "missing_id":
+    import threading
+    deadline = threading.Timer(10, lambda: os._exit(2))
+    deadline.daemon = True
+    deadline.start()
+    request = json.loads(sys.stdin.readline())
+    assert request["method"] == "campaign_index"
+    print(json.dumps({"id": None, "ok": False, "error": {"code": "invalid_owner_request"}}), flush=True)
+    request = json.loads(sys.stdin.readline())
+    assert request["method"] == "campaign_index"
+    print(json.dumps({"id": request["id"], "ok": True, "result": []}), flush=True)
+    deadline.cancel()
 if mode not in ("eof", "eof_stuck"):
     request = json.loads(sys.stdin.readline())
     assert request["method"] == "shutdown"
@@ -417,4 +430,17 @@ fn blocked_input_does_not_block_or_duplicate_the_shutdown_request() {
     fixture.drop_bridge();
     fixture.assert_live_and_preserved();
     fixture.finish(0);
+}
+
+
+#[test]
+fn missing_request_id_reports_uncertainty_without_losing_the_connection() {
+    let fixture = Fixture::new("missing_id", "0", "0");
+    let error = fixture.bridge().request("campaign_index", json!({})).unwrap_err();
+    assert!(error.starts_with("outcome_unknown:"));
+    assert_eq!(
+        fixture.bridge().request("campaign_index", json!({})).unwrap(),
+        json!([]),
+    );
+    fixture.bridge().request("shutdown", json!({})).unwrap();
 }

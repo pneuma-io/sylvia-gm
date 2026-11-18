@@ -116,3 +116,36 @@ def test_explicit_owner_refusal_keeps_the_definite_category():
             owner.reader.cancel()
             await asyncio.gather(owner.reader, return_exceptions=True)
     asyncio.run(check())
+
+
+def test_unidentified_reply_marks_pending_outcome_unknown_and_next_request_succeeds():
+    async def check():
+        owner = OwnerProcess(Path.cwd())
+        stdout = asyncio.StreamReader()
+        writes = []
+
+        class Pipe:
+            def write(self, raw):
+                request = json.loads(raw)
+                writes.append(request)
+                reply = ({"id": None, "ok": False} if len(writes) == 1
+                         else {"id": request["id"], "ok": True, "result": []})
+                stdout.feed_data(json.dumps(reply).encode() + b"\n")
+
+            async def drain(self):
+                pass
+
+        owner.process = SimpleNamespace(stdin=Pipe(), stdout=stdout)
+        owner.reader = asyncio.create_task(owner._receive())
+        try:
+            with pytest.raises(WebUIError, match="without a request ID") as error:
+                await asyncio.wait_for(owner.call("campaign_index"), timeout=2)
+            assert error.value.code == "outcome_unknown"
+            assert len(writes) == 1
+            assert await asyncio.wait_for(owner.call("campaign_index"), timeout=2) == []
+            assert owner.pending == {}
+        finally:
+            owner.reader.cancel()
+            await owner.reader
+
+    asyncio.run(check())

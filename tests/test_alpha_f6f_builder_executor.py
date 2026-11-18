@@ -27,7 +27,6 @@ from sylvia_gm.builder import _tools as builder_tools
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._anthropic import AnthropicMessagesTransport, AnthropicProvider
 from sylvia_gm.provider._base import FakeProvider, ModelInfo, ProviderResponse, ToolCall
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._openai_compat import ChatCompletionsTransport
 from sylvia_gm.tools._builder_handlers import tool_web_search
 
@@ -98,7 +97,7 @@ def test_cached_anthropic_provider_survives_builder_to_gm_event_loop_change(
     server_thread.start()
     provider = AnthropicProvider(
         base_url=f"http://127.0.0.1:{server.server_port}/v1",
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic")]),
+        api_key="synthetic",
         model_info=ModelInfo(
             id="synthetic/minimax-m3",
             name="Synthetic MiniMax M3",

@@ -23,21 +23,8 @@ from collections.abc import Callable, Mapping, Sequence
 from copy import deepcopy
 from typing import Any
 
-from sylvia_gm.dice import (
-    RollResult,
-)
-from sylvia_gm.dice import (
-    count_successes as dice_count_successes,
-)
-from sylvia_gm.dice import (
-    explode as dice_explode,
-)
-from sylvia_gm.dice import (
-    hunger_roll as dice_hunger_roll,
-)
-from sylvia_gm.dice import (
-    reroll as dice_reroll,
-)
+from sylvia_gm import dice
+from sylvia_gm.dice import RollResult
 from sylvia_gm.dice import (
     roll as dice_roll,
 )
@@ -252,7 +239,7 @@ def _handle_dice(
 
     # Roll
     if use_explode:
-        result = dice_explode(sides, count, modifier, explode_on, max_explosions)
+        result = dice.explode(sides, count, modifier, explode_on, max_explosions)
     elif use_advantage:
         result = advantage(modifier)
     elif use_disadvantage:
@@ -1213,7 +1200,7 @@ def _handle_count_successes(
         mod_val = evaluate_expression(str(modifier_expr), ctx)
         modifier = int(mod_val) if mod_val is not None else 0
 
-    result = dice_count_successes(sides, count, threshold, modifier)
+    result = dice.count_successes(sides, count, threshold, modifier)
     ctx.vars[store_as] = result
 
 
@@ -1273,7 +1260,7 @@ def _handle_reroll(
     if threshold_raw is not None:
         threshold = _resolve_int(threshold_raw, ctx)
 
-    result = dice_reroll(previous, str(predicate), modifier, threshold)
+    result = dice.reroll(previous, str(predicate), modifier, threshold)
     ctx.vars[store_as] = result
 
     # Execute consequences (the "push" cost)
@@ -1317,7 +1304,7 @@ def _handle_hunger_dice(
         mod_val = evaluate_expression(str(modifier_expr), ctx)
         modifier = int(mod_val) if mod_val is not None else 0
 
-    result = dice_hunger_roll(pool_size, hunger, sides, threshold, modifier)
+    result = dice.hunger_roll(pool_size, hunger, sides, threshold, modifier)
     ctx.vars[store_as] = result
 
 

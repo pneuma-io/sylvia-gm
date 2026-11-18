@@ -17,7 +17,15 @@ import queue
 import re
 import uuid
 import weakref
-from collections.abc import AsyncIterator, Awaitable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import (
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sequence,
+)
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -80,6 +88,7 @@ from sylvia_gm.domain.package_library import PackageLockRecord
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
+from sylvia_gm.provider._model_facts import uses_gm_narration_hint
 
 from ._provider_turn_decisions import (
     _actor_decision_can_be_requested,
@@ -87,6 +96,8 @@ from ._provider_turn_decisions import (
     _campaign_file_must_be_settled,
     _campaign_file_needs_narration,
     _held_campaign_file_narration_is_needed,
+    _is_private_deliberation_line,
+    _looks_like_private_deliberation,
     _narration_needs_private_correction,
     _narration_repeats_previous_player_response,
     _required_tool_call_is_missing,
@@ -127,21 +138,11 @@ _GM_MODEL_NARRATION_BLOCK = (
 )
 # Add routes only after verifying their canonical and upstream runtime identities.
 # Display names and unknown aliases are deliberately not used for selection.
-_GM_MODEL_NARRATION_BLOCKS: Mapping[tuple[str, str, str], str] = {
-    ("chatgpt_subscription", (
-        f'chatgpt-subscription/'
-        f'{model_id}'
-    ), model_id): _GM_MODEL_NARRATION_BLOCK
-    for model_id in ("gpt-6.1-sol", "gpt-6-sol", "gpt-5.6-sol")
-}
-
-
 def _model_gm_narration_block(provider: Provider) -> str | None:
-    model = getattr(provider, "model_info", None)
-    return _GM_MODEL_NARRATION_BLOCKS.get((
-        getattr(model, "provider_key", ""), getattr(model, "id", ""),
-        getattr(model, "wire_model_id", ""),
-    ))
+    model = provider.model_info
+    if model is None or not uses_gm_narration_hint(model):
+        return None
+    return _GM_MODEL_NARRATION_BLOCK
 
 
 @dataclass
@@ -262,31 +263,6 @@ def _contains_serialized_tool_call(text: str) -> bool:
     return "]<]minimax[>[<tool_call" in folded or (
         "<tool_call" in folded and "<invoke name=" in folded
     )
-
-
-def _looks_like_private_deliberation(text: str) -> bool:
-    """Recognize high-confidence planning prose that must never reach the player channel."""
-
-    lines = tuple(line.strip().casefold() for line in text.splitlines() if line.strip())
-    if not lines:
-        return False
-    strong_starts = (
-        "the player wants ",
-        "the player's declared action ",
-        "the declared player action ",
-        "the user wants ",
-        "actually, let me think",
-        "i think i'll have ",
-        "i should show:",
-        "i'll prepare ",
-        "i will prepare ",
-    )
-    if any(line.startswith(strong_starts) for line in lines):
-        return True
-    if lines[0].startswith("the ") and " check succeeded with a total" in lines[0]:
-        return True
-    planning_starts = ("i think ", "let me ", "i should ", "i need to ")
-    return sum(line.startswith(planning_starts) for line in lines) >= 2
 
 
 def _forced_single_tool_call_from_json(
@@ -1671,6 +1647,7 @@ class ProviderSessionAdapter:
         campaign_plan_text: str | None = None,
         campaign_plan: Mapping[str, object] | None = None,
         campaign_knowledge: Mapping[str, object] | None = None,
+        record_warning: Callable[[str], None] | None = None,
     ) -> None:
         if not owner_id:
             raise ValueError("Provider session owner identity must be nonempty")
@@ -1680,6 +1657,7 @@ class ProviderSessionAdapter:
             encoded_prompt = gm_system_prompt.encode("utf-8")
             if not gm_system_prompt.strip() or len(encoded_prompt) > _MAX_GM_SYSTEM_PROMPT_BYTES:
                 raise ValueError("GM system prompt is empty or exceeds the usability limit")
+        self._record_warning = record_warning
         self._owner = owner
         self._owner_id = owner_id
         self._provider = provider
@@ -1709,6 +1687,19 @@ class ProviderSessionAdapter:
             if campaign_knowledge is None
             else cast(Mapping[str, object], _plain_json(campaign_knowledge))
         )
+
+    def _filter_private_deliberation(self, text: str) -> str:
+        """Drop only matching lines and record a content-free warning."""
+        lines = text.splitlines(keepends=True)
+        kept = [line for line in lines if not _is_private_deliberation_line(line)]
+        if len(kept) == len(lines):
+            return text
+        if self._record_warning is not None:
+            self._record_warning("provider_private_deliberation")
+        else:
+            logger.warning("Discarded provider private deliberation from narration")
+        remaining = "".join(kept)
+        return remaining if remaining.strip() else ""
 
     def for_turn(self, turn_id: str) -> SessionProvider:
         """Bind the canonical TURN identity required by every admitted action."""
@@ -1857,11 +1848,7 @@ class ProviderSessionAdapter:
                     "Provider returned serialized tool syntax as narration",
                     code="provider_serialized_tool_call",
                 )
-            if _looks_like_private_deliberation(narration):
-                raise CommandRejected(
-                    "Provider returned private deliberation as Retry narration",
-                    code="provider_private_deliberation",
-                )
+            narration = self._filter_private_deliberation(narration)
             if not narration:
                 raise CommandRejected(
                     "Provider completed Retry without player-visible narration",
@@ -2024,17 +2011,19 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned prose where a tool call was required",
                         code="provider_required_tool_call_missing",
                     )
-                if _narration_needs_private_correction(state, _looks_like_private_deliberation):
+                if _narration_needs_private_correction(state):
                     if (
                         state.private_deliberation_corrections_used
                         < state.max_private_deliberation_corrections
                     ):
                         retry_private_deliberation(self, state, provider_input, turn_id=turn_id)
                         continue
-                    raise CommandRejected(
-                        "Provider repeatedly returned private deliberation as narration",
-                        code="provider_private_deliberation",
-                    )
+                    state.narration = self._filter_private_deliberation(state.narration)
+                    if not state.narration:
+                        raise CommandRejected(
+                            "Provider completed without player-visible narration",
+                            code="provider_empty_completion",
+                        )
                 if _campaign_file_needs_narration(state):
                     yield from record_held_narration(self, state, provider_input, turn_id=turn_id)
                     return

@@ -514,7 +514,7 @@ def test_first_click_creates_unbound_draft_without_turn_or_user_message(tmp_path
         assert dm_context.messages[0].content["kind"] == "ready_to_begin_reference"
         provider_messages = ProviderSessionAdapter(
             owner,
-            object(),  # type: ignore[arg-type]
+            FakeProvider(),
             owner_id="owner-guided-draft",
         )._messages(  # noqa: SLF001 - exact first-GM role projection is the invariant
             SessionProviderInput(

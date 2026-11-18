@@ -1146,6 +1146,7 @@ def handle_submit_session_input(ctx: DispatchContext, params: Mapping[str, Any])
         provider,
         owner_id=ctx.owner_id,
         gm_system_prompt=ctx.gm_system_prompt,
+        record_warning=ctx.record_provider_warning,
         campaign_plan_text=campaign_plan_text,
         campaign_plan=campaign_plan,
     )
@@ -1243,6 +1244,7 @@ def handle_manual_retry_session(ctx: DispatchContext, params: Mapping[str, Any])
         provider,
         owner_id=ctx.owner_id,
         gm_system_prompt=ctx.gm_system_prompt,
+        record_warning=ctx.record_provider_warning,
         campaign_plan_text=retry_plan_text,
         campaign_plan=retry_plan,
         campaign_knowledge=campaign_knowledge,
@@ -1378,6 +1380,7 @@ def handle_start_dm_session(ctx: DispatchContext, params: Mapping[str, Any]) -> 
         provider,
         owner_id=ctx.owner_id,
         gm_system_prompt=ctx.gm_system_prompt,
+        record_warning=ctx.record_provider_warning,
         campaign_plan_text=opening_plan_text,
         campaign_plan=opening_plan,
     )

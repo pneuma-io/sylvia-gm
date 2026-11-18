@@ -15,7 +15,6 @@ from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._anthropic import AnthropicMessagesTransport
 from sylvia_gm.provider._base import ModelInfo, Provider, ProviderResponse, ProviderStreamChunk
-from sylvia_gm.provider._credentials import Credential, CredentialPool
 from sylvia_gm.provider._openai_compat import (
     ChatCompletionsTransport,
     OpenAICompatProvider,
@@ -100,7 +99,7 @@ async def test_response_effort_reaches_audit_without_guessing_from_request(strea
 
     base = OpenAICompatProvider(
         base_url="https://synthetic.invalid/v1", model_info=info,
-        credential_pool=CredentialPool([Credential(type="api_key", value="synthetic-key")]),
+        api_key="synthetic-key",
     )
     await base._client.close()
     base._client = openai.AsyncOpenAI(
@@ -128,6 +127,42 @@ async def test_response_effort_reaches_audit_without_guessing_from_request(strea
         assert selection["provider_reported_effective"] is None
     finally:
         await provider.close()
+
+
+@pytest.mark.parametrize("model_id", (
+    "claude-fable-5-2", "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5",
+))
+def test_current_claude_api_models_send_native_effort(model_id):
+    info = model(model_id, "anthropic_messages", "https://api.anthropic.com/v1")
+    assert info.supported_reasoning_efforts == ("low", "medium", "high", "xhigh", "max")
+    for role, effort in (("dm", "high"), ("builder", "xhigh")):
+        request = AnthropicMessagesTransport().format_request(
+            info.wire_model_id, [], [], True, max_tokens=8192,
+            **select_reasoning(info, role).options(),
+        )
+        assert request["output_config"] == {"effort": effort}
+        assert request["thinking"] == {"type": "adaptive"}
+
+
+@pytest.mark.parametrize(("model_id", "alias", "fast", "forced", "binds_thinking"), (
+    ("claude-fable-5-2", "fable", True, False, True),
+    ("claude-opus-5-5", "opus", True, False, False),
+    ("claude-sonnet-5-5", "sonnet", False, False, False),
+    ("claude-haiku-5-5", "haiku", False, True, False),
+))
+def test_current_claude_preset_facts_cover_exact_models_and_runtime_aliases(
+    model_id, alias, fast, forced, binds_thinking,
+):
+    from sylvia_gm.provider._claude_runtime import documented_context_window
+    from sylvia_gm.provider._model_facts import claude_model_facts
+
+    facts = claude_model_facts(model_id)
+    assert facts.efforts == ("low", "medium", "high", "xhigh", "max")
+    assert (facts.fast, facts.forced_tool_choice, facts.binds_thinking) == (
+        fast, forced, binds_thinking,
+    )
+    assert facts.temperature is False
+    assert documented_context_window(model_id) == documented_context_window(alias) == 1_000_000
 
 
 def test_native_anthropic_and_minimax_do_not_fabricate_xhigh():

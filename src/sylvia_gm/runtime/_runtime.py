@@ -281,11 +281,6 @@ class RulesetRuntime:
         Returns:
             ToolResult with success, context vars, logs, narrative hooks.
         """
-        if seed is not None:
-            from sylvia_gm.dice import set_seed
-
-            set_seed(seed)
-
         # T5.5: Log tool execution start
         entity_id = (
             params.get("entity_id") or params.get("attacker") or params.get("target") or "n/a"
@@ -318,16 +313,19 @@ class RulesetRuntime:
                 budget=parent_ctx.budget,
             )
 
-        return execute_tool(
-            tool_name,
-            params,
-            self._tools,
-            self._state_bridge,
-            self.ruleset_config,
-            self.definitions,
-            self._combat_state,
-            tool_executor=nested_executor,
-        )
+        from sylvia_gm.dice import seeded_rolls
+
+        with seeded_rolls(seed):
+            return execute_tool(
+                tool_name,
+                params,
+                self._tools,
+                self._state_bridge,
+                self.ruleset_config,
+                self.definitions,
+                self._combat_state,
+                tool_executor=nested_executor,
+            )
 
     def list_available_tools(self) -> list[ToolDef]:
         """Return tools whose pre-conditions pass for current state.

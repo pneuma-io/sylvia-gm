@@ -239,6 +239,7 @@ impl OwnerBridge {
                     .ok()
                     .and_then(|value| value.get("id"))
                     .and_then(Value::as_str)
+                    .filter(|id| !id.is_empty())
                     .map(str::to_owned);
                 match (request_id, reply) {
                     (Some(request_id), result) => {
@@ -259,7 +260,16 @@ impl OwnerBridge {
                         }
                         break;
                     }
-                    _ => {}
+                    (None, Ok(_)) => {
+                        if let Ok(mut pending) = reader_pending.lock() {
+                            for (_, sender) in pending.drain() {
+                                let _ = sender.send(Err(
+                                    "outcome_unknown: The Sylvia owner replied without a request ID. Reload to inspect saved work."
+                                        .to_string(),
+                                ));
+                            }
+                        }
+                    }
                 }
               }
               // The existing reply reader retains the exact child/job after bridge Drop.

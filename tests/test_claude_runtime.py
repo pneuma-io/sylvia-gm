@@ -1037,8 +1037,7 @@ def test_setup_saves_separate_runtime_and_resolves_after_reopen(tmp_path, monkey
 
 def test_native_route_cannot_accept_api_keys_or_fallback():
     for kwargs in [
-        {"credentials_list": [{"value": "private"}]},
-        {"fallback_providers": [ProviderConfig("other", "responses", "https://example.invalid")]},
+        {"api_key": "private"},
     ]:
         with pytest.raises(ValueError):
             ProviderFactory.create(

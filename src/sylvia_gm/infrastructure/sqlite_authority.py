@@ -3755,7 +3755,7 @@ class SQLiteAuthorityStore:
             connection.close()
 
     def _upgrade_predecessor_campaign_schema(self, connection: sqlite3.Connection) -> None:
-        """Converge exact predecessor-v5 and Probe 01 authority to lifecycle v3."""
+        """Migrate supported legacy campaign authorities to lifecycle schema v3."""
 
         live_identity = _schema_identity(connection)
         if live_identity == _EXPECTED_CAMPAIGN_SCHEMA_IDENTITY:
@@ -3787,7 +3787,7 @@ class SQLiteAuthorityStore:
             self._insert_campaign_identity_extension(connection)
         elif live_identity == _EXPECTED_PROBE01_CAMPAIGN_SCHEMA_IDENTITY:
             if migration_rows not in {predecessor_migrations, current_migrations}:
-                raise SchemaIdentityError("Probe 01 campaign migration identity is not exact")
+                raise SchemaIdentityError("Saved campaign migration identity does not match")
             extension = connection.execute(
                 "SELECT extension_name, extension_sha256, predecessor_migration_name, "
                 "predecessor_sql_sha256 FROM authority_schema_extensions"
@@ -3798,7 +3798,7 @@ class SQLiteAuthorityStore:
                 _MIGRATION_5_NAME,
                 _PREDECESSOR_MIGRATION_5_SHA256,
             ):
-                raise SchemaIdentityError("Probe 01 campaign extension identity is not exact")
+                raise SchemaIdentityError("Saved campaign extension identity does not match")
         else:
             raise SchemaIdentityError("Predecessor campaign schema identity is not exact")
         sqlite_campaign.apply_lifecycle_extension(connection)
@@ -4018,9 +4018,9 @@ class SQLiteAuthorityStore:
             str(row[0]).casefold() for row in connection.execute("PRAGMA integrity_check")
         )
         if integrity_rows != ("ok",):
-            raise SchemaIdentityError("Authority stored integrity does not match F1")
+            raise SchemaIdentityError("Saved campaign records failed an integrity check")
         if connection.execute("PRAGMA foreign_key_check").fetchone() is not None:
-            raise SchemaIdentityError("Authority stored integrity does not match F1")
+            raise SchemaIdentityError("Saved campaign records failed an integrity check")
         self._verify_stored_identities(connection)
         self._verify_session_identities(connection)
         sqlite_recovery.verify_recovery_receipts(connection)
@@ -4042,7 +4042,7 @@ class SQLiteAuthorityStore:
                 or isinstance(capabilities_value, (str, bytes, bytearray))
                 or not all(isinstance(item, str) for item in capabilities_value)
             ):
-                raise SchemaIdentityError("Authority stored integrity does not match F1")
+                raise SchemaIdentityError("Saved campaign records failed an integrity check")
             dependency_rows = tuple(
                 connection.execute(
                     "SELECT dependency_order, dependency_id, dependency_version, "
@@ -4056,7 +4056,7 @@ class SQLiteAuthorityStore:
             if tuple(int(row["dependency_order"]) for row in dependency_rows) != tuple(
                 range(len(dependency_rows))
             ):
-                raise SchemaIdentityError("Authority stored integrity does not match F1")
+                raise SchemaIdentityError("Saved campaign records failed an integrity check")
             PackageLockEntry(
                 package_id=str(package["package_id"]),
                 version=str(package["version"]),
@@ -4108,12 +4108,12 @@ class SQLiteAuthorityStore:
                     ).fetchone()
                     is None
                 ):
-                    raise SchemaIdentityError("Authority stored integrity does not match F1")
+                    raise SchemaIdentityError("Saved campaign records failed an integrity check")
                 package_lock = PackageLock(entries=())
             else:
                 package_lock = self._read_lock(connection, campaign_id)
                 if _lock_representation(package_lock) != str(campaign["lock_hash"]):
-                    raise SchemaIdentityError("Authority stored integrity does not match F1")
+                    raise SchemaIdentityError("Saved campaign records failed an integrity check")
             self._verify_campaign_authority(
                 connection,
                 campaign_id=campaign_id,
@@ -4129,9 +4129,9 @@ class SQLiteAuthorityStore:
             self._verify_construction_authority(connection)
 
     def _verify_construction_authority(self, connection: sqlite3.Connection) -> None:
-        """Reconcile every Probe 01 receipt, basis, construction state, and revision cause."""
+        """Check construction receipts, saved inputs, state, and revision history."""
 
-        invalid = "Authority stored construction integrity does not match F5 Probe 01"
+        invalid = "Saved campaign construction records failed an integrity check"
         try:
             operations = {
                 str(row["operation_id"]): row
@@ -4539,7 +4539,7 @@ class SQLiteAuthorityStore:
     def _verify_stored_identities(connection: sqlite3.Connection) -> None:
         """Re-admit every string-backed canonical identity before publishing an owner."""
 
-        invalid = "Authority stored integrity does not match F1"
+        invalid = "Saved campaign records failed an integrity check"
         checks: tuple[tuple[str, tuple[tuple[str, bool], ...]], ...] = (
             (
                 "SELECT * FROM packages",
@@ -4764,7 +4764,7 @@ class SQLiteAuthorityStore:
     ) -> None:
         """Reject inconsistent revision, action, and canonical chronology authority."""
 
-        invalid = "Authority stored integrity does not match F1"
+        invalid = "Saved campaign records failed an integrity check"
         try:
             lifecycle = LifecycleState(current_lifecycle)
             writer_role = WriterRole(current_writer)
@@ -5432,7 +5432,7 @@ class SQLiteAuthorityStore:
     def _verify_session_identities(connection: sqlite3.Connection) -> None:
         """Reconcile the complete F4 session, plan, and handoff authority graph."""
 
-        invalid = "Authority stored integrity does not match F4"
+        invalid = "Saved campaign records failed an integrity check"
         if "agent_sessions" not in {
             str(row[0])
             for row in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
@@ -10310,7 +10310,7 @@ class SQLiteAuthorityStore:
             connection.close()
 
     def _before_construction_commit(self) -> None:
-        """Private deterministic fault seam for all three Probe 01 transactions."""
+        """Inject faults at the campaign construction transaction boundaries."""
 
     def create_campaign(
         self,
@@ -10502,7 +10502,7 @@ class SQLiteAuthorityStore:
             )
             if campaign_session is not None and handoff_id is not None:
                 raise CommandRejected(
-                    "F4 handoff applies only to an existing campaign",
+                    "Campaign handoff requires an existing campaign.",
                     code="existing_campaign_handoff_only",
                 )
             connection.commit()

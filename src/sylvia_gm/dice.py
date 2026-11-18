@@ -24,7 +24,7 @@ loaded or when the UI framework changes.
 **Edge cases documented in this module:**
 
 - ``seed=0`` is a valid deterministic seed (matching Python's convention).
-- The module-level RNG is NOT thread-safe (v0.1 is single-threaded).
+- Seeded tool execution uses an isolated random stream.
 - d100 range is 1–100 inclusive (not 0–99).
 - No combined product cap — per-parameter caps (1000 sides, 1000 count) are
   safety rails, not game semantics.
@@ -54,24 +54,71 @@ import dataclasses
 import enum
 import os
 import random
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 
 # ---------------------------------------------------------------------------
-# RNG state (module-level, single-threaded)
+# Default RNG and scoped tool execution
 # ---------------------------------------------------------------------------
 
 _rng: random.Random = random.Random(os.urandom(16))
 _current_seed: int | None = None
 
 
-def set_seed(seed: int) -> None:
-    """Seed the module-level RNG for deterministic dice rolls.
+@dataclasses.dataclass
+class _ToolDice:
+    rng: random.Random | None = None
 
-    All subsequent rolls will produce the same sequence for the same seed.
-    Use ``get_seed()`` to retrieve the current seed for session replay.
-    """
+
+_tool_dice: ContextVar[_ToolDice | None] = ContextVar("tool_dice", default=None)
+_roll_source: ContextVar[random.Random | None] = ContextVar("roll_source", default=None)
+
+
+@contextmanager
+def use_roll_source(source: random.Random) -> Iterator[None]:
+    """Supply scripted rolls for the current context, including nested seeded tools."""
+    token = _roll_source.set(source)
+    try:
+        yield
+    finally:
+        _roll_source.reset(token)
+
+
+@contextmanager
+def seeded_rolls(seed: int | None) -> Iterator[None]:
+    """Use an isolated random stream for one tool invocation and its nested calls."""
+    if seed is None or _roll_source.get() is not None:
+        yield
+        return
+    token = _tool_dice.set(_ToolDice())
+    try:
+        # Existing dice controls can intercept seeding or supply their own source.
+        set_seed(seed)
+        yield
+    finally:
+        _tool_dice.reset(token)
+
+
+def _roll_rng() -> random.Random:
+    source = _roll_source.get()
+    if source is not None:
+        return source
+    tool_dice = _tool_dice.get()
+    if tool_dice is not None and tool_dice.rng is not None:
+        return tool_dice.rng
+    return _rng
+
+
+def set_seed(seed: int) -> None:
+    """Seed the active tool stream or the default stream outside a tool invocation."""
     global _current_seed
-    _current_seed = seed
-    _rng.seed(seed)
+    tool_dice = _tool_dice.get()
+    if tool_dice is None:
+        _rng.seed(seed)
+        _current_seed = seed
+    else:
+        tool_dice.rng = random.Random(seed)
 
 
 def get_seed() -> int | None:
@@ -367,7 +414,7 @@ def roll(sides: int | Die, count: int = 1, modifier: int = 0) -> RollResult:
     _validate_count(count)
 
     results: tuple[int, ...] = tuple(
-        _rng.randint(1, actual_sides) for _ in range(count)
+        _roll_rng().randint(1, actual_sides) for _ in range(count)
     )
     return RollResult(
         sides=actual_sides,
@@ -430,7 +477,7 @@ def ndn(n: int, sides: int, modifier: int = 0) -> RollResult:
 def advantage(modifier: int = 0) -> RollResult:
     """Roll 2d20 with advantage: take the higher result.
 
-    Uses ``_rng.randint()`` directly — does NOT delegate to ``roll(count=2)``,
+    Uses ``_roll_rng().randint()`` directly — does NOT delegate to ``roll(count=2)``,
     because ``roll(count=2)`` would **sum** both dice, producing
     ``total = die1 + die2`` (range 2–40). Advantage requires
     ``total = max(die1, die2)`` (range 1–20).
@@ -439,8 +486,8 @@ def advantage(modifier: int = 0) -> RollResult:
     descending, ``total=higher``.
     """
     _validate_modifier(modifier)
-    a = _rng.randint(1, 20)
-    b = _rng.randint(1, 20)
+    a = _roll_rng().randint(1, 20)
+    b = _roll_rng().randint(1, 20)
     higher, lower = (a, b) if a >= b else (b, a)
     return RollResult(
         sides=20,
@@ -454,14 +501,14 @@ def advantage(modifier: int = 0) -> RollResult:
 def disadvantage(modifier: int = 0) -> RollResult:
     """Roll 2d20 with disadvantage: take the lower result.
 
-    Uses ``_rng.randint()`` directly — does NOT delegate to ``roll(count=2)``.
+    Uses ``_roll_rng().randint()`` directly — does NOT delegate to ``roll(count=2)``.
 
     Returns ``RollResult`` with ``count=2``, ``results=(lower, higher)`` sorted
     ascending, ``total=lower``.
     """
     _validate_modifier(modifier)
-    a = _rng.randint(1, 20)
-    b = _rng.randint(1, 20)
+    a = _roll_rng().randint(1, 20)
+    b = _roll_rng().randint(1, 20)
     lower, higher = (a, b) if a <= b else (b, a)
     return RollResult(
         sides=20,
@@ -576,14 +623,14 @@ def explode(
 
     # Roll initial dice
     for _ in range(count):
-        results.append(_rng.randint(1, actual_sides))
+        results.append(_roll_rng().randint(1, actual_sides))
 
     # Process explosions (including dies that explode from previous explosions)
     i = 0
     while i < len(results) and extra_count < max_explosions:
         if results[i] >= explode_val:
             extra_count += 1
-            results.append(_rng.randint(1, actual_sides))
+            results.append(_roll_rng().randint(1, actual_sides))
         i += 1
 
     return RollResult(
@@ -636,7 +683,7 @@ def count_successes(
             f"threshold ({threshold}) exceeds die maximum ({actual_sides})"
         )
 
-    results: list[int] = [_rng.randint(1, actual_sides) for _ in range(count)]
+    results: list[int] = [_roll_rng().randint(1, actual_sides) for _ in range(count)]
     results_tuple = tuple(results)
 
     successes = sum(1 for r in results if r >= threshold) + modifier
@@ -709,7 +756,7 @@ def reroll(
         if keep:
             new_results.append(previous_result.results[i])
         else:
-            new_results.append(_rng.randint(1, sides))
+            new_results.append(_roll_rng().randint(1, sides))
 
     new_tuple = tuple(new_results)
     return RollResult(
@@ -765,10 +812,12 @@ def weighted_pick(
     total_weight = sum(item.get(weight_field, 0) for item in items)
     if total_weight == 0:
         # All-zero weights — pick uniformly
-        return items[_rng.randint(0, len(items) - 1)]
+        return items[_roll_rng().randint(0, len(items) - 1)]
 
     # Use the supplied total, otherwise choose a random point in the weights.
-    roll_val = roll_result.total if roll_result is not None else _rng.randint(1, total_weight)
+    roll_val = (
+        roll_result.total if roll_result is not None else _roll_rng().randint(1, total_weight)
+    )
 
     cumulative = 0
     for item in items:
@@ -836,10 +885,10 @@ def hunger_roll(
     regular_count = pool_size - hunger
 
     regular_results: list[int] = [
-        _rng.randint(1, actual_sides) for _ in range(regular_count)
+        _roll_rng().randint(1, actual_sides) for _ in range(regular_count)
     ]
     hunger_results: list[int] = [
-        _rng.randint(1, actual_sides) for _ in range(hunger)
+        _roll_rng().randint(1, actual_sides) for _ in range(hunger)
     ]
 
     all_results = regular_results + hunger_results

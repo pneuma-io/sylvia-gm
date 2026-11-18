@@ -35,6 +35,35 @@ def test_owner_process_wire_messages_are_ascii_safe() -> None:
     assert json.loads(encoded) == {"text": "Rift—ready"}
 
 
+def test_rejected_requests_leave_the_owner_available(tmp_path: Path) -> None:
+    process, input_stream, output_stream = _launch(tmp_path / "authority.sqlite3")
+    try:
+        for request in (
+            {"id": "bad-params", "method": "campaign_index", "params": []},
+            {"id": "missing-load", "method": "cancel_display_load"},
+            {"id": "long-load", "method": "campaign_panels", "params": {"load_id": "x" * 129}},
+            {"id": "missing-method"},
+            {"method": "campaign_index"},
+        ):
+            _write(input_stream, request)
+            reply = _read(output_stream)
+            assert reply["id"] == request.get("id")
+            assert reply["ok"] is False
+            assert reply["error"]["code"] == "invalid_owner_request"
+            _write(input_stream, {"id": "healthy", "method": "campaign_index"})
+            healthy = _read(output_stream)
+            assert healthy["id"] == "healthy"
+            assert healthy["ok"] is True
+        for malformed in ("{\n", "[]\n"):
+            input_stream.write(malformed)
+            input_stream.flush()
+            reply = _read(output_stream)
+            assert reply["error"]["code"] == "invalid_owner_request"
+            assert _request(input_stream, output_stream, "after-frame", "campaign_index") == []
+    finally:
+        _shutdown(process, input_stream, output_stream)
+
+
 def test_chatgpt_connection_preserves_safe_rejection_message(tmp_path: Path) -> None:
     process, input_stream, output_stream = _launch(tmp_path / "authority.sqlite3")
     try:

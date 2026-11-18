@@ -652,6 +652,8 @@ class _Request:
 class ChatGPTProvider(Provider):
     """Adapt one runtime generation to Sylvia's existing streaming provider interface."""
 
+    model_info: ModelInfo
+
     def __init__(
         self,
         home: Path,
@@ -662,7 +664,7 @@ class ChatGPTProvider(Provider):
     ) -> None:
         super().__init__()
         self.home = home
-        self._model_info = model_info
+        self.model_info = model_info
         self._executable = executable
         self._connection_factory = connection_factory
         self._lock = asyncio.Lock()
@@ -703,15 +705,11 @@ class ChatGPTProvider(Provider):
         if interrupted is not None:
             raise interrupted
 
-    @property
-    def model_info(self) -> ModelInfo:
-        return self._model_info
-
     def _observe_context_window(self, value: object) -> None:
         """Retain the runtime's reported window without increasing a configured operating cap."""
         if type(value) is not int or value <= 0:
             return
-        model = self._model_info
+        model = self.model_info
         observed_at = datetime.now(UTC).isoformat()
         capacity = resolve_context_capacity(
             declared_context_window=model.declared_context_window,

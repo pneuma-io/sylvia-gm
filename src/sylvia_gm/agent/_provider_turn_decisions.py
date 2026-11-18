@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from sylvia_gm.domain.authority import ModelToolBehavior, WriterRole
@@ -73,10 +72,25 @@ def _required_tool_call_is_missing(state: ProviderTurnState) -> bool:
     )
 
 
-def _narration_needs_private_correction(
-    state: ProviderTurnState, _looks_like_private_deliberation: Callable[[str], bool]
-) -> bool:
-    return bool(
+_PRIVATE_DELIBERATION_STARTS = (
+    "the player wants ",
+    "the player's declared action ",
+    "the declared player action ",
+    "the user wants ",
+)
+
+
+def _is_private_deliberation_line(line: str) -> bool:
+    return line.strip().casefold().startswith(_PRIVATE_DELIBERATION_STARTS)
+
+
+def _looks_like_private_deliberation(text: str) -> bool:
+    """Detect provider prose that describes the player request as an instruction."""
+    return any(map(_is_private_deliberation_line, text.splitlines()))
+
+
+def _narration_needs_private_correction(state: ProviderTurnState) -> bool:
+    return (
         not state.obligations.force_campaign_file_update
         and _looks_like_private_deliberation(state.narration)
     )

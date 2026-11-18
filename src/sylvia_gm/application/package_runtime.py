@@ -96,7 +96,6 @@ _MAX_RUNTIME_NODES = 501_000
 _MAX_OBJECT_MEMBERS = 25_000
 _MAX_SPATIAL_EVIDENCE = 128
 _MAX_SPATIAL_RESULT_BYTES = 2 * 1024 * 1024
-_DICE_EXECUTION_LOCK = threading.RLock()
 
 
 class PackageRuntimeError(ValueError):
@@ -1502,10 +1501,9 @@ def materialize_package_mechanic(
             }
         )
         seed = int.from_bytes(hashlib.sha256(seed_basis).digest()[:8], "big")
-        with _DICE_EXECUTION_LOCK:
-            from sylvia_gm.dice import set_seed
+        from sylvia_gm.dice import seeded_rolls
 
-            set_seed(seed)
+        with seeded_rolls(seed):
             try:
                 result = execute_tool(
                     declaration.name,

@@ -6,7 +6,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from sylvia_gm.provider._model_defaults import documented_model_defaults
+from sylvia_gm.provider._model_facts import documented_model_defaults
 
 
 def subscription_model_facts(home: Path, model_ids: set[str]) -> dict[str, dict[str, object]]:

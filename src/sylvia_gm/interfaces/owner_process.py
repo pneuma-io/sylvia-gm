@@ -190,6 +190,11 @@ class OwnerProtocolError(ValueError):
     """A malformed or unsupported private owner-process message."""
 
 
+class OwnerFramingError(OwnerProtocolError):
+    """The next message boundary cannot safely be located."""
+
+
+
 def _guided_start_selection_input(payload: Mapping[str, object]) -> dict[str, object]:
     """Compare selected content without participant IDs generated for each Start attempt."""
     selection = dict(payload)
@@ -836,7 +841,7 @@ def _read_message(stream: TextIO) -> dict[str, Any] | None:
     if line == "":
         return None
     if len(line.encode("utf-8")) > _MAX_MESSAGE_BYTES or not line.endswith("\n"):
-        raise OwnerProtocolError("Owner message exceeds the bounded line protocol")
+        raise OwnerFramingError("Owner message exceeds the bounded line protocol")
     try:
         value = json.loads(line)
     except json.JSONDecodeError as error:
@@ -1838,6 +1843,7 @@ def _dispatch(
     storage_root: Path,
     reload_provider_resolver: Callable[[], None] | None = None,
     gm_system_prompt: str | None = None,
+    record_provider_warning: Callable[[str], None] | None = None,
     provider_work_reserved: bool = False,
 ) -> Any:
     """Keep a reply's selection stable from provider resolution to terminal cleanup."""
@@ -1846,6 +1852,7 @@ def _dispatch(
         owner_id=owner_id, model_choices=model_choices, session_loop=session_loop,
         storage_root=storage_root, reload_provider_resolver=reload_provider_resolver,
         gm_system_prompt=gm_system_prompt,
+        record_provider_warning=record_provider_warning,
     )
     session_id = _generation_session(method, params)
     if session_id is None:
@@ -1883,6 +1890,7 @@ def _dispatch_selected(
     storage_root: Path,
     reload_provider_resolver: Callable[[], None] | None = None,
     gm_system_prompt: str | None = None,
+    record_provider_warning: Callable[[str], None] | None = None,
 ) -> Any:
     from .commands.registry import COMMAND_REGISTRY
 
@@ -1890,6 +1898,7 @@ def _dispatch_selected(
         application_owner=application_owner,
         bus=bus,
         gm_system_prompt=gm_system_prompt,
+        record_provider_warning=record_provider_warning,
         method=method,
         model_choices=model_choices,
         owner_id=owner_id,
@@ -1902,6 +1911,11 @@ def _dispatch_selected(
     if command is None or command.handler is None:
         raise OwnerProtocolError(f'Unsupported owner method: {method}')
     return command.handler(ctx, params)
+
+
+_DISPLAY_READ_METHODS = frozenset({
+    "display_snapshot", "player_projection", "player_projection_page", "campaign_panels",
+})
 
 
 def run(
@@ -2105,6 +2119,9 @@ def run(
                         raise OwnerProtocolError("Choose a local report file.")
                     result = diagnostics.save(_required_text(params, "preview_id"), destination)
                 else:
+                    def record_provider_warning(code: str) -> None:
+                        diagnostics.record("provider_warning", operation=method, error_code=code)
+
                     result = _dispatch(
                         bus,
                         method,
@@ -2118,6 +2135,7 @@ def run(
                         reload_provider_resolver=reload_configured_provider,
                         gm_system_prompt=gm_system_prompt,
                         provider_work_reserved=preparation is not None,
+                        record_provider_warning=record_provider_warning,
                     )
                 reply = {"id": request_id, "ok": True, "result": _json_value(result)}
             except (
@@ -2296,16 +2314,42 @@ def run(
         display_reads = DisplayReads(display_cancelled)
 
         while True:
-            request = _read_message(input_stream)
+            try:
+                request = _read_message(input_stream)
+            except OwnerFramingError:
+                raise
+            except OwnerProtocolError as error:
+                write_reply({
+                    "id": None, "ok": False,
+                    "error": {"code": "invalid_owner_request", "message": str(error)},
+                })
+                continue
             if request is None:
                 return 0
             request_id = request.get("id")
-            if not isinstance(request_id, str) or not request_id:
-                raise OwnerProtocolError("Owner request id must be a nonempty string")
-            method = _required_text(request, "method")
-            params = request.get("params", {})
-            if not isinstance(params, dict):
-                raise OwnerProtocolError("Owner request params must be an object")
+            try:
+                if not isinstance(request_id, str) or not request_id:
+                    raise OwnerProtocolError("Owner request id must be a nonempty string")
+                method = _required_text(request, "method")
+                params = request.get("params", {})
+                if not isinstance(params, dict):
+                    raise OwnerProtocolError("Owner request params must be an object")
+                load_id = None
+                if method == "cancel_display_load":
+                    load_id = _required_text(params, "load_id")
+                elif method in _DISPLAY_READ_METHODS:
+                    load_id = params.get("load_id")
+                if load_id is not None and (
+                    not isinstance(load_id, str) or not 1 <= len(load_id) <= 128
+                ):
+                    raise OwnerProtocolError("Display load identity must be a bounded string")
+            except OwnerProtocolError as error:
+                write_reply({
+                    "id": request_id if isinstance(request_id, str) and request_id else None,
+                    "ok": False,
+                    "error": {"code": "invalid_owner_request", "message": str(error)},
+                })
+                continue
             if update_startup is not None and not update_start_confirmed and method not in {
                 "desktop_update_confirm_startup", "desktop_update_state", "shutdown",
                 "load_desktop_drafts", "save_desktop_drafts", "campaign_index",
@@ -2381,18 +2425,11 @@ def run(
                 write_reply({"id": request_id, "ok": True, "result": {"status": "closed"}})
                 return 0
             if method == "cancel_display_load":
-                display_reads.cancel(_required_text(params, "load_id"))
+                assert isinstance(load_id, str)
+                display_reads.cancel(load_id)
                 write_reply({"id": request_id, "ok": True, "result": {"status": "cancelled"}})
                 continue
-            if method in {
-                "display_snapshot", "player_projection", "player_projection_page",
-                "campaign_panels",
-            }:
-                load_id = params.get("load_id")
-                if load_id is not None and (
-                    not isinstance(load_id, str) or not 1 <= len(load_id) <= 128
-                ):
-                    raise OwnerProtocolError("Display load identity must be a bounded string")
+            if method in _DISPLAY_READ_METHODS:
                 display_reads.submit(request_id, load_id, functools.partial(
                     execute_request, request_id, method, params,
                 ))

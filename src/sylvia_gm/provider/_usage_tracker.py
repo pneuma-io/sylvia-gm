@@ -3,7 +3,7 @@
 Tracks cumulative token usage across an entire session and estimates
 dollar cost using ModelInfo.cost_per_1k_tokens (blended rate).
 
-Survives provider swaps in FallbackChain — attached to the session,
+Attached to the session,
 not a single provider instance.
 """
 
