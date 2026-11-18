@@ -350,6 +350,8 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         candidate = options["candidates"][0]["candidate_id"]
         preview = owner.preview_campaign_rules_update("casting", candidate)
         assert preview["compatible"], preview["conflicts"]
+        assert "Treat this update as one-way." in preview["recovery"]
+        assert "Export the campaign first" in preview["recovery"]
         assert preview["tool_changes"]
         if origin != "integration":
             # Published panels only gained source fields; they are a reviewed change.
@@ -365,6 +367,14 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert after.revision == before.revision + 1
         assert owner.package_lock_lineage("casting")[0] == old_lock
         assert adopt(owner, preview, "adopt-hotfix").replayed
+        earlier = next(
+            option
+            for option in owner.campaign_rules_update_options("casting")["candidates"]
+            if option["closure_sha256"] == old_lock.closure_sha256
+        )
+        reverse = owner.preview_campaign_rules_update("casting", earlier["candidate_id"])
+        assert not reverse["compatible"]
+        assert reverse["conflicts"]
         _projected_lite_panels(owner)
         owner.open_turn("casting", "after-upgrade")
         provider = HealingGM()

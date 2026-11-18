@@ -976,8 +976,8 @@ before confirmation. Compatible adoption keeps saved values and character record
 preserves the player's layout and adds new panels once in the sidebar. Removed or renamed panels,
 changed existing state/character contracts and unsafe saved values block this path. It performs
 no automatic repair. Stop Session reaches the checkpoint; stale previews and active work cannot
-apply. Previous exact versions remain retained. Returning to one requires another compatibility
-review against current progress; it never rewinds intervening play.
+apply. Treat a rules update as one-way. Export the campaign before adoption to keep a playable
+copy with the earlier rules and the progress saved at export.
 Character provenance and accepted Plans retain their original exact source. Active character
 bookkeeping and Ruleset/Setting reference reads follow this campaign's committed compatible
 update lineage. Existing fact identities, audiences, source bindings and declared content
