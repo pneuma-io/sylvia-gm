@@ -140,6 +140,75 @@ def process_options() -> dict[str, Any]:
     return {}
 
 
+#: ``prctl`` option that sends the child a signal when its parent dies (linux/prctl.h).
+_PR_SET_PDEATHSIG = 1
+
+
+def _dies_with_owner() -> dict[str, Any]:
+    """On Linux, a runtime child is killed when the owner process dies, however it dies.
+
+    A kept process waits on a call for up to 30 minutes and does not exit when its input
+    closes, so a crashed or killed owner would otherwise leave it running. On Windows the
+    desktop shell's job object already ends it. ``prctl`` is resolved here, in the parent,
+    so the child only makes the one call between fork and exec; a parent already gone by
+    then ends the child at once. The signal follows the *thread* that started the child, so
+    every runtime child is started from ``_SPAWNER``'s thread, which lasts as long as the
+    owner process; a short-lived thread would end its child when it exited.
+    """
+    if not sys.platform.startswith("linux"):
+        return {}
+    try:
+        import ctypes
+        import signal
+
+        prctl = ctypes.CDLL(None, use_errno=True).prctl
+    except (OSError, AttributeError):
+        return {}
+    owner = os.getpid()
+    kill = int(signal.SIGKILL)
+
+    def arm() -> None:
+        prctl(_PR_SET_PDEATHSIG, kill, 0, 0, 0)
+        if os.getppid() != owner:
+            os._exit(1)
+
+    return {"preexec_fn": arm}
+
+
+class _Spawner:
+    """One daemon thread that starts every Linux runtime child and lives with the process."""
+
+    def __init__(self) -> None:
+        self._requests: queue.Queue[tuple[Any, queue.Queue[tuple[bool, Any]]]] = queue.Queue()
+        self._thread: threading.Thread | None = None
+        self._lock = threading.Lock()
+
+    def run(self, start: Any) -> Any:
+        with self._lock:
+            if self._thread is None or not self._thread.is_alive():
+                self._thread = threading.Thread(
+                    target=self._serve, name="sylvia-claude-spawner", daemon=True,
+                )
+                self._thread.start()
+        done: queue.Queue[tuple[bool, Any]] = queue.Queue(maxsize=1)
+        self._requests.put((start, done))
+        ok, value = done.get()
+        if not ok:
+            raise value
+        return value
+
+    def _serve(self) -> None:
+        while True:
+            start, done = self._requests.get()
+            try:
+                done.put((True, start()))
+            except BaseException as error:  # noqa: BLE001 - handed back to the caller
+                done.put((False, error))
+
+
+_SPAWNER = _Spawner()
+
+
 def native_auth_command(executable: Path, action: str) -> list[str]:
     """Use native authentication while excluding unrelated settings and customizations."""
     return [
@@ -265,8 +334,10 @@ class ClaudeConnection:
         """Start the official binary with native auth and no inherited API-key override."""
         if self._stopped.is_set():
             return
-        try:
-            self._process = subprocess.Popen(
+        options = _dies_with_owner()
+
+        def spawn() -> subprocess.Popen[str]:
+            return subprocess.Popen(
                 [str(self.executable), *self.arguments],
                 cwd=self.workspace,
                 stdin=subprocess.PIPE,
@@ -277,7 +348,11 @@ class ClaudeConnection:
                 errors="strict",
                 env=self.environment,
                 **process_options(),
+                **options,
             )
+
+        try:
+            self._process = _SPAWNER.run(spawn) if options else spawn()
         except OSError:
             raise ProviderConnectionError("The Claude runtime could not start.") from None
         self._reader = threading.Thread(target=self._read, daemon=True)
@@ -306,6 +381,10 @@ class ClaudeConnection:
                 event = json.loads(line)
                 if not isinstance(event, dict):
                     raise ValueError("invalid event")
+                if event.get("type") == "tool_progress":
+                    # Heartbeats while a Sylvia call waits; a kept process waits up to 30
+                    # minutes, and Sylvia never reads them.
+                    continue
                 self._enqueue(event)
         except (OSError, UnicodeError, ValueError):
             self._enqueue(InvalidResponseError("Claude returned an invalid runtime stream."))
@@ -337,6 +416,21 @@ class ClaudeConnection:
                 "Claude exited before completing its response. Saved work is kept."
             )
         return event
+
+    def drain(self) -> list[dict[str, Any] | Exception | None]:
+        """What the process wrote that has not been read, without waiting (None: it exited)."""
+        events: list[dict[str, Any] | Exception | None] = []
+        while True:
+            try:
+                event = self._events.get_nowait()
+            except queue.Empty:
+                break
+            events.append(event)
+            if event is None:
+                break
+        if events == [] and self._process is not None and self._process.poll() is not None:
+            events.append(None)
+        return events
 
     def close(self) -> None:
         """Collect this process only; never stop, log out or search for other Claude sessions."""

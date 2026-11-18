@@ -1678,6 +1678,29 @@ the ledger resets. Builder and participant requests do not use it.
   `SYLVIA_GM_CONTEXT_MODE=legacy` alone restores the whole previous behaviour on that route. Any
   value applies only to ledger-built requests. `stable` (interrupt and continue) and
   `answer-draft` are experimental values.
+- **Claude Code process.** On `claude_code` the provider keeps the Claude Code process that served
+  a ledger-built request (one with the ledger's native route) and continues it through stdin
+  (`--input-format stream-json`) instead of starting a new process that replays the transcript.
+  After a reply that ended in text, the next request's new user content is written as a prompt.
+  At a Sylvia tool call the process is left waiting on the call, and the next request answers it:
+  the MCP tool result carries the call's result followed, as further text blocks, by the sealed
+  host records the request adds after it; the sealed continue record is not sent. The player's
+  own words are never put inside a tool result: when they follow a call (a turn that ended on a
+  call), a fresh process serves the request, so they reach the model as a user message exactly as
+  in per-step mode. A reply with more than one Sylvia call is not kept, since only one call is
+  taken. A kept process serves a request only when the request holds exactly what the process
+  holds (same model, system text and tools, the same earlier messages, the model's own text, and
+  only sealed records after a call); otherwise, or when the process has exited or its turn moved
+  on, a fresh process starts from the saved transcript, and the `claude/process_reuse` audit
+  record says why. A step's usage is its own model request's, never the native turn's total.
+  On Linux a runtime child is killed when its owner process dies. Requests without the native route
+  (Builder, NPC decisions, summaries) always use a new process per step. A kept process's session
+  file and step folder live as long as the process and are removed when it closes: after 30
+  minutes idle, on Stop, sign-in or sign-out, provider close, a chat's change away from its
+  model, a settings reload that no longer offers its model, and process exit.
+  The kept process is opt-in with `SYLVIA_CLAUDE_PROCESS=persistent`; the shipped default is a new
+  process for every step, the previous behaviour, until a fresh start after calls answered in place
+  replays exactly what the kept process sent.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 

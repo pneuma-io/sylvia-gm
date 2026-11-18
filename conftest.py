@@ -43,18 +43,22 @@ def pytest_configure(config):
 
 @pytest.fixture(autouse=True)
 def _own_kept_runtime_threads(monkeypatch):
-    """Give each test its own pool of kept ChatGPT runtime threads, and close it afterwards.
+    """Give each test its own pools of kept runtime threads and processes, closed afterwards.
 
     The ChatGPT connection keeps its runtime thread by default, so a test that makes a
     ChatGPT provider would otherwise leave its stand-in runtime and idle timer in the
     process-wide pool for every later test in the same process.
     """
-    from sylvia_gm.provider import _chatgpt
+    from sylvia_gm.provider import _chatgpt, _claude_kept
 
     pool = _chatgpt._KeptThreads()
     monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", pool)
+    # The same for the Claude Code processes kept between a GM session's requests.
+    processes = _claude_kept.KeptProcesses()
+    monkeypatch.setattr(_claude_kept, "KEPT_PROCESSES", processes)
     yield
     pool.close_all()
+    processes.close_all()
 
 
 def pytest_collection_modifyitems(items):

@@ -421,6 +421,10 @@ class ConfiguredProviderResolver:
         self.subscription_models = frozenset(
             model.wire_model_id for model in catalog if model.transport == "codex_app_server"
         )
+        #: The same for the Claude subscription (Claude Code), whose processes are kept.
+        self.claude_code_models = frozenset(
+            model.wire_model_id for model in catalog if model.transport == "claude_code"
+        )
         self._provider_definitions = dict(config.providers)
         self._user_config_path = Path(user_config_path) if user_config_path is not None else None
         self._model_capability_registry = (

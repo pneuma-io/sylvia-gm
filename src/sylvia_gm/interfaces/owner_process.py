@@ -1287,7 +1287,7 @@ def _switch_session_model(
 def _release_previous_model_threads(
     prior: SessionRecord, updated: SessionRecord, choices: Sequence[Mapping[str, object]],
 ) -> None:
-    """A chat that leaves a ChatGPT model leaves nothing for its kept thread to continue."""
+    """A chat that leaves a subscription model leaves nothing for its kept thread or process."""
     if (prior.provider_id, prior.model_id) == (updated.provider_id, updated.model_id):
         return
     previous = selected_model_info(prior, choices)
@@ -1295,17 +1295,29 @@ def _release_previous_model_threads(
         from sylvia_gm.provider._chatgpt import release_kept_threads
 
         release_kept_threads([previous.wire_model_id])
+    elif previous is not None and previous.transport == "claude_code":
+        from sylvia_gm.provider._claude_kept import release_kept_processes
+
+        release_kept_processes(models=[previous.wire_model_id])
 
 
-def _release_unoffered_model_threads(offered: frozenset[str]) -> None:
-    """After a settings reload, close kept threads of ChatGPT models no longer offered.
+def _release_unoffered_model_threads(
+    offered: frozenset[str], claude_offered: frozenset[str] | None = None,
+) -> None:
+    """After a settings reload, close kept threads and processes of models no longer offered.
 
-    The reload replaces the providers without closing them. A thread of a model still
-    offered is kept for the replacement provider, which continues it.
+    The reload replaces the providers without closing them. A thread (ChatGPT) or process
+    (Claude Code) of a model still offered is kept for the replacement provider, which
+    continues it.
     """
     from sylvia_gm.provider._chatgpt import kept_thread_models, release_kept_threads
 
     release_kept_threads(kept_thread_models() - offered)
+    if claude_offered is not None:
+        from sylvia_gm.provider import _claude_kept
+
+        _claude_kept.release_kept_processes(
+            models=_claude_kept.KEPT_PROCESSES.models() - claude_offered)
 
 
 def _switch_session_reasoning(
@@ -1680,7 +1692,8 @@ def run(
         replacement = ConfiguredProviderResolver(owner_config_path)
         with resolver_lock:
             configured_resolver = replacement
-        _release_unoffered_model_threads(replacement.subscription_models)
+        _release_unoffered_model_threads(
+            replacement.subscription_models, replacement.claude_code_models)
 
     try:
         launch = _read_message(input_stream)

@@ -612,6 +612,16 @@ class Hook:
         pass
 
 
+@pytest.fixture(autouse=True)
+def _one_process_per_step(monkeypatch):
+    """These cases check the per-step path: a new process and transcript for every step.
+
+    A kept process (issue 171) starts the same way and is checked in
+    ``tests/test_claude_persistent_process.py``.
+    """
+    monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", "per-step")
+
+
 @pytest.fixture
 def runtime(tmp_path, monkeypatch):
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
