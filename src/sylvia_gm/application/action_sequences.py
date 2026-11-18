@@ -10,6 +10,7 @@ from enum import StrEnum
 from typing import Any, Final
 
 from sylvia_gm.application.player_actions import (
+    PLAYER_ACTION_ORIGIN,
     player_action_origins,
     player_action_request_matches,
     player_control_origin,
@@ -245,15 +246,19 @@ def _bound_queues(context, *, basis_message_id=None, attempt_id=None):
     return tuple(latest.values())
 
 
-def _committed_ids(owner, queue, snapshot):
-    origins = player_action_origins(snapshot)
+def _committed_ids(owner, queue):
+    markers = owner._store.player_action_markers(
+        queue["campaign_id"], tuple(step["operation_id"] for step in queue["steps"]),
+        PLAYER_ACTION_ORIGIN,
+    )
+    origins = {item["action_id"]: item["origin"] for item in markers
+               if item["status"] == StepStatus.COMMITTED}
     identities = []
     for step in queue["steps"]:
         envelope = step.get("execution")
         if not envelope:
             continue
-        hit = owner._store.action_hit(queue["campaign_id"], step["operation_id"])
-        if hit is None or str(hit.receipt.status) != StepStatus.COMMITTED:
+        if step["operation_id"] not in origins:
             continue
         origin = player_control_origin(
             envelope["source"],
@@ -278,10 +283,9 @@ def response_results(owner, *, session_id, basis_message_id):
             return ()  # Start preflight has a safe ephemeral, unpersisted session.
         if context.session.role is not WriterRole.DM or context.session.campaign_id is None:
             return ()
-        snapshot = owner._store.snapshot(context.session.campaign_id)
         results = []
         for queue in _bound_queues(context, basis_message_id=basis_message_id):
-            identities = _committed_ids(owner, queue, snapshot)
+            identities = _committed_ids(owner, queue)
             if identities:
                 results.append(
                     owned_payload(
@@ -295,14 +299,13 @@ def response_results(owner, *, session_id, basis_message_id):
         return tuple(results)
 
 
-def response_reservations(owner, campaign_id):
-    snapshot = owner._store.snapshot(campaign_id)
+def response_reservations(owner, contexts):
     reserved, attempts = set(), set()
-    for context in owner._store.campaign_session_contexts(campaign_id):
+    for context in contexts:
         queues = _bound_queues(context)
         bases = {q["narration_basis_message_id"] for q in queues}
         for queue in queues:
-            reserved.update(_committed_ids(owner, queue, snapshot))
+            reserved.update(_committed_ids(owner, queue))
             attempts.add(queue["narration_attempt_id"])
         for message in context.messages:
             if (
@@ -321,7 +324,7 @@ def last_attempt_commit(owner, campaign_id, attempt_id):
     identities = set()
     for context in owner._store.campaign_session_contexts(campaign_id):
         for queue in _bound_queues(context, attempt_id=attempt_id):
-            identities.update(_committed_ids(owner, queue, snapshot))
+            identities.update(_committed_ids(owner, queue))
     return next(
         (a.action_id for a in reversed(snapshot.actions) if a.action_id in identities), None
     )

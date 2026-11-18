@@ -25,10 +25,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "The advertised worked Plan reference has stale package bindings",
         "Load the Plan skill's combat/multi-act examples and compare/admit their bindings against the bundled source closure.",
     ),
-    'tests/test_display_campaign_reads.py::test_display_state_skips_history_and_paged_controls_match_complete_projection': KnownDefect(
-        'Ordinary panel/action display still reads the complete engine snapshot',
-        'Create the synthetic moved campaign, reject full snapshots, then request its ordinary panels and action availability.',
-    ),
     'tests/test_srd_lite_false_life_diagnosis.py::test_actual_false_life_rejection_diagnostic': KnownDefect(
         'The selected admitted False Life owner rolls dice instead of the authored fixed Lite pool',
         'Cast first-level False Life in the default admitted candidate while guarding against RNG calls; the fixed-pool diagnostic fails.',

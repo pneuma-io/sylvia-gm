@@ -6783,7 +6783,13 @@ class AuthorityOwner:
                 }
                 for surface in linked_surfaces
             ]
-            pending_responses = self.player_action_context(campaign_id)
+            reserved, attempts = self._player_response_reservations(campaign_id)
+            recent = self._store.response_window_actions(campaign_id, response_attempts=attempts)
+            markers = self._store.player_action_markers(
+                campaign_id, tuple(key for key in recent if key not in reserved),
+                PLAYER_ACTION_ORIGIN,
+            )
+            pending_responses = [item for item in markers if item["origin"] is not None]
             response_record = pending_responses[-1] if pending_responses else None
             response_action = None if response_record is None else {
                 "action_id": response_record["action_id"],
@@ -7466,13 +7472,24 @@ class AuthorityOwner:
 
         reserved: set[str] = set()
         attempts: set[str] = set()
-        for context in self._store.campaign_session_contexts(campaign_id):
+        contexts = self._store.campaign_session_contexts(campaign_id, evidence_kinds=(
+            "player_action_response", "player_action_response_retry", "gm_turn_activity",
+            "action_sequence",
+        ))
+        for context in contexts:
             requests = {message.message_id: message for message in context.messages
                         if message.kind is SessionMessageKind.EVIDENCE
                         and message.content.get("kind") == "player_action_response"}
             for message in requests.values():
-                reserved.update(str(row["action_id"]) for row in
-                                self.player_action_response_context(campaign_id, message.content))
+                identities = message.content.get("player_action_ids")
+                if isinstance(identities, (tuple, list)):
+                    reserved.update(key for key in identities if isinstance(key, str))
+                elif isinstance(boundary := message.content.get("canonical_start_sequence"), int):
+                    reserved.update(self._store.response_window_actions(
+                        campaign_id, through=boundary,
+                    ))
+                elif isinstance(key := message.content.get("player_action_id"), str):
+                    reserved.add(key)
                 if isinstance(message.content.get("attempt_id"), str):
                     attempts.add(message.content["attempt_id"])
             for message in context.messages:
@@ -7483,7 +7500,7 @@ class AuthorityOwner:
                     and isinstance(message.content.get("attempt_id"), str)):
                     attempts.add(message.content["attempt_id"])
         from .action_sequences import response_reservations
-        queue_reserved, queue_attempts = response_reservations(self, campaign_id)
+        queue_reserved, queue_attempts = response_reservations(self, contexts)
         reserved.update(queue_reserved)
         attempts.update(queue_attempts)
         return reserved, attempts
