@@ -94,6 +94,9 @@ def test_twelve_concrete_builds_publish_calculate_materialize_and_keep_sources(t
         starters = tuple(p for p in selected.participants if p.builtin_starter)
         assert len(starters) == 12
         assert tuple(p.participant["classes"][0]["id"] for p in starters) == CLASSES
+        record = owner.package_record(package.package_id, package.version, package.sha256)
+        panel = next(s for s in record["ui_surfaces"] if s["renderer"] == "inventory")
+        names = panel["source"]["fields"]["item_names"]["value"]
         rows = selected.party_options()["player_archetypes"]
         for item, (hp, ac), row in zip(starters, EXPECTED, rows, strict=True):
             assert row["builtin_starter"] is True and row["campaign_ready"] is True
@@ -105,6 +108,7 @@ def test_twelve_concrete_builds_publish_calculate_materialize_and_keep_sources(t
             ]
             assert not item.participant.get("subclasses")
             state = item.entity_state
+            assert set(state["inventory"]) <= names.keys()
             assert (state["hp"], state["armor_class"], state["speed"]) == (hp, ac, 30)
             assert state["resources"]["hit_die"] == 1
             assert "focus_point" not in state["resources"]

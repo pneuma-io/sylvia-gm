@@ -272,6 +272,7 @@ def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
 
 
 PUBLISHED_LITE = {
+    "lite-0.3.24": ("0.3.24", "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d"),
     "alpha4": ("0.3.15", "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a"),
     "alpha5": ("0.3.21", "075c294aa916c25b598d2f02f299bf437b352dfce38d0c3bd2efa3e5a1cab143"),
     "integration": ("0.3.15", "dd42e6239820558385c316b7e5aacefa2e9b26b457175815570b1faeec2c04eb"),
@@ -286,13 +287,15 @@ def _projected_lite_panels(owner):
         assert panels[identity]["data"]["spell_categories"]["bless"] == "enchantment"
     # The saved campaign has no initiative order yet; the new field projects as empty.
     assert panels["dnd-encounter"]["data"]["order_values"] == {}
+    assert panels["dnd-inventory"]["data"]["item_names"]["priests_pack"] == "Priest's Pack"
     return panels
 
 
-@pytest.mark.parametrize("origin", ["alpha4", "alpha5", "integration"])
+@pytest.mark.parametrize("origin", ["alpha4", "alpha5", "integration", "lite-0.3.24"])
 def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state(tmp_path, origin):
     database = tmp_path / "alpha4.sqlite3"
-    archive = (Path(__file__).parent / f"fixtures/{origin}-lite.sylvia-gm-package").read_bytes()
+    filename = "lite-0.3.24" if origin == "lite-0.3.24" else f"{origin}-lite"
+    archive = (Path(__file__).parent / f"fixtures/{filename}.sylvia-gm-package").read_bytes()
     current_archive = bundled_srd_archive()
     with zipfile.ZipFile(io.BytesIO(current_archive)) as bundle:
         current_version = next(
@@ -342,7 +345,14 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         old_lock = owner.current_package_lock("casting")
         primary = next(p for p in old_lock.package_lock.entries if p.package_id == SRD)
         assert (primary.version, primary.sha256) == PUBLISHED_LITE[origin]
-        if origin == "integration":
+        inventory = next(
+            s["data"]
+            for s in owner.campaign_panels("casting")["surfaces"]
+            if s["renderer"] == "inventory"
+        )
+        assert "priests_pack" in inventory["entities"]["hero"]["inventory"]
+        assert "item_names" not in inventory
+        if origin in {"integration", "lite-0.3.24"}:
             # Packaged startup installs bare Rulesets; Setting descendants are offered lazily.
             owner.install_package_archive(io.BytesIO(current_archive), install_id="startup-current")
         options = owner.campaign_rules_update_options("casting")
@@ -354,8 +364,9 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert "Export the campaign first" in preview["recovery"]
         assert preview["tool_changes"]
         if origin != "integration":
+            added = 1 if origin == "lite-0.3.24" else 4
             # Published panels only gained source fields; they are a reviewed change.
-            assert any(c.get("added_panel_data") == 3 for c in preview["tool_changes"])
+            assert any(c.get("added_panel_data") == added for c in preview["tool_changes"])
             assert "Panels show additional information." in preview["recovery"]
         assert owner.current_package_lock("casting") == old_lock
         assert owner.snapshot("casting") == before
@@ -394,3 +405,112 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
     with AuthorityOwner.open(database, "hotfix-owner") as owner:
         assert owner.snapshot("casting") == saved
         _projected_lite_panels(owner)
+
+
+@pytest.mark.parametrize("mode", ["ledger", "legacy"])
+def test_rules_adoption_keeps_historical_tool_calls_representable(tmp_path, monkeypatch, mode):
+    """Play the same GM session on both pins and inspect what the scripted provider receives."""
+    from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+    from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
+    from tests.gm_context_contract import callable_tool_names
+    from tests.test_gm_context_contract import ChatGPTContractGM, _check, settle
+
+    class CheckingGM(ChatGPTContractGM):
+        def __init__(self):
+            super().__init__()
+            self.tool_lists = []
+
+        async def generate_stream(self, messages, tools=None, **kwargs):
+            self.tool_lists.append(json.dumps(tools).encode())
+            # Old and new aliases can both be listed. Pick the one the GM may call now.
+            name, arguments = self.steps[self.position]
+            callable_names = callable_tool_names(messages, tools)
+            (alias,) = [t for t in callable_names if t.endswith("_" + name)]
+            self.steps[self.position] = (alias, arguments)
+            async for chunk in super().generate_stream(messages, tools, **kwargs):
+                yield chunk
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", mode)
+    monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+    fixture = Path(__file__).parent / "fixtures/lite-0.3.24.sylvia-gm-package"
+    database = create_cleric_save(tmp_path / "upgrade.sqlite3", fixture.read_bytes())
+    gm = CheckingGM()
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1) as owner:
+        adapter = ProviderSessionAdapter(owner, gm, owner_id="hotfix-owner")
+
+        def check_and_narrate(turn):
+            gm.steps.extend([_check("hero", "perception"), settle("The steps are quiet.")])
+            request = SessionRunRequest(
+                "gm", turn, turn + "-attempt", turn + "-input", "I look for tracks."
+            )
+            start = len(gm.calls)
+            result = CampaignSessionLoop(owner).run(request, adapter.for_turn(turn))
+            assert result.interruption is None and gm.position == len(gm.steps)
+            assert len(gm.calls) == start + 2
+            assert gm.tool_lists[start] == gm.tool_lists[start + 1]
+            return gm.calls[start:]
+
+        old = check_and_narrate("casting-turn")
+        (old_alias,) = [name for name in old[0]["tools"] if name.endswith("_ability_check")]
+        saved = owner.session_context("gm").messages
+        assert any(
+            m.content.get("kind") == "provider_tool_calls"
+            and any(
+                c["function"]["name"] == old_alias for c in m.content["assistant"]["tool_calls"]
+            )
+            for m in saved
+        )
+        assert any(m.content.get("kind") == "provider_tool_results" for m in saved)
+        owner.complete_turn("casting", "casting-turn")
+        candidate = owner.install_package_archive(
+            io.BytesIO(bundled_srd_archive()), install_id="current"
+        )
+        preview = owner.preview_campaign_rules_update("casting", candidate.candidate_id)
+        assert preview["compatible"], preview["conflicts"]
+        adopt(owner, preview)
+        owner.open_turn("casting", "after-adoption")
+        for request in check_and_narrate("after-adoption"):
+            history = [c for m in request["messages"] for c in m.get("tool_calls", ())]
+            results = [m["tool_call_id"] for m in request["messages"] if m["role"] == "tool"]
+            assert sorted(c["id"] for c in history) == sorted(results)
+            assert {c["function"]["name"] for c in history} <= set(request["tools"])
+
+
+def test_inventory_names_only_change_package_digests_in_gm_tool_aliases(tmp_path, monkeypatch):
+    from hashlib import sha256
+
+    from tests.test_gm_memory_casting_hotfix import CaptureGM
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
+    old = Path(__file__).parent / "fixtures/lite-0.3.24.sylvia-gm-package"
+    captures = []
+    for index, archive in enumerate((old.read_bytes(), bundled_srd_archive())):
+        database = create_cleric_save(tmp_path / f"capture-{index}.sqlite3", archive)
+        with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1) as owner:
+            request = play(owner, CaptureGM(), campaign="casting", turn="casting-turn")
+        with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
+            packages = json.loads(bundle.read("manifest.json"))["packages"]
+        primary = next(p for p in packages if p["role"] == "primary")
+        tool_ids = {}
+        for t in primary["tools"]:
+            identity = [
+                primary["id"],
+                primary["version"],
+                primary["content_sha256"],
+                t["name"],
+                t["capability"],
+            ]
+            digest = sha256(json.dumps(identity, separators=(",", ":")).encode()).hexdigest()[:12]
+            tool_ids[f"tool_{digest}_{t['name']}"[:64]] = (t["name"], t["capability"])
+        captures.append((request, tool_ids))
+
+    (before, old_ids), (after, new_ids) = captures
+    assert before["messages"] == after["messages"]
+    assert len(json.dumps(before["tools"]).encode()) == len(json.dumps(after["tools"]).encode())
+    for prior, current in zip(before["tools"], after["tools"], strict=True):
+        old_name = prior["function"]["name"]
+        new_name = current["function"]["name"]
+        if old_name != new_name:
+            assert old_ids[old_name] == new_ids[new_name]
+        expected = {**prior, "function": {**prior["function"], "name": new_name}}
+        assert json.dumps(expected).encode() == json.dumps(current).encode()

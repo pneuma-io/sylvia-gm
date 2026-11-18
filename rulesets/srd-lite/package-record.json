@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d",
+  "content_sha256": "f13148bf1f68e2558e231c1b96da8a0c660e2ed67050d31b2c61edee3716025b",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -159,7 +159,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "f54e7d76d2c56141fa920b0081e4ffa2da20d650fed067a187e676eb922ca7ef"
+      "sha256": "2896e5b3883397cca87812e8113562030083dcc8b543a31b034c0453dc59a5e8"
     },
     {
       "bytes": 5865,
@@ -189,7 +189,7 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "9ba2e15398a7a0ef620a4de61fd52bd48ffe259f11522a8125ed1b93a0ae0671"
+      "sha256": "ac221d93aa99aacd0aa2cf8758d821245cdad098ec8a47bb86ef705540781374"
     },
     {
       "bytes": 25922,
@@ -49840,6 +49840,96 @@
               "wear_shield_action": "wear-shield"
             }
           },
+          "item_names": {
+            "kind": "literal",
+            "value": {
+              "18_gp": "18 GP",
+              "arcane_focus": "Arcane Focus",
+              "arrow": "Arrow",
+              "battleaxe": "Battleaxe",
+              "blowgun": "Blowgun",
+              "book_history": "Book (History)",
+              "book_occult_lore": "Book (Occult Lore)",
+              "book_prayers": "Book (Prayers)",
+              "breastplate": "Breastplate",
+              "burglars_pack": "Burglar's Pack",
+              "calligraphers_supplies": "Calligrapher's Supplies",
+              "chain_mail": "Chain Mail",
+              "chain_shirt": "Chain Shirt",
+              "club": "Club",
+              "crowbar": "Crowbar",
+              "dagger": "Dagger",
+              "dart": "Dart",
+              "druidic_focus": "Druidic Focus",
+              "dungeoneers_pack": "Dungeoneer's Pack",
+              "entertainers_pack": "Entertainer's Pack",
+              "explorers_pack": "Explorer's Pack",
+              "flail": "Flail",
+              "flute": "Flute",
+              "gaming_set_dice": "Dice",
+              "glaive": "Glaive",
+              "gp": "Gold Piece",
+              "greataxe": "Greataxe",
+              "greatclub": "Greatclub",
+              "greatsword": "Greatsword",
+              "halberd": "Halberd",
+              "half_plate_armor": "Half Plate Armor",
+              "hand_crossbow": "Hand Crossbow",
+              "handaxe": "Handaxe",
+              "healers_kit": "Healer's Kit",
+              "heavy_crossbow": "Heavy Crossbow",
+              "herbalism_kit": "Herbalism Kit",
+              "hide_armor": "Hide Armor",
+              "holy_symbol": "Holy Symbol",
+              "javelin": "Javelin",
+              "lance": "Lance",
+              "leather": "Leather Armor",
+              "leather_armor": "Leather Armor",
+              "light_crossbow": "Light Crossbow",
+              "light_hammer": "Light Hammer",
+              "lodestones": "Lodestones",
+              "longbow": "Longbow",
+              "longsword": "Longsword",
+              "lute": "Lute",
+              "mace": "Mace",
+              "maul": "Maul",
+              "morningstar": "Morningstar",
+              "musket": "Musket",
+              "padded_armor": "Padded Armor",
+              "parchment": "Parchment",
+              "phosphorescent_moss": "Phosphorescent Moss",
+              "pike": "Pike",
+              "pinch_of_dirt": "Pinch of Dirt",
+              "pistol": "Pistol",
+              "plate_armor": "Plate Armor",
+              "pouch": "Pouch",
+              "priests_pack": "Priest's Pack",
+              "quarterstaff": "Quarterstaff",
+              "quiver": "Quiver",
+              "rapier": "Rapier",
+              "ring_mail": "Ring Mail",
+              "robe": "Robe",
+              "scale_mail": "Scale Mail",
+              "scholars_pack": "Scholar's Pack",
+              "scimitar": "Scimitar",
+              "shield": "Shield",
+              "shortbow": "Shortbow",
+              "shortsword": "Shortsword",
+              "sickle": "Sickle",
+              "sling": "Sling",
+              "spear": "Spear",
+              "spellbook": "Spellbook",
+              "splint_armor": "Splint Armor",
+              "studded_leather": "Studded Leather Armor",
+              "studded_leather_armor": "Studded Leather Armor",
+              "thieves_tools": "Thieves' Tools",
+              "travelers_clothes": "Traveler's Clothes",
+              "trident": "Trident",
+              "war_pick": "War Pick",
+              "warhammer": "Warhammer",
+              "whip": "Whip"
+            }
+          },
           "participants": {
             "kind": "participants",
             "kinds": [
@@ -50314,5 +50404,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.24"
+  "version": "0.3.25"
 }

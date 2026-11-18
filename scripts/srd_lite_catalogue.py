@@ -7,7 +7,7 @@ from collections import Counter
 from pathlib import Path
 
 VARIANT_ID = "sylvia.srd-lite.bg3"
-VARIANT_VERSION = "0.3.24"
+VARIANT_VERSION = "0.3.25"
 ROOT = Path(__file__).resolve().parents[1]
 LITE = ROOT / "rulesets/srd-lite"
 HISTORICAL_CATALOGUE = ROOT / "historical/spell-research/spell-catalogue.json"
@@ -99,7 +99,7 @@ def build_catalogue():
 def write_catalogue():
     catalogue = build_catalogue()
     destination = LITE / "content/spell-catalogue.json"
-    destination.write_text(json.dumps(catalogue, indent=2) + "\n", encoding="utf-8")
+    destination.write_text(json.dumps(catalogue, indent=2) + "\n", encoding="utf-8", newline="\r\n")
     return catalogue
 
 

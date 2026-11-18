@@ -70,6 +70,15 @@ def test_four_parties_are_locally_playable_and_reopen_without_roster_constructio
                 (p.data["name"], p.data["classes"][0]["id"], p.data["level"])
                 for p in snapshot.participants
             } == set(expected)
+            primary = next(
+                p for p in snapshot.package_lock.entries if p.role is PackageRole.PRIMARY
+            )
+            assert primary.version == "0.3.25"
+            panels = owner.campaign_panels(result["campaign_id"])["surfaces"]
+            inventory = next(p["data"] for p in panels if p["renderer"] == "inventory")
+            assert inventory["item_names"]["healers_kit"] == "Healer's Kit"
+            for entity in inventory["entities"].values():
+                assert set(entity.get("inventory", ())) <= inventory["item_names"].keys()
             entities = snapshot.state["sylvia.srd-lite.bg3.entities"]
             for participant in snapshot.participants:
                 assert participant.data["party_role"] == (
