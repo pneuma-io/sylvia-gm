@@ -556,6 +556,20 @@ def test_a_reply_with_two_calls_is_never_kept(runtime):
     assert_nothing_private_left(home)
 
 
+def test_one_call_reported_twice_by_the_cli_is_one_call_and_is_kept(runtime):
+    """Claude Code reports a call in its stream and in an assistant event: still one call."""
+    provider, home, hook = runtime
+    chain = Chain()
+    steps = dict(chain_canonicals())
+    step(provider, chain, steps["fresh"], SCRIPT["fresh"])
+    *events, call_request = tool_reply("c1", 1)
+    echoed = {"type": "assistant", "message": {"content": [
+        {"type": "tool_use", "id": "c1", "name": "mcp__sylvia__roll", "input": {"n": 1}}]}}
+    step(provider, chain, steps["player"], [*events[:2], echoed, *events[2:], call_request])
+    assert reuse(hook)[-1]["kept"] is True and len(_claude_kept.KEPT_PROCESSES) == 1
+    _claude_kept.KEPT_PROCESSES.close_all()
+
+
 class Usage(Hook):
     def __init__(self):
         super().__init__()

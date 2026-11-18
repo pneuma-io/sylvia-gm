@@ -965,7 +965,9 @@ class ClaudeProvider(Provider):
                         # No result is sent to Claude and no game action runs in this child:
                         # a kept process waits on the call until the next request answers it.
                         flushed = await self._await_flush(route, config, session_id, prompt)
-                        if keep and len(pending) > 1:
+                        # Claude Code can report one call twice (its stream and an assistant
+                        # event), so the calls of the reply are counted by id.
+                        if keep and len({str(b.get("id")) for b in pending}) > 1:
                             # Sylvia takes one call; a kept process would later send the
                             # dropped ones. Close it here, as a per-step process is.
                             step.keepable, step.not_kept = False, "parallel_calls"
