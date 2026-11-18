@@ -9,7 +9,8 @@ not a single provider instance.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from threading import Lock
 
 from sylvia_gm.provider._base import ModelInfo, ProviderResponse
 
@@ -58,6 +59,7 @@ class SessionUsageTracker:
     """
 
     def __init__(self) -> None:
+        self._lock = Lock()
         self.prompt_tokens: int = 0
         self.completion_tokens: int = 0
         self.total_tokens: int = 0
@@ -73,6 +75,15 @@ class SessionUsageTracker:
         self,
         response: ProviderResponse,
         model_info: ModelInfo | None = None,
+        *,
+        count_request: bool = True,
+    ) -> None:
+        # A kept turn can deliver its figures on a runtime cleanup thread.
+        with self._lock:
+            self._record(response, model_info, count_request)
+
+    def _record(
+        self, response: ProviderResponse, model_info: ModelInfo | None, count_request: bool,
     ) -> None:
         """Record token usage from a single provider response.
 
@@ -88,7 +99,7 @@ class SessionUsageTracker:
         self.prompt_tokens += prompt
         self.completion_tokens += completion
         self.total_tokens += total
-        self.request_count += 1
+        self.request_count += count_request
 
         # Cache stats
         cu = response.cache_usage
@@ -113,7 +124,7 @@ class SessionUsageTracker:
         ms.prompt_tokens += prompt
         ms.completion_tokens += completion
         ms.total_tokens += total
-        ms.request_count += 1
+        ms.request_count += count_request
         ms.estimated_cost_usd += cost
         if cu:
             if cu.cache_read_tokens is not None:
@@ -125,33 +136,36 @@ class SessionUsageTracker:
 
     def reset(self) -> None:
         """Reset all accumulators to zero."""
-        self.prompt_tokens = 0
-        self.completion_tokens = 0
-        self.total_tokens = 0
-        self.request_count = 0
-        self.estimated_cost_usd = 0.0
-        self.cache_read_tokens = None
-        self.cache_write_tokens = None
-        self.cache_read_requests = 0
-        self.cache_write_requests = 0
-        self._by_model.clear()
+        with self._lock:
+            self.prompt_tokens = 0
+            self.completion_tokens = 0
+            self.total_tokens = 0
+            self.request_count = 0
+            self.estimated_cost_usd = 0.0
+            self.cache_read_tokens = None
+            self.cache_write_tokens = None
+            self.cache_read_requests = 0
+            self.cache_write_requests = 0
+            self._by_model.clear()
 
     def snapshot(self) -> SessionUsageSnapshot:
         """Return an immutable snapshot of current usage."""
-        return SessionUsageSnapshot(
-            prompt_tokens=self.prompt_tokens,
-            completion_tokens=self.completion_tokens,
-            total_tokens=self.total_tokens,
-            request_count=self.request_count,
-            estimated_cost_usd=self.estimated_cost_usd,
-            cache_read_tokens=self.cache_read_tokens,
-            cache_write_tokens=self.cache_write_tokens,
-            cache_read_requests=self.cache_read_requests,
-            cache_write_requests=self.cache_write_requests,
-            by_model=dict(self._by_model),
-        )
+        with self._lock:
+            return SessionUsageSnapshot(
+                prompt_tokens=self.prompt_tokens,
+                completion_tokens=self.completion_tokens,
+                total_tokens=self.total_tokens,
+                request_count=self.request_count,
+                estimated_cost_usd=self.estimated_cost_usd,
+                cache_read_tokens=self.cache_read_tokens,
+                cache_write_tokens=self.cache_write_tokens,
+                cache_read_requests=self.cache_read_requests,
+                cache_write_requests=self.cache_write_requests,
+                by_model={k: replace(v) for k, v in self._by_model.items()},
+            )
 
     @property
     def by_model(self) -> dict[str, ModelUsageSnapshot]:
         """Per-model breakdown, keyed by model_id."""
-        return dict(self._by_model)
+        with self._lock:
+            return {k: replace(v) for k, v in self._by_model.items()}

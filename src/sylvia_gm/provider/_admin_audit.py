@@ -152,6 +152,17 @@ class _CompletedResponseObserver:
                 }
             )
 
+    def late_usage_listener(
+        self, provider_key: str, exchange_id: str,
+    ) -> Callable[[ProviderResponse], None]:
+        sink = self._sink
+
+        def credit(response: ProviderResponse) -> None:
+            sink({"kind": "provider_late_usage", "exchange_id": exchange_id,
+                  "usage": _usage_projection(response)})
+
+        return credit
+
     async def on_response(self, context: HookContext) -> None:
         self.response = context.response
         self.retry_attempt = context.retry_attempt
@@ -184,6 +195,15 @@ class AdminAuditedProvider(Provider):
         self._selection_mode = selection_mode
         self.model_info = getattr(provider, "model_info", None)
         self._audit_context: dict[str, object] = {}
+
+    def _exchange_id(self) -> str:
+        if getattr(self.model_info, "transport", None) == "codex_app_server":
+            from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+
+            marked = LEDGER_REQUEST.get()
+            if isinstance(marked, str):
+                return marked
+        return f"audit-{uuid.uuid4().hex}"
 
     def _response_observer(self) -> _CompletedResponseObserver:
         """Create one observer whose lifetime and correlation belong to one provider call."""
@@ -277,7 +297,7 @@ class AdminAuditedProvider(Provider):
         timeout: float = 60.0,
         **kwargs: object,
     ) -> ProviderResponse:
-        exchange_id = f"audit-{uuid.uuid4().hex}"
+        exchange_id = self._exchange_id()
         observer = self._response_observer()
         observer.begin(exchange_id, self._audit_context)
         started = self._request(
@@ -324,7 +344,7 @@ class AdminAuditedProvider(Provider):
         timeout: float = 120.0,
         **kwargs: object,
     ) -> AsyncIterator[ProviderStreamChunk]:
-        exchange_id = f"audit-{uuid.uuid4().hex}"
+        exchange_id = self._exchange_id()
         observer = self._response_observer()
         observer.begin(exchange_id, self._audit_context)
         started = self._request(
