@@ -4207,6 +4207,108 @@ html[data-host-platform="linux"] #settings-panel-dictation :is(.settings-field-g
   .equipment-slot { padding-inline: 6px 2px; font-size: 12px; }
 }
 
+/* Inventory in the fantasy look: the same sheet as the Character panel beside it. Gold section labels, serif names,
+   framed weapon-set cards with the set in hand edged in gold, bronze buttons, item tags grouped (in hand or worn,
+   weapons, gear) and coins drawn as coins on their own line. Ally green stays for tokens, HP and thin outlines. */
+:root[data-panel-look="fantasy"] #ruleset-panels {
+  --inv-edge: color-mix(in srgb, var(--look-accent) 20%, var(--border-color));
+  --inv-gold-soft: color-mix(in srgb, var(--look-accent) 12%, transparent);
+}
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-unit:has(> .panel-inventory-list) { gap: 10px; padding: 2px 0; border: 0; background: none; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-unit:has(> .panel-inventory-list) > .panel-unit-heading strong {
+  color: var(--text-bright); font: 600 19px var(--look-heading-font); overflow-wrap: anywhere; }
+:root[data-panel-look="fantasy"] #ruleset-panels .prepared-equipment { display: grid; gap: 8px; margin: 0; }
+:root[data-panel-look="fantasy"] #ruleset-panels .prepared-equipment > h4,
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-list:not(:empty)::before {
+  margin: 0; color: var(--look-accent); font: 700 10.5px var(--font-sans); letter-spacing: .14em; text-transform: uppercase; }
+:root[data-panel-look="fantasy"] #ruleset-panels .prepared-equipment > .panel-unit-meta { margin: 0; }
+/* "Choose a weapon set before attacking.": a prompt, set off with a gold rule. */
+:root[data-panel-look="fantasy"] #ruleset-panels .prepared-equipment > h4 + .panel-unit-meta {
+  padding: 6px 9px; border-left: 2px solid var(--look-accent); border-radius: 0 8px 8px 0; background: var(--inv-gold-soft);
+  color: var(--text-narration); font-size: 12px; }
+/* The action cost: a footnote under the sets. */
+:root[data-panel-look="fantasy"] #ruleset-panels .prepared-equipment > .panel-unit-meta:last-child:not(:empty) {
+  color: var(--text-muted); font-size: 11.5px; font-style: italic; line-height: 1.4; }
+
+/* Weapon-set cards */
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-set { display: grid; gap: 9px; margin: 0; padding: 10px 11px 11px;
+  border: 1px solid var(--border-color); border-radius: 10px; background: linear-gradient(160deg, var(--bg-card-hover), var(--bg-card) 75%); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-set:has(.equipment-active) { border-color: var(--look-now-edge);
+  background: var(--look-now-fill); box-shadow: inset 3px 0 0 var(--look-accent); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-set-heading { flex-wrap: wrap; justify-content: space-between; gap: 4px 8px; margin: 0; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-set-heading strong { color: var(--text-bright); font: 600 16px var(--look-heading-font); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-active { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px;
+  border: 1px solid color-mix(in srgb, var(--look-accent) 50%, transparent); border-radius: 999px; background: var(--inv-gold-soft);
+  color: var(--look-accent); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-active::before { content: ''; width: 6px; height: 8px; background: var(--look-accent);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slots { gap: 8px 10px; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot-label { position: relative; gap: 4px; color: var(--text-muted);
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+/* Hand drop-downs: a framed field with the item's name in the heading type and a gold chevron (drawn on the label). */
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot { appearance: none; -webkit-appearance: none; min-height: 34px;
+  padding: 5px 26px 5px 10px; border: 1px solid var(--inv-edge); border-radius: 8px;
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 70%, var(--bg-card))); color: var(--text-bright);
+  font: 14px var(--look-heading-font); letter-spacing: normal; text-transform: none; text-overflow: ellipsis; cursor: pointer; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot:has(option[value=""]:checked) { color: var(--text-muted); font-style: italic; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot option { background: var(--bg-card); color: var(--text-bright); font-family: var(--font-sans); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot:hover:not(:disabled) { border-color: color-mix(in srgb, var(--look-accent) 55%, var(--border-color)); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-slot:disabled { opacity: .5; cursor: not-allowed; }
+:root[data-panel-look="fantasy"] #ruleset-panels label.equipment-slot-label::after { content: ''; position: absolute; right: 11px; bottom: 15px;
+  width: 6px; height: 6px; border-right: 1.5px solid var(--look-accent); border-bottom: 1.5px solid var(--look-accent);
+  transform: rotate(45deg); pointer-events: none; }
+:root[data-panel-look="fantasy"] #ruleset-panels label.equipment-slot-label:has(.equipment-slot:disabled)::after { opacity: .45; }
+/* A two-handed weapon fills the off hand: shown as a filled slot, dashed, so it does not read as a control. */
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-occupied { display: flex; align-items: center; min-height: 34px; padding: 5px 10px;
+  border: 1px dashed var(--inv-edge); border-radius: 8px; color: var(--text-dim); font: italic 13px var(--look-heading-font);
+  letter-spacing: normal; text-transform: none; overflow-wrap: anywhere; }
+/* Equip and Use this set: a matched pair of bronze buttons that wrap to one per row in a narrow panel. */
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-set .panel-unit-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-set .panel-unit-controls .btn { flex: 1 1 auto; }
+:root[data-panel-look="fantasy"] #ruleset-panels :is(.equipment-set, .equipment-shield) .btn { justify-content: center; min-height: 30px; padding: 4px 10px;
+  border-color: color-mix(in srgb, var(--look-accent) 45%, transparent); border-radius: 8px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--look-accent) 16%, var(--bg-card)), color-mix(in srgb, var(--look-accent) 5%, var(--bg-secondary)));
+  color: var(--text-bright); font-size: 12.5px; font-weight: 600; }
+:root[data-panel-look="fantasy"] #ruleset-panels :is(.equipment-set, .equipment-shield) .btn:hover:not(:disabled) {
+  border-color: var(--look-accent); background: color-mix(in srgb, var(--look-accent) 22%, var(--bg-card)); }
+:root[data-panel-look="fantasy"] #ruleset-panels :is(.equipment-set, .equipment-shield) .btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+:root[data-panel-look="fantasy"] #ruleset-panels :is(.equipment-set, .equipment-shield) .btn:disabled { opacity: 1; border-color: var(--border-color);
+  background: transparent; color: var(--text-muted); }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-shield { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px;
+  padding: 8px 11px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card); color: var(--text-narration); font-size: 12.5px; }
+:root[data-panel-look="fantasy"] #ruleset-panels .equipment-shield > span { font-family: var(--look-heading-font); }
+
+/* Carried items: tags in groups (in hand or worn first, then weapons, then gear) and the purse on its own line. */
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-list { gap: 6px; margin: 0; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-list:not(:empty)::before { content: 'Carried'; flex: 0 0 100%; order: -3; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item { display: inline-flex; align-items: center; gap: 6px; order: 1; min-width: 0;
+  max-width: 100%; padding: 4px 9px; border: 1px solid var(--inv-edge); border-radius: 7px;
+  background: linear-gradient(180deg, var(--bg-card-hover), var(--bg-card)); color: var(--text-narration); font-size: 12.5px; line-height: 1.25;
+  overflow-wrap: anywhere; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-kind="weapon"] { order: 0; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-kind="weapon"]::before { content: ''; flex: 0 0 7px; height: 10px;
+  background: color-mix(in srgb, var(--look-accent) 70%, var(--text-muted)); clip-path: polygon(50% 0, 100% 35%, 50% 100%, 0 35%); }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-held] { order: -1;
+  border-color: color-mix(in srgb, var(--look-accent) 60%, transparent); background: linear-gradient(180deg, color-mix(in srgb, var(--look-accent) 14%, var(--bg-card)), var(--bg-card));
+  color: var(--text-bright); }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-held]::after { flex: 0 0 auto; color: var(--look-accent);
+  font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-held="hand"]::after { content: 'In hand'; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-held="worn"]::after { content: 'Worn'; }
+/* Nothing carried: an empty pack, framed, rather than a stray line of small print. */
+:root[data-panel-look="fantasy"] #ruleset-panels .inventory-empty { margin: 4px 0; padding: 18px 12px; border: 1px dashed var(--inv-edge); border-radius: 10px;
+  color: var(--text-dim); font: italic 13.5px var(--look-heading-font); text-align: center; }
+/* The purse: a gold rule, then each counted stack as a coin and its amount. */
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-list:has(> [data-inventory-counted])::after { content: ''; flex: 0 0 100%; order: 2;
+  height: 1px; margin: 2px 0; background: linear-gradient(90deg, color-mix(in srgb, var(--look-accent) 45%, transparent), transparent); }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-counted] { order: 3; gap: 7px; padding: 2px 11px 2px 3px;
+  border-color: color-mix(in srgb, var(--look-accent) 40%, transparent); border-radius: 999px; background: var(--inv-gold-soft);
+  color: color-mix(in srgb, var(--look-accent) 35%, var(--text-bright)); font: 700 13px var(--font-number); letter-spacing: .03em; }
+:root[data-panel-look="fantasy"] #ruleset-panels .panel-inventory-item[data-inventory-counted]::before { content: ''; flex: 0 0 18px; height: 18px;
+  border-radius: 50%; background: radial-gradient(circle at 36% 30%, color-mix(in srgb, var(--look-accent) 45%, #fff), var(--look-accent) 48%,
+    color-mix(in srgb, var(--look-accent) 50%, #000)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--look-accent) 40%, #000), 0 1px 2px rgba(0,0,0,.45); }
+
 /* Turn-order rows */
 .ruleset-panel .panel-unit-heading:has(.turn-order) { flex-wrap: wrap; }
 .ruleset-panel .panel-unit-heading:has(.turn-order) > strong { flex: 1 1 4rem; min-width: 0; overflow-wrap: anywhere; color: var(--text-bright); }
