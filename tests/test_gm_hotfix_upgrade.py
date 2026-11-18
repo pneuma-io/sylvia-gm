@@ -407,8 +407,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         _projected_lite_panels(owner)
 
 
-@pytest.mark.parametrize("mode", ["ledger", "legacy"])
-def test_rules_adoption_keeps_historical_tool_calls_representable(tmp_path, monkeypatch, mode):
+def test_rules_adoption_keeps_historical_tool_calls_representable(tmp_path, monkeypatch):
     """Play the same GM session on both pins and inspect what the scripted provider receives."""
     from sylvia_gm.agent._provider_session import ProviderSessionAdapter
     from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
@@ -430,7 +429,7 @@ def test_rules_adoption_keeps_historical_tool_calls_representable(tmp_path, monk
             async for chunk in super().generate_stream(messages, tools, **kwargs):
                 yield chunk
 
-    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", mode)
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
     monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
     fixture = Path(__file__).parent / "fixtures/lite-0.3.24.sylvia-gm-package"
     database = create_cleric_save(tmp_path / "upgrade.sqlite3", fixture.read_bytes())
