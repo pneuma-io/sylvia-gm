@@ -396,7 +396,7 @@ def _tool_alias(tool: ModelMechanicsTool) -> str:
 
 
 def _package_tool_alias(
-    package_id: str, version: str, sha256: str, name: str, capability: str
+    package_id: str, version: str, sha256: str, name: str, capability: str,
 ) -> str:
     slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"
     identity = json.dumps(
