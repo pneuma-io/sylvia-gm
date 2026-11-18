@@ -481,7 +481,8 @@ test('the Linux app says dictation is not available yet and keeps its button off
   }
 });
 
-test('a Linux host says Claude Code setup is Windows-only at once and offers no download', async () => {
+// Sylvia sets up its own copy of Claude Code on Linux as on Windows (issue 170).
+test('a Linux host is offered the same Claude Code setup as Windows', async () => {
   const browser = await chromium.launch();
   try {
     const { page, errors } = await openShell(browser, { width: 1600, height: 1000 });
@@ -504,9 +505,8 @@ test('a Linux host says Claude Code setup is Windows-only at once and offers no 
       install: true, terms: true, help: true, check: true,
     });
     assert.deepEqual(await facts('linux', missing), {
-      status: 'Sylvia doesn’t have its copy of Claude Code yet.',
-      detail: 'Sylvia can set up Claude Code on Windows only in this version.',
-      install: false, terms: false, help: false, check: true,
+      status: 'Sylvia doesn’t have its copy of Claude Code yet.', detail: '',
+      install: true, terms: true, help: true, check: true,
     });
     // A copy that is already there is used on Linux like anywhere else.
     const ready = await facts('linux', { installed: true, supported: true, signed_in: false, version: '2.1.0' });

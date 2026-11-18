@@ -1,19 +1,25 @@
 """Sylvia's own copy of Claude Code: Anthropic's published binary, downloaded and checked.
 
 Sylvia never bundles, modifies or redistributes Claude Code. When asked, it downloads the
-binary Anthropic publishes, checks it against Anthropic's release manifest and Windows code
-signature, and keeps it under Sylvia's runtime home. Claude Code's own installer and updater
+binary Anthropic publishes, checks it against Anthropic's release manifest, and keeps it under
+Sylvia's runtime home. On Windows the binary must also carry Anthropic's code signature. Linux
+binaries are not code-signed; there the manifest itself must carry Anthropic's release signing
+key's signature, which covers every checksum it lists. Claude Code's own installer and updater
 are never run, so any Claude Code a person already uses is left exactly as it was.
 """
 
 from __future__ import annotations
 
+import base64
 import hashlib
+import json
 import os
 import platform
 import re
 import shutil
 import subprocess
+import sys
+import tempfile
 import threading
 from collections.abc import Mapping
 from enum import StrEnum
@@ -32,6 +38,14 @@ from sylvia_gm.provider._exceptions import ProviderConnectionError
 
 RELEASES = "https://downloads.claude.ai/claude-code-releases"
 PUBLISHER: Final = "Anthropic, PBC"
+#: Anthropic's Claude Code release signing key and its fingerprint, as Anthropic documents
+#: them (https://code.claude.com/docs/en/setup, "Binary integrity and code signing"). The key
+#: is fetched each time; only a signature by the key with this fingerprint is accepted.
+SIGNING_KEY = "https://downloads.claude.ai/keys/claude-code.asc"
+SIGNING_FINGERPRINT = "31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE"
+_UNSIGNED_MANIFEST: Final = (
+    "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+)
 MAX_BINARY_BYTES: Final = 2 * 1024**3
 _UNREACHABLE: Final = (
     "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
@@ -68,13 +82,105 @@ class _CancelledError(Exception):
     """The person stopped this download; nothing was installed."""
 
 
+def _musl() -> bool:
+    """True on a Linux whose C library is not glibc (Alpine and other musl systems)."""
+    if sys.platform == "win32":
+        return False
+    try:
+        return not os.confstr("CS_GNU_LIBC_VERSION")
+    except (AttributeError, OSError, ValueError):
+        return True
+
+
 def release_platform() -> str:
     """Name this computer's published build, or say that automatic setup is unavailable."""
-    if os.name != "nt":
+    machine = platform.machine().lower()
+    arm = machine in {"arm64", "aarch64"}
+    if os.name == "nt":
+        return "win32-arm64" if arm else "win32-x64"
+    if sys.platform == "linux" and (arm or machine in {"x86_64", "amd64"}):
+        return ("linux-arm64" if arm else "linux-x64") + ("-musl" if _musl() else "")
+    raise ProviderConnectionError(
+        "Sylvia can set up Claude Code on Windows and Linux only in this version."
+    )
+
+
+def _dearmor(armored: bytes) -> bytes:
+    """The binary key packets of one ASCII-armored OpenPGP public key block."""
+    lines = armored.decode("ascii").replace("\r", "").split("\n")
+    begin = lines.index("-----BEGIN PGP PUBLIC KEY BLOCK-----")
+    end = lines.index("-----END PGP PUBLIC KEY BLOCK-----", begin)
+    body = lines[begin + 1 : end]
+    # Armor headers end at the first blank line; the optional "=" line is a CRC24 checksum.
+    if "" in body:
+        body = body[body.index("") + 1 :]
+    data = "".join(line.strip() for line in body if not line.startswith("="))
+    return base64.b64decode(data, validate=True)
+
+
+def verify_manifest(manifest: bytes, signature: bytes, key: bytes) -> None:
+    """Require a good signature by Anthropic's release key on these exact manifest bytes.
+
+    gpgv (GnuPG's verify-only tool) checks the detached signature against a keyring holding
+    only the fetched key, in an empty folder, so no key the person trusts takes part. Anything
+    short of a good signature whose primary key has the documented fingerprint fails closed.
+    """
+    gpgv = shutil.which("gpgv")
+    if gpgv is None:
         raise ProviderConnectionError(
-            "Sylvia can set up Claude Code on Windows only in this version."
+            "Sylvia needs gpgv, part of GnuPG, to check Anthropic's signature on Claude Code. "
+            "Install GnuPG, then try again."
         )
-    return "win32-arm64" if platform.machine().lower() in {"arm64", "aarch64"} else "win32-x64"
+    try:
+        keyring = _dearmor(key)
+    except (UnicodeDecodeError, ValueError):
+        raise ProviderConnectionError(_UNSIGNED_MANIFEST) from None
+    with tempfile.TemporaryDirectory(prefix="claude-release-check-") as folder:
+        check = Path(folder)
+        (check / "release-key.gpg").write_bytes(keyring)
+        (check / "manifest.json").write_bytes(manifest)
+        (check / "manifest.json.sig").write_bytes(signature)
+        try:
+            result = subprocess.run(
+                [
+                    gpgv,
+                    "--status-fd",
+                    "1",
+                    "--keyring",
+                    str(check / "release-key.gpg"),
+                    str(check / "manifest.json.sig"),
+                    str(check / "manifest.json"),
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=60,
+                # Only the search path: no library override from a packed app, no person's keys.
+                env={
+                    "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+                    "GNUPGHOME": str(check),
+                    "LC_ALL": "C",
+                },
+                **process_options(),
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            raise ProviderConnectionError(
+                "Sylvia could not check the signature on Claude Code's release list. Try again."
+            ) from None
+    status = [line.split() for line in result.stdout.splitlines() if line.startswith("[GNUPG:]")]
+    words = {fields[1] for fields in status if len(fields) > 1}
+    valid = [fields for fields in status if len(fields) > 2 and fields[1] == "VALIDSIG"]
+    # VALIDSIG names the signing key and, last, its primary key.
+    primary = {(fields[11] if len(fields) > 11 else fields[2]).upper() for fields in valid}
+    refused = {"BADSIG", "ERRSIG", "EXPSIG", "EXPKEYSIG", "REVKEYSIG", "NO_PUBKEY"}
+    if (
+        result.returncode
+        or "GOODSIG" not in words
+        or words & refused
+        or primary != {SIGNING_FINGERPRINT}
+    ):
+        raise ProviderConnectionError(_UNSIGNED_MANIFEST)
 
 
 def _version(text: str) -> tuple[int, int, int]:
@@ -213,7 +319,14 @@ class ClaudeInstaller:
                 shutil.rmtree(final)
             listing = client.get(f"{RELEASES}/{version}/manifest.json")
             listing.raise_for_status()
-            entry = listing.json()["platforms"][build]
+            if build.startswith("linux-"):
+                # The checksums below are only as good as the list they come from.
+                signature = client.get(f"{RELEASES}/{version}/manifest.json.sig")
+                signature.raise_for_status()
+                key = client.get(SIGNING_KEY)
+                key.raise_for_status()
+                verify_manifest(listing.content, signature.content, key.content)
+            entry = json.loads(listing.content)["platforms"][build]
             checksum, size = entry["checksum"], entry["size"]
             if (
                 entry.get("binary") != executable_name()
@@ -255,7 +368,11 @@ class ClaudeInstaller:
                 "The Claude Code download did not match Anthropic's published checksum, "
                 "so Sylvia discarded it. Try again."
             )
-        verify_publisher(download)
+        if build.startswith("win32-"):
+            verify_publisher(download)
+        else:
+            # Off Windows the published file arrives without its executable bit.
+            download.chmod(0o755)
         staging.rename(final)
         if runtime_version(final / executable_name(), self.home) != version:
             shutil.rmtree(final, ignore_errors=True)

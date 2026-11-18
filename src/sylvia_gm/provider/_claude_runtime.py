@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import threading
+from collections.abc import Mapping
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
@@ -51,6 +52,19 @@ def documented_context_window(model_id: object) -> int | None:
     return claude_code_context_window(name)
 
 
+#: The variables a Linux desktop session uses to reach the person's display and browser.
+_DESKTOP_SESSION = (
+    "DISPLAY",
+    "WAYLAND_DISPLAY",
+    "XAUTHORITY",
+    "XDG_RUNTIME_DIR",
+    "XDG_CURRENT_DESKTOP",
+    "XDG_SESSION_TYPE",
+    "DBUS_SESSION_BUS_ADDRESS",
+    "BROWSER",
+)
+
+
 def native_environment(home: Path) -> dict[str, str]:
     """Run Sylvia's copy against Sylvia's profile, without inherited inference overrides.
 
@@ -82,7 +96,15 @@ def native_environment(home: Path) -> dict[str, str]:
         "xdg_config_home",
         "xdg_data_home",
     }
-    environment = {k: v for k, v in os.environ.items() if k.lower() in allowed}
+    source: Mapping[str, str] = os.environ
+    if sys.platform.startswith("linux"):
+        # A packed Linux app puts its own folders on PATH; Claude Code and the programs it
+        # starts (the browser opener among them) must find the system's own.
+        from sylvia_gm.config._host_browser import host_environment
+
+        packed = getattr(sys, "_MEIPASS", None) if getattr(sys, "frozen", False) else None
+        source = host_environment(os.environ, packed_folder=packed)
+    environment = {k: v for k, v in source.items() if k.lower() in allowed}
     environment.update(
         {
             "CLAUDE_CONFIG_DIR": str(home / "profile"),
@@ -103,6 +125,11 @@ def native_environment(home: Path) -> dict[str, str]:
         # to the person's own home. Keep them inside Sylvia's profile as well.
         environment["XDG_CACHE_HOME"] = str(home / "cache")
         environment["XDG_STATE_HOME"] = str(home / "state")
+        # Sign-in opens the person's browser through the desktop session (xdg-open), which
+        # needs to know which session that is. Library paths of a packed app stay out.
+        for name in _DESKTOP_SESSION:
+            if name in source:
+                environment[name] = source[name]
     return environment
 
 
