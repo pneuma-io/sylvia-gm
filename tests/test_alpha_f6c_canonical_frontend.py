@@ -1808,7 +1808,7 @@ class TestUI001Frame:
         assert "handoffCommitted ? 'Opening narration was interrupted'" in js
         assert ": 'Game Master could not start'" in js
         assert "content.kind === 'campaign_construction_brief'" in js
-        assert "friendlyCommandError('Session request rejected', e)" in js
+        assert "friendlyCommandError('Session request failed', e)" in js
         retry = js.split("async function retry()", maxsplit=1)[1].split(
             "function signalActiveStreamDisconnect", maxsplit=1
         )[0]

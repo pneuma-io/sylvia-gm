@@ -13917,13 +13917,13 @@ const SylviaGMFrontend = (() => {
           stopped ? 'Stopped' : playerAction
             ? (uncertain ? 'Narration request unconfirmed · the saved action was not repeated'
               : 'Narration unavailable · the saved action was not repeated')
-            : friendlyCommandError('Session request rejected', e));
+            : friendlyCommandError('Session request failed', e));
       }
     } finally {
       stopStreamHeartbeat(activity);
       stopProjectionPolling(activity);
       if (currentActivity(activity)) {
-        activity.pendingInput = null;
+        // A lost reply can still be confirmed by this or a later saved-history paint.
         try {
           if (selectedActivityMatches(activity)) await renderPlayerProjection(campaignId, sessionId);
           if (sessionRole === 'builder' && !campaignId) await refreshBuilderChats();

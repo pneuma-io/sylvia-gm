@@ -49,10 +49,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'The selected admitted True Strike owner lacks the expected independently retained concentration source',
         "Cast True Strike from two admitted casters, end the first source and check the other's retained source, expiry and reopen state.",
     ),
-    'tests/test_gcs_message_presentation.py::test_composer_sends_one_typed_turn_and_clears_only_accepted_draft[failed_after_accept]': KnownDefect(
-        'A provider failure after accepted input leaves the already accepted composer draft',
-        'Have submit_session_input retain the input then fail; return that message in session_context and inspect the original draft after final repaint.',
-    ),
     'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
         "The Builder's advertised Plan example fails its declared content schema",
         'Build the advertised Plan example against its retained synthetic source Setting, then validate before saving its inherited copies.',
