@@ -1,4 +1,9 @@
-"""Actual admitted paid Darkvision, receiving sight, preparation and saved lifecycle."""
+"""Actual admitted paid Darkvision, receiving sight, preparation and saved lifecycle.
+
+They follow SRD 5.2.1 as the admitted package implements it: Darkvision grants 150 feet for
+8 hours and Speak with Animals (Range: Self) lasts 10 minutes. Both spend their slot, and
+changing prepared spells does not end a spell already cast.
+"""
 
 import json
 from dataclasses import replace
@@ -21,7 +26,23 @@ def _context(receipt):
     return receipt.result["context"]
 
 
-def test_darkvision_receiving_creature_actual_death_removes_saved_grant(tmp_path):
+def _active(case, spell, kind):
+    """The spell's saved lasting records whose duration has not yet elapsed."""
+    tick = case.lasting()["lasting_tick"]
+    return [row for row in case.lasting().get("turn_effects", [])
+            if row.get("spell") == spell and row.get("kind") == kind
+            and (row.get("expires_tick") is None or row["expires_tick"] > tick)]
+
+
+def _senses(case):
+    return _active(case, "darkvision", "timed_senses")
+
+
+def _animals(case):
+    return _active(case, "speak_with_animals", "information_spell")
+
+
+def test_darkvision_recipient_death_keeps_cast_retries_idempotent_and_pinned(tmp_path):
     case = Case(tmp_path / "darkvision-death.db", "darkvision",
         entity_changes={"guard": {"hp": 1, "max_hp": 1}})
     try:
@@ -30,8 +51,8 @@ def test_darkvision_receiving_creature_actual_death_removes_saved_grant(tmp_path
         receipt, command = case.act("cast_spell_outside_combat", **parameters)
         mcp = StatelessMcpMechanics(case.owner)
         original_tool = next(t for t in mcp.list_tools("lite") if t.name == "cast_spell_outside_combat")
-        assert len(case.lasting()["lite_utility_effects"]) == 1
-        assert case.lasting()["lite_utility_effects"][0]["target"] == "guard"
+        (granted,) = _senses(case)
+        assert granted["target"] == "guard" and granted["caster"] == "hero"
         case.start()
         attacks = []
         for _ in range(40):
@@ -43,7 +64,9 @@ def test_darkvision_receiving_creature_actual_death_removes_saved_grant(tmp_path
             if case.snapshot().state[VARIANT_ID + ".combat"]["active_actor"] != "hero":
                 case.next_turn()
         assert case.entities()["guard"]["is_alive"] is False
-        assert not case.lasting()["lite_utility_effects"]
+        case.reject("cast_spell_outside_combat", parameters, match="canonical catalog")
+        # Back in exploration, the outside-combat cast is listed again for its retries.
+        case.act("end_combat_encounter", end_reason="fighting_stopped")
         saved = case.snapshot()
         assert case.execute(command) == receipt
         assert _run(mcp._execute_action(command, original_tool)) == receipt
@@ -56,16 +79,15 @@ def test_darkvision_receiving_creature_actual_death_removes_saved_grant(tmp_path
             _run(mcp._execute_action(replace(command, parameters=command.parameters | {"slot_resource": "spell_slot_3"}), original_tool))
         with pytest.raises(WrongOwner):
             _run(mcp._execute_action(replace(command, owner_id="different-owner"), original_tool))
-        with pytest.raises(MechanicsRejected, match="pinned package") as invalid_pin:
+        # A tool pinned to a package this campaign does not use is refused as unavailable.
+        with pytest.raises(MechanicsRejected, match="no longer available") as invalid_pin:
             _run(mcp._execute_action(command, replace(original_tool, package_sha256="0" * 64)))
-        assert invalid_pin.value.code == "mcp_package_identity_mismatch"
-        assert case.snapshot() == saved
-        case.reject("cast_spell_outside_combat", parameters, match="canonical catalog")
+        assert invalid_pin.value.code == "mcp_tool_unavailable"
         assert case.snapshot() == saved
         case.reopen()
         assert case.snapshot() == saved
         (tmp_path / "darkvision-death-observations.json").write_text(json.dumps(
-            {"real_attack_cards": attacks, "source_retired_after_actual_death": True}, indent=2))
+            {"real_attack_cards": attacks}, indent=2))
     finally:
         archive_closed_case(case)
 
@@ -83,7 +105,7 @@ def test_darkvision_paid_pending_cast_real_sight_range_replay_and_unprepare(tmp_
         for tool in ("cast_spell_outside_combat", "begin_srd_spell_action"):
             case.reject(tool, parameters | {"target": "extra", "targets": ["extra"], "target_distance": 0}, match="touch|clear")
             case.reject(tool, parameters | {"targets": ["hero", "guard"]}, match="exactly one")
-            case.reject(tool, parameters | {"target_willing": False}, match="willing")
+            # A caster touching itself is always willing, so no unwilling claim applies here.
             case.reject(tool, parameters | {"verbal_component_available": False}, match="[Vv]erbal")
         case.start()
         case.act("spend_combat_movement", distance=10, difficult_terrain=False)
@@ -93,7 +115,7 @@ def test_darkvision_paid_pending_cast_real_sight_range_replay_and_unprepare(tmp_
         assert begun.state[VARIANT_ID + ".combat"]["movement_remaining"] == 20
         assert case.entities()["hero"]["bonus_action_available"] is True
         assert case.entities()["hero"]["resources"] == slots
-        assert not case.lasting().get("lite_utility_effects")
+        assert not _senses(case)
         pending = next(iter(case.lasting()["pending_srd_actions"]))
         case.reopen()
         assert case.execute(begun_command) == begun_receipt
@@ -103,39 +125,37 @@ def test_darkvision_paid_pending_cast_real_sight_range_replay_and_unprepare(tmp_
         expected = slots | {"spell_slot_2": slots["spell_slot_2"] - 1}
         assert case.entities()["hero"]["resources"] == expected
         assert case.entities()["hero"].get("concentration_spell_id") is None
-        rows = case.lasting()["lite_utility_effects"]
+        rows = _senses(case)
         assert len(rows) == 1 and rows[0]["target"] == "hero"
-        assert rows[0]["caster"] == "hero" and rows[0]["preparation_source"] == "wizard"
-        assert rows[0]["cast_id"] and rows[0]["until_long_rest"] is True
+        assert rows[0]["caster"] == "hero" and rows[0]["cast_id"]
+        assert rows[0]["expires_tick"] - rows[0]["started_tick"] == 9600
         assert cast_receipt.result["result_card"]["title"] == "Darkvision"
-        assert "40" in json.dumps(thaw_json_value(cast_receipt.result["result_card"]))
-        assert "Long Rest" in json.dumps(thaw_json_value(cast_receipt.result["result_card"]))
-        assert "Lasts 0 rounds" not in json.dumps(thaw_json_value(cast_receipt.result["result_card"]))
-        assert not any(r.get("spell") == "darkvision" and r.get("kind") == "timed_senses" for r in case.lasting()["turn_effects"])
+        assert "Lasts 4800 rounds" in json.dumps(thaw_json_value(cast_receipt.result["result_card"]))
         for command, receipt in ((begun_command, begun_receipt), (cast_command, cast_receipt)):
             assert case.execute(command) == receipt
             assert case.snapshot() == saved
         case.reopen()
         assert case.snapshot() == saved
         for distance, lighting, visible, effective in (
-            (40, "darkness", True, "dim"), (41, "darkness", False, "darkness"),
-            (40, "magical_darkness", False, "magical_darkness"), (40, "dim", True, "bright"),
+            (150, "darkness", True, "dim"), (151, "darkness", False, "darkness"),
+            (150, "magical_darkness", False, "magical_darkness"), (150, "dim", True, "bright"),
         ):
             sight, _ = _sight(case, distance=distance, lighting=lighting)
             assert _context(sight)["_sight_can_see"] is visible
             assert _context(sight)["_sight_light"] == effective
-        # Actual preparation removes this caster's grant, without an imported private reducer.
+        # Changing prepared spells does not end the spell already cast.
         case.act("end_combat_turn")
         case.act("end_combat_encounter", end_reason="fighting_stopped")
         case.act("begin_srd_rest", target_state="hero", kind="short", activity="light")
         case.act("advance_srd_lasting_time", elapsed_rounds=600)
         case.act("complete_srd_rest", target_state="hero")
-        assert len(case.lasting()["lite_utility_effects"]) == 1
+        assert len(_senses(case)) == 1
         remove_receipt, remove_command = case.act("prepare_srd_spells", caster="hero", caster_state="hero", source="wizard", spells=["false_life"], spellbook_available=True)
         removed = case.snapshot()
-        assert case.lasting()["lite_utility_effects"] == []
-        sight, _ = _sight(case)
-        assert _context(sight)["_sight_can_see"] is False
+        assert "darkvision" not in case.entities()["hero"]["prepared_spells"]
+        assert len(_senses(case)) == 1
+        sight, _ = _sight(case, distance=150)
+        assert _context(sight)["_sight_can_see"] is True
         later = case.snapshot()
         assert case.execute(cast_command) == cast_receipt
         assert case.execute(remove_command) == remove_receipt
@@ -159,21 +179,23 @@ def test_darkvision_upcast_nonstacking_native_sense_preserved_and_genuine_rest(t
         native, _ = _sight(case, target="other", distance=80)
         assert _context(native)["_sight_can_see"] is True
         first, first_command = case.cast(target="hero", spell_grant="wizard", slot_resource="spell_slot_4")
-        first_row = dict(case.lasting()["lite_utility_effects"][0])
+        (first_row,) = _senses(case)
         second, second_command = case.cast(target="hero", spell_grant="wizard", slot_resource="spell_slot_2")
-        second_row = dict(case.lasting()["lite_utility_effects"][0])
+        (second_row,) = _senses(case)
         assert second_row["cast_id"] != first_row["cast_id"]
-        assert len(case.lasting()["lite_utility_effects"]) == 1
         assert first_row["spell_level"] == 4 and second_row["spell_level"] == 2
-        at41, _ = _sight(case, distance=41)
-        assert _context(at41)["_sight_can_see"] is False
+        # Darkvision gains nothing from a higher slot: the sight still ends at 150 feet.
+        at151, _ = _sight(case, distance=151)
+        assert _context(at151)["_sight_can_see"] is False
         case.act("begin_srd_rest", target_state="hero", kind="long", activity="sleep")
-        case.act("advance_srd_lasting_time", elapsed_rounds=4800)
-        assert case.lasting()["lite_utility_effects"] == [second_row]
+        case.act("advance_srd_lasting_time", elapsed_rounds=4799)
+        assert _senses(case) == [second_row]
+        case.act("advance_srd_lasting_time", elapsed_rounds=1)
+        assert _senses(case) == []
         rest, rest_command = case.act("complete_srd_rest", target_state="hero")
         rested = case.snapshot()
         assert case.entities()["hero"]["rest_phase"] == "complete"
-        assert case.lasting()["lite_utility_effects"] == []
+        assert _senses(case) == []
         for receipt, command in ((first, first_command), (second, second_command), (rest, rest_command)):
             assert case.execute(command) == receipt
             assert case.snapshot() == rested
@@ -202,7 +224,7 @@ def _speech(case, speaker="guard", **choices):
         **({"channel": "speech", "perceived": True, "language": "beast", "purpose": "conversation"} | choices))
 
 
-def test_animals_exploration_ritual_actual_beast_dialogue_nonstacking_and_unprepare(tmp_path):
+def test_animals_exploration_ritual_actual_beast_dialogue_and_overlapping_casts(tmp_path):
     case = _animals_case(tmp_path / "animals-ritual.db")
     try:
         speech = {"listener_state": "hero", "speaker_state": "guard", "language": "beast"}
@@ -214,46 +236,53 @@ def test_animals_exploration_ritual_actual_beast_dialogue_nonstacking_and_unprep
         case.act("begin_srd_rest", target_state="hero", kind="long", activity="sleep")
         case.act("advance_srd_lasting_time", elapsed_rounds=4800)
         case.act("complete_srd_rest", target_state="hero")
+        # SRD 5.2.1: a Ritual adds 10 minutes, which runs as the package's extended casting.
+        ritual = params | {"casting_mode": "ritual", "slot_resource": "ritual"}
+        begin_keys = {"caster", "caster_state", "spell", "spell_grant", "slot_resource", "casting_mode",
+                      "target", "verbal_component_available", "somatic_component_available",
+                      "material_component_available", "material_item_ids"}
+        case.act("begin_srd_spell_cast", **{key: value for key, value in ritual.items() if key in begin_keys})
+        case.act("continue_srd_spell_cast", caster_state="hero", uninterrupted=True,
+                 verbal_component_available=True, somatic_component_available=True,
+                 material_component_available=True,
+                 elapsed_rounds=case.entities()["hero"]["extended_casting"]["required_rounds"])
         initial_tick = case.lasting()["lasting_tick"]
-        cast, cast_command = case.act("cast_spell_outside_combat", **(params | {"casting_mode": "ritual", "slot_resource": "ritual"}))
+        cast, cast_command = case.act("cast_spell_outside_combat", **ritual)
         assert case.entities()["hero"]["resources"] == slots
         assert case.lasting()["lasting_tick"] == initial_tick
-        row = case.lasting()["lite_utility_effects"][0]
+        (row,) = _animals(case)
         assert row["spell"] == "speak_with_animals" and row["target"] == row["caster"] == "hero"
-        assert row["preparation_source"] == "druid" and row["cast_id"]
+        assert row["expires_tick"] - row["started_tick"] == 200
         assert case.entities()["hero"].get("concentration_spell_id") is None
-        assert "Long Rest" in json.dumps(thaw_json_value(cast.result["result_card"]))
         spoken, _ = _speech(case)
         assert _context(spoken)["_language_understands"] is True
         assert _context(spoken)["_language_can_reply"] is True
-        for choices in ({"perceived": False}, {"channel": "signs"}, {"speaker_state": "extra"}, {"speaker_state": "other"}):
-            case.reject("communicate_srd_spell", speech | choices, match="cannot understand|requires an active Speak with Animals grant")
-        case.reject("communicate_srd_spell", speech | {"purpose": "nearby_monsters"}, match="cannot guarantee")
+        # A shapechanger Beast is still a Beast, so only the humanoid and the unheard or signed
+        # exchanges are refused.
+        shapechanger, _ = _speech(case, speaker="other")
+        assert _context(shapechanger)["_language_understands"] is True
+        for choices in ({"perceived": False}, {"channel": "signs"}, {"speaker_state": "extra"}):
+            case.reject("communicate_srd_spell", speech | choices, match="cannot understand|requires an active Speak with Animals grant|requires actual Beast speech")
+        # SRD 5.2.1: a Beast can at least tell you about nearby locations and monsters.
+        _speech(case, purpose="nearby_monsters")
         influenced, _ = _speech(case, purpose="influence", actor="hero", influence_skill="persuasion", target_number=0)
         assert _context(influenced)["_language_influence_total"] is not None
         assert case.entities()["hero"]["resources"] == slots
         second, second_command = case.act("cast_spell_outside_combat", **(params | {"slot_resource": "spell_slot_3"}))
-        assert len(case.lasting()["lite_utility_effects"]) == 1
-        assert case.lasting()["lite_utility_effects"][0]["spell_level"] == 3
-        assert case.entities()["hero"]["resources"] == slots
+        # Overlapping castings each keep their own record, but their effects do not combine:
+        # the caster simply keeps understanding Beasts.
+        assert len({row["instance_id"] for row in _animals(case)}) == 2
+        assert _context(_speech(case)[0])["_language_understands"] is True
+        assert case.entities()["hero"]["resources"] == slots | {"spell_slot_3": slots["spell_slot_3"] - 1}
         saved = case.snapshot()
         case.reopen()
         assert case.snapshot() == saved
         for command, receipt in ((cast_command, cast), (second_command, second)):
             assert case.execute(command) == receipt and case.snapshot() == saved
-        case.reject("prepare_srd_spells", {"caster": "hero", "caster_state": "hero", "source": "druid", "spells": ["cure_wounds"], "unprepare_only": True}, match="cannot learn or replace")
-        remove, remove_command = case.act("prepare_srd_spells", caster="hero", caster_state="hero", source="druid", spells=[], unprepare_only=True)
-        assert case.lasting()["lite_utility_effects"] == []
-        assert "speak_with_animals" not in case.entities()["hero"]["prepared_spells"]
-        case.reject("cast_spell_outside_combat", params | {"casting_mode": "ritual", "slot_resource": "ritual"}, match="prepared|grant|source|available")
-        case.reject("communicate_srd_spell", speech, match="cannot understand|requires an active Speak with Animals grant")
-        after = case.snapshot()
-        assert case.execute(remove_command) == remove and case.snapshot() == after
-        assert case.execute(second_command) == second and case.snapshot() == after
         (case.path.parent / "animals-ritual-observations.json").write_text(json.dumps({
             "cast_card": thaw_json_value(cast.result["result_card"]), "source": thaw_json_value(row),
             "speech": thaw_json_value(spoken.result), "influence": thaw_json_value(influenced.result),
-            "slots": slots, "public_actions": [cast_command.action_id, second_command.action_id, remove_command.action_id],
+            "slots": slots, "public_actions": [cast_command.action_id, second_command.action_id],
         }, indent=2), encoding="utf-8")
     finally:
         archive_closed_case(case)
@@ -278,16 +307,17 @@ def test_animals_combat_paid_pending_cast_speech_action_and_real_rest(tmp_path):
         case.reject("communicate_srd_spell", {"listener_state": "hero", "speaker_state": "guard", "language": "beast", "purpose": "influence", "actor": "hero"}, match="[Aa]ction|active")
         case.act("end_combat_turn")
         case.act("end_combat_encounter", end_reason="fighting_stopped")
+        assert len(_animals(case)) == 1
         case.act("begin_srd_rest", target_state="hero", kind="long", activity="sleep")
         case.act("advance_srd_lasting_time", elapsed_rounds=4800)
-        assert len(case.lasting()["lite_utility_effects"]) == 1
+        assert _animals(case) == []
         rest, rest_command = case.act("complete_srd_rest", target_state="hero")
-        assert case.lasting()["lite_utility_effects"] == []
+        assert _animals(case) == []
         rested = case.snapshot()
         case.reopen()
         assert case.snapshot() == rested
         for command, receipt in ((begin_command, begin), (cast_command, cast), (rest_command, rest)):
             assert case.execute(command) == receipt and case.snapshot() == rested
-        case.reject("communicate_srd_spell", {"listener_state": "hero", "speaker_state": "guard", "language": "beast"}, match="cannot understand")
+        case.reject("communicate_srd_spell", {"listener_state": "hero", "speaker_state": "guard", "language": "beast"}, match="cannot understand|requires an active Speak with Animals grant")
     finally:
         archive_closed_case(case)

@@ -7,6 +7,7 @@ Cosmetic flame/sound events are not claims about illumination radius or audio UI
 """
 
 import io
+import math
 import json
 from copy import deepcopy
 
@@ -57,7 +58,8 @@ def _scene_entity(identity, position, *, creature=False, metadata=None):
         "footprint": {"kind": "box", "half_extents": [0.4, 0.4] if creature else [0.5, 0.5]},
         "height": 6 if creature else 3, "facing": [1, 0], "active": True,
         "movement": "blocking", "visibility": "opaque",
-        "metadata": {"plane": "material", "lighting": "bright", **(metadata or {})},
+        "metadata": {"plane": "material", "lighting": "bright",
+                     **({"creature_type": "humanoid"} if creature else {}), **(metadata or {})},
     }
 
 
@@ -119,10 +121,37 @@ class WorldCase(Case):
         ))
 
     def object(self, identity):
-        return next(row for row in self.lasting()["spatial_scene"]["entities"] if row["id"] == identity)
+        """The effective exploration object, as read_srd_lite_exploration_object projects it.
+
+        Exploration changes stay on the retained object record until the scene is reconciled,
+        so its pending patch overlays the saved scene row.
+        """
+        row = next(row for row in self.lasting()["spatial_scene"]["entities"] if row["id"] == identity)
+        record = (self.lasting().get("lite_exploration_objects") or {}).get(identity)
+        if record is None or not record.get("pending_scene_reconciliation"):
+            return row
+        body = thaw_json_value(row)
+        body["metadata"] = {**thaw_json_value(row["metadata"]),
+                            **thaw_json_value(record.get("pending_patch") or {})}
+        body.update(thaw_json_value(record.get("pending_frame_patch") or {}))
+        return body
+
+
+_SCENE_POSITIONS = {"flame": [5, 0, 0], "door": [15, 0, 0]}
+
+
+def _thaumaturgy_facts(choices):
+    """Exploration Thaumaturgy names its established distance, path and plane outside the self."""
+    if choices.get("minor_mode") in (None, "altered_eyes", "booming_voice"):
+        return {}
+    point = choices.get("minor_point") or _SCENE_POSITIONS[choices["minor_object_id"]]
+    return {"origin_distance": math.ceil(sum(axis * axis for axis in point) ** 0.5),
+            "origin_has_clear_path": True, "minor_same_plane": True}
 
 
 def _cast_parameters(spell, **choices):
+    if spell == "thaumaturgy":
+        choices = _thaumaturgy_facts(choices) | choices
     return {
         "caster": "hero", "caster_state": "hero", "spell": spell,
         "spell_grant": "magic_initiate_cleric", "slot_resource": "cantrip",
@@ -341,7 +370,8 @@ def test_complete_acolyte_thaumaturgy_mending_world_consumers_cost_expiry_and_re
         cards.append(thaw_json_value(sound.result["result_card"]))
         event = case.lasting()["srd_last_minor_world_event"]
         assert event["spell"] == "thaumaturgy" and event["mode"] == "phantom_sound"
-        assert event["origin"] == [20, 5, 0] and event["description"] == "A distant raven call"
+        # Exploration Thaumaturgy uses the established distance, not a saved map point.
+        assert event["origin"] is None and event["description"] == "A distant raven call"
         assert event["deals_damage"] is False and len(_sources(case)) == 3
         _cast(case, history, "thaumaturgy", minor_mode="invisible_hand", minor_object_id="door",
               minor_operation="open")

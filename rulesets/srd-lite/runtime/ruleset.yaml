@@ -67561,6 +67561,10 @@ tools:
         condition: _ms in definitions.srd_lite_catalogue
         error: This spell is excluded from the SRD Lite normal-player catalogue.
     - require:
+        condition: definitions.spells[_ms].family != 'information_spell' or definitions.spells[_ms].range_kind
+          != 'self' or _target_id == null or _target_id == _caster_state_id
+        error: This spell's range is Self; it affects only its caster.
+    - require:
         condition: _ms in definitions.srd_lite_implemented
         error: This SRD Lite profile is pending; it cannot be selected or cast yet.
     - condition: _coord_fact_target_distance != null
@@ -73919,6 +73923,10 @@ tools:
         condition: _ms in definitions.srd_lite_catalogue
         error: This spell is excluded from the SRD Lite normal-player catalogue.
     - require:
+        condition: definitions.spells[_ms].family != 'information_spell' or definitions.spells[_ms].range_kind
+          != 'self' or _target_id == null or _target_id == _caster_state_id
+        error: This spell's range is Self; it affects only its caster.
+    - require:
         condition: _ms in definitions.srd_lite_implemented
         error: This SRD Lite profile is pending; it cannot be selected or cast yet.
     - condition: _ms == 'dispel_magic'
@@ -75414,6 +75422,19 @@ tools:
     - call: initialize_srd_lite_constants_edf6727b634f
       export_context: '*'
     - set:
+        field: _distinct_spell_targets
+        value: []
+    - for_each:
+        collection: targets
+        as: _distinct_spell_target
+        do:
+        - require:
+            condition: _distinct_spell_target not in _distinct_spell_targets
+            error: Each creature can be chosen only once for this spell.
+        - list_push:
+            list: _distinct_spell_targets
+            value: _distinct_spell_target
+    - set:
         field: _maximum_timed_condition_targets
         value: base_targets + (slot_level - base_level) * targets_per_slot_level
     - set:
@@ -75730,6 +75751,19 @@ tools:
     effects:
     - call: initialize_srd_lite_constants_edf6727b634f
       export_context: '*'
+    - set:
+        field: _distinct_spell_targets
+        value: []
+    - for_each:
+        collection: targets
+        as: _distinct_spell_target
+        do:
+        - require:
+            condition: _distinct_spell_target not in _distinct_spell_targets
+            error: Each creature can be chosen only once for this spell.
+        - list_push:
+            list: _distinct_spell_targets
+            value: _distinct_spell_target
     - set:
         field: _maximum_concentration_d20_targets
         value: base_targets + (slot_level - base_level) * targets_per_slot_level
@@ -76419,7 +76453,7 @@ tools:
         value:
           spell: spell
           label: spell
-          caster: caster_state_id
+          caster: _caster_state_id
           target: _target_state_id
           kind: '''hit_point_bonus'''
           owner: '''__time_only__'''
@@ -76456,7 +76490,7 @@ tools:
     parameters:
     - param_target_state_cb03a83d0b3e524f
     - param_lasting_state_a0a632fef1e150e2
-    - param_caster_state_id_3392afbdff598c32
+    - param_caster_state_5310b8b23a525eea
     - param_spell_9eaf3c9176dc7d28
     - param_duration_rounds_36043b970e76e928
     - name: hit_point_bonus
@@ -76495,7 +76529,7 @@ tools:
           params:
             target_state: '{_timed_hit_point_target}'
             lasting_state: state
-            caster_state_id: '{_caster_state_id}'
+            caster_state: '{_caster_state_id}'
             spell: '{spell}'
             duration_rounds: '{duration_rounds}'
             hit_point_bonus: '{_timed_hit_point_amount}'
@@ -76975,6 +77009,8 @@ tools:
     pre_conditions:
     - condition: target_state.is_alive == true
       error: A timed movement spell needs a living creature.
+    - condition: target_state.creature_kind != 'object'
+      error: A timed movement spell needs a living creature, not an object.
     - condition: target_state == null or (target_state.astral_projection_role != 'form' and target_state.astral_projection_role
         != 'body')
       error: No receiving or further casting is supported for this bounded two-form projection.
@@ -76998,7 +77034,7 @@ tools:
         value:
           spell: spell
           label: spell
-          caster: caster_state_id
+          caster: _caster_state_id
           target: _target_state_id
           kind: '''speed_bonus'''
           owner: '''__time_only__'''
@@ -77032,7 +77068,7 @@ tools:
     parameters:
     - param_target_state_cb03a83d0b3e524f
     - param_lasting_state_a0a632fef1e150e2
-    - param_caster_state_id_3392afbdff598c32
+    - param_caster_state_5310b8b23a525eea
     - param_spell_9eaf3c9176dc7d28
     - param_duration_rounds_36043b970e76e928
     - param_speed_bonus_dddf66d9b4912a7b
@@ -77228,6 +77264,19 @@ tools:
     effects:
     - call: initialize_srd_lite_constants_edf6727b634f
       export_context: '*'
+    - set:
+        field: _distinct_spell_targets
+        value: []
+    - for_each:
+        collection: targets
+        as: _distinct_spell_target
+        do:
+        - require:
+            condition: _distinct_spell_target not in _distinct_spell_targets
+            error: Each creature can be chosen only once for this spell.
+        - list_push:
+            list: _distinct_spell_targets
+            value: _distinct_spell_target
     - for_each:
         collection: targets
         as: _speed_target
@@ -77236,7 +77285,7 @@ tools:
           params:
             target_state: '{_speed_target}'
             lasting_state: state
-            caster_state_id: '{_caster_state_id}'
+            caster_state: '{_caster_state_id}'
             spell: '{spell}'
             duration_rounds: '{duration_rounds}'
             speed_bonus: '{speed_bonus}'
@@ -98872,6 +98921,10 @@ tools:
         condition: _ms in definitions.srd_lite_catalogue
         error: This spell is excluded from the SRD Lite normal-player catalogue.
     - require:
+        condition: definitions.spells[_ms].family != 'information_spell' or definitions.spells[_ms].range_kind
+          != 'self' or _target_id == null or _target_id == _caster_state_id
+        error: This spell's range is Self; it affects only its caster.
+    - require:
         condition: _ms in definitions.srd_lite_implemented
         error: This SRD Lite profile is pending; it cannot be selected or cast yet.
     - condition: _coord_fact_target_distance != null
@@ -100108,6 +100161,12 @@ tools:
     - require:
         condition: _slot_level >= _spell_definition.base_level
         error: The selected spell slot is below the spell's source level.
+    - require:
+        condition: (_spell_definition.family != 'multi_target_concentration_ability_advantage' and _spell_definition.family
+          != 'multi_target_concentration_d20_modifier' and _spell_definition.family != 'multi_target_timed_repeating_save_condition'
+          and _spell_definition.family != 'multi_target_timed_speed_bonus') or targets == null or len(targets)
+          <= _spell_definition.base_targets + (_slot_level - _spell_definition.base_level) * _spell_definition.targets_per_slot_level
+        error: The selected slot cannot affect that many creatures.
     - require:
         condition: _spell_definition.casting_time == 'reaction' or lasting_state.pending_srd_action_stack
           == null or len(lasting_state.pending_srd_action_stack) == 0
@@ -129078,7 +129137,7 @@ tools:
         params:
           target_state: '{_target_state_id}'
           lasting_state: '{_lasting_state_id}'
-          caster_state_id: '{_feast.caster}'
+          caster_state: '{_feast.caster}'
           spell: heroes_feast
           duration_rounds: 14400
           hit_point_bonus: '{_feast_hp.total}'
@@ -254893,7 +254952,7 @@ tools:
           params:
             target_state: '{_timed_hit_point_target}'
             lasting_state: state
-            caster_state_id: '{_caster_state_id}'
+            caster_state: '{_caster_state_id}'
             spell: '{spell}'
             duration_rounds: '{duration_rounds}'
             hit_point_bonus: '{_timed_hit_point_amount}'
@@ -254967,7 +255026,7 @@ tools:
           params:
             target_state: '{_speed_target}'
             lasting_state: state
-            caster_state_id: '{_caster_state_id}'
+            caster_state: '{_caster_state_id}'
             spell: '{spell}'
             duration_rounds: '{duration_rounds}'
             speed_bonus: '{speed_bonus}'
@@ -356485,6 +356544,19 @@ tools:
     effects:
     - call: initialize_srd_lite_constants_edf6727b634f
       export_context: '*'
+    - set:
+        field: _distinct_spell_targets
+        value: []
+    - for_each:
+        collection: targets
+        as: _distinct_spell_target
+        do:
+        - require:
+            condition: _distinct_spell_target not in _distinct_spell_targets
+            error: Each creature can be chosen only once for this spell.
+        - list_push:
+            list: _distinct_spell_targets
+            value: _distinct_spell_target
     - set:
         field: _maximum_enhance_ability_targets
         value: base_targets + (slot_level - base_level) * targets_per_slot_level

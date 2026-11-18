@@ -325,10 +325,13 @@ def test_mage_actual_plane_and_blocked_touch_path_before_payment(boundary_case, 
     rolls = _record_rolls(monkeypatch)
     if tool == 'begin_srd_spell_action':
         case.start()
+        rolls.clear()  # Initiative is outside the spell's no-roll admission boundary.
     params = case.parameters | {'target': 'recipient', 'target_character': 'recipient',
                                 'target_distance': 0, 'caster_can_touch_target': True,
                                 'all_targets_have_clear_path': True, 'target_willing': True}
-    if obstruction != 'clear':
+    # Outside combat the Lite operating guide makes Touch the GM's established claim;
+    # saved planes and walls are authoritative only in combat.
+    if obstruction != 'clear' and tool == 'begin_srd_spell_action':
         _reject(case, tool, params, rolls, 'touch range, shared plane and a clear path|beyond range or lacks a clear path on this plane')
         assert case.entities()['hero']['resources']['spell_slot_1'] == 3
         assert case.lasting()['turn_effects'] == []
@@ -344,5 +347,5 @@ def test_mage_actual_plane_and_blocked_touch_path_before_payment(boundary_case, 
         _replay_reopen(case, receipt, command, rolls)
     record, = [row for row in case.lasting()['turn_effects'] if row.get('spell') == 'mage_armor']
     assert record['target'] == 'recipient' and record['source_caster_id'] == 'hero'
-    assert record['magnitude'] == 15 and record['lifetime_kind'] == 'until_long_rest'
+    assert record['magnitude'] == 15 and record['expires_tick'] - record['started_tick'] == 9600
     assert case.entities()['hero']['resources']['spell_slot_1'] == 2 and rolls == []

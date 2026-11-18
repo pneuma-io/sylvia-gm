@@ -1,4 +1,7 @@
-"""Paid Insect Plague: actual saves, timing, movement, perception and saved retries."""
+"""Paid Insect Plague: actual saves, timing, movement, perception and saved retries.
+
+SRD 5.2.1 Insect Plague has a 300-foot range and lasts up to 10 minutes (100 rounds).
+"""
 
 import json
 from tests.lite_imported_fixture import ImportedCase
@@ -19,16 +22,15 @@ def test_insects_upcast_start_first_entry_terrain_perception_expiry_and_replay(t
             'other':{'saving_throw_modifiers':{'constitution':-100}}},
         positions={'hero':[0,0,0],'guard':[5,0,0],'other':[10,5,0],'extra':[60,0,0]})
     try:
-        for changes in ({'environment_origin':[65,0,3]}, {'verbal_component_available':False},
+        for changes in ({'environment_origin':[301,0,3]}, {'verbal_component_available':False},
                         {'somatic_component_available':False}):
             case.reject('cast_spell_outside_combat', case.parameters | changes)
         before = dict(case.entities()['hero']['resources'])
         health = {name:case.entities()[name]['hp'] for name in ('hero','guard','other','extra')}
-        cast, command = case.cast(origin=[0,0,3], slot_resource='spell_slot_6',
-                                  material_component_available=False)
+        cast, command = case.cast(origin=[0,0,3], slot_resource='spell_slot_6')
         area = case.lasting()['persistent_spell_areas']['hero']
         assert area['spell']=='insect_plague' and area['spell_level']==6 and area['radius']==20
-        assert area['expires_tick']-case.lasting()['lasting_tick']==20
+        assert area['expires_tick']-case.lasting()['lasting_tick']==200
         assert case.entities()['hero']['resources']==before|{'spell_slot_6':before['spell_slot_6']-1}
         for name, outcome, divisor in (('guard','success',2),('other','failure',1)):
             save=case.entities()[name]['last_environment_sphere_save']
@@ -44,29 +46,39 @@ def test_insects_upcast_start_first_entry_terrain_perception_expiry_and_replay(t
         assert len(perception.result['context']['_d20_test']['results'])==2
         retain(case,perception,pc)
         case.start()
+        guard_hp=case.entities()['guard']['hp']
         combat_cast, cc=case.act('cast_spell', **(case.parameters|{
-            'environment_origin':[0,0,3], 'slot_resource':'spell_slot_6',
-            'material_component_available':False}))
+            'environment_origin':[0,0,3], 'slot_resource':'spell_slot_6'}))
         assert case.entities()['hero']['resources']==before|{'spell_slot_6':before['spell_slot_6']-2}
         assert case.snapshot().state[VARIANT_ID+'.combat']['action_available'] is False
         assert case.lasting()['persistent_spell_areas']['hero']['sequence'] > area['sequence']
         retain(case,combat_cast,cc)
+        # SRD 5.2.1: creatures in the Sphere save when it appears, then on entering it for the
+        # first time on a turn or ending a turn there, at most once per turn.
+        assert case.entities()['guard']['hp'] < guard_hp, 'The appearing swarm must make the guard save.'
         guard_hp=case.entities()['guard']['hp']
         case.next_turn()
-        assert case.entities()['guard']['hp'] < guard_hp, 'Actual target turn start must pulse.'
-        guard_hp=case.entities()['guard']['hp']
-        moved, mc=case.act('move_srd_scene_creature',actor_state='guard',destination=[10,0,0],mode='walk')
+        assert case.entities()['guard']['hp']==guard_hp, 'Starting a turn inside does not save.'
+        # Stay out of the other creature's reach so leaving it opens no opportunity attack.
+        moved, mc=case.act('move_srd_scene_creature',actor_state='guard',destination=[5,-5,0],mode='walk')
         assert moved.result['context']['_scene_movement_cost']==10
-        assert case.entities()['guard']['hp']==guard_hp
+        assert case.entities()['guard']['hp']==guard_hp, 'Moving inside the Sphere is not entering it.'
         retain(case,moved,mc)
         case.act('move_srd_scene_creature',actor_state='guard',destination=[25,0,0],mode='walk')
         case.act('move_srd_scene_creature',actor_state='guard',destination=[15,0,0],mode='walk')
-        assert case.entities()['guard']['hp']==guard_hp, 'A turn-start pulse blocks additional entry that turn.'
+        assert case.entities()['guard']['hp'] < guard_hp, 'First entry on a turn must save.'
+        guard_hp=case.entities()['guard']['hp']
+        case.act('move_srd_scene_creature',actor_state='guard',destination=[25,0,0],mode='walk')
+        case.act('move_srd_scene_creature',actor_state='guard',destination=[15,0,0],mode='walk')
+        assert case.entities()['guard']['hp']==guard_hp, 'A creature saves only once per turn.'
+        case.next_turn()
+        assert case.entities()['guard']['hp']==guard_hp, 'Ending inside after this turn\'s save does not save again.'
+        case.next_turn()
+        assert case.entities()['guard']['hp']==guard_hp, 'Starting a turn inside does not save.'
         case.act('move_srd_scene_creature',actor_state='guard',destination=[25,0,0],mode='walk')
         case.next_turn()
-        assert case.entities()['guard']['hp']==guard_hp, 'Ending turn must not pulse.'
+        assert case.entities()['guard']['hp']==guard_hp, 'Ending a turn outside does not save.'
         case.next_turn()
-        assert case.entities()['guard']['hp']==guard_hp, 'Outside start must not pulse.'
         entry, ec=case.act('move_srd_scene_creature',actor_state='guard',destination=[15,0,0],mode='walk')
         assert case.entities()['guard']['hp'] < guard_hp
         guard_hp=case.entities()['guard']['hp']
@@ -75,7 +87,7 @@ def test_insects_upcast_start_first_entry_terrain_perception_expiry_and_replay(t
         case.act('move_srd_scene_creature',actor_state='guard',destination=[15,0,0],mode='walk')
         assert case.entities()['guard']['hp']==guard_hp
         case.act('end_combat_encounter',end_reason='fighting_stopped')
-        case.act('advance_srd_lasting_time',elapsed_rounds=10)
+        case.act('advance_srd_lasting_time',elapsed_rounds=100)
         assert case.entities()['hero'].get('concentration_spell_id') is None
         assert case.lasting()['persistent_spell_areas']['hero']['active'] is False
         after, ac=case.act('ability_check',actor='hero',actor_state='hero',ability='wisdom',
