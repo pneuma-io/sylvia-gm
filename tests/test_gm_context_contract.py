@@ -729,6 +729,135 @@ def _evidence_kinds(database: Path, session: str) -> list[str]:
                 if m.kind is SessionMessageKind.EVIDENCE]
 
 
+def test_legacy_tool_history_after_package_adoption(tmp_path, monkeypatch):
+    """A regular legacy turn replays the old ability check under the newly advertised alias."""
+    import io
+
+    from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+    from sylvia_gm.agent._session_loop import (
+        CampaignSessionLoop, ProviderControl, SessionProviderInput, SessionRunRequest,
+    )
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.application.bundled_packages import bundled_srd_archive
+    from sylvia_gm.domain.authority import thaw_json_value
+    from sylvia_gm.provider._base import ModelInfo
+    from tests.test_campaign_rules_update import adopt
+    from tests.test_gm_memory_casting_hotfix import create_cleric_save
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "legacy")
+    fixture = Path(__file__).parent / "fixtures/alpha5-lite.sylvia-gm-package"
+    database = create_cleric_save(tmp_path / "legacy.sqlite3", fixture.read_bytes())
+    gm = ContractGM()
+    gm.model_info = ModelInfo(
+        id="openrouter/offline", name="Offline", provider_name="OpenRouter",
+        provider_key="openrouter", provider_mode="byok", transport="chat_completions",
+        context_window=400_000,
+    )
+    with AuthorityOwner.open(database, "hotfix-owner", disconnect_grace_seconds=1) as owner:
+        adapter = ProviderSessionAdapter(owner, gm, owner_id="hotfix-owner")
+
+        def play(turn_id):
+            gm.steps.extend([_check("hero", "perception"), settle("The steps are quiet.")])
+            start = len(gm.calls)
+            request = SessionRunRequest(
+                "gm", turn_id, turn_id + "-attempt", turn_id + "-input", "I look for tracks."
+            )
+            result = CampaignSessionLoop(owner).run(request, adapter.for_turn(turn_id))
+            assert result.interruption is None and gm.position == len(gm.steps)
+            assert len(gm.calls) == start + 2
+            return gm.calls[start:]
+
+        before = play("casting-turn")
+        saved_call = next(c for m in before[1]["messages"] for c in m.get("tool_calls", ()))
+        saved_result = next(
+            m for m in before[1]["messages"] if m.get("tool_call_id") == saved_call["id"]
+        )
+        old_alias = saved_call["function"]["name"]
+        assert old_alias.endswith("_ability_check")
+        owner.complete_turn("casting", "casting-turn")
+        package = owner.install_package_archive(io.BytesIO(bundled_srd_archive()), install_id="new")
+        preview = owner.preview_campaign_rules_update("casting", package.candidate_id)
+        assert preview["compatible"], preview["conflicts"]
+        adopt(owner, preview)
+        owner.open_turn("casting", "after-adoption")
+        adopted = play("after-adoption")
+        (alias,) = [name for name in adopted[0]["tools"] if name.endswith("_ability_check")]
+        assert alias != old_alias
+        for request in adopted:
+            assert all(c["function"]["name"] in request["tools"]
+                       for m in request["messages"] for c in m.get("tool_calls", ()))
+
+        def exchange(request, call_id):
+            for index, message in enumerate(request["messages"]):
+                if any(c["id"] == call_id for c in message.get("tool_calls", ())):
+                    result = request["messages"][index + 1]
+                    assert result["tool_call_id"] == call_id
+                    return [message, result]
+            pytest.fail(f"request omitted the exchange for {call_id}")
+
+        old_id = saved_call["id"]
+        mapped = exchange(adopted[0], old_id)
+        assert mapped[0]["tool_calls"] == [
+            {**saved_call, "function": {**saved_call["function"], "name": alias}}
+        ]
+        assert mapped[1] == {**saved_result, "name": alias}
+        assert exchange(adopted[1], old_id) == mapped
+        current_id = next(c["id"] for m in adopted[1]["messages"] for c in m.get("tool_calls", ())
+                          if c["function"]["name"] == alias and c["id"] != old_id)
+        saved = [m.content for m in owner.session_context("gm").messages]
+        current_pair = thaw_json_value([
+            next(m["assistant"] for m in saved
+                 if any(c["id"] == current_id for c in m.get("assistant", {}).get("tool_calls", ()))),
+            next(r for m in saved for r in m.get("results", ()) if r.get("tool_call_id") == current_id),
+        ])
+        assert current_pair == exchange(adopted[1], current_id)
+        current_bytes = json.dumps(current_pair).encode()
+        mapped_bytes = json.dumps(mapped).encode()
+
+        # Play a later turn with two different single-operation menus. Interrupt its
+        # second round after the check commits, then run the narration-only Retry.
+        owner.complete_turn("casting", "after-adoption")
+        turn_id = "second-after-adoption"
+        owner.open_turn("casting", turn_id)
+        start = len(gm.calls)
+        provider_tools = adapter._provider_tools
+
+        def narrowed(catalog):
+            operation = "ability_check" if len(gm.calls) == start else "update_campaign_file"
+            return provider_tools(tuple(tool for tool in catalog if tool.name == operation))
+
+        monkeypatch.setattr(adapter, "_provider_tools", narrowed)
+        gm.steps.append(_check("hero", "perception"))
+        gm.fail_on.add(start + 2)
+        request = SessionRunRequest("gm", turn_id, "last-attempt", "last-input", "I listen again.")
+        with pytest.raises(ConnectionError, match="Deliberately injected"):
+            CampaignSessionLoop(owner).run(request, adapter.for_turn(turn_id))
+        interruption = owner.retryable_interruption("casting", failed_attempt_id="last-attempt")
+        assert interruption is not None and interruption.last_action_id
+        history = owner.session_context("gm")
+        retry = adapter.for_retry(history.session.model_id, provider_input=SessionProviderInput(
+            session=history.session, history=history, catalog=(), control=ProviderControl(),
+        ))
+        recovered = owner.manual_retry(
+            campaign_id="casting", interruption_id=interruption.interruption_id,
+            retry_id="narration-retry", narrator=retry,
+        )
+        assert recovered.canonical
+        check, disposition, narration = gm.calls[start:]
+        assert check["tools"] == [alias]
+        assert len(disposition["tools"]) == 1 and disposition["tools"][0].endswith("_update_campaign_file")
+        assert narration["tools"] == []
+        for request in (check, disposition, narration):
+            assert json.dumps(exchange(request, old_id)).encode() == mapped_bytes
+            assert json.dumps(exchange(request, current_id)).encode() == current_bytes
+        # Adaptation is confined to the provider's request.
+        assert any(
+            c["function"]["name"] == old_alias
+            for m in owner.session_context("gm").messages
+            for c in m.content.get("assistant", {}).get("tool_calls", ())
+        )
+
+
 class ChatGPTContractGM(ContractGM):
     """The scripted GM as a ChatGPT subscription model, so that route's defaults apply."""
 

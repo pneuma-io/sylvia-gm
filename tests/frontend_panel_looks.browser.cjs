@@ -366,3 +366,75 @@ test('a Ruleset with no declared look gets the neutral look, and switching Rules
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });
+
+// Daniel (18 November 2026): the SRD Inventory "looks horrible and doesn't align with the overall visual design of
+// SRDs panels". Its inside now wears the fantasy look like the Character sheet beside it: serif set names, the set in
+// hand edged in gold (not ally green), item tags grouped with what is in hand or worn first, and the purse on its own
+// line. Nothing leaves the panel at the narrowest panel width, and a Ruleset without the look keeps the plain panel.
+const outfitted = (source) => variant(armed(source), (projection) => {
+  for (const surface of projection.surfaces) {
+    const hero = surface.data?.entities?.hero;
+    if (hero) Object.assign(hero, { inventory: ['chain_mail', ...hero.inventory, 'dungeoneers_pack',
+      'heirloom_greatsword_of_the_ironbound_company_of_the_northern_marches', '18_gp'], worn_armor: { inventory_item: 'chain_mail' } });
+  }
+});
+
+const inventoryLook = (page) => page.evaluate(() => {
+  const panel = document.querySelector('[data-panel-id="dnd-inventory"]');
+  const list = panel.querySelector('.panel-inventory-list');
+  const chips = Array.from(list.children, (chip) => { const r = chip.getBoundingClientRect();
+    return { text: chip.textContent, held: chip.dataset.inventoryHeld || null, counted: 'inventoryCounted' in chip.dataset, top: r.top, bottom: r.bottom }; });
+  const active = panel.querySelector('.equipment-set:has(.equipment-active)');
+  return { chips, label: getComputedStyle(list, '::before').content, activeEdge: getComputedStyle(active).boxShadow,
+    activeBorder: getComputedStyle(active).borderTopColor, setFont: getComputedStyle(panel.querySelector('.equipment-set-heading strong')).fontFamily };
+});
+
+test('SRD Inventory wears the fantasy look and fits the narrowest panel', { timeout: 90000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await open(browser);
+    await show(page, outfitted(srd));
+    await page.locator('.ruleset-panel-tab[data-workspace-panel="dnd-inventory"]').first().click();
+    const fantasy = await inventoryLook(page);
+    assert.equal(fantasy.label, '"Carried"');
+    assert.match(fantasy.setFont, /Georgia/, 'set names in the serif heading type');
+    assert.match(fantasy.activeEdge, /rgb\(226, 180, 92\)/, 'the set in hand is edged in the gold accent');
+    assert.doesNotMatch(fantasy.activeBorder, /rgb\(79, 209, 181\)/, 'no ally green on the set in hand');
+    const coin = fantasy.chips.find((chip) => chip.counted);
+    const held = fantasy.chips.filter((chip) => chip.held).map((chip) => chip.text);
+    assert.deepEqual(held, ['Chain Mail', 'Light Hammer', 'Dagger']);
+    assert.ok(fantasy.chips.filter((chip) => !chip.counted).every((chip) => chip.bottom <= coin.top), 'the purse sits on its own line below the items');
+    assert.ok(Math.min(...fantasy.chips.filter((chip) => chip.held).map((chip) => chip.top)) <=
+      Math.min(...fantasy.chips.filter((chip) => !chip.held).map((chip) => chip.top)), 'what is in hand or worn comes first');
+
+    for (const width of [198, 280]) {
+      const outside = await page.evaluate((pixels) => {
+        const content = document.querySelector('[data-panel-id="dnd-inventory"] .ruleset-panel-content');
+        Object.assign(content.style, { width: `${pixels}px`, maxWidth: 'none' });
+        const box = content.getBoundingClientRect(), style = getComputedStyle(content);
+        const left = box.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft);
+        const right = box.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight);
+        const found = [];
+        if (content.scrollWidth > content.clientWidth + 0.5) found.push(`panel scrolls sideways (${content.scrollWidth} > ${content.clientWidth})`);
+        for (const node of content.querySelectorAll('*')) {
+          const r = node.getBoundingClientRect();
+          if (r.width <= 1 || r.height <= 1 || node.tagName === 'OPTION') continue;
+          if (r.left < left - 0.5 || r.right > right + 0.5) found.push(`${node.tagName.toLowerCase()}.${String(node.className).trim().replace(/\s+/g, '.')}` +
+            ` "${(node.textContent || '').trim().slice(0, 24)}" ${r.left.toFixed(1)}–${r.right.toFixed(1)} outside ${left.toFixed(1)}–${right.toFixed(1)}`);
+          if (node.tagName !== 'SELECT' && node.scrollWidth > node.clientWidth + 0.5 && getComputedStyle(node).overflowX !== 'visible') found.push(`${node.tagName.toLowerCase()} cuts its own text`);
+        }
+        return found;
+      }, width);
+      assert.deepEqual(outside, [], `nothing in Inventory leaves a ${width}px panel`);
+    }
+
+    await show(page, variant(outfitted(srd), (projection) => { projection.ruleset_id = null; }));
+    await page.locator('.ruleset-panel-tab[data-workspace-panel="dnd-inventory"]').first().click();
+    const neutral = await inventoryLook(page);
+    assert.equal(neutral.label, 'none', 'no fantasy section label in the neutral look');
+    assert.doesNotMatch(neutral.setFont, /Georgia/);
+    assert.match(neutral.activeBorder, /rgba?\(79, 209, 181|0\.309804 0\.819608 0\.709804/, 'the neutral set in hand keeps its ally outline');
+    assert.doesNotMatch(neutral.activeEdge, /226, 180, 92/);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});

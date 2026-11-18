@@ -6587,6 +6587,19 @@ const SylviaGMFrontend = (() => {
     return /^[a-z][a-z0-9]*$/.test(label) ? label[0].toUpperCase() + label.slice(1) : label;
   }
 
+  // What a carried item is doing, as data attributes a panel look can draw: held in the active weapon set's hands or
+  // worn, one of the equipment policy's weapons, or a counted stack (an id made of a count and a short unit code, such
+  // as a purse of coins). Presentation only; the chip's text is unchanged.
+  function inventoryItemMarks(item, entity, surface) {
+    const id = typeof item === 'string' ? item : item?.item_id || item?.id || '';
+    const active = entity.weapon_sets?.active_set ? entity.weapon_sets[entity.weapon_sets.active_set] : null;
+    const held = id && active && [active.main_hand, active.off_hand].includes(id) ? 'hand'
+      : id && [entity.worn_armor?.inventory_item, entity.worn_shield?.inventory_item].includes(id) ? 'worn' : '';
+    const weapon = surface?.data?.equipment?.weapons?.some?.((candidate) => candidate.id === id);
+    return (held ? ` data-inventory-held="${held}"` : '') + (weapon ? ' data-inventory-kind="weapon"' : '') +
+      (/^\d+_[a-z]{1,3}$/.test(id) ? ' data-inventory-counted=""' : '');
+  }
+
   function renderInventoryPanel(data, surface) {
     const participants = data && Array.isArray(data.participants) ? data.participants : [];
     const entities = data && data.entities && typeof data.entities === 'object' ? data.entities : {};
@@ -6629,10 +6642,10 @@ const SylviaGMFrontend = (() => {
           const id = typeof item === 'string' ? item : item?.item_id || item?.id || 'Item';
           const label = item?.name || inventoryItemLabel(id, data?.item_names);
           const count = typeof item === 'object' && Number.isFinite(item?.quantity) ? ` × ${item.quantity}` : '';
-          return `<span class="panel-inventory-item">${escapeHtml(label)}${count}</span>`;
+          return `<span class="panel-inventory-item"${inventoryItemMarks(item, entity, surface)}>${escapeHtml(label)}${count}</span>`;
         }).join('')}</div></div>`;
     }).filter(Boolean);
-    return owners.join('') || '<div class="panel-empty">No recorded equipment yet.</div>';
+    return owners.join('') || '<div class="panel-empty inventory-empty">No recorded equipment yet.</div>';
   }
 
   // Inventory is a projection of committed holdings; selection never changes campaign state.

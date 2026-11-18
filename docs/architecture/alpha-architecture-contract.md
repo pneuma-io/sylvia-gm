@@ -997,7 +997,10 @@ side-coloured underline and struck-through fallen creatures; a turn bar reading 
 in gold serif with the action, bonus action and reaction shapes, and a gold End combat turn button; a character sheet with
 an initials plinth, a flask for HP, a shield for AC and walking speed; spell cards with a copper
 medallion, an orange left edge, "Cantrip · Evocation" and either "at will" or slot gems on the
-right; spell slots by Roman numeral with lilac gems; six ability tiles in one row. Gold and parchment
+right; spell slots by Roman numeral with lilac gems; six ability tiles in one row; an Inventory on the
+same sheet, with framed weapon-set cards whose set in hand is edged in gold, bronze Equip and Use this
+set buttons, item tags led by what is in hand or worn, and the purse drawn as coins on its own line
+(the fantasy base's ornament; the inventory renderer keeps its one `plain` style). Gold and parchment
 tones carry the panels and controls; the ally colour is kept for tokens, hit points and thin outlines.
 The reel's textured green battlefield is not part of the SRD look: it was a mockup of a future
 generated map picture.
