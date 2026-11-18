@@ -83,6 +83,7 @@ def test_preview_cancel_adopt_retry_and_reopen_preserve_state_source_and_other_c
     before = owner.snapshot("running")
     other = owner.snapshot("other")
     old_lock = owner.current_package_lock("running")
+    assert "journal" not in {panel["id"] for panel in owner.campaign_panels("running")["surfaces"]}
     source = owner.inspect_package_candidate(old.candidate_id)
     options = owner.campaign_rules_update_options("running")
     assert [x["candidate_id"] for x in options["candidates"]] == [new.candidate_id]
@@ -100,9 +101,13 @@ def test_preview_cancel_adopt_retry_and_reopen_preserve_state_source_and_other_c
     assert adopt(owner, preview).replayed
     assert owner.package_lock_lineage("running")[0] == old_lock
     assert owner.current_package_lock("running").package_lock == new.package_lock
+    panels = owner.campaign_panels("running")
+    assert panels["revision"] == receipt.resulting_revision
+    assert "journal" in {panel["id"] for panel in panels["surfaces"]}
     database = owner._store._database_path
     owner.close()
     with AuthorityOwner.open(database, "reopened") as reopened:
+        assert reopened.campaign_panels("running") == panels
         assert reopened.snapshot("running").state == before.state
         assert reopened.snapshot("other") == other
         assert adopt(reopened, preview).replayed

@@ -6289,7 +6289,9 @@ class SQLiteAuthorityStore:
         finally:
             connection.close()
 
-    def campaign_session_contexts(self, campaign_id: str) -> tuple[SessionContext, ...]:
+    def campaign_session_contexts(
+        self, campaign_id: str, *, evidence_kinds: tuple[str, ...] = (),
+    ) -> tuple[SessionContext, ...]:
         """Read only the selected campaign's durable session provenance."""
 
         connection = self._connect_read_only()
@@ -6306,7 +6308,16 @@ class SQLiteAuthorityStore:
                 (campaign_id,),
             ).fetchall()
             contexts = tuple(
-                sqlite_session.read_context(connection, str(row["session_id"]))
+                SessionContext(
+                    session=sqlite_session.read_session(connection, row["session_id"]),
+                    messages=tuple(sqlite_session.message_from_row(message) for message in
+                                   connection.execute(
+                        "SELECT * FROM agent_session_messages WHERE session_id = ? "
+                        "AND kind = 'evidence' AND json_extract(content_json, '$.kind') IN "
+                        "(SELECT value FROM json_each(?)) ORDER BY sequence",
+                        (row["session_id"], json.dumps(evidence_kinds)),
+                    )),
+                ) if evidence_kinds else sqlite_session.read_context(connection, row["session_id"])
                 for row in identities
             )
             connection.commit()
@@ -10868,6 +10879,51 @@ class SQLiteAuthorityStore:
             if connection.in_transaction:
                 connection.rollback()
             raise
+        finally:
+            connection.close()
+
+    def response_window_actions(
+        self, campaign_id: str, *, response_attempts: set[str] | None = None,
+        through: int | None = None,
+    ) -> tuple[str, ...]:
+        """Find actions since the preceding ordinary TALK at the requested cursor."""
+        connection = self._connect_read_only()
+        try:
+            return tuple(row[0] for row in connection.execute(
+                "SELECT DISTINCT action_id FROM canonical_events WHERE campaign_id = :campaign "
+                "AND action_id IS NOT NULL AND (:end IS NULL OR sequence <= :end) "
+                "AND sequence > (SELECT COALESCE(MAX(sequence), 0) FROM canonical_events "
+                "WHERE campaign_id = :campaign AND event_type = 'talk' "
+                "AND (:end IS NULL OR sequence <= :end) AND (attempt_id IS NULL OR "
+                "attempt_id NOT IN (SELECT value FROM json_each(:attempts))))",
+                {"campaign": campaign_id, "end": through,
+                 "attempts": json.dumps(sorted(response_attempts or ()))},
+            ))
+        finally:
+            connection.close()
+
+    def player_action_markers(
+        self, campaign_id: str, action_ids: Sequence[str], marker_kind: str,
+    ) -> tuple[SafePayload, ...]:
+        """Read only the saved origins and identities of the selected actions in commit order."""
+        if not action_ids:
+            return ()
+        connection = self._connect_read_only()
+        try:
+            return tuple(owned_payload({
+                "action_id": row["action_id"], "turn_id": row["turn_id"], "status": row["status"],
+                "origin": _load_payload(row["origin"]) if row["origin"] is not None else None,
+            }) for row in connection.execute(
+                "SELECT a.action_id, a.turn_id, a.status, ("
+                "SELECT json_extract(c.payload_json, '$.origin') FROM consequences c "
+                "WHERE c.campaign_id = a.campaign_id AND c.action_id = a.action_id "
+                "AND json_extract(c.payload_json, '$.kind') = ? "
+                "AND json_type(c.payload_json, '$.origin') = 'object' "
+                "ORDER BY c.ordinal DESC LIMIT 1) AS origin FROM actions a "
+                "WHERE a.campaign_id = ? AND a.action_id IN (SELECT value FROM json_each(?)) "
+                "ORDER BY a.resulting_revision",
+                (marker_kind, campaign_id, json.dumps(action_ids)),
+            ))
         finally:
             connection.close()
 
