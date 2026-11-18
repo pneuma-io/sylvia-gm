@@ -419,7 +419,9 @@ def _tool_alias(tool: ModelMechanicsTool) -> str:
     )
 
 
-def _package_tool_alias(package_id: str, version: str, sha256: str, name: str, capability: str) -> str:
+def _package_tool_alias(
+    package_id: str, version: str, sha256: str, name: str, capability: str,
+) -> str:
     slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"
     identity = json.dumps(
         [package_id, version, sha256, name, capability],
@@ -3933,7 +3935,8 @@ class ProviderSessionAdapter:
                         (package, name, capability): _package_tool_alias(
                             package, pin.version, pin.sha256, name, capability,
                         )
-                        for package, name, capability in current_aliases if package == pin.package_id
+                        for package, name, capability in current_aliases
+                        if package == pin.package_id
                     }
                 for operation, old_alias in past.items():
                     if old_alias not in current_names:
