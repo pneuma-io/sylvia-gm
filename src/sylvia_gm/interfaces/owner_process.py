@@ -52,13 +52,11 @@ from sylvia_gm.application.authority import (
 )
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.application.bundled_campaign_plans import (
-    bundled_plan,
     known_builtin_public_summary,
 )
 from sylvia_gm.application.bundled_packages import (
     BUNDLED_RIICHI_PACKAGES,
     bundled_campaign_content_catalog,
-    bundled_rift_archive_for_closure,
     bundled_rift_authority,
     bundled_rift_participant_declaration,
     bundled_riichi_archive,
@@ -68,6 +66,7 @@ from sylvia_gm.application.bundled_packages import (
 from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_library_selection import (
     participant_catalog_payload,
+    resolve_campaign_plan_selection,
 )
 from sylvia_gm.application.campaign_plan_sources import (
     CampaignPlanToolAuthority,
@@ -83,7 +82,6 @@ from sylvia_gm.application.reusable_participants import (
     compatible_reusable_participants,
 )
 from sylvia_gm.application.reusable_plans import (
-    load_reusable_campaign_plan,
     reusable_campaign_plan_catalog,
 )
 from sylvia_gm.campaign.rift import (
@@ -1051,50 +1049,15 @@ def _resolve_rift_library_selection(
     setting_id: str, plan_id: str,
 ) -> tuple[PackageCandidate, CampaignPlanToolAuthority, ValidatedCampaignPlan, dict | None]:
     """Use a Rift Plan's retained sources, including its authored party template when present."""
-    if plan_id == "the-rift-awakening":
-        retained = bundled_plan(plan_id)
-        if retained is None:
-            raise CommandRejected("The selected Rift Plan is unavailable")
-        plan = retained.plan
-        archive = retained.package_snapshot
-    else:
-        saved = load_reusable_campaign_plan(
-            storage_root, plan_id,
-            validate_plan=lambda payload, text: validate_retained_campaign_plan(
-                owner, payload, text,
-            ),
-        )
-        if saved.setup_id != "the-rift-awakening":
-            raise CommandRejected("The selected Plan does not use Rift campaign setup")
-        plan = saved.plan
-        archive = saved.package_snapshot
-    bindings = plan.payload["bindings"]
-    if setting_id != bindings["campaign_setting"]["id"]:
-        raise CommandRejected("The selected Plan belongs to another Campaign Setting")
-    if ruleset_selection != bindings["ruleset"]["id"]:
-        selected = owner.package_candidate(ruleset_selection)
-        if not any(
-            entry.role is PackageRole.PRIMARY and entry.package_id == bindings["ruleset"]["id"]
-            for entry in selected.package_lock.entries
-        ):
-            raise CommandRejected("The selected Plan belongs to another Ruleset")
-    candidate = next(
-        (item for item in owner.package_candidates()
-         if item.closure_sha256 == bindings["package_closure_sha256"]),
-        None,
+    selection = resolve_campaign_plan_selection(
+        owner,
+        storage_root,
+        candidate_id=ruleset_selection,
+        setting_id=setting_id,
+        plan_id=plan_id,
+        required_setup_id="the-rift-awakening",
     )
-    if candidate is None:
-        if archive is None:
-            archive = bundled_rift_archive_for_closure(bindings["package_closure_sha256"])
-            if archive is None:
-                raise CommandRejected("The selected Plan's saved packages are unavailable")
-        candidate = owner.install_package_archive(
-            io.BytesIO(archive),
-            install_id=f"install-bundled-rift-{hashlib.sha256(archive).hexdigest()[:24]}",
-        )
-    sources = campaign_plan_sources(owner, candidate.package_lock, setting_id=setting_id)
-    if sources is None:
-        raise CommandRejected("The selected Plan's Setting is unavailable")
+    candidate, sources, plan = selection.candidate, selection.sources, selection.plan.plan
     template_path = "campaigns/the-rift-awakening/party-template.json"
     if template_path not in sources.setting_paths and any(
         dependency.kind == "ruleset_snapshot"
