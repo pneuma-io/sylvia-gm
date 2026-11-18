@@ -29,7 +29,6 @@ from sylvia_gm.application.package_runtime import (
     PACKAGE_RUNTIME_PATH,
     package_model_decision_boundary,
 )
-from sylvia_gm.application.plan_snapshot import retained_plan_snapshot
 from sylvia_gm.application.reusable_participants import (
     ReusableParticipant,
     parse_setting_character,
@@ -252,7 +251,6 @@ def resolve_campaign_plan_selection(
     candidate_id: str,
     setting_id: str,
     plan_id: str,
-    required_setup_id: str | None = None,
 ) -> CampaignLibrarySelection:
     """Resolve exact Plan sources and required files without discovering the character library."""
     retained = selected_campaign_plan(
@@ -260,8 +258,6 @@ def resolve_campaign_plan_selection(
         plan_id,
         validate_plan=lambda payload, text: validate_retained_campaign_plan(owner, payload, text),
     )
-    if required_setup_id is not None and retained.setup_id != required_setup_id:
-        raise CommandRejected("The selected Plan does not use this campaign setup")
     bindings = retained.plan.payload["bindings"]
     try:
         selected = owner.package_candidate(candidate_id)
@@ -287,15 +283,13 @@ def resolve_campaign_plan_selection(
          if item.closure_sha256 == bindings["package_closure_sha256"]),
         None,
     )
-    if candidate is None:
-        try:
-            snapshot = retained.package_snapshot or retained_plan_snapshot(owner, retained.plan.payload)
-        except ValueError as error:
-            raise CommandRejected("The selected Campaign Plan snapshot is unavailable") from error
+    if candidate is None and retained.package_snapshot is not None:
         candidate = owner.install_package_archive(
-            io.BytesIO(snapshot),
-            install_id=f"plan-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",
+            io.BytesIO(retained.package_snapshot),
+            install_id=f"plan-snapshot-{hashlib.sha256(retained.package_snapshot).hexdigest()[:24]}",
         )
+    if candidate is None:
+        raise CommandRejected("The selected Campaign Plan snapshot is unavailable")
     candidate_id = candidate.candidate_id
     sources = campaign_plan_sources(owner, candidate.package_lock, setting_id=setting_id)
     if sources is None:

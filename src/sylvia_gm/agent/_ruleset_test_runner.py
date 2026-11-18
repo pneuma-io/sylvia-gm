@@ -162,11 +162,9 @@ def run_scenario(archive: bytes, scenario: dict[str, Any], directory: Path) -> d
     """Worker-only entry; its fresh database and process-local dice cannot touch live campaigns."""
     owner_id, campaign_id, session_id = "scenario-owner", "scenario-campaign", "scenario-session"
     rolls = ScenarioDice(scenario["rolls"])
-    previous_rng, previous_seed = dice._rng, dice._current_seed
-    dice._rng, dice._current_seed = rolls, None
     steps: list[dict[str, Any]] = []
     try:
-        with AuthorityOwner.open(
+        with dice.use_roll_source(rolls), AuthorityOwner.open(
             directory / "campaign.sqlite3",
             owner_id,
             disconnect_grace_seconds=1.0,
@@ -348,5 +346,3 @@ def run_scenario(archive: bytes, scenario: dict[str, Any], directory: Path) -> d
             "steps": steps,
             "failures": [{"message": message}],
         }
-    finally:
-        dice._rng, dice._current_seed = previous_rng, previous_seed

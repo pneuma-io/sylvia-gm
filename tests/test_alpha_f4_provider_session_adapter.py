@@ -2233,8 +2233,16 @@ def test_private_deliberation_in_content_is_repaired_before_talk(leaked: str) ->
     assert not any(event.kind is ProviderEventKind.PRIVATE_REASONING for event in events)
 
 
-def test_private_deliberation_correction_exhaustion_preserves_the_turn(caplog) -> None:
-    narration = "The player wants answers. The stranger raises a lantern."
+def test_private_deliberation_correction_exhaustion_preserves_the_turn(tmp_path) -> None:
+    from sylvia_gm.interfaces._local_diagnostics import LocalDiagnostics
+
+    diagnosis = LocalDiagnostics(tmp_path)
+    planning = "The player wants answers."
+    narration = planning + "\nThe stranger raises a lantern."
+
+    def record_warning(code: str) -> None:
+        diagnosis.record("provider_warning", operation="submit_session_input", error_code=code)
+
     provider = _ScriptedProvider([
         [ProviderStreamChunk(content=narration, finish_reason="stop")] for _ in range(3)
     ])
@@ -2242,15 +2250,22 @@ def test_private_deliberation_correction_exhaustion_preserves_the_turn(caplog) -
     events = tuple(
         ProviderSessionAdapter(
             cast(AuthorityOwner, _OwnerProjection()), provider, owner_id="owner-provider",
+            record_warning=record_warning,
         ).for_turn("turn-provider")(_provider_input(user_text="I follow the trail."))
     )
+    report = diagnosis.preview(kind="app_problem", reproduction="", feedback="")
+    diagnosis.close()
 
     assert len(provider.calls) == 3
     assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [
-        narration,
+        "The stranger raises a lantern.",
     ]
-    assert "Provider repeatedly returned private deliberation as narration" in caplog.text
-    assert narration not in caplog.text
+    assert "provider_private_deliberation" in report["content"]
+    assert planning not in report["content"]
+    warning = next(row for row in json.loads(report["content"])["diagnostics"]
+                   if row["event"] == "provider_warning")
+    assert warning["severity"] == "warning"
+    assert warning["operation"] == "submit_session_input"
 
 
 def test_committed_mechanic_empty_completion_is_reprompted_in_the_same_turn() -> None:

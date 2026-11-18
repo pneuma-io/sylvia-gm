@@ -17,7 +17,7 @@ import queue
 import re
 import uuid
 import weakref
-from collections.abc import AsyncIterator, Awaitable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -252,15 +252,21 @@ def _contains_serialized_tool_call(text: str) -> bool:
     )
 
 
+_PRIVATE_DELIBERATION_STARTS = (
+    "the player wants ",
+    "the player's declared action ",
+    "the declared player action ",
+    "the user wants ",
+)
+
+
+def _is_private_deliberation_line(line: str) -> bool:
+    return line.strip().casefold().startswith(_PRIVATE_DELIBERATION_STARTS)
+
+
 def _looks_like_private_deliberation(text: str) -> bool:
     """Detect provider prose that describes the player request as an instruction."""
-    planning_starts = (
-        "the player wants ",
-        "the player's declared action ",
-        "the declared player action ",
-        "the user wants ",
-    )
-    return any(line.strip().casefold().startswith(planning_starts) for line in text.splitlines())
+    return any(map(_is_private_deliberation_line, text.splitlines()))
 
 
 def _forced_single_tool_call_from_json(
@@ -1599,6 +1605,7 @@ class ProviderSessionAdapter:
         campaign_plan_text: str | None = None,
         campaign_plan: Mapping[str, object] | None = None,
         campaign_knowledge: Mapping[str, object] | None = None,
+        record_warning: Callable[[str], None] | None = None,
     ) -> None:
         if not owner_id:
             raise ValueError("Provider session owner identity must be nonempty")
@@ -1608,6 +1615,7 @@ class ProviderSessionAdapter:
             encoded_prompt = gm_system_prompt.encode("utf-8")
             if not gm_system_prompt.strip() or len(encoded_prompt) > _MAX_GM_SYSTEM_PROMPT_BYTES:
                 raise ValueError("GM system prompt is empty or exceeds the usability limit")
+        self._record_warning = record_warning
         self._owner = owner
         self._owner_id = owner_id
         self._provider = provider
@@ -1636,6 +1644,19 @@ class ProviderSessionAdapter:
             if campaign_knowledge is None
             else cast(Mapping[str, object], _plain_json(campaign_knowledge))
         )
+
+    def _filter_private_deliberation(self, text: str) -> str:
+        """Drop only matching lines and record a content-free warning."""
+        lines = text.splitlines(keepends=True)
+        kept = [line for line in lines if not _is_private_deliberation_line(line)]
+        if len(kept) == len(lines):
+            return text
+        if self._record_warning is not None:
+            self._record_warning("provider_private_deliberation")
+        else:
+            logger.warning("Discarded provider private deliberation from narration")
+        remaining = "".join(kept)
+        return remaining if remaining.strip() else ""
 
     def for_turn(self, turn_id: str) -> SessionProvider:
         """Bind the canonical TURN identity required by every admitted action."""
@@ -1784,8 +1805,7 @@ class ProviderSessionAdapter:
                     "Provider returned serialized tool syntax as narration",
                     code="provider_serialized_tool_call",
                 )
-            if _looks_like_private_deliberation(narration):
-                logger.warning("Provider returned private deliberation as Retry narration")
+            narration = self._filter_private_deliberation(narration)
             if not narration:
                 raise CommandRejected(
                     "Provider completed Retry without player-visible narration",
@@ -1958,7 +1978,12 @@ class ProviderSessionAdapter:
                     ):
                         retry_private_deliberation(self, state, provider_input, turn_id=turn_id)
                         continue
-                    logger.warning("Provider repeatedly returned private deliberation as narration")
+                    state.narration = self._filter_private_deliberation(state.narration)
+                    if not state.narration:
+                        raise CommandRejected(
+                            "Provider completed without player-visible narration",
+                            code="provider_empty_completion",
+                        )
                 if _campaign_file_needs_narration(state):
                     yield from record_held_narration(self, state, provider_input, turn_id=turn_id)
                     return

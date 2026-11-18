@@ -10502,7 +10502,7 @@ class SQLiteAuthorityStore:
             )
             if campaign_session is not None and handoff_id is not None:
                 raise CommandRejected(
-                    "F4 handoff applies only to an existing campaign",
+                    "Campaign handoff requires an existing campaign.",
                     code="existing_campaign_handoff_only",
                 )
             connection.commit()

@@ -144,6 +144,27 @@ def test_current_claude_api_models_send_native_effort(model_id):
         assert request["thinking"] == {"type": "adaptive"}
 
 
+@pytest.mark.parametrize(("model_id", "alias", "fast", "forced", "binds_thinking"), (
+    ("claude-fable-5-2", "fable", True, False, True),
+    ("claude-opus-5-5", "opus", True, False, False),
+    ("claude-sonnet-5-5", "sonnet", False, False, False),
+    ("claude-haiku-5-5", "haiku", False, True, False),
+))
+def test_current_claude_preset_facts_cover_exact_models_and_runtime_aliases(
+    model_id, alias, fast, forced, binds_thinking,
+):
+    from sylvia_gm.provider._claude_runtime import documented_context_window
+    from sylvia_gm.provider._model_facts import claude_model_facts
+
+    facts = claude_model_facts(model_id)
+    assert facts.efforts == ("low", "medium", "high", "xhigh", "max")
+    assert (facts.fast, facts.forced_tool_choice, facts.binds_thinking) == (
+        fast, forced, binds_thinking,
+    )
+    assert facts.temperature is False
+    assert documented_context_window(model_id) == documented_context_window(alias) == 1_000_000
+
+
 def test_native_anthropic_and_minimax_do_not_fabricate_xhigh():
     claude = model("claude-opus-4-6", "anthropic_messages", "https://api.anthropic.com")
     assert mode_reasoning_default(claude, "builder") == "high"

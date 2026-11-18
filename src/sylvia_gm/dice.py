@@ -65,34 +65,47 @@ from contextvars import ContextVar
 _rng: random.Random = random.Random(os.urandom(16))
 _current_seed: int | None = None
 _tool_rng: ContextVar[random.Random | None] = ContextVar("tool_rng", default=None)
+_roll_source: ContextVar[random.Random | None] = ContextVar("roll_source", default=None)
+
+
+@contextmanager
+def use_roll_source(source: random.Random) -> Iterator[None]:
+    """Supply scripted rolls for the current context, including nested seeded tools."""
+    token = _roll_source.set(source)
+    try:
+        yield
+    finally:
+        _roll_source.reset(token)
 
 
 @contextmanager
 def seeded_rolls(seed: int | None) -> Iterator[None]:
     """Use an isolated random stream for one tool invocation and its nested calls."""
-    if seed is None:
+    if seed is None or _roll_source.get() is not None:
         yield
         return
-    token = _tool_rng.set(random.Random(seed))
+    token = _tool_rng.set(random.Random())
     try:
+        # SylviaBench intercepts set_seed to pair rolls across model runs.
+        set_seed(seed)
         yield
     finally:
         _tool_rng.reset(token)
 
 
 def _roll_rng() -> random.Random:
-    return _tool_rng.get() or _rng
+    return _roll_source.get() or _tool_rng.get() or _rng
 
 
 def set_seed(seed: int) -> None:
-    """Seed the module-level RNG for deterministic dice rolls.
-
-    All subsequent rolls will produce the same sequence for the same seed.
-    Use ``get_seed()`` to retrieve the current seed for session replay.
-    """
+    """Seed the active tool stream or the default stream outside a tool invocation."""
     global _current_seed
-    _current_seed = seed
-    _rng.seed(seed)
+    tool_rng = _tool_rng.get()
+    if tool_rng is None:
+        _rng.seed(seed)
+        _current_seed = seed
+    else:
+        tool_rng.seed(seed)
 
 
 def get_seed() -> int | None:

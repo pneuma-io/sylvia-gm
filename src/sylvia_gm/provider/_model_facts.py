@@ -34,9 +34,17 @@ _OPENAI_EFFORT = ("none", "low", "medium", "high", "xhigh")
 _OPENAI_EXTENDED_EFFORT = (*_OPENAI_EFFORT, "max")
 
 
-# Native Anthropic request compatibility: Claude Platform effort, tool use,
-# extended thinking, and fast mode documentation.
-# Native OpenAI options: https://developers.openai.com/api/docs/models and /pricing.
+# Claude API effort, forced tool choice, sampling, thinking and Fast mode (2026-11-18):
+# https://platform.claude.com/docs/en/build-with-claude/effort
+# https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools
+# https://platform.claude.com/docs/en/api/errors
+# https://platform.claude.com/docs/en/build-with-claude/extended-thinking
+# https://platform.claude.com/docs/en/build-with-claude/fast-mode
+# Claude Code context and aliases: https://code.claude.com/docs/en/model-config (2026-11-18).
+# OpenAI API effort and service tiers (catalog checked 2026-11-12):
+# https://developers.openai.com/api/docs/models
+# https://developers.openai.com/api/docs/pricing
+# ChatGPT subscription narration hints are based on Sylvia's GM runs, not provider limits.
 _MODEL_FACTS = {
     ("anthropic", "claude-fable-5"): ModelFacts(forced_tool_choice=True),
     ("anthropic", "claude-fable-5-2"): ModelFacts(

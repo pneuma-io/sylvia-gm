@@ -183,24 +183,31 @@ class OwnerProcess:
             raise WebUIError("The Sylvia owner disconnected. Saved work is retained.")
         return json.loads(raw)
 
+    def _fail_pending(self, message: str) -> None:
+        for future in self.pending.values():
+            if not future.done():
+                future.set_exception(WebUIError(message, "outcome_unknown"))
+
     async def _receive(self) -> None:
         try:
             while True:
                 reply = await self._read()
-                future = self.pending.get(reply.get("id"))
+                identity = reply.get("id")
+                if not isinstance(identity, str) or not identity:
+                    self._fail_pending(
+                        "The Sylvia owner replied without a request ID. "
+                        "Reload to inspect saved work. The pending requests were not repeated."
+                    )
+                    continue
+                future = self.pending.get(identity)
                 if future is not None and not future.done():
                     future.set_result(reply)
         except (Exception, asyncio.CancelledError):
-            for future in self.pending.values():
-                if not future.done():
-                    future.set_exception(
-                        WebUIError(
-                            "The Sylvia owner disconnected. Reload to inspect saved work; "
-                            "restart Sylvia before reconnecting if its owner stopped. "
-                            "This request's outcome is unknown; it was not repeated.",
-                            "outcome_unknown",
-                        )
-                    )
+            self._fail_pending(
+                "The Sylvia owner disconnected. Reload to inspect saved work; "
+                "restart Sylvia before reconnecting if its owner stopped. "
+                "This request's outcome is unknown; it was not repeated."
+            )
 
     async def call(self, method: str, params: dict | None = None) -> Any:
         if self.reader is None or self.reader.done():

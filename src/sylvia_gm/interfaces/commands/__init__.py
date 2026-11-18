@@ -28,3 +28,4 @@ class DispatchContext:
     reload_provider_resolver: Callable[[], None] | None
     gm_system_prompt: str | None
     method: str
+    record_provider_warning: Callable[[str], None] | None = None
