@@ -878,6 +878,7 @@ def reject_invalid_revision(
             "npc_utterance blocks require speaker_id and spoken_words; "
             "speaker_id must be anonymous, an exact current participant or "
             "Campaign Entity ID, or an entity_id admitted by this same update; "
+            "an anonymous speaker may add a short single-line speaker_name; "
             "narration and ooc "
             "blocks use text. Put actions and attribution in separate "
             "narration blocks; start a new utterance when that NPC resumes "

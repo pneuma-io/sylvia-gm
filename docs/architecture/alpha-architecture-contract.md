@@ -370,7 +370,10 @@ their association. OOC is not an application control or fictional Player Charact
 Ordered narration, NPC dialogue and OOC reply blocks use completed TALK events with typed safe
 payloads. They pass through the same held-response and Campaign File disposition interface as prose,
 and release only after successful disposition. Host-side campaign knowledge resolves speaker labels;
-model-provided hidden names, image paths and arbitrary markup are not presentation authority.
+model-provided hidden names, image paths and arbitrary markup are not presentation authority. A
+named NPC speaks by its Campaign Entity or participant ID, including an entity recorded in the
+same update. A speaker without an ID may carry the model's short player-facing name, shown only
+when it matches no name the campaign withholds; with no name the label is "Unknown speaker".
 Canonical ordering and readable labelled text survive reopen and export without a second store.
 Current response-format instructions accompany the current tool interface even when a resumed
 session retains an older GM operating contract. This does not rewrite that stored contract or history.

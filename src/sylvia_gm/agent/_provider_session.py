@@ -723,7 +723,20 @@ def _model_tool_schema(tool: ModelMechanicsTool) -> dict[str, object]:
                                     "minLength": 1,
                                     "description": (
                                         "Exact current Campaign Entity or visible non-player "
-                                        "participant ID; use anonymous when unidentified."
+                                        "participant ID, or an entity_id this same update "
+                                        "records in entities. Record a named NPC as an entity "
+                                        "and use its ID. Use anonymous only for a speaker "
+                                        "without an ID."
+                                    ),
+                                },
+                                "speaker_name": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": _SPEAKER_NAME_MAX_LENGTH,
+                                    "description": (
+                                        "With speaker_id anonymous: the name or short "
+                                        "description the player knows this speaker by, as "
+                                        "the narration calls them. It labels the speech box."
                                     ),
                                 },
                                 "spoken_words": {
@@ -756,7 +769,8 @@ def _model_tool_schema(tool: ModelMechanicsTool) -> dict[str, object]:
                     "One complete ordered response. Put scene prose in narration blocks, each "
                     "NPC's spoken words only in npc_utterance.spoken_words, and any OOC reply in a "
                     "separate ooc block. NPC dialogue uses an exact current Campaign Entity or "
-                    "visible non-player participant speaker_id, or the anonymous sentinel. Use one "
+                    "visible non-player participant speaker_id, an entity_id this same update "
+                    "records, or the anonymous sentinel with a speaker_name. Use one "
                     "narration block for a response without dialogue. Sylvia holds the response "
                     "until "
                     "this Campaign File disposition succeeds. The "
@@ -1196,12 +1210,18 @@ def _response_format_contract_message() -> dict[str, object]:
             "uninterrupted utterance, not one NPC's whole paragraph. When narration interrupts, "
             "end the utterance and resume speech in a new block, even for the same speaker. "
             "Earlier replies may use an older layout; use this format "
-            "for the current reply. This example illustrates layout only, not campaign content; "
+            "for the current reply. Name every speaker: a named NPC speaks by its Campaign Entity "
+            "or participant ID, and a named NPC new to the Campaign File is recorded in entities "
+            "in the same update and speaks by that entity_id. Use anonymous only for a speaker "
+            "without an ID, with speaker_name set to what the player calls them. "
+            "This example illustrates layout only, not campaign content; "
             "use the actual known speaker ID in play. Example layout: "
             '[{"kind":"narration","text":"The guard nods."},'
-            '{"kind":"npc_utterance","speaker_id":"anonymous","spoken_words":"Go."},'
+            '{"kind":"npc_utterance","speaker_id":"anonymous","speaker_name":"The guard",'
+            '"spoken_words":"Go."},'
             '{"kind":"narration","text":"She steps aside, then adds:"},'
-            '{"kind":"npc_utterance","speaker_id":"anonymous","spoken_words":"Quickly."}]'
+            '{"kind":"npc_utterance","speaker_id":"anonymous","speaker_name":"The guard",'
+            '"spoken_words":"Quickly."}]'
         ),
     }
 
@@ -1221,6 +1241,37 @@ def _player_turn_text(content: Mapping[str, object]) -> str:
         },
         ensure_ascii=False,
         separators=(",", ":"),
+    )
+
+
+_SPEAKER_NAME_MAX_LENGTH = 80
+
+
+def _validated_speaker_name(value: object) -> str:
+    """Admit one short single-line speaker name, returned with its spacing collapsed."""
+
+    if not isinstance(value, str):
+        raise ValueError("speaker_name must be a string")
+    name = " ".join(value.split())
+    if (
+        not name
+        or len(name) > _SPEAKER_NAME_MAX_LENGTH
+        or any(not character.isprintable() for character in value if character != " ")
+        or _contains_serialized_tool_call(name)
+    ):
+        raise ValueError("speaker_name must be a short single-line name")
+    return name
+
+
+def _speaker_names_overlap(first: str, second: str) -> bool:
+    """Whether either casefolded name contains the other as whole words."""
+
+    def contains(outer: str, inner: str) -> bool:
+        return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None
+
+    first_key, second_key = (" ".join(name.casefold().split()) for name in (first, second))
+    return bool(first_key and second_key) and (
+        contains(first_key, second_key) or contains(second_key, first_key)
     )
 
 
@@ -1252,6 +1303,9 @@ def _validated_raw_response_blocks(
         ):
             raise ValueError(f"response block kind and {text_key} are invalid")
         allowed = {"kind", text_key, "speaker_id"} if kind == "npc_dialogue" else {"kind", "text"}
+        if kind == "npc_dialogue" and "speaker_name" in item:
+            allowed.add("speaker_name")
+            _validated_speaker_name(item["speaker_name"])
         if set(item) != allowed:
             raise ValueError("response block fields are invalid")
         if _contains_serialized_tool_call(text):
@@ -1362,6 +1416,9 @@ def _project_response_blocks(
     """Resolve raw speaker IDs to labels from fresh player-visible campaign authority."""
 
     names: dict[str, str] = {}
+    # Names the campaign does not show the player (hidden people, player-controlled
+    # characters). A model-given speaker_name never shows one of these.
+    withheld: list[str] = []
     for participant in getattr(snapshot, "participants", ()):
         data = _participant_data(participant)
         participant_id = str(getattr(participant, "participant_id", ""))
@@ -1383,6 +1440,8 @@ def _project_response_blocks(
         name = data.get("name")
         if not player_controlled and visible and isinstance(name, str) and name.strip():
             names[participant_id] = name
+        elif isinstance(name, str) and name.strip():
+            withheld.append(name)
     continuity = snapshot.continuity
     latest_entities: dict[str, object] = {}
     for record in sorted(
@@ -1394,6 +1453,12 @@ def _project_response_blocks(
     for entity_id, record in latest_entities.items():
         payload = getattr(record, "payload", {})
         names.pop(entity_id, None)
+        if (
+            isinstance(payload, Mapping)
+            and payload.get("visibility") != "player_known"
+            and isinstance(payload.get("name"), str)
+        ):
+            withheld.append(str(payload["name"]))
         if (
             getattr(record, "status", None) == "active"
             and isinstance(payload, Mapping)
@@ -1407,7 +1472,12 @@ def _project_response_blocks(
         safe = {"kind": block["kind"], "text": block["text"]}
         if block["kind"] == "npc_dialogue":
             speaker_id = str(block["speaker_id"])
-            safe["speaker_label"] = names.get(speaker_id, "Unknown speaker")
+            label = names.get(speaker_id)
+            if label is None and speaker_id == "anonymous" and "speaker_name" in block:
+                given = _validated_speaker_name(block["speaker_name"])
+                if not any(_speaker_names_overlap(given, hidden) for hidden in withheld):
+                    label = given
+            safe["speaker_label"] = label or "Unknown speaker"
         projected.append(cast(SafePayload, safe))
     admitted = validate_response_blocks(projected)
     return response_blocks_text(admitted), admitted
