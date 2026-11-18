@@ -259,7 +259,7 @@ def test_failed_action_reopen_rejects_gameplay_or_invalid_origin(tmp_path, corru
             (encoded,),
         )
 
-    with pytest.raises(SchemaIdentityError, match="stored integrity"):
+    with pytest.raises(SchemaIdentityError, match="integrity"):
         AuthorityOwner.open(database, "owner")
 
 

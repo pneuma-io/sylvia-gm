@@ -19,12 +19,12 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
-from sylvia_gm.provider._model_facts import claude_code_context_window
 from sylvia_gm.provider._exceptions import (
     InvalidResponseError,
     ProviderConnectionError,
     ProviderTimeoutError,
 )
+from sylvia_gm.provider._model_facts import claude_code_context_window
 
 MINIMUM_VERSION = (2, 1, 322)
 MINIMUM_VERSION_TEXT = ".".join(map(str, MINIMUM_VERSION))

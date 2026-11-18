@@ -342,6 +342,8 @@ _MODEL_USAGE_COUNTS = (
 class ClaudeProvider(Provider):
     """Use an ephemeral native conversation for each step of Sylvia's existing tool loop."""
 
+    model_info: ModelInfo
+
     def __init__(
         self,
         home: Path,

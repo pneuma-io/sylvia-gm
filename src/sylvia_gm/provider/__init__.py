@@ -42,7 +42,6 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
 )
 from sylvia_gm.provider._factory import ProviderFactory
-from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._hooks import (
     DiagnosticsHook,
     DumpHook,
@@ -60,6 +59,7 @@ from sylvia_gm.provider._openai_compat import (
     OpenAICompatProvider,
 )
 from sylvia_gm.provider._registry import ProviderRegistry
+from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._stream_health import StreamHealthMonitor
 from sylvia_gm.provider._usage_tracker import (
     ModelUsageSnapshot,

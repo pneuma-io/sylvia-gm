@@ -16,7 +16,6 @@ from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
 from typing import Any
 
-from sylvia_gm.provider._model_facts import claude_model_facts, claude_model_id
 from sylvia_gm.provider._base import (
     CacheUsage,
     ModelInfo,
@@ -45,8 +44,9 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
     is_context_rejection,
 )
-from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._hooks import HookContext
+from sylvia_gm.provider._model_facts import claude_model_facts, claude_model_id
+from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._retry_after import retry_after_seconds
 
 logger = logging.getLogger(__name__)
@@ -556,6 +556,8 @@ class AnthropicProvider(Provider):
     Uses the anthropic Python SDK with max_retries=0 so our failover
     layer is the sole retry authority.
     """
+
+    model_info: ModelInfo
 
     MAX_CONSECUTIVE_CONNECTION_ERRORS = 3
 

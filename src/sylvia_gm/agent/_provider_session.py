@@ -17,7 +17,15 @@ import queue
 import re
 import uuid
 import weakref
-from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import (
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Iterable,
+    Iterator,
+    Mapping,
+    Sequence,
+)
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -76,9 +84,9 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
-from sylvia_gm.provider._model_facts import uses_gm_narration_hint
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
+from sylvia_gm.provider._model_facts import uses_gm_narration_hint
 
 from ._provider_turn_decisions import (
     _actor_decision_can_be_requested,

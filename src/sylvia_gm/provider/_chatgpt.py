@@ -652,6 +652,8 @@ class _Request:
 class ChatGPTProvider(Provider):
     """Adapt one runtime generation to Sylvia's existing streaming provider interface."""
 
+    model_info: ModelInfo
+
     def __init__(
         self,
         home: Path,

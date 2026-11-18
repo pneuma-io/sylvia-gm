@@ -815,7 +815,9 @@ def weighted_pick(
         return items[_roll_rng().randint(0, len(items) - 1)]
 
     # Use the supplied total, otherwise choose a random point in the weights.
-    roll_val = roll_result.total if roll_result is not None else _roll_rng().randint(1, total_weight)
+    roll_val = (
+        roll_result.total if roll_result is not None else _roll_rng().randint(1, total_weight)
+    )
 
     cumulative = 0
     for item in items:

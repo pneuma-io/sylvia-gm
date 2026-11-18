@@ -52,7 +52,6 @@ from sylvia_gm.provider._exceptions import (
     TokenLimitError,
     is_context_rejection,
 )
-from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._hooks import HookContext
 from sylvia_gm.provider._native_output import (
     DoneTrackingStream,
@@ -60,6 +59,7 @@ from sylvia_gm.provider._native_output import (
     responses_finish,
     split_chat_content,
 )
+from sylvia_gm.provider._retry import retry_with_backoff
 from sylvia_gm.provider._retry_after import retry_after_seconds
 
 logger = logging.getLogger(__name__)
