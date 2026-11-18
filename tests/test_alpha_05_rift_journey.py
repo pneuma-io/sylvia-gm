@@ -599,31 +599,33 @@ def _construct_rift(
             storage_root=storage_root,
         )
         construction_revision = int(advanced["construction_revision"])
-    started = _dispatch(
-        bus,
-        "start_rift_campaign",
-        {
-            "operation_id": f"start-rift-{scenario_id}",
+    def start_command(operation_id: str) -> dict[str, object]:
+        """The desktop's shared guided Start, with the Rift's authored starter."""
+        return {
+            "operation_id": operation_id,
             "campaign_id": campaign_id,
             "builder_session_id": builder_session_id,
-            "ruleset_selection": "sylvia.srd-lite.bg3",
+            "display_name": f"The Rift Awakening - {scenario_id}",
+            "candidate_id": "sylvia.srd-lite.bg3",
+            "premise": (
+                f"Specific requests: {customization_notes}" if customization_notes else ""
+            ),
             "setting_id": "pneuma.severed-lands",
             "plan_id": plan_id,
-            "display_name": f"The Rift Awakening - {scenario_id}",
-            "lane": lane,
-            "player_name": "Mara Venn",
-            "archetype_id": "open-adventurer",
+            "player_character_id": "open-adventurer",
             "companion_ids": list(companion_ids),
-            "customization_notes": customization_notes,
-            "provider_id": "scripted-builder",
-            "model_id": "scripted-builder-model",
             "construction_intent": {
                 "boundaries": "",
                 "preferences": "",
                 "specific_requests": customization_notes,
                 "contributions": {},
             },
-        },
+        }
+
+    started = _dispatch(
+        bus,
+        "start_guided_campaign",
+        start_command(f"start-rift-{scenario_id}"),
         application_owner=owner,
         owner_id="owner-rift",
         provider_resolver=None,  # type: ignore[arg-type]
@@ -635,28 +637,8 @@ def _construct_rift(
     assert started["campaign_id"] == campaign_id
     resumed_start = _dispatch(
         bus,
-        "start_rift_campaign",
-        {
-            "operation_id": f"resume-start-rift-{scenario_id}",
-            "campaign_id": campaign_id,
-            "builder_session_id": builder_session_id,
-            "ruleset_selection": "sylvia.srd-lite.bg3",
-            "setting_id": "pneuma.severed-lands",
-            "plan_id": plan_id,
-            "display_name": f"The Rift Awakening - {scenario_id}",
-            "lane": lane,
-            "archetype_id": "mara",
-            "companion_ids": list(companion_ids),
-            "customization_notes": customization_notes,
-            "provider_id": "scripted-builder",
-            "model_id": "scripted-builder-model",
-            "construction_intent": {
-                "boundaries": "",
-                "preferences": "",
-                "specific_requests": customization_notes,
-                "contributions": {},
-            },
-        },
+        "start_guided_campaign",
+        start_command(f"resume-start-rift-{scenario_id}"),
         application_owner=owner,
         owner_id="owner-rift",
         provider_resolver=None,  # type: ignore[arg-type]
@@ -935,8 +917,12 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
         assert archive == bundled_rift_archive()
         public = _dispatch(
             bus,
-            "rift_template",
-            {},
+            "campaign_party_options",
+            {
+                "ruleset_selection": "sylvia.srd-lite.bg3",
+                "setting_id": "pneuma.severed-lands",
+                "plan_id": "the-rift-awakening",
+            },
             application_owner=owner,
             owner_id="owner-rift",
             provider_resolver=None,  # type: ignore[arg-type]
@@ -944,8 +930,13 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
             session_loop=CampaignSessionLoop(owner),
             storage_root=tmp_path,
         )
+        # The Setting's party template reaches the picker through ordinary party options.
         expected_public = rift_public_template()
-        assert {key: value for key, value in public.items() if key != "player_archetypes"} == {
+        assert public["starting_party"] == bundled_rift_campaign_plan().payload["starting_party"]
+        assert {
+            key: value for key, value in public.items()
+            if key not in {"player_archetypes", "starting_party"}
+        } == {
             key: value for key, value in expected_public.items() if key != "player_archetypes"
         }
         archetypes = {item["id"]: item for item in public["player_archetypes"]}
@@ -960,21 +951,19 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
             "operation_id": "reject-cross-type-rift-selection",
             "campaign_id": "not-created",
             "builder_session_id": "not-created",
-            "ruleset_selection": "the-rift-awakening",
+            "candidate_id": "the-rift-awakening",
             "setting_id": "pneuma.severed-lands",
             "plan_id": "the-rift-awakening",
             "display_name": "Rejected cross-type selection",
-            "lane": "quick_start",
-            "archetype_id": "mara",
+            "player_character_id": "open-adventurer",
             "companion_ids": [],
-            "customization_notes": "",
-            "provider_id": "scripted-builder",
-            "model_id": "scripted-builder-model",
+            "premise": "",
+            "construction_intent": {},
         }
         with pytest.raises(CommandRejected):
             _dispatch(
                 bus,
-                "start_rift_campaign",
+                "start_guided_campaign",
                 invalid_start,
                 application_owner=owner,
                 owner_id="owner-rift",
@@ -984,12 +973,12 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
                 storage_root=tmp_path,
             )
         invalid_start["operation_id"] = "reject-cross-type-rift-setting"
-        invalid_start["ruleset_selection"] = "sylvia.srd-lite.bg3"
+        invalid_start["candidate_id"] = "sylvia.srd-lite.bg3"
         invalid_start["setting_id"] = "the-rift-awakening"
         with pytest.raises(CommandRejected):
             _dispatch(
                 bus,
-                "start_rift_campaign",
+                "start_guided_campaign",
                 invalid_start,
                 application_owner=owner,
                 owner_id="owner-rift",

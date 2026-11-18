@@ -16,10 +16,9 @@ from sylvia_gm.application.builder_references import (
     with_character_examples,
 )
 from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
-from sylvia_gm.application.bundled_packages import bundled_rift_authority
-from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_library_selection import (
     materialize_library_party,
+    materialize_template_party,
     plan_with_interview_intent,
     resolve_campaign_library_selection,
 )
@@ -39,7 +38,6 @@ from sylvia_gm.application.reusable_plans import (
     save_reusable_campaign_plan,
     save_reusable_rift_plan,
 )
-from sylvia_gm.campaign.rift import rift_public_template
 from sylvia_gm.config.provider_settings import require_configured_model
 from sylvia_gm.domain.authority import (
     PackageLock,
@@ -79,11 +77,8 @@ from ..owner_process import (
     _required_artifact_id,
     _required_nonnegative_int,
     _required_text,
-    _resolve_rift_library_selection,
     _reusable_participant_catalog,
-    _rift_reusable_participants,
     _seed_campaign_plan,
-    _start_rift_campaign,
 )
 from . import DispatchContext
 
@@ -234,50 +229,10 @@ def handle_adopt_campaign_rules_update(ctx: DispatchContext, params: Mapping[str
     )
 
 
-def handle_rift_template(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
-    try:
-        participants = _rift_reusable_participants(ctx.storage_root)
-    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as error:
-        raise CommandRejected(
-            "Reusable participant library contains an invalid artifact",
-            code="reusable_participant_invalid",
-        ) from error
-    return rift_public_template(reusable_participants=participants)
-
-
 def handle_campaign_party_options(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
     ruleset_selection = _required_text(params, "ruleset_selection")
     setting_id = _required_text(params, "setting_id")
     plan_id = _required_text(params, "plan_id")
-    catalog_plan = next((
-        item for item in _campaign_creation_catalog(
-            ctx.storage_root, ctx.application_owner, include_participants=False,
-        )
-        if item.get("kind") == "campaign_plan" and item.get("id") == plan_id
-    ), None)
-    if catalog_plan is not None and catalog_plan.get("setup_id") == "the-rift-awakening":
-        candidate, sources, _plan, template = _resolve_rift_library_selection(
-            ctx.application_owner, ctx.storage_root, ruleset_selection=ruleset_selection,
-            setting_id=setting_id, plan_id=plan_id,
-        )
-        primary = next(
-            entry for entry in candidate.package_lock.entries
-            if entry.role is PackageRole.PRIMARY
-        )
-        declaration = next(
-            item for item in ctx.application_owner.exact_participant_declarations(
-                primary.package_id, primary.version, primary.sha256,
-            ) if item.kind == "player_character"
-        )
-        return rift_public_template(
-            reusable_participants=available_reusable_participants(
-                ctx.storage_root, package=primary, declaration=declaration,
-                campaign_setting=sources.setting,
-                legacy_campaign_setting=bundled_rift_authority().setting,
-                setting_character_schema=sources.setting_character_schema,
-            ),
-            template=template,
-        )
     return resolve_campaign_library_selection(
         ctx.application_owner, ctx.storage_root, candidate_id=ruleset_selection,
         setting_id=setting_id, plan_id=plan_id,
@@ -288,41 +243,6 @@ def handle_retryable_interruption(ctx: DispatchContext, params: Mapping[str, Any
     return ctx.bus.retryable_interruption(
         _required_text(params, "campaign_id"),
         failed_attempt_id=_required_text(params, "failed_attempt_id"),
-    )
-
-
-def handle_start_rift_campaign(ctx: DispatchContext, params: Mapping[str, Any]) -> Any:
-    raw_companion_ids = params.get("companion_ids")
-    if (
-        not isinstance(raw_companion_ids, list)
-        or len(raw_companion_ids) > 5
-        or any(not isinstance(item, str) or not item for item in raw_companion_ids)
-    ):
-        raise OwnerProtocolError("companion_ids must contain zero to five identities")
-    customization_notes = params.get("customization_notes", "")
-    if not isinstance(customization_notes, str):
-        raise OwnerProtocolError("customization_notes must be a string")
-    construction_intent = params.get("construction_intent", {})
-    if not isinstance(construction_intent, dict):
-        raise OwnerProtocolError("construction_intent must be an object")
-    return _start_rift_campaign(
-        ctx.bus,
-        ctx.application_owner,
-        ctx.storage_root,
-        operation_id=_required_text(params, "operation_id"),
-        campaign_id=_required_text(params, "campaign_id"),
-        builder_session_id=_required_text(params, "builder_session_id"),
-        ruleset_selection=_required_text(params, "ruleset_selection"),
-        setting_id=_required_text(params, "setting_id"),
-        plan_id=_required_text(params, "plan_id"),
-        display_name=_required_text(params, "display_name"),
-        lane=_required_text(params, "lane"),
-        archetype_id=_required_text(params, "archetype_id"),
-        companion_ids=tuple(raw_companion_ids),
-        customization_notes=customization_notes,
-        provider_id=_required_text(params, "provider_id"),
-        model_id=_required_text(params, "model_id"),
-        construction_intent=cast(SafePayload, construction_intent),
     )
 
 
@@ -368,12 +288,22 @@ def handle_start_guided_campaign(ctx: DispatchContext, params: Mapping[str, Any]
         if not isinstance(intent, dict):
             raise OwnerProtocolError("construction_intent must be an object")
         assert selection is not None
-        participants, initial_state, selected_party = materialize_library_party(
-            ctx.application_owner, selection, operation_id=operation_id,
-            player_character_id=_required_text(params, "player_character_id"),
-            companion_ids=tuple(raw_companions),
-        )
-        selected_plan = plan_with_interview_intent(selection, cast(SafePayload, intent))
+        if selection.party_template is not None:
+            participants, initial_state, selected_party, selected_plan = (
+                materialize_template_party(
+                    ctx.application_owner, selection, operation_id=operation_id,
+                    player_character_id=_required_text(params, "player_character_id"),
+                    companion_ids=tuple(raw_companions),
+                    intent=cast(SafePayload, intent),
+                )
+            )
+        else:
+            participants, initial_state, selected_party = materialize_library_party(
+                ctx.application_owner, selection, operation_id=operation_id,
+                player_character_id=_required_text(params, "player_character_id"),
+                companion_ids=tuple(raw_companions),
+            )
+            selected_plan = plan_with_interview_intent(selection, cast(SafePayload, intent))
         canonical_input.update(
             {
                 "plan_id": selection.plan.artifact_id,

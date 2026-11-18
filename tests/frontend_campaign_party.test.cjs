@@ -202,6 +202,7 @@ function harness(stepIds = ['participants'], storage = null) {
     state, createHostBridge, refreshCampaignPartyOptions, campaignPartyOptionsReady,
     campaignPartySelectionProblem, updateCampaignPartyActionAvailability,
     showConstructionPanel, toolPresentation, toolResultMarkup, wireBuilderResultActions,
+    usesBundledCampaignSetup,
     advanceConstructionInterview, loadContribution, exportSelectedCampaignPlan,
     constructionStepAnswer, showConstructionStepId, currentConstructionStepId,
     activeConstructionStepIds, wireControls, refreshRulesetBrowser,
@@ -554,36 +555,37 @@ test('host catalog defaults to complete discovery and forwards explicit setup de
 test('Ruleset browsing requests metadata without constructing an unselected Rift party', async () => {
   const h = harness();
   const calls = [];
-  let riftCalls = 0;
   h.state.bridge = {
     campaign_creation_catalog: async (includeParticipants) => {
       calls.push(includeParticipants);
       return [{ kind: 'ruleset', id: 'rules', selection_id: 'rules', title: 'Rules', compatible_settings: [] }];
     },
-    rift_template: async () => { riftCalls++; throw new Error('Party construction must wait for selection'); },
   };
   await h.showConstructionPanel();
   assert.deepEqual(calls, [false]);
-  assert.equal(riftCalls, 0);
   assert.equal(h.node('construction-panel').hidden, false);
   assert.match(h.node('construction-package').innerHTML, /Rules/);
 });
 
-test('an inventoried legacy setup still loads its retained Rift metadata', async () => {
+test('a setup Plan needs no separate template request; its party options carry the template', async () => {
   const h = harness();
-  let riftCalls = 0;
   h.state.bridge = {
     campaign_creation_catalog: async () => [{
       kind: 'campaign_plan', id: 'legacy-plan', setup_id: 'the-rift-awakening',
     }],
-    rift_template: async () => {
-      riftCalls++;
-      return { template_id: 'the-rift-awakening' };
-    },
   };
   await h.showConstructionPanel();
-  assert.equal(riftCalls, 1);
-  assert.equal(h.state.riftTemplate.template_id, 'the-rift-awakening');
+  assert.equal(h.node('construction-panel').hidden, false);
+  assert.equal(h.state.riftTemplate, undefined);
+  h.state.campaignCreationCatalog = [{
+    kind: 'campaign_plan', id: 'legacy-plan', setup_id: 'the-rift-awakening',
+  }];
+  h.node('construction-template').innerHTML =
+    '<option value="legacy-plan">Legacy</option><option value="other-plan">Other</option>';
+  h.node('construction-template').value = 'legacy-plan';
+  assert.equal(h.usesBundledCampaignSetup(), true);
+  h.node('construction-template').value = 'other-plan';
+  assert.equal(h.usesBundledCampaignSetup(), false);
 });
 
 test('host bridge forwards exact guided Interview navigation fields', async () => {
@@ -1716,7 +1718,6 @@ test('New Campaign selecting No Rules creates an isolated usable interview witho
   assert.equal(h.currentConstructionStepId(), 'review');
 
   h.node('construction-template').value = 'stale-plan';
-  h.state.riftTemplate = { template_id: 'stale-setup' };
   h.state.campaignCreationCatalog.push({
     kind: 'campaign_plan', id: 'stale-plan', setup_id: 'stale-setup',
   });

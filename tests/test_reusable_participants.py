@@ -914,10 +914,10 @@ def test_participant_builder_tool_derives_role_and_setup_refreshes_local_choices
     frontend = (ROOT / "src-tauri" / "frontend" / "app.js").read_text(encoding="utf-8")
     setup = frontend[frontend.index("async function showConstructionPanel") :]
     setup = setup[: setup.index("function restoreConstructionAnswer")]
-    assert "const template = await state.bridge.rift_template();" in setup
-    assert "renderRiftTemplate(template);" in setup
+    # A setup Plan's party template arrives with its ordinary party options.
+    assert "rift_template" not in setup
+    assert "renderRiftTemplate" not in frontend
     assert "if (!stillSelected()) return;" in setup
-    assert "!state.riftTemplate" not in setup
 
     operating_guide = (
         ROOT / "rulesets" / "srd-lite" / "prompts" / "gm-operating-guide.md"
@@ -974,19 +974,15 @@ def test_owner_dispatch_projects_only_compatible_local_participant_metadata(
             declaration=declaration,
             campaign_setting=bundled_rift_authority().setting,
         )
-        public = dispatch("rift_template", {})
-        selected = next(
-            item for item in public["player_archetypes"] if item["id"] == saved.artifact_id
-        )
-        assert selected == {
-            "id": saved.artifact_id,
-            "name": "Ilyra",
-            "label": "Ilyra",
-            "summary": "A synthetic owner-dispatch fixture.",
-            "reusable": True,
-            "profile_status": "authored",
-            "campaign_ready": True,
-        }
+        public = dispatch("campaign_party_options", {
+            "ruleset_selection": "sylvia.srd-lite.bg3", "setting_id": "pneuma.severed-lands",
+            "plan_id": "the-rift-awakening",
+        })
+        assert public["template_id"] == "the-rift-awakening"
+        # The Plan's party template supplies its authored starter; a saved file joins only
+        # when it is bound to the Plan's exact Setting copy, not the shipped Rift Setting.
+        assert public["player_archetypes"][0]["id"] == "open-adventurer"
+        assert saved.artifact_id not in {item["id"] for item in public["player_archetypes"]}
         legacy_saved = saved
         plan_package, plan_declaration, plan_setting = _plan_participant_authority()
         saved = save_reusable_participant(

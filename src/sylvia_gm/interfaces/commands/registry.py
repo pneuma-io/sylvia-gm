@@ -138,7 +138,6 @@ _COMMANDS = (
         'compare_package_candidates', _handler('packages', 'handle_compare_package_candidates'),
         True, True,
     ),
-    Command('rift_template', _handler('campaigns', 'handle_rift_template'), True, True),
     Command(
         'campaign_party_options', _handler('campaigns', 'handle_campaign_party_options'),
         True, True,
@@ -263,7 +262,6 @@ _COMMANDS = (
         'install_package_file', _handler('packages', 'handle_install_package_file'),
         False, True,
     ),
-    Command('start_rift_campaign', _handler('campaigns', 'handle_start_rift_campaign'), True, True),
     Command(
         'start_guided_campaign', _handler('campaigns', 'handle_start_guided_campaign'),
         True, True,

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from sylvia_gm.application.bundled_campaign_plans import selected_campaign_plan
+from sylvia_gm.application.bundled_packages import bundled_rift_authority
 from sylvia_gm.application.bundled_starter_characters import available_reusable_participants
 from sylvia_gm.application.campaign_plan_sources import (
     CampaignPlanToolAuthority,
@@ -35,6 +36,15 @@ from sylvia_gm.application.reusable_participants import (
     parse_setting_character,
 )
 from sylvia_gm.application.reusable_plans import ReusableCampaignPlan
+from sylvia_gm.campaign.rift import (
+    RIFT_RULESET_ID,
+    RIFT_TEMPLATE_ID,
+    bundled_rift_template,
+    materialize_rift_selection,
+    rift_public_template,
+    validate_rift_party_handoff,
+    validate_rift_template,
+)
 from sylvia_gm.domain.authority import (
     JsonValue,
     PackageLockEntry,
@@ -109,9 +119,19 @@ class CampaignLibrarySelection:
     participants: tuple[ReusableParticipant, ...]
     entity_reference: Mapping[str, object] | None
     required_participants: tuple[ReusableParticipant, ...] = ()
+    #: An authored party template the Plan's Setting supplies as campaign data.
+    party_template: Mapping[str, object] | None = None
 
     def party_options(self) -> SafePayload:
         """Expose compatible authored files and explain unavailable required Setting files."""
+        if self.party_template is not None:
+            options = rift_public_template(
+                reusable_participants=self.participants,
+                template=json.loads(canonical_json_bytes(self.party_template)),
+            )
+            options["template_id"] = self.plan.artifact_id
+            options["starting_party"] = self.plan.plan.payload["starting_party"]
+            return cast(SafePayload, options)
         rows: dict[str, list[dict[str, object]]] = {"player_character": [], "companion": []}
         def row_for(item: ReusableParticipant) -> dict[str, object]:
             row = dict(_participant_choice(item, self.entity_reference))
@@ -289,7 +309,9 @@ def resolve_campaign_plan_selection(
     )
     if candidate is None:
         try:
-            snapshot = retained.package_snapshot or retained_plan_snapshot(owner, retained.plan.payload)
+            snapshot = retained.package_snapshot or retained_plan_snapshot(
+                owner, retained.plan.payload,
+            )
         except ValueError as error:
             raise CommandRejected("The selected Campaign Plan snapshot is unavailable") from error
         candidate = owner.install_package_archive(
@@ -329,7 +351,105 @@ def resolve_campaign_plan_selection(
         (),
         reference,
         required_participants,
+        _plan_party_template(plan, candidate, sources),
     )
+
+
+def _plan_party_template(
+    plan: ReusableCampaignPlan,
+    candidate: PackageCandidate,
+    sources: CampaignPlanToolAuthority,
+) -> Mapping[str, object] | None:
+    """Read the party template a campaign setup's Setting supplies as campaign data."""
+    if plan.setup_id is None:
+        return None
+    if plan.setup_id != RIFT_TEMPLATE_ID:
+        raise CommandRejected("The selected Plan uses an unsupported campaign setup")
+    template_path = f"campaigns/{plan.setup_id}/party-template.json"
+    if template_path in sources.setting_paths:
+        try:
+            return validate_rift_template(json.loads(sources.read_setting(template_path)))
+        except (OSError, UnicodeError, ValueError) as error:
+            raise CommandRejected(
+                "The selected Plan's party template is invalid",
+                code="campaign_library_selection_invalid",
+            ) from error
+    # Copies saved before Settings carried the template keep the shipped one; a Plan that
+    # retains its own Ruleset snapshot must also contain its template.
+    if any(
+        dependency.kind == "ruleset_snapshot"
+        for entry in candidate.package_lock.entries for dependency in entry.dependencies
+    ):
+        raise CommandRejected("The selected Plan has no contained party template")
+    return bundled_rift_template()
+
+
+def materialize_template_party(
+    owner: AuthorityOwner,
+    selection: CampaignLibrarySelection,
+    *,
+    operation_id: str,
+    player_character_id: str,
+    companion_ids: tuple[str, ...],
+    intent: SafePayload,
+) -> tuple[
+    tuple[Participant, ...], tuple[StateValue, ...], list[dict[str, object]],
+    ValidatedCampaignPlan,
+]:
+    """Place a party chosen from the Plan's party template plus compatible saved files."""
+    if selection.party_template is None:  # pragma: no cover - caller checks
+        raise CommandRejected("The selected Plan has no party template")
+    primary = next(
+        (
+            entry for entry in selection.candidate.package_lock.entries
+            if entry.role is PackageRole.PRIMARY and entry.package_id == RIFT_RULESET_ID
+        ),
+        None,
+    )
+    declaration = next(
+        (
+            item
+            for item in (owner.exact_participant_declarations(
+                primary.package_id, primary.version, primary.sha256
+            ) if primary is not None else ())
+            if item.kind == "player_character"
+        ),
+        None,
+    )
+    if primary is None or declaration is None:
+        raise CommandRejected("The party template's D&D campaign package is unavailable")
+    template_party = materialize_rift_selection(
+        participant_namespace=hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24],
+        lane="quick_start",
+        archetype_id=player_character_id,
+        companion_ids=companion_ids,
+        customization_notes="",
+        package=primary,
+        participant_declaration=declaration,
+        starting_party_policy=selection.plan.plan.payload["starting_party"],
+        template=json.loads(canonical_json_bytes(selection.party_template)),
+        selected_plan=selection.plan.plan,
+        setting_character_schema=selection.sources.setting_character_schema,
+        reusable_participants=tuple(
+            item for item in selection.participants if item.schema_id == declaration.schema_id
+        ),
+    )
+    plan = plan_with_interview_intent(
+        selection, intent, readable_markdown=template_party.campaign_plan_markdown,
+    )
+    template_party = replace(
+        template_party,
+        campaign_plan=plan.payload,
+        campaign_plan_markdown=plan.readable_markdown,
+    )
+    starting_party = plan.payload.get("starting_party")
+    if not isinstance(starting_party, Mapping):  # pragma: no cover - validated format
+        raise CommandRejected("The validated Campaign Plan starting party is unavailable")
+    validate_rift_party_handoff(template_party, starting_party)
+    selected_party = template_party.canonical_input["selected_party"]
+    if not isinstance(selected_party, list):  # pragma: no cover - materializer contract
+        raise CommandRejected("The materialized party record is invalid")
+    return template_party.participants, template_party.initial_state, selected_party, plan
 
 
 def resolve_campaign_library_selection(
@@ -355,6 +475,11 @@ def resolve_campaign_library_selection(
             for item in available_reusable_participants(
                 storage_root, package=primary, declaration=declaration,
                 campaign_setting=selection.sources.setting,
+                # A party-template setup also accepts files saved against its shipped Setting.
+                legacy_campaign_setting=(
+                    bundled_rift_authority().setting
+                    if selection.party_template is not None else None
+                ),
                 setting_character_schema=selection.sources.setting_character_schema,
             )
         )
@@ -500,6 +625,8 @@ def materialize_library_party(
 def plan_with_interview_intent(
     selection: CampaignLibrarySelection,
     intent: SafePayload,
+    *,
+    readable_markdown: str | None = None,
 ) -> ValidatedCampaignPlan:
     """Retain the selected story and add the player's accepted campaign instructions."""
     payload = json.loads(canonical_json_bytes(selection.plan.plan.payload))
@@ -529,7 +656,9 @@ def plan_with_interview_intent(
             line = f"Accepted {step.replace('_', ' ')}: {rendered}"
             lines.append(line)
             payload["gm_guidance"]["instructions"] += f"\n{line}"
-    markdown = selection.plan.plan.readable_markdown
+    markdown = (
+        selection.plan.plan.readable_markdown if readable_markdown is None else readable_markdown
+    )
     if lines:
         markdown += (
             "\n\n## Accepted Campaign Construction\n\n"

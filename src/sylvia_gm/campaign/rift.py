@@ -97,6 +97,11 @@ def _template() -> dict[str, Any]:
     return validate_rift_template(value)
 
 
+def bundled_rift_template() -> dict[str, Any]:
+    """The shipped party template, for Plan copies saved before their Setting carried one."""
+    return copy.deepcopy(_template())
+
+
 def validate_rift_template(value: object) -> dict[str, Any]:
     """Validate an authored Rift party template loaded from the selected Setting copy."""
     required = {

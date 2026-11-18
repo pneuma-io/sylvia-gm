@@ -857,10 +857,10 @@ class TestUI001Frame:
         assert 'id="rift-player-name"' not in html
         assert "Player Character name" not in html
         assert "player_name" not in js
-        start_rift_command = rust.split("fn start_rift_campaign(", maxsplit=1)[1].split(
-            "fn start_guided_campaign(", maxsplit=1
+        start_command = rust.split("fn start_guided_campaign(", maxsplit=1)[1].split(
+            "#[tauri::command]", maxsplit=1
         )[0]
-        assert "player_name" not in start_rift_command
+        assert "player_name" not in start_command
 
     def test_specific_requests_has_no_manual_customization_button(self) -> None:
         html = (FRONTEND_DIR / "app.html").read_text(encoding="utf-8")
@@ -1300,8 +1300,11 @@ class TestUI001Frame:
             "rift-create-companion",
         ):
             assert f'id="{control_id}"' in html
-        assert "rift_template" in js
-        assert "start_rift_campaign" in js
+        # Setup Plans start through the shared guided path; their party template is
+        # campaign data read by campaign_party_options.
+        assert "rift_template" not in js
+        assert "start_rift_campaign" not in js
+        assert "campaign_party_options" in js
         assert "companion_ids: companionIds" in js
         assert "function applyStartingPartyPolicy()" in js
         assert "function enforceCompanionMaximum()" in js
@@ -1327,12 +1330,12 @@ class TestUI001Frame:
         assert "I want to start a new campaign." not in js
         assert "await finalizeSelectedConstruction();" in js
         assert "friendlyCommandError(\n        'Construction could not start'" in js
-        assert '"rift_template"' in rust
-        assert '"start_rift_campaign"' in rust
+        assert '"rift_template"' not in rust
+        assert '"start_rift_campaign"' not in rust
         assert '"guided_campaign_contribution"' in rust
         assert '"save_reusable_campaign_plan"' in rust
-        assert "rift_template," in rust
-        assert "start_rift_campaign," in rust
+        assert "rift_template," not in rust
+        assert "start_rift_campaign," not in rust
 
     def test_navigation_restores_guided_interview_before_chronology_clear(self) -> None:
         js = (FRONTEND_DIR / "app.js").read_text(encoding="utf-8")
@@ -2032,7 +2035,6 @@ class TestUI001Frame:
         assert "async fn owner_call_async(" in rust
         assert "tauri::async_runtime::spawn_blocking" in rust
         for command in (
-            "start_rift_campaign",
             "start_guided_campaign",
             "begin_campaign_construction",
             "finalize_campaign_construction",
@@ -2054,7 +2056,7 @@ class TestUI001Frame:
         assert "campaignConfirmationPending: false" in js
         assert "if (state.campaignConfirmationPending) return;" in confirmation
         assert confirmation.index("state.campaignConfirmationPending = true;") < (
-            confirmation.index("await state.bridge.start_rift_campaign")
+            confirmation.index("await state.bridge.start_guided_campaign")
         )
         assert "state.campaignConfirmationPending = false;" in confirmation
         assert "campaignHandoffPending: false" in js
