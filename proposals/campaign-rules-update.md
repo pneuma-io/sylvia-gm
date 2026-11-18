@@ -22,8 +22,8 @@ unchanged until the player chooses to adopt it.
   activation transaction. Failure keeps the old version authoritative.
 - Preserve saved state, existing windows, panel arrangement and applicable view
   preferences. Add new panels once in the sidebar.
-- Retain previous exact versions for recovery. Returning to one requires a fresh
-  compatibility review and must preserve progress made after the earlier adoption.
+- Retain previous exact versions. Tell players to treat adoption as one-way and export
+  the campaign first if they want a playable copy with the earlier rules.
 - Keep reusable source content and other campaigns unchanged.
 
 Reuse the existing package activation, immutable pin/lineage and panel workspace
