@@ -64,7 +64,14 @@ from contextvars import ContextVar
 
 _rng: random.Random = random.Random(os.urandom(16))
 _current_seed: int | None = None
-_tool_rng: ContextVar[random.Random | None] = ContextVar("tool_rng", default=None)
+
+
+@dataclasses.dataclass
+class _ToolDice:
+    rng: random.Random | None = None
+
+
+_tool_dice: ContextVar[_ToolDice | None] = ContextVar("tool_dice", default=None)
 _roll_source: ContextVar[random.Random | None] = ContextVar("roll_source", default=None)
 
 
@@ -84,28 +91,34 @@ def seeded_rolls(seed: int | None) -> Iterator[None]:
     if seed is None or _roll_source.get() is not None:
         yield
         return
-    token = _tool_rng.set(random.Random())
+    token = _tool_dice.set(_ToolDice())
     try:
-        # SylviaBench intercepts set_seed to pair rolls across model runs.
+        # Existing dice controls can intercept seeding or supply their own source.
         set_seed(seed)
         yield
     finally:
-        _tool_rng.reset(token)
+        _tool_dice.reset(token)
 
 
 def _roll_rng() -> random.Random:
-    return _roll_source.get() or _tool_rng.get() or _rng
+    source = _roll_source.get()
+    if source is not None:
+        return source
+    tool_dice = _tool_dice.get()
+    if tool_dice is not None and tool_dice.rng is not None:
+        return tool_dice.rng
+    return _rng
 
 
 def set_seed(seed: int) -> None:
     """Seed the active tool stream or the default stream outside a tool invocation."""
     global _current_seed
-    tool_rng = _tool_rng.get()
-    if tool_rng is None:
+    tool_dice = _tool_dice.get()
+    if tool_dice is None:
         _rng.seed(seed)
         _current_seed = seed
     else:
-        tool_rng.seed(seed)
+        tool_dice.rng = random.Random(seed)
 
 
 def get_seed() -> int | None:

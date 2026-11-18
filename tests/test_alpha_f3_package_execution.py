@@ -1181,3 +1181,16 @@ def test_seeded_tool_rolls_keep_independent_sequences_across_threads() -> None:
         for seed, batch in ((11, first), (42, second)):
             expected = Random(seed)
             assert batch.result() == tuple(expected.randint(1, 20) for _ in range(8))
+
+
+def test_seeded_tool_rolls_respect_an_existing_dice_source(monkeypatch) -> None:
+    from random import Random
+
+    from sylvia_gm import dice
+
+    monkeypatch.setattr(dice, "_rng", Random(7))
+    monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
+    expected = Random(7)
+    for seed in (12, 34):
+        with dice.seeded_rolls(seed):
+            assert dice.roll(20).results == (expected.randint(1, 20),)
