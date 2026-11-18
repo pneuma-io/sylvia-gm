@@ -709,6 +709,7 @@ class AuthorityOwner:
         self._attempts: dict[tuple[str, str], _NarrationAttempt] = {}
         self._pending_tools: dict[tuple[str, str], PlayerProjection] = {}
         self._inspector_trace: list[object] = []
+        self._pending_audit_usage: dict[str, object] = {}
         self._mechanics_diagnostics: list[SafePayload] = []
         self._admin_full_audit_enabled = False
         self._lifecycle_condition = threading.Condition()
@@ -8943,6 +8944,7 @@ class AuthorityOwner:
         with self._operation(), self._narration_lock:
             if self._admin_full_audit_enabled != enabled:
                 self._inspector_trace.clear()
+                self._pending_audit_usage.clear()
             self._admin_full_audit_enabled = enabled
             return owned_payload({"enabled": enabled, "trace_count": len(self._inspector_trace)})
 
@@ -8956,8 +8958,34 @@ class AuthorityOwner:
         """Capture a private exchange or defect only while explicit admin mode is enabled."""
 
         with self._operation(), self._narration_lock:
-            if self._admin_full_audit_enabled:
-                self._inspector_trace.append(owned_json_value(payload))
+            if not self._admin_full_audit_enabled:
+                return
+            if isinstance(payload, Mapping):
+                exchange_id = payload.get("exchange_id")
+                if isinstance(exchange_id, str):
+                    kind = payload.get("kind")
+                    if kind == "provider_late_usage":
+                        self._credit_audit_usage(exchange_id, payload["usage"])
+                        return
+                    if kind in ("provider_response", "provider_stream_response"):
+                        usage = self._pending_audit_usage.pop(exchange_id, None)
+                        if usage is not None:
+                            payload = {**payload, "usage": usage}
+            self._inspector_trace.append(owned_json_value(payload))
+
+    def _credit_audit_usage(self, exchange_id: str, usage: object) -> None:
+        """Replace only the usage projection, keeping the original response and trace index."""
+        for index in range(len(self._inspector_trace) - 1, -1, -1):
+            trace = self._inspector_trace[index]
+            if not isinstance(trace, Mapping) or trace.get("exchange_id") != exchange_id:
+                continue
+            if trace.get("kind") in ("provider_response", "provider_stream_response"):
+                self._inspector_trace[index] = owned_json_value({**trace, "usage": usage})
+                return
+            if trace.get("kind") == "provider_request":
+                # A background close can report before the stream wrapper saves its response.
+                self._pending_audit_usage[exchange_id] = owned_json_value(usage)
+                return
 
     def record_mechanics_diagnostic(
         self,
@@ -9498,6 +9526,7 @@ class AuthorityOwner:
                     if not attempt.terminal:
                         self._expire_narration_locked(attempt)
                 self._inspector_trace.clear()
+                self._pending_audit_usage.clear()
                 self._attempts.clear()
                 self._pending_tools.clear()
             self._store.close()

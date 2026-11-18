@@ -1013,7 +1013,8 @@ CURRENT_WIRE_FRAME: ContextVar[dict[str, Any] | None] = ContextVar(
 #: provider as it reads it: only such a request may keep a runtime thread. Every other
 #: request (an NPC decision, Builder, a summary) runs on a fresh thread. Each stream round
 #: runs in its own task with a copy of the context, and clears it when it starts.
-LEDGER_REQUEST: ContextVar[bool] = ContextVar("sylvia_gm_ledger_request", default=False)
+#: The mark carries the exchange ID shared by the provider and Admin Full Audit.
+LEDGER_REQUEST: ContextVar[str | bool] = ContextVar("sylvia_gm_ledger_request", default=False)
 
 
 def _prefix_fingerprint(stable: Sequence[Mapping[str, Any]]) -> str:

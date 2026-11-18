@@ -16,11 +16,12 @@ import time
 import traceback
 import uuid
 from collections import defaultdict
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager, suppress
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from pathlib import Path
+from threading import Lock
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 from sylvia_gm.provider._base import (
@@ -198,6 +199,19 @@ class HookManager:
         finally:
             self._scoped_hooks.reset(token)
 
+    def late_usage_listeners(
+        self, provider_key: str, exchange_id: str,
+    ) -> list[Callable[[ProviderResponse], None]]:
+        """Bind token accounting to this exchange before its scoped hooks are released."""
+        registered = self._registry.hooks
+        hooks = registered + [hook for hook in self._scoped_hooks.get() if hook not in registered]
+        listeners = []
+        for hook in hooks:
+            bind = getattr(hook, "late_usage_listener", None)
+            if bind is not None and (listener := bind(provider_key, exchange_id)) is not None:
+                listeners.append(listener)
+        return listeners
+
     async def _fire_scoped(self, callback: str, ctx: HookContext) -> None:
         """Fire task-local hooks without exposing concurrent calls to one another."""
 
@@ -308,6 +322,16 @@ class MetricsHook:
         self._latencies: dict[str, list[float]] = defaultdict(list)
         self._token_totals: dict[str, int] = defaultdict(int)
         self._max_latency_samples = 1000
+        self._token_lock = Lock()
+
+    def late_usage_listener(
+        self, provider_key: str, exchange_id: str,
+    ) -> Callable[[ProviderResponse], None]:
+        return lambda response: self._add_tokens(provider_key, response.usage.total_tokens)
+
+    def _add_tokens(self, key: str, total: int) -> None:
+        with self._token_lock:
+            self._token_totals[key] += total
 
     async def on_request(self, context: HookContext) -> None:
         self._call_count[context.provider_key] += 1
@@ -318,7 +342,7 @@ class MetricsHook:
         if len(latencies) < self._max_latency_samples:
             latencies.append(context.duration_ms)
         if context.response and context.response.usage:
-            self._token_totals[key] += context.response.usage.total_tokens
+            self._add_tokens(key, context.response.usage.total_tokens)
 
     async def on_error(self, context: HookContext) -> None:
         self._error_count[context.provider_key] += 1
@@ -352,15 +376,17 @@ class MetricsHook:
         }
 
     def total_tokens(self, provider_key: str | None = None) -> int:
-        if provider_key:
-            return self._token_totals.get(provider_key, 0)
-        return sum(self._token_totals.values())
+        with self._token_lock:
+            if provider_key:
+                return self._token_totals.get(provider_key, 0)
+            return sum(self._token_totals.values())
 
     def reset(self) -> None:
         self._call_count.clear()
         self._error_count.clear()
         self._latencies.clear()
-        self._token_totals.clear()
+        with self._token_lock:
+            self._token_totals.clear()
 
 
 def _percentile(sorted_values: list[float], pct: float) -> float:
@@ -500,6 +526,14 @@ class UsageTrackingHook:
 
     def __init__(self, tracker: SessionUsageTracker | None = None) -> None:
         self._tracker = tracker
+
+    def late_usage_listener(
+        self, provider_key: str, exchange_id: str,
+    ) -> Callable[[ProviderResponse], None] | None:
+        tracker = self._tracker
+        if tracker is None:
+            return None
+        return lambda response: tracker.record(response, count_request=False)
 
     def set_tracker(self, tracker: SessionUsageTracker) -> None:
         """Attach or replace the session-level usage tracker."""

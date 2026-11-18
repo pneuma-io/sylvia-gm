@@ -2417,7 +2417,7 @@ class ProviderSessionAdapter:
             CURRENT_WIRE_FRAME.set(frame.observation)
             if transport == "codex_app_server":
                 # This request may keep a ChatGPT runtime thread; the provider clears it.
-                LEDGER_REQUEST.set(True)
+                LEDGER_REQUEST.set(f"audit-{uuid.uuid4().hex}")
             if transport == "claude_code":
                 CURRENT_NATIVE_ROUTE.set(
                     self._claude_native_route(ledger, frame, bridge, persistent))

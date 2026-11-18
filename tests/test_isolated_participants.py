@@ -982,6 +982,37 @@ def test_real_serializers_interleave_owned_contexts_and_reopen(
     assert "a:1" in json.dumps(frames[5]) and "a:5" in json.dumps(frames[5])
 
 
+def test_ledger_gm_round_credits_its_audit_exchange_on_model_release(isolated_game, tmp_path):
+    from sylvia_gm.provider import _chatgpt
+    from sylvia_gm.provider._admin_audit import AdminAuditedProvider
+    from tests.test_chatgpt_answer_in_place import AnswerRuntime, Waiting, asks, audited_exchanges
+    from tests.test_chatgpt_stable_thread import provider_for, usage
+
+    owner, session, _ = isolated_game
+    owner.set_admin_full_audit(True)
+    request = asks("call-1", 7)
+    waiting = Waiting([request])
+    waiting.after_interrupt = [usage(100, 90)]
+    provider, _ = provider_for(AnswerRuntime(waiting), tmp_path)
+    wrapped = AdminAuditedProvider(provider, sink=owner.record_admin_full_audit,
+                                   session_id=session.session_id, role="gm")
+    adapter = ProviderSessionAdapter(owner, wrapped, owner_id="isolated-test",
+                                     gm_system_prompt="Run the synthetic scene.")
+    source = gm_input(owner, session)
+    tools, aliases = adapter._provider_tools(source.catalog)
+    request["params"]["tool"] = next(n for n in aliases if n.endswith("_update_campaign_file"))
+    list(adapter._stream_round(adapter._messages(source), tools, control=source.control,
+                               provider_input=source))
+    [(exchange_id, before)] = audited_exchanges(owner).items()
+    assert before["availability"] == "not_returned"
+    worker = _chatgpt.release_kept_threads([provider.model_info.wire_model_id])
+    assert worker is not None
+    worker.join(5)
+    assert not worker.is_alive()
+    after = audited_exchanges(owner)[exchange_id]
+    assert (after["total_tokens"], after["cached_tokens"]) == (105, 90)
+
+
 def test_an_npc_decision_right_after_a_gm_round_runs_on_a_fresh_chatgpt_thread(
     isolated_game, tmp_path, monkeypatch,
 ):

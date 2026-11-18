@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import atexit
 import json
+import logging
 import os
 import threading
 import time
@@ -99,7 +100,7 @@ def thread_setting(environ: Mapping[str, str] | None = None) -> str:
     return _DEFAULT_THREAD_MODE if ledger else _FRESH_THREADS
 
 
-def _ledger_request() -> bool:
+def _ledger_request() -> str | bool:
     """Whether the context ledger built this request. Reading it clears it: one request."""
     from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
 
@@ -121,8 +122,8 @@ _PENDING_TURN_IDLE_SECONDS = 1800.0
 _ABANDONED_REPORT_LIMIT = 64
 
 
-def _usage_figures(params: object) -> dict[str, object] | None:
-    """The input, cached and output counts of a usage report, or None when incomplete."""
+def _reported_usage(params: object) -> tuple[TokenUsage, CacheUsage] | None:
+    """Parse the runtime's last response, never its cumulative thread total."""
     token_usage = params.get("tokenUsage") if isinstance(params, dict) else None
     last = token_usage.get("last") if isinstance(token_usage, dict) else None
     if not isinstance(last, dict):
@@ -132,10 +133,23 @@ def _usage_figures(params: object) -> dict[str, object] | None:
         value = last.get(key)
         return value if type(value) is int and value >= 0 else None
 
-    prompt, output = count("inputTokens"), count("outputTokens")
-    if prompt is None or output is None or count("totalTokens") is None:
+    prompt, output, total = count("inputTokens"), count("outputTokens"), count("totalTokens")
+    if prompt is None or output is None or total is None:
         return None
-    return {"input": prompt, "cached": count("cachedInputTokens"), "output": output}
+    read = count("cachedInputTokens")
+    return (
+        TokenUsage(prompt, output, total, count("reasoningOutputTokens")),
+        CacheUsage(cache_read_tokens=read, cache_write_tokens=count("cacheWriteInputTokens"),
+                   cache_miss_tokens=None if read is None else max(0, prompt - read),
+                   total_prompt_tokens=prompt),
+    )
+
+
+def _usage_figures(usage: TokenUsage, cache: CacheUsage) -> dict[str, object]:
+    return {"input": usage.prompt_tokens, "cached": cache.cache_read_tokens,
+            "output": usage.completion_tokens}
+
+
 #: Events of a waiting turn that show the runtime went on without the call's answer.
 _TURN_MOVED_ON = frozenset({
     "turn/completed", "item/tool/call", "item/agentMessage/delta",
@@ -208,6 +222,23 @@ class _PendingCall:
     turn_id: str
     #: The runtime has not yet reported the usage of the response that made this call.
     usage_owed: bool = True
+    exchange_id: str | None = None
+    model: str = ""
+    listeners: list[Callable[[ProviderResponse], None]] = field(default_factory=list)
+
+    def credit(self, usage: TokenUsage, cache: CacheUsage) -> dict[str, object]:
+        self.usage_owed = False
+        report = ProviderResponse(model=self.model, usage=usage, cache_usage=cache,
+                                  usage_reported=True)
+        for listener in self.listeners:
+            try:
+                listener(report)
+            except Exception:
+                logging.getLogger(__name__).exception("Late usage listener failed")
+        figures = _usage_figures(usage, cache)
+        if self.exchange_id is not None:
+            figures["exchange_id"] = self.exchange_id
+        return figures
 
 
 def _item_text(item: dict[str, Any]) -> str:
@@ -372,7 +403,9 @@ class _KeptThread:
                     and isinstance(params, dict) and params.get("threadId") == self.thread_id
                     and params.get("turnId") == pending.turn_id
                 ):
-                    return _usage_figures(params)
+                    parsed = _reported_usage(params)
+                    if parsed is not None:
+                        return pending.credit(*parsed)
         except Exception:  # noqa: BLE001 - a report that cannot be had is an explained miss
             return None
         return None
@@ -604,6 +637,7 @@ class _Request:
     #: The kept-thread mode for this request: the switch's, or None (fresh) when the
     #: context ledger did not build it.
     thread_mode: str | None = None
+    exchange_id: str | None = None
     generation: int = 0
     #: This request's number among its home's requests (``_KeptThreads.next_ordinal``).
     ordinal: int = 0
@@ -640,7 +674,6 @@ class ChatGPTProvider(Provider):
         self._keeps_dropped_draft = switch == _DRAFT_KEEPING_VALUE
         # State of the attempt in progress; attempts are serialised by ``_lock``.
         self._usage_reports: list[dict[str, object]] = []
-        self._owed_previous_usage = False
         # The waiting call whose usage the attempt in progress expects first, if any.
         self._owing: _PendingCall | None = None
         self._owing_ago = 1
@@ -727,45 +760,25 @@ class ChatGPTProvider(Provider):
         if not isinstance(token_usage, dict):
             return
         self._observe_context_window(token_usage.get("modelContextWindow"))
-        last = token_usage.get("last")
-        if not isinstance(last, dict):
+        parsed = _reported_usage(params)
+        if parsed is None:
             return
-
-        def count(key: str) -> int | None:
-            value = last.get(key)
-            return value if type(value) is int and value >= 0 else None
-
-        prompt, output, total = (
-            count(key) for key in ("inputTokens", "outputTokens", "totalTokens")
-        )
-        if prompt is None or output is None or total is None:
-            return
-        figures: dict[str, object] = {
-            "input": prompt, "cached": count("cachedInputTokens"), "output": output,
-        }
-        if self._owed_previous_usage:
-            # An answered call: the runtime first reports the response that made the call.
-            # Those figures belong to the previous request and are recorded, not attached.
-            self._owed_previous_usage = False
-            if self._owing is not None:
-                self._owing.usage_owed = False
+        usage, cache = parsed
+        if self._owing is not None and self._owing.usage_owed:
+            # The first complete report after an answer belongs to the call's exchange.
+            figures = self._owing.credit(usage, cache)
             ago = self._owing_ago
             self._usage_reports.append({
                 "response": "previous" if ago == 1 else "earlier", "requests_ago": ago,
                 **figures,
             })
             return
-        own = {"response": "own", **figures}
+        own = {"response": "own", **_usage_figures(usage, cache)}
         if not self._usage_reports or self._usage_reports[-1] != own:
             self._usage_reports.append(own)
-        response.usage = TokenUsage(prompt, output, total, count("reasoningOutputTokens"))
+        response.usage = usage
+        response.cache_usage = cache
         response.usage_reported = True
-        read, write = count("cachedInputTokens"), count("cacheWriteInputTokens")
-        response.cache_usage = CacheUsage(
-            cache_read_tokens=read, cache_write_tokens=write,
-            cache_miss_tokens=None if read is None else max(0, prompt - read),
-            total_prompt_tokens=prompt,
-        )
 
     async def _await_usage_after_tool_call(
         self, connection: CodexConnection, response: ProviderResponse,
@@ -937,11 +950,10 @@ class ChatGPTProvider(Provider):
                 if method == "thread/tokenUsage/updated":
                     # The report for the response that made the call, sent while it waited.
                     await self._audit(method, params, received=True)
-                    self._owed_previous_usage = True
-                    self._capture_usage(
-                        ProviderResponse(), params, kept.thread_id, pending.turn_id,
-                    )
-                    self._owed_previous_usage = False
+                    if pending.usage_owed:
+                        self._capture_usage(
+                            ProviderResponse(), params, kept.thread_id, pending.turn_id,
+                        )
                 elif method in _TURN_MOVED_ON:
                     # The runtime gave up on the call, or went on without its answer.
                     raise _AnswerInPlaceError(
@@ -1063,6 +1075,7 @@ class ChatGPTProvider(Provider):
                 timeout=timeout,
                 options=kwargs,
                 thread_mode=self._thread_mode if marked else None,
+                exchange_id=marked if isinstance(marked, str) else None,
             )
             mode = request.thread_mode
             kept = await self._take_kept_thread(request) if mode is not None else None
@@ -1167,10 +1180,7 @@ class ChatGPTProvider(Provider):
         text_parts: list[str] = []
         thread_id: str | None = None
         turn_id: str | None = None
-        self._usage_reports = request.usage_reports = []
-        self._owed_previous_usage = bool(
-            kept is not None and kept.pending is not None and kept.pending.usage_owed
-        )
+        self._usage_reports = request.usage_reports
         self._owing = kept.pending if kept is not None else None
         self._owing_ago = request.ordinal - kept.ordinal if kept is not None else 1
         self._extra_call_seen = False
@@ -1314,6 +1324,11 @@ class ChatGPTProvider(Provider):
                         open_call = _PendingCall(
                             event["id"], call_id, str(turn_id),
                             usage_owed=not response.usage_reported,
+                            exchange_id=request.exchange_id,
+                            model=request.model,
+                            listeners=self.hooks.late_usage_listeners(
+                                "chatgpt_subscription", request.exchange_id,
+                            ) if request.exchange_id is not None else [],
                         )
                         keep = True
                     else:
@@ -1483,6 +1498,7 @@ class ChatGPTProvider(Provider):
                     await stop()
             finally:
                 self._active = None
+                self._owing = None
 
     async def close(self) -> None:
         connection = self._active

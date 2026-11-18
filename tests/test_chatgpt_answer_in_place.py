@@ -12,7 +12,12 @@ from typing import Any
 
 import pytest
 
+from sylvia_gm.agent._context_ledger import LEDGER_REQUEST
+from sylvia_gm.application.authority import AuthorityOwner
 from sylvia_gm.provider import _chatgpt
+from sylvia_gm.provider._admin_audit import AdminAuditedProvider
+from sylvia_gm.provider._hooks import MetricsHook, UsageTrackingHook
+from sylvia_gm.provider._usage_tracker import SessionUsageTracker
 from sylvia_gm.provider._chatgpt import _AnswerInPlaceError, _in_place_answer
 from tests.test_chatgpt_stable_thread import (
     FIRST,
@@ -99,6 +104,127 @@ class AnswerRuntime(Runtime):
 def answering(monkeypatch: pytest.MonkeyPatch, pool: _chatgpt._KeptThreads):  # noqa: F811
     monkeypatch.setenv("SYLVIA_CHATGPT_THREAD", "answer")
     return pool
+
+
+def audited_exchanges(owner):
+    count = owner.admin_full_audit_status()["trace_count"]
+    traces = (owner.admin_full_audit_record(i)["trace"] for i in range(count))
+    return {
+        trace["exchange_id"]: trace["usage"]
+        for trace in traces
+        if trace["kind"] in {"provider_response", "provider_stream_response"}
+    }
+
+
+@pytest.mark.asyncio
+async def test_each_late_report_credits_its_original_gm_exchange(tmp_path):
+    first_usage = usage(100, 0)
+    first_usage["params"]["tokenUsage"]["last"].update(
+        totalTokens=109, reasoningOutputTokens=3, cacheWriteInputTokens=7,
+    )
+    runtime = AnswerRuntime(Waiting(
+        [asks("call-1", 7)], [first_usage, asks("call-2", 8)], [usage(150, 140), *NARRATION],
+    ), text_turn())
+    provider, audit = provider_for(runtime, tmp_path)
+    metrics, tracker = MetricsHook(), SessionUsageTracker()
+    provider.hooks.register(metrics)
+    provider.hooks.register(UsageTrackingHook(tracker))
+    with AuthorityOwner.open(tmp_path / "usage.db", "usage-owner") as owner:
+        owner.set_admin_full_audit(True)
+        wrapped = AdminAuditedProvider(provider, sink=owner.record_admin_full_audit,
+                                       session_id="gm", role="gm")
+        LEDGER_REQUEST.set("first")
+        response = await wrapped.generate(FIRST, tools=TOOLS)
+        assert not response.usage_reported
+
+        # An unrelated request to the same home advances its ordinal.
+        LEDGER_REQUEST.set("interleaved")
+        await wrapped.generate([user("Another scene.")], tools=TOOLS)
+        # An incomplete notification while waiting cannot consume the first exchange's credit.
+        runtime.connections[0]._emit([{"method": "thread/tokenUsage/updated",
+                                       "params": {"tokenUsage": {"last": {}}}}])
+        LEDGER_REQUEST.set("second")
+        async for _ in wrapped.generate_stream(SECOND, tools=TOOLS):
+            pass
+        projections = audited_exchanges(owner)
+        assert projections["second"]["availability"] == "not_returned"
+        assert projections["first"]["reasoning_tokens"] == 3
+        assert projections["first"]["cache_write_tokens"] == 7
+        assert not response.usage_reported and response.usage.total_tokens == 0
+
+        LEDGER_REQUEST.set("third")
+        await wrapped.generate([*SECOND, call("call-2"), result("call-2")], tools=TOOLS)
+        projections = audited_exchanges(owner)
+        assert {k: v["total_tokens"] for k, v in projections.items()} == {
+            "first": 109, "interleaved": 125, "second": 155, "third": 165,
+        }
+        late = [r for event in audit.reuse for r in event["usage_reports"] if "exchange_id" in r]
+        assert [(r["exchange_id"], r["response"], r["requests_ago"]) for r in late] == [
+            ("first", "earlier", 2), ("second", "previous", 1),
+        ]
+        snapshot = tracker.snapshot()
+        assert snapshot.total_tokens == metrics.total_tokens() == 554
+        assert snapshot.cache_read_tokens == 390 and snapshot.cache_write_tokens == 7
+        assert snapshot.request_count == 4 and snapshot.cache_read_requests == 4
+
+
+@pytest.mark.asyncio
+async def test_model_release_credits_closed_call_before_owner_restart(tmp_path, monkeypatch):
+    waiting = Waiting([asks("call-1", 7)])
+    waiting.after_interrupt = [usage(100, 90)]
+    provider, _ = provider_for(AnswerRuntime(waiting), tmp_path)
+    metrics, tracker = MetricsHook(), SessionUsageTracker()
+    provider.hooks.register(metrics)
+    provider.hooks.register(UsageTrackingHook(tracker))
+    db = tmp_path / "usage.db"
+    with AuthorityOwner.open(db, "usage-owner") as owner:
+        owner.set_admin_full_audit(True)
+        wrapped = AdminAuditedProvider(provider, sink=owner.record_admin_full_audit,
+                                       session_id="gm", role="gm")
+        LEDGER_REQUEST.set("before-switch")
+        await wrapped.generate(FIRST, tools=TOOLS)
+        worker = _chatgpt.release_kept_threads([provider.model_info.wire_model_id])
+        assert worker is not None
+        worker.join(5)
+        assert not worker.is_alive()
+        assert audited_exchanges(owner)["before-switch"]["total_tokens"] == 105
+        assert tracker.request_count == 1 and tracker.cache_read_tokens == 90
+        assert tracker.total_tokens == metrics.total_tokens() == 105
+
+        # The replacement gets the closure receipt, with no second credit to either model.
+        monkeypatch.setattr("tests.test_chatgpt_stable_thread.MODEL", "replacement")
+        replacement_runtime = AnswerRuntime(Waiting([usage(120, 100), asks("new-call", 9)]))
+        replacement, audit = provider_for(replacement_runtime, tmp_path)
+        replacement.hooks.register(UsageTrackingHook(tracker))
+        replacement.hooks.register(metrics)
+        LEDGER_REQUEST.set("after-switch")
+        wrapped = AdminAuditedProvider(replacement, sink=owner.record_admin_full_audit,
+                                       session_id="gm", role="gm")
+        await wrapped.generate(FIRST, tools=TOOLS)
+        closed = audit.reuse[0]["usage_reports"][0]
+        assert closed["closed_unanswered"] and closed["exchange_id"] == "before-switch"
+        assert tracker.by_model[provider.model_info.wire_model_id].total_tokens == 105
+        assert tracker.by_model["replacement"].total_tokens == 125
+        assert tracker.total_tokens == metrics.total_tokens() == 230
+        assert audited_exchanges(owner)["after-switch"]["total_tokens"] == 125
+        assert replacement_runtime.alive()
+        _chatgpt._KEPT_THREADS.close_all()
+        assert not replacement_runtime.alive()
+
+    # A restarted owner's in-memory audit, hooks and kept-thread pool all start fresh.
+    monkeypatch.setattr(_chatgpt, "_KEPT_THREADS", _chatgpt._KeptThreads())
+    with AuthorityOwner.open(db, "usage-owner") as owner:
+        owner.set_admin_full_audit(True)
+        restarted, audit = provider_for(AnswerRuntime(text_turn()), tmp_path)
+        fresh_tracker = SessionUsageTracker()
+        restarted.hooks.register(UsageTrackingHook(fresh_tracker))
+        wrapped = AdminAuditedProvider(restarted, sink=owner.record_admin_full_audit,
+                                       session_id="gm", role="gm")
+        LEDGER_REQUEST.set("after-restart")
+        await wrapped.generate(FIRST, tools=TOOLS)
+        assert list(audited_exchanges(owner)) == ["after-restart"]
+        assert [r["response"] for r in audit.reuse[0]["usage_reports"]] == ["own"]
+        assert fresh_tracker.total_tokens == 125 and tracker.total_tokens == 230
 
 
 def answer_to(request_id: int, text: str) -> dict[str, Any]:
