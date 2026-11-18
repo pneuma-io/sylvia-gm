@@ -7450,20 +7450,22 @@ class AuthorityOwner:
 
         with self._operation():
             snapshot = self._store.snapshot(campaign_id)
-            identities = basis.get("player_action_ids")
-            if not isinstance(identities, Sequence) or isinstance(identities, (str, bytes, bytearray)):
-                # Older saved requests contain the canonical boundary instead of IDs.
-                boundary = basis.get("canonical_start_sequence")
-                if not isinstance(boundary, int):
-                    identities = (basis.get("player_action_id"),)
-                else:
-                    previous = max((event.sequence for event in snapshot.events
-                                    if event.event_type is CanonicalEventType.TALK
-                                    and event.sequence <= boundary), default=0)
-                    identities = tuple(event.action_id for event in snapshot.events
-                                       if previous < event.sequence <= boundary)
+            identities = self._response_action_ids(campaign_id, basis)
             return tuple(record for record in player_action_records(snapshot)
                          if record["action_id"] in identities)
+
+    def _response_action_ids(
+        self, campaign_id: str, basis: Mapping[str, object],
+    ) -> tuple[str, ...]:
+        """Read the saved response batch, including requests made before explicit IDs were saved."""
+        identities = basis.get("player_action_ids")
+        if isinstance(identities, Sequence) and not isinstance(identities, (str, bytes, bytearray)):
+            return tuple(key for key in identities if isinstance(key, str))
+        boundary = basis.get("canonical_start_sequence")
+        if isinstance(boundary, int):
+            return self._store.response_window_actions(campaign_id, through=boundary)
+        key = basis.get("player_action_id")
+        return (key,) if isinstance(key, str) else ()
 
     def _player_response_reservations(
         self, campaign_id: str,
@@ -7481,15 +7483,7 @@ class AuthorityOwner:
                         if message.kind is SessionMessageKind.EVIDENCE
                         and message.content.get("kind") == "player_action_response"}
             for message in requests.values():
-                identities = message.content.get("player_action_ids")
-                if isinstance(identities, (tuple, list)):
-                    reserved.update(key for key in identities if isinstance(key, str))
-                elif isinstance(boundary := message.content.get("canonical_start_sequence"), int):
-                    reserved.update(self._store.response_window_actions(
-                        campaign_id, through=boundary,
-                    ))
-                elif isinstance(key := message.content.get("player_action_id"), str):
-                    reserved.add(key)
+                reserved.update(self._response_action_ids(campaign_id, message.content))
                 if isinstance(message.content.get("attempt_id"), str):
                     attempts.add(message.content["attempt_id"])
             for message in context.messages:
