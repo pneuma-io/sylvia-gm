@@ -272,6 +272,7 @@ def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
 
 
 PUBLISHED_LITE = {
+    "lite-0.3.25": ("0.3.25", "f13148bf1f68e2558e231c1b96da8a0c660e2ed67050d31b2c61edee3716025b"),
     "lite-0.3.24": ("0.3.24", "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d"),
     "alpha4": ("0.3.15", "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a"),
     "alpha5": ("0.3.21", "075c294aa916c25b598d2f02f299bf437b352dfce38d0c3bd2efa3e5a1cab143"),
@@ -291,10 +292,12 @@ def _projected_lite_panels(owner):
     return panels
 
 
-@pytest.mark.parametrize("origin", ["alpha4", "alpha5", "integration", "lite-0.3.24"])
+@pytest.mark.parametrize(
+    "origin", ["alpha4", "alpha5", "integration", "lite-0.3.24", "lite-0.3.25"]
+)
 def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state(tmp_path, origin):
     database = tmp_path / "alpha4.sqlite3"
-    filename = "lite-0.3.24" if origin == "lite-0.3.24" else f"{origin}-lite"
+    filename = origin if origin.startswith("lite-") else f"{origin}-lite"
     archive = (Path(__file__).parent / f"fixtures/{filename}.sylvia-gm-package").read_bytes()
     current_archive = bundled_srd_archive()
     with zipfile.ZipFile(io.BytesIO(current_archive)) as bundle:
@@ -351,8 +354,9 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             if s["renderer"] == "inventory"
         )
         assert "priests_pack" in inventory["entities"]["hero"]["inventory"]
-        assert "item_names" not in inventory
-        if origin in {"integration", "lite-0.3.24"}:
+        # 0.3.25 introduced declared item names; earlier pins project without them.
+        assert ("item_names" in inventory) == (origin == "lite-0.3.25")
+        if origin in {"integration", "lite-0.3.24", "lite-0.3.25"}:
             # Packaged startup installs bare Rulesets; Setting descendants are offered lazily.
             owner.install_package_archive(io.BytesIO(current_archive), install_id="startup-current")
         options = owner.campaign_rules_update_options("casting")
@@ -363,7 +367,11 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert "Treat this update as one-way." in preview["recovery"]
         assert "Export the campaign first" in preview["recovery"]
         assert preview["tool_changes"]
-        if origin != "integration":
+        if origin == "lite-0.3.25":
+            # 0.3.26 repairs spell mechanics only; no panel gains source fields.
+            assert not any(c.get("added_panel_data") for c in preview["tool_changes"])
+            assert "Panels show additional information." not in preview["recovery"]
+        elif origin != "integration":
             added = 1 if origin == "lite-0.3.24" else 4
             # Published panels only gained source fields; they are a reviewed change.
             assert any(c.get("added_panel_data") == added for c in preview["tool_changes"])

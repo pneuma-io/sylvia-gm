@@ -34186,7 +34186,8 @@ tools:
         - condition: _space_body.active == true and _space_body.id != _space_mover.id and _space_body.metadata.participant_ref
             != null and (_space_body.metadata.plane == _space_mover.metadata.plane or ((_space_body.metadata.plane
             == null or _space_body.metadata.plane == 'material') and (_space_mover.metadata.plane == null
-            or _space_mover.metadata.plane == 'material')))
+            or _space_mover.metadata.plane == 'material'))) and _space_body.metadata.creature_type !=
+            'spell_force'
           on_true:
           - call: query_srd_creature_space_pair
             params:
@@ -34220,8 +34221,8 @@ tools:
                 condition: endpoint != true or _space_overlap.ends_inside != true
                 error: A willing move cannot end in another creature's occupied space.
             - require:
-                condition: passage != true or _space_overlap.hit != true or _space_allowed == true or _space_overlap.starts_inside
-                  == true
+                condition: passage != true or _space_overlap.hit != true or _space_allowed == true or
+                  _space_overlap.starts_inside == true
                 error: This creature does not permit passage through its occupied space.
           - condition: _space_overlap.hit == true and _space_difficult == true
             on_true:
@@ -142697,6 +142698,13 @@ tools:
               condition: _created_actor_existing.id != summon_id
               error: The created actor needs a unique scene ID.
       - set:
+          field: _created_actor_participant_ref
+          value: summon_id
+      - set:
+          field: _created_actor_participant_ref
+          value: null
+        condition: creature_type == 'spell_force'
+      - set:
           field: _created_actor_scene
           value:
             id: summon_id
@@ -142717,7 +142725,7 @@ tools:
             metadata:
               source_ref: spell
               source_caster: _caster_state_id
-              participant_ref: summon_id
+              participant_ref: _created_actor_participant_ref
               creature_type: creature_type
               plane: _created_actor_plane
               lighting: _summon_birth_ambient
