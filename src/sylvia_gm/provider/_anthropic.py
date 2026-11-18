@@ -16,7 +16,7 @@ from collections.abc import AsyncIterator, Mapping
 from datetime import UTC, datetime
 from typing import Any
 
-from sylvia_gm.provider._claude_model_facts import claude_model_facts, claude_model_id
+from sylvia_gm.provider._model_facts import claude_model_facts, claude_model_id
 from sylvia_gm.provider._base import (
     CacheUsage,
     ModelInfo,

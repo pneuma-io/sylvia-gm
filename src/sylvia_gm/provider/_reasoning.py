@@ -11,8 +11,6 @@ from urllib.parse import urlsplit
 
 from sylvia_gm.domain.errors import CommandRejected
 from sylvia_gm.domain.session import SessionRecord
-from sylvia_gm.provider._openai_model_facts import documented_openai_id, openai_model_facts
-from sylvia_gm.provider._claude_model_facts import claude_model_facts
 from sylvia_gm.provider._base import (
     ModelInfo,
     Provider,
@@ -21,7 +19,12 @@ from sylvia_gm.provider._base import (
     closing_provider_stream,
     release_provider_idle,
 )
-from sylvia_gm.provider._model_defaults import documented_model_defaults
+from sylvia_gm.provider._model_facts import (
+    claude_model_facts,
+    documented_model_defaults,
+    documented_openai_id,
+    openai_model_facts,
+)
 from sylvia_gm.provider._speed import SpeedSelection, select_speed
 
 

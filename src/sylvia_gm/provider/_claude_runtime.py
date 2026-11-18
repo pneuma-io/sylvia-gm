@@ -19,7 +19,7 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
-from sylvia_gm.provider._claude_model_facts import claude_code_context_window
+from sylvia_gm.provider._model_facts import claude_code_context_window
 from sylvia_gm.provider._exceptions import (
     InvalidResponseError,
     ProviderConnectionError,

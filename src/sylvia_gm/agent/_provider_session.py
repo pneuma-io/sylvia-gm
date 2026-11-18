@@ -76,7 +76,7 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.domain.session import SessionMessageKind
-from sylvia_gm.provider._chatgpt_model_facts import uses_gm_narration_hint
+from sylvia_gm.provider._model_facts import uses_gm_narration_hint
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
 

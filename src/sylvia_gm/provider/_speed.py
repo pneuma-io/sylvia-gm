@@ -13,8 +13,7 @@ from dataclasses import dataclass, replace
 from urllib.parse import urlsplit
 
 from sylvia_gm.domain.errors import CommandRejected
-from sylvia_gm.provider._openai_model_facts import openai_model_facts
-from sylvia_gm.provider._claude_model_facts import claude_model_facts
+from sylvia_gm.provider._model_facts import claude_model_facts, openai_model_facts
 from sylvia_gm.provider._base import ModelInfo, SpeedOption
 
 STANDARD_SPEED = "standard"

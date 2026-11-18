@@ -5,6 +5,8 @@ https://opencode.ai/v2/docs/console/models/
 https://opencode.ai/v2/docs/console/go/
 """
 
+from sylvia_gm.provider._model_facts import inferred_model_protocol
+
 SUPPORTED_PROTOCOLS = frozenset(
     {
         "chat_completions",
@@ -16,37 +18,11 @@ SUPPORTED_PROTOCOLS = frozenset(
     }
 )
 
-_OPENCODE_ROUTES = {
-    "opencode_zen": (
-        ("exact", ("qwen3.8-max",), "chat_completions"),
-        ("prefix", ("gemini-",), "gemini_generate_content"),
-        ("prefix", ("gpt-5", "gpt-6", "grok-", "muse-spark-"), "responses"),
-        ("prefix", ("claude-", "qwen3.5", "qwen3.6", "qwen3.7", "qwen3.8"), "anthropic_messages"),
-    ),
-    "opencode_go": (
-        ("prefix", ("gemini-",), "gemini_generate_content"),
-        ("prefix", ("gpt-5", "gpt-6", "grok-", "muse-spark-"), "responses"),
-        (
-            "prefix",
-            ("claude-", "qwen3.5", "qwen3.6", "qwen3.7", "qwen3.8", "minimax-m"),
-            "anthropic_messages",
-        ),
-    ),
-}
-
-
 def model_protocol(preset, model_id, declared=None, *, fallback="chat_completions"):
     """Use protocol metadata or documented routing, without forwarding upstream URLs."""
     if isinstance(declared, str) and declared in SUPPORTED_PROTOCOLS:
         return declared
-    identity = model_id.casefold()
-    for mode, identities, protocol in _OPENCODE_ROUTES.get(preset, ()):
-        matches = identity in identities if mode == "exact" else identity.startswith(identities)
-        if matches:
-            return protocol
-    if preset == "openai" and identity.startswith(("gpt-5", "gpt-6", "o1", "o3", "o4")):
-        return "responses"
-    return fallback
+    return inferred_model_protocol(preset, model_id) or fallback
 
 
 def is_opencode_inference(base_url: str) -> bool:

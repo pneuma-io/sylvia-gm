@@ -6,8 +6,7 @@ import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from sylvia_gm.provider._base import ModelInfo
-from sylvia_gm.provider._model_defaults import documented_model_defaults
+from sylvia_gm.provider._model_facts import documented_model_defaults
 
 
 def subscription_model_facts(home: Path, model_ids: set[str]) -> dict[str, dict[str, object]]:
@@ -60,13 +59,3 @@ def subscription_model_facts(home: Path, model_ids: set[str]) -> dict[str, dict[
     except (OSError, ValueError, TypeError, KeyError, RecursionError):
         pass
     return facts
-
-
-def uses_gm_narration_hint(model: ModelInfo) -> bool:
-    """Apply the narration hint to the verified ChatGPT runtime identities."""
-    wire_id = model.wire_model_id
-    return (
-        model.provider_key == "chatgpt_subscription"
-        and wire_id in {"gpt-6.1-sol", "gpt-6-sol", "gpt-5.6-sol"}
-        and model.id == f"chatgpt-subscription/{wire_id}"
-    )
