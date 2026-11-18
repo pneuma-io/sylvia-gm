@@ -54,6 +54,12 @@ def test_rejected_requests_leave_the_owner_available(tmp_path: Path) -> None:
             healthy = _read(output_stream)
             assert healthy["id"] == "healthy"
             assert healthy["ok"] is True
+        for malformed in ("{\n", "[]\n"):
+            input_stream.write(malformed)
+            input_stream.flush()
+            reply = _read(output_stream)
+            assert reply["error"]["code"] == "invalid_owner_request"
+            assert _request(input_stream, output_stream, "after-frame", "campaign_index") == []
     finally:
         _shutdown(process, input_stream, output_stream)
 

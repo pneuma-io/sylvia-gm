@@ -18,15 +18,20 @@ class ClaudeModelFacts:
     temperature: bool = False
     binds_thinking: bool = False
     fast: bool = False
+    claude_code_context_window: int | None = None
 
 
 _EFFORT = ("low", "medium", "high", "max")
 _EXTENDED_EFFORT = ("low", "medium", "high", "xhigh", "max")
 _MODELS = {
     "claude-fable-5": ClaudeModelFacts(forced_tool_choice=True),
-    "claude-fable-5-2": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, binds_thinking=True, fast=True),
+    "claude-fable-5-2": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, binds_thinking=True, fast=True, claude_code_context_window=1_000_000),
+    "opus": ClaudeModelFacts(claude_code_context_window=1_000_000),
+    "sonnet": ClaudeModelFacts(claude_code_context_window=1_000_000),
+    "haiku": ClaudeModelFacts(claude_code_context_window=1_000_000),
+    "fable": ClaudeModelFacts(claude_code_context_window=1_000_000),
     "claude-haiku-4-5": ClaudeModelFacts(forced_tool_choice=True, temperature=True),
-    "claude-haiku-5-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, forced_tool_choice=True),
+    "claude-haiku-5-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, forced_tool_choice=True, claude_code_context_window=1_000_000),
     "claude-mythos-5-2": ClaudeModelFacts(binds_thinking=True, fast=True),
     "claude-opus-4": ClaudeModelFacts(forced_tool_choice=True, temperature=True),
     "claude-opus-4-1": ClaudeModelFacts(forced_tool_choice=True, temperature=True),
@@ -35,12 +40,12 @@ _MODELS = {
     "claude-opus-4-7": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, forced_tool_choice=True),
     "claude-opus-4-8": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, forced_tool_choice=True),
     "claude-opus-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, forced_tool_choice=True),
-    "claude-opus-5-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, fast=True),
+    "claude-opus-5-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, fast=True, claude_code_context_window=1_000_000),
     "claude-sonnet-4": ClaudeModelFacts(forced_tool_choice=True, temperature=True),
     "claude-sonnet-4-5": ClaudeModelFacts(forced_tool_choice=True, temperature=True),
     "claude-sonnet-4-6": ClaudeModelFacts(efforts=_EFFORT, forced_tool_choice=True, temperature=True),
     "claude-sonnet-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, forced_tool_choice=True),
-    "claude-sonnet-5-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT),
+    "claude-sonnet-5-5": ClaudeModelFacts(efforts=_EXTENDED_EFFORT, claude_code_context_window=1_000_000),
 }
 
 
@@ -54,3 +59,7 @@ def claude_model_facts(model_id: str) -> ClaudeModelFacts:
 
 
 _UNKNOWN = ClaudeModelFacts()
+
+
+def claude_code_context_window(model_id: str) -> int | None:
+    return _MODELS.get(model_id, _UNKNOWN).claude_code_context_window

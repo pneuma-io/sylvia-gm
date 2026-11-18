@@ -3755,7 +3755,7 @@ class SQLiteAuthorityStore:
             connection.close()
 
     def _upgrade_predecessor_campaign_schema(self, connection: sqlite3.Connection) -> None:
-        """Converge exact predecessor-v5 and Probe 01 authority to lifecycle v3."""
+        """Migrate supported legacy campaign authorities to lifecycle schema v3."""
 
         live_identity = _schema_identity(connection)
         if live_identity == _EXPECTED_CAMPAIGN_SCHEMA_IDENTITY:
@@ -4129,7 +4129,7 @@ class SQLiteAuthorityStore:
             self._verify_construction_authority(connection)
 
     def _verify_construction_authority(self, connection: sqlite3.Connection) -> None:
-        """Reconcile every Probe 01 receipt, basis, construction state, and revision cause."""
+        """Check construction receipts, saved inputs, state, and revision history."""
 
         invalid = "Saved campaign construction records failed an integrity check"
         try:
@@ -10310,7 +10310,7 @@ class SQLiteAuthorityStore:
             connection.close()
 
     def _before_construction_commit(self) -> None:
-        """Private deterministic fault seam for all three Probe 01 transactions."""
+        """Inject faults at the campaign construction transaction boundaries."""
 
     def create_campaign(
         self,

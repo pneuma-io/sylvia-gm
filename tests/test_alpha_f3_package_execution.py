@@ -1158,3 +1158,26 @@ def test_reference_parameters_with_the_same_id_keep_distinct_named_snapshots() -
     assert result.context["_actor_state_id_seen"] == "hero"
     assert result.context["_exhaustion_level"] == 2
     print("F3 DISTINCT REFERENCES", "hero participant", "hero entity", "no collision")
+
+
+
+def test_seeded_tool_rolls_keep_independent_sequences_across_threads() -> None:
+    from concurrent.futures import ThreadPoolExecutor
+    from random import Random
+    from threading import Barrier
+
+    from sylvia_gm.dice import roll, seeded_rolls
+
+    both_seeded = Barrier(2, timeout=5)
+
+    def roll_batch(seed: int) -> tuple[int, ...]:
+        with seeded_rolls(seed):
+            both_seeded.wait()
+            return roll(20, count=8).results
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        first = pool.submit(roll_batch, 11)
+        second = pool.submit(roll_batch, 42)
+        for seed, batch in ((11, first), (42, second)):
+            expected = Random(seed)
+            assert batch.result() == tuple(expected.randint(1, 20) for _ in range(8))

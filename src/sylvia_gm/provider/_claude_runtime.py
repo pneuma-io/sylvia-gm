@@ -19,6 +19,7 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
+from sylvia_gm.provider._claude_model_facts import claude_code_context_window
 from sylvia_gm.provider._exceptions import (
     InvalidResponseError,
     ProviderConnectionError,
@@ -35,12 +36,7 @@ MAX_FRAME_BYTES = 8 * 1024 * 1024
 #: window only in the result record of a reply that ends in text, which a GM turn never
 #: produces. A plan that allows less refuses a request once, and the adapter then stops
 #: planning within this figure.
-DOCUMENTED_CONTEXT_WINDOW = 1_000_000
 DOCUMENTED_CONTEXT_WINDOW_AT = "2026-11-17"
-_DOCUMENTED_WINDOW_MODELS = frozenset({
-    "opus", "sonnet", "haiku", "fable",
-    "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5-2",
-})
 
 
 def documented_context_window(model_id: object) -> int | None:
@@ -52,7 +48,7 @@ def documented_context_window(model_id: object) -> int | None:
     if not isinstance(model_id, str):
         return None
     name = model_id.removesuffix("[1m]")
-    return DOCUMENTED_CONTEXT_WINDOW if name in _DOCUMENTED_WINDOW_MODELS else None
+    return claude_code_context_window(name)
 
 
 def native_environment(home: Path) -> dict[str, str]:

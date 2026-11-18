@@ -2233,6 +2233,26 @@ def test_private_deliberation_in_content_is_repaired_before_talk(leaked: str) ->
     assert not any(event.kind is ProviderEventKind.PRIVATE_REASONING for event in events)
 
 
+def test_private_deliberation_correction_exhaustion_preserves_the_turn(caplog) -> None:
+    narration = "The player wants answers. The stranger raises a lantern."
+    provider = _ScriptedProvider([
+        [ProviderStreamChunk(content=narration, finish_reason="stop")] for _ in range(3)
+    ])
+
+    events = tuple(
+        ProviderSessionAdapter(
+            cast(AuthorityOwner, _OwnerProjection()), provider, owner_id="owner-provider",
+        ).for_turn("turn-provider")(_provider_input(user_text="I follow the trail."))
+    )
+
+    assert len(provider.calls) == 3
+    assert [event.text for event in events if event.kind is ProviderEventKind.TALK] == [
+        narration,
+    ]
+    assert "Provider repeatedly returned private deliberation as narration" in caplog.text
+    assert narration not in caplog.text
+
+
 def test_committed_mechanic_empty_completion_is_reprompted_in_the_same_turn() -> None:
     provider = _ScriptedProvider(
         [

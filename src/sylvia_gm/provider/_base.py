@@ -308,7 +308,7 @@ PROVIDER_RETRY_DEFAULTS: dict[str, RetryConfig] = {
 class ProviderConfig:
     """Configuration for building a provider instance.
 
-    Used by ProviderFactory to construct the correct provider chain.
+    Used by ProviderFactory to construct the selected transport.
     """
 
     provider_key: str  # "opencode_go", "anthropic", etc.
