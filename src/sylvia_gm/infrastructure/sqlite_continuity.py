@@ -439,12 +439,12 @@ def read_act_markers(
     structure = [act for row in adventure_rows(connection, campaign_id)
                  for act in json.loads(
                  row['content_json']).get('campaign_plan', {}).get('structure', ())]
-    if not isinstance(structure, list):
-        return ()
     ordinals = {
         act["id"]: index + 1 for index, act in enumerate(structure)
         if isinstance(act, dict) and isinstance(act.get("id"), str)
     }
+    if not ordinals:
+        return ()
     begun: set[str] = set()
     completed: set[str] = set()
     markers: list[SafePayload] = []
