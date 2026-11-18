@@ -659,22 +659,26 @@ def test_a_runtime_child_dies_when_its_owner_is_killed(tmp_path):
         from sylvia_gm.provider._claude_runtime import ClaudeConnection
         child = ClaudeConnection(Path(sys.executable), Path({str(tmp_path)!r}),
                                  ["-c", "import time; time.sleep(120)"], dict(os.environ))
-        # Started from an executor thread, as the provider starts runtime children.
-        concurrent.futures.ThreadPoolExecutor(1).submit(child.start).result()
+        # Started from a short-lived executor thread, which then ends.
+        with concurrent.futures.ThreadPoolExecutor(1) as pool:
+            pool.submit(child.start).result()
         print(child._process.pid, flush=True)
         time.sleep(120)
     """), encoding="utf-8")
-    owner = subprocess.Popen([sys.executable, str(script)], stdout=subprocess.PIPE, text=True)
-    child = int(owner.stdout.readline())
-    os.kill(owner.pid, signal.SIGKILL)
-    owner.wait()
-
     def alive(pid: int) -> bool:
         try:
             with open(f"/proc/{pid}/stat", encoding="utf-8") as handle:
                 return handle.read().split(") ", 1)[1].split()[0] != "Z"
         except OSError:
             return False
+
+    owner = subprocess.Popen([sys.executable, str(script)], stdout=subprocess.PIPE, text=True)
+    child = int(owner.stdout.readline())
+    # The executor thread that started it has gone; the child must still be running.
+    time.sleep(1.0)
+    assert alive(child), "the runtime child ended before its owner did"
+    os.kill(owner.pid, signal.SIGKILL)
+    owner.wait()
 
     deadline = time.monotonic() + 10
     while alive(child) and time.monotonic() < deadline:

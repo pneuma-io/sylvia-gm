@@ -151,9 +151,9 @@ def _dies_with_owner() -> dict[str, Any]:
     closes, so a crashed or killed owner would otherwise leave it running. On Windows the
     desktop shell's job object already ends it. ``prctl`` is resolved here, in the parent,
     so the child only makes the one call between fork and exec; a parent already gone by
-    then ends the child at once. The signal follows the thread that started the child, and
-    Sylvia starts runtime children from the provider loop's executor threads, which last as
-    long as the owner process.
+    then ends the child at once. The signal follows the *thread* that started the child, so
+    every runtime child is started from ``_SPAWNER``'s thread, which lasts as long as the
+    owner process; a short-lived thread would end its child when it exited.
     """
     if not sys.platform.startswith("linux"):
         return {}
@@ -173,6 +173,40 @@ def _dies_with_owner() -> dict[str, Any]:
             os._exit(1)
 
     return {"preexec_fn": arm}
+
+
+class _Spawner:
+    """One daemon thread that starts every Linux runtime child and lives with the process."""
+
+    def __init__(self) -> None:
+        self._requests: queue.Queue[tuple[Any, queue.Queue[tuple[bool, Any]]]] = queue.Queue()
+        self._thread: threading.Thread | None = None
+        self._lock = threading.Lock()
+
+    def run(self, start: Any) -> Any:
+        with self._lock:
+            if self._thread is None or not self._thread.is_alive():
+                self._thread = threading.Thread(
+                    target=self._serve, name="sylvia-claude-spawner", daemon=True,
+                )
+                self._thread.start()
+        done: queue.Queue[tuple[bool, Any]] = queue.Queue(maxsize=1)
+        self._requests.put((start, done))
+        ok, value = done.get()
+        if not ok:
+            raise value
+        return value
+
+    def _serve(self) -> None:
+        while True:
+            start, done = self._requests.get()
+            try:
+                done.put((True, start()))
+            except BaseException as error:  # noqa: BLE001 - handed back to the caller
+                done.put((False, error))
+
+
+_SPAWNER = _Spawner()
 
 
 def native_auth_command(executable: Path, action: str) -> list[str]:
@@ -300,8 +334,10 @@ class ClaudeConnection:
         """Start the official binary with native auth and no inherited API-key override."""
         if self._stopped.is_set():
             return
-        try:
-            self._process = subprocess.Popen(
+        options = _dies_with_owner()
+
+        def spawn() -> subprocess.Popen[str]:
+            return subprocess.Popen(
                 [str(self.executable), *self.arguments],
                 cwd=self.workspace,
                 stdin=subprocess.PIPE,
@@ -312,8 +348,11 @@ class ClaudeConnection:
                 errors="strict",
                 env=self.environment,
                 **process_options(),
-                **_dies_with_owner(),
+                **options,
             )
+
+        try:
+            self._process = _SPAWNER.run(spawn) if options else spawn()
         except OSError:
             raise ProviderConnectionError("The Claude runtime could not start.") from None
         self._reader = threading.Thread(target=self._read, daemon=True)
