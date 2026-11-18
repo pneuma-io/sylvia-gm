@@ -19,6 +19,7 @@ from sylvia_gm.agent._session_loop import (
     SessionRunRequest,
 )
 from sylvia_gm.agent._stateless_mcp import StatelessMcpMechanics
+from sylvia_gm.agent._tool_exposure import exposure_conditions
 from sylvia_gm.application.authority import ActionCommand, AuthorityOwner
 from sylvia_gm.application.bundled_packages import (
     bundled_rift_archive,
@@ -36,6 +37,7 @@ from sylvia_gm.interfaces.owner_process import _dispatch
 from sylvia_gm.provider._admin_audit import AdminAuditedProvider
 from sylvia_gm.provider._base import Provider, ProviderResponse, ProviderStreamChunk
 from sylvia_gm.provider._exceptions import ProviderConnectionError
+from tests.test_fc_campaign_journey import _practice_scene
 
 
 def _narration_blocks(text: str) -> list[dict[str, str]]:
@@ -141,18 +143,28 @@ class _RiftIntentProvider(Provider):
             assert "Verdant Margin" in rendered_messages
             assert "Adventurer" in rendered_messages
             assert "Riftwolf" in rendered_messages
+            assert "rift-opening-riftwolf" in rendered_messages
+            # Coordinate combat starts from a declared scene: the GM places both
+            # combatants adjacent, as the player's melee approach describes.
+            scene = _practice_scene({
+                self.player_actor_id: [0, 0, 0],
+                "rift-opening-riftwolf": [5, 0, 0],
+            })
+            scene["entities"][1]["metadata"]["creature_type"] = "beast"
             yield ProviderStreamChunk(
                 tool_call_delta={
                     "index": 0,
                     "id": "call-rift-start-encounter",
                     "function": {
                         "name": start["function"]["name"],
-                        "arguments": (
-                            f'{{"first_actor":"{self.player_actor_id}",'
-                            '"second_actor":"rift-opening-riftwolf",'
-                            '"first_surprised":false,"second_surprised":false,'
-                            '"tie_winner":"first"}'
-                        ),
+                        "arguments": json.dumps({
+                            "first_actor": self.player_actor_id,
+                            "second_actor": "rift-opening-riftwolf",
+                            "first_surprised": False,
+                            "second_surprised": False,
+                            "tie_winner": "first",
+                            "combat_scenes": [scene],
+                        }),
                     },
                 },
                 finish_reason="tool_calls",
@@ -181,7 +193,10 @@ class _RiftIntentProvider(Provider):
                             '"attack_name":"Riftwolf bite","attack_modifier":3,'
                             '"damage_expression":"d6","damage_modifier":1,'
                             '"damage_type":"piercing","advantage":false,'
-                            '"disadvantage":false}'
+                            '"disadvantage":false,"attack_mode":"melee",'
+                            '"attack_distance":5,"normal_range":5,"long_range":5,'
+                            '"actor_can_see_target":true,"target_can_see_actor":true,'
+                            '"target_is_charmer":false,"fear_source_in_sight":false}'
                         ),
                     },
                 },
@@ -456,7 +471,9 @@ class _RevealedSecretProvider(Provider):
             "additional_material_available_via"
         ] == {"source": "campaign_plan", "path": "structured"}
         assert anchor_fact not in rendered
-        assert "old-history-0" not in rendered
+        # History is bounded by token-budget compaction, not by message count, so short
+        # earlier exchanges stay in the request until compaction is due.
+        assert "old-history-0" in rendered
         assert "old-history-49" in rendered
         narration = f"V has told you the truth: {self.expected_fact}"
         if kwargs.get("tool_choice") == "required":
@@ -1472,10 +1489,25 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
         }
         assert "read_campaign_reference" in after_action_mcp_surface
         assert "search_campaign_knowledge" in after_action_mcp_surface
-        assert after_action_mcp_surface - {
+        listed_mechanics = after_action_mcp_surface - {
             "search_campaign_knowledge",
             "read_campaign_reference",
-        } == after_action_surface
+        }
+        # The GM's MCP list is the catalog minus tools whose Ruleset exposure conditions
+        # do not hold in this state, and minus spell tools while the party (a Fighter)
+        # can cast nothing. Every other tool is listed.
+        assert listed_mechanics <= after_action_surface
+        hidden_schemas = {
+            tool.name: tool.input_schema
+            for tool in owner.catalog(quick_id)
+            if tool.name not in listed_mechanics
+        }
+        assert not [
+            name for name, schema in hidden_schemas.items()
+            if exposure_conditions(schema) is None
+            and "spell" not in schema.get("properties", {})
+        ]
+        assert "end_combat_turn" in listed_mechanics
         updated_panels = {
             surface["id"]: surface for surface in owner.campaign_panels(quick_id)["surfaces"]
         }
@@ -1509,10 +1541,18 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
             )
         )
         assert end_turn.status is ActionStatus.COMMITTED
-        assert {tool.name for tool in owner.catalog(quick_id)} == {
-            "advance_combat_encounter_turn",
-            "end_combat_encounter",
+        # Between turns the Initiative transitions are offered and no in-turn action is.
+        # Shared bookkeeping stays listed in every phase (execution re-admits it).
+        in_turn_tools = {
+            "begin_combat_turn",
+            "end_combat_turn",
+            "resolve_combat_attack",
+            "resolve_adjudicated_creature_attack",
+            "start_combat_encounter_entities",
         }
+        between_turns = {tool.name for tool in owner.catalog(quick_id)}
+        assert {"advance_combat_encounter_turn", "end_combat_encounter"} <= between_turns
+        assert not between_turns & in_turn_tools
         after_turn_mcp_surface = {
             tool.name
             for tool in mcp.list_tools(
@@ -1523,22 +1563,48 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
         }
         assert "read_campaign_reference" in after_turn_mcp_surface
         assert "search_campaign_knowledge" in after_turn_mcp_surface
-        assert after_turn_mcp_surface - {
+        listed_between_turns = after_turn_mcp_surface - {
             "search_campaign_knowledge",
             "read_campaign_reference",
-        } == {
-            "advance_combat_encounter_turn",
-            "end_combat_encounter",
         }
+        assert {"advance_combat_encounter_turn", "end_combat_encounter"} <= listed_between_turns
+        assert listed_between_turns <= between_turns
+        assert not [
+            tool.name for tool in owner.catalog(quick_id)
+            if tool.name not in listed_between_turns
+            and exposure_conditions(tool.input_schema) is None
+            and "spell" not in tool.input_schema.get("properties", {})
+        ]
+        # Players cannot declare combat over; the GM ends it through the engine operation.
         panel_basis = owner.snapshot(quick_id)
-        panel_receipt = owner.execute_panel_action(
-            campaign_id=quick_id,
-            surface_id="dnd-encounter",
-            panel_action_id="end-combat",
-            operation_id="panel-end-rift-combat",
-            expected_revision=panel_basis.revision,
+        with pytest.raises(CommandRejected, match="unavailable"):
+            owner.execute_panel_action(
+                campaign_id=quick_id,
+                surface_id="dnd-encounter",
+                panel_action_id="end-combat",
+                operation_id="panel-end-rift-combat",
+                expected_revision=panel_basis.revision,
+            )
+        assert owner.snapshot(quick_id) == panel_basis
+        end_encounter_tool = next(
+            tool for tool in owner.catalog(quick_id) if tool.name == "end_combat_encounter"
         )
-        assert panel_receipt.status is ActionStatus.COMMITTED
+        end_encounter = owner.execute_action(
+            ActionCommand(
+                campaign_id=quick_id,
+                action_id="action-end-rift-combat",
+                idempotency_key="end-rift-combat",
+                owner_id="owner-rift",
+                writer=WriterRole.DM,
+                expected_revision=panel_basis.revision,
+                turn_id=turn_id,
+                package_id=end_encounter_tool.package_id,
+                tool_name=end_encounter_tool.name,
+                parameters={"end_reason": "fighting_stopped"},
+                initiating_session_id=quick_dm_session,
+            )
+        )
+        assert end_encounter.status is ActionStatus.COMMITTED
         after_combat_mcp_surface = {
             tool.name
             for tool in mcp.list_tools(
@@ -1793,7 +1859,10 @@ def test_rift_quick_start_customize_mcp_and_reopen(tmp_path: Path) -> None:
         )
         assert "situations" not in act_four
         assert "planned_encounters" not in act_four
-        assert "Read the structured Campaign Plan" in act_four["detail_handling"]
+        assert (
+            "Read this act before framing its main quest or judging its ending"
+            in act_four["detail_handling"]
+        )
         assert reopened_sources == {}
         assert one_way_fact in {
             item["fact"] for item in reopened_fresh["PLAYER_KNOWN"]["revealed_facts"]

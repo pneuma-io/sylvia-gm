@@ -53,11 +53,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         'A provider failure after accepted input leaves the already accepted composer draft',
         'Have submit_session_input retain the input then fail; return that message in session_context and inspect the original draft after final repaint.',
     ),
-    'tests/test_alpha_05_rift_journey.py::test_rift_quick_start_customize_mcp_and_reopen': KnownDefect(
-        'The real Rift provider request lacks the encounter actor context expected by the retained journey',
-        'Create the actual Rift owner, commit its opening, prepare the carried weapon through the declared control, then request combat; the scripted provider cannot find Riftwolf in the real request. Context-versus-fixture attribution remains open.',
-        category='unresolved context or fixture discrepancy',
-    ),
     'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
         "The Builder's advertised Plan example fails its declared content schema",
         'Build the advertised Plan example against its retained synthetic source Setting, then validate before saving its inherited copies.',

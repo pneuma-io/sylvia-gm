@@ -365,6 +365,29 @@ def test_library_party_handoff_uses_declared_state_and_retains_profiles(
             structured_plan=payload,
         )
         assert finalized[1].content["campaign_plan"]["id"] == "relay-intrusion"
+        whole = owner.read_campaign_reference(
+            campaign_id, source="campaign_plan", path="structured",
+        )
+        assert "selection" not in whole
+        assert json.loads(whole["content"]) == finalized[1].content["campaign_plan"]
+        # A Plan past the read bound still answers the GM's advertised whole-Plan read.
+        bound = len(whole["content"].encode("utf-8")) // 2
+        outlined = owner.read_campaign_reference(
+            campaign_id, source="campaign_plan", path="structured", maximum_bytes=bound,
+        )
+        assert outlined["selection"]["kind"] == "structured_outline"
+        assert len(outlined["content"].encode("utf-8")) <= bound
+        outline = json.loads(outlined["content"])
+        assert outline["id"] == "relay-intrusion"
+        assert set(outline) == set(finalized[1].content["campaign_plan"])
+        paths = [path for value in outline.values() if isinstance(value, dict)
+                 for path in value.get("read_via", ())]
+        assert paths
+        for path in paths:
+            section = owner.read_campaign_reference(
+                campaign_id, source="campaign_plan", path=path,
+            )
+            assert section["content"]
 
 
 def test_plan_world_rejects_duplicate_foreign_reserved_and_conflicting_state(tmp_path):

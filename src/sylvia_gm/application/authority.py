@@ -367,6 +367,33 @@ def _markdown_section_references(
     return tuple(references), total
 
 
+_STRUCTURED_OUTLINE_INLINE_BYTES = (4096, 256)
+
+
+def _structured_campaign_plan_outline(
+    root: Mapping[str, object], *, inline_bytes: int,
+) -> dict[str, object]:
+    """Keep short Plan fields and replace long ones with their exact section read paths."""
+
+    outline: dict[str, object] = {}
+    for key, value in root.items():
+        if len(canonical_json_bytes(value)) <= inline_bytes:
+            outline[key] = value
+            continue
+        identities = (
+            [item.get("id") for item in value if isinstance(item, Mapping)]
+            if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray))
+            else []
+        )
+        if identities and all(isinstance(item, str) and item for item in identities) and len(
+            identities
+        ) == len(value):
+            outline[key] = {"read_via": [f"structured/{key}/{item}" for item in identities]}
+        else:
+            outline[key] = {"read_via": [f"structured/{key}"]}
+    return outline
+
+
 def _read_structured_campaign_plan(root: Mapping[str, object], path: str) -> object:
     """Read an exact section; an act read includes its linked completion requirements."""
 
@@ -6243,6 +6270,25 @@ class AuthorityOwner:
                 if path == "structured":
                     content = canonical_json_bytes(structured).decode("utf-8")
                     selection: Mapping[str, object] | None = None
+                    if len(content.encode("utf-8")) > maximum_bytes:
+                        # A whole Plan past the bound still answers the advertised read:
+                        # its short fields plus the exact section paths for the rest.
+                        for inline_bytes in _STRUCTURED_OUTLINE_INLINE_BYTES:
+                            content = canonical_json_bytes(
+                                _structured_campaign_plan_outline(
+                                    cast(Mapping[str, object], structured),
+                                    inline_bytes=inline_bytes,
+                                )
+                            ).decode("utf-8")
+                            if len(content.encode("utf-8")) <= maximum_bytes:
+                                break
+                        selection = {
+                            "kind": "structured_outline",
+                            "reason": (
+                                "The whole Plan exceeds the read bound. Long sections are "
+                                "replaced by read_via paths; read the one you need."
+                            ),
+                        }
                 elif path.startswith("structured/"):
                     selected = _read_structured_campaign_plan(
                         cast(Mapping[str, object], structured),
