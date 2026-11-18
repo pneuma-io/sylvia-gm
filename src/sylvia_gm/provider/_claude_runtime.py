@@ -140,6 +140,41 @@ def process_options() -> dict[str, Any]:
     return {}
 
 
+#: ``prctl`` option that sends the child a signal when its parent dies (linux/prctl.h).
+_PR_SET_PDEATHSIG = 1
+
+
+def _dies_with_owner() -> dict[str, Any]:
+    """On Linux, a runtime child is killed when the owner process dies, however it dies.
+
+    A kept process waits on a call for up to 30 minutes and does not exit when its input
+    closes, so a crashed or killed owner would otherwise leave it running. On Windows the
+    desktop shell's job object already ends it. ``prctl`` is resolved here, in the parent,
+    so the child only makes the one call between fork and exec; a parent already gone by
+    then ends the child at once. The signal follows the thread that started the child, and
+    Sylvia starts runtime children from the provider loop's executor threads, which last as
+    long as the owner process.
+    """
+    if not sys.platform.startswith("linux"):
+        return {}
+    try:
+        import ctypes
+        import signal
+
+        prctl = ctypes.CDLL(None, use_errno=True).prctl
+    except (OSError, AttributeError):
+        return {}
+    owner = os.getpid()
+    kill = int(signal.SIGKILL)
+
+    def arm() -> None:
+        prctl(_PR_SET_PDEATHSIG, kill, 0, 0, 0)
+        if os.getppid() != owner:
+            os._exit(1)
+
+    return {"preexec_fn": arm}
+
+
 def native_auth_command(executable: Path, action: str) -> list[str]:
     """Use native authentication while excluding unrelated settings and customizations."""
     return [
@@ -277,6 +312,7 @@ class ClaudeConnection:
                 errors="strict",
                 env=self.environment,
                 **process_options(),
+                **_dies_with_owner(),
             )
         except OSError:
             raise ProviderConnectionError("The Claude runtime could not start.") from None

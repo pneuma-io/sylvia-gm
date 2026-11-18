@@ -33,12 +33,16 @@ from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, FILLER_TEXT
 from sylvia_gm.provider._exceptions import ProviderConnectionError, ProviderTimeoutError
 from tests.gm_context_contract import first_step_records, provider_messages
 from tests.test_claude_native_route import (
+    MODEL,
     TOOLS,
     Chain,
     Hook,
     assert_nothing_private_left,
+    call,
     chain_canonicals,
     claude_model,
+    player,
+    result,
     text_reply,
     tool_reply,
 )
@@ -338,6 +342,10 @@ def test_a_failed_reply_in_a_kept_process_closes_it(runtime):
     with pytest.raises(Exception):  # noqa: B017 - the runtime's own failure classification
         step(provider, chain, steps["player"], failing)
     assert PersistentCLI.instances[0].closed and len(_claude_kept.KEPT_PROCESSES) == 0
+    # The failed continued step still has its reuse record, with what failed.
+    assert reuse(hook)[-1] == {"continued": True, "answered_in_place": False,
+                               "fresh_reason": None, "kept": False,
+                               "failure": "provider_error"}
     assert_nothing_private_left(home)
 
 
@@ -383,30 +391,35 @@ def _result(*extra: str) -> dict[str, Any]:
         *({"type": "text", "text": t} for t in extra)]}
 
 
-def test_the_answer_carries_the_result_and_what_follows_but_not_the_continue_record():
+def test_the_answer_carries_the_result_and_the_sealed_records_but_not_the_continue_record():
     kept = _kept()
-    history = [*kept.held, _call(), _result(SEALED + "STATE update", "I run!",
+    history = [*kept.held, _call(), _result(SEALED + "STATE update",
                                             SEALED + CONTINUE_RECORD_TEXT)]
     kind, answer = continuation(kept, history, CONTINUE_RECORD_TEXT)
     assert kind == "answer"
-    assert [b["text"] for b in answer["content"]] == ["Rolled 14.", SEALED + "STATE update",
-                                                      "I run!"]
+    assert [b["text"] for b in answer["content"]] == ["Rolled 14.", SEALED + "STATE update"]
 
 
-def test_an_unsealed_continue_text_is_player_speech_and_is_delivered():
+@pytest.mark.parametrize("words", ["I run!", CONTINUE_RECORD_TEXT])
+def test_the_players_words_after_a_call_are_never_put_inside_its_result(words):
+    """They must stay a user message, as per-step sends them; an unsealed text is speech."""
     kept = _kept()
-    history = [*kept.held, _call(), _result(CONTINUE_RECORD_TEXT)]
-    _kind, answer = continuation(kept, history, CONTINUE_RECORD_TEXT)
-    assert [b["text"] for b in answer["content"]] == ["Rolled 14.", CONTINUE_RECORD_TEXT]
+    for history in (
+        [*kept.held, _call(), _result(SEALED + "STATE update", words)],
+        [*kept.held, _call(), _result(), {"role": "user", "content": words}],
+    ):
+        with pytest.raises(ContinuationMismatchError) as refused:
+            continuation(kept, history, CONTINUE_RECORD_TEXT)
+        assert refused.value.reason == "player_speech_after_call"
 
 
 def test_sylvias_copy_of_narration_from_the_call_is_not_sent_again():
     kept = _kept()
     history = [*kept.held, _call(), _result(),
                {"role": "assistant", "content": "The door opens."},
-               {"role": "user", "content": "I step through."}]
+               {"role": "user", "content": SEALED + "STATE update"}]
     _kind, answer = continuation(kept, history, CONTINUE_RECORD_TEXT)
-    assert [b["text"] for b in answer["content"]] == ["Rolled 14.", "I step through."]
+    assert [b["text"] for b in answer["content"]] == ["Rolled 14.", SEALED + "STATE update"]
 
 
 @pytest.mark.parametrize(("history_tail", "reason"), [
@@ -495,3 +508,179 @@ def test_a_reload_that_still_offers_the_model_keeps_its_process(runtime, monkeyp
     _model_switch(provider, monkeypatch, to=provider.model_info.id)  # not a change of model
     assert not cli.closed and len(_claude_kept.KEPT_PROCESSES) == 1
     _claude_kept.KEPT_PROCESSES.close_all()
+
+
+# ---- review fixes: parallel calls, usage, speech after a call, idle frames, Linux owner ------
+
+def two_tool_reply(first: str, second: str) -> list[dict[str, Any]]:
+    """Claude Code's shape for two Sylvia calls in one reply: two tool_use blocks, the message's
+    end, then one ``tools/call`` request; the second request comes once the first is answered.
+    """
+    events = [{"type": "message_start", "message": {"model": MODEL, "usage": {
+        "input_tokens": 10, "output_tokens": 0}}}]
+    for index, call_id in enumerate((first, second)):
+        events += [
+            {"type": "content_block_start", "index": index, "content_block": {
+                "type": "tool_use", "id": call_id, "name": "mcp__sylvia__roll", "input": {}}},
+            {"type": "content_block_delta", "index": index, "delta": {
+                "type": "input_json_delta", "partial_json": json.dumps({"n": index + 1})}},
+            {"type": "content_block_stop", "index": index},
+        ]
+    events += [{"type": "message_delta", "delta": {"stop_reason": "tool_use"},
+                "usage": {"output_tokens": 4}}, {"type": "message_stop"}]
+    return [*({"type": "stream_event", "event": e} for e in events),
+            {"type": "control_request", "request_id": "call", "request": {
+                "subtype": "mcp_message", "server_name": "sylvia", "message": {
+                    "jsonrpc": "2.0", "id": 3, "method": "tools/call",
+                    "params": {"name": "roll", "arguments": {"n": 1}}}}}]
+
+
+def test_a_reply_with_two_calls_is_never_kept(runtime):
+    """Kept, it would send the dropped second call once the first was answered (F1)."""
+    provider, home, hook = runtime
+    chain = Chain()
+    steps = dict(chain_canonicals())
+    step(provider, chain, steps["fresh"], SCRIPT["fresh"])
+    chunks = step(provider, chain, steps["player"], two_tool_reply("c1", "c2"))
+    assert chunks[-1].finish_reason == "tool_calls"
+    first = PersistentCLI.instances[0]
+    assert first.closed and len(_claude_kept.KEPT_PROCESSES) == 0
+    assert reuse(hook)[-1]["kept"] is False and reuse(hook)[-1]["not_kept"] == "parallel_calls"
+    # Sylvia's next request (the one call it took, answered) starts fresh, as per-step does.
+    chunks = step(provider, chain, steps["tool_result_with_records"],
+                  SCRIPT["tool_result_with_records"])
+    assert chunks[-1].finish_reason == "tool_calls"
+    assert len(PersistentCLI.instances) == 2 and "--resume" in PersistentCLI.instances[1].arguments
+    assert first.answers() == []
+    _claude_kept.KEPT_PROCESSES.close_all()
+    assert_nothing_private_left(home)
+
+
+class Usage(Hook):
+    def __init__(self):
+        super().__init__()
+        self.responses = []
+
+    async def on_response(self, context):
+        response = context.response
+        self.responses.append((response.usage.prompt_tokens, response.usage.completion_tokens))
+
+
+def _streamed_tool_reply(call_id: str, n: int) -> list[dict[str, Any]]:
+    """A tool reply as the real CLI streams it, with the message's own output count."""
+    *events, call_request = tool_reply(call_id, n)
+    stop = events.pop()
+    return [*events, {"type": "stream_event", "event": {
+        "type": "message_delta", "delta": {"stop_reason": "tool_use"},
+        "usage": {"output_tokens": 3}}}, stop, call_request]
+
+
+def _with_turn_totals(reply, turn_input, turn_output, model_input, model_output):
+    """The real CLI's result: the whole native turn's usage and the process's lifetime counts."""
+    *events, result = reply
+    return [*events, {**result, "usage": {"input_tokens": turn_input,
+                                          "output_tokens": turn_output},
+                      "modelUsage": {MODEL: {"inputTokens": model_input,
+                                             "outputTokens": model_output,
+                                             "contextWindow": 200000}}}]
+
+
+def test_a_continued_steps_usage_is_its_own_not_the_turns_total(runtime):
+    """F2: each step reports the usage of its own model request, and its own share of the
+    process's per-model counts."""
+    provider, home, hook = runtime
+    usage = Usage()
+    provider.hooks.register(usage)
+    chain = Chain()
+    steps = dict(chain_canonicals())
+    step(provider, chain, steps["fresh"], _with_turn_totals(SCRIPT["fresh"], 10, 3, 10, 3))
+    step(provider, chain, steps["player"], _streamed_tool_reply("c1", 1))
+    step(provider, chain, steps["tool_result_with_records"], _streamed_tool_reply("c2", 2))
+    # The turn that began at "player" ends here, after two calls answered in place: the
+    # result carries all three model requests, the process has now made four.
+    step(provider, chain, steps["tool_result_no_records"],
+         _with_turn_totals(SCRIPT["tool_result_no_records"], 30, 9, 40, 12))
+    # Every step reports the 10 input tokens and 3 output tokens of its own request.
+    assert usage.responses == [(10, 3)] * 4
+    model_usage = [r["params"] for r in usage.requests
+                   if r.get("method") == "claude/result_model_usage"]
+    assert model_usage[0]["model_usage"][MODEL]["inputTokens"] == 10
+    assert model_usage[-1]["since_previous_step"] is True
+    assert model_usage[-1]["model_usage"][MODEL] == {
+        "inputTokens": 30, "outputTokens": 9, "contextWindow": 200000}
+    _claude_kept.KEPT_PROCESSES.close_all()
+
+
+def test_the_players_words_after_a_turn_that_ended_on_a_call_start_a_fresh_process(runtime):
+    """F3: player speech stays a real user message, exactly as per-step sends it."""
+    provider, home, hook = runtime
+    chain = Chain()
+    steps = dict(chain_canonicals())
+    step(provider, chain, steps["fresh"], SCRIPT["fresh"])
+    step(provider, chain, steps["player"], SCRIPT["player"])  # the turn ends on the call
+    after = [*steps["player"], call("c1", 1), result("c1", "awaiting_answer"),
+             player(9, "The blue door.")]
+    step(provider, chain, after, text_reply("You open the blue door."))
+    old, new = PersistentCLI.instances
+    assert old.closed and "--resume" in new.arguments and old.answers() == []
+    assert reuse(hook)[-1]["fresh_reason"] == "player_speech_after_call"
+    _claude_kept.KEPT_PROCESSES.close_all()
+    assert_nothing_private_left(home)
+
+
+def test_a_new_model_message_while_idle_means_the_turn_moved_on(runtime):
+    """F6: frames that start another model request are not the end of the waiting reply."""
+    provider, home, hook = runtime
+    chain = Chain()
+    steps = dict(chain_canonicals())
+    step(provider, chain, steps["fresh"], SCRIPT["fresh"])
+    step(provider, chain, steps["player"], SCRIPT["player"])
+    PersistentCLI.instances[0].events.put({"type": "stream_event", "event": {
+        "type": "message_start", "message": {"model": MODEL, "usage": {}}}})
+    step(provider, chain, steps["tool_result_with_records"], SCRIPT["tool_result_with_records"])
+    assert reuse(hook)[-1]["fresh_reason"] == "turn_moved_on"
+    assert len(PersistentCLI.instances) == 2
+    _claude_kept.KEPT_PROCESSES.close_all()
+
+
+@pytest.mark.runs_on("linux", reason="parent-death signal; Windows ends children by job object")
+def test_a_runtime_child_dies_when_its_owner_is_killed(tmp_path):
+    """F5: the kept process's way of dying with a crashed owner, with a stand-in child."""
+    import os
+    import signal
+    import subprocess
+    import textwrap
+
+    script = tmp_path / "owner.py"
+    script.write_text(textwrap.dedent(f"""
+        import concurrent.futures, os, sys, time
+        sys.path[:0] = {sys.path!r}
+        from pathlib import Path
+        from sylvia_gm.provider._claude_runtime import ClaudeConnection
+        child = ClaudeConnection(Path(sys.executable), Path({str(tmp_path)!r}),
+                                 ["-c", "import time; time.sleep(120)"], dict(os.environ))
+        # Started from an executor thread, as the provider starts runtime children.
+        concurrent.futures.ThreadPoolExecutor(1).submit(child.start).result()
+        print(child._process.pid, flush=True)
+        time.sleep(120)
+    """), encoding="utf-8")
+    owner = subprocess.Popen([sys.executable, str(script)], stdout=subprocess.PIPE, text=True)
+    child = int(owner.stdout.readline())
+    os.kill(owner.pid, signal.SIGKILL)
+    owner.wait()
+
+    def alive(pid: int) -> bool:
+        try:
+            with open(f"/proc/{pid}/stat", encoding="utf-8") as handle:
+                return handle.read().split(") ", 1)[1].split()[0] != "Z"
+        except OSError:
+            return False
+
+    deadline = time.monotonic() + 10
+    while alive(child) and time.monotonic() < deadline:
+        time.sleep(0.05)
+    try:
+        assert not alive(child), "the runtime child outlived its killed owner"
+    finally:
+        if alive(child):
+            os.kill(child, signal.SIGKILL)

@@ -64,6 +64,7 @@ from sylvia_gm.provider._exceptions import (
     ModelNotFoundError,
     ProviderConnectionError,
     ProviderError,
+    ProviderTimeoutError,
     RateLimitError,
     TokenLimitError,
     is_context_rejection,
@@ -347,13 +348,16 @@ _MODEL_USAGE_COUNTS = (
     "inputTokens", "outputTokens", "cacheReadInputTokens", "cacheCreationInputTokens",
     "contextWindow", "maxOutputTokens",
 )
+#: Those that add up over a process's life (the others are limits, not counts).
+_MODEL_USAGE_TOTALS = frozenset(_MODEL_USAGE_COUNTS[:4])
 
 
 def _check_still_waiting(kept: KeptProcess) -> None:
     """Read what a kept process wrote while it was idle; refuse one that moved on or exited.
 
-    Frames that only finish the reply it was left on are dropped. A result means its turn
-    ended without the answer; the end of its output means it exited.
+    Frames that only finish the reply it was left on are dropped. A result, a further call or
+    the start of another model message means its turn went on without the answer; the end of
+    its output means it exited.
     """
     drain = getattr(kept.connection, "drain", None)
     if not callable(drain):
@@ -365,6 +369,26 @@ def _check_still_waiting(kept: KeptProcess) -> None:
             raise ContinuationMismatchError("turn_moved_on")
         if event.get("type") == "control_request":
             raise ContinuationMismatchError("turn_moved_on")
+        if event.get("type") == "stream_event" and (
+            (event.get("event") or {}).get("type") == "message_start"
+        ):
+            # A new model request began while the process was idle (an MCP timeout, say).
+            raise ContinuationMismatchError("turn_moved_on")
+
+
+def _failure_code(error: BaseException) -> str:
+    """A content-free code for why a step failed, for the reuse audit."""
+    if isinstance(error, asyncio.CancelledError):
+        return "cancelled"
+    if isinstance(error, ProviderTimeoutError):
+        return "timeout"
+    if isinstance(error, (IncompleteProviderStreamError, ProviderConnectionError)):
+        return "connection_lost"
+    if isinstance(error, InvalidResponseError):
+        return _INVALID_REASONS.get(str(error), "invalid_response")
+    if isinstance(error, ProviderError):
+        return "provider_error"
+    return "local_error"
 
 
 @dataclass
@@ -380,6 +404,12 @@ class _Step:
     call_event: dict[str, Any] | None = None
     call_id: str = ""
     call_arguments: Any = None
+    #: False when the process must not be kept after this reply (``not_kept`` says why).
+    keepable: bool = True
+    not_kept: str | None = None
+    #: The process's cumulative per-model usage before and after this step (kept processes).
+    model_usage_before: dict[str, dict[str, int]] = field(default_factory=dict)
+    model_usage_after: dict[str, dict[str, int]] | None = None
 
     def native_tools(self) -> list[dict[str, Any]]:
         return self.tools
@@ -487,13 +517,19 @@ class ClaudeProvider(Provider):
                                 yielded = True
                                 yield chunk
                             return
-                        except (IncompleteProviderStreamError, ProviderConnectionError):
+                        except (IncompleteProviderStreamError, ProviderConnectionError) as error:
                             # The process had gone: serve the request once on a fresh one, but
                             # only before the caller saw anything.
                             if yielded:
+                                await self._audit_failure(plan, error)
                                 raise
                             plan.reuse.update(continued=False, answered_in_place=False,
                                               retried_fresh=True, fresh_reason="runtime_error")
+                        except GeneratorExit:
+                            raise
+                        except BaseException as error:
+                            await self._audit_failure(plan, error)
+                            raise
             async for chunk in self._fresh(messages, tools, route, timeout, plan):
                 yield chunk
 
@@ -527,6 +563,11 @@ class ClaudeProvider(Provider):
         released = _claude_kept.KEPT_PROCESSES.release(
             self.home.resolve(), self.model_info.wire_model_id)
         await self._close_kept(*released)
+
+    async def _audit_failure(self, plan: _KeepPlan, error: BaseException) -> None:
+        """The reuse record of a continued step that failed, with a code for what failed."""
+        plan.reuse.update(kept=False, failure=_failure_code(error))
+        await self._audit_reuse(plan.reuse)
 
     async def _audit_reuse(self, reuse: dict[str, Any]) -> None:
         await self.hooks.fire_on_request(
@@ -566,6 +607,7 @@ class ClaudeProvider(Provider):
             response=ProviderResponse(model=self.model_info.wire_model_id, usage_reported=False),
             allowed={tool["name"] for tool in json.loads(kept.tools_key)},
             tools=json.loads(kept.tools_key),
+            model_usage_before=kept.model_usage,
         )
         prompt: dict[str, Any] | None = None
         plan.reuse.update(continued=True, answered_in_place=kind == "answer")
@@ -604,13 +646,19 @@ class ClaudeProvider(Provider):
             finished = True
         finally:
             self._active = None
-            if finished:
+            if finished and step.keepable:
                 kept.held, kept.spoken = plan.history, "".join(step.text_parts)
                 kept.pending, kept.call_id, kept.call_arguments = (
                     step.call_event, step.call_id, step.call_arguments)
+                if step.model_usage_after is not None:
+                    kept.model_usage = step.model_usage_after
                 evicted = _claude_kept.KEPT_PROCESSES.keep(kept, plan.generation)
                 plan.reuse["kept"] = kept not in evicted
                 await self._close_kept(*evicted)
+                await self._audit_reuse(plan.reuse)
+            elif finished:
+                plan.reuse.update(kept=False, not_kept=step.not_kept)
+                await self._close_kept(kept)
                 await self._audit_reuse(plan.reuse)
             else:
                 # An error, a cancellation or a closed stream: the process's state is unknown.
@@ -787,7 +835,9 @@ class ClaudeProvider(Provider):
                 finished = True
             finally:
                 try:
-                    if finished and plan is not None:
+                    if finished and plan is not None and not step.keepable:
+                        plan.reuse.update(kept=False, not_kept=step.not_kept)
+                    if finished and plan is not None and step.keepable:
                         kept = KeptProcess(
                             connection=connection, home=plan.home, model=plan.model,
                             system=plan.system, tools_key=plan.tools_key,
@@ -795,6 +845,7 @@ class ClaudeProvider(Provider):
                             config=config, cache=cache, spoken="".join(step.text_parts),
                             pending=step.call_event, call_id=step.call_id,
                             call_arguments=step.call_arguments,
+                            model_usage=step.model_usage_after or {},
                         )
                         kept.on_close.append(
                             self._closer(config, session_id, step_folder, cache))
@@ -914,7 +965,11 @@ class ClaudeProvider(Provider):
                         # No result is sent to Claude and no game action runs in this child:
                         # a kept process waits on the call until the next request answers it.
                         flushed = await self._await_flush(route, config, session_id, prompt)
-                        if keep:
+                        if keep and len(pending) > 1:
+                            # Sylvia takes one call; a kept process would later send the
+                            # dropped ones. Close it here, as a per-step process is.
+                            step.keepable, step.not_kept = False, "parallel_calls"
+                        if keep and step.keepable:
                             step.call_event = event
                             step.call_id = candidate["id"]
                             step.call_arguments = candidate["input"]
@@ -1066,8 +1121,15 @@ class ClaudeProvider(Provider):
                     if not streamed_text and isinstance(event.get("result"), str):
                         text_parts.append(event["result"])
                         yield ProviderStreamChunk(content=event["result"])
-                    self._usage(response, event.get("usage", {}))
-                    await self._audit_model_usage(event.get("modelUsage"), response.model)
+                    if not (keep and response.usage_reported):
+                        # A kept process's result reports the whole native turn, which can
+                        # span calls answered in place: its step's own usage is the one its
+                        # message stream reported.
+                        self._usage(response, event.get("usage", {}))
+                    step.model_usage_after = await self._audit_model_usage(
+                        event.get("modelUsage"), response.model,
+                        since=step.model_usage_before if keep else None,
+                    )
                     self._observe_context_window(event.get("modelUsage"), response.model)
                     break
                 elif (
@@ -1211,15 +1273,32 @@ class ClaudeProvider(Provider):
             )
         )
 
-    async def _audit_model_usage(self, usage_by_model: object, resolved_model: str | None) -> None:
-        """Record the counts and windows Claude Code reports per model, never its price estimate."""
+    async def _audit_model_usage(
+        self, usage_by_model: object, resolved_model: str | None,
+        since: dict[str, dict[str, int]] | None = None,
+    ) -> dict[str, dict[str, int]] | None:
+        """Record the counts and windows Claude Code reports per model, never its price estimate.
+
+        A kept process reports its whole life's counts; with ``since`` (what it had reported
+        before this step) the audit records this step's share. Returns the reported counts.
+        """
         if not isinstance(usage_by_model, dict):
-            return
+            return None
         counts = {
             str(name): {key: row[key] for key in _MODEL_USAGE_COUNTS if type(row.get(key)) is int}
             for name, row in usage_by_model.items()
             if isinstance(row, dict)
         }
+        recorded = counts
+        if since is not None:
+            recorded = {
+                name: {
+                    key: value - since.get(name, {}).get(key, 0)
+                    if key in _MODEL_USAGE_TOTALS else value
+                    for key, value in row.items()
+                }
+                for name, row in counts.items()
+            }
         await self.hooks.fire_on_request(
             HookContext(
                 provider_key="claude_runtime",
@@ -1228,10 +1307,12 @@ class ClaudeProvider(Provider):
                 request_json={
                     "direction": "receive",
                     "method": "claude/result_model_usage",
-                    "params": {"model": resolved_model, "model_usage": counts},
+                    "params": {"model": resolved_model, "model_usage": recorded,
+                               **({"since_previous_step": True} if since is not None else {})},
                 },
             )
         )
+        return counts
 
     def _apply_runtime_window(
         self, value: int | None, source: str = "runtime_reported",

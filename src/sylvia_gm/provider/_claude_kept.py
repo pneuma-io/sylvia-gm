@@ -6,10 +6,11 @@ later request that extends exactly what the process holds continues it through s
 
 - a reply that ended in text is followed by a new prompt written to stdin;
 - a reply that ended in a Sylvia tool call is left waiting on that call, and the next request
-  answers it: the call's result and everything after it (host records and the player's next
-  message, as text blocks of the result) go back as the MCP tool result, and the reply goes on
-  in the same native turn. The ledger's continue record is not sent: the turn continues by
-  itself.
+  answers it: the call's result and the sealed host records after it (as text blocks of the
+  result) go back as the MCP tool result, and the reply goes on in the same native turn. The
+  ledger's continue record is not sent: the turn continues by itself. When the player's own
+  words follow the call (a turn that ended on a call), a fresh process serves the request, so
+  player speech always reaches the model as a user message, as in per-step mode.
 
 Anything else (a Retry, a compaction, a changed system text or tool list, another model) starts
 a fresh process from the saved transcript, as before. ``SYLVIA_CLAUDE_PROCESS=per-step`` keeps
@@ -83,6 +84,8 @@ class KeptProcess:
     pending: dict[str, Any] | None = None
     call_id: str = ""
     call_arguments: Any = None
+    #: The per-model usage the process has reported over its life, for per-step audits.
+    model_usage: dict[str, dict[str, int]] = field(default_factory=dict)
     idle_since: float = 0.0
     timer: threading.Timer | None = None
     keepalive: threading.Timer | None = None
@@ -343,6 +346,10 @@ def continuation(
                 continue
             raise ContinuationMismatchError("tail_not_deliverable")
         extras.extend(_text_blocks_after(message, continue_text))
+    if any(not b.get("text", "").startswith(_SEAL_START) for b in extras):
+        # The player's words after the call (a turn that ended on a call): they must stay a
+        # real user message, as per-step sends them, so a fresh process serves this request.
+        raise ContinuationMismatchError("player_speech_after_call")
     answer: dict[str, Any] = {
         "content": [{"type": "text", "text": b.get("text", "")} for b in result] + extras
     }
