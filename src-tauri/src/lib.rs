@@ -2732,11 +2732,6 @@ async fn confirm_new_campaign(
 }
 
 #[tauri::command]
-async fn rift_template(window: WebviewWindow) -> Result<Value, String> {
-    owner_call_async(window.clone(), "rift_template", json!({})).await
-}
-
-#[tauri::command]
 async fn campaign_party_options(
     window: WebviewWindow,
     _state: State<'_, OwnerBridge>,
@@ -2751,48 +2746,6 @@ async fn campaign_party_options(
             "ruleset_selection": ruleset_selection,
             "setting_id": setting_id,
             "plan_id": plan_id,
-        }),
-    )
-    .await
-}
-
-#[tauri::command]
-async fn start_rift_campaign(
-    window: WebviewWindow,
-    _state: State<'_, OwnerBridge>,
-    operation_id: String,
-    campaign_id: String,
-    builder_session_id: String,
-    ruleset_selection: String,
-    setting_id: String,
-    plan_id: String,
-    display_name: String,
-    lane: String,
-    archetype_id: String,
-    companion_ids: Vec<String>,
-    customization_notes: String,
-    provider_id: String,
-    model_id: String,
-    construction_intent: Value,
-) -> Result<Value, String> {
-    owner_call_async(
-        window,
-        "start_rift_campaign",
-        json!({
-            "operation_id": operation_id,
-            "campaign_id": campaign_id,
-            "builder_session_id": builder_session_id,
-            "ruleset_selection": ruleset_selection,
-            "setting_id": setting_id,
-            "plan_id": plan_id,
-            "display_name": display_name,
-            "lane": lane,
-            "archetype_id": archetype_id,
-            "companion_ids": companion_ids,
-            "customization_notes": customization_notes,
-            "provider_id": provider_id,
-            "model_id": model_id,
-            "construction_intent": construction_intent,
         }),
     )
     .await
@@ -3804,9 +3757,7 @@ pub fn run() {
             confirm_character_card_import,
             start_import_repair,
             ingest_builder_sources,
-            rift_template,
             campaign_party_options,
-            start_rift_campaign,
             ready_campaign_catalog,
             start_ready_campaign,
             customize_ready_campaign,

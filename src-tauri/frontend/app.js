@@ -39,7 +39,6 @@ const SylviaGMFrontend = (() => {
     sessionActivities: new Map(), // one stream/retry lifecycle record per exact session identity
     modelChoices: [],         // safe owner-projected model metadata
     providerSettings: null,   // safe provider metadata; credentials are never projected back
-    riftTemplate: null,       // safe declarative setup metadata from the owner
     campaignPartyOptions: null, // party choices for the exact current Ruleset, Setting, and Plan
     campaignPartyOptionsKey: null,
     campaignPartyOptionsStatus: 'idle',
@@ -1026,23 +1025,6 @@ const SylviaGMFrontend = (() => {
         invoke('export_package_candidate_file', { exportId, candidateId }),
       export_campaign_plan_file: (exportId, planId, expectedContentSha256) =>
         invoke('export_campaign_plan_file', { exportId, planId, expectedContentSha256 }),
-      rift_template: () => invoke('rift_template'),
-      start_rift_campaign: (command) => invoke('start_rift_campaign', {
-        operationId: command.operation_id,
-        campaignId: command.campaign_id,
-        builderSessionId: command.builder_session_id,
-        rulesetSelection: command.ruleset_selection,
-        settingId: command.setting_id,
-        planId: command.plan_id,
-        displayName: command.display_name,
-        lane: command.lane,
-        archetypeId: command.archetype_id,
-        companionIds: command.companion_ids,
-        customizationNotes: command.customization_notes,
-        providerId: command.provider_id,
-        modelId: command.model_id,
-        constructionIntent: command.construction_intent,
-      }),
       start_guided_campaign: (command) => invoke('start_guided_campaign', {
         operationId: command.operation_id,
         campaignId: command.campaign_id,
@@ -11337,9 +11319,9 @@ const SylviaGMFrontend = (() => {
     }
   }
 
+  // A setup Plan's Setting supplies an authored party template (archetypes and companions).
   function usesBundledCampaignSetup() {
-    const plan = selectedCampaignPlan();
-    return Boolean(plan?.setup_id && plan.setup_id === state.riftTemplate?.template_id);
+    return Boolean(selectedCampaignPlan()?.setup_id);
   }
 
   function campaignPartyRequestKey() {
@@ -11546,9 +11528,7 @@ const SylviaGMFrontend = (() => {
         plan_id: planId,
       });
       if (!stillCurrent()) return null;
-      const reusableRiftTemplate = usesBundledCampaignSetup() &&
-        options?.template_id === state.riftTemplate?.template_id;
-      if (!options || (options.template_id !== planId && !reusableRiftTemplate)) {
+      if (!options || options.template_id !== planId) {
         throw new Error('Campaign party choices did not match the selected Campaign Plan');
       }
       state.campaignPartyOptionsStatus = 'ready';
@@ -12422,10 +12402,6 @@ const SylviaGMFrontend = (() => {
     }
   }
 
-  function renderRiftTemplate(template) {
-    state.riftTemplate = template;
-  }
-
   function reusableCharacterTargetLabel(item) {
     if (item?.reusable !== true) return '';
     const binding = (label, value, formatName = (id) => id) => value && typeof value.id === 'string' &&
@@ -12598,18 +12574,6 @@ const SylviaGMFrontend = (() => {
         $('construction-library-warning-items').textContent = friendlyCommandError(
           'The content library could not be loaded. Reopen this Interview to try again', e
         );
-      }
-    }
-    if (state.bridge.rift_template && state.campaignCreationCatalog.some(
-      (item) => item.kind === 'campaign_plan' && item.setup_id
-    )) {
-      try {
-        const template = await state.bridge.rift_template();
-        if (!stillSelected()) return;
-        renderRiftTemplate(template);
-      } catch (e) {
-        if (!stillSelected()) return;
-        setInlineStatus('The Rift setup is unavailable', 'construction');
       }
     }
     try {
@@ -13000,7 +12964,6 @@ const SylviaGMFrontend = (() => {
     if (preferences) customizationParts.push(`Preferences: ${preferences}`);
     if (specificRequests) customizationParts.push(`Specific requests: ${specificRequests}`);
     const premise = customizationParts.join('\n');
-    const lane = premise ? 'customize' : 'quick_start';
     const playerCharacterId = hasRuleset ? $('rift-archetype').value || null : null;
     const companionIds = hasRuleset ? [...$('rift-companions').querySelectorAll(
       'input[type="checkbox"]:checked'
@@ -13018,44 +12981,24 @@ const SylviaGMFrontend = (() => {
     setInlineStatus('Confirming campaign…', 'construction');
     try {
       let begun;
-      if (hasRuleset && usesBundledCampaignSetup()) {
-        if (!state.bridge.start_rift_campaign) return;
-        if (!playerCharacterId) {
-          setInlineStatus('Player Character setup is required', 'construction');
-          return;
-        }
-        begun = await state.bridge.start_rift_campaign({
-          operation_id: `start-rift-${nonce}`,
-          campaign_id: state.constructionDraftId,
-          builder_session_id: state.activeSessionId,
-          ruleset_selection: $('construction-package').value,
-          setting_id: $('construction-setting').value,
-          plan_id: $('construction-template').value,
-          display_name: displayName,
-          lane,
-          archetype_id: playerCharacterId,
-          companion_ids: companionIds,
-          customization_notes: lane === 'customize' ? premise : '',
-          provider_id: gameMasterStart.provider_id,
-          model_id: gameMasterStart.model_id,
-          construction_intent: constructionIntent,
-        });
-      } else {
-        if (!state.bridge.start_guided_campaign) return;
-        begun = await state.bridge.start_guided_campaign({
-          operation_id: `start-guided-${nonce}`,
-          campaign_id: state.constructionDraftId,
-          builder_session_id: state.activeSessionId,
-          display_name: displayName,
-          candidate_id: $('construction-package').value || null,
-          premise,
-          setting_id: hasRuleset ? $('construction-setting').value || null : null,
-          plan_id: hasRuleset ? selectedCampaignPlan()?.id || null : null,
-          player_character_id: playerCharacterId,
-          companion_ids: companionIds,
-          construction_intent: constructionIntent,
-        });
+      if (hasRuleset && usesBundledCampaignSetup() && !playerCharacterId) {
+        setInlineStatus('Player Character setup is required', 'construction');
+        return;
       }
+      if (!state.bridge.start_guided_campaign) return;
+      begun = await state.bridge.start_guided_campaign({
+        operation_id: `start-guided-${nonce}`,
+        campaign_id: state.constructionDraftId,
+        builder_session_id: state.activeSessionId,
+        display_name: displayName,
+        candidate_id: $('construction-package').value || null,
+        premise,
+        setting_id: hasRuleset ? $('construction-setting').value || null : null,
+        plan_id: hasRuleset ? selectedCampaignPlan()?.id || null : null,
+        player_character_id: playerCharacterId,
+        companion_ids: companionIds,
+        construction_intent: constructionIntent,
+      });
       hideConstructionPanel();
       await refreshCampaignIndex();
       await openCampaign(begun.campaign_id, begun.builder_session_id || null);

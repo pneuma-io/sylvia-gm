@@ -145,16 +145,20 @@ def test_retained_rift_validates_its_owned_world_without_current_base_world(monk
 
 
 def test_retained_rift_direct_selection_installs_its_owned_closure(tmp_path):
-    from sylvia_gm.interfaces.owner_process import _resolve_rift_library_selection
+    from sylvia_gm.application.campaign_library_selection import (
+        resolve_campaign_library_selection,
+    )
 
     retained = bundled_plan("the-rift-awakening")
     database = tmp_path / "retained-selection.sqlite3"
     with AuthorityOwner.open(database, "retained-selection") as owner:
         owner.set_admin_full_audit(True)
-        candidate, sources, plan, template = _resolve_rift_library_selection(
-            owner, tmp_path, ruleset_selection=SRD,
+        selection = resolve_campaign_library_selection(
+            owner, tmp_path, candidate_id=SRD,
             setting_id="pneuma.severed-lands", plan_id="the-rift-awakening",
         )
+        candidate, sources = selection.candidate, selection.sources
+        plan, template = selection.plan.plan, selection.party_template
         bindings = retained.plan.payload["bindings"]
         assert candidate.closure_sha256 == bindings["package_closure_sha256"]
         assert plan == retained.plan
@@ -204,10 +208,10 @@ def test_retained_rift_legacy_reusable_copy_resolves_its_exact_available_snapsho
         load_reusable_campaign_plan,
         save_reusable_rift_plan,
     )
-    from sylvia_gm.interfaces.owner_process import (
-        _campaign_creation_catalog,
-        _resolve_rift_library_selection,
+    from sylvia_gm.application.campaign_library_selection import (
+        resolve_campaign_library_selection,
     )
+    from sylvia_gm.interfaces.owner_process import _campaign_creation_catalog
 
     retained = bundled_plan("the-rift-awakening")
     saved = save_reusable_rift_plan(
@@ -228,11 +232,13 @@ def test_retained_rift_legacy_reusable_copy_resolves_its_exact_available_snapsho
         assert validate_plan_snapshot(
             snapshot, saved.plan.payload, saved.plan.readable_markdown,
         ) == saved.plan
-        candidate, sources, plan, template = _resolve_rift_library_selection(
-            owner, tmp_path, ruleset_selection=SRD,
+        selection = resolve_campaign_library_selection(
+            owner, tmp_path, candidate_id=SRD,
             setting_id="pneuma.severed-lands", plan_id=saved.artifact_id,
         )
-        assert plan == saved.plan
+        candidate, sources = selection.candidate, selection.sources
+        plan, template = selection.plan, selection.party_template
+        assert plan == saved
         bindings = retained.plan.payload["bindings"]
         assert candidate.closure_sha256 == bindings["package_closure_sha256"]
         assert sources.setting.as_payload() == saved.plan.payload["bindings"]["campaign_setting"]

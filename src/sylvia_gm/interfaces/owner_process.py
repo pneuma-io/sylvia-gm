@@ -52,13 +52,11 @@ from sylvia_gm.application.authority import (
 )
 from sylvia_gm.application.builder_session_migration import migrate_legacy_builder_chats
 from sylvia_gm.application.bundled_campaign_plans import (
-    bundled_plan,
     known_builtin_public_summary,
 )
 from sylvia_gm.application.bundled_packages import (
     BUNDLED_RIICHI_PACKAGES,
     bundled_campaign_content_catalog,
-    bundled_rift_archive_for_closure,
     bundled_rift_authority,
     bundled_rift_participant_declaration,
     bundled_riichi_archive,
@@ -83,14 +81,10 @@ from sylvia_gm.application.reusable_participants import (
     compatible_reusable_participants,
 )
 from sylvia_gm.application.reusable_plans import (
-    load_reusable_campaign_plan,
     reusable_campaign_plan_catalog,
 )
 from sylvia_gm.campaign.rift import (
     RIFT_RULESET_ID,
-    materialize_rift_selection,
-    validate_rift_party_handoff,
-    validate_rift_template,
 )
 from sylvia_gm.config._resolver import ConfigError
 from sylvia_gm.config.provider_settings import (
@@ -113,8 +107,6 @@ from sylvia_gm.domain.authority import (
 )
 from sylvia_gm.domain.campaign_plan import (
     PackageBinding,
-    ValidatedCampaignPlan,
-    validate_campaign_plan,
 )
 from sylvia_gm.domain.errors import (
     AuthorityError,
@@ -1044,289 +1036,6 @@ def _seed_campaign_plan(
         structured_target.write_bytes(structured_bytes)
     except OSError as error:
         raise CommandRejected("Structured Campaign Plan could not be created") from error
-
-
-def _resolve_rift_library_selection(
-    owner: AuthorityOwner, storage_root: Path, *, ruleset_selection: str,
-    setting_id: str, plan_id: str,
-) -> tuple[PackageCandidate, CampaignPlanToolAuthority, ValidatedCampaignPlan, dict | None]:
-    """Use a Rift Plan's retained sources, including its authored party template when present."""
-    if plan_id == "the-rift-awakening":
-        retained = bundled_plan(plan_id)
-        if retained is None:
-            raise CommandRejected("The selected Rift Plan is unavailable")
-        plan = retained.plan
-        archive = retained.package_snapshot
-    else:
-        saved = load_reusable_campaign_plan(
-            storage_root, plan_id,
-            validate_plan=lambda payload, text: validate_retained_campaign_plan(
-                owner, payload, text,
-            ),
-        )
-        if saved.setup_id != "the-rift-awakening":
-            raise CommandRejected("The selected Plan does not use Rift campaign setup")
-        plan = saved.plan
-        archive = saved.package_snapshot
-    bindings = plan.payload["bindings"]
-    if setting_id != bindings["campaign_setting"]["id"]:
-        raise CommandRejected("The selected Plan belongs to another Campaign Setting")
-    if ruleset_selection != bindings["ruleset"]["id"]:
-        selected = owner.package_candidate(ruleset_selection)
-        if not any(
-            entry.role is PackageRole.PRIMARY and entry.package_id == bindings["ruleset"]["id"]
-            for entry in selected.package_lock.entries
-        ):
-            raise CommandRejected("The selected Plan belongs to another Ruleset")
-    candidate = next(
-        (item for item in owner.package_candidates()
-         if item.closure_sha256 == bindings["package_closure_sha256"]),
-        None,
-    )
-    if candidate is None:
-        if archive is None:
-            archive = bundled_rift_archive_for_closure(bindings["package_closure_sha256"])
-            if archive is None:
-                raise CommandRejected("The selected Plan's saved packages are unavailable")
-        candidate = owner.install_package_archive(
-            io.BytesIO(archive),
-            install_id=f"install-bundled-rift-{hashlib.sha256(archive).hexdigest()[:24]}",
-        )
-    sources = campaign_plan_sources(owner, candidate.package_lock, setting_id=setting_id)
-    if sources is None:
-        raise CommandRejected("The selected Plan's Setting is unavailable")
-    template_path = "campaigns/the-rift-awakening/party-template.json"
-    if template_path not in sources.setting_paths and any(
-        dependency.kind == "ruleset_snapshot"
-        for entry in candidate.package_lock.entries for dependency in entry.dependencies
-    ):
-        raise CommandRejected("The selected Rift Plan has no contained party template")
-    template = (
-        validate_rift_template(json.loads(sources.read_setting(template_path)))
-        if template_path in sources.setting_paths else None
-    )
-    return candidate, sources, plan, template
-
-
-def _start_rift_campaign(
-    bus: LocalCommandBus,
-    application_owner: AuthorityOwner,
-    storage_root: Path,
-    *,
-    operation_id: str,
-    campaign_id: str,
-    builder_session_id: str,
-    ruleset_selection: str,
-    setting_id: str,
-    plan_id: str,
-    display_name: str,
-    lane: str,
-    archetype_id: str,
-    companion_ids: tuple[str, ...],
-    customization_notes: str,
-    provider_id: str,
-    model_id: str,
-    construction_intent: SafePayload | None = None,
-) -> SafePayload:
-    """Compose The Rift through the ordinary package and construction authorities."""
-
-    candidate, rift_authority, selected_plan, party_template = _resolve_rift_library_selection(
-        application_owner, storage_root, ruleset_selection=ruleset_selection,
-        setting_id=setting_id, plan_id=plan_id,
-    )
-
-    try:
-        existing_basis = application_owner.campaign_construction_basis(campaign_id)
-    except CommandRejected as error:
-        if str(error) not in {
-            "Confirmed campaign construction is unavailable",
-            "Campaign construction has not begun",
-        }:
-            raise
-    else:
-        current_lock = application_owner.current_package_lock(campaign_id)
-        primary = next(
-            (
-                entry
-                for entry in current_lock.package_lock.entries
-                if entry.role is PackageRole.PRIMARY
-            ),
-            None,
-        )
-        if (
-            existing_basis.builder_session_id != builder_session_id
-            or existing_basis.display_name != display_name
-            or existing_basis.lane != lane
-            or primary is None
-            or primary.package_id != RIFT_RULESET_ID
-        ):
-            raise CommandRejected(
-                "The interrupted Rift Start basis differs from the current selections"
-            )
-        return {
-            "campaign_id": campaign_id,
-            "resulting_revision": existing_basis.begin_revision,
-            "builder_session_id": builder_session_id,
-            "template_id": "the-rift-awakening",
-            "lane": existing_basis.lane,
-        }
-
-    primary = next(
-        (
-            entry
-            for entry in candidate.package_lock.entries
-            if entry.role is PackageRole.PRIMARY and entry.package_id == RIFT_RULESET_ID
-        ),
-        None,
-    )
-    declaration = next(
-        (
-            item
-            for item in (application_owner.exact_participant_declarations(
-                primary.package_id, primary.version, primary.sha256
-            ) if primary is not None else ())
-            if item.kind == "player_character"
-        ),
-        None,
-    )
-    if primary is None or declaration is None:
-        raise CommandRejected("The bundled D&D campaign package is unavailable")
-    suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]
-    selected_plan_payload = selected_plan.payload
-    starting_party_policy = selected_plan_payload.get("starting_party")
-    if not isinstance(starting_party_policy, Mapping):
-        raise CommandRejected("The Rift Campaign Plan starting party is invalid")
-    selection = materialize_rift_selection(
-        participant_namespace=suffix,
-        lane=lane,
-        archetype_id=archetype_id,
-        companion_ids=companion_ids,
-        customization_notes=customization_notes,
-        package=primary,
-        participant_declaration=declaration,
-        starting_party_policy=starting_party_policy,
-        template=party_template,
-        selected_plan=selected_plan,
-        setting_character_schema=rift_authority.setting_character_schema,
-        reusable_participants=available_reusable_participants(
-            storage_root,
-            package=primary,
-            declaration=declaration,
-            campaign_setting=rift_authority.setting,
-            legacy_campaign_setting=bundled_rift_authority().setting,
-            setting_character_schema=rift_authority.setting_character_schema,
-        ),
-    )
-    intent = owned_payload(construction_intent or {})
-    plan_payload = json.loads(canonical_json_bytes(selected_plan_payload))
-    if not isinstance(plan_payload, dict):
-        raise CommandRejected("The Rift Campaign Plan is invalid")
-    boundaries = intent.get("boundaries")
-    preferences = intent.get("preferences")
-    specific_requests = intent.get("specific_requests")
-    contributions = intent.get("contributions")
-    accepted_lines: list[str] = []
-    if isinstance(boundaries, str) and boundaries.strip():
-        plan_boundaries = plan_payload.get("boundaries")
-        if not isinstance(plan_boundaries, list):
-            raise CommandRejected("The Rift Campaign Plan boundaries are invalid")
-        plan_boundaries.append(f"Player Boundary: {boundaries.strip()}")
-        accepted_lines.append(f"Hard Boundaries: {boundaries.strip()}")
-    guidance = plan_payload.get("gm_guidance")
-    if not isinstance(guidance, dict) or not isinstance(guidance.get("instructions"), str):
-        raise CommandRejected("The Rift Campaign Plan guidance is invalid")
-    guidance_lines: list[str] = []
-    if isinstance(preferences, str) and preferences.strip():
-        guidance_lines.append(f"Player Preferences: {preferences.strip()}")
-        accepted_lines.append(f"Preferences: {preferences.strip()}")
-    if isinstance(specific_requests, str) and specific_requests.strip():
-        guidance_lines.append(f"Player Specific Requests: {specific_requests.strip()}")
-        accepted_lines.append(f"Specific Requests: {specific_requests.strip()}")
-    if isinstance(contributions, Mapping):
-        for contribution_step, contribution_answer in sorted(contributions.items()):
-            if not isinstance(contribution_answer, Mapping):
-                continue
-            answer_values = contribution_answer.get("answers")
-            if not isinstance(answer_values, Mapping):
-                continue
-            rendered = ", ".join(f"{key}={value}" for key, value in sorted(answer_values.items()))
-            if rendered:
-                guidance_lines.append(
-                    f"Accepted {str(contribution_step).replace('_', ' ')}: {rendered}"
-                )
-                accepted_lines.append(
-                    f"{str(contribution_step).replace('_', ' ').title()}: {rendered}"
-                )
-    if guidance_lines:
-        guidance["instructions"] = (
-            str(guidance["instructions"]).rstrip() + "\n" + "\n".join(guidance_lines)
-        )
-    plan_markdown = selection.campaign_plan_markdown
-    if accepted_lines:
-        plan_markdown += (
-            "\n\n## Accepted Campaign Construction\n\n"
-            + "\n".join(f"- {line}" for line in accepted_lines)
-            + "\n"
-        )
-    validated_plan = validate_campaign_plan(
-        plan_payload,
-        readable_markdown=plan_markdown,
-        expected_ruleset=rift_authority.ruleset,
-        expected_setting=rift_authority.setting,
-        expected_closure_sha256=rift_authority.closure_sha256,
-        setting_paths=rift_authority.setting_paths,
-        setting_knowledge_ids=rift_authority.setting_knowledge_ids,
-    )
-    selection = dataclasses.replace(
-        selection,
-        campaign_plan=validated_plan.payload,
-        campaign_plan_markdown=validated_plan.readable_markdown,
-    )
-    validated_starting_party = validated_plan.payload.get("starting_party")
-    if not isinstance(validated_starting_party, Mapping):  # pragma: no cover - validated format
-        raise CommandRejected("The validated Campaign Plan starting party is unavailable")
-    validate_rift_party_handoff(selection, validated_starting_party)
-    application_owner.append_agent_message(
-        session_id=builder_session_id,
-        message_id=f"ready-to-begin-{suffix}",
-        kind=SessionMessageKind.USER,
-        content={
-            "text": "Ready to Begin",
-            "interview_step": "ready",
-            "interview_value": {"action": "ready_to_begin"},
-        },
-    )
-    confirmation = bus.bind_guided_campaign_basis(
-        operation_id=f"confirm-rift-{suffix}",
-        campaign_id=campaign_id,
-        display_name=display_name,
-        package_lock=candidate.package_lock,
-        turn_id=f"turn-construction-rift-{suffix}",
-        builder_session_id=builder_session_id,
-        package_candidate_id=candidate.candidate_id,
-        participants=selection.participants,
-        initial_state=selection.initial_state,
-    )
-    _seed_campaign_plan(
-        storage_root,
-        confirmation.campaign_id,
-        selection.campaign_plan_markdown,
-        selection.campaign_plan,
-    )
-    begun = bus.begin_campaign_construction(
-        operation_id=f"begin-rift-{suffix}",
-        campaign_id=confirmation.campaign_id,
-        lane=lane,
-        expected_revision=confirmation.resulting_revision,
-        canonical_input=selection.canonical_input,
-    )
-    return {
-        "campaign_id": confirmation.campaign_id,
-        "resulting_revision": begun.resulting_revision,
-        "builder_session_id": builder_session_id,
-        "template_id": "the-rift-awakening",
-        "lane": lane,
-    }
 
 
 def _publish_builder_package_candidate(
