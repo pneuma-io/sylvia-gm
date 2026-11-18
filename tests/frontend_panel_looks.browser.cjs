@@ -219,6 +219,35 @@ const armed = (source) => variant(nonCaster(source), (projection) => {
   }
 });
 
+test('Inventory chips use projected names and retain custom and older-package labels', async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await open(browser);
+    const record = JSON.parse(fs.readFileSync(path.resolve(frontend, '../../rulesets/srd-lite/package-record.json'), 'utf8'));
+    const fields = record.ui_surfaces.find(s => s.renderer === 'inventory').source.fields;
+    const hands = [];
+    for (const declared of [false, true]) {
+      const source = armed(srd);
+      const data = source.surfaces.find(s => s.renderer === 'inventory').data;
+      data.entities.hero.inventory.push('dungeoneers_pack', 'healers_kit', 'travelers_clothes', 'custom_satchel');
+      if (declared) data.item_names = fields.item_names.value;
+      await show(page, source);
+      const tab = page.locator('.ruleset-panel-tab[data-workspace-panel="dnd-inventory"]');
+      if (await tab.count()) await tab.first().click();
+      const panel = page.locator('[data-panel-id="dnd-inventory"]');
+      const chips = await panel.locator('.panel-inventory-item').allTextContents();
+      assert.deepEqual(chips.slice(-4), declared
+        ? ["Dungeoneer's Pack", "Healer's Kit", "Traveler's Clothes", 'Custom Satchel']
+        : ['Dungeoneers Pack', 'Healers Kit', 'Travelers Clothes', 'Custom Satchel']);
+      hands.push(await panel.locator('select.equipment-slot').evaluateAll(selects =>
+        selects.map(select => Array.from(select.options, o => [o.text, o.value, o.selected]))));
+    }
+    assert.equal(hands[0].length, 4);
+    assert.deepEqual(hands[1], hands[0]);
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 // Inventory's Main hand and Off hand drop-downs sat side by side at every width, so at the default panel width they
 // read "Unse" for "Unselected" and would cut an equipped item's name.
 test('SRD Inventory hand drop-downs show their values whole', { timeout: 90000 }, async () => {
