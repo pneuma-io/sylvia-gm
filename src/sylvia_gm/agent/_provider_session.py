@@ -86,6 +86,9 @@ from ._provider_turn_decisions import (
     _campaign_file_must_be_settled,
     _campaign_file_needs_narration,
     _held_campaign_file_narration_is_needed,
+    _is_private_deliberation_line,
+    _looks_like_private_deliberation,
+    _narration_needs_private_correction,
     _narration_repeats_previous_player_response,
     _required_tool_call_is_missing,
     _required_tool_correction_was_abandoned,
@@ -250,23 +253,6 @@ def _contains_serialized_tool_call(text: str) -> bool:
     return "]<]minimax[>[<tool_call" in folded or (
         "<tool_call" in folded and "<invoke name=" in folded
     )
-
-
-_PRIVATE_DELIBERATION_STARTS = (
-    "the player wants ",
-    "the player's declared action ",
-    "the declared player action ",
-    "the user wants ",
-)
-
-
-def _is_private_deliberation_line(line: str) -> bool:
-    return line.strip().casefold().startswith(_PRIVATE_DELIBERATION_STARTS)
-
-
-def _looks_like_private_deliberation(text: str) -> bool:
-    """Detect provider prose that describes the player request as an instruction."""
-    return any(map(_is_private_deliberation_line, text.splitlines()))
 
 
 def _forced_single_tool_call_from_json(
@@ -1968,10 +1954,7 @@ class ProviderSessionAdapter:
                         "Provider repeatedly returned prose where a tool call was required",
                         code="provider_required_tool_call_missing",
                     )
-                if (
-                    not state.obligations.force_campaign_file_update
-                    and _looks_like_private_deliberation(state.narration)
-                ):
+                if _narration_needs_private_correction(state):
                     if (
                         state.private_deliberation_corrections_used
                         < state.max_private_deliberation_corrections
