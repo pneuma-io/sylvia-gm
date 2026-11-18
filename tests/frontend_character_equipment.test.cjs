@@ -31,8 +31,21 @@ test('Inventory chips give single-word item ids a capital, like multi-word ids',
  const {api,loadout}=setup('vesper');
  loadout.data.entities.vesper.inventory=['greatsword','flail','dungeoneers_pack','chain_mail','gp',
   {item_id:'javelin',quantity:4},{name:'Named by the owner'},'Already Named','18_gp'];
- const chips=[...api.renderInventoryPanel(loadout.data,loadout).matchAll(/<span class="panel-inventory-item">([^<]*)<\/span>/g)].map(match=>match[1]);
+ const chips=[...api.renderInventoryPanel(loadout.data,loadout).matchAll(/<span class="panel-inventory-item"[^>]*>([^<]*)<\/span>/g)].map(match=>match[1]);
  assert.deepEqual(chips,['Greatsword','Flail','Dungeoneers Pack','Chain Mail','Gp','Javelin \u00d7 4','Named by the owner','Already Named','18 Gp']);
+});
+// A chip says what its item is doing, for a panel look to draw: held in the active set's hands, worn, one of the
+// equipment policy's weapons, or a counted stack such as a purse. The chip's text stays the item's label.
+test('Inventory chips mark held, worn, weapon and counted items without changing their text',()=>{
+ const {api,loadout}=setup('vesper');
+ Object.assign(loadout.data.entities.vesper,{inventory:['greatsword','flail','chain_mail','shield','rope','18_gp','10_minutes_of_rope'],
+  weapon_sets:{active_set:'melee',melee:{main_hand:'greatsword',off_hand:null},ranged:{main_hand:'flail',off_hand:null}},
+  worn_armor:{inventory_item:'chain_mail'},worn_shield:{inventory_item:'shield'}});
+ loadout.data.equipment={sets:[],weapons:[{id:'greatsword'},{id:'flail'}]};
+ const chips=Object.fromEntries([...api.renderInventoryPanel(loadout.data,loadout).matchAll(/<span class="panel-inventory-item"([^>]*)>([^<]*)<\/span>/g)]
+  .map(match=>[match[2],match[1].trim()]));
+ assert.deepEqual(chips,{'Greatsword':'data-inventory-held="hand" data-inventory-kind="weapon"','Flail':'data-inventory-kind="weapon"',
+  'Chain Mail':'data-inventory-held="worn"','Shield':'data-inventory-held="worn"','Rope':'','18 Gp':'data-inventory-counted=""','10 Minutes Of Rope':''});
 });
 test('Legacy Stance receipt displays Character without rewriting the native receipt',()=>{
  const {api}=setup('hex'),card={version:1,title:'Stance',summary:[{label:'Actor',value:'Hex',emphasis:false}],details:[],actions:[]};
