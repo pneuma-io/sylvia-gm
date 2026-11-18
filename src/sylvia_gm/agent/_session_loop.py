@@ -856,6 +856,8 @@ class CampaignSessionLoop:
             record_terminal("completed")
             return tuple(appended)
         except BaseException as error:
+            if isinstance(error, ProviderError) and request.input_kind is SessionInputKind.USER:
+                error.accepted_message_id = request.message_id
             # Shutdown may already have closed storage. The saved input without a
             # terminal record still identifies interrupted work after restart.
             with suppress(Exception):
@@ -1276,6 +1278,8 @@ class CampaignSessionLoop:
             self._owner.append_session_canonical_references(request.session_id, canonical)
             return SessionRunResult(canonical=canonical, receipts=tuple(receipts))
         except BaseException as error:
+            if isinstance(error, ProviderError) and request.input_kind is SessionInputKind.USER:
+                error.accepted_message_id = request.message_id
             if not narration_started:
                 raise
             was_cancelled = active.control.cancelled

@@ -1956,6 +1956,10 @@ def run(
                     )
                 else:
                     message = str(error)
+                if (method == "submit_session_input" and isinstance(error, ProviderError)
+                        and error.accepted_message_id is not None
+                        and error.accepted_message_id == params.get("message_id")):
+                    message = f"Your message was saved. {message}"
                 reply = {
                     "id": request_id,
                     "ok": False,

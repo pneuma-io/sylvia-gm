@@ -153,6 +153,7 @@ def test_owner_explains_provider_recovery_without_exposing_raw_errors(tmp_path, 
         }})
         reply = harness.read()
         assert reply["ok"] is False
+        assert reply["error"]["message"].startswith("Your message was saved.")
         assert expected in reply["error"]["message"].lower()
         assert "PRIVATE_TRANSPORT_DETAIL" not in str(reply)
         if isinstance(failure, RateLimitError) and failure.retry_after is None:

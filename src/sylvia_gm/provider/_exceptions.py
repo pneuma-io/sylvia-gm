@@ -37,6 +37,7 @@ class ErrorCategory(Enum):
 class ProviderError(Exception):
     """Base exception for all provider-layer errors."""
 
+    accepted_message_id: str | None = None
     category: ErrorCategory = ErrorCategory.PROVIDER_UNAVAILABLE
 
 
