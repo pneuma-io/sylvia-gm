@@ -1698,7 +1698,9 @@ the ledger resets. Builder and participant requests do not use it.
   file and step folder live as long as the process and are removed when it closes: after 30
   minutes idle, on Stop, sign-in or sign-out, provider close, a chat's change away from its
   model, a settings reload that no longer offers its model, and process exit.
-  `SYLVIA_CLAUDE_PROCESS=per-step` starts a new process for every step, the previous behaviour.
+  The kept process is opt-in with `SYLVIA_CLAUDE_PROCESS=persistent`; the shipped default is a new
+  process for every step, the previous behaviour, until a fresh start after calls answered in place
+  replays exactly what the kept process sent.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 

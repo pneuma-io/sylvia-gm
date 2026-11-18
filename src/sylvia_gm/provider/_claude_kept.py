@@ -13,8 +13,12 @@ later request that extends exactly what the process holds continues it through s
   player speech always reaches the model as a user message, as in per-step mode.
 
 Anything else (a Retry, a compaction, a changed system text or tool list, another model) starts
-a fresh process from the saved transcript, as before. ``SYLVIA_CLAUDE_PROCESS=per-step`` keeps
-the previous behaviour, a new process for every step.
+a fresh process from the saved transcript, as before.
+
+The kept process is opt-in, with ``SYLVIA_CLAUDE_PROCESS=persistent``. The default is a new
+process for every step: in the live check for issue 171 a fresh start after calls
+answered in place read only the prefix before the first answered call from the cache, because
+the saved transcript does not replay what the kept process sent.
 """
 
 from __future__ import annotations
@@ -30,11 +34,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-#: Environment switch, read for every request: ``persistent`` (the default) or ``per-step``.
+#: Environment switch, read for every request: ``per-step`` (the default) or ``persistent``.
 PROCESS_SWITCH = "SYLVIA_CLAUDE_PROCESS"
 PERSISTENT = "persistent"
 PER_STEP = "per-step"
-_PER_STEP_VALUES = {PER_STEP, "per_step", "step", "fresh"}
+_PERSISTENT_VALUES = {PERSISTENT, "kept", "keep"}
 #: The audit's ``persist_session`` value for a kept process's session file.
 KEPT_SESSION = "kept_until_process_closes"
 #: Idle processes kept at once; the least recently used is closed first.
@@ -50,9 +54,9 @@ _KEEPALIVE_SECONDS = 600.0
 
 
 def process_setting(environ: Mapping[str, str] | None = None) -> str:
-    """``persistent`` unless ``SYLVIA_CLAUDE_PROCESS`` asks for per-step processes."""
+    """``per-step`` unless ``SYLVIA_CLAUDE_PROCESS`` asks for a kept process (``persistent``)."""
     value = (os.environ if environ is None else environ).get(PROCESS_SWITCH, "")
-    return PER_STEP if value.strip().casefold() in _PER_STEP_VALUES else PERSISTENT
+    return PERSISTENT if value.strip().casefold() in _PERSISTENT_VALUES else PER_STEP
 
 
 class ContinuationMismatchError(Exception):
