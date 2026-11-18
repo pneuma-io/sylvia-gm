@@ -1083,6 +1083,10 @@ class _OwnerProjection:
             )
         )
 
+    def package_lock_lineage(self, campaign_id: str) -> tuple[()]:
+        assert campaign_id == "campaign-provider"
+        return ()
+
     def snapshot(self, campaign_id: str) -> object:
         assert campaign_id == "campaign-provider"
         return SimpleNamespace(
