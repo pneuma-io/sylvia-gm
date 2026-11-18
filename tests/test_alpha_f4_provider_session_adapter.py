@@ -399,6 +399,105 @@ def test_anthropic_single_required_tool_transaction_uses_zero_temperature() -> N
         assert wire.get("tool_choice") == wire_choice, wire_model
 
 
+@pytest.mark.parametrize("reuse_retired_name", [False, True])
+def test_legacy_history_preserves_one_pin_and_quotes_retired_operations(reuse_retired_name):
+    from sylvia_gm.agent._provider_session import _tool_alias
+    from sylvia_gm.domain.authority import PackageLockEntry, PackageRole
+
+    tool = ModelMechanicsTool("synthetic.rules", "1", "a" * 64, "move", "piece.move", {})
+    retired = replace(tool, name="old_score", capability="piece.score")
+    renamed = replace(tool, package_version="2", package_sha256="b" * 64)
+    # Sharing a name with a different capability does not give the new operation the old result.
+    different = replace(renamed, name=retired.name, capability="other.score")
+    declarations = {"1": [tool, retired], "2": [renamed, different] if reuse_retired_name else [renamed]}
+
+    def lock(t, previous=None):
+        pin = PackageLockEntry(
+            t.package_id, t.package_version, t.package_sha256, PackageRole.PRIMARY, 0, (), ()
+        )
+        return SimpleNamespace(
+            lock_id=t.package_version, campaign_id="game", predecessor_lock_id=previous,
+            package_lock=SimpleNamespace(entries=(pin,)),
+        )
+
+    locks = [lock(tool)]
+    owner = SimpleNamespace(
+        current_package_lock=lambda _campaign: locks[-1],
+        package_lock_lineage=lambda _campaign: locks,
+        package_record=lambda _id, version, _sha: {
+            "tools": [{"name": t.name, "capability": t.capability} for t in declarations[version]]
+        },
+    )
+    adapter = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner), _ScriptedProvider([]), owner_id="legacy"
+    )
+    calls = [
+        {
+            "id": str(i),
+            "type": "function",
+            "function": {"name": _tool_alias(t), "arguments": '{"piece":"green"}'},
+        }
+        for i, t in enumerate((tool, retired))
+    ]
+    results = [
+        {
+            "role": "tool",
+            "tool_call_id": c["id"],
+            "name": c["function"]["name"],
+            "content": "green moved" if c["id"] == "0" else "score 7",
+        }
+        for c in reversed(calls)
+    ]
+    history = [
+        {
+            "role": "assistant",
+            "_native_reference": {"response_id": "old-batch"},
+            "content": "I check the board.",
+            "tool_calls": calls,
+        },
+        *results,
+    ]
+    original = json.dumps(history).encode()
+    # A one-pin campaign may also have temporarily unavailable tools. Preserve its exact bytes.
+    assert (
+        json.dumps(adapter._legacy_adopted_history(history, "game")).encode()
+        == original
+    )
+    locks.append(lock(renamed, previous="1"))
+    message, result = adapter._legacy_adopted_history(history, "game")
+    assert "_native_reference" not in message
+    assert message["tool_calls"] == [
+        {**calls[0], "function": {**calls[0]["function"], "name": _tool_alias(renamed)}}
+    ]
+    assert result == {**results[1], "name": _tool_alias(renamed)}
+    assert message["content"].startswith("I check the board.\nEarlier tool calls")
+    quoted = json.loads(message["content"].split(" (historical data): ", 1)[1])
+    assert quoted == [{"call": calls[1]["function"], "result": "score 7"}]
+    # Host and current-package calls in a mixed batch keep their own result metadata.
+    for name in ("read_session_history", _tool_alias(renamed)):
+        intact = {**calls[0], "function": {**calls[0]["function"], "name": name}}
+        unchanged_result = {k: v for k, v in results[1].items() if k != "name"}
+        mixed = [{**history[0], "tool_calls": [intact, calls[1]]}, results[0], unchanged_result]
+        mixed_message, kept_result = adapter._legacy_adopted_history(mixed, "game")
+        assert mixed_message["tool_calls"] == [intact]
+        assert kept_result == unchanged_result
+    retired_pair = [{**history[0], "tool_calls": [calls[1]]}, results[0]]
+    (text_only,) = adapter._legacy_adopted_history(retired_pair, "game")
+    assert "tool_calls" not in text_only and "score 7" in text_only["content"]
+    # A pre-manifest pin still identifies a surviving call by its digest.
+    read_record = owner.package_record
+    def missing_old_manifest(package, version, sha):
+        if version == "1":
+            raise CommandRejected("Manifest unavailable", code="package_unavailable")
+        return read_record(package, version, sha)
+
+    owner.package_record = missing_old_manifest
+    reopened = ProviderSessionAdapter(cast(AuthorityOwner, owner), _ScriptedProvider([]), owner_id="legacy")
+    preserved = reopened._legacy_adopted_history(history, "game")
+    assert preserved[0]["tool_calls"] == [message["tool_calls"][0], calls[1]]
+    assert json.dumps(history).encode() == original
+
+
 def test_provider_tool_alias_resolution_stays_within_the_current_catalog() -> None:
     end_turn = ModelMechanicsTool(
         package_id="synthetic.rules",
@@ -1009,6 +1108,10 @@ class _OwnerProjection:
                 ),
             )
         )
+
+    def current_package_lock(self, campaign_id: str):
+        assert campaign_id == "campaign-provider"
+        return SimpleNamespace(lock_id="fixture-lock", predecessor_lock_id=None)
 
     def snapshot(self, campaign_id: str) -> object:
         assert campaign_id == "campaign-provider"

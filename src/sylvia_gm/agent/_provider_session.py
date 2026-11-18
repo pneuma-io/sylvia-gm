@@ -66,6 +66,7 @@ from sylvia_gm.domain.authority import (
     ModelDecisionBoundary,
     ModelToolBehavior,
     NarrationStream,
+    PackageLockEntry,
     ProseChannel,
     RetryNarrationInput,
     SafePayload,
@@ -75,6 +76,7 @@ from sylvia_gm.domain.authority import (
     validate_response_blocks,
 )
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
+from sylvia_gm.domain.package_library import PackageLockRecord
 from sylvia_gm.domain.session import SessionMessageKind
 from sylvia_gm.provider._base import Provider, ProviderStreamChunk, release_provider_idle
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, NativeCollection, NativeRoute
@@ -412,20 +414,64 @@ def _persisted_campaign_file_mutation_attempted(
 
 
 def _tool_alias(tool: ModelMechanicsTool) -> str:
-    slug = re.sub(r"[^A-Za-z0-9_]", "_", tool.name).strip("_") or "tool"
+    return _package_tool_alias(
+        tool.package_id, tool.package_version, tool.package_sha256, tool.name, tool.capability,
+    )
+
+
+def _package_tool_alias(package_id: str, version: str, sha256: str, name: str, capability: str) -> str:
+    slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"
     identity = json.dumps(
-        [
-            tool.package_id,
-            tool.package_version,
-            tool.package_sha256,
-            tool.name,
-            tool.capability,
-        ],
+        [package_id, version, sha256, name, capability],
         ensure_ascii=True,
         separators=(",", ":"),
     )
     digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]
     return f"tool_{digest}_{slug}"[:64]
+
+
+def _legacy_tool_exchange(
+    assistant: dict[str, object], calls: list[dict[str, Any]], results: list[dict[str, object]],
+    changes: Mapping[str, str | None],
+) -> list[dict[str, object]]:
+    """Keep surviving pairs structured and quote retired operations as historical data."""
+    result_by_id = {result["tool_call_id"]: result for result in results}
+    kept_calls = []
+    names_by_id = {}
+    retired = []
+    for call in calls:
+        function = call["function"]
+        name = function["name"]
+        if name not in changes:
+            kept_calls.append(call)
+            continue
+        current = changes[name]
+        names_by_id[call["id"]] = current
+        if current is None:
+            retired.append({"call": function, "result": result_by_id[call["id"]]["content"]})
+        else:
+            kept_calls.append({**call, "function": {**function, "name": current}})
+
+    # Native continuations can encode the original alias. Rebuild this request from
+    # public evidence while retaining the original continuation in the campaign.
+    message = {k: v for k, v in assistant.items() if k not in {"_native_reference", "tool_calls"}}
+    if kept_calls:
+        message["tool_calls"] = kept_calls
+    if retired:
+        note = "Earlier tool calls and results (historical data): " + json.dumps(
+            retired, ensure_ascii=False, separators=(",", ":"),
+        )
+        message["content"] = f"{message['content']}\n{note}" if message.get("content") else note
+    replayed = [message]
+    for result in results:
+        call_id = result["tool_call_id"]
+        if call_id not in names_by_id:
+            replayed.append(result)
+            continue
+        current = names_by_id[call_id]
+        if current is not None:
+            replayed.append({**result, "name": current} if "name" in result else result)
+    return replayed
 
 
 def _resolve_provider_tool_alias(
@@ -1636,6 +1682,7 @@ class ProviderSessionAdapter:
         self._owner_id = owner_id
         self._provider = provider
         self._working_contexts: dict[str, Any] = {}
+        self._legacy_alias_changes: dict[str, dict[str, str | None]] = {}
         # Read once per adapter. The previous request assembly is the shipped default;
         # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
         self._context_mode = context_mode(
@@ -3847,6 +3894,82 @@ class ProviderSessionAdapter:
             prepared.append(message)
         return prepared
 
+    def _declared_tool_aliases(self, pin: PackageLockEntry) -> dict[tuple[str, str, str], str]:
+        record = self._owner.package_record(pin.package_id, pin.version, pin.sha256)
+        return {
+            (pin.package_id, tool["name"], tool["capability"]): _package_tool_alias(
+                pin.package_id, pin.version, pin.sha256, tool["name"], tool["capability"],
+            )
+            for tool in cast(list[dict[str, Any]], record["tools"])
+        }
+
+    def _legacy_alias_replacements(self, current: PackageLockRecord) -> Mapping[str, str | None]:
+        if current.lock_id not in self._legacy_alias_changes:
+            lineage = self._owner.package_lock_lineage(current.campaign_id)
+            # An immutable lock fixes the declarations and its predecessor chain. Only
+            # earlier declared aliases can be remapped or retired; host tools pass through.
+            current_aliases = {
+                operation: alias for pin in current.package_lock.entries
+                for operation, alias in self._declared_tool_aliases(pin).items()
+            }
+            current_names = set(current_aliases.values())
+            by_id = {lock.lock_id: lock for lock in lineage}
+            prior_pins = set()
+            predecessor = current.predecessor_lock_id
+            while predecessor is not None:
+                prior = by_id[predecessor]
+                prior_pins.update(prior.package_lock.entries)
+                predecessor = prior.predecessor_lock_id
+            changes = {}
+            for pin in prior_pins.difference(current.package_lock.entries):
+                try:
+                    past = self._declared_tool_aliases(pin)
+                except CommandRejected as error:
+                    if error.code != "package_unavailable":
+                        raise
+                    # Pre-manifest saves can retain only a pin. A matching digest still
+                    # proves a surviving operation; do not guess what other aliases meant.
+                    past = {
+                        (package, name, capability): _package_tool_alias(
+                            package, pin.version, pin.sha256, name, capability,
+                        )
+                        for package, name, capability in current_aliases if package == pin.package_id
+                    }
+                for operation, old_alias in past.items():
+                    if old_alias not in current_names:
+                        changes[old_alias] = current_aliases.get(operation)
+            self._legacy_alias_changes[current.lock_id] = changes
+        return self._legacy_alias_changes[current.lock_id]
+
+    def _legacy_adopted_history(
+        self, messages: list[dict[str, object]], campaign_id: str,
+    ) -> list[dict[str, object]]:
+        # _messages adds this reference to every persisted call/result exchange before
+        # selecting resumed or completed history, independently of the provider transport.
+        pending = [
+            (index, cast(list[dict[str, Any]], message["tool_calls"]))
+            for index, message in enumerate(messages)
+            if "_native_reference" in message and message.get("tool_calls")
+        ]
+        if not pending:
+            return messages
+        current = self._owner.current_package_lock(campaign_id)
+        if current.predecessor_lock_id is None:
+            return messages
+        changes = self._legacy_alias_replacements(current)
+        projected = list(messages)
+        for index, calls in reversed(pending):
+            if not any(call["function"]["name"] in changes for call in calls):
+                continue
+            end = index + 1 + len(calls)
+            results = messages[index + 1:end]
+            result_ids = {r.get("tool_call_id") for r in results if r.get("role") == "tool"}
+            if len(results) == len(calls) and result_ids == {call["id"] for call in calls}:
+                projected[index:end] = _legacy_tool_exchange(
+                    messages[index], calls, results, changes,
+                )
+        return projected
+
     def _stream_round(
         self,
         messages: list[dict[str, object]],
@@ -3871,10 +3994,15 @@ class ProviderSessionAdapter:
                        else [m.content for m in provider_input.history.messages])
             # Keep all conversation and checkpoints, but bind callbacks to this request's control.
             bridge = CheckpointBridge()
+            ledger = self._ledger_active(provider_input)
             finalize_request, measure_wire, rebase_wire, strip_thinking, wire_tools = (
                 self._ledger_hooks(provider_input, provider, bridge)
-                if self._ledger_active(provider_input) else (None, None, None, None, None)
+                if ledger else (None, None, None, None, None)
             )
+            if not ledger and provider_input.session.role is WriterRole.DM:
+                campaign_id = provider_input.session.campaign_id
+                if campaign_id is not None:
+                    messages = self._legacy_adopted_history(messages, campaign_id)
             working = WorkingContextProvider(
                 provider, records=records, record_owner=self._gm_context_owner(provider_input),
                 request_context_id=self._gm_request_context_id(provider_input),
