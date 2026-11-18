@@ -12,6 +12,7 @@ from pathlib import Path
 
 from sylvia_gm.config.provider_settings import save_provider_settings
 from sylvia_gm.provider._claude_install import ClaudeInstaller
+from sylvia_gm.provider._claude_kept import release_kept_processes
 from sylvia_gm.provider._claude_runtime import (
     DOCUMENTED_CONTEXT_WINDOW_AT,
     authentication_status,
@@ -59,6 +60,8 @@ class ClaudeAccount:
         with self.lock:
             if self.login is not None and self.login.poll() is None:
                 return
+            # A process kept for the account being replaced must not serve the next one.
+            release_kept_processes(self.home.resolve())
             try:
                 self.login = subprocess.Popen(
                     [
@@ -79,6 +82,7 @@ class ClaudeAccount:
     def logout(self, executable: Path) -> None:
         """Sign Sylvia's profile out through the binary; no other Claude Code is touched."""
         self.cancel()
+        release_kept_processes(self.home.resolve())
         try:
             subprocess.run(
                 native_auth_command(executable, "logout"),

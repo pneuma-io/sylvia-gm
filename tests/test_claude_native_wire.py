@@ -262,11 +262,15 @@ def chain() -> list[tuple[str, list[dict[str, Any]], bool]]:
     ]
 
 
-def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, caplog):
+@pytest.mark.parametrize("mode", ["per-step", "persistent"])
+def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, caplog, mode):
     # Opt-in prerequisite, run by hand. The case is a declared product-case exclusion in
     # scripts/check_catalog.py, so the gate never requires it.
     if not BINARY or not Path(BINARY).is_file():
         pytest.skip("SYLVIA_TEST_CLAUDE_WIRE_BINARY does not name a Claude Code binary")
+    # ``persistent`` keeps one process for the whole chain (issue 171); ``per-step`` starts one
+    # for every request.
+    monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", mode)
     fake = FakeMessages()
     home = tmp_path / "claude-runtime"
     person = tmp_path / "person"
@@ -316,7 +320,13 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, capl
             finish = chunks[-1].finish_reason
             assert (finish == "tool_calls") == expects_tool, (name, finish)
             leftovers = private_files(home)
-            assert leftovers == [], (name, "request content left on disk", leftovers)
+            if mode == "persistent":
+                # Only the kept process's own files, until it closes.
+                sessions = {Path(f).stem if f.endswith(".jsonl") else Path(f).parent.name
+                            for f in leftovers}
+                assert len(sessions) <= 1, (name, "more than one session kept", leftovers)
+            else:
+                assert leftovers == [], (name, "request content left on disk", leftovers)
             native = ledger.state.native.get(len(frame.state.entries))
             steps.append({"name": name, "requests": len(bodies), "finish": finish,
                           "reset": frame.reset, "native": native and {
@@ -339,7 +349,8 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, capl
             pairs.append({"pair": f"{a['name']} -> {b['name']}", **report})
         report_path = os.environ.get("SYLVIA_TEST_CLAUDE_WIRE_REPORT")
         if report_path:
-            Path(report_path).write_text(json.dumps({
+            report_file = Path(report_path)
+            report_file.with_stem(f"{report_file.stem}-{mode}").write_text(json.dumps({
                 "binary_version": _claude_runtime.runtime_version(Path(BINARY), home),
                 "steps": [{k: v for k, v in s.items() if k != "body"} for s in steps],
                 "pairs": pairs, "offsite": fake.offsite,
@@ -355,6 +366,9 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, capl
             assert "MESSAGE FROM NON-USER SOURCE" not in text
             assert text.count("No response requested.") == ser(
                 step["body"]["messages"]).count("No response requested.")
+        if mode == "persistent":
+            asyncio.run(provider.close())
+            assert private_files(home) == [], "a closed kept process left request content"
     finally:
         asyncio.run(provider.close())
         fake.close()

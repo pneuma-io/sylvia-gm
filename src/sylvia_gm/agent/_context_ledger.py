@@ -167,6 +167,9 @@ _CONTINUE_TEXT = (
     f"{CONTINUE_LABEL} (application invocation, not player speech): Continue the response to the "
     "saved Sylvia conversation, using the committed tool results above."
 )
+#: The continue record's text after its seal, for a provider that delivers a tool result into
+#: an open native turn and so need not send it (Claude Code's kept process, issue 171).
+CONTINUE_RECORD_TEXT = _CONTINUE_TEXT
 
 #: Campaign-state replacement granularity. A changed subtree is replaced whole once its path
 #: reaches this depth (path length). Chosen from the offline measurement (SPEC 5.4/5.5):

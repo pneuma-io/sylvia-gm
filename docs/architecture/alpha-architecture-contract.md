@@ -1678,6 +1678,23 @@ the ledger resets. Builder and participant requests do not use it.
   `SYLVIA_GM_CONTEXT_MODE=legacy` alone restores the whole previous behaviour on that route. Any
   value applies only to ledger-built requests. `stable` (interrupt and continue) and
   `answer-draft` are experimental values.
+- **Claude Code process.** On `claude_code` the provider keeps the Claude Code process that served
+  a ledger-built request (one with the ledger's native route) and continues it through stdin
+  (`--input-format stream-json`) instead of starting a new process that replays the transcript.
+  After a reply that ended in text, the next request's new user content is written as a prompt.
+  At a Sylvia tool call the process is left waiting on the call, and the next request answers it:
+  the MCP tool result carries the call's result followed, as further text blocks, by everything
+  the request adds after it (sealed host records and the player's next message); the sealed
+  continue record is not sent. A kept process serves a request only when the request holds
+  exactly what the process holds (same model, system text and tools, the same earlier messages,
+  the model's own text, and only what a tool result can carry after a call); otherwise, or when
+  the process has exited or its turn moved on, a fresh process starts from the saved transcript,
+  and the `claude/process_reuse` audit record says why. Requests without the native route
+  (Builder, NPC decisions, summaries) always use a new process per step. A kept process's session
+  file and step folder live as long as the process and are removed when it closes: after 30
+  minutes idle, on Stop, sign-in or sign-out, provider close, a chat's change away from its
+  model, a settings reload that no longer offers its model, and process exit.
+  `SYLVIA_CLAUDE_PROCESS=per-step` starts a new process for every step, the previous behaviour.
 
 Operational provider/model identity, reported token counts, call counts, and timing are projections rather than campaign mechanics. Builder may expose them through its inspection surface. DM keeps equivalent information out of the persistent immersive conversation and makes it available only through an unobtrusive tooltip or comparable secondary surface. Sylvia GM never displays estimated monetary cost. Future in-house subscription consumption belongs only in a post-launch Usage Settings surface; Alpha local/BYOK operation does not fabricate it.
 

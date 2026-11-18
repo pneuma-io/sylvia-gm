@@ -9,11 +9,13 @@ import re
 import threading
 import uuid
 from collections.abc import AsyncIterator, Callable
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+from sylvia_gm.provider import _claude_kept
 from sylvia_gm.provider._anthropic import AnthropicMessagesTransport, _AnthropicStreamContent
 from sylvia_gm.provider._base import (
     CacheUsage,
@@ -23,6 +25,14 @@ from sylvia_gm.provider._base import (
     ProviderStreamChunk,
     TokenUsage,
     ToolCall,
+)
+from sylvia_gm.provider._claude_kept import (
+    KEPT_SESSION,
+    PERSISTENT,
+    ContinuationMismatchError,
+    KeptProcess,
+    continuation,
+    process_setting,
 )
 from sylvia_gm.provider._claude_native import (
     CURRENT_NATIVE_ROUTE,
@@ -339,6 +349,55 @@ _MODEL_USAGE_COUNTS = (
 )
 
 
+def _check_still_waiting(kept: KeptProcess) -> None:
+    """Read what a kept process wrote while it was idle; refuse one that moved on or exited.
+
+    Frames that only finish the reply it was left on are dropped. A result means its turn
+    ended without the answer; the end of its output means it exited.
+    """
+    drain = getattr(kept.connection, "drain", None)
+    if not callable(drain):
+        return
+    for event in drain():
+        if event is None:
+            raise ContinuationMismatchError("runtime_exited")
+        if isinstance(event, Exception) or event.get("type") == "result":
+            raise ContinuationMismatchError("turn_moved_on")
+        if event.get("type") == "control_request":
+            raise ContinuationMismatchError("turn_moved_on")
+
+
+@dataclass
+class _Step:
+    """One native reply as it is read: its response, the calls it streamed and what it said."""
+
+    response: ProviderResponse
+    allowed: set[str]
+    tools: list[dict[str, Any]] = field(default_factory=list)
+    pending: list[dict[str, Any]] = field(default_factory=list)
+    text_parts: list[str] = field(default_factory=list)
+    #: The ``tools/call`` request a kept process is left waiting on.
+    call_event: dict[str, Any] | None = None
+    call_id: str = ""
+    call_arguments: Any = None
+
+    def native_tools(self) -> list[dict[str, Any]]:
+        return self.tools
+
+
+@dataclass
+class _KeepPlan:
+    """What a kept process must hold to serve one ledger request, and its reuse audit."""
+
+    home: Path
+    model: str
+    system: str
+    tools_key: str
+    history: list[dict[str, Any]]
+    generation: int
+    reuse: dict[str, Any]
+
+
 class ClaudeProvider(Provider):
     """Use an ephemeral native conversation for each step of Sylvia's existing tool loop."""
 
@@ -403,415 +462,659 @@ class ClaudeProvider(Provider):
         route = CURRENT_NATIVE_ROUTE.get()
         CURRENT_NATIVE_ROUTE.set(None)
         async with self._lock:
-            executable = find_runtime(self.home)
-            if executable is None:
-                raise ProviderConnectionError(
-                    "Set up Claude Code for Sylvia in Settings > Accounts, then try again."
+            keep = route is not None and process_setting() == PERSISTENT
+            plan: _KeepPlan | None = None
+            if keep:
+                assert route is not None
+                plan = self._keep_plan(messages, tools, route)
+                kept, stale = _claude_kept.KEPT_PROCESSES.take(
+                    plan.home, plan.model, plan.system, plan.tools_key, plan.history,
                 )
-            await asyncio.to_thread(runtime_version, executable, self.home)
-            self.home.mkdir(parents=True, exist_ok=True)
-            # One fixed, empty working directory: Claude Code names it in every request. The
-            # system and transcript files live in a per-step folder that is always removed.
-            workspace = self.home / "workspace"
-            workspace.mkdir(exist_ok=True)
-            steps = self.home / "steps"
-            steps.mkdir(exist_ok=True)
-            environment = native_environment(self.home)
-            config = Path(environment.get("CLAUDE_CONFIG_DIR") or self.home / "profile")
-            cache = Path(environment["XDG_CACHE_HOME"]) if environment.get(
-                "XDG_CACHE_HOME") else None
-            session_id = str(uuid.uuid4())
-            step = steps / session_id
-            with _ACTIVE_LOCK:
-                active = _ACTIVE_STEPS.setdefault(self.home.resolve(), set())
-                running = set(active)
-                active.add(session_id)
-            try:
-                # Earlier session files hold copies of earlier requests: never leave them.
-                sweep(config, steps, running | {session_id}, self.home)
-                step.mkdir()
-                system, records, prompt, native_tools = prepare_request(
-                    messages,
-                    tools,
-                    self.model_info.wire_model_id,
-                    workspace,
-                    route,
-                )
-                system_path = step / "system.txt"
-                history_path = step / "history.jsonl"
-                system_path.write_bytes(system.encode("utf-8"))
-                transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)
-                if route is None:
-                    history_path.write_text(transcript, encoding="utf-8")
-                else:
-                    history_path.write_bytes(transcript.encode("utf-8"))
-                arguments = [
-                    "--print",
-                    "--safe-mode",
-                    "--restricted",
-                    "--tools",
-                    "",
-                    "--disable-slash-commands",
-                    "--setting-sources",
-                    "",
-                    "--settings",
-                    '{"disableAllHooks":true,"autoMemoryEnabled":false}',
-                    "--strict-mcp-config",
-                    *(["--no-session-persistence"] if route is None else []),
-                    "--no-chrome",
-                    "--input-format",
-                    "stream-json",
-                    "--output-format",
-                    "stream-json",
-                    "--verbose",
-                    "--include-partial-messages",
-                    "--system-prompt-file",
-                    str(system_path),
-                    "--model",
-                    self.model_info.wire_model_id,
-                ]
-                if records:
-                    arguments.extend(["--resume", str(history_path), "--fork-session"])
-                if route is not None:
-                    # Persisted only so Sylvia can copy the CLI's context records; deleted below.
-                    arguments.extend(["--session-id", session_id])
-                if native_tools:
-                    arguments.extend(
-                        [
-                            "--mcp-config",
-                            '{"mcpServers":{"sylvia":{"type":"sdk","name":"sylvia"}}}',
-                            "--allowedTools",
-                            ",".join(_PREFIX + tool["name"] for tool in native_tools),
-                        ]
-                    )
-                else:
-                    arguments.extend(["--mcp-config", '{"mcpServers":{}}'])
-                connection = self._connection_factory(executable, workspace, arguments, environment)
-                self._active = connection
-                response = ProviderResponse(
-                    model=self.model_info.wire_model_id, usage_reported=False
-                )
-                text_parts: list[str] = []
-                pending: list[dict[str, Any]] = []
-                blocks: dict[int, dict[str, Any]] = {}
-                allowed = {tool["name"] for tool in native_tools}
-                input_usage: dict[str, Any] = {}
-                streamed_text = False
-                resolved_model: str | None = None
-                native_state = _AnthropicStreamContent()
-                native_content: list[dict[str, Any]] | None = None
-                has_native_stream = False
-                event: dict[str, Any] = {}
-                deferred_call: dict[str, Any] | None = None
-                try:
-                    await self.hooks.fire_on_request(
-                        HookContext(
-                            provider_key="claude_runtime",
-                            model_id=self.model_info.id,
-                            stream=True,
-                            request_json={
-                                "method": "claude/native_step",
-                                "system": system,
-                                "transcript": records,
-                                "input": prompt,
-                                "tools": native_tools,
-                                "controls": {
-                                    "safe_mode": True,
-                                    "builtin_tools": [],
-                                    "persist_session": (
-                                        False if route is None else TRANSIENT_SESSION
-                                    ),
-                                    "output_allowance": "runtime_managed",
-                                    "tool_choice": "runtime_managed",
-                                },
-                                "downstream_model_request": "not_exposed_by_runtime",
-                            },
-                        )
-                    )
-                    await asyncio.to_thread(connection.start)
-                    connection.write(
-                        {
-                            "type": "control_request",
-                            "request_id": "initialize",
-                            "request": {
-                                "subtype": "initialize",
-                                "sdkMcpServers": ["sylvia"] if native_tools else [],
-                            },
-                        }
-                    )
-                    connection.write(prompt)
-                    while True:
-                        if deferred_call is not None and native_state.completed:
-                            event, deferred_call = deferred_call, None
-                        else:
-                            event = await asyncio.to_thread(connection.next_event, timeout)
-                        kind = event.get("type")
-                        if kind == "control_request":
-                            request = event.get("request", {})
-                            if (
-                                request.get("subtype") != "mcp_message"
-                                or request.get("server_name") != "sylvia"
-                            ):
-                                connection.write(
-                                    {
-                                        "type": "control_response",
-                                        "response": {
-                                            "subtype": "error",
-                                            "request_id": event.get("request_id"),
-                                            "error": "This operation is unavailable in Sylvia.",
-                                        },
-                                    }
-                                )
-                                continue
-                            message = request.get("message", {})
-                            method = message.get("method")
-                            if method == "tools/call":
-                                if has_native_stream and not native_state.completed:
-                                    if deferred_call is None:
-                                        deferred_call = event
-                                    continue
-                                params = message.get("params", {})
-                                original = params.get("name")
-                                candidate = next(
-                                    (
-                                        call
-                                        for call in pending
-                                        if call.get("name") == _PREFIX + str(original)
-                                        and call.get("input") == params.get("arguments", {})
-                                    ),
-                                    None,
-                                )
-                                if (
-                                    original not in allowed
-                                    or candidate is None
-                                    or not isinstance(candidate.get("id"), str)
-                                    or not candidate["id"]
-                                    or not isinstance(candidate.get("input"), dict)
-                                ):
-                                    raise InvalidResponseError(
-                                        "Claude requested an unavailable or uncorrelated "
-                                        "Sylvia operation."
-                                    )
-                                call = ToolCall(
-                                    candidate["id"],
-                                    original,
-                                    json.dumps(candidate["input"], allow_nan=False),
-                                )
-                                # Reaching the actual MCP call means native permissions admitted it.
-                                # No result is sent to Claude and no game action runs in this child.
-                                flushed = await self._await_flush(route, config, session_id, prompt)
-                                await self._close_owned(connection)
-                                await self._collect(route, config, session_id, prompt, flushed)
-                                response.tool_calls = [call]
-                                response.finish_reason = "tool_calls"
-                                if native_content is not None:
-                                    continuation = [
-                                        dict(block)
-                                        for block in native_content
-                                        if block.get("type") != "tool_use"
-                                        or block.get("id") == call.id
-                                    ]
-                                    for block in continuation:
-                                        if block.get("type") == "tool_use":
-                                            block["name"] = call.name
-                                    response.anthropic_content = continuation
-                                    yield ProviderStreamChunk(anthropic_content=continuation)
-                                yield ProviderStreamChunk(
-                                    tool_call_delta={
-                                        "index": 0,
-                                        "id": call.id,
-                                        "type": "function",
-                                        "function": {
-                                            "name": call.name,
-                                            "arguments": call.arguments,
-                                        },
-                                    }
-                                )
-                                break
-                            result: dict[str, Any] = {}
-                            if method == "initialize":
-                                result = {
-                                    "protocolVersion": "2025-11-25",
-                                    "capabilities": {"tools": {}},
-                                    "serverInfo": {"name": "sylvia", "version": "1"},
-                                }
-                            elif method == "tools/list":
-                                result = {"tools": native_tools}
-                            elif method not in {"notifications/initialized", "ping"}:
-                                raise InvalidResponseError(
-                                    "Claude requested an unsupported runtime operation."
-                                )
-                            connection.write(
-                                {
-                                    "type": "control_response",
-                                    "response": {
-                                        "subtype": "success",
-                                        "request_id": event["request_id"],
-                                        "response": {
-                                            "mcp_response": {
-                                                "jsonrpc": "2.0",
-                                                "id": message.get("id", 0),
-                                                "result": result,
-                                            }
-                                        },
-                                    },
-                                }
-                            )
-                        elif kind == "system" and event.get("subtype") == "init":
-                            exposed = event.get("tools")
-                            expected = {_PREFIX + original for original in allowed}
-                            if (
-                                not isinstance(exposed, list)
-                                or any(not isinstance(name, str) for name in exposed)
-                                or set(exposed) != expected
-                            ):
-                                raise InvalidResponseError(
-                                    "Claude did not expose exactly this request's Sylvia tools."
-                                )
-                            resolved_model = event.get("model")
-                            selected = self.model_info.wire_model_id
-                            if selected.startswith("claude-") and resolved_model != selected:
-                                raise ModelNotFoundError(
-                                    "Claude did not select the requested model."
-                                )
-                            if isinstance(resolved_model, str):
-                                response.model = resolved_model
-                        elif kind == "stream_event" and not event.get("parent_tool_use_id"):
-                            native = event.get("event", {})
-                            subtype = native.get("type")
-                            has_native_stream = True
-                            values = dict(native)
-                            if isinstance(values.get("delta"), dict):
-                                values["delta"] = SimpleNamespace(**values["delta"])
-                            completed_content = native_state.accept(SimpleNamespace(**values))
-                            if completed_content is not None:
-                                native_content = completed_content
-                            if subtype == "message_start":
-                                message = native.get("message", {})
-                                actual_model = message.get("model")
-                                if resolved_model and actual_model != resolved_model:
-                                    raise ModelNotFoundError(
-                                        "Claude changed models during this response."
-                                    )
-                                input_usage = dict(message.get("usage", {}))
-                            elif subtype == "content_block_start":
-                                blocks[native["index"]] = dict(native["content_block"])
-                            elif subtype == "content_block_delta":
-                                delta = native.get("delta", {})
-                                if delta.get("type") == "text_delta":
-                                    text = delta.get("text", "")
-                                    if not isinstance(text, str):
-                                        raise InvalidResponseError("Claude returned invalid text.")
-                                    text_parts.append(text)
-                                    streamed_text = True
-                                    yield ProviderStreamChunk(content=text)
-                                elif delta.get("type") == "thinking_delta":
-                                    yield ProviderStreamChunk(
-                                        reasoning_content=delta.get("thinking", "")
-                                    )
-                                elif delta.get("type") == "input_json_delta":
-                                    block = blocks[native["index"]]
-                                    block["partial_json"] = block.get(
-                                        "partial_json", ""
-                                    ) + delta.get("partial_json", "")
-                            elif subtype == "content_block_stop":
-                                block = blocks.pop(native["index"], {})
-                                if block.get("type") == "tool_use":
-                                    if "partial_json" in block:
-                                        # An operation without arguments streams an empty
-                                        # string; its input stays the start block's {}.
-                                        fragments = block.pop("partial_json")
-                                        if fragments:
-                                            block["input"] = json.loads(fragments)
-                                    pending.append(block)
-                            elif subtype == "message_delta":
-                                input_usage.update(native.get("usage", {}))
-                                self._usage(response, input_usage)
-                        elif kind == "assistant" and not event.get("parent_tool_use_id"):
-                            for block in event.get("message", {}).get("content", []):
-                                if block.get("type") == "tool_use" and not any(
-                                    p.get("id") == block.get("id") for p in pending
-                                ):
-                                    pending.append(block)
-                        elif kind == "result":
-                            if event.get("is_error") or event.get("subtype") != "success":
-                                failure = runtime_failure(event)
-                                if isinstance(failure, TokenLimitError):
-                                    self._refuse_reported_window()
-                                raise failure
-                            if event.get("permission_denials") or pending:
-                                raise InvalidResponseError(
-                                    "Claude could not admit the requested operation "
-                                    "under its native permissions."
-                                )
-                            if not streamed_text and isinstance(event.get("result"), str):
-                                text_parts.append(event["result"])
-                                yield ProviderStreamChunk(content=event["result"])
-                            self._usage(response, event.get("usage", {}))
-                            await self._audit_model_usage(event.get("modelUsage"), response.model)
-                            self._observe_context_window(event.get("modelUsage"), response.model)
-                            break
-                        elif (
-                            kind == "rate_limit_event"
-                            and event.get("rate_limit_info", {}).get("status") == "rejected"
-                        ):
-                            raise RateLimitError(
-                                "Claude reports that this account has reached its usage limit."
-                            )
-                    flushed = True
-                    if not response.tool_calls:
-                        flushed = await self._await_flush(route, config, session_id, prompt)
-                    await self._close_owned(connection)
-                    if not response.tool_calls:
-                        await self._collect(route, config, session_id, prompt, flushed)
-                    response.content = "".join(text_parts) or None
-                    self._last_response = response
-                    await self.hooks.fire_on_response(
-                        HookContext(
-                            provider_key="claude_runtime",
-                            model_id=self.model_info.id,
-                            stream=True,
-                            response=response,
-                        )
-                    )
-                    yield ProviderStreamChunk(finish_reason=response.finish_reason)
-                except InvalidResponseError as error:
-                    await self._audit_invalid_response(
-                        _INVALID_REASONS.get(str(error), "invalid_response"), event, pending,
-                    )
-                    raise
-                except (AttributeError, KeyError, TypeError, ValueError) as error:
-                    await self._audit_invalid_response("malformed_event", event, pending, error)
-                    raise InvalidResponseError(
-                        "Claude returned an invalid runtime response."
-                    ) from None
-                except ProviderConnectionError as error:
-                    raise IncompleteProviderStreamError(str(error)) from None
-                finally:
+                await self._close_kept(*stale)
+                if kept is not None:
+                    from sylvia_gm.agent._context_ledger import CONTINUE_RECORD_TEXT
+
+                    yielded = False
                     try:
-                        await self._close_owned(connection)
-                    finally:
-                        self._active = None
+                        _check_still_waiting(kept)
+                        delivery = continuation(kept, plan.history, CONTINUE_RECORD_TEXT)
+                    except ContinuationMismatchError as mismatch:
+                        plan.reuse["fresh_reason"] = mismatch.reason
+                        await self._close_kept(kept)
+                    else:
+                        try:
+                            async for chunk in self._continue(kept, delivery, route, plan, timeout):
+                                yielded = True
+                                yield chunk
+                            return
+                        except (IncompleteProviderStreamError, ProviderConnectionError):
+                            # The process had gone: serve the request once on a fresh one, but
+                            # only before the caller saw anything.
+                            if yielded:
+                                raise
+                            plan.reuse.update(continued=False, answered_in_place=False,
+                                              retried_fresh=True, fresh_reason="runtime_error")
+            async for chunk in self._fresh(messages, tools, route, timeout, plan):
+                yield chunk
+
+    def _keep_plan(
+        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None,
+        route: NativeRoute,
+    ) -> _KeepPlan:
+        """What a kept process must hold to serve this request, and the reuse audit."""
+        model = self.model_info.wire_model_id
+        workspace = self.home / "workspace"
+        system, _records, _prompt, native_tools = prepare_request(
+            messages, tools, model, workspace, route,
+        )
+        history = AnthropicMessagesTransport().format_request(model, messages, tools, True)[
+            "messages"]
+        home = self.home.resolve()
+        return _KeepPlan(
+            home=home, model=model, system=system,
+            tools_key=json.dumps(native_tools, sort_keys=True), history=history,
+            generation=_claude_kept.KEPT_PROCESSES.generation(home),
+            reuse={"continued": False, "answered_in_place": False, "fresh_reason": None,
+                   "kept": False},
+        )
+
+    async def _close_kept(self, *kept: KeptProcess) -> None:
+        for each in kept:
+            await asyncio.to_thread(each.close)
+
+    async def release_idle(self) -> None:
+        """Close the processes kept for this home and model (Stop, provider close)."""
+        released = _claude_kept.KEPT_PROCESSES.release(
+            self.home.resolve(), self.model_info.wire_model_id)
+        await self._close_kept(*released)
+
+    async def _audit_reuse(self, reuse: dict[str, Any]) -> None:
+        await self.hooks.fire_on_request(
+            HookContext(
+                provider_key="claude_runtime",
+                model_id=self.model_info.id,
+                stream=True,
+                request_json={"method": "claude/process_reuse", "params": dict(reuse)},
+            )
+        )
+
+    def _closer(
+        self, config: Path, session_id: str, step: Path, cache: Path | None,
+    ) -> Callable[[KeptProcess], None]:
+        """Remove a kept process's private files once the process itself has closed."""
+        home = self.home
+
+        def remove(_kept: KeptProcess) -> None:
+            delete_session(config, session_id, home)
+            if step.exists():
+                remove_step_folder(step, home)
+            remove_debug_logs(cache, home)
+            with _ACTIVE_LOCK:
+                _ACTIVE_STEPS.get(home.resolve(), set()).discard(session_id)
+
+        return remove
+
+    async def _continue(
+        self, kept: KeptProcess, delivery: tuple[str, Any], route: NativeRoute,
+        plan: _KeepPlan, timeout: float,
+    ) -> AsyncIterator[ProviderStreamChunk]:
+        """Serve the request in the kept process: a new prompt, or the waiting call's answer."""
+        kind, payload = delivery
+        connection = kept.connection
+        self._active = connection
+        step = _Step(
+            response=ProviderResponse(model=self.model_info.wire_model_id, usage_reported=False),
+            allowed={tool["name"] for tool in json.loads(kept.tools_key)},
+            tools=json.loads(kept.tools_key),
+        )
+        prompt: dict[str, Any] | None = None
+        plan.reuse.update(continued=True, answered_in_place=kind == "answer")
+        finished = False
+        try:
+            if kind == "prompt":
+                prompt = {"type": "user", "message": {"role": "user", "content": payload}}
+                await self._audit_continued(prompt)
+                connection.write(prompt)
+            else:
+                pending = kept.pending
+                assert pending is not None
+                await self._audit_continued({"tool_result": payload})
+                connection.write(
+                    {
+                        "type": "control_response",
+                        "response": {
+                            "subtype": "success",
+                            "request_id": pending["request_id"],
+                            "response": {
+                                "mcp_response": {
+                                    "jsonrpc": "2.0",
+                                    "id": pending.get("request", {}).get("message", {}).get(
+                                        "id", 0),
+                                    "result": payload,
+                                }
+                            },
+                        },
+                    }
+                )
+            async for chunk in self._run_events(
+                connection, step, route, kept.config, kept.session_id, prompt, timeout,
+                keep=True,
+            ):
+                yield chunk
+            finished = True
+        finally:
+            self._active = None
+            if finished:
+                kept.held, kept.spoken = plan.history, "".join(step.text_parts)
+                kept.pending, kept.call_id, kept.call_arguments = (
+                    step.call_event, step.call_id, step.call_arguments)
+                evicted = _claude_kept.KEPT_PROCESSES.keep(kept, plan.generation)
+                plan.reuse["kept"] = kept not in evicted
+                await self._close_kept(*evicted)
+                await self._audit_reuse(plan.reuse)
+            else:
+                # An error, a cancellation or a closed stream: the process's state is unknown.
+                # The caller records the request (a fresh retry writes its own record).
+                await self._close_kept(kept)
+
+    async def _audit_continued(self, given: dict[str, Any]) -> None:
+        await self.hooks.fire_on_request(
+            HookContext(
+                provider_key="claude_runtime",
+                model_id=self.model_info.id,
+                stream=True,
+                request_json={
+                    "method": "claude/native_step",
+                    "continued": True,
+                    "input": given,
+                    "controls": {"safe_mode": True, "builtin_tools": [],
+                                 "persist_session": KEPT_SESSION,
+                                 "output_allowance": "runtime_managed",
+                                 "tool_choice": "runtime_managed"},
+                    "downstream_model_request": "not_exposed_by_runtime",
+                },
+            )
+        )
+
+    async def _fresh(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None,
+        route: NativeRoute | None,
+        timeout: float,
+        plan: _KeepPlan | None,
+    ) -> AsyncIterator[ProviderStreamChunk]:
+        """Start a process from the saved transcript; keep it afterwards when ``plan`` says so."""
+        executable = find_runtime(self.home)
+        if executable is None:
+            raise ProviderConnectionError(
+                "Set up Claude Code for Sylvia in Settings > Accounts, then try again."
+            )
+        await asyncio.to_thread(runtime_version, executable, self.home)
+        self.home.mkdir(parents=True, exist_ok=True)
+        # One fixed, empty working directory: Claude Code names it in every request. The
+        # system and transcript files live in a per-step folder that is always removed.
+        workspace = self.home / "workspace"
+        workspace.mkdir(exist_ok=True)
+        steps = self.home / "steps"
+        steps.mkdir(exist_ok=True)
+        environment = native_environment(self.home)
+        config = Path(environment.get("CLAUDE_CONFIG_DIR") or self.home / "profile")
+        cache = Path(environment["XDG_CACHE_HOME"]) if environment.get(
+            "XDG_CACHE_HOME") else None
+        session_id = str(uuid.uuid4())
+        step_folder = steps / session_id
+        with _ACTIVE_LOCK:
+            active = _ACTIVE_STEPS.setdefault(self.home.resolve(), set())
+            running = set(active)
+            active.add(session_id)
+        kept: KeptProcess | None = None
+        try:
+            # Earlier session files hold copies of earlier requests: never leave them.
+            sweep(config, steps, running | {session_id}, self.home)
+            step_folder.mkdir()
+            system, records, prompt, native_tools = prepare_request(
+                messages,
+                tools,
+                self.model_info.wire_model_id,
+                workspace,
+                route,
+            )
+            system_path = step_folder / "system.txt"
+            history_path = step_folder / "history.jsonl"
+            system_path.write_bytes(system.encode("utf-8"))
+            transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)
+            if route is None:
+                history_path.write_text(transcript, encoding="utf-8")
+            else:
+                history_path.write_bytes(transcript.encode("utf-8"))
+            arguments = [
+                "--print",
+                "--safe-mode",
+                "--restricted",
+                "--tools",
+                "",
+                "--disable-slash-commands",
+                "--setting-sources",
+                "",
+                "--settings",
+                '{"disableAllHooks":true,"autoMemoryEnabled":false}',
+                "--strict-mcp-config",
+                *(["--no-session-persistence"] if route is None else []),
+                "--no-chrome",
+                "--input-format",
+                "stream-json",
+                "--output-format",
+                "stream-json",
+                "--verbose",
+                "--include-partial-messages",
+                "--system-prompt-file",
+                str(system_path),
+                "--model",
+                self.model_info.wire_model_id,
+            ]
+            if records:
+                arguments.extend(["--resume", str(history_path), "--fork-session"])
+            if route is not None:
+                # Persisted only so Sylvia can copy the CLI's context records; deleted below
+                # (or, for a kept process, when that process closes).
+                arguments.extend(["--session-id", session_id])
+            if native_tools:
+                arguments.extend(
+                    [
+                        "--mcp-config",
+                        '{"mcpServers":{"sylvia":{"type":"sdk","name":"sylvia"}}}',
+                        "--allowedTools",
+                        ",".join(_PREFIX + tool["name"] for tool in native_tools),
+                    ]
+                )
+            else:
+                arguments.extend(["--mcp-config", '{"mcpServers":{}}'])
+            connection = self._connection_factory(executable, workspace, arguments, environment)
+            self._active = connection
+            step = _Step(
+                response=ProviderResponse(
+                    model=self.model_info.wire_model_id, usage_reported=False
+                ),
+                allowed={tool["name"] for tool in native_tools},
+                tools=native_tools,
+            )
+            finished = False
+            try:
+                await self.hooks.fire_on_request(
+                    HookContext(
+                        provider_key="claude_runtime",
+                        model_id=self.model_info.id,
+                        stream=True,
+                        request_json={
+                            "method": "claude/native_step",
+                            "system": system,
+                            "transcript": records,
+                            "input": prompt,
+                            "tools": native_tools,
+                            "controls": {
+                                "safe_mode": True,
+                                "builtin_tools": [],
+                                "persist_session": (
+                                    False if route is None
+                                    else KEPT_SESSION if plan is not None
+                                    else TRANSIENT_SESSION
+                                ),
+                                "output_allowance": "runtime_managed",
+                                "tool_choice": "runtime_managed",
+                            },
+                            "downstream_model_request": "not_exposed_by_runtime",
+                        },
+                    )
+                )
+                await asyncio.to_thread(connection.start)
+                connection.write(
+                    {
+                        "type": "control_request",
+                        "request_id": "initialize",
+                        "request": {
+                            "subtype": "initialize",
+                            "sdkMcpServers": ["sylvia"] if native_tools else [],
+                        },
+                    }
+                )
+                connection.write(prompt)
+                async for chunk in self._run_events(
+                    connection, step, route, config, session_id, prompt, timeout,
+                    keep=plan is not None,
+                ):
+                    yield chunk
+                finished = True
             finally:
+                try:
+                    if finished and plan is not None:
+                        kept = KeptProcess(
+                            connection=connection, home=plan.home, model=plan.model,
+                            system=plan.system, tools_key=plan.tools_key,
+                            held=plan.history, session_id=session_id, step=step_folder,
+                            config=config, cache=cache, spoken="".join(step.text_parts),
+                            pending=step.call_event, call_id=step.call_id,
+                            call_arguments=step.call_arguments,
+                        )
+                        kept.on_close.append(
+                            self._closer(config, session_id, step_folder, cache))
+                        evicted = _claude_kept.KEPT_PROCESSES.keep(kept, plan.generation)
+                        plan.reuse["kept"] = kept not in evicted
+                        if kept in evicted:
+                            kept = None
+                        await self._close_kept(*[k for k in evicted if k is not kept])
+                    if kept is None:
+                        await self._close_owned(connection)
+                finally:
+                    self._active = None
+                    if plan is not None:
+                        await self._audit_reuse(plan.reuse)
+        finally:
+            if kept is None:
                 # Success, error, cancel or timeout: the CLI's session file and the step's
                 # files hold full copies of the request and never outlive the step.
                 delete_session(config, session_id, self.home)
-                if step.exists():
-                    remove_step_folder(step, self.home)
+                if step_folder.exists():
+                    remove_step_folder(step_folder, self.home)
                 # The CLI's MCP debug log (tool names, session ID, working folder path).
                 remove_debug_logs(cache, self.home)
                 with _ACTIVE_LOCK:
                     active.discard(session_id)
 
+    async def _run_events(
+        self,
+        connection: ClaudeConnection,
+        step: _Step,
+        route: NativeRoute | None,
+        config: Path,
+        session_id: str,
+        prompt: dict[str, Any] | None,
+        timeout: float,
+        *,
+        keep: bool,
+    ) -> AsyncIterator[ProviderStreamChunk]:
+        """Read one native reply to its end, a Sylvia tool call or a result.
+
+        ``prompt`` is what was written to stdin for this step, if anything was (it is absent
+        when a waiting call was answered); the CLI's context records follow it in the session
+        file and are collected. With ``keep`` the process is left open for the next request.
+        """
+        response = step.response
+        native_state = _AnthropicStreamContent()
+        native_content: list[dict[str, Any]] | None = None
+        has_native_stream = False
+        event: dict[str, Any] = {}
+        deferred_call: dict[str, Any] | None = None
+        blocks: dict[int, dict[str, Any]] = {}
+        input_usage: dict[str, Any] = {}
+        streamed_text = False
+        resolved_model: str | None = None
+        allowed = step.allowed
+        pending = step.pending
+        text_parts = step.text_parts
+        try:
+            while True:
+                if deferred_call is not None and native_state.completed:
+                    event, deferred_call = deferred_call, None
+                else:
+                    event = await asyncio.to_thread(connection.next_event, timeout)
+                kind = event.get("type")
+                if kind == "control_request":
+                    request = event.get("request", {})
+                    if (
+                        request.get("subtype") != "mcp_message"
+                        or request.get("server_name") != "sylvia"
+                    ):
+                        connection.write(
+                            {
+                                "type": "control_response",
+                                "response": {
+                                    "subtype": "error",
+                                    "request_id": event.get("request_id"),
+                                    "error": "This operation is unavailable in Sylvia.",
+                                },
+                            }
+                        )
+                        continue
+                    message = request.get("message", {})
+                    method = message.get("method")
+                    if method == "tools/call":
+                        if has_native_stream and not native_state.completed:
+                            if deferred_call is None:
+                                deferred_call = event
+                            continue
+                        params = message.get("params", {})
+                        original = params.get("name")
+                        candidate = next(
+                            (
+                                call
+                                for call in pending
+                                if call.get("name") == _PREFIX + str(original)
+                                and call.get("input") == params.get("arguments", {})
+                            ),
+                            None,
+                        )
+                        if (
+                            original not in allowed
+                            or candidate is None
+                            or not isinstance(candidate.get("id"), str)
+                            or not candidate["id"]
+                            or not isinstance(candidate.get("input"), dict)
+                        ):
+                            raise InvalidResponseError(
+                                "Claude requested an unavailable or uncorrelated "
+                                "Sylvia operation."
+                            )
+                        call = ToolCall(
+                            candidate["id"],
+                            original,
+                            json.dumps(candidate["input"], allow_nan=False),
+                        )
+                        # Reaching the actual MCP call means native permissions admitted it.
+                        # No result is sent to Claude and no game action runs in this child:
+                        # a kept process waits on the call until the next request answers it.
+                        flushed = await self._await_flush(route, config, session_id, prompt)
+                        if keep:
+                            step.call_event = event
+                            step.call_id = candidate["id"]
+                            step.call_arguments = candidate["input"]
+                        else:
+                            await self._close_owned(connection)
+                        await self._collect(
+                            route, config, session_id, prompt, flushed, delete=not keep,
+                        )
+                        response.tool_calls = [call]
+                        response.finish_reason = "tool_calls"
+                        if native_content is not None:
+                            continuation_blocks = [
+                                dict(block)
+                                for block in native_content
+                                if block.get("type") != "tool_use"
+                                or block.get("id") == call.id
+                            ]
+                            for block in continuation_blocks:
+                                if block.get("type") == "tool_use":
+                                    block["name"] = call.name
+                            response.anthropic_content = continuation_blocks
+                            yield ProviderStreamChunk(anthropic_content=continuation_blocks)
+                        yield ProviderStreamChunk(
+                            tool_call_delta={
+                                "index": 0,
+                                "id": call.id,
+                                "type": "function",
+                                "function": {
+                                    "name": call.name,
+                                    "arguments": call.arguments,
+                                },
+                            }
+                        )
+                        break
+                    result: dict[str, Any] = {}
+                    if method == "initialize":
+                        result = {
+                            "protocolVersion": "2025-11-25",
+                            "capabilities": {"tools": {}},
+                            "serverInfo": {"name": "sylvia", "version": "1"},
+                        }
+                    elif method == "tools/list":
+                        result = {"tools": step.native_tools()}
+                    elif method not in {"notifications/initialized", "ping"}:
+                        raise InvalidResponseError(
+                            "Claude requested an unsupported runtime operation."
+                        )
+                    connection.write(
+                        {
+                            "type": "control_response",
+                            "response": {
+                                "subtype": "success",
+                                "request_id": event["request_id"],
+                                "response": {
+                                    "mcp_response": {
+                                        "jsonrpc": "2.0",
+                                        "id": message.get("id", 0),
+                                        "result": result,
+                                    }
+                                },
+                            },
+                        }
+                    )
+                elif kind == "system" and event.get("subtype") == "init":
+                    exposed = event.get("tools")
+                    expected = {_PREFIX + original for original in allowed}
+                    if (
+                        not isinstance(exposed, list)
+                        or any(not isinstance(name, str) for name in exposed)
+                        or set(exposed) != expected
+                    ):
+                        raise InvalidResponseError(
+                            "Claude did not expose exactly this request's Sylvia tools."
+                        )
+                    resolved_model = event.get("model")
+                    selected = self.model_info.wire_model_id
+                    if selected.startswith("claude-") and resolved_model != selected:
+                        raise ModelNotFoundError("Claude did not select the requested model.")
+                    if isinstance(resolved_model, str):
+                        response.model = resolved_model
+                elif kind == "stream_event" and not event.get("parent_tool_use_id"):
+                    native = event.get("event", {})
+                    subtype = native.get("type")
+                    has_native_stream = True
+                    values = dict(native)
+                    if isinstance(values.get("delta"), dict):
+                        values["delta"] = SimpleNamespace(**values["delta"])
+                    completed_content = native_state.accept(SimpleNamespace(**values))
+                    if completed_content is not None:
+                        native_content = completed_content
+                    if subtype == "message_start":
+                        message = native.get("message", {})
+                        actual_model = message.get("model")
+                        if resolved_model and actual_model != resolved_model:
+                            raise ModelNotFoundError(
+                                "Claude changed models during this response."
+                            )
+                        input_usage = dict(message.get("usage", {}))
+                    elif subtype == "content_block_start":
+                        blocks[native["index"]] = dict(native["content_block"])
+                    elif subtype == "content_block_delta":
+                        delta = native.get("delta", {})
+                        if delta.get("type") == "text_delta":
+                            text = delta.get("text", "")
+                            if not isinstance(text, str):
+                                raise InvalidResponseError("Claude returned invalid text.")
+                            text_parts.append(text)
+                            streamed_text = True
+                            yield ProviderStreamChunk(content=text)
+                        elif delta.get("type") == "thinking_delta":
+                            yield ProviderStreamChunk(
+                                reasoning_content=delta.get("thinking", "")
+                            )
+                        elif delta.get("type") == "input_json_delta":
+                            block = blocks[native["index"]]
+                            block["partial_json"] = block.get(
+                                "partial_json", ""
+                            ) + delta.get("partial_json", "")
+                    elif subtype == "content_block_stop":
+                        block = blocks.pop(native["index"], {})
+                        if block.get("type") == "tool_use":
+                            if "partial_json" in block:
+                                # An operation without arguments streams an empty
+                                # string; its input stays the start block's {}.
+                                fragments = block.pop("partial_json")
+                                if fragments:
+                                    block["input"] = json.loads(fragments)
+                            pending.append(block)
+                    elif subtype == "message_delta":
+                        input_usage.update(native.get("usage", {}))
+                        self._usage(response, input_usage)
+                elif kind == "assistant" and not event.get("parent_tool_use_id"):
+                    for block in event.get("message", {}).get("content", []):
+                        if block.get("type") == "tool_use" and not any(
+                            p.get("id") == block.get("id") for p in pending
+                        ):
+                            pending.append(block)
+                elif kind == "result":
+                    if event.get("is_error") or event.get("subtype") != "success":
+                        failure = runtime_failure(event)
+                        if isinstance(failure, TokenLimitError):
+                            self._refuse_reported_window()
+                        raise failure
+                    if event.get("permission_denials") or pending:
+                        raise InvalidResponseError(
+                            "Claude could not admit the requested operation "
+                            "under its native permissions."
+                        )
+                    if not streamed_text and isinstance(event.get("result"), str):
+                        text_parts.append(event["result"])
+                        yield ProviderStreamChunk(content=event["result"])
+                    self._usage(response, event.get("usage", {}))
+                    await self._audit_model_usage(event.get("modelUsage"), response.model)
+                    self._observe_context_window(event.get("modelUsage"), response.model)
+                    break
+                elif (
+                    kind == "rate_limit_event"
+                    and event.get("rate_limit_info", {}).get("status") == "rejected"
+                ):
+                    raise RateLimitError(
+                        "Claude reports that this account has reached its usage limit."
+                    )
+            if not response.tool_calls:
+                flushed = await self._await_flush(route, config, session_id, prompt)
+                if not keep:
+                    await self._close_owned(connection)
+                await self._collect(route, config, session_id, prompt, flushed, delete=not keep)
+            response.content = "".join(text_parts) or None
+            self._last_response = response
+            await self.hooks.fire_on_response(
+                HookContext(
+                    provider_key="claude_runtime",
+                    model_id=self.model_info.id,
+                    stream=True,
+                    response=response,
+                )
+            )
+            yield ProviderStreamChunk(finish_reason=response.finish_reason)
+        except InvalidResponseError as error:
+            await self._audit_invalid_response(
+                _INVALID_REASONS.get(str(error), "invalid_response"), event, pending,
+            )
+            raise
+        except (AttributeError, KeyError, TypeError, ValueError) as error:
+            await self._audit_invalid_response("malformed_event", event, pending, error)
+            raise InvalidResponseError("Claude returned an invalid runtime response.") from None
+        except ProviderConnectionError as error:
+            raise IncompleteProviderStreamError(str(error)) from None
+
     @staticmethod
     async def _await_flush(
-        route: NativeRoute | None, config: Path, session_id: str, prompt: dict[str, Any]
+        route: NativeRoute | None, config: Path, session_id: str,
+        prompt: dict[str, Any] | None,
     ) -> bool:
         """Let the CLI finish writing this step's records before its process is closed.
 
-        False when the wait ended before the records were complete.
+        False when the wait ended before the records were complete. Nothing to wait for when
+        no prompt was written (a kept process's waiting call was answered).
         """
-        if route is None:
+        if route is None or prompt is None:
             return True
         return bool(
             await asyncio.to_thread(
@@ -824,22 +1127,27 @@ class ClaudeProvider(Provider):
         route: NativeRoute | None,
         config: Path,
         session_id: str,
-        prompt: dict[str, Any],
+        prompt: dict[str, Any] | None,
         flushed: bool = True,
+        *,
+        delete: bool = True,
     ) -> None:
         """Copy the CLI's context records for the ledger, then delete its session file.
 
         Never fatal: an unknown result is reported to the ledger, which starts a new journal
-        generation for this route on the next request.
+        generation for this route on the next request. A kept process keeps its session file
+        (``delete=False``) until it closes; an answered call wrote no prompt, so nothing new is
+        collected for it.
         """
-        if route is None:
+        if route is None or prompt is None:
             return
         files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
         result = collect(files[0] if files else None, prompt["message"]["content"])
         if not flushed and result.status == "collected":
             # The CLI may still have had records queued: what was read may be incomplete.
             result = NativeCollection("unknown", reason="flush_incomplete")
-        delete_session(config, session_id, self.home)
+        if delete:
+            delete_session(config, session_id, self.home)
         if result.status != "collected":
             logger.warning(
                 "Claude runtime context records are unknown for this step (%s); the next "
@@ -1024,3 +1332,4 @@ class ClaudeProvider(Provider):
     async def close(self) -> None:
         if self._active is not None:
             await self._close_owned(self._active)
+        await self.release_idle()

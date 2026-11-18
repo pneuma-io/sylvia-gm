@@ -306,6 +306,10 @@ class ClaudeConnection:
                 event = json.loads(line)
                 if not isinstance(event, dict):
                     raise ValueError("invalid event")
+                if event.get("type") == "tool_progress":
+                    # Heartbeats while a Sylvia call waits; a kept process waits up to 30
+                    # minutes, and Sylvia never reads them.
+                    continue
                 self._enqueue(event)
         except (OSError, UnicodeError, ValueError):
             self._enqueue(InvalidResponseError("Claude returned an invalid runtime stream."))
@@ -337,6 +341,21 @@ class ClaudeConnection:
                 "Claude exited before completing its response. Saved work is kept."
             )
         return event
+
+    def drain(self) -> list[dict[str, Any] | Exception | None]:
+        """What the process wrote that has not been read, without waiting (None: it exited)."""
+        events: list[dict[str, Any] | Exception | None] = []
+        while True:
+            try:
+                event = self._events.get_nowait()
+            except queue.Empty:
+                break
+            events.append(event)
+            if event is None:
+                break
+        if events == [] and self._process is not None and self._process.poll() is not None:
+            events.append(None)
+        return events
 
     def close(self) -> None:
         """Collect this process only; never stop, log out or search for other Claude sessions."""
