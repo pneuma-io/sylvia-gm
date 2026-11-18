@@ -366,12 +366,14 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert preview["compatible"], preview["conflicts"]
         assert "Treat this update as one-way." in preview["recovery"]
         assert "Export the campaign first" in preview["recovery"]
-        assert preview["tool_changes"]
         if origin == "lite-0.3.25":
-            # 0.3.26 repairs spell mechanics only; no panel gains source fields.
-            assert not any(c.get("added_panel_data") for c in preview["tool_changes"])
+            # 0.3.26 repairs internal spell mechanics only: no GM tool declaration or
+            # panel source changes, so the reviewed preview lists no tool changes.
+            assert preview["tool_changes"] == []
             assert "Panels show additional information." not in preview["recovery"]
-        elif origin != "integration":
+        else:
+            assert preview["tool_changes"]
+        if origin not in {"integration", "lite-0.3.25"}:
             added = 1 if origin == "lite-0.3.24" else 4
             # Published panels only gained source fields; they are a reviewed change.
             assert any(c.get("added_panel_data") == added for c in preview["tool_changes"])
@@ -392,8 +394,14 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             if option["closure_sha256"] == old_lock.closure_sha256
         )
         reverse = owner.preview_campaign_rules_update("casting", earlier["candidate_id"])
-        assert not reverse["compatible"]
-        assert reverse["conflicts"]
+        if origin == "lite-0.3.25":
+            # 0.3.25 declares the same tools and panels, so a return has no contract
+            # conflicts; the preview still advises treating it as one-way.
+            assert reverse["compatible"] and not reverse["conflicts"]
+            assert "Treat this update as one-way." in reverse["recovery"]
+        else:
+            assert not reverse["compatible"]
+            assert reverse["conflicts"]
         _projected_lite_panels(owner)
         owner.open_turn("casting", "after-upgrade")
         provider = HealingGM()
