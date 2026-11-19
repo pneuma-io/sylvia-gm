@@ -63,15 +63,18 @@ def accepts_temperature(model_id: str) -> bool:
     return claude_id is None or claude_model_facts(claude_id).temperature
 
 
-# Preserved thinking, from Anthropic's documentation as read on 2026-11-15 (not checked
-# against the live service): a thinking block is bound to the
-# top-level system, the tool set (full definitions, order-insensitive) and every earlier
+# Preserved thinking (Anthropic's documentation, read 2026-11-15): a thinking block is bound to
+# the top-level system, the tool set (full definitions, order-insensitive) and every earlier
 # message. Replaying one after any of those changed is HTTP 400 where the binding is enforced:
-# every account on these models; on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5 only accounts
-# created from 31 August 2026, which Sylvia cannot know, so those rely on the reactive strip.
+# every account on Fable 5.2 and Mythos 5.2; on Fable 5.1, Opus 5.5, Sonnet 5.5 and Haiku 5.5
+# accounts created from 31 August 2026. Checked live on 19 November 2026 with a new Console
+# key: Fable 5.2, Opus 5.5 and Sonnet 5.5 rejected a replay after a system or tool change
+# (Haiku 5.5 sent no thinking to test). Opus 5.5 and Sonnet 5.5 are treated as enforced, as
+# every account made from now on is; an older account then only replays less reasoning.
+# Models not named here keep the reactive strip and one retry.
 def binds_thinking_for_every_account(model_id: str) -> bool:
-    """Whether every account on this wire model rejects a thinking block replayed after the
-    system prompt or tool set changed."""
+    """Whether Sylvia treats this wire model as rejecting a thinking block replayed after the
+    system prompt or tool set changed, on every account."""
     return claude_model_facts(model_id).binds_thinking
 
 
@@ -79,7 +82,9 @@ def rejects_replayed_thinking(error: BaseException) -> bool:
     """A 400 that names a thinking block's signature as invalid or bound elsewhere.
 
     Matched narrowly on the documented wording (``Invalid `signature` in `thinking` block``,
-    a signature bound to a different conversation); never matched against a live response.
+    a signature bound to a different conversation), which the live service returned on 19
+    November 2026: ``... Invalid `signature` in `thinking` block. The block is bound to a
+    different conversation. ...``.
     """
     if not isinstance(error, InvalidRequestError):
         return False

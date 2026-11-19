@@ -1619,11 +1619,14 @@ the ledger resets. Builder and participant requests do not use it.
   does the same when the journal would end on an assistant turn, which current Claude models
   reject as a prefill. The runtime's own invented continuation prompt is never used.
 - **Claude thinking (`anthropic_messages`).** A thinking block is bound to the top-level system,
-  the tool set and every earlier message (Anthropic documentation, not verified live). The journal
+  the tool set and every earlier message (Anthropic documentation; a replay after a system or
+  tool change was rejected live on 19 November 2026 on Fable 5.2, Opus 5.5 and Sonnet 5.5 with a
+  new Console key). The journal
   keeps a thinking floor: assistant turns below it are reattached without thinking or
   redacted-thinking blocks. It only moves forward within a generation, is saved in the journal
   record that moves it and is restored on load. On models where every account enforces the
-  binding (Fable 5.2, Mythos 5.2) a changed system prefix or tool set moves it to the journal
+  binding (Fable 5.2, Mythos 5.2), and on Opus 5.5 and Sonnet 5.5, where every account created
+  from 31 August 2026 does, a changed system prefix or tool set moves it to the journal
   length after the request's new entries, so every assistant turn in that request is stripped
   (each was produced under the previous system and tools); thinking returned in response to
   that request is journaled above the floor and replayed while the fingerprints stay the same.
