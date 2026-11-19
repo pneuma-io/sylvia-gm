@@ -1651,19 +1651,29 @@ the ledger resets. Builder and participant requests do not use it.
   are removed after every step as well. The first-party
   `anthropic` provider adds ephemeral `cache_control` breakpoints on the last tool definition, the
   last system block and the last non-thinking block of the last message; other Messages-compatible
-  endpoints are unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
+  endpoints are unchanged. The breakpoints follow the connection's assembly setting, not the
+  session, so with the ledger (this connection's default) its Builder, NPC-decision and summary
+  requests carry them too; their content is otherwise unchanged. Other routes rely on automatic prefix matching; OpenRouter keeps its
   request context identifier.
 - **Mode switch.** The previous assembly is the shipped default (`DEFAULT_CONTEXT_MODE`) on
   every route except those named in `DEFAULT_CONTEXT_MODE_BY_TRANSPORT`, which lists a route
-  once its measured results support the ledger. `claude_code` and `codex_app_server` are
-  listed: they ship with the ledger. `SYLVIA_GM_CONTEXT_MODE=ledger` or `=legacy`, read once per GM
+  once its measured results support the ledger. A route is its transport, except the
+  first-party Claude API connection (provider `anthropic` on `anthropic_messages`), which is
+  the route `anthropic_api` (`gm_route`); other services that speak the Messages protocol
+  (OpenCode Zen and Go, MiniMax, custom endpoints) stay on their transport's default.
+  `claude_code`, `codex_app_server` and `anthropic_api` are listed: they ship with the ledger.
+  `anthropic_api` was measured live on 19 November 2026: under the previous assembly every
+  multi-round fight turn on Fable 5.2, Opus 5.5 and Sonnet 5.5 was rejected for a replayed
+  thinking block, while the ledger with one tool list ended every turn on the four current
+  models. `SYLVIA_GM_CONTEXT_MODE=ledger` or `=legacy`, read once per GM
   adapter, selects an assembly for every route. The previous assembly is byte for byte what it
   was before the ledger existed (including no Anthropic breakpoints).
   On `claude_code` legacy mode keeps the previous transcript and flags, with the fixed working
   directory and LF system bytes.
 - **Tool list switch.** In the ledger assembly, per-round tool lists are the shipped default
   (`DEFAULT_TOOL_LIST`) on every route except those named in `DEFAULT_TOOL_LIST_BY_TRANSPORT`,
-  which send one tool list for the session. `claude_code` and `codex_app_server` are listed.
+  which send one tool list for the session. `claude_code`, `codex_app_server` and
+  `anthropic_api` are listed.
   `SYLVIA_GM_TOOL_LIST=stable` or `=rounds` selects either for every route.
   `SYLVIA_GM_TOOL_LIST=fixed` is an opt-in third value, used only with the ledger. It lists
   the complete campaign catalog from the first GM request, in deterministic name order,

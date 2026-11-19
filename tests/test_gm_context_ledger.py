@@ -122,7 +122,7 @@ def test_the_previous_assembly_is_the_shipped_default_and_the_switch_selects_eit
     # route concerned.
     assert ledger_module.DEFAULT_CONTEXT_MODE == "legacy"
     assert dict(ledger_module.DEFAULT_CONTEXT_MODE_BY_TRANSPORT) == {
-        "claude_code": "ledger", "codex_app_server": "ledger",
+        "claude_code": "ledger", "codex_app_server": "ledger", "anthropic_api": "ledger",
     }
     assert context_mode({}) == "legacy"
     for transport in ("anthropic_messages", "gemini_generate_content",
@@ -130,6 +130,17 @@ def test_the_previous_assembly_is_the_shipped_default_and_the_switch_selects_eit
         assert context_mode({}, transport=transport) == "legacy"
     assert context_mode({}, transport="claude_code") == "ledger"
     assert context_mode({}, transport="codex_app_server") == "ledger"
+    # The first-party Claude API connection is its own route; other services that speak the
+    # Messages protocol (OpenCode Zen and Go, MiniMax, custom endpoints) keep the default.
+    assert context_mode({}, transport="anthropic_messages", provider_key="anthropic") == "ledger"
+    for provider_key in ("opencode_zen", "opencode_go", "minimax", "custom_0123", None):
+        assert context_mode({}, transport="anthropic_messages",
+                            provider_key=provider_key) == "legacy"
+    assert context_mode({}, transport="responses", provider_key="anthropic") == "legacy"
+    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "legacy"}, transport="anthropic_messages",
+                        provider_key="anthropic") == "legacy"
+    assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "ledger"}, transport="anthropic_messages",
+                        provider_key="opencode_go") == "ledger"
     assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "legacy"},
                         transport="codex_app_server") == "legacy"
     # The switch turns the ledger on, or names the previous assembly, for every route.
@@ -159,7 +170,7 @@ def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_eit
     # route concerned.
     assert ledger_module.DEFAULT_TOOL_LIST == "rounds"
     assert dict(ledger_module.DEFAULT_TOOL_LIST_BY_TRANSPORT) == {
-        "claude_code": "stable", "codex_app_server": "stable",
+        "claude_code": "stable", "codex_app_server": "stable", "anthropic_api": "stable",
     }
     stable_tool_list = ledger_module.stable_tool_list
     assert stable_tool_list({}) is False
@@ -168,6 +179,15 @@ def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_eit
         assert stable_tool_list({}, transport=transport) is False
     assert stable_tool_list({}, transport="claude_code") is True
     assert stable_tool_list({}, transport="codex_app_server") is True
+    first_party = {"transport": "anthropic_messages", "provider_key": "anthropic"}
+    assert stable_tool_list({}, **first_party) is True
+    for provider_key in ("opencode_zen", "opencode_go", "minimax", "custom_0123", None):
+        assert stable_tool_list({}, transport="anthropic_messages",
+                                provider_key=provider_key) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"}, **first_party) is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "fixed"}, **first_party) is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "stable"}, transport="anthropic_messages",
+                            provider_key="opencode_go") is True
     assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"},
                             transport="codex_app_server") is False
     # The switch selects one list, or per-round lists, for every route.
@@ -656,8 +676,9 @@ def test_first_party_anthropic_breakpoints_mark_tools_system_and_last_block() ->
 
 @pytest.mark.parametrize(("provider_key", "mode", "expected"), [
     ("anthropic", "ledger", True), ("anthropic", "legacy", False), ("minimax", "ledger", False),
-    # Without the switch the shipped default applies: the previous assembly, no breakpoints.
-    ("anthropic", None, False),
+    # Without the switch the shipped default applies: the ledger with breakpoints on the
+    # first-party Claude API, the previous assembly without them on every other endpoint.
+    ("anthropic", None, True), ("minimax", None, False), ("opencode_go", None, False),
 ])
 def test_breakpoints_only_on_the_first_party_route_in_ledger_mode(
     monkeypatch, provider_key, mode, expected,
