@@ -414,13 +414,21 @@ def test_gm_edits_select_full_behavioral_modules_without_campaign_replay(path):
     assert plan["python"]["gm-turn"] == [
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
+        "tests/test_stop_resume_contracts.py",
         "tests/test_provider_turn_state.py",
         "tests/test_provider_release_on_stop.py",
         "tests/test_npc_speaker_names.py",
     ]
+    assert "tests/test_architecture_guards.py" in plan["python"]["core-invariants"]
     assert "campaign-play" not in plan["python"]
     assert not any("test_action_sequence" in selector or "test_fc_campaign" in selector
                    for paths in plan["python"].values() for selector in paths)
+
+
+def test_feature_map_edits_select_its_validator():
+    plan = choose(["docs/testing/feature-map.json"])
+    assert not plan["broad_fallback"]
+    assert plan["python"] == {"feature-map": ["tests/test_feature_map.py"]}
 
 
 def test_queue_edits_select_their_expensive_behavior_and_fast_provider_consumer():

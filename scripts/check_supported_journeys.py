@@ -44,7 +44,7 @@ else:
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_JOURNEYS = {
-    "python-quality": ["tests/test_python_quality.py"],
+    "python-quality": ["tests/test_python_quality.py", "tests/test_architecture_guards.py"],
     "launch-lite-compatibility": [
         "tests/test_launch_lite_safety.py",
         "tests/test_runtime_payload_cache.py",
@@ -355,6 +355,7 @@ PYTHON_JOURNEYS = {
     "gm-turn": [
         "tests/test_alpha_f4_provider_session_adapter.py",
         "tests/test_alpha_f4_generic_sessions.py",
+        "tests/test_stop_resume_contracts.py",
         "tests/test_provider_turn_state.py",
         "tests/test_provider_release_on_stop.py",
         "tests/test_npc_speaker_names.py",
@@ -427,6 +428,7 @@ PYTHON_JOURNEYS = {
     "release-integrity": [
         "tests/test_known_test_defects.py",
         "tests/test_test_inventory.py",
+        "tests/test_feature_map.py",
         "tests/test_public_fixture_packages.py",
         "tests/test_pyav_release_packaging.py",
         "tests/test_protected_provider_settings.py",
