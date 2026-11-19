@@ -53,6 +53,7 @@ WINDOWS_TOOLCHAIN = {
 LINUX_TOOLCHAIN = {
     **WINDOWS_TOOLCHAIN,
     "appimage_tools_sha256": "c" * 64,
+    "appimage_tools_source": "downloaded by the bundler",
     "build_system": "Ubuntu 22.04.5 LTS",
     "glibc": "2.35",
 }
@@ -418,8 +419,11 @@ def _builder_fixture(tmp_path, monkeypatch, *, glibc=(2, 35), system="linux"):
             library = bundle / "Sylvia GM.AppDir/usr/lib/libsynthetic.so.1"
             library.parent.mkdir(parents=True)
             library.write_bytes(b"synthetic library - never load")
-            (cache / "tauri").mkdir(parents=True)
-            (cache / "tauri/linuxdeploy-x86_64.AppImage").write_bytes(b"synthetic bundler")
+            # Like the real bundler, download a tool only when its cache does not have it.
+            (cache / "tauri").mkdir(parents=True, exist_ok=True)
+            tool = cache / "tauri/linuxdeploy-x86_64.AppImage"
+            if not tool.exists():
+                tool.write_bytes(b"synthetic bundler")
         return ""
 
     written = []
@@ -475,6 +479,7 @@ def test_linux_builder_runs_the_locked_steps_and_records_the_build_machine(tmp_p
     tools = manifest["toolchain"]
     assert tools["build_system"] == "Ubuntu 22.04.5 LTS" and tools["glibc"] == "2.35"
     assert len(tools["appimage_tools_sha256"]) == 64
+    assert tools["appimage_tools_source"] == "downloaded by the bundler"
     assert {key: tools[key] for key in WINDOWS_TOOLCHAIN} == WINDOWS_TOOLCHAIN
     assert (output / DEPENDENCY_NOTICES_PATH).read_bytes() == NOTICES
     assert (output / LINUX_BUNDLED_NOTICES_PATH).read_bytes() == BUNDLED
@@ -572,6 +577,67 @@ def test_linux_builder_notices_an_input_changed_during_the_build(tmp_path, monke
     assert not (tmp_path / "changed-during").exists()
 
 
+def _kept_tools(tmp_path, files):
+    kept = tmp_path / "kept-appimage-tools"
+    kept.mkdir(parents=True)
+    for name, content in files.items():
+        (kept / name).write_bytes(content)
+    return kept, linux_builder._appimage_tools_digest(kept)
+
+
+def test_a_kept_copy_of_the_bundling_tools_is_used_and_recorded(tmp_path, monkeypatch):
+    # If the tools' "continuous" release is down or has changed, the build can use the exact
+    # copy an earlier build ran, as long as it matches the hash that build recorded.
+    root, _notice, commands = _builder_fixture(tmp_path, monkeypatch)
+    kept, digest = _kept_tools(tmp_path, {"linuxdeploy-x86_64.AppImage": b"synthetic bundler"})
+    manifest = _build(
+        root, tmp_path / "built", tmp_path, appimage_tools=kept, appimage_tools_sha256=digest
+    )
+    assert manifest["toolchain"]["appimage_tools_sha256"] == digest
+    assert manifest["toolchain"]["appimage_tools_source"] == "kept copy"
+    assert linux_builder.TAURI_BUILD_COMMAND in commands
+
+
+def test_a_kept_copy_that_no_longer_matches_stops_the_build_before_bundling(tmp_path, monkeypatch):
+    root, _notice, commands = _builder_fixture(tmp_path, monkeypatch)
+    kept, _digest = _kept_tools(tmp_path, {"linuxdeploy-x86_64.AppImage": b"changed bundler"})
+    _unused, recorded = _kept_tools(
+        tmp_path / "earlier", {"linuxdeploy-x86_64.AppImage": b"synthetic bundler"}
+    )
+    with pytest.raises(ReleaseArtifactError, match="do not match their recorded SHA-256"):
+        _build(
+            root, tmp_path / "built", tmp_path, appimage_tools=kept, appimage_tools_sha256=recorded
+        )
+    assert linux_builder.TAURI_BUILD_COMMAND not in commands
+    assert not (tmp_path / "built").exists()
+
+
+def test_a_bundler_that_adds_to_the_kept_tools_is_refused(tmp_path, monkeypatch):
+    # The kept copy lacks a tool the bundler then downloads: the build no longer ran only it.
+    root, _notice, _commands = _builder_fixture(tmp_path, monkeypatch)
+    kept, digest = _kept_tools(tmp_path, {"linuxdeploy-plugin-appimage.AppImage": b"plug-in"})
+    with pytest.raises(ReleaseArtifactError, match="replaced or added to the kept"):
+        _build(
+            root, tmp_path / "built", tmp_path, appimage_tools=kept, appimage_tools_sha256=digest
+        )
+    assert not (tmp_path / "built").exists()
+
+
+@pytest.mark.parametrize(
+    "changes",
+    [
+        {"appimage_tools": Path("kept")},
+        {"appimage_tools_sha256": "0" * 64},
+        {"appimage_tools": Path("kept"), "appimage_tools_sha256": "not a hash"},
+    ],
+)
+def test_kept_bundling_tools_need_their_folder_and_hash_together(tmp_path, monkeypatch, changes):
+    root, _notice, commands = _builder_fixture(tmp_path, monkeypatch)
+    with pytest.raises(ReleaseArtifactError, match="need both their folder and their SHA-256"):
+        _build(root, tmp_path / "built", tmp_path, **changes)
+    assert commands == []
+
+
 def test_linux_builder_command_line_defaults():
     with pytest.raises(SystemExit):
         linux_builder._parser(ROOT).parse_args([])
@@ -581,3 +647,9 @@ def test_linux_builder_command_line_defaults():
     assert arguments.output.name == f"sylvia-gm-{PRERELEASE_VERSION}-linux-x86_64"
     assert (arguments.ubuntu_22_04, arguments.ubuntu_24_04) == ("pending", "pending")
     assert arguments.allow_newer_glibc is False
+    assert (arguments.appimage_tools, arguments.appimage_tools_sha256) == (None, None)
+    kept = linux_builder._parser(ROOT).parse_args(
+        ["--forbidden-name-file", "names.txt", "--dependency-notices-sha256", "0" * 64,
+         "--appimage-tools", "kept", "--appimage-tools-sha256", "1" * 64]
+    )
+    assert (kept.appimage_tools, kept.appimage_tools_sha256) == (Path("kept"), "1" * 64)

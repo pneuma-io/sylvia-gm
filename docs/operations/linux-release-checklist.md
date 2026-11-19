@@ -88,6 +88,15 @@ Windows manifest records, its toolchain section names the build machine's system
 `pending`. `--allow-newer-glibc` is for trial builds on a newer machine only; such a build does
 not start on older distributions and must not be released.
 
+The bundler downloads its AppImage tools (linuxdeploy and its plug-ins, one of them from a moving
+"continuous" release on GitHub) into the build's own empty cache. The manifest records one hash
+over them as `appimage_tools_sha256`, and `appimage_tools_source` says where they came from. If
+GitHub is unreachable or the release has changed, give the builder a kept copy of the exact tools
+an earlier build ran, with the hash that build recorded:
+`--appimage-tools FOLDER --appimage-tools-sha256 HASH`. The builder uses the copy only while it
+still matches, refuses the build if the bundler then replaces or adds to it, and records
+`appimage_tools_source` as `kept copy`.
+
 Check the folder afterwards:
 
 ```bash

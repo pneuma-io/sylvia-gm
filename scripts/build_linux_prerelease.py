@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 from collections.abc import Sequence
@@ -118,6 +119,25 @@ def _appimage_tools_digest(cache: Path) -> str:
     return digest.hexdigest()
 
 
+def seed_appimage_tools(source: Path, expected_sha256: str, cache: Path) -> None:
+    """Put a kept copy of the AppImage bundling tools where the bundler looks before downloading.
+
+    The bundler downloads linuxdeploy and its plug-ins, one of them from a moving "continuous"
+    release, only when they are missing from its cache. A copy kept from an earlier build is
+    used only while its combined hash, as that build's manifest recorded it, still matches.
+    """
+    if _appimage_tools_digest(source) != expected_sha256:
+        raise ReleaseArtifactError(
+            "The kept AppImage bundling tools do not match their recorded SHA-256"
+        )
+    target = cache / "tauri"
+    target.mkdir(parents=True)
+    kept = sorted(item for item in source.iterdir() if item.is_file() and not item.is_symlink())
+    for path in kept:
+        shutil.copyfile(path, target / path.name)
+        (target / path.name).chmod(0o755)
+
+
 def _system_plugin_folder() -> Path:
     return Path(f"/usr/lib/{os.uname().machine}-linux-gnu/gstreamer-1.0")
 
@@ -165,9 +185,18 @@ def build_linux_prerelease(
     dependency_notices_sha256: str,
     forbidden_name_file: Path | None = None,
     allow_newer_glibc: bool = False,
+    appimage_tools: Path | None = None,
+    appimage_tools_sha256: str | None = None,
 ) -> dict[str, object]:
     if not sys.platform.startswith("linux"):
         raise ReleaseArtifactError("Linux prerelease builds run on Linux")
+    if (appimage_tools is None) != (appimage_tools_sha256 is None) or (
+        appimage_tools_sha256 is not None
+        and re.fullmatch(r"[0-9a-f]{64}", appimage_tools_sha256) is None
+    ):
+        raise ReleaseArtifactError(
+            "Kept AppImage bundling tools need both their folder and their SHA-256"
+        )
     glibc = _glibc_version()
     if glibc > BASELINE_GLIBC and not allow_newer_glibc:
         raise ReleaseArtifactError(
@@ -217,6 +246,8 @@ def build_linux_prerelease(
     # The bundling tools are downloaded into this build's own folder, so the hash recorded
     # below describes exactly what this build ran and nothing left over from another.
     tools_cache = invocation.path / "cache"
+    if appimage_tools is not None and appimage_tools_sha256 is not None:
+        seed_appimage_tools(appimage_tools, appimage_tools_sha256, tools_cache)
     environment = dict(
         os.environ,
         CARGO_TARGET_DIR=str(target),
@@ -243,6 +274,9 @@ def build_linux_prerelease(
     )
     print(f"Isolated release build work (retained on failure): {invocation.path}", flush=True)
     shared._run(TAURI_BUILD_COMMAND, cwd=root / "src-tauri", env=environment)
+    tools_digest = _appimage_tools_digest(tools_cache / "tauri")
+    if appimage_tools_sha256 is not None and tools_digest != appimage_tools_sha256:
+        raise ReleaseArtifactError("The bundler replaced or added to the kept AppImage tools")
     final_notice_bytes = read_dependency_notices(
         notice_path,
         expected_sha256=dependency_notices_sha256,
@@ -279,7 +313,10 @@ def build_linux_prerelease(
         provenance=provenance,
         toolchain={
             **toolchain,
-            "appimage_tools_sha256": _appimage_tools_digest(tools_cache / "tauri"),
+            "appimage_tools_sha256": tools_digest,
+            "appimage_tools_source": (
+                "kept copy" if appimage_tools is not None else "downloaded by the bundler"
+            ),
             "build_system": build_system,
             "glibc": f"{glibc[0]}.{glibc[1]}",
         },
@@ -324,6 +361,18 @@ def _parser(root: Path) -> argparse.ArgumentParser:
     parser.add_argument("--ubuntu-22-04", choices=_QUALIFICATION_STATES, default="pending")
     parser.add_argument("--ubuntu-24-04", choices=_QUALIFICATION_STATES, default="pending")
     parser.add_argument(
+        "--appimage-tools",
+        type=Path,
+        help=(
+            "Use this kept copy of the AppImage bundling tools instead of downloading them; "
+            "needs --appimage-tools-sha256"
+        ),
+    )
+    parser.add_argument(
+        "--appimage-tools-sha256",
+        help="The appimage_tools_sha256 the earlier build's manifest recorded for that copy",
+    )
+    parser.add_argument(
         "--allow-newer-glibc",
         action="store_true",
         help=(
@@ -345,6 +394,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         dependency_notices_sha256=arguments.dependency_notices_sha256,
         forbidden_name_file=arguments.forbidden_name_file,
         allow_newer_glibc=arguments.allow_newer_glibc,
+        appimage_tools=arguments.appimage_tools,
+        appimage_tools_sha256=arguments.appimage_tools_sha256,
     )
     print(json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2))
     return 0
