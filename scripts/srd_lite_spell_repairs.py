@@ -1,4 +1,5 @@
-"""SRD Lite 0.3.26 spell repairs, applied to the parsed runtime by update_srd_lite_spell_repairs.
+"""SRD Lite 0.3.26 and 0.3.27 spell repairs, applied to the parsed runtime by
+update_srd_lite_spell_repairs.
 
 Each repair edits one owning tool or definition and is idempotent, so the update script can be
 rerun against an already repaired runtime without changing it again.
@@ -270,6 +271,63 @@ def repair_speed_bonus_needs_a_creature(runtime):
     )
 
 
+def _calls(tool, name):
+    """Each (effect list, index) holding a nested call of the named tool."""
+    for effects in lists(tool["effects"]):
+        for index, effect in enumerate(effects):
+            if effect.get("call") == name:
+                yield effects, index
+
+
+def repair_exploration_birth_known_spell_effect(runtime):
+    """Issue 191: a creature summoned outside combat can join the combat that starts later.
+
+    Combat entry reconciles each exploration-born Find Steed or Summon Dragon against its body
+    and passed known_spell_effect as '{_birth.known_spell_effect == true}'. A call parameter is
+    resolved only as an exact {path} reference or a {path} text template, so the boolean input
+    received that literal text and the whole combat start was refused. The comparison is now
+    computed first and its boolean passed by reference.
+    """
+    tool = runtime["tools"]["reconcile_srd_lite_exploration_created_actor"]
+    (site,) = _calls(tool, "present_srd_lite_known_spell_body")
+    effects, index = site
+    params = effects[index]["params"]
+    if params["known_spell_effect"] == "{_birth_known_spell_effect}":
+        return
+    if params["known_spell_effect"] != "{_birth.known_spell_effect == true}":
+        raise ValueError("Exploration birth known-spell-effect seam changed")
+    params["known_spell_effect"] = "{_birth_known_spell_effect}"
+    effects.insert(
+        index, _set("_birth_known_spell_effect", "_birth.known_spell_effect == true")
+    )
+
+
+DWELLING_FACES = ("west", "east", "south", "north", "floor", "ceiling")
+
+
+def repair_dwelling_face_ids(runtime):
+    """Issue 191 audit: dwelling wall identities reach the scene-identity guard resolved.
+
+    Magnificent Mansion and Rope Trick passed face_ids as a list of '{dwelling_id}:room:...'
+    templates. A call resolves only a parameter's own text, not text inside a list, so the
+    guard compared saved scene rows with literal brace text and never refused a clash with
+    the walls it was about to create. The list is now built as an expression and passed by
+    reference.
+    """
+    expected = [f"{{dwelling_id}}:room:{face}" for face in DWELLING_FACES]
+    built = [f"dwelling_id + ':room:{face}'" for face in DWELLING_FACES]
+    for name in ("validate_srd_magnificent_mansion", "validate_srd_rope_trick_layout"):
+        (site,) = _calls(runtime["tools"][name], "bind_srd_dwelling_scene_ids")
+        effects, index = site
+        params = effects[index]["params"]
+        if params["face_ids"] == "{_xd_dwelling_face_ids}":
+            continue
+        if params["face_ids"] != expected:
+            raise ValueError("Dwelling face identity seam changed: " + name)
+        params["face_ids"] = "{_xd_dwelling_face_ids}"
+        effects.insert(index, _set("_xd_dwelling_face_ids", built))
+
+
 REPAIRS = (
     repair_spell_force_scene_bodies,
     repair_creature_space_skips_spell_forces,
@@ -281,6 +339,8 @@ REPAIRS = (
     repair_multi_target_distinct_recipients,
     repair_speed_bonus_needs_a_creature,
     *ATTACK_REPAIRS,
+    repair_exploration_birth_known_spell_effect,
+    repair_dwelling_face_ids,
 )
 
 

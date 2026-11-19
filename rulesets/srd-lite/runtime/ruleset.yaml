@@ -181300,18 +181300,21 @@ tools:
         condition: len(floor_cells) * 1000 == _xd_room_extent[0] * _xd_room_extent[1] * _xd_room_extent[2]
         error: The first physical Mansion mode supports contiguous rectangular cube plans; nonrectangular
           plans remain selected.
+    - set:
+        field: _xd_dwelling_face_ids
+        value:
+        - dwelling_id + ':room:west'
+        - dwelling_id + ':room:east'
+        - dwelling_id + ':room:south'
+        - dwelling_id + ':room:north'
+        - dwelling_id + ':room:floor'
+        - dwelling_id + ':room:ceiling'
     - call: bind_srd_dwelling_scene_ids
       params:
         room_id: '{dwelling_id}:room'
         outer_id: '{dwelling_id}:door'
         inner_id: '{dwelling_id}:inside'
-        face_ids:
-        - '{dwelling_id}:room:west'
-        - '{dwelling_id}:room:east'
-        - '{dwelling_id}:room:south'
-        - '{dwelling_id}:room:north'
-        - '{dwelling_id}:room:floor'
-        - '{dwelling_id}:room:ceiling'
+        face_ids: '{_xd_dwelling_face_ids}'
       export_context:
         _xd_plane: _xd_plane
         _xd_outer_id: _xd_outer_id
@@ -184243,18 +184246,21 @@ tools:
         condition: len(floor_cells) * 1000 == _xd_room_extent[0] * _xd_room_extent[1] * _xd_room_extent[2]
         error: The first physical Mansion mode supports contiguous rectangular cube plans; nonrectangular
           plans remain selected.
+    - set:
+        field: _xd_dwelling_face_ids
+        value:
+        - dwelling_id + ':room:west'
+        - dwelling_id + ':room:east'
+        - dwelling_id + ':room:south'
+        - dwelling_id + ':room:north'
+        - dwelling_id + ':room:floor'
+        - dwelling_id + ':room:ceiling'
     - call: bind_srd_dwelling_scene_ids
       params:
         room_id: '{dwelling_id}:room'
         outer_id: '{dwelling_id}:door'
         inner_id: '{dwelling_id}:inside'
-        face_ids:
-        - '{dwelling_id}:room:west'
-        - '{dwelling_id}:room:east'
-        - '{dwelling_id}:room:south'
-        - '{dwelling_id}:room:north'
-        - '{dwelling_id}:room:floor'
-        - '{dwelling_id}:room:ceiling'
+        face_ids: '{_xd_dwelling_face_ids}'
       export_context:
         _xd_plane: _xd_plane
         _xd_outer_id: _xd_outer_id
@@ -347388,13 +347394,16 @@ tools:
           field: _visual_body_capsule
           value:
           - _info_scene_entity
+      - set:
+          field: _birth_known_spell_effect
+          value: _birth.known_spell_effect == true
       - call: present_srd_lite_known_spell_body
         params:
           body_capsule: '{_visual_body_capsule}'
           spell: '{_birth.spell}'
           caster_id: '{_caster_state_id}'
           source_id: ''
-          known_spell_effect: '{_birth.known_spell_effect == true}'
+          known_spell_effect: '{_birth_known_spell_effect}'
           lasting_state: '{_lasting_state_id}'
         export_context:
           _visual_body: _visual_body

@@ -272,6 +272,7 @@ def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
 
 
 PUBLISHED_LITE = {
+    "lite-0.3.26": ("0.3.26", "3a8b43eac9fe049a604623c53a6a99f452fb0ed44ca7048125fa60b4d1459394"),
     "lite-0.3.25": ("0.3.25", "f13148bf1f68e2558e231c1b96da8a0c660e2ed67050d31b2c61edee3716025b"),
     "lite-0.3.24": ("0.3.24", "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d"),
     "alpha4": ("0.3.15", "495f41b1d630893ac8b3cdcc1945a332c6db004dfabe212d661fa2e8b5fd497a"),
@@ -293,7 +294,7 @@ def _projected_lite_panels(owner):
 
 
 @pytest.mark.parametrize(
-    "origin", ["alpha4", "alpha5", "integration", "lite-0.3.24", "lite-0.3.25"]
+    "origin", ["alpha4", "alpha5", "integration", "lite-0.3.24", "lite-0.3.25", "lite-0.3.26"]
 )
 def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state(tmp_path, origin):
     database = tmp_path / "alpha4.sqlite3"
@@ -355,8 +356,8 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         )
         assert "priests_pack" in inventory["entities"]["hero"]["inventory"]
         # 0.3.25 introduced declared item names; earlier pins project without them.
-        assert ("item_names" in inventory) == (origin == "lite-0.3.25")
-        if origin in {"integration", "lite-0.3.24", "lite-0.3.25"}:
+        assert ("item_names" in inventory) == (origin in {"lite-0.3.25", "lite-0.3.26"})
+        if origin in {"integration", "lite-0.3.24", "lite-0.3.25", "lite-0.3.26"}:
             # Packaged startup installs bare Rulesets; Setting descendants are offered lazily.
             owner.install_package_archive(io.BytesIO(current_archive), install_id="startup-current")
         options = owner.campaign_rules_update_options("casting")
@@ -366,14 +367,14 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert preview["compatible"], preview["conflicts"]
         assert "Treat this update as one-way." in preview["recovery"]
         assert "Export the campaign first" in preview["recovery"]
-        if origin == "lite-0.3.25":
-            # 0.3.26 repairs internal spell mechanics only: no GM tool declaration or
-            # panel source changes, so the reviewed preview lists no tool changes.
+        if origin in {"lite-0.3.25", "lite-0.3.26"}:
+            # 0.3.26 and 0.3.27 repair internal spell mechanics only: no GM tool declaration
+            # or panel source changes, so the reviewed preview lists no tool changes.
             assert preview["tool_changes"] == []
             assert "Panels show additional information." not in preview["recovery"]
         else:
             assert preview["tool_changes"]
-        if origin not in {"integration", "lite-0.3.25"}:
+        if origin not in {"integration", "lite-0.3.25", "lite-0.3.26"}:
             added = 1 if origin == "lite-0.3.24" else 4
             # Published panels only gained source fields; they are a reviewed change.
             assert any(c.get("added_panel_data") == added for c in preview["tool_changes"])
@@ -394,10 +395,16 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             if option["closure_sha256"] == old_lock.closure_sha256
         )
         reverse = owner.preview_campaign_rules_update("casting", earlier["candidate_id"])
-        # 0.3.26 adds internal tools (the Magic Missile dart and Scorching Ray windows) that
-        # 0.3.25 lacks, so every earlier pin, 0.3.25 included, refuses a return.
-        assert not reverse["compatible"]
-        assert reverse["conflicts"]
+        if origin == "lite-0.3.26":
+            # 0.3.27 adds no tools, so a return to 0.3.26 has no contract conflicts; the
+            # preview still advises treating it as one-way.
+            assert reverse["compatible"] and not reverse["conflicts"]
+            assert "Treat this update as one-way." in reverse["recovery"]
+        else:
+            # 0.3.26 added internal tools (the Magic Missile dart and Scorching Ray windows)
+            # that 0.3.25 lacks, so every earlier pin, 0.3.25 included, refuses a return.
+            assert not reverse["compatible"]
+            assert reverse["conflicts"]
         _projected_lite_panels(owner)
         owner.open_turn("casting", "after-upgrade")
         provider = HealingGM()

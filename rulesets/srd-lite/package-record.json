@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "3a8b43eac9fe049a604623c53a6a99f452fb0ed44ca7048125fa60b4d1459394",
+  "content_sha256": "3b3efe2969daac443113efba4387ed2fff10cd3602918e0344adec09bc3061a5",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -159,7 +159,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "f4fabbe842a2da02695b2e296a13e5ebc0ca56c52e4460cd5ebc539765da61b4"
+      "sha256": "1e81b5e952b8c4b998d9d4dad987cd6bd8f418dd0687b654c13ec0291cbf9592"
     },
     {
       "bytes": 5865,
@@ -189,7 +189,7 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "db1d5b0e9258a3aba1f7dd96da44c806b872770467e310d7b9773a853b19f4ea"
+      "sha256": "2091954dc4fede94fc4c550b3f139b8291ff65b09877639ecdf22043c18e0013"
     },
     {
       "bytes": 25922,
@@ -212,9 +212,9 @@
       "sha256": "e99cb13cdf36dca41c67b9041bf91a536c8b49c730bb27a8909eb4385a8908e3"
     },
     {
-      "bytes": 14578806,
+      "bytes": 14579095,
       "path": "runtime/ruleset.yaml",
-      "sha256": "a65738f4c0458094291d0df7ee8d8b75b8edc7a78bffb104ee709a8d57d8513d"
+      "sha256": "a6770742f3ff39cd913675a902e02dc5d760aafdf756c461f8f9b955dc26cdfa"
     },
     {
       "bytes": 59661,
@@ -50404,5 +50404,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.26"
+  "version": "0.3.27"
 }
