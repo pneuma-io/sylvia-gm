@@ -971,10 +971,11 @@ def test_an_incomplete_flush_reports_the_records_unknown(runtime, monkeypatch):
 
 def test_exports_stub_cli_records_and_the_wire_journal(tmp_path, monkeypatch):
     """A portable or private export keeps both machine-local evidence kinds only as
-    stubs; recovery opens and the next GM turn starts a journal and collects the CLI's records
+    stubs; recovery opens and the next GM step starts a journal and collects the CLI's records
     again."""
     import dataclasses
     import re
+    import uuid
     import zipfile
 
     from sylvia_gm.application.authority import AuthorityOwner
@@ -1020,7 +1021,7 @@ def test_exports_stub_cli_records_and_the_wire_journal(tmp_path, monkeypatch):
     table = Table(database, ClaudeProvider(home, model, connection_factory=ToolListCLI),
                   campaign, session)
     try:
-        table.submit("I look around.")
+        _reply, first = table.submit("I look around.")
     finally:
         table.close()
     saved = evidence(database, session)
@@ -1052,20 +1053,34 @@ def test_exports_stub_cli_records_and_the_wire_journal(tmp_path, monkeypatch):
         {"kind": r["kind"], "omitted_from_export": True} for r in saved]
 
     def next_turn(path: Path) -> tuple[str, int]:
-        """Play the same next turn; its outcome and how many CLI steps it took."""
+        """Take the step the player is offered next; its outcome and how many CLI steps it took.
+
+        With a prose-only CLI the first turn ended on this campaign's required-tool rule. That
+        is a failure, not a Stop, so the composer stays closed and offers only Manual Retry,
+        and the owner refuses a plain new message (#189, #198). The player presses Retry.
+        """
         ScriptedCLI.instances = []
         table = Table(path, ClaudeProvider(home, model, connection_factory=ToolListCLI),
                       campaign, session)
         try:
-            reply, _identity = table.submit("I keep looking.")
+            offers = [item["safe_payload"]
+                      for item in table.request("player_projection", {"campaign_id": campaign})
+                      if item["kind"] == "retry"]
+            # The composer's input is closed exactly when its Retry offer cannot redirect.
+            assert [(o["failed_attempt_id"], o["can_redirect"]) for o in offers] == [
+                (first, False)]
+            retry_id = uuid.uuid4().hex
+            reply = table.attached("manual_retry_session", {
+                "session_id": session, "interruption_id": offers[0]["interruption_id"],
+                "retry_id": retry_id}, retry_id)
         finally:
             table.close()
         error = str((reply or {}).get("interruption", {}).get("error", ""))
         code = re.search(r"'code': '([a-z_]+)'", error)
         return (code.group(1) if code else "completed"), len(ScriptedCLI.instances)
 
-    # The recovered campaign plays its next turn exactly as the never-exported one does. (With
-    # a prose-only CLI this campaign's second turn ends on its required-tool rule, in both.)
+    # The recovered campaign takes its next step exactly as the never-exported one does. (The
+    # prose-only CLI's Retry ends on the same required-tool rule, in both.)
     outcome = next_turn(recovered)
     assert outcome == next_turn(database) and outcome[1] >= 1
     after = evidence(recovered, session)[len(stubs):]
