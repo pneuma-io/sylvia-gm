@@ -1450,6 +1450,19 @@ def _campaign_plan_example(authority: CampaignPlanToolAuthority) -> str:
     """Return one small package-bound example that satisfies the closed plan schema."""
 
     source_path = min(authority.setting_paths)
+    initial_state: dict[str, Any] = {
+        "entities": [],
+        "facts": ["Replace this example fact with the campaign's actual starting state."],
+    }
+    required_keys = {item["key"] for item in authority.state_schemas if item.get("required")}
+    if required_keys:
+        worked = load_builder_skill("BUILD CAMPAIGN PLAN", reference="references/combat-plan.json")
+        mechanics = [
+            row for row in json.loads(worked.text)["initial_state"].get("mechanics", ())
+            if row["namespace"] == authority.ruleset.package_id and row["key"] in required_keys
+        ]
+        if mechanics:
+            initial_state["mechanics"] = mechanics
     payload = {
         "bindings": {
             "campaign_setting": authority.setting.as_payload(),
@@ -1487,10 +1500,7 @@ def _campaign_plan_example(authority: CampaignPlanToolAuthority) -> str:
             "railroading": "Preserve the premise without forcing one solution.",
         },
         "id": "replace-with-campaign-id",
-        "initial_state": {
-            "entities": [],
-            "facts": ["Replace this example fact with the campaign's actual starting state."],
-        },
+        "initial_state": initial_state,
         "intended_player_experience": "Replace with the intended player experience.",
         "objectives": [
             {

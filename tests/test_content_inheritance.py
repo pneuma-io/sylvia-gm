@@ -193,6 +193,8 @@ def test_plan_retains_its_copies_after_new_source_ruleset_is_installed(tmp_path)
     from tests.test_builder_references import open_character_interview
 
     rules, reference, setting = snapshot_drafts()
+    # This locally repackaged Setting is distinct from the bundled world.
+    setting = replace(setting, record={**setting.record, "id": "example.inherited-world"})
     with AuthorityOwner.open(tmp_path / "plan-copies.db", "plan-copies") as owner:
         with materialize_package_archive((rules, reference, setting)) as archive:
             original = owner.install_package_archive(archive.archive, install_id="plan-world")
@@ -210,7 +212,11 @@ def test_plan_retains_its_copies_after_new_source_ruleset_is_installed(tmp_path)
         catalog = _campaign_creation_catalog(tmp_path, owner)
         choice = next(item for item in catalog if item.get("kind") == "ruleset")
         assert choice["version"] == "9.0.0"
-        assert choice["compatible_settings"][0]["ruleset"]["version"] == rules.record["version"]
+        world = next(
+            row for row in choice["compatible_settings"] if row["id"] == setting.record["id"]
+        )
+        assert world["candidate_id"] == original.candidate_id
+        assert world["ruleset"] == sources.ruleset.as_payload()
         draft = open_character_interview(
             owner,
             newer.candidate_id,
