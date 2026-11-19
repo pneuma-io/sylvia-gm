@@ -146,8 +146,8 @@ def test_current_claude_api_models_send_native_effort(model_id):
 
 @pytest.mark.parametrize(("model_id", "alias", "fast", "forced", "binds_thinking"), (
     ("claude-fable-5-2", "fable", True, False, True),
-    ("claude-opus-5-5", "opus", True, False, False),
-    ("claude-sonnet-5-5", "sonnet", False, False, False),
+    ("claude-opus-5-5", "opus", True, False, True),
+    ("claude-sonnet-5-5", "sonnet", False, False, True),
     ("claude-haiku-5-5", "haiku", False, True, False),
 ))
 def test_current_claude_preset_facts_cover_exact_models_and_runtime_aliases(

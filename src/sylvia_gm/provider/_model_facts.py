@@ -70,7 +70,11 @@ _MODEL_FACTS = {
     ("anthropic", "claude-opus-5"): ModelFacts(
         efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
     ),
-    ("anthropic", "claude-opus-5-5"): ModelFacts(efforts=_CLAUDE_EXTENDED_EFFORT, fast=True),
+    # Opus 5.5 and Sonnet 5.5 bind replayed thinking on every account created from 31 August
+    # 2026; a live check on 19 November 2026 found a newly made Console key enforced on both.
+    ("anthropic", "claude-opus-5-5"): ModelFacts(
+        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True, fast=True
+    ),
     ("anthropic", "claude-sonnet-4"): ModelFacts(forced_tool_choice=True, temperature=True),
     ("anthropic", "claude-sonnet-4-5"): ModelFacts(forced_tool_choice=True, temperature=True),
     ("anthropic", "claude-sonnet-4-6"): ModelFacts(
@@ -79,7 +83,9 @@ _MODEL_FACTS = {
     ("anthropic", "claude-sonnet-5"): ModelFacts(
         efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
     ),
-    ("anthropic", "claude-sonnet-5-5"): ModelFacts(efforts=_CLAUDE_EXTENDED_EFFORT),
+    ("anthropic", "claude-sonnet-5-5"): ModelFacts(
+        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True
+    ),
     ("claude_runtime", "claude-fable-5-2"): ModelFacts(context_window=1_000_000),
     ("claude_runtime", "opus"): ModelFacts(context_window=1_000_000),
     ("claude_runtime", "sonnet"): ModelFacts(context_window=1_000_000),

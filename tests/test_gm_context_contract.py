@@ -540,14 +540,17 @@ def test_claude_thinking_replays_byte_for_byte_while_tools_are_unchanged(
     assert gm.recorder.plans < 2 * len(frames), (gm.recorder.plans, len(frames))
 
 
+@pytest.mark.parametrize("model", ["claude-fable-5-2", "claude-opus-5-5", "claude-sonnet-5-5"])
 @pytest.mark.parametrize("restart", [False, True], ids=["same-owner", "after-restart"])
 def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
-    started_campaign, tmp_path, monkeypatch, restart,
+    started_campaign, tmp_path, monkeypatch, restart, model,
 ):
-    """F2 proactive: Fable 5.2 binds thinking to the tool set on every account."""
+    """F2 proactive: these models bind thinking to the tool set (Opus 5.5 and Sonnet 5.5 on
+    every account created from 31 August 2026; a live check on 19 November 2026 returned the
+    400 on the request after a tool change), so no request carries stale thinking."""
     from sylvia_gm.agent._context_ledger import stable_tool_list
 
-    gm = ThinkingGM("claude-fable-5-2", drop_after=2)
+    gm = ThinkingGM(model, drop_after=2)
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
     assert all(r.get("interruption") is None for r in replies), replies
     one, two, three = list(gm.native)[:3]
@@ -604,7 +607,7 @@ def test_a_mid_turn_rebase_keeps_thinking_on_other_models_until_a_rejection(
     started_campaign, tmp_path, monkeypatch,
 ):
     """On models not enforced for every account the reactive rule covers a reset."""
-    gm = ThinkingGM("claude-opus-5-5", rebase_after=2, reject_on=(3,))
+    gm = ThinkingGM("claude-haiku-5-5", rebase_after=2, reject_on=(3,))
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
     assert all(r.get("interruption") is None for r in replies), replies
     one, two = list(gm.native)[:2]
@@ -620,7 +623,7 @@ def test_other_models_keep_thinking_until_the_service_rejects_it_then_retry_once
     started_campaign, tmp_path, monkeypatch,
 ):
     """F2 reactive: a documented 400 strips every replayed block and retries once."""
-    gm = ThinkingGM("claude-opus-5-5", drop_after=2, reject_on=(3,))
+    gm = ThinkingGM("claude-haiku-5-5", drop_after=2, reject_on=(3,))
     replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
     assert all(r.get("interruption") is None for r in replies), replies
     one, two = list(gm.native)[:2]
@@ -636,7 +639,7 @@ def test_other_models_keep_thinking_until_the_service_rejects_it_then_retry_once
 
 
 def test_a_second_thinking_rejection_surfaces(started_campaign, tmp_path, monkeypatch):
-    gm = ThinkingGM("claude-opus-5-5", reject_on=(2, 3))
+    gm = ThinkingGM("claude-haiku-5-5", reject_on=(2, 3))
     replies, _frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm)
     assert replies[0].get("interruption") is not None
     # The first turn made its request, the retry, and nothing more; it surfaced.
