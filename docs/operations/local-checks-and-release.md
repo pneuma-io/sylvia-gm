@@ -134,9 +134,10 @@ Linux runs the same checks with the same runner command, using `.venv/bin/python
 `.venv/Scripts/python.exe`. A complete run took 2 h 50 min on 16 cores with 15.9 GB of
 memory at `--jobs 4 --case-workers 3`. Keep the checkout and the output folder on ext4, xfs or
 btrfs; the saved-file checks need one of those file systems. Cases that run only on Windows are
-excluded by platform and listed in `summary.json`. Windows remains the platform for release
-builds and for installer and updater qualification. [Linux development](linux-development.md)
-covers setting up a machine.
+excluded by platform and listed in `summary.json`. Windows remains the platform for the Windows
+release build and for installer and updater qualification; the Linux AppImage is built and
+checked on Linux with the [Linux release checklist](linux-release-checklist.md).
+[Linux development](linux-development.md) covers setting up a machine.
 
 A complete run can also be split across several machines with `--machine-share I/N` and joined
 with `scripts/merge_machine_shares.py`; see
@@ -170,19 +171,23 @@ a stalled read expires at one virtual second. These timings test the selected be
 
 ## From checked source to a release
 
-After the selected PRs are combined, qualify that exact source and build its installer and
-portable package with the [tracked release recipe](../../README.md#build-from-source).
+After the selected PRs are combined, qualify that exact source and build its Windows installer
+and portable package ([Windows release checklist](windows-release-checklist.md)) and its Linux
+AppImage ([Linux release checklist](linux-release-checklist.md)) from that same commit.
 Retain source, owner and artifact identities and required notices.
 
 Scripted tests cover deterministic behavior. Real-provider replies, packaged builds and native
-Windows interaction have separate acceptance checks in the [Development Process](quality-preserving-development-process.md#5-installed-app-verification).
+interaction on each system have separate acceptance checks: for Windows in the
+[Development Process](quality-preserving-development-process.md#5-installed-app-verification),
+and for Linux in the [installed-application pass](linux-release-checklist.md#5-installed-application-pass).
 Use the selected test environment and data, record actual outcomes and remaining gaps, and obtain
 owner release approval. Source checks and a PR merge do not grant release approval.
 
 ## Versions, tags and channel
 
 - A release version is plain `X.Y.Z`, for example `0.4.1`. Its tag is `vX.Y.Z`, and its files
-  use the same version, such as `sylvia-gm-0.4.1-windows-x86_64-portable.zip`.
+  use the same version, such as `sylvia-gm-0.4.1-windows-x86_64-portable.zip`. The Linux release
+  folder is `sylvia-gm-0.4.1-linux-x86_64`; the AppImage takes its version from the same files.
 - The release channel is declared in code, not read from the version: `__release_channel__` in
   `src/sylvia_gm/__init__.py` and `RELEASE_CHANNEL` in `src-tauri/src/lib.rs`. Both say `alpha`
   today. The release version check fails if they differ.

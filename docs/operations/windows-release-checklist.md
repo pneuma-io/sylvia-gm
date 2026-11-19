@@ -140,7 +140,8 @@ Publishing needs the owner's release approval from step 5. Follow
 [Versions, tags and channel](local-checks-and-release.md#versions-tags-and-channel) for the
 version, the tag and the file names. While the declared channel is `alpha`, publish the GitHub
 release as a Pre-release, even when the tag is plain (`v0.4.1`): the Pre-release mark is what
-places a plain tag in the alpha channel for the updater.
+places a plain tag in the alpha channel for the updater. From 0.4.1 the same release also holds
+the Linux files ([Linux release checklist, Publish](linux-release-checklist.md#6-publish)).
 
 A fuller publishing procedure: Not documented in this repository.
 

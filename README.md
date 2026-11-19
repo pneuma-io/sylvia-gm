@@ -18,6 +18,22 @@ TTRPGs to your individual tastes.
 - Create and refine rulesets, settings, campaign plans and characters in Builder.
 - Save your campaign and return to its characters, history and progress.
 
+## Install
+
+Sylvia runs on Windows x64 and, from 0.4.1, on x86_64 Linux. Download the files for your system
+from the [releases page](https://github.com/pneuma-io/sylvia-gm/releases) and check them against
+the release's `SHA256SUMS.txt`. Alpha builds are unsigned.
+
+- **Windows:** run the installer, or extract the whole portable ZIP and open `Sylvia GM.exe`.
+  Microsoft Edge WebView2 is required.
+- **Linux:** download the `.AppImage` file, make it executable (`chmod +x` on the file), then run
+  it. It needs glibc 2.35 or newer (Ubuntu 22.04, Debian 12, Fedora 36 or later) and FUSE 2
+  (`libfuse2` on Ubuntu and Debian); without FUSE 2, run it with `--appimage-extract-and-run`.
+  Sylvia keeps its data in `~/.local/share/com.pneuma-io.sylvia-gm`, readable only by you. Saved
+  API keys are encrypted with a key file in `~/.local/state/sylvia-gm/`; there is no desktop
+  keyring support yet. Dictation and in-app updates are not in the Linux app yet: a new version
+  is a new AppImage. Sound effects need PulseAudio or PipeWire.
+
 ## Choose your AI
 
 Connect a supported hosted provider or an already-running local model server. Manage connections
@@ -27,21 +43,32 @@ depend on your hardware and their ability to follow instructions and use tools.
 For ChatGPT account connections, Sylvia requires the supported
 [Codex runtime](https://developers.openai.com/codex/cli/) to be installed separately. Available models
 and account access depend on your provider; a connection option does not guarantee compatibility
-with every account or model.
+with every account or model. On Linux, Sylvia looks for the `codex` program on its `PATH`. If
+Sylvia started from the application menu cannot find a Codex that works in your terminal, start
+Sylvia from that terminal, or link `codex` into a folder such as `~/.local/bin`.
 
 The Claude account connection needs no separate install. In Settings > Accounts > Claude, Sylvia
 downloads its own copy of Claude Code from Anthropic, unmodified, and keeps that copy, its
 settings and its sign-in in Sylvia's own data folder. A Claude Code you already use is never
-changed. Sign in there and add a model. Usage follows the account you sign in with; the Anthropic
-API-key connection stays separate. Automatic setup is Windows only for now. See
+changed. Sign in there and add a model; the sign-in opens your browser. Usage follows the account
+you sign in with; the Anthropic API-key connection stays separate. Automatic setup works on
+Windows and Linux. On Linux, Sylvia checks Anthropic's signature on the download with `gpgv`, part
+of GnuPG; if it is missing, install GnuPG and try again. See
 [how setup works, Anthropic's terms and the current verification limits](docs/research/claude-dedicated-instance-2026-11-12.md),
 including headless setup for SylviaBench.
+
+Sylvia keeps one Claude Code process running for each Game Master session, so a turn's steps
+do not each wait for Claude Code to start. To start a new process for every step instead, as
+before 0.4.1, set the environment variable `SYLVIA_CLAUDE_PROCESS=per-step` before starting
+Sylvia.
 
 ## Included content
 
 SRD Lite is based on the D&D SRD 5.2.1, with 117 supported spells and a deliberately limited launch
-scope. Consumables are outside this Lite release. Severed Lands supplies the included setting and
-adventures.
+scope. Consumables are outside this Lite release. The bundled version is SRD Lite 0.3.26; an
+existing campaign keeps its own version until you choose **Update campaign rules** in Settings >
+Campaign data. That update is one-way, so export the campaign first if you might want the earlier
+rules back. Severed Lands supplies the included setting and adventures.
 
 Home's **Ready campaigns** previews four existing adventures with complete prepared parties:
 A Debt in Iron, Last Cart Through, The Cartographer's Wake and The Rift Awakening.
@@ -69,7 +96,9 @@ process to exit before reopening the same data directory. A desktop or another h
 using that directory is rejected by the owner's writer lock.
 
 Source users can use `python -m sylvia_gm --webui --data-root "D:\Sylvia-browser-data"`
-with the existing project environment. Both paths use the same host and owner contracts.
+with the existing project environment. Both paths use the same host and owner contracts. The
+Linux AppImage has no separate host program beside it; on Linux, use the source command with a
+Linux data folder.
 
 For a private user-managed Tailscale HTTPS proxy, choose a fixed loopback port and supply
 the exact lowercase HTTPS origin and your access-key file:
@@ -138,7 +167,9 @@ These are future directions, not features included in the current Alpha. Priorit
 ## Build from source
 
 These instructions are for Windows source development. Playing an existing build does not require
-the development toolchain.
+the development toolchain. On Linux, one script sets up a development machine; see
+[Linux development](docs/operations/linux-development.md). The Linux desktop build is described
+in the [Linux release checklist](docs/operations/linux-release-checklist.md).
 
 Install these prerequisites:
 
@@ -195,9 +226,10 @@ Append a test file to run a focused check, for example
 `tests/test_srd_lite_dispel_decision_widgets.py`. Root pytest supplies the import paths and
 default fixture; its disposable data stays outside the checkout.
 
-The supported-journey gate runs locally. GitHub Actions is dispatch-only: pushing a branch or
-opening a PR does not start it. To select affected checks against current main, choose a fresh
-output directory for each run and use:
+The supported-journey gate runs on your own machine, or split across several Linux machines
+([Split a complete run across machines](docs/operations/linux-development.md#split-a-complete-run-across-machines)).
+GitHub Actions is dispatch-only: pushing a branch or opening a PR does not start it. To select
+affected checks against current main, choose a fresh output directory for each run and use:
 
 ```powershell
 # The runner uses normal plugin autoload after the direct-pytest example above.
@@ -219,7 +251,8 @@ selected for the candidate; the Python/Node gate alone does not qualify a releas
 Node and browser checks also need a supported [Node.js LTS](https://nodejs.org/en/download) with
 npm. The [browser-test lockfile](tests/package-lock.json) requires Node 20 or newer and pins
 Playwright 1.62.1. Install those dependencies from the repository root with `npm --prefix tests ci`.
-Windows browser checks use Microsoft Edge; see the [Playwright browser setup](https://playwright.dev/docs/browsers)
+Windows browser checks use Microsoft Edge; Linux browser checks use Playwright's Chromium, which
+`scripts/setup_linux_dev.sh` installs. See the [Playwright browser setup](https://playwright.dev/docs/browsers)
 for browser installation details. These are test prerequisites, separate from running Sylvia.
 
 See the [development process](docs/operations/quality-preserving-development-process.md) for
@@ -231,6 +264,9 @@ for implementation details.
 - [Documentation index](docs/INDEX.md)
 - [Builder content reference](docs/reference/content-formats.md)
 - [Included content, compatibility and verification status](docs/launch-compatibility.md)
+- [Linux development](docs/operations/linux-development.md), and the
+  [Windows](docs/operations/windows-release-checklist.md) and
+  [Linux](docs/operations/linux-release-checklist.md) release checklists
 - [Alpha readiness and remaining release work](docs/plans/alpha-rebuild-readiness-plan.md)
 - [Website](https://pneuma-io.dev/sylvia-gm/)
 

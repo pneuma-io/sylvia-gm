@@ -1,8 +1,10 @@
 # Linux development
 
-Linux is a development and test platform for Sylvia GM. This page is for a developer or agent
-starting on a new Linux machine. The Linux app for players is built as described in the
-[Linux release checklist](linux-release-checklist.md). The Windows release build, the installer
+Linux is a development and test platform for Sylvia GM and, from 0.4.1, a platform players can
+install it on. This page is for a developer or agent starting on a new Linux machine. The Linux
+app for players is an AppImage, built as described in the
+[Linux release checklist](linux-release-checklist.md); the [README](../../README.md#install)
+says how a player starts it. The Windows release build, the installer
 and the updater stay on Windows; see [What stays on Windows](#what-stays-on-windows).
 
 ## What you need
