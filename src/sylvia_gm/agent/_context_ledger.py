@@ -198,21 +198,37 @@ FIXED_TOOL_LIST = "fixed"
 ROUND_TOOL_LISTS = "rounds"
 CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
 
+#: Routes named by connection rather than transport. Other services also speak
+#: ``anthropic_messages`` (OpenCode Zen and Go, MiniMax, custom Messages endpoints); only
+#: the first-party Claude API connection (provider ``anthropic``) is ``anthropic_api``.
+ANTHROPIC_API_ROUTE = "anthropic_api"
+_CONNECTION_ROUTES: Mapping[tuple[str, str], str] = {
+    ("anthropic", "anthropic_messages"): ANTHROPIC_API_ROUTE,
+}
+
+
+def gm_route(transport: str | None, provider_key: str | None = None) -> str:
+    """The route name the shipped defaults are keyed by: the transport, or a connection."""
+    return _CONNECTION_ROUTES.get((provider_key or "", transport or ""), transport or "")
+
+
 #: The tool list a route uses when ``SYLVIA_GM_TOOL_LIST`` does not name one. A route ships
 #: with per-round lists unless it is named here. A route is moved to one list, by its
-#: transport name, once a measured run on that route supports it.
-#: ``claude_code`` and ``codex_app_server``: see ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``;
-#: measured together.
+#: route name (``gm_route``), once a measured run on that route supports it.
+#: ``claude_code``, ``codex_app_server`` and ``anthropic_api``: see
+#: ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``; each measured together with the ledger.
 DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
 DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
     "claude_code": STABLE_TOOL_LIST, "codex_app_server": STABLE_TOOL_LIST,
+    ANTHROPIC_API_ROUTE: STABLE_TOOL_LIST,
 }
 
 
 def stable_tool_list(
     environ: Mapping[str, str] | None = None, *, transport: str | None = None,
+    provider_key: str | None = None,
 ) -> bool:
-    """Whether ledger mode sends one tool list for the session on *transport*.
+    """Whether ledger mode sends one tool list for the session on this route.
 
     ``SYLVIA_GM_TOOL_LIST=stable``, ``=fixed`` or ``=rounds`` decides for every route.
     Without it (or with any other value) the route's shipped default applies.
@@ -220,7 +236,8 @@ def stable_tool_list(
     value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
     setting = value.strip().casefold()
     if setting not in {STABLE_TOOL_LIST, ROUND_TOOL_LISTS, FIXED_TOOL_LIST}:
-        setting = DEFAULT_TOOL_LIST_BY_TRANSPORT.get(transport or "", DEFAULT_TOOL_LIST)
+        setting = DEFAULT_TOOL_LIST_BY_TRANSPORT.get(
+            gm_route(transport, provider_key), DEFAULT_TOOL_LIST)
     return setting in {STABLE_TOOL_LIST, FIXED_TOOL_LIST}
 
 
@@ -232,14 +249,21 @@ def fixed_tool_list(environ: Mapping[str, str] | None = None) -> bool:
 
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
 #: A route ships with the previous assembly unless it is named here. A route is moved to the
-#: context ledger, by its transport name, once a measured run on that route supports it.
+#: context ledger, by its route name (``gm_route``), once a measured run on that route
+#: supports it.
 #: ``claude_code`` (a Claude subscription through Claude Code) and ``codex_app_server`` (a
 #: ChatGPT subscription through the Codex runtime, which also keeps its runtime thread): a
 #: measured fight ended every turn in ledger mode with one tool list, read most later input
 #: from the provider cache and was no slower.
+#: ``anthropic_api`` (a Claude API key on api.anthropic.com), measured live on 19 November
+#: 2026: the previous assembly had every multi-round fight turn rejected on Fable 5.2, Opus 5.5
+#: and Sonnet 5.5 (a replayed thinking block after the system text and tools changed), while
+#: the ledger with one tool list ended every turn on all four current models and read 88-96%
+#: of later input from the provider cache.
 DEFAULT_CONTEXT_MODE = LEGACY_MODE
 DEFAULT_CONTEXT_MODE_BY_TRANSPORT: Mapping[str, str] = {
     "claude_code": LEDGER_MODE, "codex_app_server": LEDGER_MODE,
+    ANTHROPIC_API_ROUTE: LEDGER_MODE,
 }
 
 
@@ -251,8 +275,9 @@ def context_mode_setting(environ: Mapping[str, str] | None = None) -> str | None
 
 def context_mode(
     environ: Mapping[str, str] | None = None, *, transport: str | None = None,
+    provider_key: str | None = None,
 ) -> str:
-    """The request assembly for GM play on *transport*.
+    """The request assembly for GM play on this route (*transport*, or the connection).
 
     ``SYLVIA_GM_CONTEXT_MODE=ledger`` or ``=legacy`` decides for every route. Without it (or
     with any other value) the route's shipped default applies.
@@ -260,7 +285,8 @@ def context_mode(
     setting = context_mode_setting(environ)
     if setting is not None:
         return setting
-    return DEFAULT_CONTEXT_MODE_BY_TRANSPORT.get(transport or "", DEFAULT_CONTEXT_MODE)
+    return DEFAULT_CONTEXT_MODE_BY_TRANSPORT.get(
+        gm_route(transport, provider_key), DEFAULT_CONTEXT_MODE)
 
 
 def host_seal(session_id: str) -> str:

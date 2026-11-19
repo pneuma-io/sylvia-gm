@@ -481,7 +481,10 @@ def started_campaign(tmp_path_factory):
     return database, campaign, session, player
 
 
-def _thinking_run(started_campaign, tmp_path, monkeypatch, gm, *, restart: bool = False):
+def _thinking_run(started_campaign, tmp_path, monkeypatch, gm, *, restart: bool = False,
+                  tool_list: str | None = "rounds"):
+    """Per-round tool lists unless *tool_list* names another setting (None: the route's
+    shipped default, one list on the first-party Claude API)."""
     import shutil
 
     from sylvia_gm.agent._working_context import WorkingContextProvider
@@ -490,6 +493,10 @@ def _thinking_run(started_campaign, tmp_path, monkeypatch, gm, *, restart: bool 
     database = tmp_path / "thinking.sqlite3"
     shutil.copyfile(base, database)
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    if tool_list is None:
+        monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", tool_list)
     original = WorkingContextProvider._request_tools
 
     def request_tools(self, tools):
@@ -540,10 +547,11 @@ def test_claude_thinking_replays_byte_for_byte_while_tools_are_unchanged(
     assert gm.recorder.plans < 2 * len(frames), (gm.recorder.plans, len(frames))
 
 
+@pytest.mark.parametrize("tool_list", ["rounds", None], ids=["per-round", "route-default"])
 @pytest.mark.parametrize("model", ["claude-fable-5-2", "claude-opus-5-5", "claude-sonnet-5-5"])
 @pytest.mark.parametrize("restart", [False, True], ids=["same-owner", "after-restart"])
 def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
-    started_campaign, tmp_path, monkeypatch, restart, model,
+    started_campaign, tmp_path, monkeypatch, restart, model, tool_list,
 ):
     """F2 proactive: these models bind thinking to the tool set (Opus 5.5 and Sonnet 5.5 on
     every account created from 31 August 2026; a live check on 19 November 2026 returned the
@@ -551,12 +559,15 @@ def test_changed_tools_strip_older_thinking_on_every_account_enforced_models(
     from sylvia_gm.agent._context_ledger import stable_tool_list
 
     gm = ThinkingGM(model, drop_after=2)
-    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart)
+    replies, frames = _thinking_run(started_campaign, tmp_path, monkeypatch, gm, restart=restart,
+                                    tool_list=tool_list)
     assert all(r.get("interruption") is None for r in replies), replies
     one, two, three = list(gm.native)[:3]
     calls = [_replayed(call) for call in gm.calls]
     assert calls[1][one] == ["thinking", "tool_use"]
-    one_list = stable_tool_list(transport="anthropic_messages")
+    one_list = stable_tool_list(transport="anthropic_messages", provider_key="anthropic")
+    # The first-party Claude API ships one tool list; per-round lists are the opt-out.
+    assert one_list is (tool_list is None)
     assert {f.observation["one_tool_list"] for f in frames} == {one_list}
     if one_list:
         # One tool list: the tool the turn loop stops offering is still sent, so the sent

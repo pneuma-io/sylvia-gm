@@ -1737,11 +1737,13 @@ class ProviderSessionAdapter:
         self._legacy_alias_changes: dict[str, dict[str, str | None]] = {}
         # Read once per adapter. The previous request assembly is the shipped default;
         # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
-        self._context_mode = context_mode(
-            transport=getattr(getattr(provider, "model_info", None), "transport", None))
+        # A route is its transport, or a named connection (the first-party Claude API).
+        model_info = getattr(provider, "model_info", None)
+        route = {"transport": getattr(model_info, "transport", None),
+                 "provider_key": getattr(model_info, "provider_key", None)}
+        self._context_mode = context_mode(**route)
         self._fixed_tool_list = fixed_tool_list()
-        self._one_tool_list = stable_tool_list(
-            transport=getattr(getattr(provider, "model_info", None), "transport", None))
+        self._one_tool_list = stable_tool_list(**route)
         self._context_ledgers: dict[str, ContextLedger] = {}
         self._timeout = timeout
         self._gm_system_prompt = gm_system_prompt
