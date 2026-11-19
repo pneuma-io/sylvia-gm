@@ -13,17 +13,9 @@ class KnownDefect:
 
 
 KNOWN_DEFECTS: dict[str, KnownDefect] = {
-    "tests/test_effective_interview_content.py::test_setting_selection_retains_its_rules_and_builder_sources_after_catalog_refresh": KnownDefect(
-        "Refreshing the catalog rejects an explicitly retained older Setting selection",
-        "Choose the original Setting in an interview, refresh the catalog to its updated identity, then capture the Builder launch references.",
-    ),
     "tests/test_campaign_plan_skill_examples.py::test_builder_retrieves_a_complete_valid_example_from_its_advertised_references": KnownDefect(
         "The advertised worked Plan reference has stale package bindings",
         "Load the Plan skill's combat/multi-act examples and compare/admit their bindings against the bundled source closure.",
-    ),
-    'tests/test_owned_package_updates.py::test_plan_adopts_complete_source_and_keeps_explicit_custom_declarations[setting]': KnownDefect(
-        'An existing Setting source becomes unavailable when launching its Plan Builder after an update',
-        'Install original and updated Setting sources, then launch a Plan Builder against the original saved candidate.',
     ),
     'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
         "The Builder's advertised Plan example fails its declared content schema",
