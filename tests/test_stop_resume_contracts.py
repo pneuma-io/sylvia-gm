@@ -2,16 +2,18 @@
 
 Each case starts one GM turn for a player input, optionally commits that turn's one mechanic,
 and then ends it either with the player's Stop or with a provider failure. It then applies one
-order of Retry, a second Retry identity, new player input (a redirection) and owner reopen to
-the real owner and SQLite database: every distinct two-step order, plus every order that
-resolves the interruption, reopens and asks again. After every step the observed state is
+order of Retry, a second Retry identity, a new message sent as a redirection, a plain new message
+and owner reopen to the real owner and SQLite database: every distinct two-step order, plus every
+order that resolves the interruption, reopens and asks again. After every step the observed state is
 compared with a small reference model of the written promises:
 
 - architecture contract section 7.3: reusing an action or retry identity returns the stored
   outcome without running mechanics again;
 - section 8.3: Retry reuses the committed result and never reruns the action; cancellation drops
   incomplete narration; after a settled Stop, new input redirects the unfinished continuation and
-  durably supersedes the Retry opportunity, so stale requests and reopening cannot revive it;
+  durably supersedes the Retry opportunity, so stale requests and reopening cannot revive it.
+  The owner applies that to a plain message too, as the desktop composer does: after a settled
+  Stop it is the redirection, and after a failure it is refused and nothing is saved;
 - section 9.3 and the product contract section 5: the Retry state survives reopening and Stop is
   not undo and grants no extra action.
 
@@ -58,7 +60,7 @@ ACTION = "contract-action"
 UNFINISHED = "UNFINISHED-PROSE-MUST-NOT-SURVIVE"
 CONTINUED = "The saved outcome is narrated once."
 STORED_RESULT = {"before": 0, "after": 4}
-STEPS = ("retry-a", "retry-b", "redirect", "reopen")
+STEPS = ("retry-a", "retry-b", "redirect", "message", "reopen")
 
 
 def _distinct_orders(length: int) -> tuple[tuple[str, ...], ...]:
@@ -92,16 +94,21 @@ class Promise:
     executed: bool
     open: bool = True
     resolved_by: str | None = None
+    narrated: int = 0
 
     def expect(self, step: str) -> str:
         """Return accept, replay or reject for a step, and record its promised effect."""
 
         if step == "reopen":
             return "accept"
-        if step == "redirect" and not self.stopped:
+        if step in ("redirect", "message") and self.open and not self.stopped:
             return "reject"
         if self.open:
             self.open, self.resolved_by, self.executed = False, step, True
+            self.narrated += 1
+            return "accept"
+        if step == "message":  # with nothing interrupted, a message is an ordinary new turn
+            self.narrated += 1
             return "accept"
         if step.startswith("retry") and step == self.resolved_by:
             return "replay"
@@ -230,10 +237,10 @@ def _apply(
         run.reopen()
         return "accept", ()
     try:
-        if step == "redirect":
+        if step in ("redirect", "message"):
             result = run.loop.run(SessionRunRequest(
-                SESSION, TURN, f"redirect-{number}", f"redirect-input-{number}", "Talk instead",
-                redirect_interruption_id=interruption_id,
+                SESSION, TURN, f"{step}-{number}", f"{step}-input-{number}", "Talk instead",
+                redirect_interruption_id=interruption_id if step == "redirect" else None,
             ), provider)
             return "accept", result.canonical
         retried = run.loop.retry(
@@ -261,7 +268,7 @@ def _broken_promises(run: _Run, promise: Promise) -> list[str]:
         broken.append(f"campaign revision is {snapshot.revision}")
     if UNFINISHED in repr(projection) or UNFINISHED in repr(snapshot.events):
         broken.append("unfinished prose from the stopped attempt was kept")
-    if len(narrated) != int(promise.resolved_by is not None):
+    if len(narrated) != promise.narrated:
         broken.append(f"the recovered narration is saved {len(narrated)} times")
     if len(retries) != int(promise.open):
         broken.append(f"{len(retries)} Retry offers are shown")
@@ -284,16 +291,20 @@ def _check_order(
         first_resolution: tuple[object, ...] = ()
         for number, step in enumerate(order, start=1):
             seen: list[object] = []
-            receipt = STORED_RESULT if promise.executed else None
+            receipt = STORED_RESULT if promise.executed and promise.open else None
+            saved = len(run.owner.session_context(SESSION).messages)
             expected = promise.expect(step)
             outcome, canonical = _apply(run, step, number, interruption_id, seen)
             label = f"step {number} ({step})"
             if outcome != expected:
                 failures.append(f"{label}: expected {expected}, owner gave {outcome}")
+            elif outcome == "reject" and len(run.owner.session_context(SESSION).messages) != saved:
+                failures.append(f"{label}: the refused request saved session messages")
             if expected == "accept" and step != "reopen":
                 if seen != [receipt]:
                     failures.append(f"{label}: recovery saw {seen}, expected [{receipt}]")
-                first_resolution = canonical
+                if promise.resolved_by == step and promise.narrated == 1:
+                    first_resolution = canonical
             elif seen:
                 failures.append(f"{label}: a provider ran for a {expected}ed step")
             if expected == "replay" and canonical != first_resolution:
@@ -320,13 +331,12 @@ def test_recovery_order_keeps_the_stop_and_resume_promises(
 def test_the_checked_orders_are_the_documented_set() -> None:
     """Guard the enumeration itself, so a refactor cannot silently shrink the checked orders."""
 
-    assert len(_distinct_orders(2)) == 9
-    assert ORDERS[9:] == (
-        ("redirect", "reopen", "redirect"),
-        ("redirect", "reopen", "retry-a"),
-        ("retry-a", "reopen", "redirect"),
-        ("retry-a", "reopen", "retry-a"),
-        ("retry-a", "reopen", "retry-b"),
-    )
-    assert ("reopen", "redirect") in ORDERS and ("retry-a", "retry-b") in ORDERS
+    assert len(_distinct_orders(2)) == 16
+    assert ORDERS[16:] == tuple(
+        (first, "reopen", then)
+        for first in ("message", "redirect", "retry-a")
+        for then in ("message", "redirect", "retry-a")
+    ) + (("retry-a", "reopen", "retry-b"),)
+    assert ("message", "retry-a") in ORDERS and ("retry-a", "message") in ORDERS
+    assert ("reopen", "message") in ORDERS and ("retry-a", "retry-b") in ORDERS
     assert not any(order[0] == "retry-b" for order in ORDERS)
