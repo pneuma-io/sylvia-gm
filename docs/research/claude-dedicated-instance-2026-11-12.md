@@ -52,8 +52,19 @@ plain failure:
 Sylvia does not bundle or redistribute Claude Code, does not run `claude install` or
 `claude update`, and does not change `PATH`. Updating happens only when the person presses
 "Check for a newer version"; the previous copy is removed after the new one passes its checks.
-The manifest's GPG signature is not checked; the Windows code signature serves that purpose.
-Automatic setup is Windows only in this version. Other platforms get a clear refusal.
+On Windows the manifest's GPG signature is not checked; the Windows code signature serves that
+purpose.
+
+**Linux, added for 0.4.1 (pull request 177).** Sylvia installs `linux-x64` or `linux-arm64`
+(with `-musl` on a musl C library) from the same channel, as `install/<version>/claude`, and
+marks it executable. Anthropic does not code-sign Linux binaries, so before any download Sylvia
+checks the exact `manifest.json` bytes against its detached `manifest.json.sig` with `gpgv`,
+using only Anthropic's published release key (`downloads.claude.ai/keys/claude-code.asc`,
+fingerprint `31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE`); the binary must then match
+the SHA-256 in that signed list. A missing or bad signature, another key, or no `gpgv` on the
+system fails closed and installs nothing. Claude Code gets the desktop session's display, D-Bus
+and browser settings so its sign-in can open the person's browser. Other systems still get a
+clear refusal.
 
 ## Anthropic's terms
 

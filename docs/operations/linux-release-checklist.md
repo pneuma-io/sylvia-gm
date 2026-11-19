@@ -113,6 +113,15 @@ cd dist/sylvia-gm-<version>-linux-x86_64 && sha256sum -c SHA256SUMS.txt
 - **Saved provider keys** are encrypted with a per-user key file
   ([Provider keys](linux-development.md#provider-keys-on-shared-or-rented-machines)). There is no
   desktop keyring in front of it yet.
+- **Claude subscription:** not bundled. As on Windows, the Claude page downloads Sylvia's own copy
+  of Claude Code from Anthropic (`linux-x64`, or `-musl` on a musl system). Anthropic does not
+  code-sign Linux builds, so Sylvia first checks the release's signed `manifest.json` with
+  `gpgv` against Anthropic's published release key, then the download's SHA-256. Without `gpgv`
+  (GnuPG) nothing is installed and the page asks for GnuPG. The sign-in opens the desktop's
+  browser.
+- **ChatGPT account:** the Codex runtime is installed separately and found on `PATH`. An app
+  started from the desktop's menu can have a shorter `PATH` than a terminal; the missing-runtime
+  message says how to fix that.
 - **Bundled system libraries:** the AppImage carries the web view (WebKitGTK), GTK and the
   libraries they need, copied from the build machine's packages. `dependency-notices.txt`
   describes the Python and Rust components, not these. The builder therefore writes
@@ -197,14 +206,20 @@ A hidden display does not show how the app looks and behaves in a real desktop s
 these in one, on at least one release candidate per release: drawing with the desktop's own
 compositing (including a Wayland session), the open drop-down lists and file dialogs in the
 desktop's theme, starting from the application menu (which decides whether separately installed
-programs such as the Codex runtime are found), the clipboard, and detached panel windows.
+programs such as the Codex runtime are found), the clipboard, and detached panel windows. The
+scripted pass installs nothing and signs in nowhere, so also use **Install Claude Code for Sylvia**
+and **Sign in with Claude Code** on the Claude page in that session: the download passes its
+signature and checksum checks and the sign-in opens the desktop's browser.
 
 ## 6. Publish
 
 Publishing is the release owner's step and is the same for both systems: attach the AppImage,
 `release-manifest.json`, `SHA256SUMS.txt` and `LINUX-BUNDLED-LIBRARIES.txt` to the GitHub release
-that holds the Windows files, marked Pre-release. Say in the release notes which distributions the build was checked on and
-what the Linux build leaves out.
+that holds the Windows files, marked Pre-release. Say in the release notes which distributions
+the build was checked on, what the Linux build leaves out
+([section 4](#4-what-the-linux-build-carries-and-leaves-out)), and how a person starts a
+downloaded AppImage: `chmod +x` first, and FUSE 2 or `--appimage-extract-and-run`
+([section 5](#5-installed-application-pass)).
 
 ## 7. Record
 

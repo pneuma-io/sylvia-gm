@@ -14,7 +14,8 @@ Native Windows and live-provider acceptance remain separate evidence layers. Bro
 
 The reviewed combined code/content import is private Git commit
 `cebc66f2245af071f6b2f4cfdeeefbeb980a70de`, followed by the README correction
-`56b0164885834ccac2a1c6f1f98607da2b0202a1`. Current SRD Lite is 0.3.14, primary content
+`56b0164885834ccac2a1c6f1f98607da2b0202a1`. SRD Lite at that import was 0.3.14 (main now
+bundles 0.3.26; see `rulesets/srd-lite/package-identity.json`), primary content
 identity `e07292d409287b5f7a31062d369f12fb8243736b5c286a8d9ced683d10b596e0`.
 This successor retains base species Speed during advancement, validates resulting walking Speed,
 and displays the computed result before confirmation. The optional Speed result row preserves
@@ -106,8 +107,9 @@ This mechanism never sweeps older builds, another live invocation, user database
 Final Windows checks must cover installed/portable coexistence, same-dataset refusal,
 save/reopen, portable folder movement and updates, required notice delivery, and credential
 re-entry after moving to another Windows account. DPAPI protects credentials for the current
-user; folder portability does not make credentials portable. Linux is not a supported player
-platform yet; there, saved credentials are sealed with a per-user key file outside the data
+user; folder portability does not make credentials portable. On Linux, a player platform from
+0.4.1 (see the [Linux release checklist](operations/linux-release-checklist.md)), saved
+credentials are sealed with a per-user key file outside the data
 folder, which guards a settings file copied on its own but not a whole-home copy from
 an unencrypted disk or another program running as the same user. Use selected synthetic data,
 never record credentials, and keep genuine-provider and final native-input results separate.
