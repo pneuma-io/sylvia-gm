@@ -17,10 +17,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Refreshing the catalog rejects an explicitly retained older Setting selection",
         "Choose the original Setting in an interview, refresh the catalog to its updated identity, then capture the Builder launch references.",
     ),
-    "tests/test_campaign_act_markers.py::test_markdown_only_plans_and_builder_chats_have_no_invented_acts": KnownDefect(
-        "An unstructured new campaign history read queries an absent continuity table",
-        "Create the ordinary markdown-only Builder-to-DM handoff, then read its history page.",
-    ),
     "tests/test_campaign_plan_skill_examples.py::test_builder_retrieves_a_complete_valid_example_from_its_advertised_references": KnownDefect(
         "The advertised worked Plan reference has stale package bindings",
         "Load the Plan skill's combat/multi-act examples and compare/admit their bindings against the bundled source closure.",
