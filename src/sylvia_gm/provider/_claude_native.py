@@ -45,6 +45,8 @@ class NativeCollection:
     status: str  # "collected" or "unknown"
     records: tuple[dict[str, Any], ...] = ()
     reason: str | None = None
+    #: For a call a kept process answered in place: the CLI's own stored tool-result message.
+    answer: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -61,6 +63,9 @@ class NativeRoute:
     entry_count: int
     boundaries: tuple[int, ...] = ()
     native_records: Mapping[int, Sequence[Mapping[str, Any]]] = field(default_factory=dict)
+    #: For a boundary whose request a kept process served by answering its waiting call: the
+    #: tool-result message that process stored, so a fresh process replays it exactly.
+    native_answers: Mapping[int, Mapping[str, Any]] = field(default_factory=dict)
     #: Called once after the step with what collection found (only on a completed step).
     on_collected: Callable[[NativeCollection], Awaitable[None]] | None = None
 
@@ -344,3 +349,54 @@ def collect(session_file: Path | None, prompt_content: Any) -> NativeCollection:
             copied["renderedRole"] = row["renderedRole"]
         records.append(copied)
     return NativeCollection("collected", tuple(records))
+
+
+def _answer_row(rows: list[dict[str, Any]], call_id: str) -> int | None:
+    for index in range(len(rows) - 1, -1, -1):
+        message = rows[index].get("message")
+        content = message.get("content") if isinstance(message, dict) else None
+        if (
+            rows[index].get("type") == "user"
+            and isinstance(content, list)
+            and content
+            and isinstance(content[0], dict)
+            and content[0].get("type") == "tool_result"
+            and content[0].get("tool_use_id") == call_id
+        ):
+            return index
+    return None
+
+
+def collect_answer(
+    config: Path, session_id: str, call_id: str, limit: float = 2.0,
+) -> NativeCollection:
+    """The tool-result message a kept process stored when its waiting call was answered.
+
+    A kept process answers a call in place (the MCP tool result carries the result and the
+    sealed records after it), so its conversation holds one nested tool-result message where a
+    per-step transcript has the result, a filler and a separate prompt. Copying the CLI's own
+    stored message, and the rendered context records it wrote after it, lets a later fresh
+    process replay exactly what the kept one sent. ``unknown`` (never raises) when it is
+    missing.
+    """
+    deadline = time.monotonic() + limit
+    while True:
+        files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
+        rows = _rows(files[0]) if files else []
+        index = _answer_row(rows, call_id)
+        if index is not None:
+            records = []
+            for row in rows[index + 1:]:
+                if row.get("type") in {"user", "assistant"}:
+                    break
+                if row.get("type") == "attachment" and row.get("rendered"):
+                    copied = {"attachment": row.get("attachment"), "rendered": row["rendered"]}
+                    if "renderedRole" in row:
+                        copied["renderedRole"] = row["renderedRole"]
+                    records.append(copied)
+            return NativeCollection(
+                "collected", tuple(records), answer=json.loads(json.dumps(rows[index]["message"])),
+            )
+        if time.monotonic() >= deadline:
+            return NativeCollection("unknown", reason="answer_record_missing")
+        time.sleep(0.02)

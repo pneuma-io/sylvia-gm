@@ -15,10 +15,12 @@ later request that extends exactly what the process holds continues it through s
 Anything else (a Retry, a compaction, a changed system text or tool list, another model) starts
 a fresh process from the saved transcript, as before.
 
-The kept process is opt-in, with ``SYLVIA_CLAUDE_PROCESS=persistent``. The default is a new
-process for every step: in the live check for issue 171 a fresh start after calls
-answered in place read only the prefix before the first answered call from the cache, because
-the saved transcript does not replay what the kept process sent.
+The kept process is the default. ``SYLVIA_CLAUDE_PROCESS=per-step`` (or ``step``) starts a new
+process for every step instead, the previous behaviour. A fresh start replays exactly what a
+kept process sent, its calls answered in place included, so the cache prefix survives it. In
+the live check for issue 171 (one combat bout on the Claude subscription) the kept process
+read 97.4% of later input from cache against 97.3% per-step, every turn ended, and the bout
+took 250.0 s against 263.1 s.
 """
 
 from __future__ import annotations
@@ -34,11 +36,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-#: Environment switch, read for every request: ``per-step`` (the default) or ``persistent``.
+#: Environment switch, read for every request: ``persistent`` (the default) or ``per-step``.
 PROCESS_SWITCH = "SYLVIA_CLAUDE_PROCESS"
 PERSISTENT = "persistent"
 PER_STEP = "per-step"
-_PERSISTENT_VALUES = {PERSISTENT, "kept", "keep"}
+#: Values that select per-step processes; ``persistent``, ``kept`` and anything else keep one.
+_PER_STEP_VALUES = {PER_STEP, "per_step", "step"}
 #: The audit's ``persist_session`` value for a kept process's session file.
 KEPT_SESSION = "kept_until_process_closes"
 #: Idle processes kept at once; the least recently used is closed first.
@@ -54,9 +57,9 @@ _KEEPALIVE_SECONDS = 600.0
 
 
 def process_setting(environ: Mapping[str, str] | None = None) -> str:
-    """``per-step`` unless ``SYLVIA_CLAUDE_PROCESS`` asks for a kept process (``persistent``)."""
+    """``persistent`` unless ``SYLVIA_CLAUDE_PROCESS`` asks for per-step processes."""
     value = (os.environ if environ is None else environ).get(PROCESS_SWITCH, "")
-    return PERSISTENT if value.strip().casefold() in _PERSISTENT_VALUES else PER_STEP
+    return PER_STEP if value.strip().casefold() in _PER_STEP_VALUES else PERSISTENT
 
 
 class ContinuationMismatchError(Exception):

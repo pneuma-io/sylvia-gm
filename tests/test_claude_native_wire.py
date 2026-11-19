@@ -29,7 +29,7 @@ import pytest
 
 from sylvia_gm.agent._context_ledger import ContextLedger
 from sylvia_gm.agent._provider_session import ProviderSessionAdapter
-from sylvia_gm.provider import _claude, _claude_runtime
+from sylvia_gm.provider import _claude, _claude_kept, _claude_runtime
 from sylvia_gm.provider._claude import ClaudeProvider
 from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE
 from tests.gm_context_contract import provider_messages
@@ -308,6 +308,11 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, capl
             route = ProviderSessionAdapter._claude_native_route(ledger, frame, None, False)
             fake.step = name
             before = len(fake.requests)
+            if mode == "persistent" and name == "7_consecutive_user":
+                # A fresh start after calls answered in place (an idle close, a restart): the
+                # new process's transcript must replay what the kept process sent, so its
+                # request still extends the previous one (issue 171).
+                _claude_kept.KEPT_PROCESSES.close_all()
 
             async def run(frame=frame, route=route):
                 CURRENT_NATIVE_ROUTE.set(route)
@@ -322,7 +327,7 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, capl
             leftovers = private_files(home)
             if mode == "persistent":
                 # Only the kept process's own files, until it closes.
-                sessions = {Path(f).stem if f.endswith(".jsonl") else Path(f).parent.name
+                sessions = {re.search(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}", f).group(0)
                             for f in leftovers}
                 assert len(sessions) <= 1, (name, "more than one session kept", leftovers)
             else:
@@ -369,6 +374,99 @@ def test_real_claude_code_requests_extend_each_other(tmp_path, monkeypatch, capl
         if mode == "persistent":
             asyncio.run(provider.close())
             assert private_files(home) == [], "a closed kept process left request content"
+    finally:
+        asyncio.run(provider.close())
+        fake.close()
+
+
+def test_real_claude_code_fresh_start_on_player_speech_replays_the_kept_process(
+    tmp_path, monkeypatch,
+):
+    """Issue 171: a call answered in place, then the player's words after a later call.
+
+    The player's words always start a fresh process (they must stay a user message). That
+    process's transcript must replay what the kept process sent, the nested answer included,
+    so its request still extends the kept process's last one and the cache marker survives.
+    """
+    if not BINARY or not Path(BINARY).is_file():
+        pytest.skip("SYLVIA_TEST_CLAUDE_WIRE_BINARY does not name a Claude Code binary")
+    monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", "persistent")
+    fake = FakeMessages()
+    home = tmp_path / "claude-runtime"
+    person = tmp_path / "person"
+    for folder in (person / "AppData" / "Roaming", person / "AppData" / "Local"):
+        folder.mkdir(parents=True)
+    for name, value in (("USERPROFILE", person), ("HOME", person),
+                        ("APPDATA", person / "AppData" / "Roaming"),
+                        ("LOCALAPPDATA", person / "AppData" / "Local")):
+        monkeypatch.setenv(name, str(value))
+    sylvias_environment = _claude_runtime.native_environment
+
+    def offline_environment(runtime_home):
+        environment = sylvias_environment(runtime_home)
+        environment.update({
+            "ANTHROPIC_BASE_URL": fake.base, "ANTHROPIC_API_KEY": DUMMY_KEY,
+            "HTTP_PROXY": fake.base, "HTTPS_PROXY": fake.base,
+            "http_proxy": fake.base, "https_proxy": fake.base,
+            "NO_PROXY": "127.0.0.1,localhost", "no_proxy": "127.0.0.1,localhost",
+        })
+        return environment
+
+    monkeypatch.setattr(_claude_runtime, "native_environment", offline_environment)
+    monkeypatch.setattr(_claude, "native_environment", offline_environment)
+    monkeypatch.setattr(_claude, "find_runtime", lambda _home: Path(BINARY))
+    provider = ClaudeProvider(home, claude_model())
+    reuse: list[dict[str, Any]] = []
+
+    class Reuse:
+        async def on_request(self, context):
+            request = context.request_json or {}
+            if request.get("method") == "claude/process_reuse":
+                reuse.append(dict(request["params"]))
+
+        async def on_response(self, context):
+            pass
+
+        async def on_error(self, context):
+            pass
+
+    provider.hooks.register(Reuse())
+    ledger = ContextLedger(session_id="speech-session", context_owner=OWNER,
+                           transport="claude_code")
+    one = [player(1, "SENTINEL_C1_USER I search the room. SENTINEL_REQUEST_TOOL=roll")]
+    two = [*one, call("toolu_B1", 2), result("toolu_B1", "SENTINEL_TR 9")]
+    three = [*two, talk(2, "SENTINEL_REPLY 2."),
+             player(3, "SENTINEL_C3_USER I ask the guard. SENTINEL_REQUEST_TOOL=roll")]
+    four = [*three, call("toolu_B3", 2), result("toolu_B3", "SENTINEL_TR awaiting_answer"),
+            player(4, "SENTINEL_C4_USER The blue door.")]
+    steps = [("B1", [*STABLE, PREP, state(1), *one]),
+             ("B2", [*STABLE, PREP, state(2, 6), *two, facts("9")]),
+             ("B3", [*STABLE, PREP, state(2, 6), *three]),
+             ("B4", [*STABLE, PREP, state(2, 6), *four])]
+    bodies = []
+    try:
+        for name, canonical in steps:
+            frame = ledger.plan(canonical, request_context_id="ctx", tools=TOOLS,
+                                check_saved_tip=False)
+            ledger.commit(frame)
+            route = ProviderSessionAdapter._claude_native_route(ledger, frame, None, False)
+            fake.step = name
+            before = len(fake.requests)
+
+            async def run(frame=frame, route=route):
+                CURRENT_NATIVE_ROUTE.set(route)
+                return [c async for c in provider.generate_stream(
+                    provider_messages(frame.wire), TOOLS, timeout=60)]
+
+            asyncio.run(run())
+            bodies.append(fake.requests[before:][-1][1])
+        assert [r.get("answered_in_place") for r in reuse] == [False, True, False, False]
+        assert reuse[-1]["fresh_reason"] == "player_speech_after_call"
+        # The fresh process's request extends what the kept process last sent.
+        report = pair_report(bodies[2], bodies[3])
+        assert report["system"] and report["tools"] and report["extends"], report
+        assert report["marker_survives"], report
+        assert fake.offsite == []
     finally:
         asyncio.run(provider.close())
         fake.close()

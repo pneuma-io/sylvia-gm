@@ -936,6 +936,8 @@ def load_journal(
         ):
             state.native[int(record["boundary"])] = {
                 "status": record["status"], "records": plain(record["records"]),
+                **({"answer": plain(record["answer"])}
+                   if isinstance(record.get("answer"), Mapping) else {}),
             }
     state.view = reconstruct_state(state.entries, seal)
     return state, None
@@ -966,6 +968,15 @@ def native_inputs(state: JournalState) -> tuple[tuple[int, ...], dict[int, list[
     return boundaries, records
 
 
+def native_answers(state: JournalState) -> dict[int, dict[str, Any]]:
+    """Earlier boundaries whose call a kept Claude Code process answered in place."""
+    end = len(state.entries)
+    return {
+        k: dict(v["answer"]) for k, v in state.native.items()
+        if 0 < k < end and v.get("status") == "collected" and isinstance(v.get("answer"), Mapping)
+    }
+
+
 def native_record(
     state: JournalState,
     *,
@@ -974,8 +985,13 @@ def native_record(
     status: str,
     reason: str | None,
     records: Sequence[Mapping[str, Any]],
+    answer: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Session evidence for what one request's Claude Code session file contained."""
+    """Session evidence for what one request's Claude Code session file contained.
+
+    ``answer`` is the tool-result message a kept Claude Code process stored when it answered
+    this request's call in place; a later transcript replays it exactly.
+    """
     return {
         "kind": NATIVE_KIND,
         "version": NATIVE_VERSION,
@@ -988,6 +1004,7 @@ def native_record(
         "status": status,
         "reason": reason,
         "records": [plain(r) for r in records],
+        **({"answer": plain(answer)} if answer is not None else {}),
     }
 
 

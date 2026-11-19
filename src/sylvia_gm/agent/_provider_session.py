@@ -43,6 +43,7 @@ from sylvia_gm.agent._context_ledger import (
     ContextLedger,
     WireFrame,
     context_mode,
+    native_answers,
     native_inputs,
     native_record,
     stable_tool_list,
@@ -2571,9 +2572,13 @@ class ProviderSessionAdapter:
             payload = native_record(
                 state, context_owner=ledger.context_owner, boundary=boundary,
                 status=result.status, reason=result.reason, records=result.records,
+                answer=result.answer,
             )
             if ledger.state is state:
-                state.native[boundary] = {"status": result.status, "records": payload["records"]}
+                state.native[boundary] = {
+                    "status": result.status, "records": payload["records"],
+                    **({"answer": payload["answer"]} if "answer" in payload else {}),
+                }
             if persistent:
                 await bridge.save(payload)
 
@@ -2582,6 +2587,7 @@ class ProviderSessionAdapter:
             entry_count=boundary,
             boundaries=boundaries,
             native_records=saved,
+            native_answers=native_answers(state),
             on_collected=on_collected,
         )
 

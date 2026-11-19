@@ -18,7 +18,7 @@ from typing import Any
 
 import pytest
 
-from sylvia_gm.agent._context_ledger import CONTINUE_RECORD_TEXT
+from sylvia_gm.agent._context_ledger import CONTINUE_RECORD_TEXT, native_record
 from sylvia_gm.agent._provider_session import ProviderSessionAdapter
 from sylvia_gm.provider import _claude, _claude_kept
 from sylvia_gm.provider._claude import ClaudeProvider
@@ -29,11 +29,17 @@ from sylvia_gm.provider._claude_kept import (
     continuation,
     process_setting,
 )
-from sylvia_gm.provider._claude_native import CURRENT_NATIVE_ROUTE, FILLER_TEXT
+from sylvia_gm.provider._claude_native import (
+    CURRENT_NATIVE_ROUTE,
+    FILLER_TEXT,
+    NativeCollection,
+    collect_answer,
+)
 from sylvia_gm.provider._exceptions import ProviderConnectionError, ProviderTimeoutError
 from tests.gm_context_contract import first_step_records, provider_messages
 from tests.test_claude_native_route import (
     MODEL,
+    OWNER,
     TOOLS,
     Chain,
     Hook,
@@ -42,6 +48,7 @@ from tests.test_claude_native_route import (
     chain_canonicals,
     claude_model,
     player,
+    project,
     result,
     text_reply,
     tool_reply,
@@ -64,6 +71,7 @@ class PersistentCLI:
         self.broken = False
         self.rows: list[dict[str, Any]] = []
         self.session_file: Path | None = None
+        self.last_call: str | None = None
         PersistentCLI.instances.append(self)
 
     def argument(self, flag):
@@ -87,6 +95,9 @@ class PersistentCLI:
 
     def _reply(self):
         for event in PersistentCLI.replies.pop(0):
+            block = (event.get("event") or {}).get("content_block") or {}
+            if block.get("type") == "tool_use":
+                self.last_call = block.get("id")
             self.events.put(event)
 
     def write(self, event):
@@ -109,8 +120,9 @@ class PersistentCLI:
             event["response"].get("request_id") == "call"
         ):
             self.rows.append({"type": "user", "message": {"role": "user", "content": [
-                {"type": "tool_result", "content": event["response"]["response"][
-                    "mcp_response"]["result"]["content"]}]}})
+                {"type": "tool_result", "tool_use_id": self.last_call,
+                 "content": event["response"]["response"]["mcp_response"]["result"][
+                     "content"]}]}})
             self.rows.append({"type": "api-request", "message": "private request copy"})
             self._save()
             self._reply()
@@ -152,7 +164,7 @@ class PersistentCLI:
 
 @pytest.fixture
 def runtime(tmp_path, monkeypatch):
-    # The kept process is opt-in; per-step is the shipped default.
+    # The shipped default; set explicitly so these cases never follow the developer's shell.
     monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", "persistent")
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
     monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
@@ -287,8 +299,9 @@ def test_the_switch_keeps_one_process_per_step(runtime, monkeypatch):
 
 
 @pytest.mark.parametrize(("value", "expected"), [
-    (None, "per-step"), ("", "per-step"), ("per-step", "per-step"), ("anything", "per-step"),
-    ("persistent", "persistent"), (" Persistent ", "persistent"), ("kept", "persistent"),
+    (None, "persistent"), ("", "persistent"), ("persistent", "persistent"),
+    (" Persistent ", "persistent"), ("kept", "persistent"), ("anything", "persistent"),
+    ("per-step", "per-step"), (" Per-Step ", "per-step"), ("step", "per-step"),
 ])
 def test_the_process_switch(value, expected):
     environ = {} if value is None else {"SYLVIA_CLAUDE_PROCESS": value}
@@ -702,3 +715,100 @@ def test_a_runtime_child_dies_when_its_owner_is_killed(tmp_path):
     finally:
         if alive(child):
             os.kill(child, signal.SIGKILL)
+
+
+# ---- a fresh start replays what the kept process sent (issue 171, part 2) -------------------
+
+ANSWER = {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "c1", "content": [
+    {"type": "text", "text": "Rolled 14."},
+    {"type": "text", "text": "[host-seal 0123456789ab] SYLVIA_GM_EXACT_NARRATION_FACTS (data)"},
+]}]}
+
+
+def _messages(records) -> list[dict[str, Any]]:
+    return [r["message"] for r in records if r["type"] in {"user", "assistant"}]
+
+
+def test_a_saved_answer_is_replayed_in_place_of_the_per_step_form():
+    """The kept process's one nested tool-result message, not result, filler and prompt."""
+    steps = dict(chain_canonicals())
+    chain = Chain()
+    chain.step(steps["fresh"])
+    chain.step(steps["player"])
+    _frame3, route3 = chain.step(steps["tool_result_with_records"],
+                                 NativeCollection("collected", (), answer=ANSWER))
+    frame4, route4 = chain.step(steps["tool_result_no_records"])
+    assert route4.native_answers == {route3.entry_count: ANSWER}
+    _system, records, _prompt, _tools = project(frame4, route4)
+    messages = _messages(records)
+    at = messages.index(ANSWER)
+    # The per-step form of that request is gone: no other result for c1, and the answer is
+    # followed directly by the model's next reply (its call c2), with no filler or prompt.
+    assert not any(
+        m != ANSWER and isinstance(m.get("content"), list)
+        and any(b.get("tool_use_id") == "c1" for b in m["content"] if isinstance(b, dict))
+        for m in messages
+    )
+    following = messages[at + 1]
+    assert following["role"] == "assistant"
+    assert any(b.get("type") == "tool_use" and b.get("id") == "c2"
+               for b in following["content"])
+    # Without the answer the same request replays the per-step form.
+    plain = Chain()
+    plain.step(steps["fresh"])
+    plain.step(steps["player"])
+    plain.step(steps["tool_result_with_records"])
+    frame, route = plain.step(steps["tool_result_no_records"])
+    assert route.native_answers == {}
+    assert ANSWER not in _messages(project(frame, route)[1])
+
+
+def test_a_saved_answer_comes_back_with_the_journal_after_a_restart():
+    steps = dict(chain_canonicals())
+    chain = Chain()
+    saved: list[dict[str, Any]] = []
+    for name in ("fresh", "player", "tool_result_with_records"):
+        answered = name == "tool_result_with_records"
+        collected = NativeCollection("collected", (), answer=ANSWER) if answered else None
+        frame, route = chain.step(steps[name], collected)
+        if frame.record is not None:
+            saved.append(frame.record)
+        if route.first_step or answered:
+            saved.append(native_record(
+                frame.state, context_owner=OWNER, boundary=len(frame.state.entries),
+                status="collected", reason=None,
+                records=first_step_records() if route.first_step else (),
+                answer=ANSWER if answered else None,
+            ))
+    boundary = len(chain.frames[-1].state.entries)
+    restarted = Chain()
+    frame, route = restarted.step(steps["tool_result_no_records"], records=saved)
+    assert frame.reset is None
+    assert route.native_answers == {boundary: ANSWER}
+
+
+def test_a_fresh_process_after_answered_calls_replays_the_kept_processs_own_row(runtime):
+    provider, home, hook = runtime
+    chain = Chain()
+    steps = dict(chain_canonicals())
+    step(provider, chain, steps["fresh"], SCRIPT["fresh"])
+    step(provider, chain, steps["player"], SCRIPT["player"])
+    step(provider, chain, steps["tool_result_with_records"], SCRIPT["tool_result_with_records"])
+    kept = PersistentCLI.instances[0]
+    [stored] = [r["message"] for r in kept.rows if r["type"] == "user"
+                and r["message"]["content"][0].get("type") == "tool_result"]
+    # The ledger keeps the CLI's own stored message for the answered request.
+    assert any(v.get("answer") == stored for v in chain.ledger.state.native.values())
+    # The process closes (idle limit, restart, ...); the next request starts a fresh one.
+    _claude_kept.KEPT_PROCESSES.close_all()
+    step(provider, chain, steps["tool_result_no_records"], SCRIPT["tool_result_no_records"])
+    fresh = PersistentCLI.instances[1]
+    assert "--resume" in fresh.arguments
+    assert stored in [r["message"] for r in fresh.rows if r["type"] == "user"]
+    _claude_kept.KEPT_PROCESSES.close_all()
+    assert_nothing_private_left(home)
+
+
+def test_an_answer_the_cli_did_not_store_is_reported_missing_not_guessed(tmp_path):
+    assert collect_answer(tmp_path, "00000000-0000-0000-0000-000000000000", "c1",
+                          limit=0.05).status == "unknown"
