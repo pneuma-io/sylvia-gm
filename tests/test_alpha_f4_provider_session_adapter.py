@@ -13143,6 +13143,171 @@ def test_post_mechanics_recovery_restores_the_live_rounds_exact_narration_facts(
     assert json.loads(facts_text.split("\n")[1]) == live_facts
 
 
+@pytest.mark.parametrize("lost_after", ["transition", "next_mechanic"])
+def test_post_mechanics_recovery_restores_automatic_transition_facts_in_live_order(
+    lost_after: str,
+) -> None:
+    """A Retry gets the facts of engine bookkeeping that ran between the GM's mechanics."""
+
+    source = _provider_input(user_text="I shove past the hound.")
+    user = source.history.messages[0]
+    advance = source.catalog[0]
+    begin_turn = ModelMechanicsTool(
+        package_id="synthetic.rules",
+        package_version="1",
+        package_sha256="a" * 64,
+        name="begin_turn",
+        capability="synthetic.turn",
+        description="Begin the required turn.",
+        input_schema={
+            "type": "object", "properties": {}, "required": [], "additionalProperties": False,
+        },
+        model_behavior=ModelToolBehavior.REQUIRED_ENGINE_TRANSITION,
+    )
+    # The second context is a start-of-turn saving throw the engine rolled on its own.
+    rolls = [
+        {"_d20_test": 15, "_modifier": 3, "_adjusted_total": 18, "_outcome": "success"},
+        {"_d20_test": 4, "_modifier": 2, "_adjusted_total": 6, "_outcome": "failure"},
+        {"_attack_roll": 11, "_attack_adjusted_total": 16, "_damage_roll": [5],
+         "_damage_modifier": 3},
+    ]
+    committed: list[tuple[str, str]] = []
+
+    def catalog(_discovery_id: str) -> tuple[ModelMechanicsTool, ...]:
+        if len(committed) == 1:
+            return (begin_turn, _campaign_file_tool(allow_unchanged=True))
+        return (advance, _campaign_file_tool(allow_unchanged=True))
+
+    def call(index: int) -> list[ProviderStreamChunk]:
+        return [ProviderStreamChunk(
+            tool_call_delta={"index": 0, "id": f"call-live-{index}", "function": {
+                "name": "advance",
+                "arguments": '{"steps":1,"actor":"rift-player-character","actor_state":"ready"}',
+            }},
+            finish_reason="tool_calls",
+        )]
+
+    narration = [ProviderStreamChunk(content="The hound snaps.", finish_reason="stop")]
+    owner = _OwnerProjection()
+    live_provider = _ScriptedProvider(
+        [call(0), narration] if lost_after == "transition" else [call(0), call(1), narration]
+    )
+    live = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner), live_provider, owner_id="owner-provider",
+    ).for_turn("turn-provider")(replace(source, catalog_supplier=catalog))
+    lost_request = 2 if lost_after == "transition" else 3
+    saved: list[SessionMessage] = [user]
+    for event in live:
+        if len(live_provider.calls) == lost_request:
+            break  # The provider is lost during the request that follows these commits.
+        if event.kind is ProviderEventKind.ACTION:
+            assert event.action_command is not None
+            action_id = event.action_command.action_id
+            context = rolls[len(committed)]
+            committed.append((event.action_command.tool_name, action_id))
+            owner.revision += 1
+            owner.events = (
+                *owner.events,
+                CanonicalEvent(
+                    sequence=len(owner.events) + 1, event_type=CanonicalEventType.TOOL_RESULT,
+                    turn_id="turn-provider", action_id=action_id,
+                    safe_payload={"status": "committed",
+                                  "result": {"status": "committed", "context": context}},
+                    visibility=EventVisibility.PLAYER_SAFE,
+                ),
+                CanonicalEvent(
+                    sequence=len(owner.events) + 2,
+                    event_type=CanonicalEventType.ACTION_COMMITTED,
+                    turn_id="turn-provider", action_id=action_id,
+                    safe_payload={"status": "committed"},
+                    visibility=EventVisibility.PLAYER_SAFE,
+                ),
+            )
+        elif event.evidence is not None:
+            saved.append(SessionMessage(
+                session_id=source.session.session_id, sequence=len(saved) + 1,
+                message_id=f"evidence-{len(saved)}", kind=SessionMessageKind.EVIDENCE,
+                content=cast(dict[str, object], _plain_json(event.evidence)),
+            ))
+    expected_tools = ["advance", "begin_turn"] + (["advance"] if lost_after != "transition" else [])
+    assert [name for name, _action_id in committed] == expected_tools
+
+    marker = "SYLVIA_GM_EXACT_NARRATION_FACTS "
+
+    def facts_sent(messages: list[dict[str, Any]]) -> list[dict[str, object]]:
+        sent = [
+            str(message["content"]) for message in messages
+            if str(message.get("content", "")).startswith(marker)
+        ]
+        assert len(sent) == 1
+        return cast(list[dict[str, object]], json.loads(sent[0].split("\n")[1]))
+
+    live_request = live_provider.calls[-1][0]
+    live_facts = facts_sent(live_request)
+    assert [fact["tool"] for fact in live_facts] == expected_tools
+    assert live_facts[1]["d20_test"] == 4 and live_facts[1]["outcome"] == "failure"
+    # Saved evidence never reaches the live request as history.
+    assert all('"narration_facts"' not in json.dumps(message) for message in live_request)
+
+    retry_provider = _ScriptedProvider([narration])
+    resumed = ProviderSessionAdapter(
+        cast(AuthorityOwner, owner), retry_provider, owner_id="owner-provider",
+    ).for_turn("turn-provider")(SessionProviderInput(
+        session=source.session,
+        history=SessionContext(session=source.session, messages=tuple(saved)),
+        catalog=(advance, _campaign_file_tool(allow_unchanged=True)),
+        control=source.control,
+        basis_message_id=user.message_id,
+        recovery_kind="post_mechanics_narration",
+        retry_action_receipt=ActionReceipt(
+            campaign_id="campaign-provider", action_id=committed[-1][1],
+            status=ActionStatus.COMMITTED,
+            result={"status": "committed", "context": rolls[len(committed) - 1]},
+            resulting_revision=owner.revision,
+        ),
+    ))
+    for _event in resumed:
+        if retry_provider.calls:
+            break
+
+    # The failed start-of-turn save is restored where the live round placed it.
+    assert facts_sent(retry_provider.calls[0][0]) == live_facts
+
+    # A later turn's request is the same with or without the saved transition facts.
+    def next_turn_request(history: list[SessionMessage]) -> list[dict[str, Any]]:
+        provider = _ScriptedProvider([narration])
+        talk = SessionMessage(
+            session_id=source.session.session_id, sequence=len(history) + 1,
+            message_id="talk-provider", kind=SessionMessageKind.TALK,
+            content={"text": "The hound snaps."},
+        )
+        next_user = replace(
+            user, sequence=len(history) + 2, message_id="message-next",
+            content={**user.content, "text": "I keep going."},
+        )
+        for _event in ProviderSessionAdapter(
+            cast(AuthorityOwner, owner), provider, owner_id="owner-provider",
+        ).for_turn("turn-next")(SessionProviderInput(
+            session=source.session,
+            history=SessionContext(
+                session=source.session, messages=(*history, talk, next_user),
+            ),
+            catalog=(advance, _campaign_file_tool(allow_unchanged=True)),
+            control=ProviderControl(),
+        )):
+            if provider.calls:
+                break
+        return provider.calls[0][0]
+
+    without_transition_facts = [
+        message for message in saved
+        if message.content.get("kind") != "provider_tool_results"
+        or message.content.get("results")
+    ]
+    assert len(without_transition_facts) == len(saved) - 1
+    assert next_turn_request(saved) == next_turn_request(without_transition_facts)
+
+
 def test_retry_adapter_reconstructs_authoritative_context_and_never_exposes_tools() -> None:
     provider = _ScriptedProvider(
         [
