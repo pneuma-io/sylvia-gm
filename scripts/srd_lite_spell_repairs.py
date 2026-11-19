@@ -4,6 +4,7 @@ Each repair edits one owning tool or definition and is idempotent, so the update
 rerun against an already repaired runtime without changing it again.
 """
 
+from .srd_lite_attack_repairs import ATTACK_REPAIRS
 from .srd_lite_profiles import lists
 
 
@@ -279,6 +280,7 @@ REPAIRS = (
     repair_self_range_information_target,
     repair_multi_target_distinct_recipients,
     repair_speed_bonus_needs_a_creature,
+    *ATTACK_REPAIRS,
 )
 
 

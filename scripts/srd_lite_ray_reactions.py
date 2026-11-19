@@ -1,8 +1,9 @@
-"""UNEXECUTED draft: retain ordered Lite Scorching Rays across real hit windows.
+"""Retain ordered Lite Scorching Rays across real hit windows (issue 163).
 
-The main owner calls bind_ray_reactions on its already qualified runtime mapping,
-after bind_attacks and the Shield adapter. This module never loads a YAML graph,
-reads an archive, writes candidate source, or allocates a synthetic pending event.
+Each staged ray that hits opens the same Reaction window as a single spell attack, so a
+target can answer that ray with Shield (SRD 5.2.1: a Reaction to being hit by an attack
+roll, whose +5 AC counts against the triggering attack). srd_lite_attack_repairs calls
+bind_ray_reactions on the parsed runtime; rebinding an already bound runtime changes nothing.
 """
 
 from copy import deepcopy
@@ -15,7 +16,6 @@ from .srd_timed_actor_defenses import _call, _require, _set, _tool, _when
 CURSOR = "lite_scorching_ray_cursor"
 CONTINUE = "continue_srd_lite_scorching_rays"
 FINISH = "finish_srd_lite_scorching_ray_hit"
-ANNOTATE = "annotate_srd_lite_shield_window"
 EVENT = "lasting_state.pending_srd_actions.{pending_action_id}"
 LOCAL_EVENT = "state.pending_srd_actions.{_lite_ray_pending_id}"
 EXPORTS = (
@@ -89,10 +89,8 @@ def _append_rows(collection, destination):
 def bind_ray_reactions(runtime):
     """Add one ordered cursor only to staged Scorching Ray; preserve direct calls."""
     tools = runtime["tools"]
-    if ANNOTATE not in tools:
-        raise ValueError("Bind the actual Lite Shield event reader before Scorching Rays")
     if CONTINUE in tools or FINISH in tools:
-        raise ValueError("Scorching Ray cursor must be composed exactly once")
+        return None
     owner = tools["cast_spell_multi_attack_damage"]
     child = tools["resolve_spell_multi_attack_target"]
     parent_parameters = _parameters(runtime, owner)
@@ -133,14 +131,15 @@ def bind_ray_reactions(runtime):
     cursor_field = LOCAL_EVENT + "." + CURSOR
     save_hit = [
         _set("_lite_ray_pending_id", "caster_state.pending_srd_completion_id"),
+        # Expressions are limited to 500 characters, so read the saved event once.
+        _set("_lite_ray_saved", "state.pending_srd_actions[_lite_ray_pending_id]"),
+        _set("_lite_ray_saved_cursor", "_lite_ray_saved." + CURSOR),
         _require(
-            "state.pending_srd_actions[_lite_ray_pending_id].owner_kind == 'spell_cast' and "
-            "state.pending_srd_actions[_lite_ray_pending_id].spell == 'scorching_ray' and "
-            "state.pending_srd_actions[_lite_ray_pending_id].status == 'open' and "
-            "state.pending_srd_actions[_lite_ray_pending_id].actor_state_id == _caster_state_id and "
-            "state.pending_srd_actions[_lite_ray_pending_id]." + CURSOR + ".awaiting_hit != true and "
-            "state.pending_srd_actions[_lite_ray_pending_id]." + CURSOR + ".targets["
-            "state.pending_srd_actions[_lite_ray_pending_id]." + CURSOR + ".index] == _target_id",
+            "_lite_ray_saved.owner_kind == 'spell_cast' and "
+            "_lite_ray_saved.spell == 'scorching_ray' and _lite_ray_saved.status == 'open' and "
+            "_lite_ray_saved.actor_state_id == _caster_state_id and "
+            "_lite_ray_saved_cursor.awaiting_hit != true and "
+            "_lite_ray_saved_cursor.targets[_lite_ray_saved_cursor.index] == _target_id",
             "This ray must belong to its original ordered casting action.",
         ),
         _set(LOCAL_EVENT + ".kind", "'spell_attack'"),
@@ -156,7 +155,6 @@ def bind_ray_reactions(runtime):
         *_copy_context(names, LOCAL_EVENT + ".spell_attack_context."),
         _set(cursor_field + ".awaiting_hit", True),
         _set("_spell_hit_window_deferred", True),
-        _call(ANNOTATE, {"pending_action_id": "{_lite_ray_pending_id}", "lasting_state": "state"}),
         _call("record_srd_spell_target_result", {
             "target": "{_target_id}",
             "brief": "Attack total {_card_d20_total}; awaiting defense",
@@ -185,6 +183,7 @@ def bind_ray_reactions(runtime):
          _param("pending_action_id"), _lasting()],
         [
             _set("_lite_ray_event", "lasting_state.pending_srd_actions[pending_action_id]"),
+            _set("_lite_ray_saved_cursor", "_lite_ray_event." + CURSOR),
             _require("_lite_ray_event.kind == 'spell_attack' and "
                      "_lite_ray_event.owner_kind == 'spell_cast' and "
                      "_lite_ray_event.spell == 'scorching_ray' and "
@@ -192,9 +191,8 @@ def bind_ray_reactions(runtime):
                      "_lite_ray_event.status == 'open' and "
                      "_lite_ray_event.actor_state_id == _caster_state_id and "
                      "_lite_ray_event.target_state_id == _target_id and "
-                     "_lite_ray_event." + CURSOR + ".targets[_lite_ray_event." + CURSOR +
-                     ".index] == _target_id and "
-                     "_lite_ray_event." + CURSOR + ".awaiting_hit == true",
+                     "_lite_ray_saved_cursor.targets[_lite_ray_saved_cursor.index] == _target_id "
+                     "and _lite_ray_saved_cursor.awaiting_hit == true",
                      "Only the original saved ray can finish this hit window."),
             *_copy_context(names, "", "_lite_ray_event.spell_attack_context."),
             _set("_spell_hit_window_deferred", False),
@@ -322,10 +320,11 @@ def bind_ray_reactions(runtime):
 
     initial_cursor = [
         _set("_lite_ray_pending_id", "caster_state.pending_srd_completion_id"),
-        _require("lasting_state.pending_srd_actions[_lite_ray_pending_id].kind == 'spell_cast' and "
-                 "lasting_state.pending_srd_actions[_lite_ray_pending_id].owner_kind == 'spell_cast' and "
-                 "lasting_state.pending_srd_actions[_lite_ray_pending_id].actor_state_id == _caster_state_id and "
-                 "lasting_state.pending_srd_actions[_lite_ray_pending_id]." + CURSOR + " == null",
+        _set("_lite_ray_saved", "lasting_state.pending_srd_actions[_lite_ray_pending_id]"),
+        _require("_lite_ray_saved.kind == 'spell_cast' and "
+                 "_lite_ray_saved.owner_kind == 'spell_cast' and "
+                 "_lite_ray_saved.actor_state_id == _caster_state_id and "
+                 "_lite_ray_saved." + CURSOR + " == null",
                  "Start this ordered ray cursor only inside its original saved casting action."),
         _set(cursor_field, {
             "targets": "attack_targets", "index": 0, "awaiting_hit": False,
@@ -348,6 +347,7 @@ def bind_ray_reactions(runtime):
     # The validation/payment prefix and direct immediate-resolution sequence are retained.
     original_tail = deepcopy(owner["effects"][loop_index:])
     owner["effects"][loop_index:] = [
+        _set("_spell_hit_window_deferred", False),
         _set("_lite_ray_staged", "spell == 'scorching_ray' and "
              "caster_state.pending_srd_completion_id != null"),
         _when("_lite_ray_staged == true", initial_cursor),

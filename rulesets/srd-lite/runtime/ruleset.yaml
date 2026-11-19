@@ -70354,6 +70354,7 @@ tools:
             _spell_multi_concentration_save_rolls: _spell_multi_concentration_save_rolls
             _nested_spell_summary_rows: _spell_summary_rows
             _nested_spell_detail_rows: _spell_detail_rows
+            _spell_hit_window_deferred: _spell_hit_window_deferred
         - for_each:
             collection: _nested_spell_summary_rows
             as: _nested_spell_row
@@ -77428,17 +77429,48 @@ tools:
         value: _spell_projectiles * flat_damage_per_projectile
     - condition: projectile_targets == null
       on_true:
-      - call: apply_srd_magic_missile_damage
-        params:
-          target: '{_target_id}'
-          amount: '{_spell_damage.total}'
-          adjustment: '{_spell_flat_damage}'
-          damage_type: '{damage_type}'
-          source_state_id: '{_caster_state_id}'
-          witness_state_ids: '{witness_state_ids}'
-        export_context:
-          _affliction_trigger_damage: _effective_damage
-          _affliction_trigger_alive: _is_alive_after
+      - set:
+          field: _projectile_index
+          value: 0
+      - set:
+          field: _projectile_struck
+          value: []
+      - for_each:
+          collection: _ray_projectile_results
+          as: _single_dart_amount
+          do:
+          - set:
+              field: _projectile_repeat
+              value: _target_id in _projectile_struck
+          - condition: _projectile_repeat != true
+            on_true:
+            - list_push:
+                list: _projectile_struck
+                value: _target_id
+          - set:
+              field: _projectile_face
+              value: _spell_damage.results[_projectile_index]
+          - set:
+              field: _projectile_amount
+              value: _ray_projectile_results[_projectile_index]
+          - set:
+              field: _projectile_index
+              value: _projectile_index + 1
+          - call: apply_srd_lite_force_dart
+            params:
+              target: '{_target_id}'
+              index: '{_projectile_index}'
+              face: '{_projectile_face}'
+              amount: '{_projectile_amount}'
+              flat: '{flat_damage_per_projectile}'
+              repeat: '{_projectile_repeat}'
+              damage_type: '{damage_type}'
+              source_state_id: '{_caster_state_id}'
+              witness_state_ids: '{witness_state_ids}'
+              lasting_state: '{_lasting_state_id}'
+            export_context:
+              _spell_target_summary: _spell_target_summary
+              _spell_target_detail: _spell_target_detail
       - set:
           field: _card_hp_lost
           value: max(0, _card_hp_before - target.hp)
@@ -77474,75 +77506,53 @@ tools:
           value: _spell_target_detail
       on_false:
       - set:
-          field: _projectile_recorded_targets
+          field: _projectile_index
+          value: 0
+      - set:
+          field: _projectile_struck
           value: []
       - for_each:
           collection: projectile_targets
           as: _projectile_target
           do:
-          - condition: _projectile_target not in _projectile_recorded_targets
+          - set:
+              field: _projectile_repeat
+              value: _projectile_target in _projectile_struck
+          - condition: _projectile_repeat != true
             on_true:
             - list_push:
-                list: _projectile_recorded_targets
+                list: _projectile_struck
                 value: _projectile_target
-            - set:
-                field: _projectile_index
-                value: 0
-            - set:
-                field: _projectile_count
-                value: 0
-            - set:
-                field: _projectile_roll_total
-                value: 0
-            - for_each:
-                collection: projectile_targets
-                as: _projectile_allocation
-                do:
-                - condition: _projectile_allocation == _projectile_target
-                  on_true:
-                  - set:
-                      field: _projectile_roll_total
-                      value: _projectile_roll_total + _ray_projectile_results[_projectile_index]
-                  - set:
-                      field: _projectile_count
-                      value: _projectile_count + 1
-                - set:
-                    field: _projectile_index
-                    value: _projectile_index + 1
-            - set:
-                field: _projectile_flat
-                value: _projectile_count * flat_damage_per_projectile
-            - call: apply_srd_magic_missile_damage
-              params:
-                target: '{_projectile_target}'
-                amount: '{_projectile_roll_total}'
-                adjustment: '{_projectile_flat}'
-                damage_type: '{damage_type}'
-                source_state_id: '{_caster_state_id}'
-                witness_state_ids: '{witness_state_ids}'
-              export_context:
-                _projectile_hp_lost: _hp_lost
-                _projectile_temp_lost: _temp_hp_absorbed
-                _affliction_trigger_damage: _effective_damage
-                _affliction_trigger_alive: _is_alive_after
-            - set:
-                field: _projectile_actual
-                value: _projectile_hp_lost + _projectile_temp_lost
-            - call: record_srd_spell_target_result
-              params:
-                target: '{_projectile_target}'
-                brief: '{_projectile_count} automatic projectiles; damage {_projectile_actual}'
-                detail: '{_projectile_count} automatic projectiles. Damage {_projectile_actual} (HP {_projectile_hp_lost};
-                  temporary HP {_projectile_temp_lost}). Rolled {_projectile_roll_total}; flat bonus {_projectile_flat}.'
-              export_context:
-                _spell_target_summary: _spell_target_summary
-                _spell_target_detail: _spell_target_detail
-            - list_push:
-                list: _spell_summary_rows
-                value: _spell_target_summary
-            - list_push:
-                list: _spell_detail_rows
-                value: _spell_target_detail
+          - set:
+              field: _projectile_face
+              value: _spell_damage.results[_projectile_index]
+          - set:
+              field: _projectile_amount
+              value: _ray_projectile_results[_projectile_index]
+          - set:
+              field: _projectile_index
+              value: _projectile_index + 1
+          - call: apply_srd_lite_force_dart
+            params:
+              target: '{_projectile_target}'
+              index: '{_projectile_index}'
+              face: '{_projectile_face}'
+              amount: '{_projectile_amount}'
+              flat: '{flat_damage_per_projectile}'
+              repeat: '{_projectile_repeat}'
+              damage_type: '{damage_type}'
+              source_state_id: '{_caster_state_id}'
+              witness_state_ids: '{witness_state_ids}'
+              lasting_state: '{_lasting_state_id}'
+            export_context:
+              _spell_target_summary: _spell_target_summary
+              _spell_target_detail: _spell_target_detail
+          - list_push:
+              list: _spell_summary_rows
+              value: _spell_target_summary
+          - list_push:
+              list: _spell_detail_rows
+              value: _spell_target_detail
     narrative:
       on_success: The automatic force projectiles strike the selected target.
       on_failure: The automatic force-projectile spell cannot be resolved.
@@ -78467,6 +78477,9 @@ tools:
             - key: '''_spell_summary_rows'''
               missing: _spell_summary_rows == null
               value: _spell_summary_rows
+            - key: '''_spell_target_armor_class'''
+              missing: _spell_target_armor_class == null
+              value: _spell_target_armor_class
         - for_each:
             collection: _retained_nullable_capture_rows
             as: _retained_nullable_capture_row
@@ -78776,6 +78789,9 @@ tools:
               - key: '''_spell_summary_rows'''
                 missing: _spell_summary_rows == null
                 value: _spell_summary_rows
+              - key: '''_spell_target_armor_class'''
+                missing: _spell_target_armor_class == null
+                value: _spell_target_armor_class
           - for_each:
               collection: _retained_nullable_capture_rows
               as: _retained_nullable_capture_row
@@ -79582,6 +79598,12 @@ tools:
     - param_minor_elementals_damage_type_9c99a3aafb5abaaa
   resolve_spell_multi_attack_target:
     effects:
+    - set:
+        field: _spell_target_armor_class
+        value: null
+    - set:
+        field: _spell_hit_window_deferred
+        value: false
     - condition: cover != null
       on_true:
       - set:
@@ -79895,64 +79917,480 @@ tools:
       - set:
           field: _spell_critical_hit
           value: _spell_attack_kind == 'critical_hit'
-      - condition: _spell_attack_outcome == 'success'
+      - condition: spell == 'scorching_ray' and caster_state.pending_srd_completion_id != null and _spell_attack_outcome
+          == 'success'
         on_true:
-        - call: resolve_srd_mirror_image_hit
-          params:
-            target_state: '{_target_id}'
-            attacker_state: '{_caster_state_id}'
-          export_context:
-            _mirror_redirected: _mirror_redirected
-            _mirror_dice: _mirror_dice
-            _mirror_source_id: _mirror_source_id
-            _mirror_remaining: _mirror_remaining
-        - condition: _mirror_redirected != true
+        - set:
+            field: _lite_ray_pending_id
+            value: caster_state.pending_srd_completion_id
+        - set:
+            field: _lite_ray_saved
+            value: state.pending_srd_actions[_lite_ray_pending_id]
+        - set:
+            field: _lite_ray_saved_cursor
+            value: _lite_ray_saved.lite_scorching_ray_cursor
+        - require:
+            condition: _lite_ray_saved.owner_kind == 'spell_cast' and _lite_ray_saved.spell == 'scorching_ray'
+              and _lite_ray_saved.status == 'open' and _lite_ray_saved.actor_state_id == _caster_state_id
+              and _lite_ray_saved_cursor.awaiting_hit != true and _lite_ray_saved_cursor.targets[_lite_ray_saved_cursor.index]
+              == _target_id
+            error: This ray must belong to its original ordered casting action.
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.kind
+            value: '''spell_attack'''
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.stage
+            value: '''spell_attack_reaction'''
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.target_state_id
+            value: _target_id
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.attack_outcome
+            value: '''hit'''
+        - condition: _spell_critical_hit == true
           on_true:
-          - dice:
-              expression: '{dice_per_attack}{damage_die}'
-              critical: _spell_attack_kind == 'critical_hit'
-            store_as: _spell_damage
           - set:
-              field: _visual_original_spell_damage
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.attack_outcome
+              value: '''critical_hit'''
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters
+            value: {}
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context
+            value: {}
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.spell
+            value: null
+        - condition: spell != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.spell
+              value: spell
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_ability
+            value: null
+        - condition: casting_ability != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_ability
+              value: casting_ability
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_modifier
+            value: null
+        - condition: casting_modifier != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_modifier
+              value: casting_modifier
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_attack_bonus
+            value: null
+        - condition: casting_attack_bonus != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_attack_bonus
+              value: casting_attack_bonus
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_save_dc
+            value: null
+        - condition: casting_save_dc != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_save_dc
+              value: casting_save_dc
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_scaling_level
+            value: null
+        - condition: casting_scaling_level != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_scaling_level
+              value: casting_scaling_level
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_concentration_save_modifier
+            value: null
+        - condition: casting_concentration_save_modifier != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.casting_concentration_save_modifier
+              value: casting_concentration_save_modifier
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.caster_state
+            value: null
+        - condition: _caster_state_id != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.caster_state
+              value: _caster_state_id
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.target
+            value: null
+        - condition: _target_id != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.target
+              value: _target_id
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.dice_per_attack
+            value: null
+        - condition: dice_per_attack != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.dice_per_attack
+              value: dice_per_attack
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.damage_die
+            value: null
+        - condition: damage_die != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.damage_die
+              value: damage_die
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.damage_type
+            value: null
+        - condition: damage_type != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.damage_type
+              value: damage_type
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.caster_can_see_target
+            value: null
+        - condition: caster_can_see_target != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.caster_can_see_target
+              value: caster_can_see_target
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.target_can_see_caster
+            value: null
+        - condition: target_can_see_caster != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.target_can_see_caster
+              value: target_can_see_caster
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.target_within_5_feet
+            value: null
+        - condition: target_within_5_feet != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.target_within_5_feet
+              value: target_within_5_feet
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.initial_advantage
+            value: null
+        - condition: initial_advantage != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.initial_advantage
+              value: initial_advantage
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.initial_disadvantage
+            value: null
+        - condition: initial_disadvantage != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.initial_disadvantage
+              value: initial_disadvantage
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.enemy_within_5_feet
+            value: null
+        - condition: enemy_within_5_feet != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.enemy_within_5_feet
+              value: enemy_within_5_feet
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.close_enemy_can_see_caster
+            value: null
+        - condition: close_enemy_can_see_caster != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.close_enemy_can_see_caster
+              value: close_enemy_can_see_caster
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.close_enemy_incapacitated
+            value: null
+        - condition: close_enemy_incapacitated != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.close_enemy_incapacitated
+              value: close_enemy_incapacitated
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.cover
+            value: null
+        - condition: cover != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.cover
+              value: cover
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.witness_state_ids
+            value: null
+        - condition: witness_state_ids != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.witness_state_ids
+              value: witness_state_ids
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.minor_elementals_damage_type
+            value: null
+        - condition: minor_elementals_damage_type != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_parameters.minor_elementals_damage_type
+              value: minor_elementals_damage_type
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_d20_modifier
+            value: null
+        - condition: _card_d20_modifier != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_d20_modifier
+              value: _card_d20_modifier
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_d20_roll
+            value: null
+        - condition: _card_d20_roll != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_d20_roll
+              value: _card_d20_roll
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_d20_total
+            value: null
+        - condition: _card_d20_total != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_d20_total
+              value: _card_d20_total
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_hp_before
+            value: null
+        - condition: _card_hp_before != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_hp_before
+              value: _card_hp_before
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_temp_before
+            value: null
+        - condition: _card_temp_before != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._card_temp_before
+              value: _card_temp_before
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_dice
+            value: null
+        - condition: _mirror_dice != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_dice
+              value: _mirror_dice
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_redirected
+            value: null
+        - condition: _mirror_redirected != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_redirected
+              value: _mirror_redirected
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_remaining
+            value: null
+        - condition: _mirror_remaining != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_remaining
+              value: _mirror_remaining
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_source_id
+            value: null
+        - condition: _mirror_source_id != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._mirror_source_id
+              value: _mirror_source_id
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_attack
+            value: null
+        - condition: _spell_attack != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_attack
+              value: _spell_attack
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_attack_kind
+            value: null
+        - condition: _spell_attack_kind != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_attack_kind
+              value: _spell_attack_kind
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_attack_outcome
+            value: null
+        - condition: _spell_attack_outcome != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_attack_outcome
+              value: _spell_attack_outcome
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_concentration_save_dc
+            value: null
+        - condition: _spell_concentration_save_dc != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_concentration_save_dc
+              value: _spell_concentration_save_dc
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_concentration_save_outcome
+            value: null
+        - condition: _spell_concentration_save_outcome != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_concentration_save_outcome
+              value: _spell_concentration_save_outcome
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_concentration_save_roll
+            value: null
+        - condition: _spell_concentration_save_roll != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_concentration_save_roll
+              value: _spell_concentration_save_roll
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_condition_critical_hit
+            value: null
+        - condition: _spell_condition_critical_hit != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_condition_critical_hit
+              value: _spell_condition_critical_hit
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_critical_hit
+            value: null
+        - condition: _spell_critical_hit != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_critical_hit
+              value: _spell_critical_hit
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_damage
+            value: null
+        - condition: _spell_damage != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_damage
               value: _spell_damage
-          - condition: caster_state.spell_ray_of_enfeeblement == true
-            on_true:
-            - call: modify_srd_actor_raw_damage_roll
-              params:
-                actor_state: '{_caster_state_id}'
-                lasting_state: state
-                amount: '{_spell_damage.total}'
-              export_context:
-                _ray_raw_damage: _ray_raw_damage
-            - set:
-                field: _spell_damage
-                value:
-                  sides: _spell_damage.sides
-                  count: _spell_damage.count
-                  results: _spell_damage.results
-                  modifier: _spell_damage.modifier
-                  total: _ray_raw_damage
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_damage_amount
+            value: null
+        - condition: _spell_damage_amount != null
+          on_true:
           - set:
-              field: _minor_producer_roll_carry
-              value: max(0, -(_spell_damage.total))
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_damage_amount
+              value: _spell_damage_amount
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_target_armor_class
+            value: null
+        - condition: _spell_target_armor_class != null
+          on_true:
           - set:
-              field: _minor_multi_base_amount
-              value: max(0, _spell_damage.total)
-          - call: apply_srd_multi_attack_damage
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._spell_target_armor_class
+              value: _spell_target_armor_class
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._visual_original_spell_damage
+            value: null
+        - condition: _visual_original_spell_damage != null
+          on_true:
+          - set:
+              field: state.pending_srd_actions.{_lite_ray_pending_id}.spell_attack_context._visual_original_spell_damage
+              value: _visual_original_spell_damage
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.awaiting_hit
+            value: true
+        - set:
+            field: _spell_hit_window_deferred
+            value: true
+        - call: record_srd_spell_target_result
+          params:
+            target: '{_target_id}'
+            brief: Attack total {_card_d20_total}; awaiting defense
+            detail: Saved D20 {_card_d20_roll.results}; attack total {_card_d20_total}. Resolve this real
+              ray's Reaction window before its damage or the next ray.
+          export_context:
+            _spell_target_summary: _spell_target_summary
+            _spell_target_detail: _spell_target_detail
+        - list_push:
+            list: _spell_summary_rows
+            value: _spell_target_summary
+        - list_push:
+            list: _spell_detail_rows
+            value: _spell_target_detail
+      - condition: _spell_hit_window_deferred != true
+        on_true:
+        - condition: _spell_attack_outcome == 'success'
+          on_true:
+          - call: resolve_srd_mirror_image_hit
             params:
-              target: '{_target_id}'
-              amount: '{_minor_multi_base_amount}'
-              damage_type: '{damage_type}'
-              critical_hit: '{_spell_critical_hit}'
-              source_state_id: '{_caster_state_id}'
-              witness_state_ids: '{witness_state_ids}'
-              unallocated_roll_penalty: '{_minor_producer_roll_carry}'
-              minor_elementals_damage_type: '{minor_elementals_damage_type}'
+              target_state: '{_target_id}'
+              attacker_state: '{_caster_state_id}'
             export_context:
-              _spell_damage_amount: _effective_damage
-              _spell_concentration_save_dc: _concentration_save_dc
-              _spell_concentration_save_outcome: _concentration_save_outcome
-              _spell_concentration_save_roll: _concentration_save_roll
+              _mirror_redirected: _mirror_redirected
+              _mirror_dice: _mirror_dice
+              _mirror_source_id: _mirror_source_id
+              _mirror_remaining: _mirror_remaining
+          - condition: _mirror_redirected != true
+            on_true:
+            - dice:
+                expression: '{dice_per_attack}{damage_die}'
+                critical: _spell_attack_kind == 'critical_hit'
+              store_as: _spell_damage
+            - set:
+                field: _visual_original_spell_damage
+                value: _spell_damage
+            - condition: caster_state.spell_ray_of_enfeeblement == true
+              on_true:
+              - call: modify_srd_actor_raw_damage_roll
+                params:
+                  actor_state: '{_caster_state_id}'
+                  lasting_state: state
+                  amount: '{_spell_damage.total}'
+                export_context:
+                  _ray_raw_damage: _ray_raw_damage
+              - set:
+                  field: _spell_damage
+                  value:
+                    sides: _spell_damage.sides
+                    count: _spell_damage.count
+                    results: _spell_damage.results
+                    modifier: _spell_damage.modifier
+                    total: _ray_raw_damage
+            - set:
+                field: _minor_producer_roll_carry
+                value: max(0, -(_spell_damage.total))
+            - set:
+                field: _minor_multi_base_amount
+                value: max(0, _spell_damage.total)
+            - call: apply_srd_multi_attack_damage
+              params:
+                target: '{_target_id}'
+                amount: '{_minor_multi_base_amount}'
+                damage_type: '{damage_type}'
+                critical_hit: '{_spell_critical_hit}'
+                source_state_id: '{_caster_state_id}'
+                witness_state_ids: '{witness_state_ids}'
+                unallocated_roll_penalty: '{_minor_producer_roll_carry}'
+                minor_elementals_damage_type: '{minor_elementals_damage_type}'
+              export_context:
+                _spell_damage_amount: _effective_damage
+                _spell_concentration_save_dc: _concentration_save_dc
+                _spell_concentration_save_outcome: _concentration_save_outcome
+                _spell_concentration_save_roll: _concentration_save_roll
       on_false:
       - set:
           field: _spell_target_armor_class
@@ -79979,105 +80417,107 @@ tools:
           value: null
       - call: initialize_srd_lite_constants_edf6727b634f
         export_context: '*'
-    - set:
-        field: _card_hp_lost
-        value: max(0, _card_hp_before - target.hp)
-    - set:
-        field: _card_temp_lost
-        value: max(0, _card_temp_before - target.temp_hp)
-    - set:
-        field: _card_damage
-        value: _card_hp_lost + _card_temp_lost
-    - set:
-        field: _card_check_text
-        value: '''No roll.'''
-    - call: record_srd_result_text
-      params:
-        text: D20 {_card_d20_roll.results}; selected {_card_d20_roll.total} + ({_card_d20_modifier}) =
-          {_card_d20_total}.
-      export_context:
-        _card_check_text: _recorded_result_text
-      condition: _card_d20_roll != null
-    - set:
-        field: _card_attack_label
-        value: '''No attack; target already defeated'''
-    - set:
-        field: _card_attack_label
-        value: '''Hit'''
-      condition: _spell_attack_outcome == 'success'
-    - set:
-        field: _card_attack_label
-        value: '''Miss'''
-      condition: _spell_attack_outcome == 'failure'
-    - set:
-        field: _card_attack_label
-        value: '''Critical hit'''
-      condition: _spell_attack_kind == 'critical_hit'
-    - set:
-        field: _card_attack_label
-        value: '''Duplicate hit'''
-      condition: _mirror_redirected == true
-    - set:
-        field: _card_damage_roll_text
-        value: ''''''
-    - call: record_srd_result_text
-      params:
-        text: Damage dice {_spell_damage.results}; rolled {_spell_damage.total}.
-      export_context:
-        _card_damage_roll_text: _recorded_result_text
-      condition: _spell_damage != null
-    - call: record_srd_spell_target_result
-      params:
-        target: '{_target_id}'
-        brief: '{_card_attack_label}; damage {_card_damage}'
-        detail: '{_card_attack_label}. {_card_check_text} Damage {_card_damage} (HP {_card_hp_lost}; temporary
-          HP {_card_temp_lost}). {_card_damage_roll_text}'
-      export_context:
-        _spell_target_summary: _spell_target_summary
-        _spell_target_detail: _spell_target_detail
-    - list_push:
-        list: _spell_summary_rows
-        value: _spell_target_summary
-    - list_push:
-        list: _spell_detail_rows
-        value: _spell_target_detail
-    - condition: _card_d20_roll != null
+    - condition: _spell_hit_window_deferred != true
       on_true:
-      - call: format_srd_information_projection
+      - set:
+          field: _card_hp_lost
+          value: max(0, _card_hp_before - target.hp)
+      - set:
+          field: _card_temp_lost
+          value: max(0, _card_temp_before - target.temp_hp)
+      - set:
+          field: _card_damage
+          value: _card_hp_lost + _card_temp_lost
+      - set:
+          field: _card_check_text
+          value: '''No roll.'''
+      - call: record_srd_result_text
         params:
-          message: Attack roll · AC {_spell_target_armor_class} · {_card_attack_label}
+          text: D20 {_card_d20_roll.results}; selected {_card_d20_roll.total} + ({_card_d20_modifier})
+            = {_card_d20_total}.
         export_context:
-          _visual_target_roll_caption: _info_projection_message
+          _card_check_text: _recorded_result_text
+        condition: _card_d20_roll != null
+      - set:
+          field: _card_attack_label
+          value: '''No attack; target already defeated'''
+      - set:
+          field: _card_attack_label
+          value: '''Hit'''
+        condition: _spell_attack_outcome == 'success'
+      - set:
+          field: _card_attack_label
+          value: '''Miss'''
+        condition: _spell_attack_outcome == 'failure'
+      - set:
+          field: _card_attack_label
+          value: '''Critical hit'''
+        condition: _spell_attack_kind == 'critical_hit'
+      - set:
+          field: _card_attack_label
+          value: '''Duplicate hit'''
+        condition: _mirror_redirected == true
+      - set:
+          field: _card_damage_roll_text
+          value: ''''''
+      - call: record_srd_result_text
+        params:
+          text: Damage dice {_spell_damage.results}; rolled {_spell_damage.total}.
+        export_context:
+          _card_damage_roll_text: _recorded_result_text
+        condition: _spell_damage != null
+      - call: record_srd_spell_target_result
+        params:
+          target: '{_target_id}'
+          brief: '{_card_attack_label}; damage {_card_damage}'
+          detail: '{_card_attack_label}. {_card_check_text} Damage {_card_damage} (HP {_card_hp_lost};
+            temporary HP {_card_temp_lost}). {_card_damage_roll_text}'
+        export_context:
+          _spell_target_summary: _spell_target_summary
+          _spell_target_detail: _spell_target_detail
+      - list_push:
+          list: _spell_summary_rows
+          value: _spell_target_summary
       - list_push:
           list: _spell_detail_rows
-          value:
-            label: target.name
-            value: _visual_target_roll_caption
-            equation:
-              die_sides: 20
-              roll: _card_d20_roll.total
-              modifier: _card_d20_modifier
-              total: _card_d20_total
-    - condition: _visual_original_spell_damage.results != null and len(_visual_original_spell_damage.results)
-        > 0
-      on_true:
-      - call: format_srd_information_projection
-        params:
-          message: '{damage_type} damage dice · applied {_card_damage} (HP {_card_hp_lost}; temporary
-            HP {_card_temp_lost})'
-        export_context:
-          _visual_beam_damage_caption: _info_projection_message
-      - list_push:
-          list: _spell_detail_rows
-          value:
-            label: _spell_target_detail.label
-            value: _visual_beam_damage_caption
-            equation:
-              die_sides: _visual_original_spell_damage.sides
-              rolls: _visual_original_spell_damage.results
-              roll: _visual_original_spell_damage.total
-              modifier: _spell_damage.modifier + _spell_damage.total - _visual_original_spell_damage.total
-              total: _spell_damage.total + _spell_damage.modifier
+          value: _spell_target_detail
+      - condition: _card_d20_roll != null
+        on_true:
+        - call: format_srd_information_projection
+          params:
+            message: Attack roll · AC {_spell_target_armor_class} · {_card_attack_label}
+          export_context:
+            _visual_target_roll_caption: _info_projection_message
+        - list_push:
+            list: _spell_detail_rows
+            value:
+              label: target.name
+              value: _visual_target_roll_caption
+              equation:
+                die_sides: 20
+                roll: _card_d20_roll.total
+                modifier: _card_d20_modifier
+                total: _card_d20_total
+      - condition: _visual_original_spell_damage.results != null and len(_visual_original_spell_damage.results)
+          > 0
+        on_true:
+        - call: format_srd_information_projection
+          params:
+            message: '{damage_type} damage dice · applied {_card_damage} (HP {_card_hp_lost}; temporary
+              HP {_card_temp_lost})'
+          export_context:
+            _visual_beam_damage_caption: _info_projection_message
+        - list_push:
+            list: _spell_detail_rows
+            value:
+              label: _spell_target_detail.label
+              value: _visual_beam_damage_caption
+              equation:
+                die_sides: _visual_original_spell_damage.sides
+                rolls: _visual_original_spell_damage.results
+                roll: _visual_original_spell_damage.total
+                modifier: _spell_damage.modifier + _spell_damage.total - _visual_original_spell_damage.total
+                total: _spell_damage.total + _spell_damage.modifier
     narrative:
       on_success: One independent ranged spell attack is resolved.
       on_failure: The independent ranged spell attack cannot be resolved.
@@ -80267,135 +80707,745 @@ tools:
           field: _sanctuary_lost_rays
           value: _sanctuary_ray_cast.sanctuary_lost_rays
         condition: _sanctuary_ray_cast.sanctuary_list_kind == 'attack'
-    - for_each:
-        collection: attack_targets
-        as: _multi_ray_target
-        do:
+    - set:
+        field: _spell_hit_window_deferred
+        value: false
+    - set:
+        field: _lite_ray_staged
+        value: spell == 'scorching_ray' and caster_state.pending_srd_completion_id != null
+    - condition: _lite_ray_staged == true
+      on_true:
+      - set:
+          field: _lite_ray_pending_id
+          value: caster_state.pending_srd_completion_id
+      - set:
+          field: _lite_ray_saved
+          value: lasting_state.pending_srd_actions[_lite_ray_pending_id]
+      - require:
+          condition: _lite_ray_saved.kind == 'spell_cast' and _lite_ray_saved.owner_kind == 'spell_cast'
+            and _lite_ray_saved.actor_state_id == _caster_state_id and _lite_ray_saved.lite_scorching_ray_cursor
+            == null
+          error: Start this ordered ray cursor only inside its original saved casting action.
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor
+          value:
+            targets: attack_targets
+            index: 0
+            awaiting_hit: false
+            finalized: false
+            parameters: {}
+            context: {}
+            sanctuary_lost_rays: _sanctuary_lost_rays
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.spell
+          value: null
+      - condition: spell != null
+        on_true:
         - set:
-            field: caster_state.pending_srd_sanctuary_ray_index
-            value: _sanctuary_ray_index
-        - condition: _sanctuary_ray_index not in _sanctuary_lost_rays
-          on_true:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.spell
+            value: spell
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.family
+          value: null
+      - condition: family != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.family
+            value: family
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_ability
+          value: null
+      - condition: casting_ability != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_ability
+            value: casting_ability
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_modifier
+          value: null
+      - condition: casting_modifier != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_modifier
+            value: casting_modifier
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_attack_bonus
+          value: null
+      - condition: casting_attack_bonus != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_attack_bonus
+            value: casting_attack_bonus
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_save_dc
+          value: null
+      - condition: casting_save_dc != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_save_dc
+            value: casting_save_dc
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_scaling_level
+          value: null
+      - condition: casting_scaling_level != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_scaling_level
+            value: casting_scaling_level
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_concentration_save_modifier
+          value: null
+      - condition: casting_concentration_save_modifier != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.casting_concentration_save_modifier
+            value: casting_concentration_save_modifier
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.caster_state
+          value: null
+      - condition: _caster_state_id != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.caster_state
+            value: _caster_state_id
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attack_targets
+          value: null
+      - condition: attack_targets != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attack_targets
+            value: attack_targets
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.caster_unseen_attack_targets
+          value: null
+      - condition: caster_unseen_attack_targets != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.caster_unseen_attack_targets
+            value: caster_unseen_attack_targets
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attack_targets_unable_to_see_caster
+          value: null
+      - condition: attack_targets_unable_to_see_caster != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attack_targets_unable_to_see_caster
+            value: attack_targets_unable_to_see_caster
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attack_targets_within_5_feet
+          value: null
+      - condition: attack_targets_within_5_feet != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attack_targets_within_5_feet
+            value: attack_targets_within_5_feet
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.half_cover_targets
+          value: null
+      - condition: half_cover_targets != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.half_cover_targets
+            value: half_cover_targets
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.three_quarters_cover_targets
+          value: null
+      - condition: three_quarters_cover_targets != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.three_quarters_cover_targets
+            value: three_quarters_cover_targets
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.slot_resource
+          value: null
+      - condition: slot_resource != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.slot_resource
+            value: slot_resource
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.slot_level
+          value: null
+      - condition: slot_level != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.slot_level
+            value: slot_level
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scaling_mode
+          value: null
+      - condition: scaling_mode != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scaling_mode
+            value: scaling_mode
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.base_level
+          value: null
+      - condition: base_level != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.base_level
+            value: base_level
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.base_attacks
+          value: null
+      - condition: base_attacks != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.base_attacks
+            value: base_attacks
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attacks_per_slot_level
+          value: null
+      - condition: attacks_per_slot_level != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.attacks_per_slot_level
+            value: attacks_per_slot_level
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.cantrip_upgrade_attacks
+          value: null
+      - condition: cantrip_upgrade_attacks != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.cantrip_upgrade_attacks
+            value: cantrip_upgrade_attacks
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.upgrade_level_1
+          value: null
+      - condition: upgrade_level_1 != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.upgrade_level_1
+            value: upgrade_level_1
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.upgrade_level_2
+          value: null
+      - condition: upgrade_level_2 != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.upgrade_level_2
+            value: upgrade_level_2
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.upgrade_level_3
+          value: null
+      - condition: upgrade_level_3 != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.upgrade_level_3
+            value: upgrade_level_3
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.dice_per_attack
+          value: null
+      - condition: dice_per_attack != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.dice_per_attack
+            value: dice_per_attack
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.damage_die
+          value: null
+      - condition: damage_die != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.damage_die
+            value: damage_die
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.damage_type
+          value: null
+      - condition: damage_type != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.damage_type
+            value: damage_type
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.range_feet
+          value: null
+      - condition: range_feet != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.range_feet
+            value: range_feet
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.requires_sight
+          value: null
+      - condition: requires_sight != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.requires_sight
+            value: requires_sight
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.targets_max_distance
+          value: null
+      - condition: targets_max_distance != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.targets_max_distance
+            value: targets_max_distance
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.all_attack_targets_have_clear_path
+          value: null
+      - condition: all_attack_targets_have_clear_path != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.all_attack_targets_have_clear_path
+            value: all_attack_targets_have_clear_path
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.enemy_within_5_feet
+          value: null
+      - condition: enemy_within_5_feet != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.enemy_within_5_feet
+            value: enemy_within_5_feet
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.close_enemy_can_see_caster
+          value: null
+      - condition: close_enemy_can_see_caster != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.close_enemy_can_see_caster
+            value: close_enemy_can_see_caster
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.close_enemy_incapacitated
+          value: null
+      - condition: close_enemy_incapacitated != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.close_enemy_incapacitated
+            value: close_enemy_incapacitated
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_target_supplied
+          value: null
+      - condition: scalar_target_supplied != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_target_supplied
+            value: scalar_target_supplied
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_target_distance_supplied
+          value: null
+      - condition: scalar_target_distance_supplied != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_target_distance_supplied
+            value: scalar_target_distance_supplied
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_caster_sight_supplied
+          value: null
+      - condition: scalar_caster_sight_supplied != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_caster_sight_supplied
+            value: scalar_caster_sight_supplied
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_target_can_see_caster
+          value: null
+      - condition: scalar_target_can_see_caster != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_target_can_see_caster
+            value: scalar_target_can_see_caster
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_cover
+          value: null
+      - condition: scalar_cover != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_cover
+            value: scalar_cover
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_advantage
+          value: null
+      - condition: scalar_advantage != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_advantage
+            value: scalar_advantage
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_disadvantage
+          value: null
+      - condition: scalar_disadvantage != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.scalar_disadvantage
+            value: scalar_disadvantage
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.witness_state_ids
+          value: null
+      - condition: witness_state_ids != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.witness_state_ids
+            value: witness_state_ids
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.minor_elementals_damage_type
+          value: null
+      - condition: minor_elementals_damage_type != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.parameters.minor_elementals_damage_type
+            value: minor_elementals_damage_type
+      - condition: _spell_summary_rows == null
+        on_true:
+        - set:
+            field: _spell_summary_rows
+            value: []
+      - condition: _spell_detail_rows == null
+        on_true:
+        - set:
+            field: _spell_detail_rows
+            value: []
+      - condition: _spell_multi_attack_targets == null
+        on_true:
+        - set:
+            field: _spell_multi_attack_targets
+            value: []
+      - condition: _spell_multi_target_numbers == null
+        on_true:
+        - set:
+            field: _spell_multi_target_numbers
+            value: []
+      - condition: _spell_multi_attacks == null
+        on_true:
+        - set:
+            field: _spell_multi_attacks
+            value: []
+      - condition: _spell_multi_attack_outcomes == null
+        on_true:
+        - set:
+            field: _spell_multi_attack_outcomes
+            value: []
+      - condition: _spell_multi_attack_kinds == null
+        on_true:
+        - set:
+            field: _spell_multi_attack_kinds
+            value: []
+      - condition: _spell_multi_damage == null
+        on_true:
+        - set:
+            field: _spell_multi_damage
+            value: []
+      - condition: _spell_multi_damage_amounts == null
+        on_true:
+        - set:
+            field: _spell_multi_damage_amounts
+            value: []
+      - condition: _spell_multi_concentration_save_dcs == null
+        on_true:
+        - set:
+            field: _spell_multi_concentration_save_dcs
+            value: []
+      - condition: _spell_multi_concentration_save_outcomes == null
+        on_true:
+        - set:
+            field: _spell_multi_concentration_save_outcomes
+            value: []
+      - condition: _spell_multi_concentration_save_rolls == null
+        on_true:
+        - set:
+            field: _spell_multi_concentration_save_rolls
+            value: []
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_summary_rows
+          value: null
+      - condition: _spell_summary_rows != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_summary_rows
+            value: _spell_summary_rows
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_detail_rows
+          value: null
+      - condition: _spell_detail_rows != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_detail_rows
+            value: _spell_detail_rows
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_count
+          value: null
+      - condition: _spell_multi_attack_count != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_count
+            value: _spell_multi_attack_count
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_targets
+          value: null
+      - condition: _spell_multi_attack_targets != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_targets
+            value: _spell_multi_attack_targets
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_target_numbers
+          value: null
+      - condition: _spell_multi_target_numbers != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_target_numbers
+            value: _spell_multi_target_numbers
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attacks
+          value: null
+      - condition: _spell_multi_attacks != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attacks
+            value: _spell_multi_attacks
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_outcomes
+          value: null
+      - condition: _spell_multi_attack_outcomes != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_outcomes
+            value: _spell_multi_attack_outcomes
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_kinds
+          value: null
+      - condition: _spell_multi_attack_kinds != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_attack_kinds
+            value: _spell_multi_attack_kinds
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_damage
+          value: null
+      - condition: _spell_multi_damage != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_damage
+            value: _spell_multi_damage
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_damage_amounts
+          value: null
+      - condition: _spell_multi_damage_amounts != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_damage_amounts
+            value: _spell_multi_damage_amounts
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_dcs
+          value: null
+      - condition: _spell_multi_concentration_save_dcs != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_dcs
+            value: _spell_multi_concentration_save_dcs
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_outcomes
+          value: null
+      - condition: _spell_multi_concentration_save_outcomes != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_outcomes
+            value: _spell_multi_concentration_save_outcomes
+      - set:
+          field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_rolls
+          value: null
+      - condition: _spell_multi_concentration_save_rolls != null
+        on_true:
+        - set:
+            field: state.pending_srd_actions.{_lite_ray_pending_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_rolls
+            value: _spell_multi_concentration_save_rolls
+      - call: continue_srd_lite_scorching_rays
+        params:
+          spell: '{spell}'
+          family: '{family}'
+          casting_ability: '{casting_ability}'
+          casting_modifier: '{casting_modifier}'
+          casting_attack_bonus: '{casting_attack_bonus}'
+          casting_save_dc: '{casting_save_dc}'
+          casting_scaling_level: '{casting_scaling_level}'
+          casting_concentration_save_modifier: '{casting_concentration_save_modifier}'
+          caster_state: '{_caster_state_id}'
+          attack_targets: '{attack_targets}'
+          caster_unseen_attack_targets: '{caster_unseen_attack_targets}'
+          attack_targets_unable_to_see_caster: '{attack_targets_unable_to_see_caster}'
+          attack_targets_within_5_feet: '{attack_targets_within_5_feet}'
+          half_cover_targets: '{half_cover_targets}'
+          three_quarters_cover_targets: '{three_quarters_cover_targets}'
+          slot_resource: '{slot_resource}'
+          slot_level: '{slot_level}'
+          scaling_mode: '{scaling_mode}'
+          base_level: '{base_level}'
+          base_attacks: '{base_attacks}'
+          attacks_per_slot_level: '{attacks_per_slot_level}'
+          cantrip_upgrade_attacks: '{cantrip_upgrade_attacks}'
+          upgrade_level_1: '{upgrade_level_1}'
+          upgrade_level_2: '{upgrade_level_2}'
+          upgrade_level_3: '{upgrade_level_3}'
+          dice_per_attack: '{dice_per_attack}'
+          damage_die: '{damage_die}'
+          damage_type: '{damage_type}'
+          range_feet: '{range_feet}'
+          requires_sight: '{requires_sight}'
+          targets_max_distance: '{targets_max_distance}'
+          all_attack_targets_have_clear_path: '{all_attack_targets_have_clear_path}'
+          enemy_within_5_feet: '{enemy_within_5_feet}'
+          close_enemy_can_see_caster: '{close_enemy_can_see_caster}'
+          close_enemy_incapacitated: '{close_enemy_incapacitated}'
+          scalar_target_supplied: '{scalar_target_supplied}'
+          scalar_target_distance_supplied: '{scalar_target_distance_supplied}'
+          scalar_caster_sight_supplied: '{scalar_caster_sight_supplied}'
+          scalar_target_can_see_caster: '{scalar_target_can_see_caster}'
+          scalar_cover: '{scalar_cover}'
+          scalar_advantage: '{scalar_advantage}'
+          scalar_disadvantage: '{scalar_disadvantage}'
+          witness_state_ids: '{witness_state_ids}'
+          minor_elementals_damage_type: '{minor_elementals_damage_type}'
+          pending_action_id: '{_lite_ray_pending_id}'
+          lasting_state: '{_lasting_state_id}'
+        export_context:
+          _spell_summary_rows: _spell_summary_rows
+          _spell_detail_rows: _spell_detail_rows
+          _spell_multi_attack_count: _spell_multi_attack_count
+          _spell_multi_attack_targets: _spell_multi_attack_targets
+          _spell_multi_target_numbers: _spell_multi_target_numbers
+          _spell_multi_attacks: _spell_multi_attacks
+          _spell_multi_attack_outcomes: _spell_multi_attack_outcomes
+          _spell_multi_attack_kinds: _spell_multi_attack_kinds
+          _spell_multi_damage: _spell_multi_damage
+          _spell_multi_damage_amounts: _spell_multi_damage_amounts
+          _spell_multi_concentration_save_dcs: _spell_multi_concentration_save_dcs
+          _spell_multi_concentration_save_outcomes: _spell_multi_concentration_save_outcomes
+          _spell_multi_concentration_save_rolls: _spell_multi_concentration_save_rolls
+          _spell_hit_window_deferred: _spell_hit_window_deferred
+    - condition: _lite_ray_staged != true
+      on_true:
+      - for_each:
+          collection: attack_targets
+          as: _multi_ray_target
+          do:
           - set:
-              field: _multi_caster_can_see_target
-              value: not (_multi_ray_target in caster_unseen_attack_targets)
+              field: caster_state.pending_srd_sanctuary_ray_index
+              value: _sanctuary_ray_index
+          - condition: _sanctuary_ray_index not in _sanctuary_lost_rays
+            on_true:
+            - set:
+                field: _multi_caster_can_see_target
+                value: not (_multi_ray_target in caster_unseen_attack_targets)
+            - set:
+                field: _multi_target_can_see_caster
+                value: not (_multi_ray_target in attack_targets_unable_to_see_caster)
+            - set:
+                field: _multi_target_within_5_feet
+                value: _multi_ray_target in attack_targets_within_5_feet
+            - set:
+                field: _multi_cover
+                value: '''none'''
+            - set:
+                field: _multi_cover
+                value: '''half'''
+              condition: _multi_ray_target in half_cover_targets
+            - set:
+                field: _multi_cover
+                value: '''three_quarters'''
+              condition: _multi_ray_target in three_quarters_cover_targets
+            - call: resolve_spell_multi_attack_target
+              params:
+                spell: '{spell}'
+                caster_state: '{_caster_state_id}'
+                target: '{_multi_ray_target}'
+                dice_per_attack: '{dice_per_attack}'
+                damage_die: '{damage_die}'
+                damage_type: '{damage_type}'
+                caster_can_see_target: '{_multi_caster_can_see_target}'
+                target_can_see_caster: '{_multi_target_can_see_caster}'
+                target_within_5_feet: '{_multi_target_within_5_feet}'
+                initial_advantage: false
+                initial_disadvantage: false
+                enemy_within_5_feet: '{enemy_within_5_feet}'
+                close_enemy_can_see_caster: '{close_enemy_can_see_caster}'
+                close_enemy_incapacitated: '{close_enemy_incapacitated}'
+                cover: '{_multi_cover}'
+                casting_ability: '{casting_ability}'
+                casting_modifier: '{casting_modifier}'
+                casting_attack_bonus: '{casting_attack_bonus}'
+                casting_save_dc: '{casting_save_dc}'
+                casting_scaling_level: '{casting_scaling_level}'
+                casting_concentration_save_modifier: '{casting_concentration_save_modifier}'
+                witness_state_ids: '{witness_state_ids}'
+                minor_elementals_damage_type: '{minor_elementals_damage_type}'
+              export_context:
+                _multi_target_number: _spell_target_armor_class
+                _multi_attack: _spell_attack
+                _multi_attack_outcome: _spell_attack_outcome
+                _multi_attack_kind: _spell_attack_kind
+                _multi_damage: _spell_damage
+                _multi_damage_amount: _spell_damage_amount
+                _multi_concentration_save_dc: _spell_concentration_save_dc
+                _multi_concentration_save_outcome: _spell_concentration_save_outcome
+                _multi_concentration_save_roll: _spell_concentration_save_roll
+                _nested_spell_summary_rows: _spell_summary_rows
+                _nested_spell_detail_rows: _spell_detail_rows
+            - for_each:
+                collection: _nested_spell_summary_rows
+                as: _nested_spell_row
+                do:
+                - list_push:
+                    list: _spell_summary_rows
+                    value: _nested_spell_row
+            - for_each:
+                collection: _nested_spell_detail_rows
+                as: _nested_spell_row
+                do:
+                - list_push:
+                    list: _spell_detail_rows
+                    value: _nested_spell_row
+            - list_push:
+                list: _spell_multi_attack_targets
+                value: _multi_ray_target
+            - list_push:
+                list: _spell_multi_target_numbers
+                value: _multi_target_number
+            - list_push:
+                list: _spell_multi_attacks
+                value: _multi_attack
+            - list_push:
+                list: _spell_multi_attack_outcomes
+                value: _multi_attack_outcome
+            - list_push:
+                list: _spell_multi_attack_kinds
+                value: _multi_attack_kind
+            - list_push:
+                list: _spell_multi_damage
+                value: _multi_damage
+            - list_push:
+                list: _spell_multi_damage_amounts
+                value: _multi_damage_amount
+            - list_push:
+                list: _spell_multi_concentration_save_dcs
+                value: _multi_concentration_save_dc
+            - list_push:
+                list: _spell_multi_concentration_save_outcomes
+                value: _multi_concentration_save_outcome
+            - list_push:
+                list: _spell_multi_concentration_save_rolls
+                value: _multi_concentration_save_roll
+            on_false:
+            - list_push:
+                list: _spell_summary_rows
+                value:
+                  label: '''Sanctuary'''
+                  value: '''Ray lost after failed Sanctuary save.'''
           - set:
-              field: _multi_target_can_see_caster
-              value: not (_multi_ray_target in attack_targets_unable_to_see_caster)
+              field: caster_state.pending_srd_sanctuary_ray_index
+              value: null
           - set:
-              field: _multi_target_within_5_feet
-              value: _multi_ray_target in attack_targets_within_5_feet
-          - set:
-              field: _multi_cover
-              value: '''none'''
-          - set:
-              field: _multi_cover
-              value: '''half'''
-            condition: _multi_ray_target in half_cover_targets
-          - set:
-              field: _multi_cover
-              value: '''three_quarters'''
-            condition: _multi_ray_target in three_quarters_cover_targets
-          - call: resolve_spell_multi_attack_target
+              field: _sanctuary_ray_index
+              value: _sanctuary_ray_index + 1
+      - for_each:
+          collection: attack_targets
+          as: _multi_ray_target
+          do:
+          - call: finalize_spell_multi_attack_target
             params:
-              spell: '{spell}'
-              caster_state: '{_caster_state_id}'
               target: '{_multi_ray_target}'
-              dice_per_attack: '{dice_per_attack}'
-              damage_die: '{damage_die}'
-              damage_type: '{damage_type}'
-              caster_can_see_target: '{_multi_caster_can_see_target}'
-              target_can_see_caster: '{_multi_target_can_see_caster}'
-              target_within_5_feet: '{_multi_target_within_5_feet}'
-              initial_advantage: false
-              initial_disadvantage: false
-              enemy_within_5_feet: '{enemy_within_5_feet}'
-              close_enemy_can_see_caster: '{close_enemy_can_see_caster}'
-              close_enemy_incapacitated: '{close_enemy_incapacitated}'
-              cover: '{_multi_cover}'
-              casting_ability: '{casting_ability}'
-              casting_modifier: '{casting_modifier}'
-              casting_attack_bonus: '{casting_attack_bonus}'
-              casting_save_dc: '{casting_save_dc}'
-              casting_scaling_level: '{casting_scaling_level}'
-              casting_concentration_save_modifier: '{casting_concentration_save_modifier}'
-              witness_state_ids: '{witness_state_ids}'
-              minor_elementals_damage_type: '{minor_elementals_damage_type}'
-            export_context:
-              _multi_target_number: _spell_target_armor_class
-              _multi_attack: _spell_attack
-              _multi_attack_outcome: _spell_attack_outcome
-              _multi_attack_kind: _spell_attack_kind
-              _multi_damage: _spell_damage
-              _multi_damage_amount: _spell_damage_amount
-              _multi_concentration_save_dc: _spell_concentration_save_dc
-              _multi_concentration_save_outcome: _spell_concentration_save_outcome
-              _multi_concentration_save_roll: _spell_concentration_save_roll
-              _nested_spell_summary_rows: _spell_summary_rows
-              _nested_spell_detail_rows: _spell_detail_rows
-          - for_each:
-              collection: _nested_spell_summary_rows
-              as: _nested_spell_row
-              do:
-              - list_push:
-                  list: _spell_summary_rows
-                  value: _nested_spell_row
-          - for_each:
-              collection: _nested_spell_detail_rows
-              as: _nested_spell_row
-              do:
-              - list_push:
-                  list: _spell_detail_rows
-                  value: _nested_spell_row
-          - list_push:
-              list: _spell_multi_attack_targets
-              value: _multi_ray_target
-          - list_push:
-              list: _spell_multi_target_numbers
-              value: _multi_target_number
-          - list_push:
-              list: _spell_multi_attacks
-              value: _multi_attack
-          - list_push:
-              list: _spell_multi_attack_outcomes
-              value: _multi_attack_outcome
-          - list_push:
-              list: _spell_multi_attack_kinds
-              value: _multi_attack_kind
-          - list_push:
-              list: _spell_multi_damage
-              value: _multi_damage
-          - list_push:
-              list: _spell_multi_damage_amounts
-              value: _multi_damage_amount
-          - list_push:
-              list: _spell_multi_concentration_save_dcs
-              value: _multi_concentration_save_dc
-          - list_push:
-              list: _spell_multi_concentration_save_outcomes
-              value: _multi_concentration_save_outcome
-          - list_push:
-              list: _spell_multi_concentration_save_rolls
-              value: _multi_concentration_save_roll
-          on_false:
-          - list_push:
-              list: _spell_summary_rows
-              value:
-                label: '''Sanctuary'''
-                value: '''Ray lost after failed Sanctuary save.'''
-        - set:
-            field: caster_state.pending_srd_sanctuary_ray_index
-            value: null
-        - set:
-            field: _sanctuary_ray_index
-            value: _sanctuary_ray_index + 1
-    - for_each:
-        collection: attack_targets
-        as: _multi_ray_target
-        do:
-        - call: finalize_spell_multi_attack_target
-          params:
-            target: '{_multi_ray_target}'
     narrative:
       on_success: Every declared ray is resolved as an independent ranged spell attack.
       on_failure: The independent spell-attack family cannot be resolved.
@@ -95967,6 +97017,79 @@ tools:
           source_id: '{_retained_event.retained_attack_parameters.source_id}'
           pending_action_id: '{pending_action_id}'
         export_context: '*'
+    - condition: _pending_action.kind == 'spell_attack' and _pending_action.status == 'open' and _pending_action.stage
+        == 'spell_attack_reaction' and _pending_action.lite_scorching_ray_cursor != null
+      on_true:
+      - call: continue_srd_lite_scorching_rays
+        params:
+          spell: '{_pending_action.lite_scorching_ray_cursor.parameters.spell}'
+          family: '{_pending_action.lite_scorching_ray_cursor.parameters.family}'
+          casting_ability: '{_pending_action.lite_scorching_ray_cursor.parameters.casting_ability}'
+          casting_modifier: '{_pending_action.lite_scorching_ray_cursor.parameters.casting_modifier}'
+          casting_attack_bonus: '{_pending_action.lite_scorching_ray_cursor.parameters.casting_attack_bonus}'
+          casting_save_dc: '{_pending_action.lite_scorching_ray_cursor.parameters.casting_save_dc}'
+          casting_scaling_level: '{_pending_action.lite_scorching_ray_cursor.parameters.casting_scaling_level}'
+          casting_concentration_save_modifier: '{_pending_action.lite_scorching_ray_cursor.parameters.casting_concentration_save_modifier}'
+          caster_state: '{_pending_action.lite_scorching_ray_cursor.parameters.caster_state}'
+          attack_targets: '{_pending_action.lite_scorching_ray_cursor.parameters.attack_targets}'
+          caster_unseen_attack_targets: '{_pending_action.lite_scorching_ray_cursor.parameters.caster_unseen_attack_targets}'
+          attack_targets_unable_to_see_caster: '{_pending_action.lite_scorching_ray_cursor.parameters.attack_targets_unable_to_see_caster}'
+          attack_targets_within_5_feet: '{_pending_action.lite_scorching_ray_cursor.parameters.attack_targets_within_5_feet}'
+          half_cover_targets: '{_pending_action.lite_scorching_ray_cursor.parameters.half_cover_targets}'
+          three_quarters_cover_targets: '{_pending_action.lite_scorching_ray_cursor.parameters.three_quarters_cover_targets}'
+          slot_resource: '{_pending_action.lite_scorching_ray_cursor.parameters.slot_resource}'
+          slot_level: '{_pending_action.lite_scorching_ray_cursor.parameters.slot_level}'
+          scaling_mode: '{_pending_action.lite_scorching_ray_cursor.parameters.scaling_mode}'
+          base_level: '{_pending_action.lite_scorching_ray_cursor.parameters.base_level}'
+          base_attacks: '{_pending_action.lite_scorching_ray_cursor.parameters.base_attacks}'
+          attacks_per_slot_level: '{_pending_action.lite_scorching_ray_cursor.parameters.attacks_per_slot_level}'
+          cantrip_upgrade_attacks: '{_pending_action.lite_scorching_ray_cursor.parameters.cantrip_upgrade_attacks}'
+          upgrade_level_1: '{_pending_action.lite_scorching_ray_cursor.parameters.upgrade_level_1}'
+          upgrade_level_2: '{_pending_action.lite_scorching_ray_cursor.parameters.upgrade_level_2}'
+          upgrade_level_3: '{_pending_action.lite_scorching_ray_cursor.parameters.upgrade_level_3}'
+          dice_per_attack: '{_pending_action.lite_scorching_ray_cursor.parameters.dice_per_attack}'
+          damage_die: '{_pending_action.lite_scorching_ray_cursor.parameters.damage_die}'
+          damage_type: '{_pending_action.lite_scorching_ray_cursor.parameters.damage_type}'
+          range_feet: '{_pending_action.lite_scorching_ray_cursor.parameters.range_feet}'
+          requires_sight: '{_pending_action.lite_scorching_ray_cursor.parameters.requires_sight}'
+          targets_max_distance: '{_pending_action.lite_scorching_ray_cursor.parameters.targets_max_distance}'
+          all_attack_targets_have_clear_path: '{_pending_action.lite_scorching_ray_cursor.parameters.all_attack_targets_have_clear_path}'
+          enemy_within_5_feet: '{_pending_action.lite_scorching_ray_cursor.parameters.enemy_within_5_feet}'
+          close_enemy_can_see_caster: '{_pending_action.lite_scorching_ray_cursor.parameters.close_enemy_can_see_caster}'
+          close_enemy_incapacitated: '{_pending_action.lite_scorching_ray_cursor.parameters.close_enemy_incapacitated}'
+          scalar_target_supplied: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_target_supplied}'
+          scalar_target_distance_supplied: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_target_distance_supplied}'
+          scalar_caster_sight_supplied: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_caster_sight_supplied}'
+          scalar_target_can_see_caster: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_target_can_see_caster}'
+          scalar_cover: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_cover}'
+          scalar_advantage: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_advantage}'
+          scalar_disadvantage: '{_pending_action.lite_scorching_ray_cursor.parameters.scalar_disadvantage}'
+          witness_state_ids: '{_pending_action.lite_scorching_ray_cursor.parameters.witness_state_ids}'
+          minor_elementals_damage_type: '{_pending_action.lite_scorching_ray_cursor.parameters.minor_elementals_damage_type}'
+          pending_action_id: '{pending_action_id}'
+          lasting_state: '{_lasting_state_id}'
+        export_context:
+          _spell_summary_rows: _spell_summary_rows
+          _spell_detail_rows: _spell_detail_rows
+          _spell_multi_attack_count: _spell_multi_attack_count
+          _spell_multi_attack_targets: _spell_multi_attack_targets
+          _spell_multi_target_numbers: _spell_multi_target_numbers
+          _spell_multi_attacks: _spell_multi_attacks
+          _spell_multi_attack_outcomes: _spell_multi_attack_outcomes
+          _spell_multi_attack_kinds: _spell_multi_attack_kinds
+          _spell_multi_damage: _spell_multi_damage
+          _spell_multi_damage_amounts: _spell_multi_damage_amounts
+          _spell_multi_concentration_save_dcs: _spell_multi_concentration_save_dcs
+          _spell_multi_concentration_save_outcomes: _spell_multi_concentration_save_outcomes
+          _spell_multi_concentration_save_rolls: _spell_multi_concentration_save_rolls
+          _spell_hit_window_deferred: _spell_hit_window_deferred
+          _spell_card_summary: _spell_card_summary
+      - set:
+          field: _pending_card_summary
+          value: _spell_summary_rows
+      - set:
+          field: _pending_card_details
+          value: _spell_detail_rows
     - call: complete_srd_spell_attack_consequences
       params:
         material_item_ids: '{_pending_action.parameters.material_item_ids}'
@@ -96334,9 +97457,9 @@ tools:
         travel_exploration_destinations: '{_pending_action.parameters.travel_exploration_destinations}'
         minor_same_plane: '{_pending_action.parameters.minor_same_plane}'
       export_context: '*'
-      condition: _pending_action.kind == 'spell_attack' and _pending_action.status == 'open' and _pending_action.owner_kind
+      condition: (_pending_action.kind == 'spell_attack' and _pending_action.status == 'open' and _pending_action.owner_kind
         != 'produce_flame' and _pending_action.owner_kind != 'chromatic_orb' and _pending_action.owner_kind
-        != 'retained_spell_attack'
+        != 'retained_spell_attack') and _pending_action.lite_scorching_ray_cursor == null
     - call: complete_srd_chromatic_orb_attack
       params:
         pending_action_id: '{pending_action_id}'
@@ -120000,6 +121123,9 @@ tools:
         - key: '''_spell_summary_rows'''
           missing: _spell_hit_event.spell_attack_context._spell_summary_rows == null
           value: _spell_hit_event.spell_attack_context._spell_summary_rows
+        - key: '''_spell_target_armor_class'''
+          missing: _spell_target_armor_class == null
+          value: _spell_target_armor_class
     - for_each:
         collection: _retained_nullable_capture_rows
         as: _retained_nullable_capture_row
@@ -120373,6 +121499,9 @@ tools:
             - key: '''_spell_summary_rows'''
               missing: _spell_summary_rows == null
               value: _spell_summary_rows
+            - key: '''_spell_target_armor_class'''
+              missing: _spell_target_armor_class == null
+              value: _spell_target_armor_class
         - for_each:
             collection: _retained_nullable_capture_rows
             as: _retained_nullable_capture_row
@@ -363077,6 +364206,1357 @@ tools:
         field: _concentration_save_total
         value: null
 # Shared generated parameter declarations; expand before source regeneration.
+  apply_srd_lite_force_dart:
+    description: Apply one rolled Magic Missile dart to its own target and record its result row.
+    parameters:
+    - name: target
+      type: string
+      required: true
+      resolve: entity
+    - name: index
+      type: integer
+      required: true
+    - name: face
+      type: integer
+      required: true
+    - name: amount
+      type: integer
+      required: true
+    - name: flat
+      type: integer
+      required: true
+    - name: repeat
+      type: boolean
+      required: true
+    - param_damage_type_38a60b911799493b
+    - param_source_state_id_565a8b9e227b2551
+    - param_witness_state_ids_1dc147c145211b0d
+    - name: lasting_state
+      type: string
+      required: false
+      resolve: entity
+      default: state
+    pre_conditions: []
+    effects:
+    - set:
+        field: _dart_hp_lost
+        value: 0
+    - set:
+        field: _dart_temp_lost
+        value: 0
+    - set:
+        field: _dart_amount
+        value: max(0, amount)
+    - set:
+        field: _dart_flat
+        value: flat + min(0, amount)
+    - set:
+        field: _dart_alive_before
+        value: target.is_alive == true
+    - set:
+        field: _dart_rest_window
+        value: target.short_rest_hit_dice_available
+    - condition: _dart_alive_before == true
+      on_true:
+      - call: apply_srd_magic_missile_damage
+        params:
+          target: '{_target_id}'
+          amount: '{_dart_amount}'
+          adjustment: '{_dart_flat}'
+          damage_type: '{damage_type}'
+          source_state_id: '{source_state_id}'
+          witness_state_ids: '{witness_state_ids}'
+        export_context:
+          _dart_hp_lost: _hp_lost
+          _dart_temp_lost: _temp_hp_absorbed
+    - condition: repeat == true and _dart_rest_window == true and target.short_rest_hit_dice_available
+        != true
+      on_true:
+      - set:
+          field: target.short_rest_hit_dice_available
+          value: true
+    - set:
+        field: _dart_damage
+        value: _dart_hp_lost + _dart_temp_lost
+    - set:
+        field: _dart_alive_text
+        value: '''false'''
+    - condition: _dart_alive_before == true
+      on_true:
+      - set:
+          field: _dart_alive_text
+          value: '''true'''
+    - call: record_srd_spell_target_result
+      params:
+        target: '{_target_id}'
+        brief: 'Dart {index}: damage {_dart_damage}'
+        detail: 'Dart {index}. d4: {face}; {_dart_amount} + {_dart_flat} force before mitigation. Damage
+          {_dart_damage}. HP lost {_dart_hp_lost}; temporary HP lost {_dart_temp_lost}. Target alive before
+          dart: {_dart_alive_text}.'
+      export_context:
+        _spell_target_summary: _spell_target_summary
+        _spell_target_detail: _spell_target_detail
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  finish_srd_lite_scorching_ray_hit:
+    description: Finish the actual retained Scorching Ray hit without another attack roll or casting cost.
+    parameters:
+    - name: spell
+    - name: casting_ability
+      type: enum
+      enum_values:
+      - intelligence
+      - wisdom
+      - charisma
+      - strength
+      - dexterity
+      - constitution
+    - name: casting_modifier
+      type: integer
+    - name: casting_attack_bonus
+      type: integer
+    - name: casting_save_dc
+      type: integer
+    - name: casting_scaling_level
+      type: integer
+    - name: casting_concentration_save_modifier
+      type: integer
+      required: false
+    - name: caster_state
+      resolve: entity
+    - name: target
+      resolve: entity
+    - name: dice_per_attack
+      type: integer
+      minimum: 1
+      maximum: 32
+    - name: damage_die
+      type: enum
+      enum_values:
+      - d4
+      - d6
+      - d8
+      - d10
+      - d12
+    - name: damage_type
+      type: enum
+      enum_values:
+      - acid
+      - bludgeoning
+      - cold
+      - fire
+      - force
+      - lightning
+      - necrotic
+      - piercing
+      - poison
+      - psychic
+      - radiant
+      - slashing
+      - thunder
+    - name: caster_can_see_target
+      type: boolean
+    - name: target_can_see_caster
+      type: boolean
+    - name: target_within_5_feet
+      type: boolean
+    - name: initial_advantage
+      type: boolean
+    - name: initial_disadvantage
+      type: boolean
+    - name: enemy_within_5_feet
+      type: boolean
+    - name: close_enemy_can_see_caster
+      type: boolean
+    - name: close_enemy_incapacitated
+      type: boolean
+    - name: cover
+      type: enum
+      enum_values:
+      - none
+      - half
+      - three_quarters
+    - name: witness_state_ids
+      type: array
+      items:
+        type: string
+      required: false
+    - name: minor_elementals_damage_type
+      type: enum
+      required: false
+      default: fire
+      enum_values:
+      - acid
+      - cold
+      - fire
+      - lightning
+    - name: pending_action_id
+      type: string
+      required: true
+    - name: lasting_state
+      type: string
+      required: false
+      resolve: entity
+      default: state
+    pre_conditions: []
+    effects:
+    - set:
+        field: _lite_ray_event
+        value: lasting_state.pending_srd_actions[pending_action_id]
+    - set:
+        field: _lite_ray_saved_cursor
+        value: _lite_ray_event.lite_scorching_ray_cursor
+    - require:
+        condition: _lite_ray_event.kind == 'spell_attack' and _lite_ray_event.owner_kind == 'spell_cast'
+          and _lite_ray_event.spell == 'scorching_ray' and _lite_ray_event.stage == 'spell_attack_reaction'
+          and _lite_ray_event.status == 'open' and _lite_ray_event.actor_state_id == _caster_state_id
+          and _lite_ray_event.target_state_id == _target_id and _lite_ray_saved_cursor.targets[_lite_ray_saved_cursor.index]
+          == _target_id and _lite_ray_saved_cursor.awaiting_hit == true
+        error: Only the original saved ray can finish this hit window.
+    - set:
+        field: _card_d20_modifier
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._card_d20_modifier != null
+      on_true:
+      - set:
+          field: _card_d20_modifier
+          value: _lite_ray_event.spell_attack_context._card_d20_modifier
+    - set:
+        field: _card_d20_roll
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._card_d20_roll != null
+      on_true:
+      - set:
+          field: _card_d20_roll
+          value: _lite_ray_event.spell_attack_context._card_d20_roll
+    - set:
+        field: _card_d20_total
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._card_d20_total != null
+      on_true:
+      - set:
+          field: _card_d20_total
+          value: _lite_ray_event.spell_attack_context._card_d20_total
+    - set:
+        field: _card_hp_before
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._card_hp_before != null
+      on_true:
+      - set:
+          field: _card_hp_before
+          value: _lite_ray_event.spell_attack_context._card_hp_before
+    - set:
+        field: _card_temp_before
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._card_temp_before != null
+      on_true:
+      - set:
+          field: _card_temp_before
+          value: _lite_ray_event.spell_attack_context._card_temp_before
+    - set:
+        field: _mirror_dice
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._mirror_dice != null
+      on_true:
+      - set:
+          field: _mirror_dice
+          value: _lite_ray_event.spell_attack_context._mirror_dice
+    - set:
+        field: _mirror_redirected
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._mirror_redirected != null
+      on_true:
+      - set:
+          field: _mirror_redirected
+          value: _lite_ray_event.spell_attack_context._mirror_redirected
+    - set:
+        field: _mirror_remaining
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._mirror_remaining != null
+      on_true:
+      - set:
+          field: _mirror_remaining
+          value: _lite_ray_event.spell_attack_context._mirror_remaining
+    - set:
+        field: _mirror_source_id
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._mirror_source_id != null
+      on_true:
+      - set:
+          field: _mirror_source_id
+          value: _lite_ray_event.spell_attack_context._mirror_source_id
+    - set:
+        field: _spell_attack
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_attack != null
+      on_true:
+      - set:
+          field: _spell_attack
+          value: _lite_ray_event.spell_attack_context._spell_attack
+    - set:
+        field: _spell_attack_kind
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_attack_kind != null
+      on_true:
+      - set:
+          field: _spell_attack_kind
+          value: _lite_ray_event.spell_attack_context._spell_attack_kind
+    - set:
+        field: _spell_attack_outcome
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_attack_outcome != null
+      on_true:
+      - set:
+          field: _spell_attack_outcome
+          value: _lite_ray_event.spell_attack_context._spell_attack_outcome
+    - set:
+        field: _spell_concentration_save_dc
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_concentration_save_dc != null
+      on_true:
+      - set:
+          field: _spell_concentration_save_dc
+          value: _lite_ray_event.spell_attack_context._spell_concentration_save_dc
+    - set:
+        field: _spell_concentration_save_outcome
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_concentration_save_outcome != null
+      on_true:
+      - set:
+          field: _spell_concentration_save_outcome
+          value: _lite_ray_event.spell_attack_context._spell_concentration_save_outcome
+    - set:
+        field: _spell_concentration_save_roll
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_concentration_save_roll != null
+      on_true:
+      - set:
+          field: _spell_concentration_save_roll
+          value: _lite_ray_event.spell_attack_context._spell_concentration_save_roll
+    - set:
+        field: _spell_condition_critical_hit
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_condition_critical_hit != null
+      on_true:
+      - set:
+          field: _spell_condition_critical_hit
+          value: _lite_ray_event.spell_attack_context._spell_condition_critical_hit
+    - set:
+        field: _spell_critical_hit
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_critical_hit != null
+      on_true:
+      - set:
+          field: _spell_critical_hit
+          value: _lite_ray_event.spell_attack_context._spell_critical_hit
+    - set:
+        field: _spell_damage
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_damage != null
+      on_true:
+      - set:
+          field: _spell_damage
+          value: _lite_ray_event.spell_attack_context._spell_damage
+    - set:
+        field: _spell_damage_amount
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_damage_amount != null
+      on_true:
+      - set:
+          field: _spell_damage_amount
+          value: _lite_ray_event.spell_attack_context._spell_damage_amount
+    - set:
+        field: _spell_target_armor_class
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._spell_target_armor_class != null
+      on_true:
+      - set:
+          field: _spell_target_armor_class
+          value: _lite_ray_event.spell_attack_context._spell_target_armor_class
+    - set:
+        field: _visual_original_spell_damage
+        value: null
+    - condition: _lite_ray_event.spell_attack_context._visual_original_spell_damage != null
+      on_true:
+      - set:
+          field: _visual_original_spell_damage
+          value: _lite_ray_event.spell_attack_context._visual_original_spell_damage
+    - set:
+        field: _spell_hit_window_deferred
+        value: false
+    - set:
+        field: _spell_attack_outcome
+        value: '''target_already_defeated'''
+    - set:
+        field: _spell_attack_kind
+        value: null
+    - condition: target.is_alive == true
+      on_true:
+      - set:
+          field: _spell_target_armor_class
+          value: target.armor_class
+      - set:
+          field: _hand_attack_origin
+          value: _caster_state_id
+      - call: initialize_srd_lite_constants_ff2306b7469f
+        export_context: '*'
+      - set:
+          field: _hand_existing_cover
+          value: 2
+        condition: _cantrip_combat_cover == 'half'
+      - set:
+          field: _hand_existing_cover
+          value: 5
+        condition: _cantrip_combat_cover == 'three_quarters'
+      - call: resolve_srd_effective_armor_class
+        params:
+          target_state: '{_target_id}'
+          lasting_state: state
+          base_armor_class: '{_spell_target_armor_class}'
+          hand_cover_source: '{_hand_attack_origin}'
+          hand_existing_cover_bonus: '{_hand_existing_cover}'
+        export_context:
+          _spell_target_armor_class: _effective_armor_class
+      - set:
+          field: _spell_target_armor_class
+          value: _spell_target_armor_class + 2
+        condition: _cantrip_combat_cover == 'half'
+      - set:
+          field: _spell_target_armor_class
+          value: _spell_target_armor_class + 5
+        condition: _cantrip_combat_cover == 'three_quarters'
+      - set:
+          field: _spell_attack_outcome
+          value: '''failure'''
+      - set:
+          field: _spell_attack_kind
+          value: '''miss'''
+      - condition: _card_d20_roll.total == 20
+        on_true:
+        - set:
+            field: _spell_attack_outcome
+            value: '''success'''
+        - set:
+            field: _spell_attack_kind
+            value: '''critical_hit'''
+      - condition: _card_d20_roll.total != 1 and _card_d20_total >= _spell_target_armor_class and _spell_attack_kind
+          != 'critical_hit'
+        on_true:
+        - set:
+            field: _spell_attack_outcome
+            value: '''success'''
+        - set:
+            field: _spell_attack_kind
+            value: '''hit'''
+      - condition: _spell_attack_outcome == 'success' and _spell_condition_critical_hit == true
+        on_true:
+        - set:
+            field: _spell_attack_kind
+            value: '''critical_hit'''
+      - set:
+          field: _spell_critical_hit
+          value: _spell_attack_kind == 'critical_hit'
+      - condition: _spell_attack_outcome == 'success'
+        on_true:
+        - call: resolve_srd_mirror_image_hit
+          params:
+            target_state: '{_target_id}'
+            attacker_state: '{_caster_state_id}'
+          export_context:
+            _mirror_redirected: _mirror_redirected
+            _mirror_dice: _mirror_dice
+            _mirror_source_id: _mirror_source_id
+            _mirror_remaining: _mirror_remaining
+        - condition: _mirror_redirected != true
+          on_true:
+          - dice:
+              expression: '{dice_per_attack}{damage_die}'
+              critical: _spell_attack_kind == 'critical_hit'
+            store_as: _spell_damage
+          - set:
+              field: _visual_original_spell_damage
+              value: _spell_damage
+          - condition: caster_state.spell_ray_of_enfeeblement == true
+            on_true:
+            - call: modify_srd_actor_raw_damage_roll
+              params:
+                actor_state: '{_caster_state_id}'
+                lasting_state: state
+                amount: '{_spell_damage.total}'
+              export_context:
+                _ray_raw_damage: _ray_raw_damage
+            - set:
+                field: _spell_damage
+                value:
+                  sides: _spell_damage.sides
+                  count: _spell_damage.count
+                  results: _spell_damage.results
+                  modifier: _spell_damage.modifier
+                  total: _ray_raw_damage
+          - set:
+              field: _minor_producer_roll_carry
+              value: max(0, -(_spell_damage.total))
+          - set:
+              field: _minor_multi_base_amount
+              value: max(0, _spell_damage.total)
+          - call: apply_srd_multi_attack_damage
+            params:
+              target: '{_target_id}'
+              amount: '{_minor_multi_base_amount}'
+              damage_type: '{damage_type}'
+              critical_hit: '{_spell_critical_hit}'
+              source_state_id: '{_caster_state_id}'
+              witness_state_ids: '{witness_state_ids}'
+              unallocated_roll_penalty: '{_minor_producer_roll_carry}'
+              minor_elementals_damage_type: '{minor_elementals_damage_type}'
+            export_context:
+              _spell_damage_amount: _effective_damage
+              _spell_concentration_save_dc: _concentration_save_dc
+              _spell_concentration_save_outcome: _concentration_save_outcome
+              _spell_concentration_save_roll: _concentration_save_roll
+    - set:
+        field: _card_hp_lost
+        value: max(0, _card_hp_before - target.hp)
+    - set:
+        field: _card_temp_lost
+        value: max(0, _card_temp_before - target.temp_hp)
+    - set:
+        field: _card_damage
+        value: _card_hp_lost + _card_temp_lost
+    - set:
+        field: _card_check_text
+        value: '''No roll.'''
+    - call: record_srd_result_text
+      params:
+        text: D20 {_card_d20_roll.results}; selected {_card_d20_roll.total} + ({_card_d20_modifier}) =
+          {_card_d20_total}.
+      export_context:
+        _card_check_text: _recorded_result_text
+      condition: _card_d20_roll != null
+    - set:
+        field: _card_attack_label
+        value: '''No attack; target already defeated'''
+    - set:
+        field: _card_attack_label
+        value: '''Hit'''
+      condition: _spell_attack_outcome == 'success'
+    - set:
+        field: _card_attack_label
+        value: '''Miss'''
+      condition: _spell_attack_outcome == 'failure'
+    - set:
+        field: _card_attack_label
+        value: '''Critical hit'''
+      condition: _spell_attack_kind == 'critical_hit'
+    - set:
+        field: _card_attack_label
+        value: '''Duplicate hit'''
+      condition: _mirror_redirected == true
+    - set:
+        field: _card_damage_roll_text
+        value: ''''''
+    - call: record_srd_result_text
+      params:
+        text: Damage dice {_spell_damage.results}; rolled {_spell_damage.total}.
+      export_context:
+        _card_damage_roll_text: _recorded_result_text
+      condition: _spell_damage != null
+    - call: record_srd_spell_target_result
+      params:
+        target: '{_target_id}'
+        brief: '{_card_attack_label}; damage {_card_damage}'
+        detail: '{_card_attack_label}. {_card_check_text} Damage {_card_damage} (HP {_card_hp_lost}; temporary
+          HP {_card_temp_lost}). {_card_damage_roll_text}'
+      export_context:
+        _spell_target_summary: _spell_target_summary
+        _spell_target_detail: _spell_target_detail
+    - list_push:
+        list: _spell_summary_rows
+        value: _spell_target_summary
+    - list_push:
+        list: _spell_detail_rows
+        value: _spell_target_detail
+    - condition: _card_d20_roll != null
+      on_true:
+      - call: format_srd_information_projection
+        params:
+          message: Attack roll · AC {_spell_target_armor_class} · {_card_attack_label}
+        export_context:
+          _visual_target_roll_caption: _info_projection_message
+      - list_push:
+          list: _spell_detail_rows
+          value:
+            label: target.name
+            value: _visual_target_roll_caption
+            equation:
+              die_sides: 20
+              roll: _card_d20_roll.total
+              modifier: _card_d20_modifier
+              total: _card_d20_total
+    - condition: _visual_original_spell_damage.results != null and len(_visual_original_spell_damage.results)
+        > 0
+      on_true:
+      - call: format_srd_information_projection
+        params:
+          message: '{damage_type} damage dice · applied {_card_damage} (HP {_card_hp_lost}; temporary
+            HP {_card_temp_lost})'
+        export_context:
+          _visual_beam_damage_caption: _info_projection_message
+      - list_push:
+          list: _spell_detail_rows
+          value:
+            label: _spell_target_detail.label
+            value: _visual_beam_damage_caption
+            equation:
+              die_sides: _visual_original_spell_damage.sides
+              rolls: _visual_original_spell_damage.results
+              roll: _visual_original_spell_damage.total
+              modifier: _spell_damage.modifier + _spell_damage.total - _visual_original_spell_damage.total
+              total: _spell_damage.total + _spell_damage.modifier
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.awaiting_hit
+        value: false
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.stage
+        value: '''scorching_ray_running'''
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
+  continue_srd_lite_scorching_rays:
+    description: Resume the saved ordered rays without casting again, spending again or rerolling a saved
+      hit.
+    parameters:
+    - name: spell
+    - name: family
+      type: enum
+      enum_values:
+      - multi_spell_attack_damage
+    - name: casting_ability
+      type: enum
+      enum_values:
+      - intelligence
+      - wisdom
+      - charisma
+      - strength
+      - dexterity
+      - constitution
+    - name: casting_modifier
+      type: integer
+    - name: casting_attack_bonus
+      type: integer
+    - name: casting_save_dc
+      type: integer
+    - name: casting_scaling_level
+      type: integer
+    - name: casting_concentration_save_modifier
+      type: integer
+      required: false
+    - name: caster_state
+      resolve: entity
+    - name: attack_targets
+      type: entity_id_list
+      resolve: entity_list
+      min_items: 1
+      max_items: 10
+      unique_items: false
+    - name: caster_unseen_attack_targets
+      type: entity_id_list
+      resolve: entity_list
+      max_items: 10
+      unique_items: true
+    - name: attack_targets_unable_to_see_caster
+      type: entity_id_list
+      resolve: entity_list
+      max_items: 10
+      unique_items: true
+    - name: attack_targets_within_5_feet
+      type: entity_id_list
+      resolve: entity_list
+      max_items: 10
+      unique_items: true
+    - name: half_cover_targets
+      type: entity_id_list
+      resolve: entity_list
+      max_items: 10
+      unique_items: true
+    - name: three_quarters_cover_targets
+      type: entity_id_list
+      resolve: entity_list
+      max_items: 10
+      unique_items: true
+    - name: slot_resource
+      type: enum
+      enum_values:
+      - cantrip
+      - spell_slot_1
+      - spell_slot_2
+      - spell_slot_3
+      - spell_slot_4
+      - spell_slot_5
+      - spell_slot_6
+      - spell_slot_7
+      - spell_slot_8
+      - spell_slot_9
+      - no_slot
+    - name: slot_level
+      type: integer
+      minimum: 0
+      maximum: 9
+    - name: scaling_mode
+      type: enum
+      enum_values:
+      - caster_level
+      - slot_level
+    - name: base_level
+      type: integer
+      minimum: 0
+      maximum: 9
+    - name: base_attacks
+      type: integer
+      minimum: 1
+      maximum: 10
+    - name: attacks_per_slot_level
+      type: integer
+      minimum: 0
+      maximum: 10
+    - name: cantrip_upgrade_attacks
+      type: integer
+      minimum: 0
+      maximum: 10
+    - name: upgrade_level_1
+      type: integer
+      minimum: 2
+      maximum: 20
+    - name: upgrade_level_2
+      type: integer
+      minimum: 2
+      maximum: 20
+    - name: upgrade_level_3
+      type: integer
+      minimum: 2
+      maximum: 20
+    - name: dice_per_attack
+      type: integer
+      minimum: 1
+      maximum: 32
+    - name: damage_die
+      type: enum
+      enum_values:
+      - d4
+      - d6
+      - d8
+      - d10
+      - d12
+    - name: damage_type
+      type: enum
+      enum_values:
+      - acid
+      - bludgeoning
+      - cold
+      - fire
+      - force
+      - lightning
+      - necrotic
+      - piercing
+      - poison
+      - psychic
+      - radiant
+      - slashing
+      - thunder
+    - name: range_feet
+      type: integer
+      minimum: 0
+      maximum: 1000
+    - name: requires_sight
+      type: boolean
+    - name: targets_max_distance
+      type: number
+      minimum: 0
+      maximum: 1000
+    - name: all_attack_targets_have_clear_path
+      type: boolean
+    - name: enemy_within_5_feet
+      type: boolean
+    - name: close_enemy_can_see_caster
+      type: boolean
+    - name: close_enemy_incapacitated
+      type: boolean
+    - name: scalar_target_supplied
+      type: boolean
+    - name: scalar_target_distance_supplied
+      type: boolean
+    - name: scalar_caster_sight_supplied
+      type: boolean
+    - name: scalar_target_can_see_caster
+      type: boolean
+    - name: scalar_cover
+      type: enum
+      enum_values:
+      - none
+      - half
+      - three_quarters
+      - total
+    - name: scalar_advantage
+      type: boolean
+    - name: scalar_disadvantage
+      type: boolean
+    - name: witness_state_ids
+      type: array
+      items:
+        type: string
+      required: false
+    - name: minor_elementals_damage_type
+      type: enum
+      required: false
+      default: fire
+      enum_values:
+      - acid
+      - cold
+      - fire
+      - lightning
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
+    - name: pending_action_id
+      type: string
+      required: true
+    pre_conditions: []
+    effects:
+    - set:
+        field: _lite_ray_event
+        value: lasting_state.pending_srd_actions[pending_action_id]
+    - require:
+        condition: _lite_ray_event.owner_kind == 'spell_cast' and _lite_ray_event.spell == 'scorching_ray'
+          and _lite_ray_event.status == 'open' and _lite_ray_event.actor_state_id == _caster_state_id
+          and _lite_ray_event.lite_scorching_ray_cursor != null and _lite_ray_event.lite_scorching_ray_cursor.finalized
+          != true
+        error: Continue only this original ordered Scorching Ray casting.
+    - set:
+        field: _spell_summary_rows
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_summary_rows != null
+      on_true:
+      - set:
+          field: _spell_summary_rows
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_summary_rows
+    - set:
+        field: _spell_detail_rows
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_detail_rows != null
+      on_true:
+      - set:
+          field: _spell_detail_rows
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_detail_rows
+    - set:
+        field: _spell_multi_attack_count
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_count != null
+      on_true:
+      - set:
+          field: _spell_multi_attack_count
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_count
+    - set:
+        field: _spell_multi_attack_targets
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_targets != null
+      on_true:
+      - set:
+          field: _spell_multi_attack_targets
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_targets
+    - set:
+        field: _spell_multi_target_numbers
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_target_numbers != null
+      on_true:
+      - set:
+          field: _spell_multi_target_numbers
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_target_numbers
+    - set:
+        field: _spell_multi_attacks
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attacks != null
+      on_true:
+      - set:
+          field: _spell_multi_attacks
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attacks
+    - set:
+        field: _spell_multi_attack_outcomes
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_outcomes != null
+      on_true:
+      - set:
+          field: _spell_multi_attack_outcomes
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_outcomes
+    - set:
+        field: _spell_multi_attack_kinds
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_kinds != null
+      on_true:
+      - set:
+          field: _spell_multi_attack_kinds
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_attack_kinds
+    - set:
+        field: _spell_multi_damage
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_damage != null
+      on_true:
+      - set:
+          field: _spell_multi_damage
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_damage
+    - set:
+        field: _spell_multi_damage_amounts
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_damage_amounts != null
+      on_true:
+      - set:
+          field: _spell_multi_damage_amounts
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_damage_amounts
+    - set:
+        field: _spell_multi_concentration_save_dcs
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_concentration_save_dcs
+        != null
+      on_true:
+      - set:
+          field: _spell_multi_concentration_save_dcs
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_concentration_save_dcs
+    - set:
+        field: _spell_multi_concentration_save_outcomes
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_concentration_save_outcomes
+        != null
+      on_true:
+      - set:
+          field: _spell_multi_concentration_save_outcomes
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_concentration_save_outcomes
+    - set:
+        field: _spell_multi_concentration_save_rolls
+        value: null
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_concentration_save_rolls
+        != null
+      on_true:
+      - set:
+          field: _spell_multi_concentration_save_rolls
+          value: _lite_ray_event.lite_scorching_ray_cursor.context._spell_multi_concentration_save_rolls
+    - set:
+        field: _sanctuary_lost_rays
+        value: _lite_ray_event.lite_scorching_ray_cursor.sanctuary_lost_rays
+    - set:
+        field: _sanctuary_ray_index
+        value: _lite_ray_event.lite_scorching_ray_cursor.index
+    - set:
+        field: _lite_ray_deferred
+        value: false
+    - set:
+        field: _spell_hit_window_deferred
+        value: false
+    - set:
+        field: _lite_ray_completion_before
+        value: null
+    - condition: caster_state.pending_srd_completion_id != null
+      on_true:
+      - set:
+          field: _lite_ray_completion_before
+          value: caster_state.pending_srd_completion_id
+    - condition: _lite_ray_event.lite_scorching_ray_cursor.awaiting_hit == true
+      on_true:
+      - set:
+          field: _multi_ray_target
+          value: _lite_ray_event.target_state_id
+      - call: finish_srd_lite_scorching_ray_hit
+        params:
+          spell: '{_lite_ray_event.spell_attack_parameters.spell}'
+          casting_ability: '{_lite_ray_event.spell_attack_parameters.casting_ability}'
+          casting_modifier: '{_lite_ray_event.spell_attack_parameters.casting_modifier}'
+          casting_attack_bonus: '{_lite_ray_event.spell_attack_parameters.casting_attack_bonus}'
+          casting_save_dc: '{_lite_ray_event.spell_attack_parameters.casting_save_dc}'
+          casting_scaling_level: '{_lite_ray_event.spell_attack_parameters.casting_scaling_level}'
+          casting_concentration_save_modifier: '{_lite_ray_event.spell_attack_parameters.casting_concentration_save_modifier}'
+          caster_state: '{_lite_ray_event.spell_attack_parameters.caster_state}'
+          target: '{_lite_ray_event.spell_attack_parameters.target}'
+          dice_per_attack: '{_lite_ray_event.spell_attack_parameters.dice_per_attack}'
+          damage_die: '{_lite_ray_event.spell_attack_parameters.damage_die}'
+          damage_type: '{_lite_ray_event.spell_attack_parameters.damage_type}'
+          caster_can_see_target: '{_lite_ray_event.spell_attack_parameters.caster_can_see_target}'
+          target_can_see_caster: '{_lite_ray_event.spell_attack_parameters.target_can_see_caster}'
+          target_within_5_feet: '{_lite_ray_event.spell_attack_parameters.target_within_5_feet}'
+          initial_advantage: '{_lite_ray_event.spell_attack_parameters.initial_advantage}'
+          initial_disadvantage: '{_lite_ray_event.spell_attack_parameters.initial_disadvantage}'
+          enemy_within_5_feet: '{_lite_ray_event.spell_attack_parameters.enemy_within_5_feet}'
+          close_enemy_can_see_caster: '{_lite_ray_event.spell_attack_parameters.close_enemy_can_see_caster}'
+          close_enemy_incapacitated: '{_lite_ray_event.spell_attack_parameters.close_enemy_incapacitated}'
+          cover: '{_lite_ray_event.spell_attack_parameters.cover}'
+          witness_state_ids: '{_lite_ray_event.spell_attack_parameters.witness_state_ids}'
+          minor_elementals_damage_type: '{_lite_ray_event.spell_attack_parameters.minor_elementals_damage_type}'
+          pending_action_id: '{pending_action_id}'
+          lasting_state: '{_lasting_state_id}'
+        export_context:
+          _multi_target_number: _spell_target_armor_class
+          _multi_attack: _spell_attack
+          _multi_attack_outcome: _spell_attack_outcome
+          _multi_attack_kind: _spell_attack_kind
+          _multi_damage: _spell_damage
+          _multi_damage_amount: _spell_damage_amount
+          _multi_concentration_save_dc: _spell_concentration_save_dc
+          _multi_concentration_save_outcome: _spell_concentration_save_outcome
+          _multi_concentration_save_roll: _spell_concentration_save_roll
+          _nested_spell_summary_rows: _spell_summary_rows
+          _nested_spell_detail_rows: _spell_detail_rows
+          _spell_hit_window_deferred: _spell_hit_window_deferred
+      - for_each:
+          collection: _nested_spell_summary_rows
+          as: _nested_spell_row
+          do:
+          - list_push:
+              list: _spell_summary_rows
+              value: _nested_spell_row
+      - for_each:
+          collection: _nested_spell_detail_rows
+          as: _nested_spell_row
+          do:
+          - list_push:
+              list: _spell_detail_rows
+              value: _nested_spell_row
+      - list_push:
+          list: _spell_multi_attack_targets
+          value: _multi_ray_target
+      - list_push:
+          list: _spell_multi_target_numbers
+          value: _multi_target_number
+      - list_push:
+          list: _spell_multi_attacks
+          value: _multi_attack
+      - list_push:
+          list: _spell_multi_attack_outcomes
+          value: _multi_attack_outcome
+      - list_push:
+          list: _spell_multi_attack_kinds
+          value: _multi_attack_kind
+      - list_push:
+          list: _spell_multi_damage
+          value: _multi_damage
+      - list_push:
+          list: _spell_multi_damage_amounts
+          value: _multi_damage_amount
+      - list_push:
+          list: _spell_multi_concentration_save_dcs
+          value: _multi_concentration_save_dc
+      - list_push:
+          list: _spell_multi_concentration_save_outcomes
+          value: _multi_concentration_save_outcome
+      - list_push:
+          list: _spell_multi_concentration_save_rolls
+          value: _multi_concentration_save_roll
+      - set:
+          field: _sanctuary_ray_index
+          value: _sanctuary_ray_index + 1
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.index
+          value: _sanctuary_ray_index
+    - set:
+        field: caster_state.pending_srd_completion_id
+        value: pending_action_id
+    - set:
+        field: _lite_ray_visit_index
+        value: 0
+    - for_each:
+        collection: attack_targets
+        as: _multi_ray_target
+        do:
+        - condition: _lite_ray_visit_index >= _sanctuary_ray_index and _lite_ray_deferred != true
+          on_true:
+          - set:
+              field: caster_state.pending_srd_sanctuary_ray_index
+              value: _sanctuary_ray_index
+          - condition: _sanctuary_ray_index not in _sanctuary_lost_rays
+            on_true:
+            - set:
+                field: _multi_caster_can_see_target
+                value: not (_multi_ray_target in caster_unseen_attack_targets)
+            - set:
+                field: _multi_target_can_see_caster
+                value: not (_multi_ray_target in attack_targets_unable_to_see_caster)
+            - set:
+                field: _multi_target_within_5_feet
+                value: _multi_ray_target in attack_targets_within_5_feet
+            - set:
+                field: _multi_cover
+                value: '''none'''
+            - set:
+                field: _multi_cover
+                value: '''half'''
+              condition: _multi_ray_target in half_cover_targets
+            - set:
+                field: _multi_cover
+                value: '''three_quarters'''
+              condition: _multi_ray_target in three_quarters_cover_targets
+            - call: resolve_spell_multi_attack_target
+              params:
+                spell: '{spell}'
+                caster_state: '{_caster_state_id}'
+                target: '{_multi_ray_target}'
+                dice_per_attack: '{dice_per_attack}'
+                damage_die: '{damage_die}'
+                damage_type: '{damage_type}'
+                caster_can_see_target: '{_multi_caster_can_see_target}'
+                target_can_see_caster: '{_multi_target_can_see_caster}'
+                target_within_5_feet: '{_multi_target_within_5_feet}'
+                initial_advantage: false
+                initial_disadvantage: false
+                enemy_within_5_feet: '{enemy_within_5_feet}'
+                close_enemy_can_see_caster: '{close_enemy_can_see_caster}'
+                close_enemy_incapacitated: '{close_enemy_incapacitated}'
+                cover: '{_multi_cover}'
+                casting_ability: '{casting_ability}'
+                casting_modifier: '{casting_modifier}'
+                casting_attack_bonus: '{casting_attack_bonus}'
+                casting_save_dc: '{casting_save_dc}'
+                casting_scaling_level: '{casting_scaling_level}'
+                casting_concentration_save_modifier: '{casting_concentration_save_modifier}'
+                witness_state_ids: '{witness_state_ids}'
+                minor_elementals_damage_type: '{minor_elementals_damage_type}'
+              export_context:
+                _multi_target_number: _spell_target_armor_class
+                _multi_attack: _spell_attack
+                _multi_attack_outcome: _spell_attack_outcome
+                _multi_attack_kind: _spell_attack_kind
+                _multi_damage: _spell_damage
+                _multi_damage_amount: _spell_damage_amount
+                _multi_concentration_save_dc: _spell_concentration_save_dc
+                _multi_concentration_save_outcome: _spell_concentration_save_outcome
+                _multi_concentration_save_roll: _spell_concentration_save_roll
+                _nested_spell_summary_rows: _spell_summary_rows
+                _nested_spell_detail_rows: _spell_detail_rows
+                _spell_hit_window_deferred: _spell_hit_window_deferred
+            - condition: _spell_hit_window_deferred != true
+              on_true:
+              - for_each:
+                  collection: _nested_spell_summary_rows
+                  as: _nested_spell_row
+                  do:
+                  - list_push:
+                      list: _spell_summary_rows
+                      value: _nested_spell_row
+              - for_each:
+                  collection: _nested_spell_detail_rows
+                  as: _nested_spell_row
+                  do:
+                  - list_push:
+                      list: _spell_detail_rows
+                      value: _nested_spell_row
+              - list_push:
+                  list: _spell_multi_attack_targets
+                  value: _multi_ray_target
+              - list_push:
+                  list: _spell_multi_target_numbers
+                  value: _multi_target_number
+              - list_push:
+                  list: _spell_multi_attacks
+                  value: _multi_attack
+              - list_push:
+                  list: _spell_multi_attack_outcomes
+                  value: _multi_attack_outcome
+              - list_push:
+                  list: _spell_multi_attack_kinds
+                  value: _multi_attack_kind
+              - list_push:
+                  list: _spell_multi_damage
+                  value: _multi_damage
+              - list_push:
+                  list: _spell_multi_damage_amounts
+                  value: _multi_damage_amount
+              - list_push:
+                  list: _spell_multi_concentration_save_dcs
+                  value: _multi_concentration_save_dc
+              - list_push:
+                  list: _spell_multi_concentration_save_outcomes
+                  value: _multi_concentration_save_outcome
+              - list_push:
+                  list: _spell_multi_concentration_save_rolls
+                  value: _multi_concentration_save_roll
+            - condition: _spell_hit_window_deferred == true
+              on_true:
+              - set:
+                  field: _lite_ray_deferred
+                  value: true
+            on_false:
+            - list_push:
+                list: _spell_summary_rows
+                value:
+                  label: '''Sanctuary'''
+                  value: '''Ray lost after failed Sanctuary save.'''
+          - set:
+              field: caster_state.pending_srd_sanctuary_ray_index
+              value: null
+          - condition: _lite_ray_deferred != true
+            on_true:
+            - set:
+                field: _sanctuary_ray_index
+                value: _sanctuary_ray_index + 1
+            - set:
+                field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.index
+                value: _sanctuary_ray_index
+        - set:
+            field: _lite_ray_visit_index
+            value: _lite_ray_visit_index + 1
+    - set:
+        field: caster_state.pending_srd_completion_id
+        value: null
+    - condition: _lite_ray_completion_before != null
+      on_true:
+      - set:
+          field: caster_state.pending_srd_completion_id
+          value: _lite_ray_completion_before
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_summary_rows
+        value: null
+    - condition: _spell_summary_rows != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_summary_rows
+          value: _spell_summary_rows
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_detail_rows
+        value: null
+    - condition: _spell_detail_rows != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_detail_rows
+          value: _spell_detail_rows
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_count
+        value: null
+    - condition: _spell_multi_attack_count != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_count
+          value: _spell_multi_attack_count
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_targets
+        value: null
+    - condition: _spell_multi_attack_targets != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_targets
+          value: _spell_multi_attack_targets
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_target_numbers
+        value: null
+    - condition: _spell_multi_target_numbers != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_target_numbers
+          value: _spell_multi_target_numbers
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attacks
+        value: null
+    - condition: _spell_multi_attacks != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attacks
+          value: _spell_multi_attacks
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_outcomes
+        value: null
+    - condition: _spell_multi_attack_outcomes != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_outcomes
+          value: _spell_multi_attack_outcomes
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_kinds
+        value: null
+    - condition: _spell_multi_attack_kinds != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_attack_kinds
+          value: _spell_multi_attack_kinds
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_damage
+        value: null
+    - condition: _spell_multi_damage != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_damage
+          value: _spell_multi_damage
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_damage_amounts
+        value: null
+    - condition: _spell_multi_damage_amounts != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_damage_amounts
+          value: _spell_multi_damage_amounts
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_dcs
+        value: null
+    - condition: _spell_multi_concentration_save_dcs != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_dcs
+          value: _spell_multi_concentration_save_dcs
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_outcomes
+        value: null
+    - condition: _spell_multi_concentration_save_outcomes != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_outcomes
+          value: _spell_multi_concentration_save_outcomes
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_rolls
+        value: null
+    - condition: _spell_multi_concentration_save_rolls != null
+      on_true:
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.context._spell_multi_concentration_save_rolls
+          value: _spell_multi_concentration_save_rolls
+    - condition: _lite_ray_deferred != true and _sanctuary_ray_index == len(attack_targets)
+      on_true:
+      - for_each:
+          collection: attack_targets
+          as: _multi_ray_target
+          do:
+          - call: finalize_spell_multi_attack_target
+            params:
+              target: '{_multi_ray_target}'
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.lite_scorching_ray_cursor.finalized
+          value: true
+      - set:
+          field: lasting_state.pending_srd_actions.{pending_action_id}.stage
+          value: '''spell_attack_resolved'''
+    - condition: _lite_ray_deferred == true
+      on_true:
+      - for_each:
+          collection: _nested_spell_summary_rows
+          as: _lite_ray_row
+          do:
+          - list_push:
+              list: _spell_summary_rows
+              value: _lite_ray_row
+      - for_each:
+          collection: _nested_spell_detail_rows
+          as: _lite_ray_row
+          do:
+          - list_push:
+              list: _spell_detail_rows
+              value: _lite_ray_row
+    - set:
+        field: _spell_hit_window_deferred
+        value: _lite_ray_deferred
+    - set:
+        field: _spell_card_summary
+        value: _spell_summary_rows
+    metadata:
+      category: internal
+      visible_to_player: false
+      costs_action: false
 parameter_declarations:
   param_contingent_fact_tag_6ddb058d82da6cce:
     name: contingent_fact_tag
