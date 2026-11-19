@@ -64,10 +64,40 @@ def casting_seed(tmp_path_factory):
     return database, parameters
 
 
-@pytest.mark.parametrize("mode", ["fixed", "stable"])
+def forbid_fixed_code(monkeypatch):
+    """Make every fixed-list-only entry point fail, so an off setting provably never reaches it."""
+    from sylvia_gm.agent import _fixed_tool_projection, _provider_turn_phases, _stateless_mcp
+    from sylvia_gm.agent._provider_session import ProviderSessionAdapter
+
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("fixed tool list code ran with the setting off")
+    for module, name in ((_fixed_tool_projection, "argument_choices_record"),
+                         (_fixed_tool_projection, "schema_choices"),
+                         (_fixed_tool_projection, "unavailable_values"),
+                         (_fixed_tool_projection, "compact_schema"),
+                         (_stateless_mcp, "_fixed_campaign_file_schema"),
+                         (_provider_turn_phases, "record_fixed_tool_refusal"),
+                         (ProviderSessionAdapter, "_fixed_provider_tools")):
+        monkeypatch.setattr(module, name, forbidden)
+    catalog = AuthorityOwner.catalog
+
+    def ordinary_catalog(owner, campaign_id, **kwargs):
+        assert not kwargs.get("include_unexposed"), "fixed catalog read with the setting off"
+        return catalog(owner, campaign_id, **kwargs)
+    monkeypatch.setattr(AuthorityOwner, "catalog", ordinary_catalog)
+
+
+# "default" leaves SYLVIA_GM_TOOL_LIST unset; with every off setting the session must never run
+# fixed-only code, so its requests are the ones the existing modes already send.
+@pytest.mark.parametrize("mode", ["fixed", "stable", "rounds", "default"])
 def test_fixed_session_catalog(casting_seed, tmp_path, monkeypatch, mode):
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
-    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
+    if mode == "default":
+        monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
+    if mode != "fixed":
+        forbid_fixed_code(monkeypatch)
     database = tmp_path / "session.db"
     shutil.copy2(casting_seed[0], database)
     gm = FixedGM()
@@ -146,7 +176,8 @@ def test_fixed_session_catalog(casting_seed, tmp_path, monkeypatch, mode):
         if mode == "fixed":
             assert records[0].get("tools_added")
             assert all(not r.get("tools_added") and not r.get("tools_replaced") for r in records[1:])
-        else:
+        elif mode != "rounds":
+            # The route default here (codex_app_server) is one stable list, which grows.
             assert sum(bool(r.get("tools_added")) for r in records[1:]) >= 2
     finally:
         owner.close()
