@@ -8618,6 +8618,28 @@ class AuthorityOwner:
             for message in context.messages
         )
 
+    def unresolved_session_interruption(
+        self, context: SessionContext,
+    ) -> tuple[NarrationInterruption, bool] | None:
+        """Return a GM session's latest open interruption and whether new input redirects it.
+
+        This is the owner's form of the composer rule: after a settled Stop a new message
+        redirects the stopped turn, and after a failure the player resolves it with Retry first.
+        """
+
+        campaign_id = context.session.campaign_id
+        if campaign_id is None or context.session.role is not WriterRole.DM:
+            return None
+        attempts = {message.content.get("attempt_id") for message in context.messages}
+        with self._operation():
+            unresolved = [
+                interruption for interruption in self._store.interruptions(campaign_id)
+                if interruption.retryable and interruption.failed_attempt_id in attempts
+            ]
+        if not unresolved:
+            return None
+        return unresolved[-1], self._can_redirect_interruption(unresolved[-1], context)
+
     def retryable_interruption(
         self, campaign_id: str, *, failed_attempt_id: str
     ) -> NarrationInterruption | None:

@@ -1007,6 +1007,15 @@ class CampaignSessionLoop:
                 raise CommandRejected("The saved player action belongs to another turn")
         elif request.player_action_id is not None or request.automatic_response:
             raise CommandRejected("Player action response context requires its application event")
+        if (request.redirect_interruption_id is None and not application_event
+                and request.campaign_ending_choice is None):
+            # Plain input never leaves an interrupted turn behind it (architecture contract 8.3).
+            unresolved = self._owner.unresolved_session_interruption(context)
+            if unresolved is not None:
+                interruption, redirectable = unresolved
+                if not redirectable:
+                    raise CommandRejected("Retry or resolve the interrupted turn first")
+                request = replace(request, redirect_interruption_id=interruption.interruption_id)
         redirection = None
         if request.redirect_interruption_id is not None:
             if application_event:
