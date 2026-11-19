@@ -25,64 +25,13 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "The advertised worked Plan reference has stale package bindings",
         "Load the Plan skill's combat/multi-act examples and compare/admit their bindings against the bundled source closure.",
     ),
-    'tests/test_srd_lite_false_life_diagnosis.py::test_actual_false_life_rejection_diagnostic': KnownDefect(
-        'The selected admitted False Life owner rolls dice instead of the authored fixed Lite pool',
-        'Cast first-level False Life in the default admitted candidate while guarding against RNG calls; the fixed-pool diagnostic fails.',
-    ),
-    'tests/test_srd_lite_insect_zone.py::test_insects_upcast_start_first_entry_terrain_perception_expiry_and_replay': KnownDefect(
-        'The selected admitted Insect Plague owner accepts an input the Lite range/component contract rejects',
-        'Attempt the default admitted Insect Plague cast at 65 feet and with unavailable verbal/somatic components.',
-    ),
     'tests/test_owned_package_updates.py::test_plan_adopts_complete_source_and_keeps_explicit_custom_declarations[setting]': KnownDefect(
         'An existing Setting source becomes unavailable when launching its Plan Builder after an update',
         'Install original and updated Setting sources, then launch a Plan Builder against the original saved candidate.',
     ),
-    'tests/test_srd_lite_progression_cantrips_c.py::test_complete_acolyte_thaumaturgy_mending_world_consumers_cost_expiry_and_reopen': KnownDefect(
-        'Mending does not retain the expected unselected object-break records in the admitted scene',
-        'Record three breaks on the synthetic relic, complete the actual Mending cast for one, then inspect its remaining break metadata.',
-    ),
-    'tests/test_srd_lite_multicaster_persistence.py::test_independent_caster_survives_other_source_end_then_expires_and_reopens[true_strike-2]': KnownDefect(
-        'The selected admitted True Strike owner lacks the expected independently retained concentration source',
-        "Cast True Strike from two admitted casters, end the first source and check the other's retained source, expiry and reopen state.",
-    ),
     'tests/test_content_inheritance.py::test_plan_retains_its_copies_after_new_source_ruleset_is_installed': KnownDefect(
         "The Builder's advertised Plan example fails its declared content schema",
         'Build the advertised Plan example against its retained synthetic source Setting, then validate before saving its inherited copies.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_false_life_native_provenance.py::test_actual_overlap_pool_winner_retirement_and_reopen[sorcerer-wizard-spell_slot_1-sorcerer-7]': KnownDefect(
-        'The admitted False Life behavior lacks the retained fixed-pool/source-retirement contract',
-        "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_false_life_native_provenance.py::test_actual_overlap_pool_winner_retirement_and_reopen[sorcerer-wizard-spell_slot_2-wizard-0]': KnownDefect(
-        'The admitted False Life behavior lacks the retained fixed-pool/source-retirement contract',
-        "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_false_life_native_provenance.py::test_actual_overlap_pool_winner_retirement_and_reopen[wizard-sorcerer-spell_slot_1-wizard-0]': KnownDefect(
-        'The admitted False Life behavior lacks the retained fixed-pool/source-retirement contract',
-        "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_false_life_native_provenance.py::test_public_attack_exhaustion_clears_source_immediately': KnownDefect(
-        'The admitted False Life behavior lacks the retained fixed-pool/source-retirement contract',
-        "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_false_life_native_provenance.py::test_public_earned_long_rest_clears_source': KnownDefect(
-        'The admitted False Life behavior lacks the retained fixed-pool/source-retirement contract',
-        "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_false_life_native_provenance.py::test_public_focus_replacement_clears_source_before_wizard_retirement': KnownDefect(
-        'The admitted False Life behavior lacks the retained fixed-pool/source-retirement contract',
-        "Use the public False Life cast and the case's pool overlap, attack, rest or source-replacement flow; inspect its saved source and reopen state.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_integrated_worker_seams.py::test_area_damage_card_exposes_the_actual_concentration_roll': KnownDefect(
-        'An area-damage card emits two concentration rows for one actual saving throw',
-        'Damage the real concentrating caster with the admitted area action and inspect its actual result-card concentration rows.',
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_defense_boundaries.py::test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens[False]': KnownDefect(
@@ -93,26 +42,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
     'tests/test_srd_lite_defense_boundaries.py::test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens[True]': KnownDefect(
         'The actual Guiding Bolt attack lacks retained target-AC evidence for the Shield boundary',
         'Cast Guiding Bolt against the admitted Wizard, inspect the saved scalar attack, then attempt the selected Shield/decline and reopen continuation.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defense_boundaries.py::test_mage_actual_plane_and_blocked_touch_path_before_payment[clear-begin_srd_spell_action]': KnownDefect(
-        'A valid Mage Armor effect lacks the retained until-Long-Rest lifetime metadata',
-        "Cast against the actual same-plane willing recipient through the selected route and inspect the saved effect's lifetime before reopen.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defense_boundaries.py::test_mage_actual_plane_and_blocked_touch_path_before_payment[clear-cast_spell_outside_combat]': KnownDefect(
-        'A valid Mage Armor effect lacks the retained until-Long-Rest lifetime metadata',
-        "Cast against the actual same-plane willing recipient through the selected route and inspect the saved effect's lifetime before reopen.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defense_boundaries.py::test_mage_actual_plane_and_blocked_touch_path_before_payment[other_plane-cast_spell_outside_combat]': KnownDefect(
-        'A free-exploration Mage Armor cast accepts an actual plane/path obstruction',
-        "Admit the case's other-plane recipient or intervening wall, make a false clear-path/touch claim, then attempt the public free-exploration Mage Armor cast.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defense_boundaries.py::test_mage_actual_plane_and_blocked_touch_path_before_payment[wall-cast_spell_outside_combat]': KnownDefect(
-        'A free-exploration Mage Armor cast accepts an actual plane/path obstruction',
-        "Admit the case's other-plane recipient or intervening wall, make a false clear-path/touch claim, then attempt the public free-exploration Mage Armor cast.",
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_defense_boundaries.py::test_real_shield_survives_encounter_exit_then_expires_on_free_time_clock': KnownDefect(
@@ -133,36 +62,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
     'tests/test_srd_lite_defense_boundaries.py::test_scalar_cover_classification_survives_to_actual_ac_and_shield_boundary[three_quarters-21-True]': KnownDefect(
         'The actual scalar spell attack loses retained cover or target-AC evidence',
         'Resolve Guiding Bolt against the admitted Wizard with the selected actual cover geometry and inspect its saved cover/AC before the Shield boundary.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_actual_formula_paid_cost_no_roll_contact_and_reopen[1]': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_actual_formula_paid_cost_no_roll_contact_and_reopen[3]': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_elapsed_time_short_failed_rest_and_successful_long_rest': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_real_far_target_rejects_before_spend_even_with_touch_claim[cast_spell_outside_combat]': KnownDefect(
-        'A free-exploration Mage Armor cast accepts a false touch claim for an actual distant recipient',
-        'Place the validated companion 30 feet away, claim distance zero/touch true, then attempt the public free-exploration Mage Armor cast and compare payment/state.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_same_caster_two_real_grants_do_not_lose_independent_ownership': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_defenses.py::test_mage_two_casters_exact_unprepare_and_free_dismiss_replay': KnownDefect(
-        'The admitted Mage Armor effect lacks the retained preparation-source or until-Long-Rest lifetime contract',
-        "Cast valid Mage Armor with carried Materials and contact facts, then inspect its saved source/lifetime before the case's equip, unprepare, rest or reopen continuation.",
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_defenses.py::test_shield_actual_split_magic_missile_allocation_keeps_other_recipient_damage': KnownDefect(
@@ -200,139 +99,9 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Execute the case's actual incoming attack or split missiles against the admitted Wizard and inspect the saved Shield eligibility/recipient before response and replay.",
         category='suspected retained contract discrepancy',
     ),
-    'tests/test_srd_lite_false_life.py::test_fixed_pool_does_not_roll_or_stack_and_retries_persist[1-0-7]': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_false_life.py::test_fixed_pool_does_not_roll_or_stack_and_retries_persist[1-20-20]': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_false_life.py::test_fixed_pool_does_not_roll_or_stack_and_retries_persist[3-0-17]': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_false_life.py::test_genuine_long_rest_clears_the_fixed_pool': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_false_life.py::test_real_creature_attack_consumes_false_life_pool_before_hp': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_false_life.py::test_short_rest_preparation_clears_only_false_life_owned_pool[False]': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_false_life.py::test_short_rest_preparation_clears_only_false_life_owned_pool[True]': KnownDefect(
-        'The admitted False Life behavior differs from the retained fixed-pool/rest contract',
-        "Cast False Life through the actual admitted owner, then execute the case's dice guard, attack or earned-rest step and inspect its pool/source.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost[mage_armor-begin_srd_spell_action]': KnownDefect(
-        'The admitted Mage Armor alias lacks the retained preparation-source/lifetime contract',
-        'Cast the named Mage Armor alias through the selected public route, reopen/retry it, and inspect its canonical source and lifetime metadata.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost[mage_armor-cast_spell]': KnownDefect(
-        'The admitted Mage Armor alias lacks the retained preparation-source/lifetime contract',
-        'Cast the named Mage Armor alias through the selected public route, reopen/retry it, and inspect its canonical source and lifetime metadata.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost[mage_armor-cast_spell_outside_combat]': KnownDefect(
-        'The admitted Mage Armor alias lacks the retained preparation-source/lifetime contract',
-        'Cast the named Mage Armor alias through the selected public route, reopen/retry it, and inspect its canonical source and lifetime metadata.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost[mage_armour-begin_srd_spell_action]': KnownDefect(
-        'The admitted Mage Armor alias lacks the retained preparation-source/lifetime contract',
-        'Cast the named Mage Armor alias through the selected public route, reopen/retry it, and inspect its canonical source and lifetime metadata.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost[mage_armour-cast_spell]': KnownDefect(
-        'The admitted Mage Armor alias lacks the retained preparation-source/lifetime contract',
-        'Cast the named Mage Armor alias through the selected public route, reopen/retry it, and inspect its canonical source and lifetime metadata.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost[mage_armour-cast_spell_outside_combat]': KnownDefect(
-        'The admitted Mage Armor alias lacks the retained preparation-source/lifetime contract',
-        'Cast the named Mage Armor alias through the selected public route, reopen/retry it, and inspect its canonical source and lifetime metadata.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mage_alias.py::test_mage_alias_keeps_actual_armor_target_rejection_atomic': KnownDefect(
-        'A free-exploration Mage Armor alias accepts the actually armored target',
-        'Admit the caster wearing leather, cast the public mage_armour alias and require atomic rejection without a retained effect.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_missiles.py::test_later_allocated_darts_do_not_rollback_a_target_killed_by_the_first': KnownDefect(
-        'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
-        "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_srd_lite_missiles.py::test_missile_actual_range_and_bad_allocation_are_atomic': KnownDefect(
         'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
         "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_missiles.py::test_split_force_darts_roll_each_face_and_apply_resistance_per_dart[1]': KnownDefect(
-        'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
-        "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_missiles.py::test_split_force_darts_roll_each_face_and_apply_resistance_per_dart[3]': KnownDefect(
-        'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
-        "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_actual_fall_death_retires_only_the_dead_longstrider_recipient': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_enhance_leap_alias_actual_touch_nonstacking_and_finite_expiry_survive_replay': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_enhance_leap_triples_ordinary_jump_reach_and_spends_actual_distance': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_exact_longstrider_dismissal_preserves_self_and_guards_unresolved_recipient_rest': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_free_exploration_longstrider_level_three_keeps_targets_cost_card_and_retry': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_free_longstrider_shape_uses_saved_capacity_without_spending_exhausted_slots': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_paid_longstrider_rejects_invalid_begin_and_completes_once_after_reopen': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_self_longstrider_expires_only_when_an_earned_long_rest_completes': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_mobility_support.py::test_short_rest_wizard_replacement_ends_longstrider_despite_other_prepared_grant': KnownDefect(
-        'The admitted mobility spell behavior differs from the retained Lite cost/source/lifetime contract',
-        "Cast the selected Longstrider or Enhance Leap through the public owner and exercise the case's movement, payment, dismissal, preparation or earned-rest boundary.",
         category='suspected retained contract discrepancy',
     ),
     'tests/test_srd_lite_ray_reactions.py::test_actual_critical_ray_and_dead_later_target_skip_preserve_saved_rolls': KnownDefect(
@@ -348,41 +117,6 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
     'tests/test_srd_lite_ray_reactions.py::test_hostile_wizard_natural_twenty_is_a_real_window_but_shield_cannot_convert_it': KnownDefect(
         'The admitted ray cast does not retain the expected saved action/reaction window',
         "Begin the real ray attack against the admitted hostile Wizard and inspect its saved pending action before the case's Shield or critical-hit continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_travel_support.py::test_misty_step_exact_scene_geometry_paid_bonus_pending_retry_and_reopen': KnownDefect(
-        'The admitted Misty Step route rejects a retained geometry premise with different validation',
-        "Exercise Misty Step with the case's admitted scene and horizontal/downhill/upward or pending-cast inputs; inspect the actual refusal before its paid/reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_travel_support.py::test_misty_step_horizontal_downhill_extension_upward_range_and_no_upcast_gain': KnownDefect(
-        'The admitted Misty Step route rejects a retained geometry premise with different validation',
-        "Exercise Misty Step with the case's admitted scene and horizontal/downhill/upward or pending-cast inputs; inspect the actual refusal before its paid/reopen continuation.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_utility_support.py::test_animals_combat_paid_pending_cast_speech_action_and_real_rest': KnownDefect(
-        'The admitted utility spell behavior differs from retained self/range/source/lifetime boundaries',
-        "Cast Darkvision or Speak with Animals through the actual admitted owner using the case's target boundary, paid cast, death, unprepare or earned-rest flow.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_utility_support.py::test_animals_exploration_ritual_actual_beast_dialogue_nonstacking_and_unprepare': KnownDefect(
-        'A self-only Speak with Animals cast accepts another selected recipient',
-        'Without an active grant, choose guard instead of the caster as the public Speak with Animals target and require atomic rejection before the ritual continuation.',
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_utility_support.py::test_darkvision_paid_pending_cast_real_sight_range_replay_and_unprepare': KnownDefect(
-        'The admitted utility spell behavior differs from retained self/range/source/lifetime boundaries',
-        "Cast Darkvision or Speak with Animals through the actual admitted owner using the case's target boundary, paid cast, death, unprepare or earned-rest flow.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_utility_support.py::test_darkvision_receiving_creature_actual_death_removes_saved_grant': KnownDefect(
-        'The admitted utility spell behavior differs from retained self/range/source/lifetime boundaries',
-        "Cast Darkvision or Speak with Animals through the actual admitted owner using the case's target boundary, paid cast, death, unprepare or earned-rest flow.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_utility_support.py::test_darkvision_upcast_nonstacking_native_sense_preserved_and_genuine_rest': KnownDefect(
-        'The admitted utility spell behavior differs from retained self/range/source/lifetime boundaries',
-        "Cast Darkvision or Speak with Animals through the actual admitted owner using the case's target boundary, paid cast, death, unprepare or earned-rest flow.",
         category='suspected retained contract discrepancy',
     ),
 }

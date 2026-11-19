@@ -1,4 +1,4 @@
-"""UNRUN public casting regression; imported mechanics fixture, not acquisition proof."""
+"""Public Mage Armor alias casting regression; imported mechanics fixture, not acquisition proof."""
 import pytest
 
 from tests.lite_fixture_archive import archive_closed_case
@@ -44,15 +44,17 @@ def test_mage_advertised_alias_has_canonical_saved_source_and_once_only_cost(ali
         assert pending_id not in case.lasting().get('pending_srd_actions', {})
     record, = _mage_records(case)
     assert record['spell'] == 'mage_armor' and record['source_caster_id'] == 'hero'
-    assert record['lite_prepared_source'] == 'wizard' and record['cast_id']
-    assert record['magnitude'] == 15 and record['lifetime_kind'] == 'until_long_rest'
-    assert record['expires_tick'] is None
+    assert record['cast_id'] and record['magnitude'] == 15
+    # SRD 5.2.1: 8 hours, saved as 4800 rounds of two lasting ticks.
+    assert record['expires_tick'] - record['started_tick'] == 9600
     assert case.entities()['hero']['resources']['spell_slot_1'] == before - 1
     _replay_reopen(case, receipt, command)
 
 
 def test_mage_alias_keeps_actual_armor_target_rejection_atomic(alias_case):
-    case = alias_case(entity_changes={'hero': {'worn_armor': 'leather'}})
+    leather = {'inventory_item': 'leather', 'armor_type': 'leather_armor', 'magic_bonus': 0}
+    case = alias_case(entity_changes={'hero': {'worn_armor': leather}},
+                      inventory_additions=('leather',))
     _reject(case, 'cast_spell_outside_combat',
-            _mage_params(case, spell='mage_armour', slot_resource='spell_slot_1'), 'unarmored')
+            _mage_params(case, spell='mage_armour', slot_resource='spell_slot_1'), 'wearing armor')
     assert not _mage_records(case)

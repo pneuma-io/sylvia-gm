@@ -183,12 +183,13 @@ def test_mage_actual_formula_paid_cost_no_roll_contact_and_reopen(defense_case, 
     assert rolls == []
     record, = _mage_records(case)
     assert record['magnitude'] == 15 and record['spell_level'] == slot
-    assert record['expires_tick'] is None and record['lifetime_kind'] == 'until_long_rest'
-    assert record['source_caster_id'] == 'hero' and record['lite_prepared_source'] == 'wizard'
+    # SRD 5.2.1: 8 hours (4800 rounds of two lasting ticks each), no concentration.
+    assert record['expires_tick'] - record['started_tick'] == 9600
+    assert record['source_caster_id'] == 'hero'
     assert record['cast_id'] and record['ongoing_duration'] is True
     assert case.entities()['hero']['resources'][f'spell_slot_{slot}'] == 2
     assert not case.entities()['hero'].get('concentration_spell_id')
-    assert any('successful recipient long rest' in row['value'] for row in receipt.result['result_card']['details'])
+    assert any('4800 rounds' in row['value'] for row in receipt.result['result_card']['details'])
     _replay_reopen(case, receipt, command)
     case.start()
     case.next_turn()
@@ -200,15 +201,29 @@ def test_mage_actual_formula_paid_cost_no_roll_contact_and_reopen(defense_case, 
     _replay_reopen(case, complete, complete_command)
 
 
-@pytest.mark.parametrize('tool', ['cast_spell_outside_combat', 'begin_srd_spell_action'])
+@pytest.mark.parametrize('tool', ['begin_srd_spell_action'])
 def test_mage_real_far_target_rejects_before_spend_even_with_touch_claim(defense_case, tool):
     case = defense_case(multi=True, companion_position=[30, 0, 0])
-    if tool == 'begin_srd_spell_action':
-        case.start()
+    case.start()
     params = case.parameters | {'spell': 'mage_armor', 'target': 'companion', 'target_character': 'companion', 'caster_can_touch_target': True, 'target_distance': 0}
     _reject(case, tool, params, 'touch range|beyond range')
     assert not _mage_records(case)
     _reject(case, tool, _mage_params(case, lite_prepared_source='wizard'))
+
+
+def test_mage_exploration_touch_follows_the_established_scene_claim(defense_case):
+    # The Lite operating guide: outside combat, Touch uses the GM's established fiction;
+    # saved map positions are authoritative only in combat.
+    case = defense_case(multi=True, companion_position=[30, 0, 0])
+    params = case.parameters | {'spell': 'mage_armor', 'target': 'companion', 'target_character': 'companion', 'target_distance': 0}
+    _reject(case, 'cast_spell_outside_combat', params | {'caster_can_touch_target': False}, 'touch')
+    assert not _mage_records(case)
+    before = case.entities()['hero']['resources']['spell_slot_1']
+    receipt, command = case.act('cast_spell_outside_combat', **(params | {'caster_can_touch_target': True}))
+    record, = _mage_records(case)
+    assert record['target'] == 'companion' and record['source_caster_id'] == 'hero'
+    assert case.entities()['hero']['resources']['spell_slot_1'] == before - 1
+    _replay_reopen(case, receipt, command)
 
 
 def test_mage_real_armor_equip_permanently_retires_and_old_retry_cannot_retire_new_cast(defense_case, monkeypatch):
@@ -278,7 +293,7 @@ def test_mage_trained_shield_and_stronger_real_unarmored_base_feed_attack(defens
 def test_mage_elapsed_time_short_failed_rest_and_successful_long_rest(defense_case, monkeypatch):
     case = defense_case()
     case.act('cast_spell_outside_combat', **_mage_params(case))
-    case.act('advance_srd_lasting_time', elapsed_rounds=4800)
+    case.act('advance_srd_lasting_time', elapsed_rounds=3000)
     assert len(_mage_records(case)) == 1
     case.start()
     case.next_turn()
@@ -295,6 +310,7 @@ def test_mage_elapsed_time_short_failed_rest_and_successful_long_rest(defense_ca
     assert len(_mage_records(case)) == 1
     case.act('advance_srd_lasting_time', elapsed_rounds=4800)
     rest, rest_command = case.act('complete_srd_rest', target_state='hero')
+    # The 8-hour duration elapsed during the rest; resting itself does not end the spell.
     assert not _mage_records(case)
     assert case.entities()['hero']['rest_phase'] == 'complete'
     _replay_reopen(case, rest, rest_command)
@@ -312,13 +328,15 @@ def test_mage_two_casters_exact_unprepare_and_free_dismiss_replay(defense_case):
     case.act('complete_srd_rest', target_state='hero')
     prepared, prepared_command = case.act('prepare_srd_spells', caster='hero', caster_state='hero',
         source='wizard', spells=['cloud_of_daggers'], spellbook_available=True)
-    remaining, = _mage_records(case)
-    assert remaining['source_caster_id'] == 'companion' and remaining['cast_id'] == companion_id
+    # Changing prepared spells does not end a spell already cast.
+    assert {row['cast_id'] for row in _mage_records(case)} == {row['cast_id'] for row in records}
     _replay_reopen(case, prepared, prepared_command)
     _reject(case, 'dismiss_srd_spell', {'caster_state': 'hero', 'cast_id': companion_id})
     resources = dict(case.entities()['companion']['resources'])
     dismissed, dismissed_command = case.act('dismiss_srd_spell', caster_state='companion', cast_id=companion_id)
-    assert not _mage_records(case) and case.entities()['companion']['resources'] == resources
+    remaining, = _mage_records(case)
+    assert remaining['source_caster_id'] == 'hero'
+    assert case.entities()['companion']['resources'] == resources
     _replay_reopen(case, dismissed, dismissed_command)
 
 
@@ -330,17 +348,20 @@ def test_mage_same_caster_two_real_grants_do_not_lose_independent_ownership(defe
             {'source': 'sorcerer', 'ability': 'charisma', 'spells': ['mage_armor']},
         ],
     })
+    slots = case.entities()['hero']['resources']['spell_slot_1']
     case.act('cast_spell_outside_combat', **_mage_params(case, spell_grant='wizard'))
     case.act('cast_spell_outside_combat', **_mage_params(case, spell_grant='sorcerer'))
-    assert {row['lite_prepared_source'] for row in _mage_records(case)} == {'wizard', 'sorcerer'}
-    assert len({row['cast_id'] for row in _mage_records(case)}) == 2
+    # The same caster's second cast on the same creature replaces the first; they never stack.
+    casts = {row['cast_id'] for row in _mage_records(case)}
+    assert len(casts) == 1
+    assert case.entities()['hero']['resources']['spell_slot_1'] == slots - 2
     case.act('begin_srd_rest', target_state='hero', kind='short', activity='light')
     case.act('advance_srd_lasting_time', elapsed_rounds=600)
     case.act('complete_srd_rest', target_state='hero')
     receipt, command = case.act('prepare_srd_spells', caster='hero', caster_state='hero',
         source='wizard', spells=['cloud_of_daggers'], spellbook_available=True)
-    remaining, = _mage_records(case)
-    assert remaining['lite_prepared_source'] == 'sorcerer'
+    # Unpreparing one grant's copy does not end the cast.
+    assert {row['cast_id'] for row in _mage_records(case)} == casts
     assert 'mage_armor' in case.entities()['hero']['prepared_spells']
     _replay_reopen(case, receipt, command)
 

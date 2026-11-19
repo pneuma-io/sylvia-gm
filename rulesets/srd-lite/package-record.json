@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "85e2586d8c743284b617a972ca2cebce0ca5453c5b3fc963514bcf043e6a096b",
+  "content_sha256": "3a8b43eac9fe049a604623c53a6a99f452fb0ed44ca7048125fa60b4d1459394",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -212,9 +212,9 @@
       "sha256": "e99cb13cdf36dca41c67b9041bf91a536c8b49c730bb27a8909eb4385a8908e3"
     },
     {
-      "bytes": 14469128,
+      "bytes": 14578806,
       "path": "runtime/ruleset.yaml",
-      "sha256": "44d51167c3b91012462f34cd2deba3cc4a3bd90814fd331db59614e54b1c26a7"
+      "sha256": "a65738f4c0458094291d0df7ee8d8b75b8edc7a78bffb104ee709a8d57d8513d"
     },
     {
       "bytes": 59661,

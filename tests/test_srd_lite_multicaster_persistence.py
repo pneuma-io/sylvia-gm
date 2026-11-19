@@ -64,7 +64,9 @@ def multi_case(tmp_path, monkeypatch):
         archive_closed_case(case)
 
 
-@pytest.mark.parametrize("spell,rounds", [("true_strike", 2), ("bless", 10), ("cloud_of_daggers", 10)])
+# SRD 5.2.1 True Strike is Instantaneous and takes no concentration, so only real
+# concentration sources are exercised here.
+@pytest.mark.parametrize("spell,rounds", [("bless", 10), ("cloud_of_daggers", 10)])
 def test_independent_caster_survives_other_source_end_then_expires_and_reopens(multi_case, spell, rounds):
     case = multi_case(spell)
     first = {"target": "guard"}
@@ -76,21 +78,18 @@ def test_independent_caster_survives_other_source_end_then_expires_and_reopens(m
         first["environment_origin"] = [30, 30, 3]
         second["environment_origin"] = [40, 30, 3]
     expected_resources = dict(case.entities()["companion"]["resources"])
-    if spell != "true_strike":
-        expected_resources[f"spell_slot_{2 if spell == 'cloud_of_daggers' else 1}"] -= 1
+    expected_resources[f"spell_slot_{2 if spell == 'cloud_of_daggers' else 1}"] -= 1
     case.cast(**first)
     case.cast(**second)
     key = "lite_concentration_casters"
-    if spell != "true_strike":
-        assert case.lasting()[key] == ["hero", "companion"]
+    assert case.lasting()[key] == ["hero", "companion"]
     assert case.entities()["hero"]["concentration_spell_id"] == spell
     assert case.entities()["companion"]["concentration_spell_id"] == spell
     if spell == "cloud_of_daggers":
         cloud_sources = {identity: source["caster"] for identity, source in case.lasting()["persistent_spell_areas"].items() if source["spell"] == spell}
         assert set(cloud_sources.values()) == {"hero", "companion"}
     receipt, command = case.act("end_concentration", caster_state="hero")
-    if spell != "true_strike":
-        assert case.lasting()[key] == ["companion"]
+    assert case.lasting()[key] == ["companion"]
     assert not case.entities()["hero"].get("concentration_spell_id")
     assert case.entities()["companion"]["concentration_spell_id"] == spell
     if spell == "cloud_of_daggers":
@@ -99,15 +98,11 @@ def test_independent_caster_survives_other_source_end_then_expires_and_reopens(m
     assert case.execute(command) == receipt and case.snapshot().state == before.state
     case.reopen()
     assert case.execute(command) == receipt and case.snapshot().state == before.state
-    if spell != "true_strike":
-        assert case.lasting()[key] == ["companion"]
+    assert case.lasting()[key] == ["companion"]
     case.act("advance_srd_lasting_time", elapsed_rounds=rounds)
-    if spell != "true_strike":
-        assert case.lasting()[key] == []
+    assert case.lasting()[key] == []
     assert not case.entities()["companion"].get("concentration_spell_id")
     assert case.entities()["companion"]["resources"] == expected_resources
-    if spell == "true_strike":
-        assert case.entities()["companion"].get("lite_true_strike") is None
     if spell == "cloud_of_daggers":
         assert all(case.lasting()["persistent_spell_areas"][identity]["active"] is False for identity in cloud_sources)
     after = case.snapshot()
