@@ -50,8 +50,19 @@ def test_later_allocated_darts_do_not_rollback_a_target_killed_by_the_first(heal
 
 
 def test_missile_actual_range_and_bad_allocation_are_atomic(healing_case):
-    case = healing_case('magic_missile', positions={'hero': [0, 0, 0], 'guard': [61, 0, 0], 'other': [1, 0, 0], 'extra': [2, 0, 0]})
-    case.reject('cast_spell_outside_combat', case.parameters | {'target_distance': 0, 'projectile_targets': ['guard', 'other', 'other']}, match='actual dart target')
+    # SRD 5.2.1 range is 120 feet. The Lite operating guide makes saved positions authoritative
+    # in combat, whatever is claimed; outside combat the GM's stated distances decide.
+    case = healing_case('magic_missile', positions={'hero': [0, 0, 0], 'guard': [121, 0, 0], 'other': [1, 0, 0], 'extra': [2, 0, 0]})
+    split = ['guard', 'other', 'other']
+    case.reject('cast_spell_outside_combat', case.parameters | {'targets_max_distance': 121, 'projectile_targets': split}, match='within range')
+    case.reject('cast_spell_outside_combat', case.parameters | {'projectile_targets': ['guard', 'other']}, match='projectile')
+    case.start()
+    claimed = case.parameters | {'target': 'other', 'target_distance': 1, 'targets_max_distance': 1}
+    for tool in ('begin_srd_spell_action', 'cast_spell'):
+        case.reject(tool, claimed | {'projectile_targets': split}, match='range')
+        case.reject(tool, claimed | {'projectile_targets': ['other', 'other']}, match='projectile')
+    assert case.entities()['hero']['resources']['spell_slot_1'] == 3
+    assert case.snapshot().state['sylvia.srd-lite.bg3.combat']['action_available'] is True
 
 
 def test_saved_shield_blocks_each_dart_without_extra_spend(healing_case):

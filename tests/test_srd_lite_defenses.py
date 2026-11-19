@@ -366,22 +366,27 @@ def test_mage_same_caster_two_real_grants_do_not_lose_independent_ownership(defe
     _replay_reopen(case, receipt, command)
 
 
-@pytest.mark.parametrize('seed,modifier,eligible', [(8, 6, True), (8, 0, False), (8, 30, False), (5, 0, False)])
-def test_shield_real_saved_hit_gate_same_roll_payment_and_reopen(defense_case, monkeypatch, seed, modifier, eligible):
+@pytest.mark.parametrize('seed,modifier,converts', [(8, 6, True), (8, 0, False), (8, 30, False), (5, 0, False)])
+def test_shield_real_saved_hit_gate_same_roll_payment_and_reopen(defense_case, monkeypatch, seed, modifier, converts):
+    # SRD 5.2.1 Shield is a Reaction to being hit, so any saved hit (a natural 20 too) opens it.
+    # Its +5 AC counts against the triggering attack; `converts` is whether that makes it miss.
     case = defense_case('shield')
     case.start()
     case.next_turn()
     _, _, event_id, event = _begin_attack(case, monkeypatch, seed=seed, modifier=modifier)
-    assert event['lite_shield_eligible'] is eligible
     params = {'spell': 'shield', 'caster': 'hero', 'caster_state': 'hero', 'slot_resource': 'spell_slot_1',
               'reaction_trigger_id': event_id, 'verbal_component_available': True, 'somatic_component_available': True}
-    if not eligible:
+    if event['attack_outcome'] == 'miss':
+        assert (seed, modifier) == (8, 0) and event['attack_total'] == 8
         _reject(case, 'cast_srd_reaction_spell', params)
         assert case.entities()['hero']['resources']['spell_slot_1'] == 3
         assert case.entities()['hero']['reaction_available'] is True
         case.act('complete_srd_pending_action', pending_action_id=event_id)
         return
-    assert event['attack_outcome'] == 'hit' and event['attack_total'] == 14
+    if seed == 5:
+        assert event['attack_roll']['results'] == [20] and event['attack_outcome'] == 'critical_hit'
+    else:
+        assert event['attack_outcome'] == 'hit' and event['attack_total'] == 8 + modifier
     _replay_reopen(case, *case.act('cast_srd_reaction_spell', **params))
     assert case.entities()['hero']['resources']['spell_slot_1'] == 2
     assert case.entities()['hero']['reaction_available'] is False
@@ -396,8 +401,14 @@ def test_shield_real_saved_hit_gate_same_roll_payment_and_reopen(defense_case, m
 
     monkeypatch.setattr(_effect_executor, 'dice_roll', recorded)
     complete, command = case.act('complete_srd_pending_action', pending_action_id=event_id)
-    assert rolls == [] and case.entities()['hero']['hp'] == hp
     assert complete.result['context']['_attack_roll'] == event['attack_roll']
+    assert all(roll.sides != 20 for roll in rolls)
+    if not converts:
+        assert complete.result['context']['_attack_outcome'] == event['attack_outcome']
+        assert case.entities()['hero']['hp'] < hp
+        _replay_reopen(case, complete, command)
+        return
+    assert rolls == [] and case.entities()['hero']['hp'] == hp
     assert complete.result['context']['_attack_outcome'] == 'miss'
     _replay_reopen(case, complete, command)
     _, _, later_id, later = _begin_attack(case, monkeypatch, seed=9, modifier=0)
@@ -413,8 +424,13 @@ def test_shield_real_saved_hit_gate_same_roll_payment_and_reopen(defense_case, m
 
 def test_shield_actual_split_magic_missile_allocation_keeps_other_recipient_damage(defense_case):
     case = defense_case('shield', multi=True, companion_spell='magic_missile')
-    case.start(second_actor='companion')
-    case.next_turn()
+    # Both casters share +20 initiative, so the saved rolls decide who acts first.
+    case.act('start_combat_encounter_entities', first_actor='hero', second_actor='companion',
+             first_surprised=False, second_surprised=False, tie_winner='first')
+    case.act('begin_combat_turn')
+    if case.snapshot().state[VARIANT_ID + '.combat']['active_actor'] != 'companion':
+        case.next_turn()
+    assert case.snapshot().state[VARIANT_ID + '.combat']['active_actor'] == 'companion'
     parameters = case.parameters | {
         'spell': 'magic_missile', 'caster': 'companion', 'caster_state': 'companion',
         'target': 'hero', 'projectile_targets': ['hero', 'guard', 'hero'],
@@ -446,10 +462,8 @@ def test_shield_condition_critical_uses_saved_ordinary_roll_but_keeps_caster_leg
     assert event['attack_roll']['total'] == 12 and event['attack_total'] == 14
     assert event['context']['_condition_critical_hit'] is True
     assert event['context']['_critical_hit'] is True and event['attack_outcome'] == 'critical_hit'
-    # The saved ordinary roll is AC-convertible even though a surviving hit is
-    # condition-critical. Eligibility does not grant an incapacitated caster a
-    # Reaction or bypass the canonical condition/component/payment owner.
-    assert event['lite_shield_eligible'] is True
+    # A hit opens the Shield trigger, but a Paralyzed caster is Incapacitated (SRD 5.2.1)
+    # and cannot take the Reaction; the canonical condition owner refuses before payment.
     _reject(case, 'cast_srd_reaction_spell', {
         'spell': 'shield', 'caster': 'hero', 'caster_state': 'hero', 'slot_resource': 'spell_slot_1',
         'reaction_trigger_id': event_id,
@@ -467,7 +481,7 @@ def test_shield_decline_resumes_original_saved_hit_without_payment(defense_case,
     case.start()
     case.next_turn()
     begun, begun_command, event_id, event = _begin_attack(case, monkeypatch)
-    assert event['lite_shield_eligible'] is True
+    assert event['attack_outcome'] == 'hit' and event['target_state_id'] == 'hero'
     _replay_reopen(case, begun, begun_command)
     hp = case.entities()['hero']['hp']
     complete, command = case.act('complete_srd_pending_action', pending_action_id=event_id)
