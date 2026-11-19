@@ -164,7 +164,7 @@ class PersistentCLI:
 
 @pytest.fixture
 def runtime(tmp_path, monkeypatch):
-    # The kept process is opt-in; per-step is the shipped default.
+    # The shipped default; set explicitly so these cases never follow the developer's shell.
     monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", "persistent")
     monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(sys.executable))
     monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
@@ -299,8 +299,9 @@ def test_the_switch_keeps_one_process_per_step(runtime, monkeypatch):
 
 
 @pytest.mark.parametrize(("value", "expected"), [
-    (None, "per-step"), ("", "per-step"), ("per-step", "per-step"), ("anything", "per-step"),
-    ("persistent", "persistent"), (" Persistent ", "persistent"), ("kept", "persistent"),
+    (None, "persistent"), ("", "persistent"), ("persistent", "persistent"),
+    (" Persistent ", "persistent"), ("kept", "persistent"), ("anything", "persistent"),
+    ("per-step", "per-step"), (" Per-Step ", "per-step"), ("step", "per-step"),
 ])
 def test_the_process_switch(value, expected):
     environ = {} if value is None else {"SYLVIA_CLAUDE_PROCESS": value}
