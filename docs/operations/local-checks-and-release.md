@@ -115,6 +115,12 @@ git fetch origin
 For authority-document edits, also run `bash scripts/check-docs-index.sh --worktree`.
 The source quality group runs `ruff check src` and `mypy src`. Type checking still has
 recorded legacy exceptions in `pyproject.toml`; new refactor modules stay strict.
+`tests/test_architecture_guards.py` in the same group fails when those exceptions or the inline
+`type: ignore` comments grow, and when the domain package imports an outer layer or I/O; its
+messages name the file, the import and what to change.
+[`docs/testing/feature-map.json`](../testing/feature-map.json) links each mapped player feature
+to its contract sections and existing checks; `tests/test_feature_map.py` fails when a mapped
+test is renamed, a heading moves, or a mapped check is not in the gate.
 
 Development runs have no whole-run time cutoff. `--ci` explicitly selects the separate
 future post-launch budget; it is not a development setting or a promised full-suite runtime.

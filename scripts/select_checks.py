@@ -20,6 +20,7 @@ else:
 
 CORE = [
     "tests/test_python_quality.py",
+    "tests/test_architecture_guards.py",
     "tests/test_private_provider_records.py",
     "tests/test_protected_provider_settings.py",
     "tests/test_runtime_procedure_failures.py",
@@ -202,6 +203,9 @@ def select_checks(paths, *, source, base, diff_complete=True, full=False, root=N
             }:
                 add("release-integrity")
                 reason = "Touched policy, exact notices, exclusions and copy"
+            elif path == "docs/testing/feature-map.json":
+                groups.setdefault("feature-map", []).append("tests/test_feature_map.py")
+                reason = "Feature map: contract anchors, test selectors and gate registration"
             elif path in {"README.md", "AGENTS.md", "CONTEXT.md"} or path.startswith("docs/"):
                 groups.setdefault(
                     "copy-and-links",

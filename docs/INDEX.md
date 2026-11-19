@@ -129,6 +129,7 @@ the complete documentation set. Their original dates and evidence limits remain 
 | [`operations/linux-development.md`](operations/linux-development.md) | Setting up a Linux machine for development and the complete local check run. |
 | [`operations/linux-release-checklist.md`](operations/linux-release-checklist.md) | The Linux build machine, release build (one AppImage), what the Linux build leaves out and the installed-app steps before each release. |
 | [`operations/windows-release-checklist.md`](operations/windows-release-checklist.md) | The Windows-only checks, build, installer and installed-app steps before each release, linking the sections that explain them. |
+| [`testing/feature-map.json`](testing/feature-map.json) | Player-facing features linked to their contract sections and existing checks; a supporting reference validated by `tests/test_feature_map.py`, not acceptance or run results. |
 | [`reference/content-formats.md`](reference/content-formats.md) | Installed content-definition retrieval, examples and validation owners; a supporting implementation reference. |
 | [`launch-compatibility.md`](launch-compatibility.md) | Lite package compatibility, current implementation ownership and bounded candidate evidence; current task and product contract select scope. |
 
