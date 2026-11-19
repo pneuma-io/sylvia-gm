@@ -39,6 +39,14 @@ import uuid
 from collections.abc import Mapping, Sequence
 from typing import cast
 
+from sylvia_gm.agent._argument_contracts import (
+    ARGUMENTS_TOOL_NAME,
+    CONTRACT_KEY,
+    argument_contract,
+    read_tool_arguments,
+    selected_schema,
+    unwrap_arguments,
+)
 from sylvia_gm.agent._native_continuation import attach_chat_metadata
 from sylvia_gm.agent._session_loop import ProviderActionFeedback
 from sylvia_gm.agent._stateless_mcp import (
@@ -83,6 +91,7 @@ from ._provider_session import (
     _gm_decision_control_message,
     _mechanics_narration_facts,
     _missing_required_arguments,
+    _model_tool_schema,
     _native_content_for_text_operation,
     _normalize_state_references,
     _persisted_campaign_file_mutation_attempted,
@@ -892,6 +901,69 @@ def record_fixed_tool_refusal(
                   "campaign_id": state.campaign_id, "session_id": provider_input.session.session_id,
                   "turn_id": turn_id, "inference_id": state.inference_id,
                   "call_id": state.assembly.call_id, "tool_name": state.assembly.name})
+
+
+def _contract_tools(state: ProviderTurnState) -> dict[str, tuple[dict[str, Any], Any]]:
+    """This round's tools that keep a selected value's inputs behind an argument contract."""
+    tools: dict[str, tuple[dict[str, Any], Any]] = {}
+    for alias, tool in state.aliases.items():
+        if CONTRACT_KEY not in tool.input_schema:
+            continue
+        schema = _model_tool_schema(tool, envelope=False)
+        contract = argument_contract(schema)
+        if contract is not None:
+            tools[alias] = (schema, contract)
+    return tools
+
+
+def read_selected_arguments(
+    self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
+    *, turn_id: str,
+) -> None:
+    """Answer a read of one selected value's inputs locally, without touching game state."""
+    tools = _contract_tools(state)
+    if not tools:
+        reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
+        return
+    try:
+        parameters = json.loads(state.assembly.arguments or "{}")
+    except json.JSONDecodeError as error:
+        reject_invalid_tool_json(self, state, provider_input, turn_id=turn_id, error=error)
+        return
+    result = read_tool_arguments(parameters, tools)
+    state.local_tool_results[state.assembly.call_id] = {**result, "state_changed": False}
+    if result.get("status") != "ok":
+        state.local_tool_failures.add(state.assembly.call_id)
+
+
+def unwrap_selected_arguments(self: ProviderSessionAdapter, state: ProviderTurnState) -> bool:
+    """Flatten a contract tool's call after checking it against the selected value's inputs.
+
+    Returns False when the call is refused; the refusal carries the selected contract so the
+    model can correct it in one round without a separate read.
+    """
+    if CONTRACT_KEY not in state.catalog_tool.input_schema:
+        return True
+    schema = _model_tool_schema(state.catalog_tool, envelope=False)
+    contract = argument_contract(schema)
+    if contract is None:
+        return True
+    state.parameters, issues = unwrap_arguments(state.parameters, schema, contract)
+    if not issues:
+        return True
+    value = state.parameters.get(contract.selector)
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected", "code": "selected_arguments_invalid", "state_changed": False,
+        "validation": {"issues": issues},
+        "selected_arguments": selected_schema(schema, contract, value),
+        "instruction": (
+            f"Use only the inputs selected_arguments lists for this {contract.selector}, "
+            f"inside {contract.field}, keep the tool's own inputs at the top level, and retry "
+            "once."
+        ),
+    }
+    state.local_tool_failures.add(state.assembly.call_id)
+    return False
 
 
 def reject_invalid_tool_json(
@@ -1989,6 +2061,10 @@ def execute_tool_batch(
                 and loader_mechanic_names(self, provider_input) is not None
                 and read_loader_mechanic(self, state, provider_input)):
             continue
+        # A spell-value read the loader leaves to a contract tool's own reader (#65).
+        if state.assembly.name == ARGUMENTS_TOOL_NAME:
+            read_selected_arguments(self, state, provider_input, turn_id=turn_id)
+            continue
         resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
         if resolved_tool is None:
             reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
@@ -2021,6 +2097,8 @@ def execute_tool_batch(
                 "instruction": "Call the tool again with a JSON object.",
             }
             state.local_tool_failures.add(state.assembly.call_id)
+            continue
+        if not unwrap_selected_arguments(self, state):
             continue
         if self._fixed_tool_list and self._ledger_active(provider_input):
             from ._fixed_tool_projection import unavailable_values

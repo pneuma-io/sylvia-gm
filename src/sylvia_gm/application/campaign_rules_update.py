@@ -422,9 +422,14 @@ def _tool_input_change(prior: ToolDeclaration, incoming: ToolDeclaration) -> str
                 return None
             choices_changed = True
     # Exposure decides only whether the model is shown the tool; admission is unchanged.
+    # An argument contract only groups which inputs the model is shown at once; the
+    # executable schema and every check stay the same.
     for schema in (before, after):
         exposure = schema.pop("x-sylvia-gm-exposure", None)
         if exposure is not None and not isinstance(exposure, dict):
+            return None
+        contract = schema.pop("x-sylvia-gm-argument-contracts", None)
+        if contract is not None and not isinstance(contract, dict):
             return None
     if before != after:
         return None

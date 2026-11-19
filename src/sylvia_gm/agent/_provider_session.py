@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import copy
 import hashlib
 import json
 import logging
@@ -29,6 +30,12 @@ from collections.abc import (
 from dataclasses import dataclass
 from typing import Any, cast
 
+from sylvia_gm.agent._argument_contracts import (
+    ARGUMENTS_TOOL,
+    CONTRACT_KEY,
+    argument_contract,
+    envelope_schema,
+)
 from sylvia_gm.agent._campaign_memory import select_campaign_memory
 from sylvia_gm.agent._context_ledger import (
     ACTIVE_RECORDS_KEY,
@@ -668,8 +675,14 @@ def _preparation_keeps_intent_pending(scope: object, *, pending: bool) -> bool:
     )
 
 
-def _model_tool_schema(tool: ModelMechanicsTool) -> dict[str, object]:
-    """Project provider-only guidance around the authority-owned tool interface."""
+def _model_tool_schema(
+    tool: ModelMechanicsTool, *, envelope: bool = True,
+) -> dict[str, object]:
+    """Project provider-only guidance around the authority-owned tool interface.
+
+    With ``envelope`` a tool declaring argument contracts shows only its envelope; without
+    it, the full projection a selected contract is read from.
+    """
 
     projected = _plain_json(tool.input_schema)
     if not isinstance(projected, dict):
@@ -811,6 +824,10 @@ def _model_tool_schema(tool: ModelMechanicsTool) -> dict[str, object]:
                     "Set true only when campaign facts explicitly establish this optional "
                     "feature; otherwise use false.",
                 )
+    contract = argument_contract(projected) if envelope else None
+    if contract is not None:
+        # The selected value's own inputs are read on demand; execution flattens them back.
+        return envelope_schema(projected, contract)
     return projected
 
 
@@ -2222,6 +2239,8 @@ class ProviderSessionAdapter:
                     },
                 }
             )
+        if any(CONTRACT_KEY in tool.input_schema for tool in aliases.values()):
+            tools.append(copy.deepcopy(ARGUMENTS_TOOL))
         return tools, aliases
 
     def _opening_footing_payload(

@@ -1695,6 +1695,20 @@ the ledger resets. Builder and participant requests do not use it.
   `reason`, session, turn, inference and call ID. Count the audit events (or deduplicated saved
   tool results), not the replayed conversation copies. Live casting accuracy and cache savings
   remain unmeasured until a separately authorized provider run.
+- **Argument contracts.** A package may declare `x-sylvia-gm-argument-contracts` (version 1)
+  at the root of a tool's input schema: a `selector` input, a `field` name, the `common`
+  inputs and, per selector value, the further inputs that value can use. The GM is then
+  shown only the selector, the common inputs and one object `field`; `read_tool_arguments`
+  (offered whenever such a tool is) returns one value's exact inputs with their current
+  choices. Before mechanics run, the turn loop refuses a non-object field, a duplicate, an
+  input placed in the field that belongs at the top level or that the tool does not have,
+  and a selected input whose value its schema refuses, returning the selected contract
+  with the refusal; it then flattens the call. Every other input reaches the existing
+  checks exactly as with the full schema, so a flat call that worked still works. SRD Lite
+  0.3.27 declares contracts for `begin_srd_spell_action` and
+  `cast_spell_outside_combat`, derived by `scripts.srd_lite_argument_contracts` as a sound
+  over-approximation and stamped by `scripts.update_srd_argument_contracts`. Saved-campaign
+  rules updates treat the declaration as model guidance.
 - **ChatGPT runtime thread.** On `codex_app_server` the provider keeps the Codex runtime process
   and thread between the requests of a GM turn and between turns. At a Sylvia tool call the turn
   is left waiting, and the next request, which brings the call's result, answers the call inside
