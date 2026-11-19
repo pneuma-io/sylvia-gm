@@ -32,6 +32,14 @@ DISTANT_OTHERS = {
     'hero': [0, 0, 0], 'guard': [50, 0, 0],
     'other': [-50, 0, 0], 'extra': [60, 10, 0],
 }
+# Walls halfway between the caster at x=0 and the defender at x=30, so each still sees the
+# other. A 2-foot wall leaves three of nine body samples exposed (half cover); a taller side
+# wall leaves two of nine (three-quarters cover).
+COVER_WALLS = {
+    'none': None,
+    'half': [([14.75, -5, 0], [15.25, 5, 2])],
+    'three_quarters': [([14.75, -5, 0], [15.25, 5, 2]), ([14.75, -5, 0], [15.25, -0.1, 6])],
+}
 
 
 def _public(case):
@@ -67,9 +75,14 @@ class BoundaryCampaignCase(Case):
 class ScalarShieldCase(BoundaryCampaignCase):
     """The Guiding Bolt caster is a Cleric; the defender comes from a real Wizard."""
 
-    def __init__(self, path, wizard_donor):
+    def __init__(self, path, wizard_donor, cover='none'):
         self.campaign_id = 'lite'
-        super().__init__(path, 'guiding_bolt', positions=DISTANT_OTHERS)
+        walls = COVER_WALLS[cover]
+        geometry = None if walls is None else [
+            _geometry(f'cover_wall_{index}', lower, upper) | {'map_id': 'lite'}
+            for index, (lower, upper) in enumerate(walls)
+        ]
+        super().__init__(path, 'guiding_bolt', positions=DISTANT_OTHERS, geometry=geometry)
         initial = self.snapshot()
         donor = wizard_donor.snapshot()
         def exact(lock):
@@ -138,13 +151,13 @@ def boundary_case(tmp_path, monkeypatch):
     monkeypatch.setattr(dice, 'set_seed', lambda _seed: None)
     opened = []
 
-    def make(*, mage_obstruction=None):
+    def make(*, mage_obstruction=None, cover='none'):
         path = tmp_path / f'boundary-{len(opened)}.db'
         if mage_obstruction is None:
             # The donor is an ordinary admitted Wizard, never a relabelled Cleric.
             donor = Case(path.with_name(path.stem + '-wizard.db'), 'scorching_ray')
             opened.append(donor)
-            case = ScalarShieldCase(path, donor)
+            case = ScalarShieldCase(path, donor, cover)
         else:
             case = MageSceneCase(path, mage_obstruction)
         opened.append(case)
@@ -228,7 +241,7 @@ def test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens(bo
     captured = event['spell_attack_context']
     assert captured['_card_d20_roll']['results'] == [8]
     assert captured['_card_d20_total'] == 18 and captured['_spell_target_armor_class'] == 16
-    assert captured['_spell_critical_hit'] is False and event['lite_shield_eligible'] is True
+    assert captured['_spell_critical_hit'] is False and event['attack_outcome'] == 'hit'
     if intervene:
         _replay_reopen(case, *case.act('cast_srd_reaction_spell', **_shield(event_id)), rolls)
         assert case.entities()['defender']['resources']['spell_slot_1'] == 2
@@ -252,26 +265,25 @@ def test_actual_guiding_bolt_shield_or_decline_reuses_scalar_roll_and_reopens(bo
     _replay_reopen(case, finished, finish_command, rolls)
 
 
-@pytest.mark.parametrize('cover,ac,eligible', [('none', 16, False), ('half', 18, False), ('three_quarters', 21, True)])
-def test_scalar_cover_classification_survives_to_actual_ac_and_shield_boundary(boundary_case, monkeypatch, cover, ac, eligible):
-    case = boundary_case()
+@pytest.mark.parametrize('cover,ac,converts', [('none', 16, False), ('half', 18, False), ('three_quarters', 21, True)])
+def test_scalar_cover_classification_survives_to_actual_ac_and_shield_boundary(boundary_case, monkeypatch, cover, ac, converts):
+    # Cover comes from the saved scene walls (combat positions are authoritative). Shield
+    # answers any hit (SRD 5.2.1); its +5 turns the saved total 25 into a miss only at AC 21.
+    case = boundary_case(cover=cover)
     rolls = _record_rolls(monkeypatch)
     event_id, event = _hold_scalar(case, monkeypatch, rolls, seed=9, cover=cover)
     captured = event['spell_attack_context']
     assert captured['_card_d20_roll']['results'] == [15] and captured['_card_d20_total'] == 25
     assert captured['_spell_target_armor_class'] == ac
-    assert event['attack_outcome'] == 'hit' and event['lite_shield_eligible'] is eligible
-    if eligible:
-        _replay_reopen(case, *case.act('cast_srd_reaction_spell', **_shield(event_id)), rolls)
-    else:
-        _reject(case, 'cast_srd_reaction_spell', _shield(event_id), rolls)
-        assert case.entities()['defender']['resources']['spell_slot_1'] == 3
-        assert case.entities()['defender']['reaction_available'] is True
+    assert event['attack_outcome'] == 'hit'
+    _replay_reopen(case, *case.act('cast_srd_reaction_spell', **_shield(event_id)), rolls)
+    assert case.entities()['defender']['resources']['spell_slot_1'] == 2
+    assert case.entities()['defender']['reaction_available'] is False
     finished, command = case.act('complete_srd_pending_action', pending_action_id=event_id)
     assert finished.result['context']['_spell_attack'] == captured['_spell_attack']
-    assert finished.result['context']['_spell_attack_outcome'] == ('failure' if eligible else 'success')
+    assert finished.result['context']['_spell_attack_outcome'] == ('failure' if converts else 'success')
     assert sum(roll.sides == 20 for roll in rolls) == 1
-    if eligible:
+    if converts:
         assert rolls[-1].sides == 20 and case.entities()['defender']['hp'] == 1000
     else:
         assert rolls[-1].sides == 6 and case.entities()['defender']['hp'] < 1000
@@ -292,7 +304,15 @@ def test_real_shield_survives_encounter_exit_then_expires_on_free_time_clock(bou
     assert case.snapshot().state[VARIANT_ID + '.combat']['encounter_active'] is False
     assert case.lasting()['lasting_tick'] == cast_tick
     assert case.entities()['defender']['reaction_shield'] == actual_shield
-    _replay_reopen(case, ended, ended_command, rolls)
+    # Outside combat the MCP catalog no longer offers end_combat_encounter, so a replay there is
+    # refused unchanged; the owner's receipt store still returns the committed result.
+    saved = case.snapshot()
+    with pytest.raises(CommandRejected) as unavailable:
+        case.execute(ended_command)
+    assert unavailable.value.code == 'mcp_tool_unavailable' and case.snapshot() == saved
+    assert case.owner.execute_action(ended_command) == ended and case.snapshot() == saved
+    case.reopen()
+    assert case.owner.execute_action(ended_command) == ended and case.snapshot() == saved
     monkeypatch.setattr(dice, '_rng', Random(8))
     before = len(rolls)
     active, active_command = case.act('cast_spell_outside_combat', **_guiding(case))

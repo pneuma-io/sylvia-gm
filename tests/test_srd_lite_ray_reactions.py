@@ -1,7 +1,7 @@
-"""UNEXECUTED draft: actual admitted ray windows, costs, dice and saved campaigns.
+"""Actual admitted Scorching Ray hit windows, Shield, costs, dice and saved campaigns.
 
-Main must first compose an archive containing the ray cursor and admitted Shield
-adapter. No test manufactures a pending event or substitutes an attack result.
+Each staged ray that hits holds its saved roll in a Reaction window. No test manufactures a
+pending event or substitutes an attack result.
 """
 
 from copy import deepcopy
@@ -17,6 +17,7 @@ from sylvia_gm.domain.authority import StateValue, WriterRole, owned_payload, th
 from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected
 from sylvia_gm.runtime import _effect_executor
 from tests.lite_fixture_archive import archive_closed_case
+from tests.test_spatial_engine import _geometry
 from tests.test_srd_lite_foundation import Case, VARIANT_ID
 
 
@@ -39,12 +40,14 @@ def _public(case):
 class RayShieldCase(Case):
     """Admit a second Wizard with actual Shield source and hostile relationship facts."""
 
-    def __init__(self, path):
+    def __init__(self, path, half_cover=False):
         self.campaign_id = "lite"
+        # A 2-foot wall halfway to the defender at x=30 gives it actual half cover.
+        geometry = [_geometry("ray_cover_wall", [14.75, -5, 0], [15.25, 5, 2]) | {"map_id": "lite"}]
         super().__init__(path, "scorching_ray", positions={
             "hero": [0, 0, 0], "guard": [-10, -10, 0],
             "other": [-10, 10, 0], "extra": [20, 10, 0],
-        })
+        }, geometry=geometry if half_cover else None)
         self.parameters["targets_max_distance"] = 30
         original = self.snapshot()
         state = thaw_json_value(original.state)
@@ -89,9 +92,9 @@ def ray_case(tmp_path, monkeypatch):
     monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
     opened = []
 
-    def make(*, shield=False, spell="scorching_ray", **changes):
+    def make(*, shield=False, half_cover=False, spell="scorching_ray", **changes):
         path = tmp_path / f"ray-{len(opened)}.db"
-        case = RayShieldCase(path) if shield else Case(path, spell, **changes)
+        case = RayShieldCase(path, half_cover) if shield else Case(path, spell, **changes)
         opened.append(case)
         return _public(case)
 
@@ -146,13 +149,13 @@ def _finish_windows(case, event_id, rolls):
 
 
 def test_actual_ray_shield_changes_saved_hit_then_resumes_order_without_repayment(ray_case, monkeypatch):
-    case = ray_case(shield=True)
+    case = ray_case(shield=True, half_cover=True)
     case.start()
     monkeypatch.setattr(dice, "_rng", Random(8))  # Genuine first D20 is 8, adjusted by the real Wizard.
     rolls = _record_rolls(monkeypatch)
     targets = ["defender", "other", "defender"]
-    begun, begin_command = case.act("begin_srd_spell_action", **(_parameters(case, targets) |
-        {"half_cover_targets": ["defender"]}))
+    # In combat the saved wall, not a claim, gives the defender half cover.
+    begun, begin_command = case.act("begin_srd_spell_action", **_parameters(case, targets))
     event_id = begun.result["context"]["_pending_action_id"]
     assert rolls == []
     _retry_reopen(case, begun, begin_command, rolls)
@@ -168,7 +171,7 @@ def test_actual_ray_shield_changes_saved_hit_then_resumes_order_without_repaymen
     assert actual["_spell_target_armor_class"] == 18
     assert actual["_card_d20_roll"]["results"] == list(rolls[0].results)
     assert actual["_spell_critical_hit"] is False
-    assert 16 <= actual["_card_d20_total"] < 21 and event["lite_shield_eligible"] is True
+    assert 16 <= actual["_card_d20_total"] < 21 and event["attack_outcome"] == "hit"
     assert [roll.sides for roll in rolls] == [20]  # No mirror, damage or second ray has run.
     assert case.entities()["defender"]["hp"] == case.entities()["other"]["hp"] == 1000
     assert case.entities()["hero"]["resources"]["spell_slot_2"] == 2
@@ -217,7 +220,7 @@ def test_actual_critical_ray_and_dead_later_target_skip_preserve_saved_rolls(ray
     assert event["spell_attack_context"]["_spell_critical_hit"] is True
     assert event["spell_attack_context"]["_spell_condition_critical_hit"] is False
     assert event["spell_attack_context"]["_card_d20_roll"]["results"] == [20]
-    assert event["lite_shield_eligible"] is False and [roll.sides for roll in rolls] == [20]
+    assert [roll.sides for roll in rolls] == [20]
     _retry_reopen(case, held, held_command, rolls)
     final = _finish_windows(case, event_id, rolls)
     assert case.entities()["guard"]["is_alive"] is False
@@ -225,7 +228,7 @@ def test_actual_critical_ray_and_dead_later_target_skip_preserve_saved_rolls(ray
     first_damage = next(roll for roll in rolls if roll.sides == 6)
     assert len(first_damage.results) == 4
     assert final.result["context"]["_spell_multi_attack_targets"] == targets
-    assert final.result["context"]["_spell_multi_attack_outcomes"][1] == "target_already_defeated"
+    assert final.result["context"]["_spell_multi_attack_outcomes"][1] == "skipped"
     assert final.result["context"]["_spell_multi_attacks"][1] is None
     assert final.result["context"]["_spell_multi_target_numbers"][1] is None
     assert case.entities()["hero"]["resources"]["spell_slot_2"] == 2
@@ -279,16 +282,17 @@ def test_hostile_wizard_natural_twenty_is_a_real_window_but_shield_cannot_conver
     assert event["target_state_id"] == "defender" and event["attack_outcome"] == "critical_hit"
     assert event["spell_attack_context"]["_card_d20_roll"]["results"] == [20]
     assert event["spell_attack_context"]["_spell_condition_critical_hit"] is False
-    assert event["lite_shield_eligible"] is False
     _retry_reopen(case, held, command, rolls)
-    before = case.snapshot()
-    with pytest.raises((CommandRejected, MechanicsRejected)):
-        case.act("cast_srd_reaction_spell", spell="shield", caster="defender", caster_state="defender",
-            slot_resource="spell_slot_1", reaction_trigger_id=event_id,
-            verbal_component_available=True, somatic_component_available=True)
-    assert case.snapshot().state == before.state and case.snapshot().revision == before.revision
-    assert case.entities()["defender"]["resources"]["spell_slot_1"] == 3
-    assert case.entities()["defender"]["reaction_available"] is True
-    _finish_windows(case, event_id, rolls)
+    # SRD 5.2.1: a natural 20 is a hit, so Shield may answer it, but +5 AC cannot make it miss.
+    shield, shield_command = case.act("cast_srd_reaction_spell", spell="shield",
+        caster="defender", caster_state="defender", slot_resource="spell_slot_1",
+        reaction_trigger_id=event_id, verbal_component_available=True, somatic_component_available=True)
+    _retry_reopen(case, shield, shield_command, rolls)
+    assert case.entities()["defender"]["resources"]["spell_slot_1"] == 2
+    assert case.entities()["defender"]["reaction_available"] is False
+    final = _finish_windows(case, event_id, rolls)
     assert sum(roll.sides == 20 for roll in rolls) == 3
+    assert final.result["context"]["_spell_multi_attack_outcomes"][0] == "success"
+    assert final.result["context"]["_spell_multi_attack_kinds"][0] == "critical_hit"
     assert case.entities()["defender"]["hp"] < 1000
+    assert case.entities()["defender"]["resources"]["spell_slot_1"] == 2
