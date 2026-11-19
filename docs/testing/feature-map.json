@@ -112,7 +112,7 @@
       "not_covered": [
         "No browser journey drives Stop, Retry and redirection through the rendered controls after normal startup; the ui-script checks stub the desktop bridge.",
         "No check covers the composer staying closed after a narration failure, where the Retry offer cannot redirect.",
-        "The owner admits ordinary new input after a settled Stop without superseding the Retry offer; only the desktop composer adds the redirection. See the open GitHub issue.",
+        "The owner admits ordinary new input after a settled Stop without superseding the Retry offer; only the desktop composer adds the redirection. GitHub issue #189.",
         "Two owner-transport Stop cases exist outside the supported-journey gate: test_stop_overtakes_blocked_manual_retry_and_discards_retry_prose and test_stop_overtakes_pending_owner_submission_and_cancels_provider.",
         "No installed-app or real-model check is mapped."
       ]
