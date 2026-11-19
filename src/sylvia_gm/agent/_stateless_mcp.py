@@ -318,6 +318,7 @@ def _model_input_schema(
     *,
     participant_ids: Sequence[str],
     castable_spell_ids: frozenset[str] | None = None,
+    fixed: bool = False,
 ) -> tuple[dict[str, object], dict[str, Mapping[str, object]]]:
     """Project one executable model contract and its authority-owned argument derivations."""
 
@@ -346,16 +347,22 @@ def _model_input_schema(
         if required_for_model is True:
             model_required.add(name)
         if child.get("x-sylvia-gm-reference") == "participant":
-            child["enum"] = list(participant_ids)
+            if fixed:
+                child.pop("enum", None)
+            else:
+                child["enum"] = list(participant_ids)
         enum = child.get("enum")
         spell_scope = child.pop(SPELL_SCOPE_KEY, None)
         if child.get("x-sylvia-gm-castable-spells") is True and isinstance(enum, list):
-            child["enum"] = scoped_spell_choices(
-                enum,
-                castable_spell_ids=castable_spell_ids,
-                scope=spell_scope,
-                aliases=child.get("x-sylvia-gm-value-aliases"),
-            )
+            if fixed:
+                child.pop("enum", None)
+            else:
+                child["enum"] = scoped_spell_choices(
+                    enum,
+                    castable_spell_ids=castable_spell_ids,
+                    scope=spell_scope,
+                    aliases=child.get("x-sylvia-gm-value-aliases"),
+                )
         properties[name] = child
     raw_required = projected.get("required", ())
     required = (
@@ -367,6 +374,10 @@ def _model_input_schema(
     projected["properties"] = properties
     projected["required"] = sorted(required | model_required)
     projected.pop(EXPOSURE_KEY, None)
+    if fixed:
+        from ._fixed_tool_projection import compact_schema
+
+        projected = compact_schema(projected)
     return projected, derivations
 
 
@@ -757,6 +768,26 @@ def _campaign_file_update_schema(options: Mapping[str, object]) -> dict[str, obj
         "required": [_CAMPAIGN_FILE_STATE_CHANGE, _CAMPAIGN_FILE_STATE_CHANGE_SUMMARY],
         "additionalProperties": False,
     }
+
+
+def _fixed_campaign_file_schema(options: Mapping[str, object]) -> dict[str, object]:
+    """Keep every narrative field; current eligibility travels in the callable record."""
+    stable = dict(options)
+    stable["operations"] = [*cast(Sequence[str], options.get("operations", ())),
+                            "update_plan_progress", "reveal_secret"]
+    # A placeholder includes the optional act field without embedding any current identity.
+    stable["scene_act_ids"] = ["act"]
+    schema = _campaign_file_update_schema(stable)
+    properties = cast(dict[str, Any], schema["properties"])
+    for collection, field in (("scenes", "act_id"), ("plan_progress", "plan_item_id"),
+                              ("reveals", "secret_id")):
+        if collection in properties:
+            child = properties[collection]["items"]["properties"][field]
+            child.pop("enum", None)
+            if field == "plan_item_id":
+                child["description"] = (
+                    "Exact private Campaign Plan item identity from the current choices record.")
+    return schema
 
 
 def _json_type_name(value: object) -> str:
@@ -1413,7 +1444,9 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                 for participant in getattr(snapshot, "participants", ())
             )
             castable_spell_ids = _castable_spell_ids(snapshot)
-            catalog = owner.catalog(campaign_id)
+            fixed = meta.get(f"{_META_PREFIX}fixed_tool_list") is True
+            catalog = (owner.catalog(campaign_id, include_unexposed=True) if fixed
+                       else owner.catalog(campaign_id))
             asked_spell_ids = exposure_spell_ids(tool.input_schema for tool in catalog)
             exposure = ExposureContext(
                 # Exposure reads the whole saved state, including engine-private records,
@@ -1425,7 +1458,7 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
             )
             projected: list[types.Tool] = []
             for tool in catalog:
-                if not exposure.exposed(tool.input_schema):
+                if not fixed and not exposure.exposed(tool.input_schema):
                     continue
                 schema = _plain_json(tool.input_schema)
                 if not isinstance(schema, dict):  # pragma: no cover - CatalogTool contract
@@ -1434,10 +1467,12 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                     schema,
                     participant_ids=participant_ids,
                     castable_spell_ids=castable_spell_ids,
+                    fixed=fixed,
                 )
                 properties = cast(Mapping[str, object], model_schema["properties"])
                 spell_schema = properties.get("spell")
-                if isinstance(spell_schema, Mapping) and spell_schema.get("enum") == []:
+                if (not fixed and isinstance(spell_schema, Mapping)
+                        and spell_schema.get("enum") == []):
                     continue
                 projected.append(
                     types.Tool(
@@ -1621,7 +1656,10 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                             types.Tool(
                                 name=_CAMPAIGN_FILE_UPDATE_TOOL_NAME,
                                 description=_campaign_file_update_description(),
-                                input_schema=_campaign_file_update_schema(options),
+                                input_schema=(
+                                    _fixed_campaign_file_schema(options) if fixed
+                                    else _campaign_file_update_schema(options)
+                                ),
                                 _meta={
                                     f"{_META_PREFIX}package_id": _REFERENCE_PACKAGE_ID,
                                     f"{_META_PREFIX}package_version": "1",
@@ -1633,6 +1671,8 @@ def build_stateless_mcp_server(owner: AuthorityOwner) -> Server[Any]:
                                 },
                             )
                         )
+            if fixed:
+                projected.sort(key=lambda tool: tool.name)
             return types.ListToolsResult(tools=projected, ttl_ms=0, cache_scope="private")
         except AuthorityError as error:
             raise MCPError(
@@ -2105,6 +2145,7 @@ class StatelessMcpMechanics:
         purpose: str,
         discovery_id: str,
         session_id: str | None,
+        fixed: bool = False,
     ) -> tuple[ModelMechanicsTool, ...]:
         basis = self._owner.snapshot(campaign_id)
         server = build_stateless_mcp_server(self._owner)
@@ -2115,6 +2156,8 @@ class StatelessMcpMechanics:
                     code="unsupported_mcp_protocol_version",
                 )
             list_meta: dict[str, object] = {"campaign_id": campaign_id}
+            if fixed:
+                list_meta["fixed_tool_list"] = True
             if session_id is not None:
                 list_meta["session_id"] = session_id
             result = await client.list_tools(
@@ -2195,6 +2238,7 @@ class StatelessMcpMechanics:
         purpose: str = "direct_discovery",
         discovery_id: str | None = None,
         session_id: str | None = None,
+        fixed: bool = False,
     ) -> tuple[ModelMechanicsTool, ...]:
         return _run(
             self._list_tools(
@@ -2202,6 +2246,7 @@ class StatelessMcpMechanics:
                 purpose=purpose,
                 discovery_id=discovery_id or f"mcp-discovery-{uuid.uuid4().hex}",
                 session_id=session_id,
+                fixed=fixed,
             )
         )
 

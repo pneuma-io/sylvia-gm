@@ -43,6 +43,7 @@ from sylvia_gm.agent._context_ledger import (
     ContextLedger,
     WireFrame,
     context_mode,
+    fixed_tool_list,
     native_answers,
     native_inputs,
     native_record,
@@ -1738,6 +1739,7 @@ class ProviderSessionAdapter:
         # ``SYLVIA_GM_CONTEXT_MODE=ledger`` (or a route's own default) selects the ledger.
         self._context_mode = context_mode(
             transport=getattr(getattr(provider, "model_info", None), "transport", None))
+        self._fixed_tool_list = fixed_tool_list()
         self._one_tool_list = stable_tool_list(
             transport=getattr(getattr(provider, "model_info", None), "transport", None))
         self._context_ledgers: dict[str, ContextLedger] = {}
@@ -2448,6 +2450,24 @@ class ProviderSessionAdapter:
             "kind": "gm", "campaign_id": session.campaign_id, "session_id": session.session_id,
         })
 
+    def _fixed_provider_tools(
+        self, provider_input: SessionProviderInput,
+    ) -> list[dict[str, object]]:
+        """Build a reproducible complete catalog without using the round's exposure."""
+        from ._stateless_mcp import StatelessMcpMechanics, action_sequence_model_tools
+        from ._working_context import HISTORY_TOOL
+
+        campaign_id = provider_input.session.campaign_id
+        assert campaign_id is not None
+        catalog = StatelessMcpMechanics(self._owner).list_tools(
+            campaign_id, session_id=provider_input.session.session_id,
+            purpose="fixed_session_catalog", fixed=True,
+        )
+        if self._owner.snapshot(campaign_id).package_lock.entries:
+            catalog = (*catalog, *action_sequence_model_tools(self._owner))
+        tools, _aliases = self._provider_tools(catalog)
+        return sorted([*tools, HISTORY_TOOL], key=lambda tool: str(tool["function"]["name"]))
+
     def _ledger_hooks(
         self, provider_input: SessionProviderInput, provider: Provider, bridge: Any,
     ) -> tuple[Any, Any, Any, Any, Any]:
@@ -2459,11 +2479,14 @@ class ProviderSessionAdapter:
         persistent = callable(getattr(self._owner, "append_agent_message", None))
         ledgers = self._ledger_store()
         ledger = ledgers.get(session_id)
-        if ledger is None or ledger.context_owner != owner or ledger.transport != transport:
+        if (ledger is None or ledger.context_owner != owner or ledger.transport != transport
+                or (ledger.fixed_tools is not None) != self._fixed_tool_list):
             previous = ledger
+            fixed_tools = (self._fixed_provider_tools(provider_input)
+                           if self._fixed_tool_list else None)
             ledger = ContextLedger(session_id=session_id, context_owner=owner,
                                    transport=transport,
-                                   one_tool_list=self._one_tool_list)
+                                   one_tool_list=self._one_tool_list, fixed_tools=fixed_tools)
             if previous is not None:
                 # A different owner or transport is a new epoch; keep the reset visible.
                 ledger.state = previous.state
