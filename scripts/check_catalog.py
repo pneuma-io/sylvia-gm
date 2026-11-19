@@ -37,10 +37,19 @@ PRODUCT_CASE_EXCLUSIONS = {
     "test_probe_25_durable_map_labels_all_frozen_probes_and_parent_owned_93_gate":
         "Historical milestone-label assertions; retained for the historical checkpoint, "
         "excluded from product qualification by the independent CCO review.",
-    "tests/test_claude_native_wire.py::test_real_claude_code_requests_extend_each_other":
+    **dict.fromkeys(
+        (
+            "tests/test_claude_native_wire.py::"
+            "test_real_claude_code_requests_extend_each_other[per-step]",
+            "tests/test_claude_native_wire.py::"
+            "test_real_claude_code_requests_extend_each_other[persistent]",
+            "tests/test_claude_native_wire.py::"
+            "test_real_claude_code_fresh_start_on_player_speech_replays_the_kept_process",
+        ),
         "Opt-in offline wire check with a real Claude Code binary (local fake endpoint, "
         "throwaway profile); it runs only when SYLVIA_TEST_CLAUDE_WIRE_BINARY names the binary "
         "and is run by hand, so it is never a required case.",
+    ),
 }
 
 

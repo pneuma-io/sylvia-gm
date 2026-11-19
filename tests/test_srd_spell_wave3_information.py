@@ -108,6 +108,10 @@ def _case(spell, **choices):
         params["information_kind"] = "jewel"
     if spell == "locate_animals_or_plants":
         state[f"{SRD}.state"]["spatial_scene"]["entities"][1]["metadata"]["creature_type"] = "beast"
+    if spell == "speak_with_animals":
+        # SRD 5.2.1 Range: Self. The package refuses another chosen creature (#161), so
+        # the cast names its caster; the Beast it talks to is chosen when communicating.
+        params.update(target="hero", target_distance=0)
     if spell == "clairvoyance":
         state[f"{SRD}.entities"]["hero"]["spell_materials"][0]["components"].append(
             "clairvoyance.glass_eye"
@@ -482,6 +486,7 @@ def test_public_npc_information_cast_uses_its_saved_daily_use_then_communicates(
         params.pop("caster")
         params.pop("slot_resource")
         params["caster_state"] = "mage"
+        params["target"] = "mage"  # Range: Self names its own caster.
         receipt, command = _act(owner, "cast_spell_outside_combat", **params)
         assert receipt.status is ActionStatus.COMMITTED
         assert (
