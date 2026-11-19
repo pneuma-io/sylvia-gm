@@ -394,14 +394,10 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
             if option["closure_sha256"] == old_lock.closure_sha256
         )
         reverse = owner.preview_campaign_rules_update("casting", earlier["candidate_id"])
-        if origin == "lite-0.3.25":
-            # 0.3.25 declares the same tools and panels, so a return has no contract
-            # conflicts; the preview still advises treating it as one-way.
-            assert reverse["compatible"] and not reverse["conflicts"]
-            assert "Treat this update as one-way." in reverse["recovery"]
-        else:
-            assert not reverse["compatible"]
-            assert reverse["conflicts"]
+        # 0.3.26 adds internal tools (the Magic Missile dart and Scorching Ray windows) that
+        # 0.3.25 lacks, so every earlier pin, 0.3.25 included, refuses a return.
+        assert not reverse["compatible"]
+        assert reverse["conflicts"]
         _projected_lite_panels(owner)
         owner.open_turn("casting", "after-upgrade")
         provider = HealingGM()
