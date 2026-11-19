@@ -37,8 +37,10 @@ end to end.
 
 The public Alpha supports the Windows 11 desktop application through an unsigned NSIS installer
 and an unsigned portable EXE ZIP. The ZIP uses adjacent local data and does not require installation.
-Both formats need exact-candidate qualification before publication. Windows 10 qualification,
-installer formats other than NSIS, native macOS/Linux clients and cloud-hosted play are post-Alpha.
+Both formats need exact-candidate qualification before publication. From 0.4.1 the Alpha also
+supports x86_64 Linux through an unsigned AppImage (glibc 2.35 or newer), qualified by the
+[Linux release checklist](../operations/linux-release-checklist.md). Windows 10 qualification,
+installer formats other than NSIS, native macOS clients and cloud-hosted play are post-Alpha.
 
 Sylvia GM never displays estimated monetary cost. Any future in-house subscription usage belongs
 only in a dedicated Usage Settings surface, never Builder or DM conversation windows. Local or
@@ -131,7 +133,8 @@ processes are an explicit exception to the local inference-server lifecycle para
 Missing/old runtimes, unavailable models, expired sign-in and quota failures retain saved work and
 give explicit outcomes. Sylvia does not bundle or redistribute Claude Code and updates its copy
 only when the person asks; Claude Code's own installer and updater are never run. No shared
-subscription service or Portal route is included. Automatic setup is Windows only. Agreeing to
+subscription service or Portal route is included. Automatic setup works on Windows and Linux; on
+Linux the download's signed manifest is checked with `gpgv` before its SHA-256. Agreeing to
 Anthropic's terms for products that run Claude Code remains an owner decision before release.
 A source PR and synthetic/native-protocol checks do not establish genuine-account
 or installed-release acceptance. See the [setup, terms and evidence note](../research/claude-dedicated-instance-2026-11-12.md)
@@ -1117,7 +1120,7 @@ qualified artifacts through GitHub Releases after direct approval.
   compatible-only adoption path;
 - Trigger Discipline and Siren Protocol implementation and acceptance; they are not Alpha blockers;
 - Cairn 2e as an advertised supported ruleset;
-- multiplayer, mobile, native macOS/Linux, or hosted cloud play;
+- multiplayer, mobile, native macOS, or hosted cloud play;
 - Windows 10 qualification, installer formats other than NSIS, and elevated MSI qualification;
 - third-party executable plugins and Unsafe Mode execution;
 - importing unreleased predecessor-prototype campaign state;
