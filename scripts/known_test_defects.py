@@ -99,22 +99,7 @@ KNOWN_DEFECTS: dict[str, KnownDefect] = {
         "Execute the case's actual incoming attack or split missiles against the admitted Wizard and inspect the saved Shield eligibility/recipient before response and replay.",
         category='suspected retained contract discrepancy',
     ),
-    'tests/test_srd_lite_missiles.py::test_later_allocated_darts_do_not_rollback_a_target_killed_by_the_first': KnownDefect(
-        'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
-        "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
     'tests/test_srd_lite_missiles.py::test_missile_actual_range_and_bad_allocation_are_atomic': KnownDefect(
-        'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
-        "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_missiles.py::test_split_force_darts_roll_each_face_and_apply_resistance_per_dart[1]': KnownDefect(
-        'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
-        "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
-        category='suspected retained contract discrepancy',
-    ),
-    'tests/test_srd_lite_missiles.py::test_split_force_darts_roll_each_face_and_apply_resistance_per_dart[3]': KnownDefect(
         'The admitted Magic Missile behavior differs from the retained per-dart/range contract',
         "Use the real public Magic Missile route with the case's split allocation, resistance, defeated recipient or invalid-range input; inspect atomicity and dart results.",
         category='suspected retained contract discrepancy',
