@@ -228,7 +228,8 @@ def linux_release_platform() -> ReleasePlatform:
         required_kinds=frozenset({"appimage"}),
         required_kinds_message="Release must contain exactly one AppImage",
         qualification_keys=frozenset({"ubuntu_22_04", "ubuntu_24_04"}),
-        toolchain_keys=_TOOLCHAIN_KEYS | {"appimage_tools_sha256", "build_system", "glibc"},
+        toolchain_keys=_TOOLCHAIN_KEYS
+        | {"appimage_tools_sha256", "appimage_tools_source", "build_system", "glibc"},
         disclosure=LINUX_UNSIGNED_DISCLOSURE,
         bundled_notices_path=LINUX_BUNDLED_NOTICES_PATH,
         executable_kinds=frozenset({"appimage"}),
