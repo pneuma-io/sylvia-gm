@@ -238,6 +238,20 @@ def execute_required_transition(
             ),
         }
     )
+    # No model call or result accompanies this transition, so its facts are saved alone, in
+    # the order they joined the live facts. Replay pairs results with calls and skips this.
+    yield ProviderEvent.tool_evidence(
+        message_id=f"{state.inference_id}-engine-transition-results",
+        payload={
+            "kind": "provider_tool_results",
+            **state.context_fields,
+            "turn_id": turn_id,
+            "inference_id": state.inference_id,
+            "basis_message_id": state.basis_message_id,
+            "results": [],
+            "narration_facts": cast(JsonValue, _plain_json([state.facts])),
+        },
+    )
     if callable(recorder):
         recorder(
             {
