@@ -50,6 +50,7 @@ from tests.test_claude_native_route import (
     player,
     project,
     result,
+    session_files_left,
     text_reply,
     tool_reply,
 )
@@ -339,8 +340,14 @@ def test_an_idle_process_is_closed_with_its_files_after_the_idle_limit(runtime, 
     step(provider, chain, dict(chain_canonicals())["fresh"], SCRIPT["fresh"])
     cli = PersistentCLI.instances[0]
     deadline = time.monotonic() + 5
-    # The timer closes the process, then removes its files.
-    while (not cli.closed or cli.session_file.exists()) and time.monotonic() < deadline:
+
+    def private_files_left() -> bool:
+        return bool(session_files_left(home) or any((home / "steps").iterdir())
+                    or any((home / "workspace").iterdir()))
+
+    # The timer closes the process, then removes its session file, steps and workspace, in
+    # that order; wait for all of them, since the last can lag under load (#202).
+    while (not cli.closed or private_files_left()) and time.monotonic() < deadline:
         time.sleep(0.02)
     assert cli.closed and len(_claude_kept.KEPT_PROCESSES) == 0
     assert_nothing_private_left(home)
