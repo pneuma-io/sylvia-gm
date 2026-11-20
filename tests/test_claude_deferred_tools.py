@@ -149,14 +149,19 @@ def test_collect_answer_keeps_rounds_after_the_answered_call(tmp_path):
     folder.mkdir(parents=True)
     answer = {"type": "user", "message": {"role": "user", "content": [
         {"type": "tool_result", "tool_use_id": "toolu_prev", "content": "14"}]}}
-    rows = [answer, {"type": "api-request"}, SEARCH, LOADED, {"type": "api-request"}, FINAL]
+    # Claude Code writes a message's thinking as a row of its own, before its other blocks.
+    thinking = {"type": "assistant", "message": {**SEARCH["message"], "content": [
+        {"type": "thinking", "thinking": "SENTINEL_PRIVATE plan", "signature": "sig"}]}}
+    rows = [answer, {"type": "api-request"}, thinking, SEARCH, LOADED, {"type": "api-request"},
+            FINAL]
     _rows_file(folder / "sid.jsonl", rows)
     found = collect_answer(config, "sid", "toolu_prev", final_message_id="msg_final",
                            requests=2)
     assert found.status == "collected" and found.answer == answer["message"]
     assert [r["type"] for r in found.records] == ["assistant", "user"]
+    assert "SENTINEL_PRIVATE" not in json.dumps(found.records)
     # The CLI has not yet recorded the step's second request: unknown, never partial.
-    _rows_file(folder / "sid.jsonl", rows[:3])
+    _rows_file(folder / "sid.jsonl", rows[:4])
     assert collect_answer(config, "sid", "toolu_prev", 0.05, final_message_id="msg_final",
                           requests=2).status == "unknown"
 
@@ -333,6 +338,8 @@ class ScriptedEndpoint:
         self.offsite: list[str] = []
         self.failure: str | None = None
         self.searches = 0
+        #: Every reply starts with a signed thinking block, as a thinking model's does.
+        self.thinking = False
         self.lock = threading.Lock()
         endpoint = self
 
@@ -425,6 +432,21 @@ class ScriptedEndpoint:
                         "usage": {"output_tokens": 5}}),
                     ("message_stop", {"type": "message_stop"}),
                 ]
+                if endpoint.thinking:
+                    for _name, data in events:
+                        if "index" in data:
+                            data["index"] += 1
+                    events[1:1] = [
+                        ("content_block_start", {"type": "content_block_start", "index": 0,
+                         "content_block": {"type": "thinking", "thinking": "",
+                                           "signature": ""}}),
+                        ("content_block_delta", {"type": "content_block_delta", "index": 0,
+                         "delta": {"type": "thinking_delta",
+                                   "thinking": f"SENTINEL_THINKING {number}."}}),
+                        ("content_block_delta", {"type": "content_block_delta", "index": 0,
+                         "delta": {"type": "signature_delta", "signature": f"sig{number}"}}),
+                        ("content_block_stop", {"type": "content_block_stop", "index": 0}),
+                    ]
                 self.send_response(200)
                 self.send_header("Content-Type", "text/event-stream")
                 self.end_headers()
@@ -516,7 +538,8 @@ def offline_runtime(monkeypatch, tmp_path: Path, endpoint: ScriptedEndpoint,
 
 
 def run_session(tmp_path: Path, monkeypatch, *, binary: str, seed: tuple[Path, dict],
-                mode: str, process: str, refused_call: bool) -> dict[str, Any]:
+                mode: str, process: str, refused_call: bool,
+                thinking: bool = False) -> dict[str, Any]:
     """The scripted D&D session of PR 208 on ``claude_code``; every request body is kept.
 
     Exploration (optionally a refused call first), a fight with a summoned dragon, an owner
@@ -531,6 +554,7 @@ def run_session(tmp_path: Path, monkeypatch, *, binary: str, seed: tuple[Path, d
     monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
     monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", process)
     endpoint = ScriptedEndpoint()
+    endpoint.thinking = thinking
     offline_runtime(monkeypatch, tmp_path, endpoint, binary)
     home = tmp_path / "claude-runtime"
     database = tmp_path / "session.db"
@@ -690,14 +714,16 @@ def claude_seed(tmp_path_factory):
     return database, parameters
 
 
-@pytest.mark.parametrize("process", ["persistent", "per-step"])
+@pytest.mark.parametrize(("process", "thinking"), [
+    ("persistent", False), ("per-step", False), ("persistent", True),
+], ids=["persistent", "per-step", "persistent-thinking"])
 def test_real_claude_code_deferred_session_keeps_one_tool_list(
-    tmp_path, monkeypatch, claude_seed, process,
+    tmp_path, monkeypatch, claude_seed, process, thinking,
 ):
     # Opt-in prerequisite, run by hand, like tests/test_claude_native_wire.py.
     assert BINARY
     run = run_session(tmp_path, monkeypatch, binary=BINARY, seed=claude_seed,
-                      mode="deferred", process=process, refused_call=True)
+                      mode="deferred", process=process, refused_call=True, thinking=thinking)
     requests = run["requests"]
     assert run["offsite"] == []
     assert len(requests) >= 12
@@ -710,10 +736,15 @@ def test_real_claude_code_deferred_session_keeps_one_tool_list(
     assert len(names) < 20
     for body in requests:
         assert loaded_tools(body) == loaded
-    # Every request extends the one before it, the restart included.
+    # Every request extends the one before it, the restart included. With thinking, a fresh
+    # process replays every assistant message without it (the journal never keeps thinking),
+    # so a fresh start does not extend what a kept process sent with it; that is the same for
+    # every tool list and not checked here.
     breaks = [n for n, (a, b) in enumerate(zip(requests, requests[1:], strict=False), 2)
               if not extends(a, b)]
-    assert breaks == []
+    assert thinking or breaks == []
+    assert "SENTINEL_THINKING" not in json.dumps(
+        [m for m in requests[-1]["messages"] if m["role"] == "user"])
     # What the GM said before a search stays in that search round, never in a reply.
     holding = [m for m in requests[-1]["messages"] if SEARCH_TEXT in json.dumps(m)]
     assert len(holding) == run["searches"]

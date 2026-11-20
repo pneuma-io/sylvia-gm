@@ -49,6 +49,8 @@ PRODUCT_CASE_EXCLUSIONS = {
             "test_real_claude_code_deferred_session_keeps_one_tool_list[persistent]",
             "tests/test_claude_deferred_tools.py::"
             "test_real_claude_code_deferred_session_keeps_one_tool_list[per-step]",
+            "tests/test_claude_deferred_tools.py::"
+            "test_real_claude_code_deferred_session_keeps_one_tool_list[persistent-thinking]",
         ),
         "Opt-in offline wire check with a real Claude Code binary (local fake endpoint, "
         "throwaway profile); it runs only when SYLVIA_TEST_CLAUDE_WIRE_BINARY names the binary "

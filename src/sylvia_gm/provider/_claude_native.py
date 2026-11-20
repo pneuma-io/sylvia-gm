@@ -398,13 +398,13 @@ def collect(
             return NativeCollection("unknown", reason="cli_inserted_turn")
     records = []
     for row in rows[prompt_index + 1 :]:
-        if final_message_id is not None:
+        if final_message_id is not None and row.get("type") in {"assistant", "user"}:
             if _is_final(row, final_message_id):
                 break
             round_row = _round_row(row)
             if round_row is not None:
                 records.append(round_row)
-                continue
+            continue
         if row.get("type") != "attachment" or not row.get("rendered"):
             continue
         if not isinstance(row.get("attachment"), dict):
@@ -460,13 +460,14 @@ def collect_answer(
         if index is not None:
             records = []
             for row in rows[index + 1:]:
-                if final_message_id is not None:
+                if final_message_id is not None and row.get("type") in {"assistant", "user"}:
+                    # A row with only thinking is dropped; it never ends the round.
                     if _is_final(row, final_message_id):
                         break
                     round_row = _round_row(row)
                     if round_row is not None:
                         records.append(round_row)
-                        continue
+                    continue
                 if row.get("type") in {"user", "assistant"}:
                     break
                 if row.get("type") == "attachment" and row.get("rendered"):
