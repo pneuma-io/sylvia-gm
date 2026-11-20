@@ -1673,7 +1673,11 @@ the ledger resets. Builder and participant requests do not use it.
 - **Tool list switch.** In the ledger assembly, per-round tool lists are the shipped default
   (`DEFAULT_TOOL_LIST`) on every route except those named in `DEFAULT_TOOL_LIST_BY_TRANSPORT`,
   which send one tool list for the session. `claude_code`, `codex_app_server` and
-  `anthropic_api` are listed.
+  `anthropic_api` are listed. `codex_app_server` (ChatGPT) ships `deferred` with Sylvia's
+  loader: Codex fixes a thread's tools at `thread/start` and loads every tool in Sylvia's
+  direct-only `sylvia` namespace whatever `deferLoading` says, so a list that grew cost a
+  fresh runtime thread. The loader declares a small constant list, so one runtime thread
+  serves the session.
   `SYLVIA_GM_TOOL_LIST=stable` or `=rounds` selects either for every route.
   `SYLVIA_GM_TOOL_LIST=fixed` is an opt-in third value, used only with the ledger. It lists
   the complete campaign catalog from the first GM request, in deterministic name order,

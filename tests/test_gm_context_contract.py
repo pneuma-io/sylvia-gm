@@ -886,6 +886,19 @@ class ChatGPTContractGM(ContractGM):
         )
 
 
+def _chatgpt_loader_gm():
+    """The shared loader-aware scripted GM as a ChatGPT subscription model.
+
+    That route ships Sylvia's tool loader, so mechanics are called through ``call_mechanic``
+    once they are defined; the plain ``ContractGM`` only calls tools by their listed names.
+    """
+    from tests.test_gm_deferred_tool_list import _route_gm
+
+    gm = _route_gm("chat")
+    gm.model_info = ChatGPTContractGM().model_info
+    return gm
+
+
 @pytest.mark.parametrize("route", ["switched", "chatgpt_default"])
 def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(
     tmp_path, monkeypatch, route,
@@ -908,7 +921,7 @@ def test_a_session_saved_under_the_previous_assembly_adopts_the_ledger(
     with AuthorityOwner.open(database, "adoption-ids") as owner:
         player = next(p.participant_id for p in owner.snapshot(campaign).participants
                       if p.data.get("party_role") == "player_character")
-    gm = ChatGPTContractGM() if route == "chatgpt_default" else ContractGM()
+    gm = _chatgpt_loader_gm() if route == "chatgpt_default" else ContractGM()
     monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
 
     # Played under the previous assembly, with a compaction partway.

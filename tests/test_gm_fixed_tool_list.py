@@ -87,13 +87,18 @@ def forbid_fixed_code(monkeypatch):
     monkeypatch.setattr(AuthorityOwner, "catalog", ordinary_catalog)
 
 
-# "default" leaves SYLVIA_GM_TOOL_LIST unset; with every off setting the session must never run
-# fixed-only code, so its requests are the ones the existing modes already send.
+# "default" leaves SYLVIA_GM_TOOL_LIST unset on a route whose shipped default is one growing
+# list; with every off setting the session must never run fixed-only code, so its requests are
+# the ones the existing modes already send. The ChatGPT route itself now ships the deferred
+# list (tests/test_chatgpt_deferred_tool_list.py), so this case pins that route's default back.
 @pytest.mark.parametrize("mode", ["fixed", "stable", "rounds", "default"])
 def test_fixed_session_catalog(casting_seed, tmp_path, monkeypatch, mode):
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
     if mode == "default":
+        from sylvia_gm.agent import _context_ledger
         monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+        monkeypatch.setitem(_context_ledger.DEFAULT_TOOL_LIST_BY_TRANSPORT,
+                            "codex_app_server", _context_ledger.STABLE_TOOL_LIST)
     else:
         monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
     if mode != "fixed":

@@ -455,7 +455,9 @@ def test_rules_adoption_keeps_historical_tool_calls_representable(tmp_path, monk
                 yield chunk
 
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
-    monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+    # The one stable list, which lists old and new aliases side by side. The ChatGPT route
+    # itself ships the tool loader now; this test is about the stable list's aliases.
+    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", "stable")
     fixture = Path(__file__).parent / "fixtures/lite-0.3.24.sylvia-gm-package"
     database = create_cleric_save(tmp_path / "upgrade.sqlite3", fixture.read_bytes())
     gm = CheckingGM()
