@@ -1107,8 +1107,17 @@ def with_cache_breakpoints(request: dict[str, Any]) -> dict[str, Any]:
             and message["content"] else message
             for message in messages
         ]
-        # A trailing tool-change system message (deferred tool list) takes no breakpoint; the
-        # moving one goes on the message before it.
+        # A trailing tool-change system message (deferred tool list): the moving breakpoint
+        # goes on the message before it, which finds the previous request's cache entry, and
+        # a fourth on the change's last block, so its surfaced definitions are written now.
+        # A change of many blocks would otherwise put that entry beyond the cache lookback.
+        if (len(messages) > 1 and isinstance(messages[-1], dict)
+                and messages[-1].get("role") == "system" and _is_tool_change(messages[-1])):
+            change = dict(messages[-1])
+            blocks = [dict(block) for block in change["content"]]
+            blocks[-1]["cache_control"] = dict(_EPHEMERAL)
+            change["content"] = blocks
+            messages[-1] = change
         index = len(messages) - 1
         while index > 0 and isinstance(messages[index], dict) and (
                 messages[index].get("role") == "system" and _is_tool_change(messages[index])):
