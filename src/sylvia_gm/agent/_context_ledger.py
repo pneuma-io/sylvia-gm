@@ -245,6 +245,11 @@ DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
     "claude_code": STABLE_TOOL_LIST,
     "codex_app_server": STABLE_TOOL_LIST,
     ANTHROPIC_API_ROUTE: STABLE_TOOL_LIST,
+    # Other API routes and local models: Sylvia's loader (see the context mode table).
+    "chat_completions": DEFERRED_TOOL_LIST,
+    "responses": DEFERRED_TOOL_LIST,
+    "gemini_generate_content": DEFERRED_TOOL_LIST,
+    "anthropic_messages": DEFERRED_TOOL_LIST,
 }
 #: Routes whose provider takes deferred tools itself: route name -> whether a wire model does.
 #: A route's own change registers it together with its request rendering.
@@ -388,9 +393,16 @@ def definitions_record(tools: Sequence[Mapping[str, Any]]) -> str:
 #: the ledger with one tool list ended every turn on all four current models and read 88-96%
 #: of later input from the provider cache.
 DEFAULT_CONTEXT_MODE = LEGACY_MODE
+#: The other API routes and local models (Chat Completions, Responses, Gemini, other Messages
+#: endpoints) use the ledger with Sylvia's deferred tool loader. Offline, a scripted fight
+#: with a summon and an owner restart broke the provider's cached prefix on every request
+#: with the previous assembly and on none with the ledger and loader, with 63% less
+#: cache-weighted input (#117).
 DEFAULT_CONTEXT_MODE_BY_TRANSPORT: Mapping[str, str] = {
     "claude_code": LEDGER_MODE, "codex_app_server": LEDGER_MODE,
     ANTHROPIC_API_ROUTE: LEDGER_MODE,
+    "chat_completions": LEDGER_MODE, "responses": LEDGER_MODE,
+    "gemini_generate_content": LEDGER_MODE, "anthropic_messages": LEDGER_MODE,
 }
 
 
