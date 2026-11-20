@@ -73,7 +73,7 @@ def test_four_parties_are_locally_playable_and_reopen_without_roster_constructio
             primary = next(
                 p for p in snapshot.package_lock.entries if p.role is PackageRole.PRIMARY
             )
-            assert primary.version == "0.3.26"
+            assert primary.version == "0.3.27"
             panels = owner.campaign_panels(result["campaign_id"])["surfaces"]
             inventory = next(p["data"] for p in panels if p["renderer"] == "inventory")
             assert inventory["item_names"]["healers_kit"] == "Healer's Kit"
