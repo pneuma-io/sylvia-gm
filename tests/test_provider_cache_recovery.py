@@ -192,8 +192,11 @@ def campaign_file_chunk():
 @pytest.mark.parametrize("status", ["campaign_file_updated", "campaign_file_unchanged"])
 @pytest.mark.parametrize("recovery", [False, True])
 def test_current_direct_response_never_reuses_a_completed_prior_disposition(
-    route, status, recovery
+    route, status, recovery, monkeypatch
 ):
+    # The stand-in owner has no package catalog, which the ChatGPT route's shipped tool loader
+    # reads; this test is about the Campaign File disposition, so it uses the stable list.
+    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", "stable")
     source, owner, writes = direct_response_input(status=status, recovery=recovery)
     provider = _ScriptedProvider([[campaign_file_chunk()]])
     provider.model_info = ModelInfo(
@@ -252,6 +255,9 @@ def test_full_direct_response_cycles_keep_variable_task_data_out_of_fixed_instru
     from tests.gm_context_contract import unsealed
 
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", context_mode)
+    # The stand-in owner has no package catalog, which the ChatGPT route's shipped tool loader
+    # reads; this test is about where variable task data goes, so it uses the stable list.
+    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", "stable")
 
     from sylvia_gm.provider._chatgpt import ChatGPTProvider
     from sylvia_gm.provider._openai_compat import OpenAICompatProvider
