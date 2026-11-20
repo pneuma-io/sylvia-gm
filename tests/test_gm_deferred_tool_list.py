@@ -323,6 +323,10 @@ def _route_gm(route: str):
     return RouteGM()
 
 
+def _tool_name_of(tool: dict) -> str:
+    return tool.get("name") or tool["function"]["name"]
+
+
 def _surfaced_names(request: dict, deferral: str) -> list[str]:
     if deferral == NATIVE_DEFERRAL:
         return [block["tool"]["name"] for message in request["messages"]
@@ -426,6 +430,14 @@ def test_deferred_session_fight_summon_restart(casting_seed, tmp_path, monkeypat
                   if tool["function"]["description"] != LOADER_STUB_NOTE]
     assert loaded and len(loaded) < len(declared[0]) // 4
     assert all(not name.endswith("begin_srd_spell_action") for name in loaded)
+    # Host-local tools (outside the catalog: session history, an argument reader) are always
+    # loaded from the first request; catalog aliases carry a package digest prefix.
+    import re
+
+    host_local = [_tool_name_of(tool) for tool in declared[0]
+                  if not re.match(r"tool_[0-9a-f]{12}_", _tool_name_of(tool))]
+    assert "read_session_history" in host_local
+    assert set(host_local) <= set(loaded)
     for previous, current in zip(requests[:-1], requests[1:], strict=True):
         assert _clean(current.get("system")) == _clean(previous.get("system"))
         before = _clean(previous["messages"])

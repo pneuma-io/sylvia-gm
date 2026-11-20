@@ -2463,7 +2463,9 @@ class ProviderSessionAdapter:
         """Build a reproducible complete catalog without using the round's exposure.
 
         With *core*, also collect the names a deferred list always loads: the application's
-        own tools (reference, Campaign File, action sequences, history), never a mechanic.
+        own tools (reference, Campaign File, action sequences, history) and every host-local
+        tool the list carries (one outside the catalog, such as an argument reader), never a
+        Ruleset mechanic.
         """
         from ._stateless_mcp import StatelessMcpMechanics, action_sequence_model_tools
         from ._working_context import HISTORY_TOOL
@@ -2478,8 +2480,9 @@ class ProviderSessionAdapter:
             catalog = (*catalog, *action_sequence_model_tools(self._owner))
         tools, aliases = self._provider_tools(catalog)
         if core is not None:
-            core.update(alias for alias, tool in aliases.items() if tool.category != "mechanic")
-            core.add(str(HISTORY_TOOL["function"]["name"]))
+            mechanics = {alias for alias, tool in aliases.items() if tool.category == "mechanic"}
+            core.update(str(tool["function"]["name"]) for tool in [*tools, HISTORY_TOOL]
+                        if str(tool["function"]["name"]) not in mechanics)
         return sorted([*tools, HISTORY_TOOL], key=lambda tool: str(tool["function"]["name"]))
 
     def _ledger_hooks(
