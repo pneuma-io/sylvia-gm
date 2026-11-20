@@ -62,6 +62,17 @@ def test_route_gate_kinds():
     # Claude Code loads deferred tools by its own search.
     assert deferred_tool_list(env, transport="claude_code", model_id="opus") == PROVIDER_DEFERRAL
     assert deferred_tool_list({}, transport="chat_completions", model_id="x") is None
+
+
+def test_a_registered_route_whose_model_cannot_defer_keeps_one_stable_list(monkeypatch):
+    from sylvia_gm.agent import _context_ledger as ledger_module
+
+    monkeypatch.setitem(ledger_module.NATIVE_DEFERRED_ROUTES, "chat_completions",
+                        lambda model_id: model_id == "able")
+    env = {"SYLVIA_GM_TOOL_LIST": "deferred"}
+    assert deferred_tool_list(env, transport="chat_completions", model_id="able") == "native"
+    assert deferred_tool_list(env, transport="chat_completions", model_id="other") is None
+    assert stable_tool_list(env, transport="chat_completions")
     assert deferred_tool_list({"SYLVIA_GM_TOOL_LIST": "fixed"}, transport="chat_completions",
                               model_id="x") is None
     for transport in ("chat_completions", "codex_app_server", "claude_code"):
