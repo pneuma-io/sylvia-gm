@@ -303,3 +303,103 @@ def test_scripted_session_casts_through_the_envelope(tmp_path, monkeypatch):
             if tool["function"]["name"].endswith(CASTING_TOOLS):
                 size = len(encoded(tool).encode("utf-8"))
                 assert size < 16_000, (tool["function"]["name"], size)
+
+
+@pytest.fixture(scope="module")
+def loader_seed(tmp_path_factory):
+    """The SRD spell-casting campaign with a summon, on the loader's Chat Completions route."""
+    from sylvia_gm.application.authority import AuthorityOwner
+    from sylvia_gm.domain.authority import WriterRole
+    from tests.test_srd_public_spell_casting import _create_spell_campaign
+
+    database = tmp_path_factory.mktemp("contract-loader-seed") / "seed.db"
+    with AuthorityOwner.open(database, "loader-seed") as owner:
+        _state, _data, parameters = _create_spell_campaign(owner, "summon_dragon")
+        owner.create_agent_session(campaign_id="casting", session_id="fixed-session",
+                                   role=WriterRole.DM, provider_id="openai_compatible",
+                                   model_id="openai_compatible/qwen3-32b")
+    return database, parameters
+
+
+def test_loader_mode_routes_mechanic_reads_to_the_loader_and_spell_reads_to_the_contract(
+    loader_seed, tmp_path, monkeypatch,
+):
+    """With Sylvia's tool loader, a mechanic's first read goes to the loader (its definition,
+    plus the spell's own inputs when a spell is named); a spell read once it is defined goes
+    to the argument-contract reader; the cast then runs through spell_arguments."""
+    import shutil
+
+    from sylvia_gm.agent._provider_session import ProviderSessionAdapter, _plain_json
+    from sylvia_gm.agent._session_loop import CampaignSessionLoop, SessionRunRequest
+    from sylvia_gm.application.authority import AuthorityOwner
+    from tests.test_gm_context_contract import settle
+    from tests.test_gm_tool_loader import _session_gm
+    from tests.test_srd_public_spell_casting import SRD
+
+    monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", "deferred")
+    database = tmp_path / "session.db"
+    shutil.copy2(loader_seed[0], database)
+    gm = _session_gm()
+    owner = AuthorityOwner.open(database, "loader-owner", disconnect_grace_seconds=1.0)
+    outcomes: list[tuple[str, dict]] = []
+    try:
+        scene = _plain_json(owner.snapshot("casting").state[f"{SRD}.state"]["spatial_scene"])
+        scene["zones"] = [{"id": "daylight", "map_id": "fixture",
+                           "shape": {"kind": "box", "min": [-100, -100, -10],
+                                     "max": [100, 100, 20]},
+                           "metadata": {"lighting": "bright", "plane": "material"}}]
+        summon = dict(loader_seed[1])
+        summon.pop("target")
+        summon.update(summon_id="dragon_one", summon_distance=30,
+                      caster_can_see_summon_space=True, summon_space_unoccupied=True,
+                      selected_damage_type="fire", created_actor_position=[0, 30, 0],
+                      created_actor_height=6, created_actor_lighting="bright")
+        own = {"summon_id", "selected_damage_type", "created_actor_position",
+               "created_actor_height", "created_actor_lighting"}
+        nested = {**{k: v for k, v in summon.items() if k not in own},
+                  "spell_arguments": {k: summon[k] for k in own}}
+
+        def completion():
+            pending = owner.snapshot("casting").state[f"{SRD}.state"]["pending_srd_action_stack"]
+            return {"pending_action_id": pending[-1]}
+
+        gm.steps.extend([
+            ("start_group_combat_encounter",
+             {"combatants": ["hero", "guard", "other"], "combat_scenes": [scene]}),
+            ("raw", ("read_tool_arguments", json.dumps(
+                {"tool": "begin_srd_spell_action", "value": "summon_dragon"}))),
+            ("raw", ("read_tool_arguments", json.dumps(
+                {"tool": "begin_srd_spell_action", "value": "summon_dragon"}))),
+            ("begin_srd_spell_action", nested),
+            ("complete_srd_pending_action", completion),
+            ("end_combat_encounter", {"end_reason": "fighting_stopped"}),
+            settle("The summoned dragon remains as the practice fight ends."),
+        ])
+        result = CampaignSessionLoop(owner).run(SessionRunRequest(
+            session_id="fixed-session", turn_id="casting-turn", attempt_id="t1",
+            message_id="t1", user_text="Begin a practice fight, summon a dragon, then stop.",
+        ), ProviderSessionAdapter(owner, gm, owner_id="loader-owner").for_turn("casting-turn"))
+        assert result.interruption is None, (result.interruption, gm.failure)
+        for message in owner.session_context("fixed-session").messages:
+            evidence = message.content
+            if evidence.get("kind") == "provider_tool_results":
+                outcomes.extend((row["name"], json.loads(row["content"]))
+                                for row in evidence["results"])
+        assert owner.snapshot("casting").state[f"{SRD}.entities"]["dragon_one"]["summon_active"]
+    finally:
+        owner.close()
+    reads = [outcome for name, outcome in outcomes if name == "read_tool_arguments"]
+    assert len(reads) == 2
+    first, second = reads
+    # The loader's read: the envelope's definition and the spell's own inputs together.
+    assert first["mechanic_definition"] == "begin_srd_spell_action"
+    assert "spell summon_dragon, inside spell_arguments: {" in first["definition"]
+    assert "summon_id?: " in first["definition"]
+    # Once defined, a spell read is the contract's: the exact selected inputs.
+    assert "mechanic_definition" not in second
+    assert second["status"] == "ok" and second["arguments_field"] == "spell_arguments"
+    assert "summon_id" in second["arguments"]["properties"]
+    casts = [outcome.get("status") for name, outcome in outcomes
+             if name.endswith("begin_srd_spell_action")]
+    assert casts == ["action_committed"]

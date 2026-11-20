@@ -272,6 +272,8 @@ def test_upgrade_keeps_custom_setting_files_and_records(tmp_path):
 
 
 PUBLISHED_LITE = {
+    # Published in 0.4 (v0.4.0-alpha.1): the bundled archive built at that tag.
+    "lite-0.3.23": ("0.3.23", "6076e4b10909f7a773b699b7ed264dd09ebc0416b5b1d51310a43c08a2a946b9"),
     "lite-0.3.26": ("0.3.26", "3a8b43eac9fe049a604623c53a6a99f452fb0ed44ca7048125fa60b4d1459394"),
     "lite-0.3.25": ("0.3.25", "f13148bf1f68e2558e231c1b96da8a0c660e2ed67050d31b2c61edee3716025b"),
     "lite-0.3.24": ("0.3.24", "653952ed03ad691d2d5e8c8d41fe5d93a402b1a9729120d32044251c133d523d"),
@@ -294,7 +296,9 @@ def _projected_lite_panels(owner):
 
 
 @pytest.mark.parametrize(
-    "origin", ["alpha4", "alpha5", "integration", "lite-0.3.24", "lite-0.3.25", "lite-0.3.26"]
+    "origin",
+    ["alpha4", "alpha5", "integration", "lite-0.3.23", "lite-0.3.24", "lite-0.3.25",
+     "lite-0.3.26"],
 )
 def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state(tmp_path, origin):
     database = tmp_path / "alpha4.sqlite3"
@@ -357,7 +361,8 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert "priests_pack" in inventory["entities"]["hero"]["inventory"]
         # 0.3.25 introduced declared item names; earlier pins project without them.
         assert ("item_names" in inventory) == (origin in {"lite-0.3.25", "lite-0.3.26"})
-        if origin in {"integration", "lite-0.3.24", "lite-0.3.25", "lite-0.3.26"}:
+        if origin in {"integration", "lite-0.3.23", "lite-0.3.24", "lite-0.3.25",
+                      "lite-0.3.26"}:
             # Packaged startup installs bare Rulesets; Setting descendants are offered lazily.
             owner.install_package_archive(io.BytesIO(current_archive), install_id="startup-current")
         options = owner.campaign_rules_update_options("casting")
@@ -376,7 +381,7 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         else:
             assert preview["tool_changes"]
         if origin not in {"integration", "lite-0.3.25", "lite-0.3.26"}:
-            added = 1 if origin == "lite-0.3.24" else 4
+            added = 1 if origin in {"lite-0.3.23", "lite-0.3.24"} else 4
             # Published panels only gained source fields; they are a reviewed change.
             assert any(c.get("added_panel_data") == added for c in preview["tool_changes"])
             assert "Panels show additional information." in preview["recovery"]

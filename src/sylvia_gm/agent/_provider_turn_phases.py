@@ -805,6 +805,18 @@ def read_loader_mechanic(
             and value.strip() and not ledger.needs_definition(alias)):
         return False
     result = read_result(ledger.mechanic_tool(alias, state.tools), names.short(alias))
+    if CONTRACT_SCHEMA_KEY in tool.input_schema and isinstance(value, str) and value.strip():
+        # The first read of a contract tool with a choice also gives that choice's own
+        # inputs (#65), so the model can call it without a second read.
+        from sylvia_gm.agent._tool_loader import compact_arguments
+
+        schema = _model_tool_schema(tool, envelope=False)
+        contract = argument_contract(schema)
+        selected = selected_schema(schema, contract, value) if contract else None
+        if contract is not None and selected is not None:
+            result = {**result, "definition": (
+                f"{result['definition']}\n{contract.selector} {contract.canonical(value)}, "
+                f"inside {contract.field}: {compact_arguments(selected)}")}
     state.local_tool_results[state.assembly.call_id] = {**result, "state_changed": False}
     return True
 

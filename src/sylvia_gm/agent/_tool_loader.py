@@ -224,6 +224,11 @@ class _Renderer:
         return "\n".join(lines)
 
 
+def compact_arguments(schema: Mapping[str, Any]) -> str:
+    """An object schema's argument shape in the same TypeScript-like form."""
+    return _Renderer(schema).object(schema, 0)
+
+
 def compact_definition(tool: Mapping[str, Any], name: str | None = None) -> str:
     """One mechanic: its name, description and argument shape in a TypeScript-like form."""
     function = _function(tool)
