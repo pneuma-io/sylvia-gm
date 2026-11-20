@@ -641,7 +641,8 @@ class Analysis:
         outer = self.uses
         self.uses = set()
         try:
-            env: Env | None = Env(self.tool_params(definition, bindings), {})
+            params = self.tool_params(definition, bindings)
+            env: Env | None = Env(params, self.engine_variables(definition, params))
             for pre in definition.get("pre_conditions", ()):
                 if env is None:
                     break
@@ -672,6 +673,32 @@ class Analysis:
         for name, value in bindings.items():
             params.setdefault(name, value)
         return params
+
+    def engine_variables(self, definition: dict[str, Any],
+                         params: dict[str, A]) -> dict[str, A]:
+        """Context variables the tool executor derives from inputs before any effect runs.
+
+        An entity or participant input is replaced by its saved snapshot and also gives
+        ``_<input>_id``; ``weapon``/``offhand_weapon`` give their definition rows; a ranged
+        tool reads ``target``'s band. Each carries the input it came from.
+        """
+        derived: dict[str, A] = {}
+        for entry in definition.get("parameters", ()):
+            decl = self.decls.get(entry, {}) if isinstance(entry, str) else entry
+            name = decl.get("name")
+            if decl.get("resolve") not in ("entity", "participant") or name not in params:
+                continue
+            value = params[name]
+            if value.unknown() or isinstance(value.v, str):
+                derived[name] = unknown(value.t)
+                derived[f"_{name}_id"] = unknown(value.t)
+        for source, target in (("weapon", "weapon_info"),
+                               ("offhand_weapon", "offhand_weapon_info")):
+            if source in params:
+                derived[target] = unknown(params[source].t)
+        if definition.get("range") and "target" in params:
+            derived["target_band"] = unknown(params["target"].t)
+        return derived
 
     def parameter_names(self, tool: str) -> list[str]:
         names = []

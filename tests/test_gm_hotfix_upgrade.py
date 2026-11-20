@@ -368,9 +368,10 @@ def test_retained_campaign_reviews_adopts_heals_and_reopens_without_losing_state
         assert "Treat this update as one-way." in preview["recovery"]
         assert "Export the campaign first" in preview["recovery"]
         if origin in {"lite-0.3.25", "lite-0.3.26"}:
-            # 0.3.26 and 0.3.27 repair internal spell mechanics only: no GM tool declaration
-            # or panel source changes, so the reviewed preview lists no tool changes.
-            assert preview["tool_changes"] == []
+            # 0.3.26 and 0.3.27 repair internal spell mechanics only; 0.3.28 adds argument
+            # contracts to the two casting tools, which is reviewed model guidance alone.
+            assert preview["tool_changes"] == [
+                {"package_id": SRD, "changed_model_guidance": 2}]
             assert "Panels show additional information." not in preview["recovery"]
         else:
             assert preview["tool_changes"]
@@ -524,8 +525,26 @@ def test_inventory_names_only_change_package_digests_in_gm_tool_aliases(tmp_path
 
     (before, old_ids), (after, new_ids) = captures
     assert before["messages"] == after["messages"]
-    assert len(json.dumps(before["tools"]).encode()) == len(json.dumps(after["tools"]).encode())
-    for prior, current in zip(before["tools"], after["tools"], strict=True):
+    # 0.3.28 shows the two casting tools as argument-contract envelopes and adds the local
+    # read_tool_arguments; every other definition still differs only in its digest.
+    casting = ("_begin_srd_spell_action", "_cast_spell_outside_combat")
+
+    def split(tools):
+        kept = [t for t in tools if not t["function"]["name"].endswith(casting)
+                and t["function"]["name"] != "read_tool_arguments"]
+        changed = {t["function"]["name"].split("_", 2)[2]: t for t in tools
+                   if t["function"]["name"].endswith(casting)}
+        return kept, changed
+
+    before_tools, before_casting = split(before["tools"])
+    after_tools, after_casting = split(after["tools"])
+    assert [t["function"]["name"] for t in after["tools"]].count("read_tool_arguments") == 1
+    assert before_casting.keys() == after_casting.keys()
+    for name, current in after_casting.items():
+        assert "spell_arguments" in current["function"]["parameters"]["properties"]
+        assert len(json.dumps(current).encode()) < len(json.dumps(before_casting[name]).encode())
+    assert len(json.dumps(before_tools).encode()) == len(json.dumps(after_tools).encode())
+    for prior, current in zip(before_tools, after_tools, strict=True):
         old_name = prior["function"]["name"]
         new_name = current["function"]["name"]
         if old_name != new_name:

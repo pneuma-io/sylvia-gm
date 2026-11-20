@@ -65,7 +65,7 @@ Sylvia.
 ## Included content
 
 SRD Lite is based on the D&D SRD 5.2.1, with 117 supported spells and a deliberately limited launch
-scope. Consumables are outside this Lite release. The bundled version is SRD Lite 0.3.27; an
+scope. Consumables are outside this Lite release. The bundled version is SRD Lite 0.3.28; an
 existing campaign keeps its own version until you choose **Update campaign rules** in Settings >
 Campaign data. That update is one-way, so export the campaign first if you might want the earlier
 rules back. Severed Lands supplies the included setting and adventures.
