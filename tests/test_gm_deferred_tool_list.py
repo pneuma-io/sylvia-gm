@@ -204,14 +204,16 @@ def test_claude_request_keeps_tool_changes_in_the_conversation():
         MODEL, copy.deepcopy(messages), tools, True,
         extra_headers={"anthropic-beta": "other-beta"}))
     assert request["system"][0]["text"] == "GM CONTRACT"
-    assert request["messages"][-1] == change
+    assert _clean(request["messages"][-1]) == change
     assert request["tools"][0] == {"name": "attack", "description": "Attack",
                                    "input_schema": tools[0]["function"]["parameters"],
                                    "defer_loading": True}
-    # Breakpoints: never on a deferred tool or the tool change.
+    # Breakpoints: never on a deferred tool; on the message before the tool change (which
+    # finds the previous entry) and on the change's last block (its definitions are cached).
     assert "cache_control" not in request["tools"][0]
     assert "cache_control" in request["tools"][1]
     assert "cache_control" in request["messages"][-2]["content"][-1]
+    assert "cache_control" in request["messages"][-1]["content"][-1]
     assert request["extra_headers"]["anthropic-beta"] == f"other-beta,{TOOL_CHANGES_BETA}"
     # A request that failed before its reply: a later user record sorts ahead of the change,
     # which then sits just before the next assistant turn.
