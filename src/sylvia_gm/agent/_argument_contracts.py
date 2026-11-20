@@ -235,10 +235,13 @@ def read_tool_arguments(
     if not isinstance(parameters, Mapping):
         return {"status": "rejected", "code": "provider_tool_arguments_not_object"}
     name, value = parameters.get("tool"), parameters.get("value")
-    entry = tools.get(name) if isinstance(name, str) else None
-    if entry is None and isinstance(name, str):
-        entry = next((item for listed, item in tools.items()
-                      if listed.endswith("_" + name)), None)
+    entry = None
+    if isinstance(name, str):
+        # A model may name the tool as listed, by its operation, or with the prefix its
+        # transport adds (Claude Code shows Sylvia's tools as mcp__sylvia__<name>).
+        bare = name.rsplit("__", 1)[-1] if name.startswith("mcp__") else name
+        entry = tools.get(bare) or next((item for listed, item in tools.items()
+                                         if listed.endswith("_" + bare)), None)
     if entry is None:
         return {"status": "rejected", "code": "argument_contract_tool_unavailable",
                 "available_tools": sorted(tools)}

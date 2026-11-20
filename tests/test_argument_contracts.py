@@ -124,6 +124,9 @@ def test_read_tool_arguments_answers_by_listed_name_or_operation():
     assert answer["status"] == "ok" and answer["spell"] == "fire_bolt"
     assert set(answer["arguments"]["properties"]) == {"target", "fire_bolt_object_facts"}
     assert read_tool_arguments({"tool": "begin_cast", "value": "bless"}, tools)["status"] == "ok"
+    # Claude Code lists Sylvia's tools with its MCP server prefix; models pass that name.
+    prefixed = {"tool": "mcp__sylvia__tool_abc_begin_cast", "value": "bless"}
+    assert read_tool_arguments(prefixed, tools)["status"] == "ok"
     assert read_tool_arguments({"tool": "other", "value": "bless"}, tools)["code"] == (
         "argument_contract_tool_unavailable")
     assert read_tool_arguments({"tool": "begin_cast", "value": "wish"}, tools)["code"] == (
