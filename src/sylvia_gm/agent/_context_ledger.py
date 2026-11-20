@@ -196,7 +196,29 @@ TOOL_LIST_ENV = "SYLVIA_GM_TOOL_LIST"
 STABLE_TOOL_LIST = "stable"
 FIXED_TOOL_LIST = "fixed"
 ROUND_TOOL_LISTS = "rounds"
+#: ``deferred``: the session declares the fixed catalog once, with each Ruleset mechanic left
+#: out of the model's view until the turn loop first offers it; an appended record then makes
+#: it usable. The declared list, and so the cached prefix, never changes. A route registered
+#: in ``NATIVE_DEFERRED_ROUTES`` defers natively (the provider's own deferred tools and
+#: appended tool changes); every other route uses Sylvia's loader: a short stub per mechanic
+#: in the declared list and the full definition in an appended host record.
+DEFERRED_TOOL_LIST = "deferred"
+NATIVE_DEFERRAL = "native"
+LOADER_DEFERRAL = "loader"
+#: The provider searches and loads deferred tools itself (Claude Code's tool search): the
+#: ledger declares the catalog with non-core tools marked ``defer_loading`` and appends nothing.
+PROVIDER_DEFERRAL = "provider"
 CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
+#: Journal class of an appended record that makes tools usable (deferred list only); the
+#: entry's ``n`` lists the tool names it surfaces.
+TOOL_CHANGE_CLASS = "tools"
+TOOL_CHANGE_LABEL = "SYLVIA_GM_TOOL_ADDITION"
+DEFINITIONS_LABEL = "SYLVIA_GM_TOOL_DEFINITIONS"
+#: Block types of an in-conversation system message that changes the tool set (native).
+TOOL_CHANGE_BLOCKS = frozenset({"tool_addition", "tool_removal"})
+_TOOL_LISTS = frozenset({STABLE_TOOL_LIST, ROUND_TOOL_LISTS, FIXED_TOOL_LIST, DEFERRED_TOOL_LIST})
+#: The loader's stub description: a mechanic is usable once a definitions record names it.
+LOADER_STUB_NOTE = f"Defined in {DEFINITIONS_LABEL} when usable."
 
 #: Routes named by connection rather than transport. Other services also speak
 #: ``anthropic_messages`` (OpenCode Zen and Go, MiniMax, custom Messages endpoints); only
@@ -222,6 +244,28 @@ DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
     "claude_code": STABLE_TOOL_LIST, "codex_app_server": STABLE_TOOL_LIST,
     ANTHROPIC_API_ROUTE: STABLE_TOOL_LIST,
 }
+#: Routes whose provider takes deferred tools itself: route name -> whether a wire model does.
+#: A route's own change registers it together with its request rendering.
+NATIVE_DEFERRED_ROUTES: dict[str, Callable[[str], bool]] = {}
+
+#: Routes whose provider loads deferred tools by its own search: route name -> whether a wire
+#: model does. The provider reads ``defer_loading`` on each declared tool (core has none).
+PROVIDER_DEFERRED_ROUTES: dict[str, Callable[[str], bool]] = {
+    "claude_code": lambda _model_id: True,
+}
+
+
+def tool_list_setting(
+    environ: Mapping[str, str] | None = None, *, transport: str | None = None,
+    provider_key: str | None = None,
+) -> str:
+    """``SYLVIA_GM_TOOL_LIST`` when it names a list, else the route's shipped default."""
+    value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
+    setting = value.strip().casefold()
+    if setting in _TOOL_LISTS:
+        return setting
+    return DEFAULT_TOOL_LIST_BY_TRANSPORT.get(gm_route(transport, provider_key),
+                                              DEFAULT_TOOL_LIST)
 
 
 def stable_tool_list(
@@ -230,21 +274,102 @@ def stable_tool_list(
 ) -> bool:
     """Whether ledger mode sends one tool list for the session on this route.
 
-    ``SYLVIA_GM_TOOL_LIST=stable``, ``=fixed`` or ``=rounds`` decides for every route.
-    Without it (or with any other value) the route's shipped default applies.
+    ``SYLVIA_GM_TOOL_LIST=stable``, ``=fixed``, ``=deferred`` or ``=rounds`` decides for every
+    route. Without it (or with any other value) the route's shipped default applies.
     """
-    value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
-    setting = value.strip().casefold()
-    if setting not in {STABLE_TOOL_LIST, ROUND_TOOL_LISTS, FIXED_TOOL_LIST}:
-        setting = DEFAULT_TOOL_LIST_BY_TRANSPORT.get(
-            gm_route(transport, provider_key), DEFAULT_TOOL_LIST)
-    return setting in {STABLE_TOOL_LIST, FIXED_TOOL_LIST}
+    return tool_list_setting(environ, transport=transport, provider_key=provider_key) in {
+        STABLE_TOOL_LIST, FIXED_TOOL_LIST, DEFERRED_TOOL_LIST}
 
 
 def fixed_tool_list(environ: Mapping[str, str] | None = None) -> bool:
     """The full, state-independent catalog is opt-in; route defaults stay unchanged."""
     value = (os.environ if environ is None else environ).get(TOOL_LIST_ENV, "")
     return value.strip().casefold() == FIXED_TOOL_LIST
+
+
+def deferred_tool_list(
+    environ: Mapping[str, str] | None = None, *, transport: str | None = None,
+    provider_key: str | None = None, model_id: str | None = None,
+) -> str | None:
+    """How this route defers tools (``native`` or ``loader``), or None without ``deferred``."""
+    if tool_list_setting(environ, transport=transport,
+                         provider_key=provider_key) != DEFERRED_TOOL_LIST:
+        return None
+    route = gm_route(transport, provider_key)
+    for kind, routes in ((PROVIDER_DEFERRAL, PROVIDER_DEFERRED_ROUTES),
+                         (NATIVE_DEFERRAL, NATIVE_DEFERRED_ROUTES)):
+        supports = routes.get(route)
+        if supports is not None and supports(model_id or ""):
+            return kind
+    return LOADER_DEFERRAL
+
+
+def _function(tool: Mapping[str, Any]) -> Mapping[str, Any]:
+    raw = tool.get("function")
+    return raw if isinstance(raw, Mapping) else tool
+
+
+def loader_stub(tool: Mapping[str, Any]) -> dict[str, Any]:
+    """A declared mechanic by name only: a tool is surfaced with its full definition when the
+    turn loop first offers it, and a tool not offered cannot be called anyway."""
+    return {"type": "function", "function": {
+        "name": str(_function(tool).get("name", "")), "description": LOADER_STUB_NOTE,
+        "parameters": {"type": "object"},
+    }}
+
+
+def deferred_definitions(
+    fixed: Sequence[Mapping[str, Any]], core: frozenset[str], deferral: str = NATIVE_DEFERRAL,
+) -> list[dict[str, Any]]:
+    """The declared catalog: *core* in full; every other tool deferred or as a loader stub."""
+    declared = []
+    for tool in fixed:
+        if _tool_name(tool) in core:
+            declared.append(copy.deepcopy(dict(tool)))
+        elif deferral in {NATIVE_DEFERRAL, PROVIDER_DEFERRAL}:
+            declared.append(dict(copy.deepcopy(dict(tool)), defer_loading=True))
+        else:
+            declared.append(loader_stub(tool))
+    return declared
+
+
+def is_tool_change(message: Mapping[str, Any]) -> bool:
+    """An in-conversation system message whose content changes the tool set."""
+    content = message.get("content")
+    return (message.get("role") == "system" and isinstance(content, list) and bool(content)
+            and all(isinstance(b, Mapping) and b.get("type") in TOOL_CHANGE_BLOCKS
+                    for b in content))
+
+
+def _surfaced(entries: Sequence[Mapping[str, Any]]) -> set[str]:
+    return {str(name) for entry in entries if entry.get("c") == TOOL_CHANGE_CLASS
+            for name in entry.get("n") or ()}
+
+
+def _addition_block(tool: Mapping[str, Any], declared: bool) -> dict[str, Any]:
+    """Surface a declared tool by reference, or define one the catalog lacks by value."""
+    if declared:
+        return {"type": "tool_addition", "tool": {"type": "tool_reference",
+                                                  "name": _tool_name(tool)}}
+    function = _function(tool)
+    return {"type": "tool_addition", "tool": {"type": "tool_definition", "definition": {
+        "name": function.get("name", ""), "description": function.get("description", ""),
+        "input_schema": function.get("parameters", {"type": "object"}),
+    }}}
+
+
+def definitions_record(tools: Sequence[Mapping[str, Any]]) -> str:
+    """The loader's appended definitions: full description and schema per tool name."""
+    definitions = {
+        str(_function(tool).get("name", "")): {
+            "description": _function(tool).get("description", ""),
+            "parameters": _function(tool).get("parameters", {"type": "object"}),
+        } for tool in tools
+    }
+    return (f"{DEFINITIONS_LABEL} (application control, not player speech): the full "
+            "definitions of these listed tools, valid for the rest of the session. Call each "
+            "by its listed name with arguments that match its parameters schema:\n"
+            + _json(definitions))
 
 
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
@@ -859,7 +984,7 @@ def _valid_entry(entry: Any) -> bool:
         isinstance(entry, Mapping)
         and isinstance(entry.get("m"), Mapping)
         and isinstance(entry["m"].get("role"), str)
-        and entry.get("c") in {"conversation", "latest", "event", "state"}
+        and entry.get("c") in {"conversation", "latest", "event", "state", TOOL_CHANGE_CLASS}
     )
 
 
@@ -1187,6 +1312,8 @@ class ContextLedger:
         transport: str | None,
         one_tool_list: bool = False,
         fixed_tools: Sequence[Mapping[str, Any]] | None = None,
+        core_tools: frozenset[str] | None = None,
+        deferral: str | None = None,
     ) -> None:
         self.session_id = session_id
         self.context_owner = dict(context_owner) if context_owner is not None else None
@@ -1194,8 +1321,22 @@ class ContextLedger:
         self.seal = host_seal(session_id)
         #: Send every tool sent so far instead of the list offered this round.
         self.one_tool_list = one_tool_list or fixed_tools is not None
+        #: The full, state-independent definitions (fixed and deferred lists).
         self.fixed_tools = (copy.deepcopy([dict(tool) for tool in fixed_tools])
                             if fixed_tools is not None else None)
+        #: Deferred list (with *fixed_tools*): the names always loaded; every other tool is
+        #: declared deferred (``native``) or as a stub (``loader``) and surfaced when offered.
+        self.core_tools = (frozenset(core_tools)
+                           if core_tools is not None and fixed_tools is not None else None)
+        self.deferral = ((deferral or NATIVE_DEFERRAL) if self.core_tools is not None
+                         else None)
+        #: What the provider is declared: the fixed tools, or the deferred catalog.
+        self.declared_tools = (
+            None if self.fixed_tools is None
+            else deferred_definitions(self.fixed_tools, self.core_tools, self.deferral)
+            if self.core_tools is not None and self.deferral is not None
+            else copy.deepcopy(self.fixed_tools))
+        self._declared_names = {_tool_name(tool) for tool in self.declared_tools or ()}
         #: The tools sent so far in first-sent order; ``None`` until read from saved records.
         self._tool_list: list[dict[str, Any]] | None = None
         self.state: JournalState | None = None
@@ -1227,8 +1368,14 @@ class ContextLedger:
         definition is sent with that definition. Which tools can be called is unchanged:
         the turn loop still accepts only the offered ones.
         """
-        if self.fixed_tools is not None:
-            return self.fixed_tools
+        if self.deferral == LOADER_DEFERRAL and self.declared_tools is not None:
+            # A tool outside the catalog cannot be stubbed: it joins the list (rare).
+            merged, _added, _replaced = merged_tool_list(
+                self._sent_so_far(history_records) or self.declared_tools,
+                [tool for tool in offered or () if _tool_name(tool) not in self._declared_names])
+            return merged
+        if self.declared_tools is not None:
+            return self.declared_tools
         if not self.one_tool_list:
             return offered
         merged, _added, _replaced = merged_tool_list(
@@ -1459,9 +1606,14 @@ class ContextLedger:
             # mode, so the thinking floor below moves the same way.
             tool_list, tools_added, tools_replaced = merged_tool_list(
                 self._sent_so_far(history_records),
-                self.fixed_tools if self.fixed_tools is not None else offered_tools)
-            if self.fixed_tools is not None:
-                tool_list = copy.deepcopy(self.fixed_tools)
+                self.declared_tools if self.declared_tools is not None else offered_tools)
+            if self.deferral == LOADER_DEFERRAL:
+                tool_list, grown, _replaced = merged_tool_list(tool_list, [
+                    tool for tool in offered_tools or ()
+                    if _tool_name(tool) not in self._declared_names])
+                tools_added = [*tools_added, *grown]
+            elif self.declared_tools is not None:
+                tool_list = copy.deepcopy(self.declared_tools)
             tools = tool_list or offered_tools
         state_messages = [
             m for m in hosts if str(m.get("content", "")).startswith(STATE_LABEL + " ")
@@ -1496,13 +1648,45 @@ class ContextLedger:
                 content = _withdrawn(label)
                 appended.append({"m": self._host_message({"role": "system"}, content),
                                  "c": "latest", "l": label, "h": _sha(content)})
-        if self.one_tool_list and tool_list:
+        # Deferred list: a tool the turn loop offers for the first time is surfaced once, by
+        # an appended record (native: a tool addition at the end of this request; loader: its
+        # full definition in a sealed host record before the callable record).
+        surfaced: list[Mapping[str, Any]] = []
+        additions: list[dict[str, Any]] = []
+        visible = tool_list
+        # ``provider``: the provider's own search loads tools; the whole list stays visible.
+        if self.deferral in {NATIVE_DEFERRAL, LOADER_DEFERRAL} and tool_list:
+            shown = set(self.core_tools or ()) | _surfaced(state.entries)
+            for tool in sorted(offered_tools or (), key=_tool_name):
+                name = _tool_name(tool)
+                if name and name not in shown:
+                    shown.add(name)
+                    surfaced.append(tool)
+            if self.deferral == NATIVE_DEFERRAL:
+                # The model sees the core and what was surfaced; a deferred tool, nothing.
+                additions = [_addition_block(tool, _tool_name(tool) in self._declared_names)
+                             for tool in surfaced]
+                visible = [tool for tool in tool_list if _tool_name(tool) in shown] + [
+                    dict(tool) for tool in offered_tools or ()
+                    if _tool_name(tool) not in self._declared_names]
+            elif surfaced:
+                # The loader declares every name; it appends the definitions of stubs only.
+                full = {_tool_name(tool): tool for tool in self.fixed_tools or ()}
+                stubbed = [full[_tool_name(tool)] for tool in surfaced
+                           if _tool_name(tool) in full]
+                names = [_tool_name(tool) for tool in surfaced]
+                content = definitions_record(stubbed) if stubbed else ""
+                if content:
+                    appended.append({"m": self._host_message({"role": "user"}, content),
+                                     "c": TOOL_CHANGE_CLASS, "l": DEFINITIONS_LABEL,
+                                     "h": _sha(content), "n": names})
+        if self.one_tool_list and visible:
             # Tell the model which listed tools can be called now, only when that changed.
-            content = callable_record(tool_list, offered_tools)
+            content = callable_record(visible, offered_tools)
             if self.fixed_tools is not None:
                 from ._fixed_tool_projection import argument_choices_record
 
-                content += argument_choices_record(tool_list, offered_tools)
+                content += argument_choices_record(self.fixed_tools, offered_tools)
             if (last_of_label(CALLABLE_LABEL) or {}).get("h") != _sha(content):
                 role = "user" if self.fixed_tools is not None else "system"
                 appended.append({"m": self._host_message({"role": role}, content),
@@ -1522,6 +1706,13 @@ class ContextLedger:
                     "m": {"role": "user", "content": seal_prefix(self.seal) + _CONTINUE_TEXT},
                     "c": "event", "l": CONTINUE_LABEL, "h": _sha(_CONTINUE_TEXT),
                 })
+        if additions:
+            # Last, after a user message: a Claude system message that carries a tool change
+            # must follow a user turn and precede the assistant turn (or end the request).
+            appended.append({"m": {"role": "system", "content": additions},
+                             "c": TOOL_CHANGE_CLASS, "l": TOOL_CHANGE_LABEL,
+                             "h": _sha(_json(additions)),
+                             "n": [_tool_name(tool) for tool in surfaced]})
         if (
             self.transport == "claude_code" and not _native_reset
             and native_gap(state, base_count + len(appended))
@@ -1624,6 +1815,9 @@ class ContextLedger:
             "one_tool_list": self.one_tool_list,
             "callable_tool_count": len(offered_tools or []),
         }
+        if self.deferral is not None:
+            observation.update(deferred_tool_list=self.deferral, tools_surfaced=len(surfaced),
+                               tools_visible=len(visible or []))
         return WireFrame(wire, state, record, appended, base_count, prefix, reset, observation,
                          tool_list)
 
