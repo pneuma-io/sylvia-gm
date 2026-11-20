@@ -98887,7 +98887,8 @@ tools:
       required: false
       default: false
   begin_srd_spell_action:
-    description: 'Begin a source-validated casting action before its spell resolves.
+    description: 'In combat, begin a source-validated casting action before its spell resolves. Outside
+      combat, cast with cast_spell_outside_combat instead.
 
       For Web, Cloud of Daggers, Insect Plague, Stinking Cloud, Fog Cloud, Sleet Storm or Zone of Truth,
       set known_area=true only when the player knows the committed spell area from observing the cast

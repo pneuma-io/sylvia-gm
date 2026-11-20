@@ -443,7 +443,11 @@ def test_loader_session_reads_refuses_and_runs_mechanics(loader_seed, tmp_path, 
     assert unread["definition"].startswith("## start_group_combat_encounter\n")
     read = next(outcome for name, outcome in outcomes if name == "read_tool_arguments")
     assert read["status"] == "ok" and read["mechanic_definition"] == "begin_srd_spell_action"
-    assert "summon_distance?: " in read["definition"]
+    # With SRD Lite's argument contracts (#65) the definition is the casting envelope, and
+    # the read with a spell also gives that spell's own inputs, so the cast needs no second read.
+    assert "spell_arguments?: object" in read["definition"]
+    assert "spell summon_dragon, inside spell_arguments: {" in read["definition"]
+    assert "summon_id?: " in read["definition"]
     statuses = [(_operation_of(name), outcome.get("status")) for name, outcome in outcomes]
     assert ("start_group_combat_encounter", "action_committed") in statuses
     # The cast runs on its first call: its arguments were read.

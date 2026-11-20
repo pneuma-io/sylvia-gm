@@ -328,6 +328,25 @@ def repair_dwelling_face_ids(runtime):
         effects.insert(index, _set("_xd_dwelling_face_ids", built))
 
 
+def repair_begin_names_its_combat_use(runtime):
+    """Issue 65 live check: say when the casting window is the right entry point.
+
+    The GM guide says to cast outside combat with cast_spell_outside_combat and to use the
+    casting window in combat. Once both casting tools were shown as small, alike envelopes, a
+    smaller model opened the window outside combat; it worked, at the cost of an extra round.
+    The window's own description now says when it applies, as the guide does.
+    """
+    tool = runtime["tools"]["begin_srd_spell_action"]
+    old = "Begin a source-validated casting action before its spell resolves."
+    new = ("In combat, begin a source-validated casting action before its spell resolves. "
+           "Outside combat, cast with cast_spell_outside_combat instead.")
+    if tool["description"].startswith(new):
+        return
+    if not tool["description"].startswith(old):
+        raise ValueError("begin_srd_spell_action description changed")
+    tool["description"] = new + tool["description"][len(old):]
+
+
 REPAIRS = (
     repair_spell_force_scene_bodies,
     repair_creature_space_skips_spell_forces,
@@ -341,6 +360,7 @@ REPAIRS = (
     *ATTACK_REPAIRS,
     repair_exploration_birth_known_spell_effect,
     repair_dwelling_face_ids,
+    repair_begin_names_its_combat_use,
 )
 
 

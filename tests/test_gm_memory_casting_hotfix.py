@@ -681,7 +681,9 @@ def test_actual_gm_catalog_excludes_permanent_refusals_and_preserves_lock(lite_s
         "_record_srd_magic_jar_container",
     ):
         assert not any(name.endswith(hidden) for name in names), hidden
-    assert len(tools) == 93
+    # 93 catalog tools plus read_tool_arguments, offered beside the two contract casting tools.
+    assert len(tools) == 94
+    assert any(name == "read_tool_arguments" for name in names)
     casting = next(
         t["function"] for t in tools if t["function"]["name"].endswith("_cast_spell_outside_combat")
     )

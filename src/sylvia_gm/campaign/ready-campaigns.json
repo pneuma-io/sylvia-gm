@@ -4,7 +4,7 @@
     "adventures": "Existing bundled Severed Lands Campaign Plans; story preparation unchanged.",
     "characters": "Existing SRD starters and Tavin Bell; independent prepared role/level editions.",
     "starter_source_sha256": "40fe46595f4b4b70d7188e96877e71a50c5342e8d4027f44026a4b265268a716",
-    "rules": "Contained SRD Lite 0.3.27; retained SRD 5.2.1 class and creation references.",
+    "rules": "Contained SRD Lite 0.3.28; retained SRD 5.2.1 class and creation references.",
     "notices": [
       "LICENSING-STATUS.md",
       "campaign-settings/severed-lands/ATTRIBUTION.md",
@@ -14,18 +14,18 @@
   "campaigns": [
     {
       "id": "a-debt-in-iron",
-      "plan_content_sha256": "b6de3178d2bf64de0ef37e22576dfbeb7e5de29b57b78b265f2bda16606dac0c",
+      "plan_content_sha256": "2e48e1eaf434bdb8b17d74a33a81d0a20e9057e66ca0b24c1272ab30481707eb",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "403640068b22540fabdd95daab62bf87d265c8a38eab2ff3358e0053db75d5c9",
+          "content_sha256": "b3154d2d529b6921c60f786ec67480142d87da89281756c4191d9a94bb37e56e",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "da6cca79004e5c5ffe043588fc2e89d7c56a2b630f44df880213021942282996",
+        "package_closure_sha256": "5ff0b57587efc85de56cafb962353a5254dcf955f10a710ea5efb78e30eb4f82",
         "ruleset": {
-          "content_sha256": "3b3efe2969daac443113efba4387ed2fff10cd3602918e0344adec09bc3061a5",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.27"
+          "version": "0.3.28"
         }
       },
       "party": [
@@ -258,18 +258,18 @@
     },
     {
       "id": "last-cart-through",
-      "plan_content_sha256": "6c1680188177fceb23cae57ce7ae099795e8c72d9afa4257e49cebd1fc787f0b",
+      "plan_content_sha256": "e0876b83bab851ccdf5afd403d93affcf69bbf2cd84319e761503bcefb0c4e2d",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "78337d4efb58ec956260f40d7a4f31eae0203a577cee50d74c88026d137e15fc",
+          "content_sha256": "e16275e9024ba5ce70696e63751bba9d60b1d70f4a6be4dab09f9ee4efb482f9",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "4213c2bd0e73f76ed8c43bfd1b2cc525689bfdb90cd3f181a5588cd864c3ac5e",
+        "package_closure_sha256": "ab01dac86b5798bb509bbcbec2b4e0109de1a8d5fb9e20bf674173355b5e12a9",
         "ruleset": {
-          "content_sha256": "3b3efe2969daac443113efba4387ed2fff10cd3602918e0344adec09bc3061a5",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.27"
+          "version": "0.3.28"
         }
       },
       "party": [
@@ -723,18 +723,18 @@
     },
     {
       "id": "the-cartographers-wake",
-      "plan_content_sha256": "2f22ed4ba2d196be5095f07c7d464117db8cdb2bb7be411ab509c87efcfaae5c",
+      "plan_content_sha256": "9ff22c73d11243e10f12285cf97d60e22c8d7498770aaf80b08850de59ed44d7",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "78337d4efb58ec956260f40d7a4f31eae0203a577cee50d74c88026d137e15fc",
+          "content_sha256": "e16275e9024ba5ce70696e63751bba9d60b1d70f4a6be4dab09f9ee4efb482f9",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "4213c2bd0e73f76ed8c43bfd1b2cc525689bfdb90cd3f181a5588cd864c3ac5e",
+        "package_closure_sha256": "ab01dac86b5798bb509bbcbec2b4e0109de1a8d5fb9e20bf674173355b5e12a9",
         "ruleset": {
-          "content_sha256": "3b3efe2969daac443113efba4387ed2fff10cd3602918e0344adec09bc3061a5",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.27"
+          "version": "0.3.28"
         }
       },
       "party": [
@@ -1380,18 +1380,18 @@
     },
     {
       "id": "rift-awakening",
-      "plan_content_sha256": "d6c5aef19f95c9c7411b3360ed3d5c41355a29c9416176be753ca6d2a9f6e20c",
+      "plan_content_sha256": "3235d6b7957ad07cba31071c2441561266c8dc0fefdb96f768f8159a16d93d18",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "b160044bd18fd8a10c41099e10bb78a6e1d4ab12beddfe68792e9f07192939d2",
+          "content_sha256": "599df3975090d097b9a48dd5226e98039f3a1427469e845150e8d8599215e0a4",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "5758dfd4c10d6b73906ca5ebebd148bbf0fbe9eefa5ea36d7c9149e9621ceeda",
+        "package_closure_sha256": "dd5a1dbca98776a1e98e7fe71ffaae7b61214a8017c1e28f10b80400b87b6560",
         "ruleset": {
-          "content_sha256": "3b3efe2969daac443113efba4387ed2fff10cd3602918e0344adec09bc3061a5",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
-          "version": "0.3.27"
+          "version": "0.3.28"
         }
       },
       "party": [
