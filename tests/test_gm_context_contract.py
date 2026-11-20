@@ -1351,6 +1351,9 @@ def test_pinned_adapter_scenarios_keep_the_wire_invariant_in_ledger_mode(
     import tests.test_alpha_f4_provider_session_adapter as pinned
 
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
+    # Per-round lists, as these companions ran before the deferred loader became the default:
+    # their stand-in owners cannot list a full catalog (test_gm_deferred_tool_list covers it).
+    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", "rounds")
     recorder = LedgerRecorder().install(monkeypatch)
     function = getattr(pinned, name)
     fixtures = {"monkeypatch": monkeypatch, "tmp_path": tmp_path}

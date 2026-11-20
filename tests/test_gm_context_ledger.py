@@ -123,20 +123,24 @@ def test_the_previous_assembly_is_the_shipped_default_and_the_switch_selects_eit
     assert ledger_module.DEFAULT_CONTEXT_MODE == "legacy"
     assert dict(ledger_module.DEFAULT_CONTEXT_MODE_BY_TRANSPORT) == {
         "claude_code": "ledger", "codex_app_server": "ledger", "anthropic_api": "ledger",
+        "chat_completions": "ledger", "responses": "ledger",
+        "gemini_generate_content": "ledger", "anthropic_messages": "ledger",
     }
     assert context_mode({}) == "legacy"
+    assert context_mode({}, transport=None) == "legacy"
+    # The other API routes and local models: the ledger with Sylvia's loader (#117).
     for transport in ("anthropic_messages", "gemini_generate_content",
-                      "chat_completions", "responses", None):
-        assert context_mode({}, transport=transport) == "legacy"
+                      "chat_completions", "responses"):
+        assert context_mode({}, transport=transport) == "ledger"
     assert context_mode({}, transport="claude_code") == "ledger"
     assert context_mode({}, transport="codex_app_server") == "ledger"
     # The first-party Claude API connection is its own route; other services that speak the
-    # Messages protocol (OpenCode Zen and Go, MiniMax, custom endpoints) keep the default.
+    # Messages protocol (OpenCode Zen and Go, MiniMax, custom endpoints) use their transport's.
     assert context_mode({}, transport="anthropic_messages", provider_key="anthropic") == "ledger"
     for provider_key in ("opencode_zen", "opencode_go", "minimax", "custom_0123", None):
         assert context_mode({}, transport="anthropic_messages",
-                            provider_key=provider_key) == "legacy"
-    assert context_mode({}, transport="responses", provider_key="anthropic") == "legacy"
+                            provider_key=provider_key) == "ledger"
+    assert context_mode({}, transport="responses", provider_key="anthropic") == "ledger"
     assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "legacy"}, transport="anthropic_messages",
                         provider_key="anthropic") == "legacy"
     assert context_mode({"SYLVIA_GM_CONTEXT_MODE": "ledger"}, transport="anthropic_messages",
@@ -173,19 +177,25 @@ def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_eit
         "claude_code": "stable",
         "codex_app_server": "stable",
         "anthropic_api": "stable",
+        "chat_completions": "deferred",
+        "responses": "deferred",
+        "gemini_generate_content": "deferred",
+        "anthropic_messages": "deferred",
     }
     stable_tool_list = ledger_module.stable_tool_list
     assert stable_tool_list({}) is False
+    assert stable_tool_list({}, transport=None) is False
+    # The other API routes and local models: one declared list, Sylvia's loader (#117).
     for transport in ("anthropic_messages", "gemini_generate_content",
-                      "chat_completions", "responses", None):
-        assert stable_tool_list({}, transport=transport) is False
+                      "chat_completions", "responses"):
+        assert stable_tool_list({}, transport=transport) is True
     assert stable_tool_list({}, transport="claude_code") is True
     assert stable_tool_list({}, transport="codex_app_server") is True
     first_party = {"transport": "anthropic_messages", "provider_key": "anthropic"}
     assert stable_tool_list({}, **first_party) is True
     for provider_key in ("opencode_zen", "opencode_go", "minimax", "custom_0123", None):
         assert stable_tool_list({}, transport="anthropic_messages",
-                                provider_key=provider_key) is False
+                                provider_key=provider_key) is True
     assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "rounds"}, **first_party) is False
     assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "fixed"}, **first_party) is True
     assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "stable"}, transport="anthropic_messages",
@@ -202,7 +212,8 @@ def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_eit
                             transport="anthropic_messages") is False
     # Any other value is not a choice: the route's default applies.
     assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "1"}) is False
-    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "anything"}, transport="responses") is False
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "anything"}, transport="responses") is True
+    assert stable_tool_list({"SYLVIA_GM_TOOL_LIST": "anything"}, transport=None) is False
 
 
 def test_a_route_tool_list_default_applies_only_without_the_switch(monkeypatch) -> None:

@@ -61,7 +61,9 @@ def test_route_gate_kinds():
         assert deferred_tool_list(env, **route) == LOADER_DEFERRAL
     # Claude Code loads deferred tools by its own search.
     assert deferred_tool_list(env, transport="claude_code", model_id="opus") == PROVIDER_DEFERRAL
-    assert deferred_tool_list({}, transport="chat_completions", model_id="x") is None
+    # The other API routes and local models default to Sylvia's loader.
+    assert deferred_tool_list({}, transport="chat_completions", model_id="x") == LOADER_DEFERRAL
+    assert deferred_tool_list({}, transport=None, model_id="x") is None
     assert deferred_tool_list({"SYLVIA_GM_TOOL_LIST": "fixed"}, transport="chat_completions",
                               model_id="x") is None
     for transport in ("chat_completions", "codex_app_server", "claude_code"):
