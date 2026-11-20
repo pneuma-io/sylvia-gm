@@ -442,8 +442,9 @@ def project_conversation(
     if projected.get("role") == "assistant" and isinstance(calls, list):
         wrapped = []
         for call in calls:
-            function = call.get("function") if isinstance(call, Mapping) else None
-            name = function.get("name") if isinstance(function, Mapping) else None
+            raw = call.get("function") if isinstance(call, Mapping) else None
+            function: Mapping[str, Any] = raw if isinstance(raw, Mapping) else {}
+            name = function.get("name")
             if isinstance(name, str) and name not in declared:
                 call = {**call, "function": {
                     **function, "name": MECHANIC_TOOL_NAME,

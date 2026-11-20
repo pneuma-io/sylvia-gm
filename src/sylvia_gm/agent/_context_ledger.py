@@ -1676,12 +1676,12 @@ class ContextLedger:
             if key in journaled:
                 continue
             journaled.add(key)
-            wire = _wire_message(message)
+            conversation_message = _wire_message(message)
             if self.mechanic_names is not None:
                 # Loader: a mechanic call goes to the model as the call_mechanic call it made.
-                wire = project_conversation(wire, frozenset(self._declared_names),
-                                            self.mechanic_names)
-            appended.append({"m": wire, "c": "conversation", "k": key})
+                conversation_message = project_conversation(
+                    conversation_message, frozenset(self._declared_names), self.mechanic_names)
+            appended.append({"m": conversation_message, "c": "conversation", "k": key})
         for message in other_hosts:
             add_host(message)
         # A latest-wins record that left canonical assembly: say once that none is selected
