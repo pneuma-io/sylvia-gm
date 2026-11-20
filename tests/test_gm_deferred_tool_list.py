@@ -79,6 +79,22 @@ def test_a_registered_route_whose_model_cannot_defer_keeps_one_stable_list(monke
         assert stable_tool_list(env, transport=transport)
 
 
+def test_claude_api_defers_natively_by_default_on_models_with_tool_changes():
+    claude_api = {"transport": "anthropic_messages", "provider_key": "anthropic"}
+    for env in ({"SYLVIA_GM_TOOL_LIST": "deferred"}, {}):
+        assert deferred_tool_list(env, **claude_api, model_id=MODEL) == NATIVE_DEFERRAL
+        assert deferred_tool_list(env, **claude_api,
+                                  model_id="claude-fable-5-2") == NATIVE_DEFERRAL
+        # Claude Sonnet 5 takes no mid-conversation tool changes: one stable list, as before.
+        assert deferred_tool_list(env, **claude_api, model_id="claude-sonnet-5") is None
+        assert stable_tool_list(env, **claude_api)
+    for setting in ("stable", "fixed", "rounds"):
+        assert deferred_tool_list({"SYLVIA_GM_TOOL_LIST": setting}, **claude_api,
+                                  model_id=MODEL) is None
+    # Other Messages endpoints keep their own default (per-round lists).
+    assert deferred_tool_list({}, transport="anthropic_messages", provider_key="minimax",
+                              model_id=MODEL) is None
+
 def test_ledger_surfaces_each_tool_once_and_keeps_the_declared_list():
     ledger = _ledger()
     dialogue = [_user("u1", "Look around")]
@@ -250,7 +266,7 @@ def test_requests_without_deferred_tools_are_unchanged():
 # ── The scripted D&D session on a stand-in route ─────────────────────────────────────────
 
 #: (route, how it defers) the session test runs on.
-SESSION_ROUTES = [("chat", LOADER_DEFERRAL)]
+SESSION_ROUTES = [("claude_api", NATIVE_DEFERRAL), ("chat", LOADER_DEFERRAL)]
 
 
 def _rule_problems(request: dict) -> list[str]:

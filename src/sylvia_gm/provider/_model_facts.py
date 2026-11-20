@@ -21,6 +21,8 @@ class ModelFacts:
     forced_tool_choice: bool = False
     temperature: bool = False
     binds_thinking: bool = False
+    #: Mid-conversation tool changes (``tool_addition`` / ``tool_removal``) are accepted.
+    tool_changes: bool = False
     fast: bool = False
     flex: bool = False
     context_window: int | None = None
@@ -40,21 +42,25 @@ _OPENAI_EXTENDED_EFFORT = (*_OPENAI_EFFORT, "max")
 # https://platform.claude.com/docs/en/api/errors
 # https://platform.claude.com/docs/en/build-with-claude/extended-thinking
 # https://platform.claude.com/docs/en/build-with-claude/fast-mode
+# Mid-conversation tool changes (beta; models checked 2026-11-20):
+# https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages
 # Claude Code context and aliases: https://code.claude.com/docs/en/model-config (2026-11-18).
 # OpenAI API effort and service tiers (catalog checked 2026-11-12):
 # https://developers.openai.com/api/docs/models
 # https://developers.openai.com/api/docs/pricing
 # ChatGPT subscription narration hints are based on Sylvia's GM runs, not provider limits.
 _MODEL_FACTS = {
-    ("anthropic", "claude-fable-5"): ModelFacts(forced_tool_choice=True),
+    ("anthropic", "claude-fable-5"): ModelFacts(forced_tool_choice=True, tool_changes=True),
     ("anthropic", "claude-fable-5-2"): ModelFacts(
-        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True, fast=True
+        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True, fast=True, tool_changes=True
     ),
     ("anthropic", "claude-haiku-4-5"): ModelFacts(forced_tool_choice=True, temperature=True),
     ("anthropic", "claude-haiku-5-5"): ModelFacts(
-        efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
+        efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True, tool_changes=True
     ),
-    ("anthropic", "claude-mythos-5-2"): ModelFacts(binds_thinking=True, fast=True),
+    ("anthropic", "claude-mythos-5-2"): ModelFacts(
+        binds_thinking=True, fast=True, tool_changes=True
+    ),
     ("anthropic", "claude-opus-4"): ModelFacts(forced_tool_choice=True, temperature=True),
     ("anthropic", "claude-opus-4-1"): ModelFacts(forced_tool_choice=True, temperature=True),
     ("anthropic", "claude-opus-4-5"): ModelFacts(forced_tool_choice=True, temperature=True),
@@ -65,15 +71,15 @@ _MODEL_FACTS = {
         efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
     ),
     ("anthropic", "claude-opus-4-8"): ModelFacts(
-        efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
+        efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True, tool_changes=True
     ),
     ("anthropic", "claude-opus-5"): ModelFacts(
-        efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
+        efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True, tool_changes=True
     ),
     # Opus 5.5 and Sonnet 5.5 bind replayed thinking on every account created from 31 August
     # 2026; a live check on 19 November 2026 found a newly made Console key enforced on both.
     ("anthropic", "claude-opus-5-5"): ModelFacts(
-        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True, fast=True
+        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True, fast=True, tool_changes=True
     ),
     ("anthropic", "claude-sonnet-4"): ModelFacts(forced_tool_choice=True, temperature=True),
     ("anthropic", "claude-sonnet-4-5"): ModelFacts(forced_tool_choice=True, temperature=True),
@@ -84,7 +90,7 @@ _MODEL_FACTS = {
         efforts=_CLAUDE_EXTENDED_EFFORT, forced_tool_choice=True
     ),
     ("anthropic", "claude-sonnet-5-5"): ModelFacts(
-        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True
+        efforts=_CLAUDE_EXTENDED_EFFORT, binds_thinking=True, tool_changes=True
     ),
     ("claude_runtime", "claude-fable-5-2"): ModelFacts(context_window=1_000_000),
     ("claude_runtime", "opus"): ModelFacts(context_window=1_000_000),

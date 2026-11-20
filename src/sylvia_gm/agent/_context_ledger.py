@@ -237,18 +237,32 @@ def gm_route(transport: str | None, provider_key: str | None = None) -> str:
 #: The tool list a route uses when ``SYLVIA_GM_TOOL_LIST`` does not name one. A route ships
 #: with per-round lists unless it is named here. A route is moved to one list, by its
 #: route name (``gm_route``), once a measured run on that route supports it.
-#: ``claude_code``, ``codex_app_server`` and ``anthropic_api``: see
-#: ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``; each measured together with the ledger.
+#: ``claude_code`` and ``codex_app_server``: see ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``;
+#: each measured together with the ledger.
+#: ``anthropic_api``: ``deferred``, native on models with ``tool_changes`` (others keep one
+#: stable list). Live on Opus 5.5, 20 November 2026: no prefix rewrite after the first
+#: request (``stable``: two), 95.7% of later input read from cache (79.8%), about half the
+#: cost per request.
 DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
 DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
     # One route per line, so each route's own change edits only its line.
     "claude_code": STABLE_TOOL_LIST,
     "codex_app_server": STABLE_TOOL_LIST,
-    ANTHROPIC_API_ROUTE: STABLE_TOOL_LIST,
+    ANTHROPIC_API_ROUTE: DEFERRED_TOOL_LIST,
 }
 #: Routes whose provider takes deferred tools itself: route name -> whether a wire model does.
 #: A route's own change registers it together with its request rendering.
 NATIVE_DEFERRED_ROUTES: dict[str, Callable[[str], bool]] = {}
+
+
+def _claude_api_defers(model_id: str) -> bool:
+    """Claude API: deferred tools and mid-conversation tool changes (``tool_changes``)."""
+    from sylvia_gm.provider._model_facts import claude_model_facts
+
+    return claude_model_facts(model_id).tool_changes
+
+
+NATIVE_DEFERRED_ROUTES[ANTHROPIC_API_ROUTE] = _claude_api_defers
 
 #: Routes whose provider loads deferred tools by its own search: route name -> whether a wire
 #: model does. The provider reads ``defer_loading`` on each declared tool (core has none).
