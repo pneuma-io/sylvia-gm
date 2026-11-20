@@ -39,8 +39,10 @@ def argument_choices_record(fixed: Sequence[Mapping[str, Any]],
             choices[function["name"]] = fields
     return (
         "\nCurrent argument choices (the latest record replaces earlier choices; $ is the "
-        "argument object and [] means each array item). Use only these allowed_values and "
-        "available_fields where given; all other schema and engine checks still apply:\n"
+        "argument object and [] means each array item). Each entry limits only the field it "
+        "names: use its allowed_values or available_fields there. A field not listed is not "
+        "limited by this record (a target field not listed may name any current creature or "
+        "object). All other schema and engine checks still apply:\n"
         + json.dumps(choices, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     )
 
