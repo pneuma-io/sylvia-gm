@@ -1274,6 +1274,11 @@ def merged_tool_list(
     return merged, added, replaced
 
 
+def _canonical_tool(tool: Mapping[str, Any]) -> dict[str, Any]:
+    """A tool definition with every mapping's keys sorted: the bytes a saved copy reloads to."""
+    return dict(json.loads(_json(plain(tool))))
+
+
 def _tool_definitions(value: Any) -> list[Mapping[str, Any]]:
     if not isinstance(value, Sequence) or isinstance(value, (str, bytes, bytearray)):
         return []
@@ -1397,9 +1402,19 @@ class ContextLedger:
             return self.declared_tools
         if not self.one_tool_list:
             return offered
-        merged, _added, _replaced = merged_tool_list(
-            self._sent_so_far(history_records), offered)
+        merged, _added, _replaced = self._stable_list(self._sent_so_far(history_records), offered)
         return merged or offered
+
+    def _stable_list(
+        self, sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+        """The one stable list, with every definition's keys sorted at every level.
+
+        That is the form a restart rebuilds from saved records, so a reopened session sends the
+        same bytes, not only the same content (a provider's cached prefix compares bytes).
+        """
+        return merged_tool_list([_canonical_tool(tool) for tool in sent],
+                                [_canonical_tool(tool) for tool in offered or ()])
 
     def _loader_list(
         self, sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
@@ -1642,9 +1657,10 @@ class ContextLedger:
         if self.one_tool_list:
             # A replaced definition changes the tool set like a changed list in the previous
             # mode, so the thinking floor below moves the same way.
-            tool_list, tools_added, tools_replaced = merged_tool_list(
-                self._sent_so_far(history_records),
-                self.declared_tools if self.declared_tools is not None else offered_tools)
+            tool_list, tools_added, tools_replaced = (
+                merged_tool_list(self._sent_so_far(history_records), self.declared_tools)
+                if self.declared_tools is not None
+                else self._stable_list(self._sent_so_far(history_records), offered_tools))
             if self.deferral == LOADER_DEFERRAL:
                 tool_list, grown = self._loader_list(
                     self._sent_so_far(history_records), offered_tools)

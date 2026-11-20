@@ -1508,3 +1508,33 @@ def test_one_tool_list_is_the_same_after_a_restart_and_a_new_generation() -> Non
     assert rewound.reset == "identity_missing"
     assert rewound.tool_list == [attack, narrate, spear]
     assert len(_callable_records(rewound)) == 1
+
+
+def test_one_stable_list_sends_the_same_bytes_after_an_owner_restart() -> None:
+    # Saved evidence comes back with sorted keys, so a list rebuilt from it must already have
+    # been sent that way: an Anthropic or OpenAI cached prefix compares bytes, not content.
+    def unsorted(name: str) -> dict:
+        return {"type": "function", "function": {
+            "parameters": {"type": "object", "properties": {"target": {"type": "string"}},
+                           "additionalProperties": False},
+            "name": name, "description": name.title()}}
+    ledger = _one_list()
+    records, frames = [], []
+    dialogue = [_user("u1", "Go")]
+    for offered in ([unsorted("attack")], [unsorted("attack"), unsorted("narrate")]):
+        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
+        frame = _offer(ledger, _canonical(*dialogue), offered)
+        frames.append(frame)
+        if frame.record is not None:
+            records.append(frame.record)
+    saved = json.loads(json.dumps(records, sort_keys=True))
+    restarted = _one_list()
+    again = restarted.plan(_canonical(*dialogue), request_context_id=CONTEXT,
+                           tools=[unsorted("attack"), unsorted("narrate")],
+                           history_records=lambda: saved)
+
+    def encoded(tools):
+        return json.dumps(tools, ensure_ascii=False, separators=(",", ":"))
+    assert encoded(again.tool_list) == encoded(frames[-1].tool_list)
+    assert again.tool_list == [unsorted("attack"), unsorted("narrate")]
+    assert again.record is None
