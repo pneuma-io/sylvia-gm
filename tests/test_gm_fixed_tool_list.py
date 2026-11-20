@@ -413,13 +413,19 @@ def test_choices_record_limits_only_the_fields_it_names():
     # Issue 235: a participant-only field's choices read as the only allowed target, so a
     # model declined to cast on an NPC whose ID belongs in the unlisted target field.
     from sylvia_gm.agent._fixed_tool_projection import argument_choices_record
+    participant = {"type": "string", "x-sylvia-gm-reference": "participant"}
     fixed = [{"type": "function", "function": {"name": "cast", "parameters": {
-        "type": "object", "properties": {"target_character": {"type": "string"},
+        "type": "object", "properties": {"target_character": participant,
+                                         "spell": {"type": "string"},
                                          "target": {"type": "string"}}}}}]
     offered = copy.deepcopy(fixed)
-    offered[0]["function"]["parameters"]["properties"]["target_character"]["enum"] = ["hero"]
+    properties = offered[0]["function"]["parameters"]["properties"]
+    properties["target_character"]["enum"] = ["hero"]
+    properties["spell"]["enum"] = ["cure_wounds"]
     record = argument_choices_record(fixed, offered)
-    assert '"cast":{"$.target_character":{"allowed_values":["hero"]}}' in record
+    # Participant IDs are in the campaign state; the record lists only other current choices.
+    assert '"cast":{"$.spell":{"allowed_values":["cure_wounds"]}}' in record
+    assert "target_character" not in record
     assert "limits only the field it names" in record
     assert "A field not listed is not limited by this record" in record
     assert "Use only these allowed_values and available_fields where given" not in record

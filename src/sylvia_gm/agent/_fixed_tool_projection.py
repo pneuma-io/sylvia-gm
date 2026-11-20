@@ -8,9 +8,15 @@ from typing import Any
 
 def schema_choices(current: Mapping[str, Any], fixed: Mapping[str, Any],
                    path: str = "$") -> dict[str, Any]:
-    """Describe only constraints omitted from the fixed projection, using schema paths."""
+    """Describe only constraints omitted from the fixed projection, using schema paths.
+
+    A participant reference is left out: its IDs are in the campaign state, and listing a
+    participant-only field's choices read as the only allowed target to a model (issue 235).
+    The turn loop still refuses a value outside it, naming the allowed values.
+    """
     choices: dict[str, Any] = {}
-    if "enum" in current and current["enum"] != fixed.get("enum"):
+    if ("enum" in current and current["enum"] != fixed.get("enum")
+            and current.get("x-sylvia-gm-reference") != "participant"):
         choices[path] = {"allowed_values": current["enum"]}
     properties = current.get("properties", {})
     fixed_properties = fixed.get("properties", {})
