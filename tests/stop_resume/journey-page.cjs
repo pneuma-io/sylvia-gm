@@ -85,4 +85,59 @@ function controls(page) {
   };
 }
 
-module.exports = { launchBrowser, hostContext, openSylvia, controls, FRONTEND };
+// WCAG contrast ratio of an element's text colour against the first opaque background behind it.
+function contrast(locator) {
+  return locator.evaluate(element => {
+    const rgb = value => (value.match(/[\d.]+/g) || []).map(Number);
+    const luminance = ([r, g, b]) => [r, g, b].map(channel => {
+      const value = channel / 255;
+      return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    }).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+    let node = element, background = null;
+    while (node && node.nodeType === 1) {
+      const color = rgb(getComputedStyle(node).backgroundColor);
+      if (color.length >= 3 && (color[3] ?? 1) >= 0.95) { background = color; break; }
+      node = node.parentElement;
+    }
+    background ||= rgb(getComputedStyle(document.body).backgroundColor);
+    const [light, dark] = [luminance(rgb(getComputedStyle(element).color)), luminance(background)]
+      .sort((left, right) => right - left);
+    return (light + 0.05) / (dark + 0.05);
+  });
+}
+
+// How an element and its two nearest containers look: outline, shadow and border colour. A focus
+// indicator is either an outline or shadow on the element, or a change from its unfocused look.
+function focusLook(locator) {
+  return locator.evaluate(async element => {
+    await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {})));
+    return [element, element.parentElement, element.parentElement?.parentElement].filter(Boolean)
+      .map(node => { const style = getComputedStyle(node);
+        return [style.outlineStyle, style.outlineWidth, style.outlineColor, style.boxShadow, style.borderColor]
+          .join(' '); });
+  });
+}
+
+// Whether the element has focus and shows it; `unfocused` is its focusLook() before it had focus.
+async function focusShown(locator, unfocused = null) {
+  const own = await locator.evaluate(element => {
+    const style = getComputedStyle(element);
+    return { focused: element === document.activeElement, marked: (style.outlineStyle !== 'none' &&
+      parseFloat(style.outlineWidth) > 0) || style.boxShadow !== 'none' };
+  });
+  if (!own.focused) return false;
+  if (own.marked) return true;
+  return Boolean(unfocused) && JSON.stringify(await focusLook(locator)) !== JSON.stringify(unfocused);
+}
+
+// The element's box, and whether it lies fully inside the viewport without page scrolling sideways.
+async function placement(page, locator) {
+  const box = await locator.boundingBox();
+  const { width, height, scrollWidth } = await page.evaluate(() => ({ width: innerWidth, height: innerHeight,
+    scrollWidth: document.documentElement.scrollWidth }));
+  return { box, inside: Boolean(box) && box.x >= 0 && box.y >= 0 && box.x + box.width <= width &&
+    box.y + box.height <= height, sideways: scrollWidth > width };
+}
+
+module.exports = { launchBrowser, hostContext, openSylvia, controls, contrast, focusLook, focusShown, placement,
+  FRONTEND };

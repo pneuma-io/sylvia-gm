@@ -8,9 +8,15 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { ScriptedOwner } = require('./stop_resume/scripted-owner.cjs');
-const { launchBrowser, hostContext, openSylvia, controls } = require('./stop_resume/journey-page.cjs');
+const path = require('node:path');
+const { launchBrowser, hostContext, openSylvia, controls, contrast, focusLook, focusShown, placement } =
+  require('./stop_resume/journey-page.cjs');
 
 const CAMPAIGNS = ['Greyhook', 'Saltmarsh'];
+const THEMES = ['slate', 'sylvia', 'sylvia-dark'];
+// Optional folder for review screenshots; the checks never depend on it.
+const EVIDENCE = process.env.SYLVIA_JOURNEY_EVIDENCE || null;
+const shot = (page, name) => EVIDENCE ? page.screenshot({ path: path.join(EVIDENCE, `${name}.png`) }) : null;
 
 async function journey(run, options = {}) {
   const owner = new ScriptedOwner(CAMPAIGNS);
@@ -148,3 +154,139 @@ test('reopen: an interrupted turn keeps its message and Retry after the window i
       assert.deepEqual(reopened.errors, []);
     });
   });
+
+// Press `key` until `locator` has focus; returns the number of presses, or fails after `limit`.
+async function pressUntilFocused(page, key, locator, limit = 8) {
+  for (let presses = 1; presses <= limit; presses++) {
+    await page.keyboard.press(key);
+    if (await locator.evaluate(element => element === document.activeElement).catch(() => false)) return presses;
+  }
+  assert.fail(`${key} did not reach the control within ${limit} presses`);
+}
+
+const runningAnimations = page => page.evaluate(() => document.getAnimations()
+  .filter(animation => animation.playState === 'running' && animation.constructor.name === 'CSSAnimation')
+  .map(animation => animation.animationName));
+
+test('keyboard: Stop and Manual Retry are reached by Tab, operated by key and show their focus',
+  { timeout: 60000 }, async () => {
+    await journey(async ({ page, ui }) => {
+      await ui.campaign('Greyhook').focus();
+      await page.keyboard.press('Enter');
+      await ui.title.filter({ hasText: 'Greyhook' }).waitFor();
+      await enabled(page, ui.composer);
+      await ui.composer.focus();
+      await page.keyboard.type('[hold] I listen at the door.');
+      await page.keyboard.press('Enter');
+      await ui.stop.waitFor();
+      // Focus currently falls to the page when the message box is disabled (issue #221); Tab
+      // still continues from the message box to Stop.
+      await pressUntilFocused(page, 'Tab', ui.stop, 4);
+      assert.equal(await focusShown(ui.stop), true, 'Stop shows its keyboard focus');
+      await page.keyboard.press('Space');
+      await ui.status.filter({ hasText: 'Stopped' }).waitFor();
+
+      await ui.composer.focus();
+      await page.keyboard.type('[fail] I open the door.');
+      await page.keyboard.press('Enter');
+      await ui.retry.waitFor();
+      await pressUntilFocused(page, 'Shift+Tab', ui.retry, 8);
+      assert.equal(await focusShown(ui.retry), true, 'Manual Retry shows its keyboard focus');
+      await page.keyboard.press('Enter');
+      await ui.story.getByText('The Game Master answers: I open the door.').waitFor();
+      await enabled(page, ui.composer);
+      const unfocused = await focusLook(ui.composer);
+      await pressUntilFocused(page, 'Tab', ui.composer, 12);
+      assert.equal(await focusShown(ui.composer, unfocused), true, 'the message box shows its focus');
+    });
+  });
+
+test('narrow layout: Stop and Retry fit a phone-width window through the Story pane',
+  { timeout: 60000 }, async () => {
+    await journey(async ({ page, ui }) => {
+      await ui.campaign('Greyhook').click();
+      await ui.title.filter({ hasText: 'Greyhook' }).waitFor();
+      await page.locator('#view-switch').getByRole('button', { name: 'Story' }).click();
+      await enabled(page, ui.composer);
+      await send(ui, '[hold] I listen at the door.');
+      await ui.stop.waitFor();
+      for (const [name, control] of [['Stop', ui.stop], ['message box', ui.composer]]) {
+        const { box, inside, sideways } = await placement(page, control);
+        assert.ok(inside, `${name} is inside the window: ${JSON.stringify(box)}`);
+        assert.equal(sideways, false, 'the page does not scroll sideways');
+      }
+      const stopBox = await ui.stop.boundingBox();
+      assert.ok(stopBox.width >= 24 && stopBox.height >= 24, 'Stop is at least 24 by 24 pixels');
+      await shot(page, 'narrow-working');
+      await ui.stop.click();
+      await ui.status.filter({ hasText: 'Stopped' }).waitFor();
+      await send(ui, '[fail] I open the door.');
+      await ui.retry.waitFor();
+      await ui.retry.scrollIntoViewIfNeeded();
+      const { box, inside, sideways } = await placement(page, ui.retry);
+      assert.ok(inside, `Manual Retry is inside the window: ${JSON.stringify(box)}`);
+      assert.equal(sideways, false);
+      assert.ok(box.height >= 24, 'Manual Retry is at least 24 pixels tall');
+      await shot(page, 'narrow-retry');
+      await ui.retry.click();
+      await ui.story.getByText('The Game Master answers: I open the door.').waitFor();
+    }, { viewport: { width: 390, height: 844 } });
+  });
+
+test('reduced motion: the working indicator animates only when motion is allowed',
+  { timeout: 60000 }, async () => {
+    const working = {};
+    for (const reducedMotion of ['no-preference', 'reduce']) {
+      await journey(async ({ owner, page, ui }) => {
+        await openCampaign(page, ui, 'Greyhook');
+        await send(ui, '[hold] I listen at the door.');
+        await owner.working('Greyhook');
+        await ui.stop.waitFor();
+        await delivered(page);
+        working[reducedMotion] = await runningAnimations(page);
+        await ui.stop.click();
+        await ui.status.filter({ hasText: 'Stopped' }).waitFor();
+      }, { reducedMotion });
+    }
+    assert.ok(working['no-preference'].length > 0, 'the check sees the working animation when motion is allowed');
+    assert.deepEqual(working.reduce, [], 'nothing animates while the GM works under reduced motion');
+  });
+
+// Text measured below 4.5:1 and tracked by issue #222. Remove an entry once the theme is fixed;
+// every other element is held to the minimum in every theme.
+const CONTRAST_ISSUE_222 = {
+  slate: [],
+  sylvia: ['status line', 'Retry notice'],
+  'sylvia-dark': ['status line', 'Retry notice', 'Manual Retry'],
+};
+
+for (const theme of THEMES) {
+  test(`theme ${theme}: interruption and recovery text and controls keep readable contrast`,
+    { timeout: 60000 }, async () => {
+      await journey(async ({ page, ui }) => {
+        assert.equal(await page.locator('body').getAttribute('data-theme'), theme);
+        const readable = async (name, element, minimum = 4.5) => {
+          if (CONTRAST_ISSUE_222[theme].includes(name)) return;
+          const ratio = await contrast(element);
+          assert.ok(ratio >= minimum, `${name} contrast ${ratio.toFixed(2)} is at least ${minimum}`);
+        };
+        await openCampaign(page, ui, 'Greyhook');
+        await send(ui, '[hold] I listen at the door.');
+        await ui.stop.waitFor();
+        await readable('Stop', ui.stop, 3);
+        await ui.stop.click();
+        await ui.status.filter({ hasText: 'Stopped' }).waitFor();
+        await readable('status line', ui.status);
+        await send(ui, '[fail] I open the door.');
+        await ui.retry.waitFor();
+        await readable('Retry notice', ui.story.locator('.retry-card > div').first());
+        await readable('Manual Retry', ui.retry);
+        await readable('your message', ui.story.getByText('[fail] I open the door.'));
+        await shot(page, `theme-${theme}-retry`);
+        await ui.retry.click();
+        const answer = ui.story.getByText('The Game Master answers: I open the door.');
+        await answer.waitFor();
+        await readable('the reply', answer);
+      }, { theme });
+    });
+}
