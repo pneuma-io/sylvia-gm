@@ -49,14 +49,16 @@ function client(invoke) {
     // live controls only: the frontend asks from the newest sequence its history page holds.
     projection: (row, after = 0) => invoke('player_projection_page', { campaignId: row.campaign_id,
       afterSequence: after, loadId: null }),
-    // Wait until the owner reports this attempt as working. Reads owner state; no fixed delay.
-    async working(row, attemptId) {
-      for (let tries = 0; tries < 500; tries++) {
+    // Wait until the owner reports this attempt as working: a read of owner state, repeated until
+    // a deadline (a busy machine can take seconds to start the reply), never a fixed delay.
+    async working(row, attemptId, seconds = 60) {
+      const deadline = Date.now() + seconds * 1000;
+      while (Date.now() < deadline) {
         const page = await self.history(row);
         if (page.activity_progress?.attempt_id === attemptId && page.activity_progress.phase === 'working') return;
-        await new Promise(resolve => setImmediate(resolve));
+        await new Promise(resolve => setTimeout(resolve, 20));
       }
-      assert.fail(`attempt ${attemptId} never started working`);
+      assert.fail(`attempt ${attemptId} did not start working within ${seconds} s`);
     },
     retryId: () => id('retry'),
   };
