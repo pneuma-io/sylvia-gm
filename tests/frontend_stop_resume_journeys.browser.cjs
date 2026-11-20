@@ -18,13 +18,9 @@ const THEMES = ['slate', 'sylvia', 'sylvia-dark'];
 const EVIDENCE = process.env.SYLVIA_JOURNEY_EVIDENCE || null;
 async function shot(page, name) {
   if (!EVIDENCE) return;
-  // Let running entrance transitions finish so the picture shows the settled state. Review
-  // pictures only: the cap keeps a stuck animation from holding up the checks.
-  await page.evaluate(() => Promise.race([Promise.all(document.getAnimations()
-    .filter(animation => animation.playState === 'running' &&
-      animation.effect?.getComputedTiming().endTime !== Infinity)
-    .map(animation => animation.finished.catch(() => {}))),
-  new Promise(resolve => setTimeout(resolve, 2000))]));
+  // Jump running entrance transitions to their end so the picture shows the settled state.
+  await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === 'running' &&
+    animation.effect?.getComputedTiming().endTime !== Infinity).forEach(animation => animation.finish()));
   await page.screenshot({ path: path.join(EVIDENCE, `${name}.png`) });
 }
 
