@@ -241,7 +241,9 @@ def gm_route(transport: str | None, provider_key: str | None = None) -> str:
 #: ``DEFAULT_CONTEXT_MODE_BY_TRANSPORT``; each measured together with the ledger.
 DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
 DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
-    "claude_code": STABLE_TOOL_LIST, "codex_app_server": STABLE_TOOL_LIST,
+    # One route per line, so each route's own change edits only its line.
+    "claude_code": STABLE_TOOL_LIST,
+    "codex_app_server": STABLE_TOOL_LIST,
     ANTHROPIC_API_ROUTE: STABLE_TOOL_LIST,
 }
 #: Routes whose provider takes deferred tools itself: route name -> whether a wire model does.
