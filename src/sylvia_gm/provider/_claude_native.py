@@ -261,13 +261,41 @@ def _rows(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def wait_for_flush(config: Path, session_id: str, prompt_content: Any, limit: float = 2.0) -> bool:
+def _requests_after(rows: Sequence[Mapping[str, Any]], start: int) -> int:
+    """How many model requests the CLI recorded after row ``start``."""
+    return sum(1 for row in rows[start + 1:] if row.get("type") == "api-request")
+
+
+def _round_row(row: Mapping[str, Any]) -> dict[str, Any] | None:
+    """A ToolSearch round message as the CLI stored it, for replay (deferred tool list)."""
+    if row.get("type") not in {"assistant", "user"} or not isinstance(row.get("message"), dict):
+        return None
+    copied = {"type": row["type"], "message": json.loads(json.dumps(row["message"]))}
+    if row["type"] == "user" and "toolUseResult" in row:
+        copied["toolUseResult"] = json.loads(json.dumps(row["toolUseResult"]))
+    return copied
+
+
+def _is_final(row: Mapping[str, Any], final_message_id: str | None) -> bool:
+    message = row.get("message")
+    return (
+        row.get("type") == "assistant" and final_message_id is not None
+        and isinstance(message, dict) and message.get("id") == final_message_id
+    )
+
+
+def wait_for_flush(
+    config: Path, session_id: str, prompt_content: Any, limit: float = 2.0, *,
+    requests: int | None = None,
+) -> bool:
     """Before the step's process is closed, let the CLI finish writing this step's records.
 
     Claude Code writes the prompt and its context records before it sends the request, then
     its request bookkeeping (``api-request*``). Closing the process at a tool call can lose
     writes still queued, so wait until that bookkeeping follows the prompt record, or the file
-    stops growing, for at most ``limit`` seconds. True when the records are complete.
+    stops growing, for at most ``limit`` seconds. True when the records are complete. With
+    ``requests`` (a step that also made ToolSearch rounds), wait for that many requests'
+    bookkeeping, which the CLI writes after each earlier round's messages.
     """
     deadline = time.monotonic() + limit
     last_size, quiet_since = -1, time.monotonic()
@@ -286,7 +314,10 @@ def wait_for_flush(config: Path, session_id: str, prompt_content: Any, limit: fl
                 None,
             )
             if prompt is not None:
-                if any(
+                if requests is not None:
+                    if _requests_after(rows, prompt) >= requests:
+                        return True
+                elif any(
                     str(row.get("type", "")).startswith("api-request") for row in rows[prompt + 1 :]
                 ):
                     return True
@@ -300,12 +331,17 @@ def wait_for_flush(config: Path, session_id: str, prompt_content: Any, limit: fl
         time.sleep(0.02)
 
 
-def collect(session_file: Path | None, prompt_content: Any) -> NativeCollection:
+def collect(
+    session_file: Path | None, prompt_content: Any, *, final_message_id: str | None = None,
+) -> NativeCollection:
     """Copy the CLI's rendered context records that follow this step's prompt record.
 
     Returns ``unknown`` (never raises) when the file is missing or unreadable, when the prompt
     record is absent, or when the CLI inserted its own assistant turn before the prompt, which
-    means Sylvia's transcript was not what the CLI needed.
+    means Sylvia's transcript was not what the CLI needed. With ``final_message_id`` (a step
+    that made ToolSearch rounds, deferred tool list) the rounds' messages are copied too, in
+    order with the context records, up to the model message with that id, which ended the
+    step and is in the journal.
     """
     if session_file is None or not session_file.is_file():
         return NativeCollection("unknown", reason="session_file_missing")
@@ -340,6 +376,13 @@ def collect(session_file: Path | None, prompt_content: Any) -> NativeCollection:
             return NativeCollection("unknown", reason="cli_inserted_turn")
     records = []
     for row in rows[prompt_index + 1 :]:
+        if final_message_id is not None:
+            if _is_final(row, final_message_id):
+                break
+            round_row = _round_row(row)
+            if round_row is not None:
+                records.append(round_row)
+                continue
         if row.get("type") != "attachment" or not row.get("rendered"):
             continue
         if not isinstance(row.get("attachment"), dict):
@@ -368,7 +411,8 @@ def _answer_row(rows: list[dict[str, Any]], call_id: str) -> int | None:
 
 
 def collect_answer(
-    config: Path, session_id: str, call_id: str, limit: float = 2.0,
+    config: Path, session_id: str, call_id: str, limit: float = 2.0, *,
+    final_message_id: str | None = None, requests: int | None = None,
 ) -> NativeCollection:
     """The tool-result message a kept process stored when its waiting call was answered.
 
@@ -377,16 +421,30 @@ def collect_answer(
     per-step transcript has the result, a filler and a separate prompt. Copying the CLI's own
     stored message, and the rendered context records it wrote after it, lets a later fresh
     process replay exactly what the kept one sent. ``unknown`` (never raises) when it is
-    missing.
+    missing. With ``final_message_id`` and ``requests`` (ToolSearch rounds followed the answer,
+    deferred tool list), the rounds' messages are copied as well, up to the model message that
+    ended the step, once the CLI has recorded that many requests after the answer.
     """
     deadline = time.monotonic() + limit
     while True:
         files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
         rows = _rows(files[0]) if files else []
         index = _answer_row(rows, call_id)
+        if index is not None and requests is not None and _requests_after(rows, index) < requests:
+            if time.monotonic() < deadline:
+                time.sleep(0.02)
+                continue
+            return NativeCollection("unknown", reason="answer_record_missing")
         if index is not None:
             records = []
             for row in rows[index + 1:]:
+                if final_message_id is not None:
+                    if _is_final(row, final_message_id):
+                        break
+                    round_row = _round_row(row)
+                    if round_row is not None:
+                        records.append(round_row)
+                        continue
                 if row.get("type") in {"user", "assistant"}:
                     break
                 if row.get("type") == "attachment" and row.get("rendered"):

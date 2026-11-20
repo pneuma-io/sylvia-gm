@@ -75,6 +75,14 @@ from sylvia_gm.provider._hooks import HookContext
 logger = logging.getLogger(__name__)
 
 _PREFIX = "mcp__sylvia__"
+#: Claude Code's own tool that loads a deferred tool's definition (deferred tool list, #204).
+TOOL_SEARCH = "ToolSearch"
+#: The MCP ``_meta`` key that keeps a tool loaded under Claude Code's tool search; ``False``
+#: defers it (Claude Code 2.1.327 and later).
+ALWAYS_LOAD = "anthropic/alwaysLoad"
+#: The first Claude Code release checked with tool search over Sylvia's SDK MCP tools. An
+#: older copy is sent every tool loaded, as the fixed tool list sends them.
+TOOL_SEARCH_VERSION = (2, 1, 327)
 #: Session ids of steps running in this process, by runtime home (kept out of the sweep).
 _ACTIVE_STEPS: dict[Path, set[str]] = {}
 _ACTIVE_LOCK = threading.Lock()
@@ -104,6 +112,9 @@ def prepare_request(
             raise InvalidResponseError("Claude cannot represent this system input.")
         system = "\n\n".join(block["text"] for block in system)
     native_tools = []
+    # Deferred tool list (#204): a tool marked ``defer_loading`` stays behind Claude Code's
+    # tool search and every other tool is always loaded; each says which in its MCP ``_meta``.
+    deferring = any(tool.get("defer_loading") is True for tool in request.get("tools", []))
     for tool in request.get("tools", []):
         name = tool["name"]
         if not isinstance(name, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) is None:
@@ -113,6 +124,8 @@ def prepare_request(
                 "name": name,
                 "description": tool["description"],
                 "inputSchema": tool["input_schema"],
+                **({"_meta": {ALWAYS_LOAD: tool.get("defer_loading") is not True}}
+                   if deferring else {}),
             }
         )
     if len({tool["name"] for tool in native_tools}) != len(native_tools):
@@ -171,6 +184,39 @@ def prepare_request(
         )
         parent = identity
     return str(system), records, prompt, native_tools
+
+
+def tool_search(native_tools: list[dict[str, Any]]) -> bool:
+    """Does this step defer tools behind Claude Code's tool search (deferred tool list)?"""
+    return any(
+        isinstance(tool.get("_meta"), dict) and tool["_meta"].get(ALWAYS_LOAD) is False
+        for tool in native_tools
+    )
+
+
+def _runs_tool_search(version: object) -> bool:
+    """Is this Claude Code release one whose tool search Sylvia has checked?"""
+    try:
+        parts = tuple(int(part) for part in str(version).split("."))
+    except ValueError:
+        return False
+    return parts >= TOOL_SEARCH_VERSION
+
+
+def _replay_record(add: Callable[[str, dict[str, Any]], None], saved: Mapping[str, Any]) -> None:
+    """Replay one saved CLI record: a rendered context record, or a tool-search round message.
+
+    A round (the model's ``ToolSearch`` call and the CLI's result, deferred tool list) is kept
+    as the CLI stored it, so a fresh process sends what the earlier one sent and the tools it
+    loaded stay loaded.
+    """
+    if saved.get("type") in {"assistant", "user"} and isinstance(saved.get("message"), dict):
+        body = {key: json.loads(json.dumps(saved[key]))
+                for key in ("message", "toolUseResult") if key in saved}
+        add(str(saved["type"]), body)
+        return
+    add("attachment", {key: saved[key] for key in ("attachment", "rendered", "renderedRole")
+                       if key in saved})
 
 
 def _text_blocks(content: Any) -> list[dict[str, Any]]:
@@ -288,8 +334,7 @@ def _native_projection(
                 add_message(message)
             add("user", {"message": json.loads(json.dumps(answer))})
             for saved in route.native_records.get(end, ()):
-                add("attachment", {key: saved[key] for key in
-                                   ("attachment", "rendered", "renderedRole") if key in saved})
+                _replay_record(add, saved)
             start = end
             continue
         for message in history[start:group]:
@@ -320,14 +365,7 @@ def _native_projection(
         else:
             add("user", {"message": {"role": "user", "content": content}})
             for saved in route.native_records.get(end, ()):
-                add(
-                    "attachment",
-                    {
-                        key: saved[key]
-                        for key in ("attachment", "rendered", "renderedRole")
-                        if key in saved
-                    },
-                )
+                _replay_record(add, saved)
     assert prompt is not None
     return records, prompt
 
@@ -438,6 +476,10 @@ class _Step:
     #: The process's cumulative per-model usage before and after this step (kept processes).
     model_usage_before: dict[str, dict[str, int]] = field(default_factory=dict)
     model_usage_after: dict[str, dict[str, int]] | None = None
+    #: Deferred tool list: the step's ``ToolSearch`` rounds (tools loaded and each round's
+    #: request usage), and the id of the model message that ended the step.
+    searches: list[dict[str, Any]] = field(default_factory=list)
+    final_message_id: str | None = None
 
     def native_tools(self) -> list[dict[str, Any]]:
         return self.tools
@@ -643,12 +685,12 @@ class ClaudeProvider(Provider):
         try:
             if kind == "prompt":
                 prompt = {"type": "user", "message": {"role": "user", "content": payload}}
-                await self._audit_continued(prompt)
+                await self._audit_continued(prompt, tool_search(step.tools))
                 connection.write(prompt)
             else:
                 pending = kept.pending
                 assert pending is not None
-                await self._audit_continued({"tool_result": payload})
+                await self._audit_continued({"tool_result": payload}, tool_search(step.tools))
                 connection.write(
                     {
                         "type": "control_response",
@@ -693,7 +735,7 @@ class ClaudeProvider(Provider):
                 # The caller records the request (a fresh retry writes its own record).
                 await self._close_kept(kept)
 
-    async def _audit_continued(self, given: dict[str, Any]) -> None:
+    async def _audit_continued(self, given: dict[str, Any], searching: bool = False) -> None:
         await self.hooks.fire_on_request(
             HookContext(
                 provider_key="claude_runtime",
@@ -703,7 +745,8 @@ class ClaudeProvider(Provider):
                     "method": "claude/native_step",
                     "continued": True,
                     "input": given,
-                    "controls": {"safe_mode": True, "builtin_tools": [],
+                    "controls": {"safe_mode": True,
+                                 "builtin_tools": [TOOL_SEARCH] if searching else [],
                                  "persist_session": KEPT_SESSION,
                                  "output_allowance": "runtime_managed",
                                  "tool_choice": "runtime_managed"},
@@ -726,7 +769,7 @@ class ClaudeProvider(Provider):
             raise ProviderConnectionError(
                 "Set up Claude Code for Sylvia in Settings > Accounts, then try again."
             )
-        await asyncio.to_thread(runtime_version, executable, self.home)
+        version = await asyncio.to_thread(runtime_version, executable, self.home)
         self.home.mkdir(parents=True, exist_ok=True)
         # One fixed, empty working directory: Claude Code names it in every request. The
         # system and transcript files live in a per-step folder that is always removed.
@@ -756,6 +799,14 @@ class ClaudeProvider(Provider):
                 workspace,
                 route,
             )
+            if tool_search(native_tools) and not _runs_tool_search(version):
+                # An older copy: every tool loaded, as the fixed tool list sends them.
+                native_tools = [{key: value for key, value in tool.items() if key != "_meta"}
+                                for tool in native_tools]
+            searching = tool_search(native_tools)
+            if searching:
+                # Deferred tool list (#204): Claude Code's own tool search loads deferred tools.
+                environment["ENABLE_TOOL_SEARCH"] = "true"
             system_path = step_folder / "system.txt"
             history_path = step_folder / "history.jsonl"
             system_path.write_bytes(system.encode("utf-8"))
@@ -769,7 +820,7 @@ class ClaudeProvider(Provider):
                 "--safe-mode",
                 "--restricted",
                 "--tools",
-                "",
+                TOOL_SEARCH if searching else "",
                 "--disable-slash-commands",
                 "--setting-sources",
                 "",
@@ -801,7 +852,8 @@ class ClaudeProvider(Provider):
                         "--mcp-config",
                         '{"mcpServers":{"sylvia":{"type":"sdk","name":"sylvia"}}}',
                         "--allowedTools",
-                        ",".join(_PREFIX + tool["name"] for tool in native_tools),
+                        ",".join([*([TOOL_SEARCH] if searching else []),
+                                  *(_PREFIX + tool["name"] for tool in native_tools)]),
                     ]
                 )
             else:
@@ -830,7 +882,7 @@ class ClaudeProvider(Provider):
                             "tools": native_tools,
                             "controls": {
                                 "safe_mode": True,
-                                "builtin_tools": [],
+                                "builtin_tools": [TOOL_SEARCH] if searching else [],
                                 "persist_session": (
                                     False if route is None
                                     else KEPT_SESSION if plan is not None
@@ -934,6 +986,11 @@ class ClaudeProvider(Provider):
         allowed = step.allowed
         pending = step.pending
         text_parts = step.text_parts
+        # Deferred tool list (#204): a step may hold several model requests, each ToolSearch
+        # call answered by Claude Code itself before the model calls a Sylvia tool or narrates.
+        searching = tool_search(step.tools)
+        searched_here = False
+        held_text: list[str] = []
         try:
             while True:
                 if deferred_call is not None and native_state.completed:
@@ -995,13 +1052,18 @@ class ClaudeProvider(Provider):
                         # Reaching the actual MCP call means native permissions admitted it.
                         # No result is sent to Claude and no game action runs in this child:
                         # a kept process waits on the call until the next request answers it.
-                        flushed = await self._await_flush(route, config, session_id, prompt)
+                        flushed = await self._await_flush(route, config, session_id, prompt,
+                                                          len(step.searches))
                         # Claude Code can report one call twice (its stream and an assistant
                         # event), so the calls of the reply are counted by id.
                         if keep and len({str(b.get("id")) for b in pending}) > 1:
                             # Sylvia takes one call; a kept process would later send the
                             # dropped ones. Close it here, as a per-step process is.
                             step.keepable, step.not_kept = False, "parallel_calls"
+                        elif keep and searched_here:
+                            # A ToolSearch call beside this one stays in the process's own
+                            # message, which the journal does not keep (it holds the call).
+                            step.keepable, step.not_kept = False, "search_beside_call"
                         if keep and step.keepable:
                             step.call_event = event
                             step.call_id = candidate["id"]
@@ -1010,8 +1072,11 @@ class ClaudeProvider(Provider):
                             await self._close_owned(connection)
                         await self._collect(
                             route, config, session_id, prompt, flushed, delete=not keep,
+                            step=step,
                         )
-                        await self._collect_answer(route, config, session_id, answered_call)
+                        await self._collect_answer(route, config, session_id, answered_call,
+                                                   step)
+                        await self._audit_searches(step)
                         response.tool_calls = [call]
                         response.finish_reason = "tool_calls"
                         if native_content is not None:
@@ -1069,7 +1134,8 @@ class ClaudeProvider(Provider):
                     )
                 elif kind == "system" and event.get("subtype") == "init":
                     exposed = event.get("tools")
-                    expected = {_PREFIX + original for original in allowed}
+                    expected = {_PREFIX + original for original in allowed} | (
+                        {TOOL_SEARCH} if searching else set())
                     if (
                         not isinstance(exposed, list)
                         or any(not isinstance(name, str) for name in exposed)
@@ -1088,6 +1154,13 @@ class ClaudeProvider(Provider):
                     native = event.get("event", {})
                     subtype = native.get("type")
                     has_native_stream = True
+                    if searching and subtype == "message_start":
+                        # Each model request of the step is its own native message; only
+                        # the last one is the step's reply.
+                        native_state, native_content = _AnthropicStreamContent(), None
+                        searched_here = False
+                        message_id = (native.get("message") or {}).get("id")
+                        step.final_message_id = message_id if isinstance(message_id, str) else None
                     values = dict(native)
                     if isinstance(values.get("delta"), dict):
                         values["delta"] = SimpleNamespace(**values["delta"])
@@ -1110,9 +1183,14 @@ class ClaudeProvider(Provider):
                             text = delta.get("text", "")
                             if not isinstance(text, str):
                                 raise InvalidResponseError("Claude returned invalid text.")
-                            text_parts.append(text)
-                            streamed_text = True
-                            yield ProviderStreamChunk(content=text)
+                            if searching:
+                                # Held until the message ends: a search round's text is
+                                # Claude Code's own round, not the step's reply.
+                                held_text.append(text)
+                            else:
+                                text_parts.append(text)
+                                streamed_text = True
+                                yield ProviderStreamChunk(content=text)
                         elif delta.get("type") == "thinking_delta":
                             yield ProviderStreamChunk(
                                 reasoning_content=delta.get("thinking", "")
@@ -1131,12 +1209,40 @@ class ClaudeProvider(Provider):
                                 fragments = block.pop("partial_json")
                                 if fragments:
                                     block["input"] = json.loads(fragments)
-                            pending.append(block)
+                            if searching and block.get("name") == TOOL_SEARCH:
+                                # Claude Code answers it itself; it is no Sylvia call.
+                                if not searched_here:
+                                    step.searches.append({"loaded": [], "usage": {}})
+                                searched_here = True
+                            else:
+                                pending.append(block)
+                    elif subtype == "message_stop" and searching:
+                        if not searched_here and held_text:
+                            text_parts.extend(held_text)
+                            streamed_text = True
+                            yield ProviderStreamChunk(content="".join(held_text))
+                        held_text = []
                     elif subtype == "message_delta":
                         input_usage.update(native.get("usage", {}))
                         self._usage(response, input_usage)
+                        if searched_here and step.searches:
+                            step.searches[-1]["usage"] = {
+                                key: value for key, value in input_usage.items()
+                                if type(value) is int}
+                elif (kind == "user" and searching and not event.get("parent_tool_use_id")
+                      and step.searches):
+                    # Claude Code's answer to a ToolSearch call: the tools it loaded.
+                    content = (event.get("message") or {}).get("content")
+                    for block in content if isinstance(content, list) else ():
+                        found = block.get("content") if isinstance(block, dict) else None
+                        for item in found if isinstance(found, list) else ():
+                            if isinstance(item, dict) and item.get("type") == "tool_reference":
+                                name = str(item.get("tool_name", ""))
+                                step.searches[-1]["loaded"].append(name.removeprefix(_PREFIX))
                 elif kind == "assistant" and not event.get("parent_tool_use_id"):
                     for block in event.get("message", {}).get("content", []):
+                        if searching and block.get("name") == TOOL_SEARCH:
+                            continue
                         if block.get("type") == "tool_use" and not any(
                             p.get("id") == block.get("id") for p in pending
                         ):
@@ -1174,11 +1280,14 @@ class ClaudeProvider(Provider):
                         "Claude reports that this account has reached its usage limit."
                     )
             if not response.tool_calls:
-                flushed = await self._await_flush(route, config, session_id, prompt)
+                flushed = await self._await_flush(route, config, session_id, prompt,
+                                                  len(step.searches))
                 if not keep:
                     await self._close_owned(connection)
-                await self._collect(route, config, session_id, prompt, flushed, delete=not keep)
-                await self._collect_answer(route, config, session_id, answered_call)
+                await self._collect(route, config, session_id, prompt, flushed, delete=not keep,
+                                    step=step)
+                await self._collect_answer(route, config, session_id, answered_call, step)
+                await self._audit_searches(step)
             response.content = "".join(text_parts) or None
             self._last_response = response
             await self.hooks.fire_on_response(
@@ -1204,23 +1313,49 @@ class ClaudeProvider(Provider):
     @staticmethod
     async def _await_flush(
         route: NativeRoute | None, config: Path, session_id: str,
-        prompt: dict[str, Any] | None,
+        prompt: dict[str, Any] | None, searches: int = 0,
     ) -> bool:
         """Let the CLI finish writing this step's records before its process is closed.
 
         False when the wait ended before the records were complete. Nothing to wait for when
-        no prompt was written (a kept process's waiting call was answered).
+        no prompt was written (a kept process's waiting call was answered). After ``searches``
+        ToolSearch rounds the step made that many more model requests, each recorded first.
         """
         if route is None or prompt is None:
             return True
+        if not searches:
+            return bool(
+                await asyncio.to_thread(
+                    wait_for_flush, config, session_id, prompt["message"]["content"]
+                )
+            )
         return bool(
             await asyncio.to_thread(
-                wait_for_flush, config, session_id, prompt["message"]["content"]
+                wait_for_flush, config, session_id, prompt["message"]["content"],
+                requests=searches + 1,
+            )
+        )
+
+    async def _audit_searches(self, step: _Step) -> None:
+        """Record a step's ToolSearch rounds: tools loaded and each round's usage, no content."""
+        if not step.searches:
+            return
+        await self.hooks.fire_on_request(
+            HookContext(
+                provider_key="claude_runtime",
+                model_id=self.model_info.id,
+                stream=True,
+                request_json={
+                    "direction": "receive",
+                    "method": "claude/tool_search",
+                    "params": {"rounds": [dict(s) for s in step.searches]},
+                },
             )
         )
 
     async def _collect_answer(
         self, route: NativeRoute | None, config: Path, session_id: str, call_id: str | None,
+        step: _Step | None = None,
     ) -> None:
         """Save the tool-result message a kept process stored for the call it was answered on.
 
@@ -1230,7 +1365,14 @@ class ClaudeProvider(Provider):
         """
         if route is None or route.on_collected is None or not call_id:
             return
-        result = await asyncio.to_thread(collect_answer, config, session_id, call_id)
+        if step is not None and step.searches:
+            # The ToolSearch rounds after the answer are replayed with it.
+            result = await asyncio.to_thread(
+                collect_answer, config, session_id, call_id,
+                final_message_id=step.final_message_id, requests=len(step.searches) + 1,
+            )
+        else:
+            result = await asyncio.to_thread(collect_answer, config, session_id, call_id)
         if result.status != "collected":
             logger.warning(
                 "The message Claude Code stored for an answered call was not found (%s); a "
@@ -1253,18 +1395,24 @@ class ClaudeProvider(Provider):
         flushed: bool = True,
         *,
         delete: bool = True,
+        step: _Step | None = None,
     ) -> None:
         """Copy the CLI's context records for the ledger, then delete its session file.
 
         Never fatal: an unknown result is reported to the ledger, which starts a new journal
         generation for this route on the next request. A kept process keeps its session file
         (``delete=False``) until it closes; an answered call wrote no prompt, so nothing new is
-        collected for it.
+        collected for it. A step's ToolSearch rounds (deferred tool list) are collected with
+        its context records, in order, up to the model message that ended the step.
         """
         if route is None or prompt is None:
             return
         files = [p for p in session_files(config, session_id) if p.suffix == ".jsonl"]
-        result = collect(files[0] if files else None, prompt["message"]["content"])
+        if step is not None and step.searches:
+            result = collect(files[0] if files else None, prompt["message"]["content"],
+                             final_message_id=step.final_message_id)
+        else:
+            result = collect(files[0] if files else None, prompt["message"]["content"])
         if not flushed and result.status == "collected":
             # The CLI may still have had records queued: what was read may be incomplete.
             result = NativeCollection("unknown", reason="flush_incomplete")
