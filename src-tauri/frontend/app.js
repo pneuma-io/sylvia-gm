@@ -14845,8 +14845,10 @@ const SylviaGMFrontend = (() => {
       payload.interruption_id || ''}`;
   }
 
+  // The desktop host rejects with "owner_code: message"; show only the owner's words (#223).
   function friendlyCommandError(fallback, error) {
-    const detail = String(error || '').replace(/^Error:\s*/, '').trim();
+    const detail = String(error || '').replace(/^Error:\s*/, '')
+      .replace(/^[a-z]+(?:_[a-z]+)+:\s+/, '').trim();
     if (!detail || detail === '[object Object]') return fallback;
     return `${fallback}: ${detail}`;
   }
