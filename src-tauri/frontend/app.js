@@ -4525,6 +4525,15 @@ const SylviaGMFrontend = (() => {
       sessions.find((session) => session.role === 'dm') || sessions[0] || null;
   }
 
+  // Opening a campaign returns to its Game Master. A stopped Game Master (Stop Session, as
+  // Update campaign rules asks) comes before an active Builder so Resume Session stays reachable.
+  function campaignOpenSession(campaign) {
+    const sessions = Array.isArray(campaign && campaign.sessions) ? campaign.sessions : [];
+    return sessions.find((session) => session.role === 'dm' && session.status === 'active') ||
+      sessions.find((session) => session.role === 'dm' && session.status === 'stopped') ||
+      preferredCampaignSession(campaign);
+  }
+
   // Plain session wording for Home; a non-active status stays visible.
   function sessionSummary(session) {
     if (!session) return 'No saved session';
@@ -4587,7 +4596,7 @@ const SylviaGMFrontend = (() => {
       $('home-recent').innerHTML =
         '<h2 class="visually-hidden" id="home-recent-title">Most recently updated campaign</h2>';
     } else {
-      const session = preferredCampaignSession(recent);
+      const session = campaignOpenSession(recent);
       const isDraft = recent.availability === 'draft';
       const ruleset = isDraft
         ? 'Campaign Draft'
@@ -4652,7 +4661,7 @@ const SylviaGMFrontend = (() => {
         const tiles = setting.campaigns
           .sort((left, right) => String(left.display_name).localeCompare(String(right.display_name)))
           .map((campaign) => {
-            const session = preferredCampaignSession(campaign);
+            const session = campaignOpenSession(campaign);
             const streaming = Boolean(
               session && activityIsWorking(activityForSession(session.session_id))
             );
@@ -14419,7 +14428,7 @@ const SylviaGMFrontend = (() => {
       $('home-new-campaign-btn')?.focus();
       return;
     }
-    void openCampaign(campaign.campaign_id, preferredCampaignSession(campaign)?.session_id || null);
+    void openCampaign(campaign.campaign_id, campaignOpenSession(campaign)?.session_id || null);
   }
 
   // Open the first listed Builder session, or start one. Inside Builder it reveals the session list.
