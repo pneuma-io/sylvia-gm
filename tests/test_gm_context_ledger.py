@@ -170,7 +170,9 @@ def test_per_round_tool_lists_are_the_shipped_default_and_the_switch_selects_eit
     # route concerned.
     assert ledger_module.DEFAULT_TOOL_LIST == "rounds"
     assert dict(ledger_module.DEFAULT_TOOL_LIST_BY_TRANSPORT) == {
-        "claude_code": "stable", "codex_app_server": "stable", "anthropic_api": "stable",
+        "claude_code": "stable",
+        "codex_app_server": "stable",
+        "anthropic_api": "stable",
     }
     stable_tool_list = ledger_module.stable_tool_list
     assert stable_tool_list({}) is False
