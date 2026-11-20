@@ -5,6 +5,7 @@ worker. No mechanic, schema check, action, participant or campaign state is mock
 Admission-specific tests keep calling the importer directly.
 """
 
+import atexit
 import hashlib
 import io
 import json
@@ -27,6 +28,8 @@ CANDIDATE_ID = "candidate-fixture-package"
 @timed("package_seed_prepare")
 def _admitted_seed(archive: bytes) -> Path:
     root = Path(tempfile.mkdtemp(prefix="sylvia-admitted-library-"))
+    # Each worker reuses its seed for the whole run; remove it when the worker exits (#209).
+    atexit.register(shutil.rmtree, root, ignore_errors=True)
     database = root / "closed-library.sqlite3"
     with AuthorityOwner.open(database, "fixture-library-seed") as owner:
         # Activate the current campaign schema while the database is tiny.

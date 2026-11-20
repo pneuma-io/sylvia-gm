@@ -6,8 +6,10 @@ const os = require('node:os');
 const vm = require('node:vm');
 const {spawnSync} = require('node:child_process');
 
-test('real saved choice commitment removes the generic receipt and retains reopened state and narration', () => {
-  const database = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'sylvia-choice-receipt-')), 'authority.sqlite3');
+test('real saved choice commitment removes the generic receipt and retains reopened state and narration', t => {
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'sylvia-choice-receipt-'));
+  t.after(() => fs.rmSync(scratch, {recursive: true, force: true}));
+  const database = path.join(scratch, 'authority.sqlite3');
   const fixture = path.join(__dirname, 'frontend_saved_choice_fixture.py');
   const invoke = (mode, command) => {
     const child = spawnSync(process.env.SYLVIA_TEST_PYTHON || 'python', [fixture, mode, database], {
