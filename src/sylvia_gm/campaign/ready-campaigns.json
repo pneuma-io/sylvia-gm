@@ -14,16 +14,16 @@
   "campaigns": [
     {
       "id": "a-debt-in-iron",
-      "plan_content_sha256": "7ffadcc26495c080917f132ddf773ac4992c440d3a79bfb0abbcf9ddffccb2f9",
+      "plan_content_sha256": "2e48e1eaf434bdb8b17d74a33a81d0a20e9057e66ca0b24c1272ab30481707eb",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "76cf5df593f5322425df3c9e12d4d918f3e8d985e7edafde956e70326c37d4b8",
+          "content_sha256": "b3154d2d529b6921c60f786ec67480142d87da89281756c4191d9a94bb37e56e",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "af5538c0b2f61ada63f0ee77151795b1abc072b10f5a9cdac4c529ea4f230ebb",
+        "package_closure_sha256": "5ff0b57587efc85de56cafb962353a5254dcf955f10a710ea5efb78e30eb4f82",
         "ruleset": {
-          "content_sha256": "4d6f935f00ad10d26f941fd7277324bc5ea9c047f72d539ee31b8f14c7ac85d6",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
           "version": "0.3.28"
         }
@@ -258,16 +258,16 @@
     },
     {
       "id": "last-cart-through",
-      "plan_content_sha256": "5ce2fd3a9f48f603384c9c2dba123041d8ea352a65dbb72ce48205a7cef146e1",
+      "plan_content_sha256": "e0876b83bab851ccdf5afd403d93affcf69bbf2cd84319e761503bcefb0c4e2d",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "a282ffa92882bd697f71f8416e11cbc6e3ac8d30c5a464b0e63c1794f9071847",
+          "content_sha256": "e16275e9024ba5ce70696e63751bba9d60b1d70f4a6be4dab09f9ee4efb482f9",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "52b7291dfc9b4659ff0efd04b34d7648ee533c71817162d6686aa4f0bc6d4abd",
+        "package_closure_sha256": "ab01dac86b5798bb509bbcbec2b4e0109de1a8d5fb9e20bf674173355b5e12a9",
         "ruleset": {
-          "content_sha256": "4d6f935f00ad10d26f941fd7277324bc5ea9c047f72d539ee31b8f14c7ac85d6",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
           "version": "0.3.28"
         }
@@ -723,16 +723,16 @@
     },
     {
       "id": "the-cartographers-wake",
-      "plan_content_sha256": "1e0e62facdf3423ae722923b064cb0d18f967216f7e52b9309fd560ae7d5d1b5",
+      "plan_content_sha256": "9ff22c73d11243e10f12285cf97d60e22c8d7498770aaf80b08850de59ed44d7",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "a282ffa92882bd697f71f8416e11cbc6e3ac8d30c5a464b0e63c1794f9071847",
+          "content_sha256": "e16275e9024ba5ce70696e63751bba9d60b1d70f4a6be4dab09f9ee4efb482f9",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "52b7291dfc9b4659ff0efd04b34d7648ee533c71817162d6686aa4f0bc6d4abd",
+        "package_closure_sha256": "ab01dac86b5798bb509bbcbec2b4e0109de1a8d5fb9e20bf674173355b5e12a9",
         "ruleset": {
-          "content_sha256": "4d6f935f00ad10d26f941fd7277324bc5ea9c047f72d539ee31b8f14c7ac85d6",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
           "version": "0.3.28"
         }
@@ -1380,16 +1380,16 @@
     },
     {
       "id": "rift-awakening",
-      "plan_content_sha256": "ae14d6851ef6308de37168e9246a0a7dce2d10d016c60fd8c628ed0feec76057",
+      "plan_content_sha256": "3235d6b7957ad07cba31071c2441561266c8dc0fefdb96f768f8159a16d93d18",
       "bindings": {
         "campaign_setting": {
-          "content_sha256": "1297451b3dae479f2b50660cd24e7a9050c41d5bfcc755153e13d5c26ae03abb",
+          "content_sha256": "599df3975090d097b9a48dd5226e98039f3a1427469e845150e8d8599215e0a4",
           "id": "pneuma.severed-lands",
           "version": "1.0.0-alpha.2.naming.1"
         },
-        "package_closure_sha256": "6e94a19c89a2d742eac860891c5d9421dc11998379d2f7e0722b5c888a224384",
+        "package_closure_sha256": "dd5a1dbca98776a1e98e7fe71ffaae7b61214a8017c1e28f10b80400b87b6560",
         "ruleset": {
-          "content_sha256": "4d6f935f00ad10d26f941fd7277324bc5ea9c047f72d539ee31b8f14c7ac85d6",
+          "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
           "id": "sylvia.srd-lite.bg3",
           "version": "0.3.28"
         }

@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LITE = ROOT / "rulesets/srd-lite"
 CONTRACT_KEY = "x-sylvia-gm-argument-contracts"
 #: An input most spells use stays in the envelope rather than in every spell's list.
-COMMON_SHARE = 0.9
+COMMON_SHARE = 0.75
 SOURCE_SECTIONS = ("tools", "parameter_declarations", "definitions")
 
 

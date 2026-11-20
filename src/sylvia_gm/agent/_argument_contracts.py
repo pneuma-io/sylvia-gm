@@ -86,11 +86,11 @@ def argument_contract(schema: Mapping[str, object]) -> ArgumentContract | None:
 
 def _field_description(contract: ArgumentContract) -> str:
     return (
-        f"The inputs of the selected {contract.selector} beyond those listed here. Read them "
-        f"once per {contract.selector} with {ARGUMENTS_TOOL_NAME} (this tool's name and the "
-        f"{contract.selector}), then pass them in this object. Omit it when the selected "
-        f"{contract.selector} needs nothing more. An input this tool does not have, or one "
-        "already given at the top level, is refused before anything resolves."
+        f"Inputs the selected {contract.selector} needs beyond those listed here; most need "
+        f"none, so cast directly. If one is missing, its refusal names it and lists that "
+        f"{contract.selector}'s inputs; {ARGUMENTS_TOOL_NAME} (this tool's name and the "
+        f"{contract.selector}) returns them beforehand. An input this tool does not have, or "
+        "one already given at the top level, is refused before anything resolves."
     )
 
 
