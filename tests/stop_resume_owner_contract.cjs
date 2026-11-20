@@ -4,26 +4,43 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const http = require('node:http');
 const { FIXTURES, runFixtures } = require('./stop_resume/contract.cjs');
 
 const base = process.env.SYLVIA_TEST_OWNER_URL;
 assert.ok(base, 'Run this helper through pytest tests/test_stop_resume_owner_contract.py');
 
+// One HTTP request on its own connection (no keep-alive agent), so no idle socket keeps this
+// process alive after the test; fetch's pooled sockets did on Linux.
+function request(url, { method = 'GET', headers = {}, body = null } = {}) {
+  return new Promise((resolve, reject) => {
+    const outgoing = http.request(url, { method, headers, agent: false }, incoming => {
+      const chunks = [];
+      incoming.on('data', chunk => chunks.push(chunk));
+      incoming.on('end', () => resolve({ status: incoming.statusCode, headers: incoming.headers,
+        text: Buffer.concat(chunks).toString('utf8') }));
+      incoming.on('error', reject);
+    });
+    outgoing.on('error', reject);
+    outgoing.end(body);
+  });
+}
+
 // The WebUI's transport, outside a browser: one signed-in local session; errors become the
 // desktop host's "code: message" strings, so the fixtures see the same contract either way.
 async function webuiTransport(url) {
-  const page = await fetch(`${url}/app.html`);
+  const page = await request(`${url}/app.html`);
   assert.equal(page.status, 200);
-  const cookie = page.headers.getSetCookie().map(value => value.split(';')[0]).join('; ');
+  const cookie = (page.headers['set-cookie'] || []).map(value => value.split(';')[0]).join('; ');
   const started = Date.now();
   return async (method, params) => {
     // One line per command, so a stalled fixture shows where it stopped.
     const at = () => `${((Date.now() - started) / 1000).toFixed(2)}s`;
     console.log(`# ${at()} → ${method}`);
-    const response = await fetch(`${url}/api/command`, { method: 'POST', headers: { Origin: url,
+    const response = await request(`${url}/api/command`, { method: 'POST', headers: { Origin: url,
       'X-Sylvia-WebUI': '1', 'Content-Type': 'application/json', Cookie: cookie },
     body: JSON.stringify({ id: crypto.randomUUID(), method, params }) });
-    const envelope = await response.json();
+    const envelope = JSON.parse(response.text);
     console.log(`# ${at()} ← ${method} ${envelope.ok ? 'ok' : envelope.error?.code}`);
     if (!envelope.ok) throw `${envelope.error?.code || 'command_rejected'}: ${envelope.error?.message || ''}`;
     return envelope.result;
