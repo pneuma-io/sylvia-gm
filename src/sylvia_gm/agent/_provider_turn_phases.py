@@ -46,6 +46,7 @@ from sylvia_gm.agent._stateless_mcp import (
     action_sequence_model_tools,
     call_action_sequence_tool,
 )
+from sylvia_gm.agent._tool_loader import READER_NAME as LOADER_READER_NAME
 from sylvia_gm.application.authority import ActionCommand
 from sylvia_gm.domain.authority import (
     CanonicalEventType,
@@ -689,6 +690,35 @@ def loader_mechanic_names(
     return getattr(ledger, "mechanic_names", None)
 
 
+def loader_text_call(
+    self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
+    text: str,
+) -> Any:
+    """Loader: a required round's reply that is one call written as JSON text, as that call.
+
+    Admission, unwrapping and validation then treat it like any other call. Only a declared
+    tool, ``call_mechanic`` or an offered mechanic's name counts.
+    """
+    from sylvia_gm.agent._tool_loader import text_call
+
+    names = loader_mechanic_names(self, provider_input)
+    ledger = self._ledger_store().get(provider_input.session.session_id)
+    if names is None or ledger is None:
+        return None
+    callable_names = {*(_tool_name_of(tool) for tool in ledger.declared_tools or ()),
+                      *state.aliases, *(names.short(alias) for alias in state.aliases)}
+    found = text_call(text, callable_names)
+    if found is None:
+        return None
+    return _ToolCallAssembly(call_id=f"call-{uuid.uuid4().hex}", name=found[0],
+                             arguments=found[1])
+
+
+def _tool_name_of(tool: Mapping[str, Any]) -> str:
+    function = tool.get("function")
+    return str((function if isinstance(function, Mapping) else tool).get("name", ""))
+
+
 def unwrap_loader_calls(
     self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
 ) -> None:
@@ -714,21 +744,59 @@ def unwrap_loader_calls(
             assembly.arguments = unwrapped[1]
 
 
-def give_loader_definition(
+def refuse_unread_mechanic(
     self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
-    name: str,
+    name: str, *, turn_id: str,
 ) -> bool:
-    """Loader: answer a first call to a mechanic listed without arguments with its definition.
+    """Loader: refuse a call to a mechanic listed without arguments and not yet read.
 
-    Nothing runs and it is not a failed call: the model calls again with the shape it now has.
+    Nothing runs. The refusal carries the definition, so the model can correct the call in one
+    round without a read, as an argument-contract refusal carries the selected contract.
     """
-    if loader_mechanic_names(self, provider_input) is None:
-        return False
+    from sylvia_gm.agent._tool_loader import unread_refusal
+
+    names = loader_mechanic_names(self, provider_input)
     ledger = self._ledger_store().get(provider_input.session.session_id)
-    if ledger is None or not ledger.needs_definition(name):
+    if names is None or ledger is None or not ledger.needs_definition(name):
         return False
-    state.local_tool_results[state.assembly.call_id] = ledger.definition_result(
-        name, state.tools)
+    state.local_tool_results[state.assembly.call_id] = unread_refusal(
+        ledger.mechanic_tool(name, state.tools), names.short(name))
+    state.local_tool_failures.add(state.assembly.call_id)
+    record_fixed_tool_refusal(self, state, provider_input, turn_id=turn_id,
+                              reason="arguments_unread")
+    return True
+
+
+def read_loader_mechanic(
+    self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
+) -> bool:
+    """Loader: answer ``read_tool_arguments`` for an offered mechanic with its definition.
+
+    A read with a value of a defined tool that keeps a selected value's inputs behind an
+    argument contract (#65) is left to that contract's reader, when the catalog has one.
+    """
+    from sylvia_gm.agent._tool_loader import CONTRACT_SCHEMA_KEY, read_result
+
+    names = loader_mechanic_names(self, provider_input)
+    ledger = self._ledger_store().get(provider_input.session.session_id)
+    if names is None or ledger is None:
+        return False
+    try:
+        parameters = json.loads(state.assembly.arguments or "{}")
+    except json.JSONDecodeError:
+        return False
+    requested = parameters.get("tool") if isinstance(parameters, Mapping) else None
+    if not isinstance(requested, str):
+        return False
+    alias = names.alias(requested.strip(), state.aliases)
+    tool = state.aliases.get(alias)
+    value = parameters.get("value")
+    if tool is None or tool.category != "mechanic" or (
+            CONTRACT_SCHEMA_KEY in tool.input_schema and isinstance(value, str)
+            and value.strip() and not ledger.needs_definition(alias)):
+        return False
+    result = read_result(ledger.mechanic_tool(alias, state.tools), names.short(alias))
+    state.local_tool_results[state.assembly.call_id] = {**result, "state_changed": False}
     return True
 
 
@@ -1763,6 +1831,8 @@ def stream_provider_round(
     if not state.assemblies and state.provider_tool_call_required:
         encoded_text = "".join(state.assistant_text)
         normalized_call = _forced_single_tool_call_from_json(encoded_text, state.aliases)
+        if normalized_call is None and state.native_assistant_content is None:
+            normalized_call = loader_text_call(self, state, provider_input, encoded_text)
         if normalized_call is not None:
             normalized_native_content = _native_content_for_text_operation(
                 state.native_assistant_content,
@@ -1915,12 +1985,17 @@ def execute_tool_batch(
                 }
                 state.local_tool_failures.add(state.assembly.call_id)
             continue
+        if (state.assembly.name == LOADER_READER_NAME
+                and loader_mechanic_names(self, provider_input) is not None
+                and read_loader_mechanic(self, state, provider_input)):
+            continue
         resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
         if resolved_tool is None:
             reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
             continue
         _, state.catalog_tool = resolved_tool
-        if give_loader_definition(self, state, provider_input, resolved_tool[0]):
+        if refuse_unread_mechanic(self, state, provider_input, resolved_tool[0],
+                                  turn_id=turn_id):
             continue
         if _tool_call_needs_fresh_catalog(state, position):
             state.local_tool_results[state.assembly.call_id] = {

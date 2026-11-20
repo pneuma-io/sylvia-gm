@@ -264,8 +264,10 @@ def _route_gm(route: str):
             self.requests = []
 
         async def generate_stream(self, messages, tools=None, **kwargs):
-            last = messages[-1] if messages else {}
-            if last.get("role") == "tool" and "definition_given" in str(last.get("content")):
+            last = next((m for m in reversed(messages or [])
+                         if m.get("role") in {"tool", "assistant"}), {})
+            if last.get("role") == "tool" and "mechanic_arguments_unread" in str(
+                    last.get("content")):
                 self.position -= 1  # the loader defined the mechanic instead: call it again
             if self.position < len(self.steps) and callable(self.steps[self.position][1]):
                 operation, parameters = self.steps[self.position]

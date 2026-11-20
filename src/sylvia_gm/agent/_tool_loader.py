@@ -50,6 +50,32 @@ MECHANIC_TOOL: dict[str, Any] = {
         },
     },
 }
+#: The host-local reader of a listed mechanic's arguments. It has the name, and a compatible
+#: shape, of the argument-contract reader (#65); when the catalog carries that one, it is
+#: declared instead and reads of a contract value still reach it.
+READER_NAME = "read_tool_arguments"
+#: The schema key of an argument contract (#65): a read with a value of such a tool, once the
+#: tool is defined, is that contract's read.
+CONTRACT_SCHEMA_KEY = "x-sylvia-gm-argument-contracts"
+READER_TOOL: dict[str, Any] = {
+    "type": "function",
+    "function": {
+        "name": READER_NAME,
+        "description": (
+            "READ-ONLY: return a game mechanic's arguments. Call it before first using a "
+            f"mechanic that {DEFINITIONS_LABEL} marks (read its arguments first)."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tool": {"type": "string", "description": "The mechanic's name as listed."},
+                "value": {"type": "string",
+                          "description": "The choice it is for (such as the spell), or \"\"."},
+            },
+            "required": ["tool"],
+        },
+    },
+}
 _ALIAS = re.compile(r"^tool_[0-9a-f]{12}_(.+)$")
 _CONSTRAINTS = (("minimum", ">="), ("maximum", "<="), ("exclusiveMinimum", ">"),
                 ("exclusiveMaximum", "<"), ("minLength", "min length"),
@@ -210,12 +236,16 @@ def compact_definition(tool: Mapping[str, Any], name: str | None = None) -> str:
 
 
 #: A mechanic whose compact definition is longer than this (characters) is listed by name and
-#: summary only; its first call returns the definition instead of running. Large definitions
-#: (a spell action's hundreds of optional fields) would otherwise sit in every later request.
+#: summary only, and read on demand with ``read_tool_arguments`` (the host-local reader of
+#: argument contracts, #218). Large definitions (a level-up's hundreds of optional fields)
+#: would otherwise sit in every later request.
 INLINE_LIMIT = 700
 #: The summary of a mechanic listed without its arguments: its description, cut to this.
 SUMMARY_LIMIT = 240
-LISTED_NOTE = "(arguments given on first use)"
+LISTED_NOTE = "(read its arguments first)"
+#: The field that marks a tool result as having given a mechanic's definition.
+DEFINED_KEY = "mechanic_definition"
+UNREAD_CODE = "mechanic_arguments_unread"
 
 
 def _summary(tool: Mapping[str, Any]) -> str:
@@ -230,7 +260,7 @@ def definitions_record(
     tools: Sequence[Mapping[str, Any]], names: MechanicNames,
 ) -> tuple[str, list[str]]:
     """The appended definitions of mechanics first offered at this step, and which of them
-    are defined in full (the rest are listed; their first call returns the definition)."""
+    are defined in full (the rest are listed, and read on demand)."""
     full: list[str] = []
     listed: list[str] = []
     defined: list[str] = []
@@ -244,40 +274,43 @@ def definitions_record(
             listed.append(f"## {short} {LISTED_NOTE}\n{_summary(tool)}")
     content = (f"{DEFINITIONS_LABEL} (application control, not player speech): game mechanics, "
                f"each used by calling {MECHANIC_TOOL_NAME} with its name and an arguments "
-               "object of the shape shown (? marks an optional field). For a mechanic marked "
-               f"{LISTED_NOTE}, your first call returns its arguments and runs nothing; then "
-               "call it again. Each stays defined for the rest of the session; the latest "
-               f"{CALLABLE_LABEL} record says which can be used now.\n\n"
-               + "\n\n".join([*full, *listed]))
+               "object of the shape shown (? marks an optional field). Before using a "
+               f"mechanic marked {LISTED_NOTE}, call {READER_NAME} once with tool set to its "
+               "name and value set to the choice it is for (such as the spell), or \"\"; a "
+               "call before that is refused with its arguments. Each stays defined for the "
+               f"rest of the session; the latest {CALLABLE_LABEL} record says which can be "
+               "used now.\n\n" + "\n\n".join([*full, *listed]))
     return content, defined
 
 
-DEFINITION_CODE = "mechanic_definition"
+def read_result(tool: Mapping[str, Any], short: str) -> dict[str, Any]:
+    """``read_tool_arguments`` for a listed mechanic: its definition. Nothing runs."""
+    return {"status": "ok", "tool": short, DEFINED_KEY: short,
+            "definition": compact_definition(tool, short),
+            "instruction": f"Call {MECHANIC_TOOL_NAME} for {short} with arguments of this shape."}
 
 
-def definition_result(tool: Mapping[str, Any], short: str) -> dict[str, Any]:
-    """The result of a first call to a listed mechanic: its definition; nothing ran."""
-    return {
-        "status": "definition_given", "code": DEFINITION_CODE, "state_changed": False,
-        "mechanic": short, "definition": compact_definition(tool, short),
-        "instruction": (f"Nothing ran. Call {MECHANIC_TOOL_NAME} again for {short} with "
-                        "arguments of this shape, if it still fits."),
-    }
+def unread_refusal(tool: Mapping[str, Any], short: str) -> dict[str, Any]:
+    """A call to a listed mechanic before its arguments were read: refused with them, so the
+    model can correct it in one round without a separate read (as #218's contract refusal)."""
+    return {"status": "rejected", "code": UNREAD_CODE, "state_changed": False,
+            DEFINED_KEY: short, "definition": compact_definition(tool, short),
+            "instruction": (f"Nothing ran. Call {MECHANIC_TOOL_NAME} again for {short} with "
+                            "arguments of this shape, if it still fits; retry once.")}
 
 
 def defined_in_result(message: Mapping[str, Any]) -> str | None:
-    """The short name a tool result defined (``definition_result``), else None."""
+    """The short name a tool result gave the definition of, else None."""
     content = message.get("content")
     if message.get("role") != "tool" or not isinstance(content, str) or (
-            DEFINITION_CODE not in content):
+            DEFINED_KEY not in content):
         return None
     try:
         value = json.loads(content)
     except ValueError:
         return None
-    mechanic = value.get("mechanic") if isinstance(value, Mapping) else None
-    return (mechanic if value.get("code") == DEFINITION_CODE and isinstance(mechanic, str)
-            else None)
+    mechanic = value.get(DEFINED_KEY) if isinstance(value, Mapping) else None
+    return mechanic if isinstance(mechanic, str) else None
 
 
 # ── What the engine accepts now ───────────────────────────────────────────────────────────
@@ -285,11 +318,16 @@ def defined_in_result(message: Mapping[str, Any]) -> str | None:
 
 def callable_record(
     declared: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
-    names: MechanicNames,
+    names: MechanicNames, *, reading: bool = False,
 ) -> str:
-    """Name the mechanics (and say which declared tools) the engine accepts at this step."""
+    """Name the mechanics (and say which declared tools) the engine accepts at this step.
+
+    With *reading*, an offered mechanic is still to be read, so the reader can be called.
+    """
     listed = {tool_name(tool) for tool in declared} - {MECHANIC_TOOL_NAME}
     allowed = {tool_name(tool) for tool in offered or ()}
+    if reading and READER_NAME in listed:
+        allowed.add(READER_NAME)
     mechanics = sorted(names.short(name) for name in allowed - listed)
     refused = sorted(listed - allowed)
     head = (f"{CALLABLE_LABEL} (application control, not player speech; the latest record "
@@ -351,6 +389,35 @@ def unwrap_mechanic_call(arguments: str) -> tuple[str, str] | None:
     if not isinstance(name, str) or not name.strip() or not isinstance(inner, Mapping):
         return None
     return name.strip(), _compact_json(inner)
+
+
+def text_call(text: str, callable_names: Iterable[str]) -> tuple[str, str] | None:
+    """A whole reply that is one JSON call written as text: (name, arguments JSON), or None.
+
+    Small local models sometimes write a call as ``{"name": ..., "arguments": {...}}`` text
+    instead of the provider's call format. Only a name in *callable_names* (a declared tool,
+    ``call_mechanic`` or a mechanic's name) counts; anything else stays prose.
+    """
+    body = text.strip()
+    if body.startswith("```"):
+        body = body.strip("`").strip()
+        body = body[4:].lstrip() if body.startswith("json") else body
+    try:
+        value = json.loads(body)
+    except ValueError:
+        return None
+    if not isinstance(value, Mapping) or not isinstance(value.get("name"), str):
+        return None
+    name = value["name"].strip()
+    arguments = value.get("arguments", value.get("parameters", {}))
+    if isinstance(arguments, str):
+        try:
+            arguments = json.loads(arguments or "{}")
+        except ValueError:
+            return None
+    if name not in set(callable_names) or not isinstance(arguments, Mapping):
+        return None
+    return name, _compact_json(arguments)
 
 
 def wrap_mechanic_arguments(name: str, arguments: str) -> str:

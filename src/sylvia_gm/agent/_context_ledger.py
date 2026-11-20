@@ -44,13 +44,13 @@ from sylvia_gm.agent._tool_loader import (
     CHOICES_LABEL,
     DEFINITIONS_LABEL,
     MECHANIC_TOOL,
+    READER_TOOL,
     MechanicNames,
     defined_in_result,
     project_conversation,
 )
 from sylvia_gm.agent._tool_loader import callable_record as loader_callable_record
 from sylvia_gm.agent._tool_loader import choices_record as loader_choices_record
-from sylvia_gm.agent._tool_loader import definition_result as loader_definition_result
 from sylvia_gm.agent._tool_loader import definitions_record as loader_definitions_record
 
 MODE_ENV = "SYLVIA_GM_CONTEXT_MODE"
@@ -354,6 +354,9 @@ def deferred_definitions(
         elif deferral in {NATIVE_DEFERRAL, PROVIDER_DEFERRAL}:
             declared.append(dict(copy.deepcopy(dict(tool)), defer_loading=True))
     if deferral == LOADER_DEFERRAL:
+        # The reader of listed mechanics, unless the catalog already carries one by that name.
+        if READER_TOOL["function"]["name"] not in {_tool_name(tool) for tool in declared}:
+            declared.append(copy.deepcopy(READER_TOOL))
         declared.append(copy.deepcopy(MECHANIC_TOOL))
     return declared
 
@@ -1393,29 +1396,33 @@ class ContextLedger:
             self._sent_so_far(history_records), offered)
         return merged or offered
 
-    def needs_definition(self, name: str) -> bool:
-        """Loader: whether a call to mechanic *name* must first return its definition.
-
-        True for a mechanic the journal lists without arguments and no earlier result defined.
-        """
-        if self.mechanic_names is None or name in self._declared_names or self.state is None:
-            return False
+    def _unread(self, name: str, entries: Sequence[Mapping[str, Any]]) -> bool:
+        assert self.mechanic_names is not None
         short = self.mechanic_names.short(name)
-        for entry in self.state.entries:
+        for entry in entries:
             if entry.get("c") == TOOL_CHANGE_CLASS and name in (entry.get("f") or ()):
                 return False
             if entry.get("c") == "conversation" and defined_in_result(entry["m"]) == short:
                 return False
         return True
 
-    def definition_result(
+    def needs_definition(self, name: str) -> bool:
+        """Loader: whether mechanic *name* is listed without arguments and not yet read.
+
+        Its call is then refused with its definition; ``read_tool_arguments`` gives it first.
+        """
+        if self.mechanic_names is None or name in self._declared_names or self.state is None:
+            return False
+        return self._unread(name, self.state.entries)
+
+    def mechanic_tool(
         self, name: str, offered: Sequence[Mapping[str, Any]] | None,
     ) -> dict[str, Any]:
-        """Loader: the result that gives mechanic *name*'s definition (nothing runs)."""
-        assert self.mechanic_names is not None
+        """Loader: mechanic *name*'s state-independent definition (as offered when outside the
+        catalog), the one its definitions record describes."""
         tool = next((t for t in self.fixed_tools or () if _tool_name(t) == name), None) or next(
             (t for t in offered or () if _tool_name(t) == name), {"name": name})
-        return loader_definition_result(tool, self.mechanic_names.short(name))
+        return dict(tool)
 
     def request_thinking_strip(self) -> None:
         """The service rejected a replayed thinking block: strip all of them from now on."""
@@ -1445,10 +1452,14 @@ class ContextLedger:
         }))[:24]
 
     def _host_message(self, message: Mapping[str, Any], content: str) -> dict[str, Any]:
+        # The loader serves local servers too, whose chat templates (Ollama's among them) lift
+        # every system message into the opening one: an appended system record would break the
+        # prefix there, so the loader appends every host record as a sealed user record.
         system_role = (
             message.get("role") == "system"
             and not _is_data_record(message)
             and self.transport not in LIFTING_TRANSPORTS
+            and self.deferral != LOADER_DEFERRAL
         )
         if system_role:
             return {"role": "system", "content": content}
@@ -1718,7 +1729,12 @@ class ContextLedger:
         if self.mechanic_names is not None and visible:
             # Loader: what the engine accepts now, and the current argument choices, each in
             # its own latest-wins record appended only when it changed.
-            content = loader_callable_record(visible, offered_tools, self.mechanic_names)
+            entries = [*state.entries, *appended]
+            reading = any(
+                _tool_name(tool) not in self._declared_names
+                and self._unread(_tool_name(tool), entries) for tool in offered_tools or ())
+            content = loader_callable_record(visible, offered_tools, self.mechanic_names,
+                                             reading=reading)
             if (last_of_label(CALLABLE_LABEL) or {}).get("h") != _sha(content):
                 appended.append({"m": self._host_message({"role": "user"}, content),
                                  "c": "latest", "l": CALLABLE_LABEL, "h": _sha(content)})
