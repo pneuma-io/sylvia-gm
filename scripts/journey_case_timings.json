@@ -1766,6 +1766,7 @@
     "tests.test_claude_deferred_tools::test_deferred_tools_are_marked_for_claude_code_and_others_are_unchanged": 0.01,
     "tests.test_claude_deferred_tools::test_real_claude_code_deferred_session_keeps_one_tool_list[per-step]": 0.01,
     "tests.test_claude_deferred_tools::test_real_claude_code_deferred_session_keeps_one_tool_list[persistent]": 0.01,
+    "tests.test_claude_deferred_tools::test_round_messages_keep_no_thinking_and_no_private_fields": 0.01,
     "tests.test_claude_deferred_tools::test_saved_rounds_are_replayed_after_the_prompt": 0.01,
     "tests.test_claude_install::test_a_newer_stable_release_is_selected": 0.588,
     "tests.test_claude_install::test_an_unverified_download_is_discarded[checksum]": 0.583,

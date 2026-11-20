@@ -195,14 +195,12 @@ def tool_search(native_tools: list[dict[str, Any]]) -> bool:
 def _replay_record(add: Callable[[str, dict[str, Any]], None], saved: Mapping[str, Any]) -> None:
     """Replay one saved CLI record: a rendered context record, or a tool-search round message.
 
-    A round (the model's ``ToolSearch`` call and the CLI's result, deferred tool list) is kept
-    as the CLI stored it, so a fresh process sends what the earlier one sent and the tools it
-    loaded stay loaded.
+    A round (the model's ``ToolSearch`` call and the CLI's result, deferred tool list) is
+    replayed as the CLI rendered it, without thinking as every journal message is, so a fresh
+    process sends what the earlier one sent and the tools it loaded stay loaded.
     """
     if saved.get("type") in {"assistant", "user"} and isinstance(saved.get("message"), dict):
-        body = {key: json.loads(json.dumps(saved[key]))
-                for key in ("message", "toolUseResult") if key in saved}
-        add(str(saved["type"]), body)
+        add(str(saved["type"]), {"message": json.loads(json.dumps(saved["message"]))})
         return
     add("attachment", {key: saved[key] for key in ("attachment", "rendered", "renderedRole")
                        if key in saved})

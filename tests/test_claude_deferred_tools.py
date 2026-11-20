@@ -117,11 +117,30 @@ def test_collect_keeps_search_rounds_in_order_up_to_the_final_message(tmp_path):
     assert [r.get("type") or r["attachment"]["type"] for r in found.records] == [
         "environment", "deferred_tools_delta", "assistant", "user"]
     assert found.records[2] == {"type": "assistant", "message": SEARCH["message"]}
-    assert found.records[3] == {"type": "user", "message": LOADED["message"],
-                                "toolUseResult": LOADED["toolUseResult"]}
+    # The CLI's answer keeps its message only; its private result details stay behind.
+    assert found.records[3] == {"type": "user", "message": LOADED["message"]}
     # Without a search round (or the id) collection is what it was: rendered records only.
     assert [r["attachment"]["type"] for r in collect(session, PROMPT).records] == [
         "environment", "deferred_tools_delta"]
+
+
+def test_round_messages_keep_no_thinking_and_no_private_fields(tmp_path):
+    thinking = {"type": "assistant", "message": {**SEARCH["message"], "content": [
+        {"type": "thinking", "thinking": "SENTINEL_PRIVATE plan", "signature": "sig"}]}}
+    said = {"type": "assistant", "message": {
+        **SEARCH["message"], "usage": {"input_tokens": 3}, "container": None,
+        "content": [{"type": "redacted_thinking", "data": "x"},
+                    {"type": "text", "text": "Loading the rules."},
+                    *SEARCH["message"]["content"]]}}
+    rows = [{"type": "user", "message": {"role": "user", "content": PROMPT}}, thinking, said,
+            LOADED, {"type": "api-request"}, FINAL]
+    found = collect(_rows_file(tmp_path / "s.jsonl", rows), PROMPT, final_message_id="msg_final")
+    assert "SENTINEL_PRIVATE" not in json.dumps(found.records)
+    # The thinking-only row is dropped; the other keeps its rendered blocks and identity.
+    assert [r["type"] for r in found.records] == ["assistant", "user"]
+    message = found.records[0]["message"]
+    assert set(message) == {"id", "type", "role", "model", "content", "stop_reason"}
+    assert [b["type"] for b in message["content"]] == ["text", "tool_use"]
 
 
 def test_collect_answer_keeps_rounds_after_the_answered_call(tmp_path):
@@ -154,8 +173,7 @@ def test_saved_rounds_are_replayed_after_the_prompt(tmp_path):
     ]
     saved = [{k: v for k, v in ENVIRONMENT.items() if k != "type"},
              {"type": "assistant", "message": SEARCH["message"]},
-             {"type": "user", "message": LOADED["message"],
-              "toolUseResult": LOADED["toolUseResult"]}]
+             {"type": "user", "message": LOADED["message"]}]
     # The first request ended after the player's words (journal length 1) with the call.
     route = NativeRoute(stable_count=1, entry_count=4, boundaries=(1,),
                         native_records={1: saved})
@@ -165,7 +183,6 @@ def test_saved_rounds_are_replayed_after_the_prompt(tmp_path):
     assert kinds[:5] == [("user", None), ("attachment", None), ("assistant", "msg_search"),
                          ("user", None), ("assistant", kinds[4][1])]
     assert records[3]["message"] == LOADED["message"]
-    assert records[3]["toolUseResult"] == LOADED["toolUseResult"]
     assert records[4]["message"]["content"][0]["name"] == "mcp__sylvia__roll"
     # The chain stays linked: each record's parent is the one before it.
     assert all(b["parentUuid"] == a["uuid"] for a, b in zip(records, records[1:], strict=False))

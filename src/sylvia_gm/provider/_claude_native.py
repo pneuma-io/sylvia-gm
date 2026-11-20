@@ -266,14 +266,36 @@ def _requests_after(rows: Sequence[Mapping[str, Any]], start: int) -> int:
     return sum(1 for row in rows[start + 1:] if row.get("type") == "api-request")
 
 
+#: What a replayed round's model message keeps: what Claude Code renders and merges rows by.
+_ROUND_MESSAGE_KEYS = ("id", "type", "role", "model", "content", "stop_reason", "stop_sequence")
+#: Never kept: the model's private reasoning stays out of session evidence, as the journal
+#: leaves it out of every replayed assistant message.
+_PRIVATE_BLOCKS = frozenset({"thinking", "redacted_thinking"})
+
+
 def _round_row(row: Mapping[str, Any]) -> dict[str, Any] | None:
-    """A ToolSearch round message as the CLI stored it, for replay (deferred tool list)."""
-    if row.get("type") not in {"assistant", "user"} or not isinstance(row.get("message"), dict):
+    """A ToolSearch round message, for replay (deferred tool list); None if nothing is kept.
+
+    The model's message keeps its rendered blocks without thinking, as every assistant message
+    of the journal is replayed; a row that held only thinking is dropped. The CLI's answer
+    keeps its message.
+    """
+    message = row.get("message")
+    if row.get("type") not in {"assistant", "user"} or not isinstance(message, dict):
         return None
-    copied = {"type": row["type"], "message": json.loads(json.dumps(row["message"]))}
-    if row["type"] == "user" and "toolUseResult" in row:
-        copied["toolUseResult"] = json.loads(json.dumps(row["toolUseResult"]))
-    return copied
+    if row["type"] == "assistant":
+        content = message.get("content")
+        if not isinstance(content, list):
+            return None
+        kept = [block for block in content
+                if not (isinstance(block, dict) and block.get("type") in _PRIVATE_BLOCKS)]
+        if not kept:
+            return None
+        message = {key: message[key] for key in _ROUND_MESSAGE_KEYS if key in message}
+        message["content"] = kept
+        return {"type": "assistant", "message": json.loads(json.dumps(message))}
+    return {"type": "user", "message": json.loads(json.dumps(
+        {key: message[key] for key in ("role", "content") if key in message}))}
 
 
 def _is_final(row: Mapping[str, Any], final_message_id: str | None) -> bool:
