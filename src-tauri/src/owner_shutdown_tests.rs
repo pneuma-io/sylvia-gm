@@ -86,7 +86,18 @@ struct Fixture {
     child: Weak<Mutex<std::process::Child>>,
     code: Arc<AtomicI64>,
     notice: mpsc::Receiver<Result<i32, String>>,
+    // Declared last so it drops after the bridge and the child's containment (#209).
+    _scratch: Scratch,
 }
+
+// Removes the fixture folder when a test fails before `finish` has removed it.
+struct Scratch(PathBuf);
+impl Drop for Scratch {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
 impl Fixture {
     fn new(mode: &str, delay: &str, code: &str) -> Self {
         let python = std::env::var_os("SYLVIA_GM_TEST_PYTHON")
@@ -126,13 +137,14 @@ impl Fixture {
         Self {
             bridge: Some(bridge),
             containment: Containment { handle, release },
-            root,
+            root: root.clone(),
             marker,
             preserved,
             job,
             child,
             code: saved,
             notice,
+            _scratch: Scratch(root),
         }
     }
 
