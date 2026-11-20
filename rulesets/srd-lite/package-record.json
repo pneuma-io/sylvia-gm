@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "f46ee576930c32ad912a8c371a65f69ce274bb909d01de04c01e9e4a72397669",
+  "content_sha256": "4d6f935f00ad10d26f941fd7277324bc5ea9c047f72d539ee31b8f14c7ac85d6",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -25216,7 +25216,6 @@
           "by_value": {
             "acid_arrow": [
               "material_component_available",
-              "material_item_ids",
               "minor_elementals_damage_type",
               "selected_damage_type",
               "somatic_component_available",
@@ -25234,18 +25233,21 @@
             ],
             "aid": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "alter_self": [
+              "all_targets_willing",
               "somatic_component_available",
+              "target_willing",
+              "transformation_accept_temporary_hp",
               "transformation_appearance",
               "transformation_equipment",
               "transformation_form",
               "transformation_forms",
               "transformation_option",
               "transformation_same_basic_shape",
-              "transformation_same_size"
+              "transformation_same_size",
+              "transformation_seen_before"
             ],
             "arcane_eye": [
               "information_kind",
@@ -25254,31 +25256,30 @@
               "information_sense",
               "information_subject",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "aura_of_life": [],
             "bane": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "beacon_of_hope": [
               "actor_spell_weapon",
+              "all_targets_in_area",
+              "all_targets_willing",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
-              "somatic_component_available"
+              "somatic_component_available",
+              "target_willing"
             ],
             "befuddlement": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
             "bless": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "blight": [
@@ -25286,8 +25287,12 @@
               "witness_state_ids"
             ],
             "blindness_deafness": [],
-            "blur": [],
+            "blur": [
+              "all_targets_willing",
+              "target_willing"
+            ],
             "burning_hands": [
+              "environment_origin",
               "instant_area_apex",
               "instant_area_direction",
               "instant_area_include_origin",
@@ -25298,7 +25303,6 @@
             ],
             "chain_lightning": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -25319,7 +25323,6 @@
             ],
             "chromatic_orb": [
               "material_component_available",
-              "material_item_ids",
               "minor_elementals_damage_type",
               "selected_damage_type",
               "somatic_component_available",
@@ -25332,7 +25335,6 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -25349,19 +25351,19 @@
               "geas_command"
             ],
             "commune": [
+              "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "message_words",
               "somatic_component_available"
             ],
             "cone_of_cold": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
             ],
             "contact_other_plane": [
+              "all_targets_willing",
               "message_words",
               "spellbook_readable"
             ],
@@ -25375,7 +25377,6 @@
             "darkvision": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -25392,7 +25393,6 @@
               "disintegrate_source_id",
               "disintegrate_source_kind",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
@@ -25413,7 +25413,6 @@
             ],
             "dragons_breath": [
               "material_component_available",
-              "material_item_ids",
               "selected_damage_type",
               "somatic_component_available",
               "target_willing"
@@ -25429,7 +25428,6 @@
             "enhance_ability": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "etherealness": [
@@ -25438,7 +25436,6 @@
             ],
             "false_life": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "fear": [
@@ -25449,7 +25446,6 @@
               "instant_area_include_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "sleepless_targets",
               "somatic_component_available"
             ],
@@ -25482,11 +25478,11 @@
               "actor_spell_choice",
               "actor_spell_weapon",
               "actor_spell_weapon_hand",
+              "all_targets_in_area",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "fire_storm": [
@@ -25500,7 +25496,6 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -25510,14 +25505,12 @@
               "ice_storm_ground_zone_ids",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
             "fly": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -25528,29 +25521,28 @@
             ],
             "foresight": [
               "actor_spell_weapon",
+              "all_targets_in_area",
               "all_targets_willing",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
             "freedom_of_movement": [
               "actor_spell_weapon",
+              "all_targets_in_area",
               "all_targets_willing",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
             "freezing_sphere": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -25564,7 +25556,6 @@
             ],
             "greater_restoration": [
               "material_component_available",
-              "material_item_ids",
               "recovery_choice",
               "recovery_effect",
               "recovery_item",
@@ -25605,18 +25596,15 @@
             "healing_word": [],
             "hex": [
               "material_component_available",
-              "material_item_ids",
               "rider_ability",
               "somatic_component_available"
             ],
             "hold_monster": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "hold_person": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "hunter_s_mark": [
@@ -25627,7 +25615,6 @@
             ],
             "ice_knife": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_can_see_caster"
             ],
@@ -25636,7 +25623,6 @@
               "ice_storm_ground_zone_ids",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
@@ -25648,15 +25634,14 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "legend_lore": [
+              "all_targets_willing",
               "divination_gm_answer",
               "divination_subject",
               "divination_subject_famous",
               "material_component_available",
-              "material_item_ids",
               "message_words",
               "somatic_component_available"
             ],
@@ -25856,7 +25841,6 @@
               "mask_subject",
               "mask_willing",
               "material_component_available",
-              "material_item_ids",
               "meld_stone_subject",
               "message_words",
               "minor_color",
@@ -26004,6 +25988,7 @@
               "wish_spell"
             ],
             "lightning_bolt": [
+              "environment_origin",
               "instant_area_apex",
               "instant_area_direction",
               "instant_area_height",
@@ -26011,27 +25996,23 @@
               "instant_area_up",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
             ],
             "longstrider": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "mage_armor": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
             "mage_armour": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -26248,7 +26229,6 @@
               "mask_subject",
               "mask_willing",
               "material_component_available",
-              "material_item_ids",
               "meld_stone_subject",
               "message_words",
               "minor_color",
@@ -26419,14 +26399,16 @@
               "witness_state_ids"
             ],
             "polymorph": [
+              "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
+              "target_willing",
               "transformation_accept_temporary_hp",
               "transformation_appearance",
               "transformation_equipment",
               "transformation_form",
-              "transformation_forms"
+              "transformation_forms",
+              "transformation_seen_before"
             ],
             "power_word_heal": [
               "selected_restoration_condition"
@@ -26443,7 +26425,6 @@
             "protection_from_evil_and_good": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -26469,7 +26450,6 @@
             ],
             "revivify": [
               "material_component_available",
-              "material_item_ids",
               "recovery_choice",
               "recovery_effect",
               "recovery_item",
@@ -26493,7 +26473,6 @@
             ],
             "shatter": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -26504,17 +26483,16 @@
             ],
             "shield_of_faith": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "shillelagh": [
               "actor_spell_weapon",
               "actor_spell_weapon_hand",
+              "all_targets_in_area",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "shocking_grasp": [
@@ -26536,7 +26514,6 @@
               "instant_area_include_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "sleepless_targets",
               "somatic_component_available"
             ],
@@ -26545,7 +26522,6 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "spare_the_dying": [
@@ -26570,12 +26546,10 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "stoneskin": [
               "material_component_available",
-              "material_item_ids",
               "selected_damage_type",
               "somatic_component_available",
               "target_willing"
@@ -26587,15 +26561,13 @@
               "caster_allies",
               "command",
               "geas_command",
-              "material_component_available",
-              "material_item_ids"
+              "material_component_available"
             ],
             "summon_dragon": [
               "created_actor_height",
               "created_actor_lighting",
               "created_actor_position",
               "material_component_available",
-              "material_item_ids",
               "selected_damage_type",
               "somatic_component_available",
               "summon_id"
@@ -26603,7 +26575,6 @@
             "sunburst": [
               "caster_can_see_origin",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "sunburst_origin",
               "sunburst_plane",
@@ -26631,11 +26602,11 @@
               "witness_state_ids"
             ],
             "tree_stride": [
+              "all_targets_willing",
               "somatic_component_available"
             ],
             "true_strike": [
               "material_component_available",
-              "material_item_ids",
               "minor_elementals_damage_type",
               "somatic_component_available",
               "true_strike_attack_mode",
@@ -26650,7 +26621,6 @@
             ],
             "vitriolic_sphere": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -26663,12 +26633,10 @@
               "environment_origin",
               "environment_wall_axis",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "wall_of_stone": [
               "material_component_available",
-              "material_item_ids",
               "solid_wall_axis",
               "solid_wall_origin",
               "somatic_component_available"
@@ -26679,7 +26647,6 @@
               "environment_web_layer",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "zone_of_truth": [
@@ -26730,6 +26697,7 @@
             "mage_hand_move_distance",
             "mage_hand_object_contact",
             "mage_hand_placement",
+            "material_item_ids",
             "object_component_ids",
             "origin_distance",
             "origin_has_clear_path",
@@ -34697,7 +34665,6 @@
           "by_value": {
             "acid_arrow": [
               "material_component_available",
-              "material_item_ids",
               "minor_elementals_damage_type",
               "selected_damage_type",
               "somatic_component_available",
@@ -34714,18 +34681,21 @@
             ],
             "aid": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "alter_self": [
+              "all_targets_willing",
               "somatic_component_available",
+              "target_willing",
+              "transformation_accept_temporary_hp",
               "transformation_appearance",
               "transformation_equipment",
               "transformation_form",
               "transformation_forms",
               "transformation_option",
               "transformation_same_basic_shape",
-              "transformation_same_size"
+              "transformation_same_size",
+              "transformation_seen_before"
             ],
             "arcane_eye": [
               "information_kind",
@@ -34734,31 +34704,30 @@
               "information_sense",
               "information_subject",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "aura_of_life": [],
             "bane": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "beacon_of_hope": [
               "actor_spell_weapon",
+              "all_targets_in_area",
+              "all_targets_willing",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
-              "somatic_component_available"
+              "somatic_component_available",
+              "target_willing"
             ],
             "befuddlement": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
             "bless": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "blight": [
@@ -34766,8 +34735,12 @@
               "witness_state_ids"
             ],
             "blindness_deafness": [],
-            "blur": [],
+            "blur": [
+              "all_targets_willing",
+              "target_willing"
+            ],
             "burning_hands": [
+              "environment_origin",
               "instant_area_apex",
               "instant_area_direction",
               "instant_area_include_origin",
@@ -34777,7 +34750,6 @@
             ],
             "chain_lightning": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -34798,7 +34770,6 @@
             ],
             "chromatic_orb": [
               "material_component_available",
-              "material_item_ids",
               "minor_elementals_damage_type",
               "selected_damage_type",
               "somatic_component_available",
@@ -34810,7 +34781,6 @@
             "circle_of_death": [
               "environment_origin",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -34827,19 +34797,19 @@
               "geas_command"
             ],
             "commune": [
+              "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "message_words",
               "somatic_component_available"
             ],
             "cone_of_cold": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
             ],
             "contact_other_plane": [
+              "all_targets_willing",
               "divination_contact_target",
               "message_words",
               "spellbook_readable"
@@ -34854,7 +34824,6 @@
             "darkvision": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -34871,7 +34840,6 @@
               "disintegrate_source_id",
               "disintegrate_source_kind",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
@@ -34892,7 +34860,6 @@
             ],
             "dragons_breath": [
               "material_component_available",
-              "material_item_ids",
               "selected_damage_type",
               "somatic_component_available",
               "target_willing"
@@ -34908,7 +34875,6 @@
             "enhance_ability": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "etherealness": [
@@ -34917,7 +34883,6 @@
             ],
             "false_life": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "fear": [
@@ -34927,7 +34892,6 @@
               "instant_area_direction",
               "instant_area_include_origin",
               "material_component_available",
-              "material_item_ids",
               "sleepless_targets",
               "somatic_component_available"
             ],
@@ -34960,11 +34924,11 @@
               "actor_spell_choice",
               "actor_spell_weapon",
               "actor_spell_weapon_hand",
+              "all_targets_in_area",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "fire_storm": [
@@ -34976,7 +34940,6 @@
             "fireball": [
               "environment_origin",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -34985,14 +34948,12 @@
               "environment_origin",
               "ice_storm_ground_zone_ids",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
             "fly": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -35003,29 +34964,28 @@
             ],
             "foresight": [
               "actor_spell_weapon",
+              "all_targets_in_area",
               "all_targets_willing",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
             "freedom_of_movement": [
               "actor_spell_weapon",
+              "all_targets_in_area",
               "all_targets_willing",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
             "freezing_sphere": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -35039,7 +34999,6 @@
             ],
             "greater_restoration": [
               "material_component_available",
-              "material_item_ids",
               "recovery_choice",
               "recovery_effect",
               "recovery_item",
@@ -35080,18 +35039,15 @@
             "healing_word": [],
             "hex": [
               "material_component_available",
-              "material_item_ids",
               "rider_ability",
               "somatic_component_available"
             ],
             "hold_monster": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "hold_person": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "hunter_s_mark": [
@@ -35102,7 +35058,6 @@
             ],
             "ice_knife": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_can_see_caster"
             ],
@@ -35110,7 +35065,6 @@
               "environment_origin",
               "ice_storm_ground_zone_ids",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "witness_state_ids"
             ],
@@ -35122,15 +35076,14 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "legend_lore": [
+              "all_targets_willing",
               "divination_gm_answer",
               "divination_subject",
               "divination_subject_famous",
               "material_component_available",
-              "material_item_ids",
               "message_words",
               "somatic_component_available"
             ],
@@ -35330,7 +35283,6 @@
               "mask_subject",
               "mask_willing",
               "material_component_available",
-              "material_item_ids",
               "meld_stone_subject",
               "message_words",
               "minor_color",
@@ -35478,33 +35430,30 @@
               "wish_spell"
             ],
             "lightning_bolt": [
+              "environment_origin",
               "instant_area_apex",
               "instant_area_direction",
               "instant_area_height",
               "instant_area_include_origin",
               "instant_area_up",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
             ],
             "longstrider": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "mage_armor": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
             "mage_armour": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -35719,7 +35668,6 @@
               "mask_subject",
               "mask_willing",
               "material_component_available",
-              "material_item_ids",
               "meld_stone_subject",
               "message_words",
               "minor_color",
@@ -35890,14 +35838,16 @@
               "witness_state_ids"
             ],
             "polymorph": [
+              "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
+              "target_willing",
               "transformation_accept_temporary_hp",
               "transformation_appearance",
               "transformation_equipment",
               "transformation_form",
-              "transformation_forms"
+              "transformation_forms",
+              "transformation_seen_before"
             ],
             "power_word_heal": [
               "selected_restoration_condition"
@@ -35914,7 +35864,6 @@
             "protection_from_evil_and_good": [
               "all_targets_willing",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "target_willing"
             ],
@@ -35940,7 +35889,6 @@
             ],
             "revivify": [
               "material_component_available",
-              "material_item_ids",
               "recovery_choice",
               "recovery_effect",
               "recovery_item",
@@ -35964,7 +35912,6 @@
             ],
             "shatter": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -35975,17 +35922,16 @@
             ],
             "shield_of_faith": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "shillelagh": [
               "actor_spell_weapon",
               "actor_spell_weapon_hand",
+              "all_targets_in_area",
               "calm_allies",
               "calm_indifference_targets",
               "calm_indifferent_toward",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "shocking_grasp": [
@@ -36006,7 +35952,6 @@
               "instant_area_direction",
               "instant_area_include_origin",
               "material_component_available",
-              "material_item_ids",
               "sleepless_targets",
               "somatic_component_available"
             ],
@@ -36015,7 +35960,6 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "spare_the_dying": [
@@ -36040,12 +35984,10 @@
               "environment_origin",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "stoneskin": [
               "material_component_available",
-              "material_item_ids",
               "selected_damage_type",
               "somatic_component_available",
               "target_willing"
@@ -36057,15 +35999,13 @@
               "caster_allies",
               "command",
               "geas_command",
-              "material_component_available",
-              "material_item_ids"
+              "material_component_available"
             ],
             "summon_dragon": [
               "created_actor_height",
               "created_actor_lighting",
               "created_actor_position",
               "material_component_available",
-              "material_item_ids",
               "selected_damage_type",
               "somatic_component_available",
               "summon_id"
@@ -36073,7 +36013,6 @@
             "sunburst": [
               "caster_can_see_origin",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "sunburst_origin",
               "sunburst_plane",
@@ -36101,11 +36040,11 @@
               "witness_state_ids"
             ],
             "tree_stride": [
+              "all_targets_willing",
               "somatic_component_available"
             ],
             "true_strike": [
               "material_component_available",
-              "material_item_ids",
               "minor_elementals_damage_type",
               "somatic_component_available",
               "true_strike_attack_mode",
@@ -36120,7 +36059,6 @@
             ],
             "vitriolic_sphere": [
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available",
               "thunderwave_unsecured_objects",
               "witness_state_ids"
@@ -36133,12 +36071,10 @@
               "environment_origin",
               "environment_wall_axis",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "wall_of_stone": [
               "material_component_available",
-              "material_item_ids",
               "solid_wall_axis",
               "solid_wall_origin",
               "somatic_component_available"
@@ -36149,7 +36085,6 @@
               "environment_web_layer",
               "known_area",
               "material_component_available",
-              "material_item_ids",
               "somatic_component_available"
             ],
             "zone_of_truth": [
@@ -36200,6 +36135,7 @@
             "mage_hand_move_distance",
             "mage_hand_object_contact",
             "mage_hand_placement",
+            "material_item_ids",
             "object_component_ids",
             "origin_distance",
             "origin_has_clear_path",

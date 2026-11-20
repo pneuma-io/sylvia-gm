@@ -642,7 +642,8 @@ class Analysis:
         self.uses = set()
         try:
             params = self.tool_params(definition, bindings)
-            env: Env | None = Env(params, self.engine_variables(definition, params))
+            env: Env | None = (Env(params, self.engine_variables(definition, params))
+                               if self.required_inputs_pass(definition, params) else None)
             for pre in definition.get("pre_conditions", ()):
                 if env is None:
                     break
@@ -673,6 +674,26 @@ class Analysis:
         for name, value in bindings.items():
             params.setdefault(name, value)
         return params
+
+    def required_inputs_pass(self, definition: dict[str, Any], params: dict[str, A]) -> bool:
+        """Model the executor's required-input check; False when it surely refuses.
+
+        A required input that is null or empty refuses the call, and a nested call passes
+        every listed input explicitly. An input whose value may be absent therefore decides
+        whether the call runs, so its inputs count as used.
+        """
+        for entry in definition.get("parameters", ()):
+            decl = self.decls.get(entry, {}) if isinstance(entry, str) else entry
+            name = decl.get("name")
+            if not name or not decl.get("required", True):
+                continue
+            value = params.get(name, A(None))
+            if isinstance(value.v, S) or (not value.unknown() and value.v not in (None, "")):
+                continue
+            if not value.unknown():
+                return False
+            self.mark(value.t)
+        return True
 
     def engine_variables(self, definition: dict[str, Any],
                          params: dict[str, A]) -> dict[str, A]:
