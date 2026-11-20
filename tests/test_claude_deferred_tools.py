@@ -46,8 +46,6 @@ MODEL = "claude-opus-5-5"
 BINARY = os.environ.get("SYLVIA_TEST_CLAUDE_WIRE_BINARY")
 DUMMY_KEY = "sk-ant-api03-OFFLINE-WIRE-TEST-DUMMY-KEY-NOT-A-CREDENTIAL-0000000000000000-AA"
 SYLVIA_NAME = re.compile(r"mcp__sylvia__[A-Za-z0-9_-]+")
-#: What the scripted GM says before each ToolSearch call; it must never reach the player.
-SEARCH_TEXT = "SENTINEL_SEARCH_TEXT Loading that rule."
 
 
 def _tool(name: str, deferred: bool) -> dict[str, Any]:
@@ -140,7 +138,8 @@ def test_round_messages_keep_no_thinking_and_no_private_fields(tmp_path):
     assert [r["type"] for r in found.records] == ["assistant", "user"]
     message = found.records[0]["message"]
     assert set(message) == {"id", "type", "role", "model", "content", "stop_reason"}
-    assert [b["type"] for b in message["content"]] == ["text", "tool_use"]
+    # Its text is the step's reply already (it was streamed), so the round keeps the call.
+    assert [b["type"] for b in message["content"]] == ["tool_use"]
 
 
 def test_collect_answer_keeps_rounds_after_the_answered_call(tmp_path):
@@ -217,18 +216,24 @@ class _Connection:
         pass
 
 
-def _stream(message_id: str, block: dict[str, Any], partial: str = "",
-            said: str = "") -> list[dict[str, Any]]:
-    """One native message: optional text said first, then *block*."""
+def _stream(message_id: str, block: dict[str, Any] | None, partial: str = "",
+            said: tuple[str, ...] = ()) -> list[dict[str, Any]]:
+    """One native message: optional text said first (one delta per part), then *block*."""
     index = 1 if said else 0
     events = [
         {"type": "message_start", "message": {"id": message_id, "model": MODEL, "usage": {
             "input_tokens": 7, "cache_read_input_tokens": 90, "output_tokens": 0}}},
         *([{"type": "content_block_start", "index": 0,
             "content_block": {"type": "text", "text": ""}},
-           {"type": "content_block_delta", "index": 0,
-            "delta": {"type": "text_delta", "text": said}},
+           *({"type": "content_block_delta", "index": 0,
+              "delta": {"type": "text_delta", "text": part}} for part in said),
            {"type": "content_block_stop", "index": 0}] if said else []),
+    ]
+    if block is None:
+        events += [{"type": "message_delta", "delta": {"stop_reason": "end_turn"},
+                    "usage": {"output_tokens": 4}}, {"type": "message_stop"}]
+        return [{"type": "stream_event", "event": e} for e in events]
+    events += [
         {"type": "content_block_start", "index": index, "content_block": block},
         *([{"type": "content_block_delta", "index": index, "delta": {
             "type": "input_json_delta", "partial_json": partial}}] if partial else []),
@@ -253,12 +258,12 @@ def test_a_search_round_is_no_sylvia_call_and_the_last_message_is_the_reply(
         init,
         *_stream("msg_search", {"type": "tool_use", "id": "toolu_s", "name": TOOL_SEARCH,
                                 "input": {}}, json.dumps({"query": "select:mcp__sylvia__roll"}),
-                 said="Loading the attack rules."),
+                 said=("Loading the attack rules.",)),
         {"type": "assistant", "message": SEARCH["message"]},
         {"type": "user", "message": LOADED["message"]},
         *_stream("msg_final", {"type": "tool_use", "id": "toolu_roll",
                                "name": "mcp__sylvia__roll", "input": {}}, '{"n": 2}',
-                 said="You swing."),
+                 said=("You swing.",)),
         {"type": "control_request", "request_id": "call", "request": {
             "subtype": "mcp_message", "server_name": "sylvia", "message": {
                 "jsonrpc": "2.0", "id": 3, "method": "tools/call",
@@ -295,19 +300,45 @@ def test_a_search_round_is_no_sylvia_call_and_the_last_message_is_the_reply(
     assert listed == {"mcpServers": {"sylvia": {"type": "sdk", "name": "sylvia"}}}
     calls = [c.tool_call_delta for c in chunks if c.tool_call_delta]
     assert [c["function"]["name"] for c in calls] == ["roll"]
-    # The text of the search round is never streamed; the reply's own text is.
-    assert "".join(c.content for c in chunks if c.content) == "You swing."
+    # Text streams as it is written, a search round's too (Opus 5.5 wrote none beside its
+    # searches in the live check); the player saw it, so it is the step's reply.
+    assert [c.content for c in chunks if c.content] == ["Loading the attack rules.",
+                                                        "You swing."]
     response = provider._last_response
-    # The step's reply is its last model message; the search round is not part of it.
-    assert response.content == "You swing."
+    assert response.content == "Loading the attack rules.You swing."
+    # The step's native reply is its last model message; the search round is not part of it.
     assert response.anthropic_content == [
         {"type": "text", "text": "You swing."},
         {"type": "tool_use", "id": "toolu_roll", "name": "roll", "input": {"n": 2}}]
     rounds = [a["params"]["rounds"] for a in audits if a.get("method") == "claude/tool_search"]
-    assert rounds == [[{"loaded": ["roll"], "usage": {
+    assert rounds == [[{"loaded": ["roll"], "said": True, "usage": {
         "input_tokens": 7, "cache_read_input_tokens": 90, "output_tokens": 4}}]]
     native = next(a for a in audits if a.get("method") == "claude/native_step")
     assert native["controls"]["builtin_tools"] == [TOOL_SEARCH]
+
+
+def test_narration_streams_as_it_is_written_under_tool_search(tmp_path, monkeypatch):
+    monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", "per-step")
+    monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(__file__))
+    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.322")
+    parts = ("The guard ", "lowers his spear ", "and waves you through.")
+    events = [
+        {"type": "system", "subtype": "init", "model": MODEL,
+         "tools": [TOOL_SEARCH, "mcp__sylvia__read_reference", "mcp__sylvia__roll",
+                   "mcp__sylvia__cast"]},
+        *_stream("msg_say", None, said=parts),
+        {"type": "result", "subtype": "success", "is_error": False, "result": "".join(parts),
+         "usage": {"input_tokens": 10, "output_tokens": 3}},
+    ]
+    _Connection.instances = []
+    provider = ClaudeProvider(tmp_path / "runtime", _model(),
+                              connection_factory=lambda *a: _Connection(*a, events=events))
+    messages = [{"role": "system", "content": "GM"}, {"role": "user", "content": "Hi."}]
+    chunks = asyncio.run(_drain(provider, messages, DEFERRED_TOOLS))
+    assert _Connection.instances[-1].environment["ENABLE_TOOL_SEARCH"] == "true"
+    # One chunk per delta, as on every route: nothing is held until the message ends.
+    assert [c.content for c in chunks if c.content] == list(parts)
+    assert provider._last_response.content == "".join(parts)
 
 
 def _model():
@@ -396,17 +427,6 @@ class ScriptedEndpoint:
                     "stop_sequence": None, "usage": usage}})]
                 if "tool" in reply:
                     index = 0
-                    if reply["tool"] == TOOL_SEARCH:
-                        # Models often say what they are about to load.
-                        events += [
-                            ("content_block_start", {"type": "content_block_start",
-                             "index": 0, "content_block": {"type": "text", "text": ""}}),
-                            ("content_block_delta", {"type": "content_block_delta",
-                             "index": 0, "delta": {"type": "text_delta",
-                                                   "text": SEARCH_TEXT}}),
-                            ("content_block_stop", {"type": "content_block_stop", "index": 0}),
-                        ]
-                        index = 1
                     events += [
                         ("content_block_start", {"type": "content_block_start", "index": index,
                          "content_block": {"type": "tool_use", "id": f"toolu_gm_{number:04d}",
@@ -745,11 +765,6 @@ def test_real_claude_code_deferred_session_keeps_one_tool_list(
     assert thinking or breaks == []
     assert "SENTINEL_THINKING" not in json.dumps(
         [m for m in requests[-1]["messages"] if m["role"] == "user"])
-    # What the GM said before a search stays in that search round, never in a reply.
-    holding = [m for m in requests[-1]["messages"] if SEARCH_TEXT in json.dumps(m)]
-    assert len(holding) == run["searches"]
-    assert all(m["role"] == "assistant" and any(
-        b.get("name") == TOOL_SEARCH for b in m["content"]) for m in holding)
     # Mechanics were loaded by the model through ToolSearch, each once: after the restart
     # the replayed rounds keep them loaded, so the second fight searches nothing again.
     rounds = [r for a in run["audits"] if a["method"] == "claude/tool_search"

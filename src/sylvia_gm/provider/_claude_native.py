@@ -269,16 +269,17 @@ def _requests_after(rows: Sequence[Mapping[str, Any]], start: int) -> int:
 #: What a replayed round's model message keeps: what Claude Code renders and merges rows by.
 _ROUND_MESSAGE_KEYS = ("id", "type", "role", "model", "content", "stop_reason", "stop_sequence")
 #: Never kept: the model's private reasoning stays out of session evidence, as the journal
-#: leaves it out of every replayed assistant message.
-_PRIVATE_BLOCKS = frozenset({"thinking", "redacted_thinking"})
+#: leaves it out of every replayed assistant message. Text is not kept either: it was streamed
+#: as the step's reply, so the journal holds it already.
+_DROPPED_BLOCKS = frozenset({"thinking", "redacted_thinking", "text"})
 
 
 def _round_row(row: Mapping[str, Any]) -> dict[str, Any] | None:
     """A ToolSearch round message, for replay (deferred tool list); None if nothing is kept.
 
-    The model's message keeps its rendered blocks without thinking, as every assistant message
-    of the journal is replayed; a row that held only thinking is dropped. The CLI's answer
-    keeps its message.
+    The model's message keeps its tool calls and identity: thinking is left out, as from every
+    assistant message of the journal, and any text it wrote is in the step's reply already; a
+    row with nothing else is dropped. The CLI's answer keeps its message.
     """
     message = row.get("message")
     if row.get("type") not in {"assistant", "user"} or not isinstance(message, dict):
@@ -288,7 +289,7 @@ def _round_row(row: Mapping[str, Any]) -> dict[str, Any] | None:
         if not isinstance(content, list):
             return None
         kept = [block for block in content
-                if not (isinstance(block, dict) and block.get("type") in _PRIVATE_BLOCKS)]
+                if not (isinstance(block, dict) and block.get("type") in _DROPPED_BLOCKS)]
         if not kept:
             return None
         message = {key: message[key] for key in _ROUND_MESSAGE_KEYS if key in message}

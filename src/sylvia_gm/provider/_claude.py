@@ -973,7 +973,7 @@ class ClaudeProvider(Provider):
         # call answered by Claude Code itself before the model calls a Sylvia tool or narrates.
         searching = tool_search(step.tools)
         searched_here = False
-        held_text: list[str] = []
+        said_here = False
         try:
             while True:
                 if deferred_call is not None and native_state.completed:
@@ -1141,7 +1141,7 @@ class ClaudeProvider(Provider):
                         # Each model request of the step is its own native message; only
                         # the last one is the step's reply.
                         native_state, native_content = _AnthropicStreamContent(), None
-                        searched_here = False
+                        searched_here = said_here = False
                         message_id = (native.get("message") or {}).get("id")
                         step.final_message_id = message_id if isinstance(message_id, str) else None
                     values = dict(native)
@@ -1166,14 +1166,10 @@ class ClaudeProvider(Provider):
                             text = delta.get("text", "")
                             if not isinstance(text, str):
                                 raise InvalidResponseError("Claude returned invalid text.")
-                            if searching:
-                                # Held until the message ends: a search round's text is
-                                # Claude Code's own round, not the step's reply.
-                                held_text.append(text)
-                            else:
-                                text_parts.append(text)
-                                streamed_text = True
-                                yield ProviderStreamChunk(content=text)
+                            text_parts.append(text)
+                            streamed_text = True
+                            said_here = True
+                            yield ProviderStreamChunk(content=text)
                         elif delta.get("type") == "thinking_delta":
                             yield ProviderStreamChunk(
                                 reasoning_content=delta.get("thinking", "")
@@ -1193,18 +1189,16 @@ class ClaudeProvider(Provider):
                                 if fragments:
                                     block["input"] = json.loads(fragments)
                             if searching and block.get("name") == TOOL_SEARCH:
-                                # Claude Code answers it itself; it is no Sylvia call.
+                                # Claude Code answers it itself; it is no Sylvia call. Text
+                                # the model wrote before it was streamed as it came, as on
+                                # every route, so it is part of the step's reply.
                                 if not searched_here:
                                     step.searches.append({"loaded": [], "usage": {}})
+                                    if said_here:
+                                        step.searches[-1]["said"] = True
                                 searched_here = True
                             else:
                                 pending.append(block)
-                    elif subtype == "message_stop" and searching:
-                        if not searched_here and held_text:
-                            text_parts.extend(held_text)
-                            streamed_text = True
-                            yield ProviderStreamChunk(content="".join(held_text))
-                        held_text = []
                     elif subtype == "message_delta":
                         input_usage.update(native.get("usage", {}))
                         self._usage(response, input_usage)
