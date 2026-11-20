@@ -1342,6 +1342,7 @@ class ContextLedger:
         fixed_tools: Sequence[Mapping[str, Any]] | None = None,
         core_tools: frozenset[str] | None = None,
         deferral: str | None = None,
+        seed_tools: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         self.session_id = session_id
         self.context_owner = dict(context_owner) if context_owner is not None else None
@@ -1365,6 +1366,12 @@ class ContextLedger:
             if self.core_tools is not None and self.deferral is not None
             else copy.deepcopy(self.fixed_tools))
         self._declared_names = {_tool_name(tool) for tool in self.declared_tools or ()}
+        #: One stable list only: tools declared from the first request in their
+        #: state-independent definitions (``seeded_offer``), so the state that admits them
+        #: adds nothing later.
+        self.seed_tools = (copy.deepcopy([dict(tool) for tool in seed_tools])
+                           if seed_tools and self.one_tool_list and fixed_tools is None
+                           else None)
         #: The tools sent so far in first-sent order; ``None`` until read from saved records.
         self._tool_list: list[dict[str, Any]] | None = None
         self.state: JournalState | None = None
@@ -1402,8 +1409,35 @@ class ContextLedger:
             return self.declared_tools
         if not self.one_tool_list:
             return offered
-        merged, _added, _replaced = self._stable_list(self._sent_so_far(history_records), offered)
+        merged, _added, _replaced = self._stable_list(
+            self._sent_so_far(history_records), self.seeded_offer(offered))
         return merged or offered
+
+    def seeded_offer(
+        self, offered: Sequence[Mapping[str, Any]] | None,
+    ) -> Sequence[Mapping[str, Any]] | None:
+        """*offered* with each seeded tool in its seeded definition, then the other seeds.
+
+        A seeded tool keeps one definition whether or not it is offered, so being offered never
+        replaces it; its current argument choices go in the callable record instead.
+        """
+        if not self.seed_tools:
+            return offered
+        seeds = {_tool_name(tool): tool for tool in self.seed_tools}
+        listed = [dict(seeds.get(_tool_name(tool), tool)) for tool in offered or ()]
+        names = {_tool_name(tool) for tool in listed}
+        return [*listed, *(dict(tool) for tool in self.seed_tools
+                           if _tool_name(tool) not in names)]
+
+    def seeded_parameters(self, name: str) -> Mapping[str, Any] | None:
+        """The declared (state-independent) parameters of a fixed or seeded tool, else None."""
+        for tool in (*(self.fixed_tools or ()), *(self.seed_tools or ())):
+            if _tool_name(tool) == name:
+                function = tool.get("function")
+                source = function if isinstance(function, Mapping) else tool
+                parameters = source.get("parameters", {})
+                return parameters if isinstance(parameters, Mapping) else {}
+        return None
 
     def _stable_list(
         self, sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
@@ -1660,7 +1694,8 @@ class ContextLedger:
             tool_list, tools_added, tools_replaced = (
                 merged_tool_list(self._sent_so_far(history_records), self.declared_tools)
                 if self.declared_tools is not None
-                else self._stable_list(self._sent_so_far(history_records), offered_tools))
+                else self._stable_list(self._sent_so_far(history_records),
+                                       self.seeded_offer(offered_tools)))
             if self.deferral == LOADER_DEFERRAL:
                 tool_list, grown = self._loader_list(
                     self._sent_so_far(history_records), offered_tools)
@@ -1740,6 +1775,12 @@ class ContextLedger:
                 from ._fixed_tool_projection import argument_choices_record
 
                 content += argument_choices_record(self.fixed_tools, offered_tools)
+            elif self.seed_tools:
+                from ._fixed_tool_projection import argument_choices_record
+
+                seeded = {_tool_name(tool) for tool in self.seed_tools}
+                content += argument_choices_record(self.seed_tools, [
+                    tool for tool in offered_tools or () if _tool_name(tool) in seeded])
             if (last_of_label(CALLABLE_LABEL) or {}).get("h") != _sha(content):
                 role = "user" if self.fixed_tools is not None else "system"
                 appended.append({"m": self._host_message({"role": role}, content),

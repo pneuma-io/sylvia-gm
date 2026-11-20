@@ -4534,6 +4534,35 @@ class AuthorityOwner:
         with self._operation():
             return self._catalog(campaign_id, include_unexposed=include_unexposed)
 
+    def state_gated_tool_names(self, campaign_id: str) -> frozenset[str]:
+        """Names of tools that only a Ruleset state predicate decides, now or later.
+
+        A declaration with state predicates whose capability, TURN status and writer admit it
+        now: whether it can be called depends only on campaign state (an encounter starting,
+        a turn phase). No predicate is read for meaning, so this holds for any Ruleset.
+        """
+        with self._operation():
+            self._ensure_campaign_not_transitioning(campaign_id)
+            lock, _state, turn_status, writer, lifecycle, declarations = (
+                self._store.package_catalog_basis(campaign_id)
+            )
+            if lifecycle != LifecycleState.ACTIVE.value:
+                return frozenset()
+            capabilities = frozenset(
+                capability
+                for entry in lock.package_lock.entries
+                for capability in entry.capabilities
+            )
+            return frozenset(
+                declaration.name
+                for _entry, declaration in declarations
+                if declaration.state_predicates
+                and "x-sylvia-gm-character-update" not in declaration.input_schema
+                and declaration.capability in capabilities
+                and turn_status in declaration.turn_statuses
+                and writer in declaration.writers
+            )
+
     def ruleset_gm_operating_guide(self, campaign_id: str) -> str | None:
         """Read the locked primary Ruleset's GM guide, or Sylvia's No Ruleset guide."""
 

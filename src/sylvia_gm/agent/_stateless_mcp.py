@@ -29,6 +29,7 @@ from sylvia_gm.agent._tool_exposure import (
     EXPOSURE_KEY,
     SPELL_SCOPE_KEY,
     ExposureContext,
+    exposure_conditions,
     exposure_spell_ids,
     scoped_spell_choices,
 )
@@ -398,6 +399,39 @@ def _castable_spell_ids(snapshot: CampaignDisplaySnapshot) -> frozenset[str]:
             if isinstance(prepared, Sequence) and not isinstance(prepared, (str, bytes)):
                 choices.update(value for value in prepared if isinstance(value, str))
     return frozenset(choices)
+
+
+def seed_tool_names(owner: Any, campaign_id: str) -> frozenset[str]:
+    """Tools a session's one stable tool list declares from its first request.
+
+    Every tool whose availability only Ruleset campaign state decides, so the list does not
+    grow when that state first arrives: a tool gated by Ruleset state predicates (an
+    encounter, a turn phase), and a tool exposed only by entity fields (a summon being
+    active). Nothing reads what a predicate or field means. A tool exposed by spells in play
+    is declared only when exposed now; spells that come into play later still add theirs.
+    """
+    gated = getattr(owner, "state_gated_tool_names", None)
+    if not callable(gated):
+        return frozenset()
+    names = gated(campaign_id)
+    admitted = {tool.name for tool in owner.catalog(campaign_id)}
+    snapshot, _boundary = owner.model_context_snapshot(campaign_id)
+    catalog = owner.catalog(campaign_id, include_unexposed=True)
+    exposure = ExposureContext(
+        owner.snapshot(campaign_id).state,
+        castable_spell_ids=_castable_spell_ids(snapshot),
+        asked_spell_ids=exposure_spell_ids(tool.input_schema for tool in catalog),
+    )
+    seeded = set()
+    for tool in catalog:
+        if tool.name not in names and tool.name not in admitted:
+            continue
+        conditions = exposure_conditions(tool.input_schema)
+        entity_only = conditions is not None and all(
+            "entity_field" in condition for condition in conditions)
+        if entity_only or (tool.name in names and exposure.exposed(tool.input_schema)):
+            seeded.add(tool.name)
+    return frozenset(seeded)
 
 
 def _castable_spell_refusal(
