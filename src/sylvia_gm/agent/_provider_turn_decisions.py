@@ -66,9 +66,30 @@ def _narration_repeats_previous_player_response(state: ProviderTurnState) -> boo
     )
 
 
+def _player_boundary_prose_can_end_turn(state: ProviderTurnState) -> bool:
+    """Ruleset control is back with the player and nothing declared remains to resolve.
+
+    The round still asks for a tool call, but prose here is the turn's narration, as the
+    player-boundary control asks. It is held for the Campaign File disposition, which still
+    settles the turn before anything is shown. Routes whose runtime manages tool_choice can
+    otherwise only ever discard it.
+    """
+    return bool(
+        state.decisions.player_boundary_narration
+        and (not state.obligations.player_intent_resolution_required)
+        and (not state.decisions.gm_boundary_decision)
+        and (not state.obligations.engine_transition_review_pending)
+        and (not state.obligations.pending_failed_tool_call)
+        and state.progress.any_commit_in_exchange
+        and state.campaign_file_disposition_supported
+    )
+
+
 def _required_tool_call_is_missing(state: ProviderTurnState) -> bool:
     return bool(
-        state.provider_tool_call_required and (not state.obligations.force_campaign_file_update)
+        state.provider_tool_call_required
+        and (not state.obligations.force_campaign_file_update)
+        and (not _player_boundary_prose_can_end_turn(state))
     )
 
 
