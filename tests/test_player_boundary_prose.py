@@ -62,7 +62,10 @@ class Session:
     def __init__(self, seed, tmp_path, monkeypatch):
         monkeypatch.setattr(dice, "_rng", Random(0))
         monkeypatch.setattr(dice, "set_seed", lambda _seed: None)
-        monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+        # The stable list, so the scripted GM calls mechanics by their own names. The ChatGPT
+        # route ships the tool loader (tests/test_chatgpt_deferred_tool_list.py); its live
+        # runs crossed this same player boundary without a discarded reply.
+        monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", "stable")
         database = tmp_path / "session.db"
         shutil.copy2(seed[0], database)
         self.parameters = seed[1]
@@ -98,8 +101,75 @@ class Session:
         self.owner.close()
 
 
+class LoaderSession(Session):
+    """The same turns on the ChatGPT route's shipped default: Sylvia's tool loader.
+
+    The loader-aware scripted GM calls each mechanic through ``call_mechanic``, and repeats a
+    first call the loader refuses with the mechanic's definition (``mechanic_arguments_unread``).
+    """
+
+    def __init__(self, seed, tmp_path, monkeypatch):
+        from tests.test_gm_context_contract import _chatgpt_loader_gm
+
+        super().__init__(seed, tmp_path, monkeypatch)
+        monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+        self.gm = _chatgpt_loader_gm()
+
+
 def _text(call):
     return "\n".join(str(message.get("content", "")) for message in call["messages"])
+
+
+def test_loader_holds_fight_start_and_cast_prose_for_the_campaign_file(
+    player_seed, tmp_path, monkeypatch,
+):
+    """#215's fix on the ChatGPT route's shipped default, the tool loader."""
+    from sylvia_gm.agent._tool_loader import MECHANIC_TOOL_NAME
+
+    session = LoaderSession(player_seed, tmp_path, monkeypatch)
+    try:
+        session.turn("We look around the clearing. What do we notice?",
+                     [settle("The clearing is quiet.")])
+        fight, shown = session.turn(START_TEXT, [session.start_step(), ("prose", FIGHT_PROSE),
+                                          UNCHANGED])
+        # The loader is in use: one small declared list with its generic mechanic tool (the
+        # request as sent; the scripted GM's own view adds the mechanics it has read).
+        declared = [tool["function"]["name"] for tool in session.gm.requests[-1]["tools"]]
+        assert MECHANIC_TOOL_NAME in declared and len(declared) < 16
+        # The prose reply is held for one Campaign File disposition, never discarded.
+        assert not any(DISCARDED in _text(call) for call in fight)
+        held = [call for call in fight if HELD in _text(call)]
+        assert len(held) == 1 and FIGHT_PROSE in _text(held[0])
+        combat = session.owner.snapshot("casting").state[f"{SRD}.combat"]
+        assert combat["encounter_active"] is True and combat["active_actor"] == "hero"
+        assert shown == [FIGHT_PROSE]
+
+        summon = dict(session.parameters)
+        summon.pop("target")
+        summon.update(summon_id="dragon_one", summon_distance=30,
+                      caster_can_see_summon_space=True, summon_space_unoccupied=True,
+                      selected_damage_type="fire", created_actor_position=[0, 30, 0],
+                      created_actor_height=6, created_actor_lighting="bright")
+
+        def completion():
+            pending = session.owner.snapshot("casting").state[f"{SRD}.state"][
+                "pending_srd_action_stack"]
+            return {"pending_action_id": pending[-1]}
+        cast, shown = session.turn(CAST_TEXT, [("begin_srd_spell_action", summon),
+                                        ("complete_srd_pending_action", completion),
+                                        ("prose", CAST_PROSE), UNCHANGED])
+        assert not any(DISCARDED in _text(call) for call in cast)
+        # The last request of the turn is the Campaign File disposition for the cast's prose
+        # (each request carries the history, so the fight's held record is in all of them).
+        assert CAST_PROSE not in _text(cast[-2]) or HELD not in _text(cast[-2]).split(
+            CAST_PROSE, 1)[-1]
+        assert HELD in _text(cast[-1]).split(CAST_PROSE, 1)[-1]
+        entities = session.owner.snapshot("casting").state[f"{SRD}.entities"]
+        assert entities["dragon_one"]["summon_active"] is True
+        assert shown == [CAST_PROSE]
+    finally:
+        session.close()
+    assert session.gm.failure is None
 
 
 def test_fight_start_and_cast_narrated_in_prose_are_held_for_the_campaign_file(

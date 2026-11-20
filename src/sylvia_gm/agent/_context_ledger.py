@@ -255,11 +255,14 @@ def gm_route(transport: str | None, provider_key: str | None = None) -> str:
 #: cost per request.
 #: ``claude_code`` is ``deferred`` (Claude Code's own tool search), measured offline on 20
 #: November 2026 (#204): no prefix breaks and 65% less cache-weighted input than ``stable``.
+#: ``codex_app_server``: ``deferred`` (Sylvia's loader; Codex keeps a thread's tools fixed).
+#: Live on GPT-6.1 Sol, 21 November 2026: one runtime thread for the session against three,
+#: 10 declared tools against 91-110, 9.0k cache-weighted input per response against 21.2k.
 DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
 DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
     # One route per line, so each route's own change edits only its line.
     "claude_code": DEFERRED_TOOL_LIST,
-    "codex_app_server": STABLE_TOOL_LIST,
+    "codex_app_server": DEFERRED_TOOL_LIST,
     ANTHROPIC_API_ROUTE: DEFERRED_TOOL_LIST,
 }
 #: Routes whose provider takes deferred tools itself: route name -> whether a wire model does.

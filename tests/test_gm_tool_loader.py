@@ -75,7 +75,10 @@ def test_other_routes_use_the_loader_only_when_deferred_is_set():
     for transport in ("chat_completions", "codex_app_server", "gemini_generate_content",
                       "responses"):
         assert deferred_tool_list(env, transport=transport, model_id="m") == LOADER_DEFERRAL
+    for transport in ("chat_completions", "gemini_generate_content", "responses"):
         assert deferred_tool_list({}, transport=transport, model_id="m") is None
+    # The ChatGPT route ships the loader (tests/test_chatgpt_deferred_tool_list.py).
+    assert deferred_tool_list({}, transport="codex_app_server", model_id="m") == LOADER_DEFERRAL
 
 
 def test_compact_definition_shows_the_argument_shape_tersely():
