@@ -581,6 +581,7 @@ test('audit export shows actionable save errors and permits another Save As', as
   };
   await h.exportAdminAudit();
   assert.match(h.node('admin-audit-status').textContent, /not enough space/);
+  assert.doesNotMatch(h.node('admin-audit-status').textContent, /command_rejected/);
   assert.match(h.node('admin-audit-status').textContent, /choose another drive/);
   assert.equal(h.state.adminAuditRawTraceCount, 1);
   h.state.bridge.export_admin_audit_file = async () => {

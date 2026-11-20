@@ -292,8 +292,9 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
       };
       await attachBuilderSources();
     });
+    // The desktop host's "owner_code: " prefix is not shown to the player (#223).
     assert.match(await page.locator('#session-status-text').textContent(),
-      /Source attachment failed: command_rejected: Text Builder source is not valid UTF-8/,
+      /Source attachment failed: Text Builder source is not valid UTF-8/,
       'Builder displays the bounded admission reason so the selected source can be corrected');
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
