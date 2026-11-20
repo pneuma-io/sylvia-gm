@@ -87,8 +87,9 @@ def forbid_fixed_code(monkeypatch):
     monkeypatch.setattr(AuthorityOwner, "catalog", ordinary_catalog)
 
 
-# "default" leaves SYLVIA_GM_TOOL_LIST unset; with every off setting the session must never run
-# fixed-only code, so its requests are the ones the existing modes already send.
+# "default" leaves SYLVIA_GM_TOOL_LIST unset (here the stable list). Per-round lists must never
+# run fixed-only code, so their requests are the ones that mode already sends. The stable list
+# seeds its state-gated tools from the fixed projection (tests/test_gm_seeded_stable_tool_list.py).
 @pytest.mark.parametrize("mode", ["fixed", "stable", "rounds", "default"])
 def test_fixed_session_catalog(casting_seed, tmp_path, monkeypatch, mode):
     monkeypatch.setenv("SYLVIA_GM_CONTEXT_MODE", "ledger")
@@ -96,7 +97,7 @@ def test_fixed_session_catalog(casting_seed, tmp_path, monkeypatch, mode):
         monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
     else:
         monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
-    if mode != "fixed":
+    if mode == "rounds":
         forbid_fixed_code(monkeypatch)
     database = tmp_path / "session.db"
     shutil.copy2(casting_seed[0], database)
@@ -177,8 +178,16 @@ def test_fixed_session_catalog(casting_seed, tmp_path, monkeypatch, mode):
             assert records[0].get("tools_added")
             assert all(not r.get("tools_added") and not r.get("tools_replaced") for r in records[1:])
         elif mode != "rounds":
-            # The route default here (codex_app_server) is one stable list, which grows.
-            assert sum(bool(r.get("tools_added")) for r in records[1:]) >= 2
+            # The route default here (codex_app_server) is one stable list. Its state-gated
+            # tools are declared from the first request, so only a tool exposed by a spell in
+            # play joins later (this scene's "daylight" zone id reads as the Daylight spell).
+            from sylvia_gm.agent._tool_exposure import exposure_spell_ids
+            spell_exposed = {tool.name for tool in owner.catalog("casting", include_unexposed=True)
+                             if exposure_spell_ids([tool.input_schema])}
+            later = [tool["function"]["name"] for r in records[1:]
+                     for tool in r.get("tools_added") or ()]
+            assert later and all(any(name.endswith("_" + exposed) for exposed in spell_exposed)
+                                 for name in later), later
     finally:
         owner.close()
     assert sum(name.endswith("_start_group_combat_encounter") for name in committed) == 2

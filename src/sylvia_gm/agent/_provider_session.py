@@ -2485,6 +2485,25 @@ class ProviderSessionAdapter:
                         if str(tool["function"]["name"]) not in mechanics)
         return sorted([*tools, HISTORY_TOOL], key=lambda tool: str(tool["function"]["name"]))
 
+    def _seed_provider_tools(
+        self, provider_input: SessionProviderInput,
+    ) -> list[dict[str, object]] | None:
+        """The stable list's seed: state-gated tools in their state-independent definitions."""
+        from ._stateless_mcp import StatelessMcpMechanics, seed_tool_names
+
+        campaign_id = provider_input.session.campaign_id
+        assert campaign_id is not None
+        names = seed_tool_names(self._owner, campaign_id)
+        if not names:
+            return None
+        catalog = StatelessMcpMechanics(self._owner).list_tools(
+            campaign_id, session_id=provider_input.session.session_id,
+            purpose="seeded_session_catalog", fixed=True,
+        )
+        tools, _aliases = self._provider_tools(
+            tuple(tool for tool in catalog if tool.name in names))
+        return sorted(tools, key=lambda tool: str(tool["function"]["name"])) or None
+
     def _ledger_hooks(
         self, provider_input: SessionProviderInput, provider: Provider, bridge: Any,
     ) -> tuple[Any, Any, Any, Any, Any]:
@@ -2503,11 +2522,14 @@ class ProviderSessionAdapter:
             core: set[str] | None = set() if self._deferred_tool_list is not None else None
             fixed_tools = (self._fixed_provider_tools(provider_input, core)
                            if self._fixed_tool_list else None)
+            # One stable list declares the state-gated tools from the first request.
+            seed_tools = (self._seed_provider_tools(provider_input)
+                          if self._one_tool_list and not self._fixed_tool_list else None)
             ledger = ContextLedger(session_id=session_id, context_owner=owner,
                                    transport=transport,
                                    one_tool_list=self._one_tool_list, fixed_tools=fixed_tools,
                                    core_tools=frozenset(core) if core is not None else None,
-                                   deferral=self._deferred_tool_list)
+                                   deferral=self._deferred_tool_list, seed_tools=seed_tools)
             if previous is not None:
                 # A different owner or transport is a new epoch; keep the reset visible.
                 ledger.state = previous.state

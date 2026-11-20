@@ -711,9 +711,24 @@ def reject_unavailable_tool(
         ),
     }
     state.local_tool_failures.add(state.assembly.call_id)
-    if self._fixed_tool_list and self._ledger_active(provider_input):
+    if declared_choices_active(self, provider_input):
         record_fixed_tool_refusal(self, state, provider_input,
                                   turn_id=turn_id, reason="not_callable")
+
+
+def declared_choices_active(
+    self: ProviderSessionAdapter, provider_input: SessionProviderInput,
+) -> bool:
+    """The model is sent tools it may not call now: the fixed catalog, or a seeded stable list.
+
+    Then a refused call is counted, and a fixed or seeded tool's current choices are checked.
+    """
+    if not self._ledger_active(provider_input):
+        return False
+    if self._fixed_tool_list:
+        return True
+    ledger = self._ledger_store().get(provider_input.session.session_id)
+    return ledger is not None and ledger.seed_tools is not None
 
 
 def record_fixed_tool_refusal(
@@ -1848,18 +1863,18 @@ def execute_tool_batch(
             }
             state.local_tool_failures.add(state.assembly.call_id)
             continue
-        if self._fixed_tool_list and self._ledger_active(provider_input):
+        ledger = (self._ledger_store().get(provider_input.session.session_id)
+                  if declared_choices_active(self, provider_input) else None)
+        declared_schema = (ledger.seeded_parameters(resolved_tool[0])
+                           if ledger is not None else None)
+        if declared_schema is None and self._fixed_tool_list and self._ledger_active(
+                provider_input):
+            declared_schema = {}
+        if declared_schema is not None:
             from ._fixed_tool_projection import unavailable_values
 
-            ledger = self._ledger_store().get(provider_input.session.session_id)
-            fixed_schema: dict[str, Any] = {}
-            if ledger is not None:
-                fixed_schema = next((
-                    tool["function"]["parameters"] for tool in (ledger.fixed_tools or ())
-                    if tool["function"]["name"] == resolved_tool[0]
-                ), {})
             issues = unavailable_values(
-                state.parameters, state.catalog_tool.input_schema, fixed_schema)
+                state.parameters, state.catalog_tool.input_schema, declared_schema)
             if issues:
                 state.local_tool_results[state.assembly.call_id] = {
                     "status": "rejected", "code": "fixed_tool_argument_unavailable",
