@@ -1,4 +1,5 @@
-"""Static architecture guards: domain dependency direction and the type-check exception ratchet.
+"""Static architecture guards: domain dependency direction, the type-check exception ratchet, and
+no new browser tests that rewrite the shipped frontend's app.js.
 
 Architecture contract section 4: dependencies point inward, and the domain layer has no SQLite,
 HTTP, desktop, provider or filesystem dependencies and imports no infrastructure or interfaces.
@@ -503,3 +504,90 @@ def test_type_check_ratchet_counts_inline_ignores(tmp_path: Path) -> None:
     assert any("dice.py has a type: ignore without an error code" in line for line in problems)
     assert any("dice.py has 1 type: ignore comments, up from 0" in line for line in problems)
     assert any("loop.py changes mypy settings inline" in line for line in problems)
+
+
+# ---- Browser tests that rewrite the shipped frontend ----
+# Browser tests that patch app.js text to reach its internals, recorded when the Stop and resume
+# journeys (tests/frontend_stop_resume_journeys.browser.cjs) showed the alternative: start the
+# unmodified frontend and supply the host transport (tests/stop_resume/journey-page.cjs). This list
+# may only shrink; remove a file once it no longer rewrites app.js.
+LEGACY_APP_REWRITING_BROWSER_TESTS = frozenset({
+    "tests/frontend_builder_questions.browser.cjs",
+    "tests/frontend_campaign_rules_update.browser.cjs",
+    "tests/frontend_campaign_sequel.browser.cjs",
+    "tests/frontend_character_card_import.browser.cjs",
+    "tests/frontend_character_chat.browser.cjs",
+    "tests/frontend_character_inspection.browser.cjs",
+    "tests/frontend_chat_start.browser.cjs",
+    "tests/frontend_claude_connection.browser.cjs",
+    "tests/frontend_content_security.browser.cjs",
+    "tests/frontend_dictation.browser.cjs",
+    "tests/frontend_floating_panels.browser.cjs",
+    "tests/frontend_home.browser.cjs",
+    "tests/frontend_integration_seams.browser.cjs",
+    "tests/frontend_map_camera.browser.cjs",
+    "tests/frontend_map_header.browser.cjs",
+    "tests/frontend_map_initial_camera.browser.cjs",
+    "tests/frontend_model_settings.browser.cjs",
+    "tests/frontend_panel_looks.browser.cjs",
+    "tests/frontend_result_migration.browser.cjs",
+    "tests/frontend_rig_motion.browser.cjs",
+    "tests/frontend_saved_equipment.browser.cjs",
+    "tests/frontend_settings_layout.browser.cjs",
+    "tests/frontend_shell.browser.cjs",
+    "tests/frontend_shell_layout.browser.cjs",
+    "tests/frontend_starter_characters.browser.cjs",
+    "tests/frontend_suite_order_categories.browser.cjs",
+    "tests/frontend_suite_roster_strip.browser.cjs",
+    "tests/frontend_support_report.browser.cjs",
+    "tests/frontend_tile_actions.browser.cjs",
+    "tests/frontend_tutorials.browser.cjs",
+    "tests/frontend_weapon_reload.browser.cjs",
+    "tests/frontend_webui_navigation.browser.cjs",
+})
+REWRITE_GUIDANCE = (
+    "New browser tests start the shipped frontend unmodified and supply the host transport, as "
+    "tests/stop_resume/journey-page.cjs does; they do not patch app.js text to reach internals."
+)
+
+
+def _rewrites_app_js(text: str) -> bool:
+    """A harness that reads files, names app.js and edits text rewrites the shipped frontend.
+
+    A deliberately simple text rule; a harness that trips it without rewriting app.js can keep
+    the file reading and the text editing in separate helper files.
+    """
+
+    return "app.js" in text and ".replace(" in text and ("readFileSync" in text or "readFile(" in text)
+
+
+def app_rewrite_problems(root: Path, legacy: frozenset[str]) -> list[str]:
+    """Browser tests that newly rewrite app.js, and legacy entries that no longer do."""
+
+    files = sorted([*(root / "tests").glob("*.browser.cjs"), *(root / "tests/stop_resume").glob("*.cjs")])
+    rewriting = {path.relative_to(root).as_posix() for path in files
+                 if _rewrites_app_js(path.read_text(encoding="utf-8"))}
+    problems = [f"{name} rewrites app.js. {REWRITE_GUIDANCE}" for name in sorted(rewriting - legacy)]
+    problems += [f"{name} no longer rewrites app.js; remove it from LEGACY_APP_REWRITING_BROWSER_TESTS "
+                 "in tests/test_architecture_guards.py." for name in sorted(legacy - rewriting)]
+    return problems
+
+
+def test_no_new_browser_test_rewrites_the_shipped_frontend() -> None:
+    problems = app_rewrite_problems(ROOT, LEGACY_APP_REWRITING_BROWSER_TESTS)
+    assert not problems, "\n".join(problems)
+
+
+def test_app_rewrite_ratchet_rejects_new_rewrites_and_stale_entries(tmp_path: Path) -> None:
+    (tmp_path / "tests/stop_resume").mkdir(parents=True)
+    (tmp_path / "tests/a.browser.cjs").write_text(
+        "body = fs.readFileSync('app.js').toString().replace('x', 'y');\n", encoding="utf-8")
+    (tmp_path / "tests/stop_resume/page.cjs").write_text(
+        "// Serves app.js unmodified.\nroute.fulfill({ body: fs.readFileSync(file) });\n",
+        encoding="utf-8")
+    (tmp_path / "tests/b.browser.cjs").write_text("await page.goto(url);\n", encoding="utf-8")
+    assert app_rewrite_problems(tmp_path, frozenset({"tests/a.browser.cjs"})) == []
+    new = app_rewrite_problems(tmp_path, frozenset())
+    assert new == [f"tests/a.browser.cjs rewrites app.js. {REWRITE_GUIDANCE}"]
+    stale = app_rewrite_problems(tmp_path, frozenset({"tests/a.browser.cjs", "tests/b.browser.cjs"}))
+    assert len(stale) == 1 and "tests/b.browser.cjs no longer rewrites app.js" in stale[0]

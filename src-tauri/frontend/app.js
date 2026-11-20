@@ -3,10 +3,10 @@
    ============================================================
    The renderer is SECRETLESS:
      - No bearer token, port number, or database path appears here.
-     - The Tauri host injects window.__sylviaGMBridge AFTER
-       the launch handshake is verified.  The bridge is a thin JS façade
-       over the in-process LocalCommandBus; its methods map 1:1 to the
-       authority commands and return authoritative projections only.
+     - The bridge (createHostBridge) is a thin JS façade over one owner
+       transport, invoke(command, args); hostTransport() says where that
+       transport comes from.  Its methods map 1:1 to the authority
+       commands and return authoritative projections only.
      - The frontend never invents client-side truth.  Every render is a
        verbatim projection of data the owner returned.
      - Stop, manual Retry, and reconnect/replay are invoked exclusively
@@ -23,7 +23,7 @@ const SylviaGMFrontend = (() => {
 
   // ---- State: only authoritative projections; no secrets, no paths ----
   const state = {
-    bridge: null,            // window.__sylviaGMBridge (injected by host)
+    bridge: null,            // createHostBridge() over hostTransport(), set by init()
     campaigns: [],           // authoritative campaign_index() result
     campaignIndexStatus: 'loading', // loading, ready, or a recoverable projection failure
     campaignIndexError: null,
@@ -866,8 +866,18 @@ const SylviaGMFrontend = (() => {
     return $('allow-public-web').getAttribute('aria-pressed') === 'true';
   }
 
+  // The main window's owner transport. The desktop host provides Tauri's invoke and the local
+  // WebUI provides window.__sylviaBrowserInvoke; both take the same command names and camelCase
+  // arguments, resolve with the owner's result and reject with "code: message". Anything that
+  // keeps that contract can stand in for the desktop host by setting window.__TAURI__.core.invoke
+  // before this script runs, as the Stop and resume browser journeys do with
+  // tests/stop_resume/scripted-owner.cjs.
+  function hostTransport() {
+    return window.__TAURI__?.core?.invoke || window.__sylviaBrowserInvoke || null;
+  }
+
   function createHostBridge() {
-    const invoke = window.__TAURI__?.core?.invoke || window.__sylviaBrowserInvoke;
+    const invoke = hostTransport();
     if (!invoke) return null;
     const bridge = {
       application_info: () => invoke('application_info'),
@@ -1342,9 +1352,9 @@ const SylviaGMFrontend = (() => {
       }
       return;
     }
-    // The host injects window.__sylviaGMBridge once the handshake is
-    // verified.  If it is absent (e.g. opened outside the Tauri shell),
-    // the overlay stays visible and the frontend does nothing — it
+    // The bridge wraps the host's transport (hostTransport). A Node startup test may instead
+    // supply a finished bridge object as window.__sylviaGMBridge. With neither (e.g. opened
+    // outside the Tauri shell) the overlay stays visible and the frontend does nothing — it
     // never guesses a port or invents an endpoint.
     state.bridge = window.__sylviaGMBridge || createHostBridge();
     if (!state.bridge) {
