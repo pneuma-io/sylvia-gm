@@ -43,13 +43,23 @@ def test_real_owner_keeps_the_stop_and_resume_contract_fixtures(tmp_path: Path) 
                     cwd=ROOT, env={**os.environ, "SYLVIA_TEST_OWNER_URL": url},
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT,
                 )
+                assert process.stdout is not None
+                lines: list[str] = []
+
+                async def collect() -> None:
+                    async for line in process.stdout:
+                        lines.append(line.decode(errors="replace"))
+
+                reader = asyncio.create_task(collect())
                 try:
-                    output, _ = await asyncio.wait_for(process.communicate(), 180)
+                    await asyncio.wait_for(process.wait(), 180)
                 finally:
                     if process.returncode is None:
                         process.kill()
                         await process.wait()
-                print(output.decode(errors="replace"))
+                    await reader
+                    # Printed even on a timeout, so a stalled fixture shows its last command.
+                    print("".join(lines))
                 assert process.returncode == 0
 
     asyncio.run(check())

@@ -15,11 +15,16 @@ async function webuiTransport(url) {
   const page = await fetch(`${url}/app.html`);
   assert.equal(page.status, 200);
   const cookie = page.headers.getSetCookie().map(value => value.split(';')[0]).join('; ');
+  const started = Date.now();
   return async (method, params) => {
+    // One line per command, so a stalled fixture shows where it stopped.
+    const at = () => `${((Date.now() - started) / 1000).toFixed(2)}s`;
+    console.log(`# ${at()} → ${method}`);
     const response = await fetch(`${url}/api/command`, { method: 'POST', headers: { Origin: url,
       'X-Sylvia-WebUI': '1', 'Content-Type': 'application/json', Cookie: cookie },
     body: JSON.stringify({ id: crypto.randomUUID(), method, params }) });
     const envelope = await response.json();
+    console.log(`# ${at()} ← ${method} ${envelope.ok ? 'ok' : envelope.error?.code}`);
     if (!envelope.ok) throw `${envelope.error?.code || 'command_rejected'}: ${envelope.error?.message || ''}`;
     return envelope.result;
   };
