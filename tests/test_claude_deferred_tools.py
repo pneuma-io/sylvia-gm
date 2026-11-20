@@ -288,36 +288,6 @@ def test_a_search_round_is_no_sylvia_call_and_the_last_message_is_the_reply(
     assert native["controls"]["builtin_tools"] == [TOOL_SEARCH]
 
 
-def test_an_older_claude_code_is_sent_every_tool_loaded(tmp_path, monkeypatch):
-    monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", "per-step")
-    monkeypatch.setattr(_claude, "find_runtime", lambda _: Path(__file__))
-    monkeypatch.setattr(_claude, "runtime_version", lambda *_: "2.1.326")
-    events = [
-        {"type": "system", "subtype": "init", "model": MODEL,
-         "tools": ["mcp__sylvia__read_reference", "mcp__sylvia__roll", "mcp__sylvia__cast"]},
-        {"type": "control_request", "request_id": "list", "request": {
-            "subtype": "mcp_message", "server_name": "sylvia", "message": {
-                "jsonrpc": "2.0", "id": 1, "method": "tools/list"}}},
-        {"type": "result", "subtype": "success", "is_error": False, "result": "Onward.",
-         "usage": {"input_tokens": 10, "output_tokens": 3}},
-    ]
-    _Connection.instances = []
-    provider = ClaudeProvider(tmp_path / "runtime", _model(),
-                              connection_factory=lambda *a: _Connection(*a, events=events))
-    messages = [{"role": "system", "content": "GM"}, {"role": "user", "content": "Hi."}]
-    asyncio.run(_drain(provider, messages, DEFERRED_TOOLS))
-    connection = _Connection.instances[-1]
-    assert connection.environment["ENABLE_TOOL_SEARCH"] == "false"
-    assert connection.arguments[connection.arguments.index("--tools") + 1] == ""
-    allowed = connection.arguments[connection.arguments.index("--allowedTools") + 1]
-    assert TOOL_SEARCH not in allowed.split(",")
-    listed = next(w for w in connection.writes if w.get("type") == "control_response"
-                  and w["response"]["request_id"] == "list")
-    tools = listed["response"]["response"]["mcp_response"]["result"]["tools"]
-    assert [t["name"] for t in tools] == ["read_reference", "roll", "cast"]
-    assert all("_meta" not in t for t in tools)
-
-
 def _model():
     from tests.test_claude_native_route import claude_model
 

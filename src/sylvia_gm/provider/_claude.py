@@ -78,11 +78,9 @@ _PREFIX = "mcp__sylvia__"
 #: Claude Code's own tool that loads a deferred tool's definition (deferred tool list, #204).
 TOOL_SEARCH = "ToolSearch"
 #: The MCP ``_meta`` key that keeps a tool loaded under Claude Code's tool search; ``False``
-#: defers it (Claude Code 2.1.327 and later).
+#: defers it. Checked offline on 2.1.322 (Sylvia's minimum and its installed stable release on
+#: 20 November 2026) and 2.1.327.
 ALWAYS_LOAD = "anthropic/alwaysLoad"
-#: The first Claude Code release checked with tool search over Sylvia's SDK MCP tools. An
-#: older copy is sent every tool loaded, as the fixed tool list sends them.
-TOOL_SEARCH_VERSION = (2, 1, 327)
 #: Session ids of steps running in this process, by runtime home (kept out of the sweep).
 _ACTIVE_STEPS: dict[Path, set[str]] = {}
 _ACTIVE_LOCK = threading.Lock()
@@ -192,15 +190,6 @@ def tool_search(native_tools: list[dict[str, Any]]) -> bool:
         isinstance(tool.get("_meta"), dict) and tool["_meta"].get(ALWAYS_LOAD) is False
         for tool in native_tools
     )
-
-
-def _runs_tool_search(version: object) -> bool:
-    """Is this Claude Code release one whose tool search Sylvia has checked?"""
-    try:
-        parts = tuple(int(part) for part in str(version).split("."))
-    except ValueError:
-        return False
-    return parts >= TOOL_SEARCH_VERSION
 
 
 def _replay_record(add: Callable[[str, dict[str, Any]], None], saved: Mapping[str, Any]) -> None:
@@ -769,7 +758,7 @@ class ClaudeProvider(Provider):
             raise ProviderConnectionError(
                 "Set up Claude Code for Sylvia in Settings > Accounts, then try again."
             )
-        version = await asyncio.to_thread(runtime_version, executable, self.home)
+        await asyncio.to_thread(runtime_version, executable, self.home)
         self.home.mkdir(parents=True, exist_ok=True)
         # One fixed, empty working directory: Claude Code names it in every request. The
         # system and transcript files live in a per-step folder that is always removed.
@@ -799,10 +788,6 @@ class ClaudeProvider(Provider):
                 workspace,
                 route,
             )
-            if tool_search(native_tools) and not _runs_tool_search(version):
-                # An older copy: every tool loaded, as the fixed tool list sends them.
-                native_tools = [{key: value for key, value in tool.items() if key != "_meta"}
-                                for tool in native_tools]
             searching = tool_search(native_tools)
             if searching:
                 # Deferred tool list (#204): Claude Code's own tool search loads deferred tools.
