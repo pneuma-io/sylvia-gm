@@ -13628,10 +13628,11 @@ const SylviaGMFrontend = (() => {
       if (campaignId) await openCampaign(campaignId);
       setCampaignDataStatus(`Recovered ${result.file_name || 'campaign archive'}`);
     } catch (e) {
-      const detail = uploadCommandError('Recovery', e);
-      setCampaignDataStatus(detail.includes('portable_recovery_campaign_collision')
+      // Read the owner's code from the raw rejection; the shown text no longer carries it.
+      const collision = String(e?.message ?? e).includes('portable_recovery_campaign_collision');
+      setCampaignDataStatus(collision
         ? 'This campaign already exists here. Your current campaign is unchanged.'
-        : detail);
+        : uploadCommandError('Recovery', e));
     }
   }
 
