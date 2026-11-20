@@ -96,6 +96,20 @@ def rejects_replayed_thinking(error: BaseException) -> bool:
     )
 
 
+#: Mid-conversation tool changes, by reference or by value (Claude API; checked 2026-11-20):
+#: https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages
+TOOL_CHANGES_BETA = "inline-tools-2026-09-15"
+_TOOL_CHANGE_BLOCKS = frozenset({"tool_addition", "tool_removal"})
+
+
+def _is_tool_change(message: Mapping[str, Any]) -> bool:
+    content = message.get("content")
+    return isinstance(content, list) and bool(content) and all(
+        isinstance(block, Mapping) and block.get("type") in _TOOL_CHANGE_BLOCKS
+        for block in content
+    )
+
+
 def _content_block_dict(block: Any) -> dict[str, Any]:
     """Copy native blocks without rebuilding or losing signatures and provider fields."""
     if isinstance(block, dict):
@@ -179,13 +193,27 @@ class AnthropicMessagesTransport(ProviderTransport):
         """
         system_messages: list[dict[str, Any]] = []
         anthropic_messages: list[dict[str, Any]] = []
+        # Tool-change system messages stay in the conversation (deferred tool list only). Each
+        # is placed just before the next assistant turn, or at the end: the API accepts one
+        # only after a user turn and before an assistant turn. A request that failed before
+        # its reply produced no thinking, so a later user record sorting ahead of it changes
+        # no earlier thinking block, and once a reply follows, its place is fixed.
+        tool_changes: list[dict[str, Any]] = []
 
         for msg in messages:
             role = msg.get("role")
 
+            if role == "system" and _is_tool_change(msg):
+                tool_changes.append({"role": "system", "content": msg["content"]})
+                continue
+
             if role == "system":
                 system_messages.append(msg)
                 continue
+
+            if role == "assistant" and tool_changes:
+                anthropic_messages.extend(tool_changes)
+                tool_changes = []
 
             if role == "assistant":
                 native_content = msg.get("anthropic_content")
@@ -244,6 +272,7 @@ class AnthropicMessagesTransport(ProviderTransport):
                 raise InvalidResponseError(
                     f"Unsupported internal message role for Anthropic transport: {role!r}"
                 )
+        anthropic_messages.extend(tool_changes)
 
         # System prompt — handle both legacy plain-string and new
         # multi-block (cache-annotated) system messages.
@@ -300,6 +329,9 @@ class AnthropicMessagesTransport(ProviderTransport):
                         "name": func_def.get("name", ""),
                         "description": func_def.get("description", ""),
                         "input_schema": func_def.get("parameters", {"type": "object"}),
+                        # Deferred tool list: outside the model's context until surfaced.
+                        **({"defer_loading": True} if tool.get("defer_loading") is True
+                           else {}),
                     }
                 )
             request["tools"] = anthropic_tools
@@ -312,6 +344,17 @@ class AnthropicMessagesTransport(ProviderTransport):
                     else {"type": "any"}
                 )
 
+        if any(tool.get("defer_loading") for tool in request.get("tools", ())) or any(
+            message.get("role") == "system" for message in anthropic_messages
+        ):
+            # Deferred tool list: tool additions in messages need the beta on every request
+            # of the conversation (the first one has deferred tools and may have none yet).
+            headers = dict(request.get("extra_headers") or {})
+            betas = [b.strip() for b in str(headers.get("anthropic-beta", "")).split(",")
+                     if b.strip()]
+            if TOOL_CHANGES_BETA not in betas:
+                headers["anthropic-beta"] = ",".join([*betas, TOOL_CHANGES_BETA])
+            request["extra_headers"] = headers
         return request
 
     def parse_response(self, raw_response: Any, model_id: str) -> ProviderResponse:
@@ -1042,7 +1085,10 @@ def with_cache_breakpoints(request: dict[str, Any]) -> dict[str, Any]:
     tools = marked.get("tools")
     if isinstance(tools, list) and tools:
         tools = [dict(tool) for tool in tools]
-        tools[-1]["cache_control"] = dict(_EPHEMERAL)
+        # A deferred tool cannot carry a breakpoint; mark the last one that is loaded.
+        loaded = [tool for tool in tools if not tool.get("defer_loading")]
+        if loaded:
+            loaded[-1]["cache_control"] = dict(_EPHEMERAL)
         marked["tools"] = tools
     system = marked.get("system")
     if isinstance(system, str) and system:
@@ -1061,7 +1107,22 @@ def with_cache_breakpoints(request: dict[str, Any]) -> dict[str, Any]:
             and message["content"] else message
             for message in messages
         ]
-        last = messages[-1]
+        # A trailing tool-change system message (deferred tool list): the moving breakpoint
+        # goes on the message before it, which finds the previous request's cache entry, and
+        # a fourth on the change's last block, so its surfaced definitions are written now.
+        # A change of many blocks would otherwise put that entry beyond the cache lookback.
+        if (len(messages) > 1 and isinstance(messages[-1], dict)
+                and messages[-1].get("role") == "system" and _is_tool_change(messages[-1])):
+            change = dict(messages[-1])
+            blocks = [dict(block) for block in change["content"]]
+            blocks[-1]["cache_control"] = dict(_EPHEMERAL)
+            change["content"] = blocks
+            messages[-1] = change
+        index = len(messages) - 1
+        while index > 0 and isinstance(messages[index], dict) and (
+                messages[index].get("role") == "system" and _is_tool_change(messages[index])):
+            index -= 1
+        last = messages[index]
         if isinstance(last, dict) and isinstance(last.get("content"), list):
             last = dict(last)
             blocks = [dict(block) if isinstance(block, dict) else block
@@ -1071,7 +1132,7 @@ def with_cache_breakpoints(request: dict[str, Any]) -> dict[str, Any]:
                     block["cache_control"] = dict(_EPHEMERAL)
                     break
             last["content"] = blocks
-            messages[-1] = last
+            messages[index] = last
         marked["messages"] = messages
     return marked
 

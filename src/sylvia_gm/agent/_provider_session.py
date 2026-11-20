@@ -43,6 +43,7 @@ from sylvia_gm.agent._context_ledger import (
     ContextLedger,
     WireFrame,
     context_mode,
+    deferred_tool_list,
     fixed_tool_list,
     native_answers,
     native_inputs,
@@ -1742,7 +1743,11 @@ class ProviderSessionAdapter:
         route = {"transport": getattr(model_info, "transport", None),
                  "provider_key": getattr(model_info, "provider_key", None)}
         self._context_mode = context_mode(**route)
-        self._fixed_tool_list = fixed_tool_list()
+        # ``deferred`` declares the fixed catalog once with Ruleset mechanics deferred:
+        # ``native`` where the route's provider defers tools itself, else Sylvia's ``loader``.
+        self._deferred_tool_list = deferred_tool_list(
+            **route, model_id=getattr(model_info, "wire_model_id", None))
+        self._fixed_tool_list = fixed_tool_list() or self._deferred_tool_list is not None
         self._one_tool_list = stable_tool_list(**route)
         self._context_ledgers: dict[str, ContextLedger] = {}
         self._timeout = timeout
@@ -2453,9 +2458,15 @@ class ProviderSessionAdapter:
         })
 
     def _fixed_provider_tools(
-        self, provider_input: SessionProviderInput,
+        self, provider_input: SessionProviderInput, core: set[str] | None = None,
     ) -> list[dict[str, object]]:
-        """Build a reproducible complete catalog without using the round's exposure."""
+        """Build a reproducible complete catalog without using the round's exposure.
+
+        With *core*, also collect the names a deferred list always loads: the application's
+        own tools (reference, Campaign File, action sequences, history) and every host-local
+        tool the list carries (one outside the catalog, such as an argument reader), never a
+        Ruleset mechanic.
+        """
         from ._stateless_mcp import StatelessMcpMechanics, action_sequence_model_tools
         from ._working_context import HISTORY_TOOL
 
@@ -2467,7 +2478,11 @@ class ProviderSessionAdapter:
         )
         if self._owner.snapshot(campaign_id).package_lock.entries:
             catalog = (*catalog, *action_sequence_model_tools(self._owner))
-        tools, _aliases = self._provider_tools(catalog)
+        tools, aliases = self._provider_tools(catalog)
+        if core is not None:
+            mechanics = {alias for alias, tool in aliases.items() if tool.category == "mechanic"}
+            core.update(str(tool["function"]["name"]) for tool in [*tools, HISTORY_TOOL]
+                        if str(tool["function"]["name"]) not in mechanics)
         return sorted([*tools, HISTORY_TOOL], key=lambda tool: str(tool["function"]["name"]))
 
     def _ledger_hooks(
@@ -2482,13 +2497,17 @@ class ProviderSessionAdapter:
         ledgers = self._ledger_store()
         ledger = ledgers.get(session_id)
         if (ledger is None or ledger.context_owner != owner or ledger.transport != transport
-                or (ledger.fixed_tools is not None) != self._fixed_tool_list):
+                or (ledger.fixed_tools is not None) != self._fixed_tool_list
+                or ledger.deferral != self._deferred_tool_list):
             previous = ledger
-            fixed_tools = (self._fixed_provider_tools(provider_input)
+            core: set[str] | None = set() if self._deferred_tool_list is not None else None
+            fixed_tools = (self._fixed_provider_tools(provider_input, core)
                            if self._fixed_tool_list else None)
             ledger = ContextLedger(session_id=session_id, context_owner=owner,
                                    transport=transport,
-                                   one_tool_list=self._one_tool_list, fixed_tools=fixed_tools)
+                                   one_tool_list=self._one_tool_list, fixed_tools=fixed_tools,
+                                   core_tools=frozenset(core) if core is not None else None,
+                                   deferral=self._deferred_tool_list)
             if previous is not None:
                 # A different owner or transport is a new epoch; keep the reset visible.
                 ledger.state = previous.state

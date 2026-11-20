@@ -369,6 +369,7 @@ PYTHON_JOURNEYS = {
         "tests/test_gm_context_ledger.py",
         "tests/test_gm_context_contract.py",
         "tests/test_gm_fixed_tool_list.py",
+        "tests/test_gm_deferred_tool_list.py",
     ],
     "provider-contracts": [
         "tests/test_provider_session_transport_projection.py",

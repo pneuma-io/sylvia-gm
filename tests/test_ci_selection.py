@@ -622,6 +622,7 @@ def test_real_gm_request_contracts_follow_relevant_changes(path):
         module, "tests/test_gm_schema_minimal_refusals.py",
         "tests/test_gm_tool_exposure.py", "tests/test_gm_context_ledger.py",
         "tests/test_gm_context_contract.py", "tests/test_gm_fixed_tool_list.py",
+        "tests/test_gm_deferred_tool_list.py",
     ]
     selectors = [item for values in plan["python"].values() for item in values]
     assert sum(item.split("::")[0] == module for item in selectors) == 1
@@ -653,6 +654,7 @@ def test_real_gm_request_contracts_have_one_full_owner_and_separate_quick_group(
         "tests/test_gm_memory_casting_hotfix.py", "tests/test_gm_schema_minimal_refusals.py",
         "tests/test_gm_tool_exposure.py", "tests/test_gm_context_ledger.py",
         "tests/test_gm_context_contract.py", "tests/test_gm_fixed_tool_list.py",
+        "tests/test_gm_deferred_tool_list.py",
     ]
     assert full["python"]["gm-turn"] == PYTHON_JOURNEYS["gm-turn"]
 
