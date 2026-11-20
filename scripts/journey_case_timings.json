@@ -2591,6 +2591,7 @@
     "tests.test_gm_context_ledger::test_the_bridge_collapse_replaces_the_retired_fact_in_the_journaled_state": 0.004,
     "tests.test_gm_context_ledger::test_the_contract_limits_superseding_and_names_turns_without_player_input": 0.002,
     "tests.test_gm_context_ledger::test_the_previous_assembly_is_the_shipped_default_and_the_switch_selects_either": 0.001,
+    "tests.test_gm_deferred_tool_list::test_a_registered_route_whose_model_cannot_defer_keeps_one_stable_list": 0.01,
     "tests.test_gm_deferred_tool_list::test_claude_request_keeps_tool_changes_in_the_conversation": 0.01,
     "tests.test_gm_deferred_tool_list::test_deferred_session_fight_summon_restart[chat-loader]": 110.0,
     "tests.test_gm_deferred_tool_list::test_ledger_surfaces_each_tool_once_and_keeps_the_declared_list": 0.01,

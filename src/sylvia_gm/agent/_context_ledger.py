@@ -293,7 +293,12 @@ def deferred_tool_list(
     environ: Mapping[str, str] | None = None, *, transport: str | None = None,
     provider_key: str | None = None, model_id: str | None = None,
 ) -> str | None:
-    """How this route defers tools (``native`` or ``loader``), or None without ``deferred``."""
+    """How this route defers tools (``native``, ``provider`` or ``loader``), or None.
+
+    None without ``deferred``, and on a registered route whose model cannot defer there: such
+    a route keeps one stable list rather than switching to the loader, which is measured only
+    where its route names it.
+    """
     if tool_list_setting(environ, transport=transport,
                          provider_key=provider_key) != DEFERRED_TOOL_LIST:
         return None
@@ -301,8 +306,8 @@ def deferred_tool_list(
     for kind, routes in ((PROVIDER_DEFERRAL, PROVIDER_DEFERRED_ROUTES),
                          (NATIVE_DEFERRAL, NATIVE_DEFERRED_ROUTES)):
         supports = routes.get(route)
-        if supports is not None and supports(model_id or ""):
-            return kind
+        if supports is not None:
+            return kind if supports(model_id or "") else None
     return LOADER_DEFERRAL
 
 
