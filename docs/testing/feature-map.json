@@ -5,7 +5,9 @@
     "owner-contract": "Generated orders of actions against the real owner and SQLite, compared with a small model of the written promise.",
     "owner-integration": "A single scripted example against the real owner and SQLite.",
     "owner-transport": "The owner process protocol with a scripted provider.",
-    "ui-script": "Node tests of shipped frontend logic with a stubbed desktop bridge; not a rendered browser journey."
+    "ui-script": "Node tests of shipped frontend logic with a stubbed desktop bridge; not a rendered browser journey.",
+    "browser-journey": "The shipped frontend, started normally and unmodified, driven through rendered controls with a scripted owner standing in for the desktop host; not native-window, installed or real-model acceptance.",
+    "contract-fixture": "JavaScript fixtures of the owner command contract, run against the real owner through the WebUI command adapter and against the browser journeys' scripted owner."
   },
   "features": [
     {
@@ -27,7 +29,7 @@
       "id": "play.stop-and-resume",
       "name": "Stop and resume a GM reply",
       "status": "mapped",
-      "surfaces": ["GM conversation", "Stop", "Narration interrupted—Retry", "Retry", "New message after Stop", "Reopen"],
+      "surfaces": ["GM conversation", "Stop", "Narration interrupted—Retry", "Retry", "New message after Stop", "Reopen", "Switching campaigns"],
       "promises": [
         {
           "promise": "Retry never repeats a committed action; it reuses the saved result, and repeating a Retry identity replays its saved outcome.",
@@ -46,6 +48,9 @@
             {"kind": "owner-integration", "selector": "tests/test_alpha_f2_event_protocol.py::test_f2_manual_retry_narrates_stored_action_result_without_rerunning_mechanics"},
             {"kind": "owner-integration", "selector": "tests/test_alpha_f2_event_protocol.py::test_f2_duplicate_retry_identity_is_idempotent_across_owner_reload"},
             {"kind": "owner-transport", "selector": "tests/test_alpha_f6e_owner_session_transport.py::test_owner_manual_retry_reuses_action_and_resettles_campaign_file"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::manual Retry: a failed reply offers Retry, keeps new input closed, and answers once without resending"},
+            {"kind": "contract-fixture", "selector": "tests/test_stop_resume_owner_contract.py::test_real_owner_keeps_the_stop_and_resume_contract_fixtures"},
+            {"kind": "contract-fixture", "selector": "tests/frontend_stop_resume_contract.test.cjs::the scripted owner keeps the Stop and resume contract fixtures"},
             {"kind": "ui-script", "selector": "tests/frontend_activity_lifecycle.test.cjs::manual Retry retains two ordered attempts around their original input without changing result cards"}
           ]
         },
@@ -64,7 +69,9 @@
             {"kind": "owner-integration", "selector": "tests/test_alpha_f4_generic_sessions.py::test_probe_09b_stop_fences_pending_retry_provider_admission"},
             {"kind": "ui-script", "selector": "tests/frontend_activity_lifecycle.test.cjs::a saved Stop remains Stopped inside its activity row"},
             {"kind": "ui-script", "selector": "tests/frontend_saved_sessions.test.cjs::Stop waits for owner cancellation to settle before starting another request"},
-            {"kind": "ui-script", "selector": "tests/frontend_saved_sessions.test.cjs::reconnect reads the saved stopped outcome rather than calling it completed"}
+            {"kind": "ui-script", "selector": "tests/frontend_saved_sessions.test.cjs::reconnect reads the saved stopped outcome rather than calling it completed"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::Stop: a held reply stops, keeps the message without a reply, and the next message redirects it"},
+            {"kind": "contract-fixture", "selector": "tests/test_stop_resume_owner_contract.py::test_real_owner_keeps_the_stop_and_resume_contract_fixtures"}
           ]
         },
         {
@@ -78,7 +85,11 @@
             {"kind": "owner-integration", "selector": "tests/test_alpha_f4_generic_sessions.py::test_stopped_gm_redirects_without_repeating_committed_actions"},
             {"kind": "owner-integration", "selector": "tests/test_alpha_f4_generic_sessions.py::test_redirect_recovery_keeps_new_input_and_later_consequence"},
             {"kind": "ui-script", "selector": "tests/frontend_saved_sessions.test.cjs::stopped GM accepts replacement input while preserving its saved continuation basis"},
-            {"kind": "ui-script", "selector": "tests/frontend_saved_sessions.test.cjs::GM input and retry stay with the campaign while another Builder works"}
+            {"kind": "ui-script", "selector": "tests/frontend_saved_sessions.test.cjs::GM input and retry stay with the campaign while another Builder works"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::Stop: a held reply stops, keeps the message without a reply, and the next message redirects it"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::manual Retry: a failed reply offers Retry, keeps new input closed, and answers once without resending"},
+            {"kind": "contract-fixture", "selector": "tests/test_stop_resume_owner_contract.py::test_real_owner_keeps_the_stop_and_resume_contract_fixtures"},
+            {"kind": "contract-fixture", "selector": "tests/frontend_stop_resume_contract.test.cjs::the scripted owner keeps the Stop and resume contract fixtures"}
           ]
         },
         {
@@ -105,15 +116,41 @@
             {"kind": "owner-integration", "selector": "tests/test_dm_input_replay.py::test_completed_input_is_rejected_without_provider_after_narration_and_reopen"},
             {"kind": "owner-integration", "selector": "tests/test_dm_input_replay.py::test_interrupted_input_needs_saved_retry_and_cannot_restart_after_reopen"},
             {"kind": "owner-transport", "selector": "tests/test_alpha_f6e_owner_session_transport.py::test_retry_publication_failure_preserves_checkpoint_across_owner_restart"},
-            {"kind": "ui-script", "selector": "tests/frontend_activity_lifecycle.test.cjs::a failed Retry with no prior activity event stays beside its input after reopen"}
+            {"kind": "ui-script", "selector": "tests/frontend_activity_lifecycle.test.cjs::a failed Retry with no prior activity event stays beside its input after reopen"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::reopen: an interrupted turn keeps its message and Retry after the window is reopened"}
+          ]
+        },
+        {
+          "promise": "A reply, or a saved-history read, that arrives after the player has switched to another campaign stays with its own campaign: it neither appears in nor blocks the campaign on screen, and is shown once on return.",
+          "contracts": [
+            "docs/product/alpha-launch-contract.md#22-play-panels-and-fallback-inventory",
+            "docs/product/alpha-launch-contract.md#5-agent-event-and-reasoning-contract"
+          ],
+          "checks": [
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::switching away: a late reply and a late history read from the other campaign stay with it"},
+            {"kind": "contract-fixture", "selector": "tests/test_stop_resume_owner_contract.py::test_real_owner_keeps_the_stop_and_resume_contract_fixtures"},
+            {"kind": "contract-fixture", "selector": "tests/frontend_stop_resume_contract.test.cjs::the scripted owner keeps the Stop and resume contract fixtures"}
+          ]
+        },
+        {
+          "promise": "Stop and Manual Retry can be reached and used from the keyboard with a visible focus, fit a phone-width window, stop animating under reduced motion, and their recovery text stays readable in each session theme.",
+          "contracts": [
+            "docs/architecture/alpha-architecture-contract.md#1051-panelsystem-panels-and-panelwidgets"
+          ],
+          "checks": [
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::keyboard: Stop and Manual Retry are reached by Tab, operated by key and show their focus"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::narrow layout: Stop and Retry fit a phone-width window through the Story pane"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::reduced motion: the working indicator animates only when motion is allowed"},
+            {"kind": "browser-journey", "selector": "tests/frontend_stop_resume_journeys.browser.cjs::themes: interruption and recovery text and controls keep readable contrast in each theme"}
           ]
         }
       ],
       "not_covered": [
-        "No browser journey drives Stop, Retry and redirection through the rendered controls after normal startup; the ui-script checks stub the desktop bridge.",
-        "No check covers the composer staying closed after a narration failure, where the Retry offer cannot redirect.",
-        "Two owner-transport Stop cases exist outside the supported-journey gate: test_stop_overtakes_blocked_manual_retry_and_discards_retry_prose and test_stop_overtakes_pending_owner_submission_and_cancels_provider.",
-        "No installed-app or real-model check is mapped."
+        "The browser journeys use a scripted owner in place of the desktop host; the contract fixtures tie it to the real owner for the commands they cover, but native detached panel windows and host events are stubbed, and no installed-app or real-model check is mapped.",
+        "Keyboard focus falls to the page after Stop, Manual Retry, Send or opening a campaign (issue #221); the keyboard journey checks reachability and visible focus, not where focus lands.",
+        "In the Sylvia and Dark themes some recovery text is below 4.5:1 contrast (issue #222); the theme checks name those elements in CONTRAST_ISSUE_222 until it is fixed.",
+        "Stopping a running Retry, and reconnecting to a reply still running after a reload, are not driven through the browser.",
+        "Two owner-transport Stop cases exist outside the supported-journey gate: test_stop_overtakes_blocked_manual_retry_and_discards_retry_prose and test_stop_overtakes_pending_owner_submission_and_cancels_provider."
       ]
     },
     {

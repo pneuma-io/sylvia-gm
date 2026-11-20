@@ -110,7 +110,11 @@ function contrast(locator) {
 // indicator is either an outline or shadow on the element, or a change from its unfocused look.
 function focusLook(locator) {
   return locator.evaluate(async element => {
-    await Promise.all(document.getAnimations().map(animation => animation.finished.catch(() => {})));
+    // Settle running focus transitions; endless indicators (the working wave) never finish.
+    await Promise.all(document.getAnimations()
+      .filter(animation => animation.playState === 'running' &&
+        animation.effect?.getComputedTiming().endTime !== Infinity)
+      .map(animation => animation.finished.catch(() => {})));
     return [element, element.parentElement, element.parentElement?.parentElement].filter(Boolean)
       .map(node => { const style = getComputedStyle(node);
         return [style.outlineStyle, style.outlineWidth, style.outlineColor, style.boxShadow, style.borderColor]

@@ -16,7 +16,17 @@ const CAMPAIGNS = ['Greyhook', 'Saltmarsh'];
 const THEMES = ['slate', 'sylvia', 'sylvia-dark'];
 // Optional folder for review screenshots; the checks never depend on it.
 const EVIDENCE = process.env.SYLVIA_JOURNEY_EVIDENCE || null;
-const shot = (page, name) => EVIDENCE ? page.screenshot({ path: path.join(EVIDENCE, `${name}.png`) }) : null;
+async function shot(page, name) {
+  if (!EVIDENCE) return;
+  // Let running entrance transitions finish so the picture shows the settled state. Review
+  // pictures only: the cap keeps a stuck animation from holding up the checks.
+  await page.evaluate(() => Promise.race([Promise.all(document.getAnimations()
+    .filter(animation => animation.playState === 'running' &&
+      animation.effect?.getComputedTiming().endTime !== Infinity)
+    .map(animation => animation.finished.catch(() => {}))),
+  new Promise(resolve => setTimeout(resolve, 2000))]));
+  await page.screenshot({ path: path.join(EVIDENCE, `${name}.png`) });
+}
 
 async function journey(run, options = {}) {
   const owner = new ScriptedOwner(CAMPAIGNS);
@@ -59,6 +69,7 @@ test('Stop: a held reply stops, keeps the message without a reply, and the next 
       await ui.story.getByText('[hold] I listen at the door.').waitFor();
       assert.equal(await ui.story.getByText('The Game Master answers').count(), 0, 'the stopped message has no reply');
       assert.equal(await ui.composer.isEnabled(), true, 'a stopped reply can be redirected by a new message');
+      await shot(page, 'stop-stopped');
       await send(ui, 'I knock instead.');
       await ui.story.getByText('The Game Master answers: I knock instead.').waitFor();
       assert.equal(await ui.retry.count(), 0, 'the redirected message replaced the Retry offer');
@@ -82,6 +93,7 @@ test('manual Retry: a failed reply offers Retry, keeps new input closed, and ans
       await ui.status.filter({ hasText: 'could not connect to the provider' }).waitFor();
       assert.equal(await ui.composer.isDisabled(), true, 'after a failure only Retry continues the turn');
       assert.equal(await ui.send.isDisabled(), true);
+      await shot(page, 'retry-offered');
       await ui.retry.click();
       await ui.story.getByText('The Game Master answers: I open the door.').waitFor();
       await ui.retry.waitFor({ state: 'detached' });
@@ -90,6 +102,7 @@ test('manual Retry: a failed reply offers Retry, keeps new input closed, and ans
       assert.equal(await ui.story.getByText('The Game Master answers: I open the door.').count(), 1);
       assert.equal(count(owner, 'submit_session_input'), 1, 'Retry did not resend the message');
       assert.equal(count(owner, 'manual_retry_session'), 1);
+      await shot(page, 'retry-answered');
     });
   });
 
@@ -128,6 +141,7 @@ test('switching away: a late reply and a late history read from the other campai
       await openCampaign(page, ui, 'Greyhook');
       await ui.story.getByText('The Game Master answers: I wait for the tide.').waitFor();
       assert.equal(await ui.story.getByText('The Game Master answers: I wait for the tide.').count(), 1);
+      await shot(page, 'switch-late-reply-in-its-campaign');
       assert.equal(await ui.stop.isVisible(), false);
     });
   });
@@ -147,6 +161,7 @@ test('reopen: an interrupted turn keeps its message and Retry after the window i
       await again.retry.waitFor();
       await again.story.getByText('[fail] I climb the stair.').waitFor();
       assert.equal(await again.composer.isDisabled(), true, 'reopening does not turn the failed turn into new input');
+      await shot(reopened.page, 'reopen-retry-kept');
       await again.retry.click();
       await again.story.getByText('The Game Master answers: I climb the stair.').waitFor();
       await again.retry.waitFor({ state: 'detached' });
@@ -260,15 +275,15 @@ const CONTRAST_ISSUE_222 = {
   'sylvia-dark': ['status line', 'Retry notice', 'Manual Retry'],
 };
 
-for (const theme of THEMES) {
-  test(`theme ${theme}: interruption and recovery text and controls keep readable contrast`,
-    { timeout: 60000 }, async () => {
+test('themes: interruption and recovery text and controls keep readable contrast in each theme',
+  { timeout: 120000 }, async () => {
+    for (const theme of THEMES) {
       await journey(async ({ page, ui }) => {
         assert.equal(await page.locator('body').getAttribute('data-theme'), theme);
         const readable = async (name, element, minimum = 4.5) => {
           if (CONTRAST_ISSUE_222[theme].includes(name)) return;
           const ratio = await contrast(element);
-          assert.ok(ratio >= minimum, `${name} contrast ${ratio.toFixed(2)} is at least ${minimum}`);
+          assert.ok(ratio >= minimum, `${theme}: ${name} contrast ${ratio.toFixed(2)} is at least ${minimum}`);
         };
         await openCampaign(page, ui, 'Greyhook');
         await send(ui, '[hold] I listen at the door.');
@@ -288,5 +303,5 @@ for (const theme of THEMES) {
         await answer.waitFor();
         await readable('the reply', answer);
       }, { theme });
-    });
-}
+    }
+  });
