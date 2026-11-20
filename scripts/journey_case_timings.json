@@ -1614,6 +1614,8 @@
     "tests.test_chatgpt_cancel_boundaries::test_unintentional_connection_failure_stays_an_error[account/read]": 0.015,
     "tests.test_chatgpt_cancel_boundaries::test_unintentional_connection_failure_stays_an_error[initialize]": 0.013,
     "tests.test_chatgpt_cancel_boundaries::test_unintentional_connection_failure_stays_an_error[stream]": 0.022,
+    "tests.test_chatgpt_deferred_tool_list::test_deferred_chatgpt_session_keeps_one_runtime_thread": 95.0,
+    "tests.test_chatgpt_deferred_tool_list::test_the_chatgpt_route_defers_with_the_loader": 0.01,
     "tests.test_chatgpt_lifecycle::test_account_status_still_rejects_missing_or_non_chatgpt_auth[None]": 0.006,
     "tests.test_chatgpt_lifecycle::test_account_status_still_rejects_missing_or_non_chatgpt_auth[account1]": 0.013,
     "tests.test_chatgpt_lifecycle::test_boot_failure_is_recorded_without_exception_text": 0.013,
