@@ -8,9 +8,7 @@ import pytest
 
 from sylvia_gm.agent._context_ledger import (
     CALLABLE_LABEL,
-    DEFINITIONS_LABEL,
     LOADER_DEFERRAL,
-    LOADER_STUB_NOTE,
     NATIVE_DEFERRAL,
     PROVIDER_DEFERRAL,
     TOOL_CHANGE_CLASS,
@@ -19,6 +17,7 @@ from sylvia_gm.agent._context_ledger import (
     deferred_tool_list,
     stable_tool_list,
 )
+from sylvia_gm.agent._tool_loader import DEFINITIONS_LABEL, MECHANIC_TOOL_NAME
 from sylvia_gm.provider._anthropic import (
     TOOL_CHANGES_BETA,
     AnthropicMessagesTransport,
@@ -146,65 +145,6 @@ def test_ledger_surfaces_each_tool_once_and_keeps_the_declared_list():
     assert rebuilt.record is None
 
 
-@pytest.mark.parametrize("transport", ["chat_completions", "anthropic_messages", "responses",
-                                       "gemini_generate_content"])
-def test_loader_declares_stubs_and_appends_each_definition_once(transport):
-    ledger = _ledger(LOADER_DEFERRAL, transport)
-    dialogue = [_user("u1", "Look around")]
-    frames, records = [], []
-    rounds = [
-        [_tool("read_reference"), _tool("rest")],
-        [_tool("read_reference"), _tool("rest")],
-        [_tool("attack"), _tool("cast", spells=["light"])],
-        [_tool("cast", spells=["aid"])],
-    ]
-    for offered in rounds:
-        dialogue.append(_talk(f"t{len(dialogue)}", "ok"))
-        frame = ledger.plan(_canonical(*dialogue), request_context_id=CONTEXT, tools=offered)
-        ledger.commit(frame)
-        frames.append(frame)
-        records.append(frame.record)
-    declared = frames[0].tool_list
-    assert [t["function"]["name"] for t in declared] == ["attack", "cast", "read_reference",
-                                                         "rest"]
-    # A stub: the name and an open schema; the core in full.
-    assert declared[0]["function"] == {"name": "attack", "description": LOADER_STUB_NOTE,
-                                       "parameters": {"type": "object"}}
-    assert declared[2] == _tool("read_reference")
-    assert all(frame.tool_list == declared for frame in frames)
-    assert ledger.sent_tools(rounds[-1]) == declared
-    definitions = [[entry for entry in frame.appended if entry.get("l") == DEFINITIONS_LABEL]
-                   for frame in frames]
-    assert [[e["n"] for e in found] for found in definitions] == [
-        [["rest"]], [], [["attack", "cast"]], []]
-    record = definitions[2][0]["m"]
-    assert record["role"] == "user" and DEFINITIONS_LABEL in record["content"]
-    body = json.loads(record["content"].split(chr(10), 1)[1])
-    # The full state-independent definition; current choices stay in the callable record.
-    assert body["cast"]["parameters"] == CATALOG[1]["function"]["parameters"]
-    assert not _additions(frames[2])
-    for previous, current in zip(frames[:-1], frames[1:], strict=True):
-        assert current.wire[:len(previous.wire)] == previous.wire
-    restarted = _ledger(LOADER_DEFERRAL, transport)
-    rebuilt = restarted.plan(_canonical(*dialogue), request_context_id=CONTEXT,
-                             tools=rounds[-1], history_records=lambda: _history(records))
-    assert rebuilt.wire == frames[-1].wire and rebuilt.record is None
-    # Saved records come back with sorted keys; the list sent keeps its own bytes.
-    sorted_records = [json.loads(json.dumps(r, sort_keys=True)) for r in records]
-    resent = _ledger(LOADER_DEFERRAL, transport).sent_tools(
-        rounds[-1], history_records=lambda: sorted_records)
-    assert json.dumps(resent) == json.dumps(declared)
-
-
-def test_loader_adds_a_tool_outside_the_catalog_to_the_list():
-    ledger = _ledger(LOADER_DEFERRAL, "chat_completions")
-    frame = ledger.plan(_canonical(_user("u1", "Go")), request_context_id=CONTEXT,
-                        tools=[_tool("summon_breath")])
-    assert [t["function"]["name"] for t in frame.tool_list][-1] == "summon_breath"
-    assert frame.tool_list[-1] == _tool("summon_breath")
-    assert frame.record["tools_added"][-1] == _tool("summon_breath")
-
-
 def test_provider_deferral_declares_flags_and_appends_nothing():
     ledger = _ledger(PROVIDER_DEFERRAL, "claude_code")
     frames = []
@@ -324,6 +264,11 @@ def _route_gm(route: str):
             self.requests = []
 
         async def generate_stream(self, messages, tools=None, **kwargs):
+            last = next((m for m in reversed(messages or [])
+                         if m.get("role") in {"tool", "assistant"}), {})
+            if last.get("role") == "tool" and "mechanic_arguments_unread" in str(
+                    last.get("content")):
+                self.position -= 1  # the loader defined the mechanic instead: call it again
             if self.position < len(self.steps) and callable(self.steps[self.position][1]):
                 operation, parameters = self.steps[self.position]
                 self.steps[self.position] = operation, parameters()
@@ -334,7 +279,25 @@ def _route_gm(route: str):
                 request = ChatCompletionsTransport().format_request(
                     "qwen3-32b", copy.deepcopy(messages), copy.deepcopy(tools), True)
             self.requests.append(request)
-            async for chunk in super().generate_stream(messages, tools, **kwargs):
+            declared = [tool["function"]["name"] for tool in tools or ()]
+            offered = tools
+            if MECHANIC_TOOL_NAME in declared:
+                # Sylvia's loader: mechanics are named in definitions records, called through
+                # the generic tool.
+                names = [*declared, *_loader_defined(messages)]
+                kind = self.steps[self.position][0] if self.position < len(self.steps) else ""
+                if kind != "prose" and not any(
+                        name == kind or name.endswith("_" + kind) for name in names):
+                    names.append(kind)  # a mechanic never offered yet, called anyway
+                offered = [*(tools or ()), *({"type": "function", "function": {"name": name}}
+                                             for name in names[len(declared):])]
+            async for chunk in super().generate_stream(messages, offered, **kwargs):
+                delta = chunk.tool_call_delta
+                if delta is not None and delta["function"]["name"] not in declared:
+                    chunk.tool_call_delta = {**delta, "function": {
+                        "name": MECHANIC_TOOL_NAME, "arguments": json.dumps({
+                            "name": delta["function"]["name"],
+                            "arguments": json.loads(delta["function"]["arguments"])})}}
                 yield chunk
     return RouteGM()
 
@@ -343,17 +306,21 @@ def _tool_name_of(tool: dict) -> str:
     return tool.get("name") or tool["function"]["name"]
 
 
+def _loader_defined(messages) -> list[str]:
+    import re
+
+    return [name for message in messages
+            if isinstance(message.get("content"), str)
+            and DEFINITIONS_LABEL in message["content"][:200]
+            for name in re.findall(r"^## (\S+)", message["content"], re.M)]
+
+
 def _surfaced_names(request: dict, deferral: str) -> list[str]:
     if deferral == NATIVE_DEFERRAL:
         return [block["tool"]["name"] for message in request["messages"]
                 if message["role"] == "system" and isinstance(message["content"], list)
                 for block in message["content"]]
-    names = []
-    for message in request["messages"]:
-        content = message.get("content")
-        if isinstance(content, str) and DEFINITIONS_LABEL in content[:200]:
-            names.extend(json.loads(content.split(chr(10), 1)[1]))
-    return names
+    return _loader_defined(request["messages"])
 
 
 @pytest.mark.parametrize(("route", "deferral"), SESSION_ROUTES)
@@ -441,10 +408,11 @@ def test_deferred_session_fight_summon_restart(casting_seed, tmp_path, monkeypat
         loaded = [tool["name"] for tool in declared[0] if not tool.get("defer_loading")]
         for request in requests:
             assert _rule_problems(request) == [], _rule_problems(request)
+        assert loaded and len(loaded) < len(declared[0]) // 4
     else:
-        loaded = [tool["function"]["name"] for tool in declared[0]
-                  if tool["function"]["description"] != LOADER_STUB_NOTE]
-    assert loaded and len(loaded) < len(declared[0]) // 4
+        # The loader declares the application's own tools and the generic mechanic tool.
+        loaded = [tool["function"]["name"] for tool in declared[0]]
+        assert loaded[-1] == MECHANIC_TOOL_NAME and len(loaded) < 16
     assert all(not name.endswith("begin_srd_spell_action") for name in loaded)
     # Host-local tools (outside the catalog: session history, an argument reader) are always
     # loaded from the first request; catalog aliases carry a package digest prefix.
@@ -462,8 +430,9 @@ def test_deferred_session_fight_summon_restart(casting_seed, tmp_path, monkeypat
     assert len(surfaced) == len(set(surfaced))
     assert any(name.endswith("begin_srd_spell_action") for name in surfaced)
     assert any(name.endswith("start_group_combat_encounter") for name in surfaced)
-    # Tools the session never offered stay deferred and are never surfaced.
-    assert len(surfaced) + len(loaded) < len(declared[0])
+    if deferral == NATIVE_DEFERRAL:
+        # Tools the session never offered stay deferred and are never surfaced.
+        assert len(surfaced) + len(loaded) < len(declared[0])
     assert gm.failure is None
 
 
