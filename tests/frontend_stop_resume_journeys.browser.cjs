@@ -91,6 +91,7 @@ test('manual Retry: a failed reply offers Retry, keeps new input closed, and ans
       await ui.retry.waitFor();
       await ui.story.getByText("No game changes were saved for this turn. Sylvia couldn't finish the response.").waitFor();
       await ui.status.filter({ hasText: 'could not connect to the provider' }).waitFor();
+      assert.doesNotMatch(await ui.status.innerText(), /provider_error/, 'no owner code in player text (#223)');
       assert.equal(await ui.composer.isDisabled(), true, 'after a failure only Retry continues the turn');
       assert.equal(await ui.send.isDisabled(), true);
       await shot(page, 'retry-offered');
