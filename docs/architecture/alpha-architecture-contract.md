@@ -1705,7 +1705,7 @@ the ledger resets. Builder and participant requests do not use it.
   and a selected input whose value its schema refuses, returning the selected contract
   with the refusal; it then flattens the call. Every other input reaches the existing
   checks exactly as with the full schema, so a flat call that worked still works. SRD Lite
-  0.3.27 declares contracts for `begin_srd_spell_action` and
+  0.3.28 declares contracts for `begin_srd_spell_action` and
   `cast_spell_outside_combat`, derived by `scripts.srd_lite_argument_contracts` as a sound
   over-approximation and stamped by `scripts.update_srd_argument_contracts`. Saved-campaign
   rules updates treat the declaration as model guidance.

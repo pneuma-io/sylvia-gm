@@ -89,8 +89,8 @@ def _field_description(contract: ArgumentContract) -> str:
         f"The inputs of the selected {contract.selector} beyond those listed here. Read them "
         f"once per {contract.selector} with {ARGUMENTS_TOOL_NAME} (this tool's name and the "
         f"{contract.selector}), then pass them in this object. Omit it when the selected "
-        f"{contract.selector} needs nothing more. Inputs outside that {contract.selector}'s "
-        "contract are refused before anything is resolved."
+        f"{contract.selector} needs nothing more. An input this tool does not have, or one "
+        "already given at the top level, is refused before anything resolves."
     )
 
 
