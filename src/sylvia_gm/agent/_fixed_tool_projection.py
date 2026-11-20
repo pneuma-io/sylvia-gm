@@ -8,9 +8,15 @@ from typing import Any
 
 def schema_choices(current: Mapping[str, Any], fixed: Mapping[str, Any],
                    path: str = "$") -> dict[str, Any]:
-    """Describe only constraints omitted from the fixed projection, using schema paths."""
+    """Describe only constraints omitted from the fixed projection, using schema paths.
+
+    A participant reference is left out: its IDs are in the campaign state, and listing a
+    participant-only field's choices read as the only allowed target to a model (issue 235).
+    The turn loop still refuses a value outside it, naming the allowed values.
+    """
     choices: dict[str, Any] = {}
-    if "enum" in current and current["enum"] != fixed.get("enum"):
+    if ("enum" in current and current["enum"] != fixed.get("enum")
+            and current.get("x-sylvia-gm-reference") != "participant"):
         choices[path] = {"allowed_values": current["enum"]}
     properties = current.get("properties", {})
     fixed_properties = fixed.get("properties", {})
@@ -39,8 +45,10 @@ def argument_choices_record(fixed: Sequence[Mapping[str, Any]],
             choices[function["name"]] = fields
     return (
         "\nCurrent argument choices (the latest record replaces earlier choices; $ is the "
-        "argument object and [] means each array item). Use only these allowed_values and "
-        "available_fields where given; all other schema and engine checks still apply:\n"
+        "argument object and [] means each array item). Each entry limits only the field it "
+        "names: use its allowed_values or available_fields there. A field not listed is not "
+        "limited by this record (a target field not listed may name any current creature or "
+        "object). All other schema and engine checks still apply:\n"
         + json.dumps(choices, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     )
 
