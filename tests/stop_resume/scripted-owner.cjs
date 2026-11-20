@@ -17,7 +17,7 @@ const FAILURE = 'provider_error: Your message was saved. Sylvia could not connec
   'Check the connection address, network, and whether your local model server is running, then ' +
   'retry. Saved work is kept.';
 
-const reply = text => 'The Game Master answers: ' + text.replace(FAIL, '').trim();
+const reply = text => 'The Game Master answers: ' + text.replace(/\[(hold|fail|late)\]/g, '').trim();
 const slug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 class Rejection extends Error {}
@@ -76,6 +76,9 @@ class ScriptedOwner {
   // Resolve when the named campaign's GM is working on a reply (or at once if it already is).
   working(name) { return this.#until(() => this.campaign(name).attempt?.status === 'working'); }
 
+  // Resolve once the named campaign's GM is no longer working on a reply.
+  settled(name) { return this.#until(() => this.campaign(name).attempt?.status !== 'working'); }
+
   // Finish a [late] reply for the named campaign.
   release(name) {
     const attempt = this.campaign(name).attempt;
@@ -83,14 +86,15 @@ class ScriptedOwner {
     attempt.late();
   }
 
-  // Delay the next call of command whose arguments include match, until the returned release().
+  // Delay the next call of command whose arguments include match until release(). `arrived`
+  // resolves when the frontend makes that call, `answered` once its result has been returned.
   gate(command, match = {}) {
-    let open;
-    const opened = new Promise(resolve => { open = resolve; });
-    let reached;
-    const arrived = new Promise(resolve => { reached = resolve; });
-    this.gates.push({ command, match, opened, reached });
-    return { arrived, release: () => open() };
+    const signal = () => { let resolve; const promise = new Promise(done => { resolve = done; });
+      return { promise, resolve }; };
+    const opened = signal(), arrived = signal(), answered = signal();
+    this.gates.push({ command, match, opened: opened.promise, reached: arrived.resolve,
+      answered: answered.resolve });
+    return { arrived: arrived.promise, answered: answered.promise, release: () => opened.resolve() };
   }
 
   #until(condition) {
@@ -110,8 +114,9 @@ class ScriptedOwner {
     this.calls.push({ command, args });
     const gateIndex = this.gates.findIndex(gate => gate.command === command &&
       Object.entries(gate.match).every(([key, value]) => args[key] === value));
+    let gate = null;
     if (gateIndex >= 0) {
-      const [gate] = this.gates.splice(gateIndex, 1);
+      [gate] = this.gates.splice(gateIndex, 1);
       gate.reached();
       await gate.opened;
     }
@@ -122,7 +127,10 @@ class ScriptedOwner {
     }
     try {
       return structuredClone(await handler.call(this, args));
-    } finally { this.#changed(); }
+    } finally {
+      this.#changed();
+      gate?.answered();
+    }
   }
 
   #session(id) {
@@ -267,7 +275,9 @@ class ScriptedOwner {
     },
     player_projection_page: function ({ campaignId, afterSequence }) {
       const c = this.#byCampaign(campaignId);
-      const talk = c.canonical.filter(event => event.sequence > (afterSequence || 0)).map(event => ({
+      // With no afterSequence the owner sends live controls only, no narration.
+      const shown = afterSequence == null ? [] : c.canonical.filter(event => event.sequence > afterSequence);
+      const talk = shown.map(event => ({
         kind: 'talk', sequence: event.sequence, text: event.safe_payload.text, safe_payload: event.safe_payload,
         collapsed_by_default: false, provisional: false, action_id: null, attempt_id: event.attempt_id }));
       // The owner withdraws the Retry offer while a reply for the interrupted turn is running.
@@ -277,9 +287,11 @@ class ScriptedOwner {
     submit_session_input: async function (args) {
       const c = this.#session(args.sessionId);
       if (c.attempt?.status === 'working') reject('session_busy', 'The Game Master is still working on a reply.');
-      if (c.interruption && (!c.interruption.can_redirect ||
-          args.redirectInterruptionId !== c.interruption.interruption_id)) {
-        reject('retry_required', 'Retry or resolve the interrupted turn first.');
+      if (c.interruption && args.redirectInterruptionId !== c.interruption.interruption_id) {
+        reject('command_rejected', 'Retry or resolve the interrupted turn first');
+      }
+      if (c.interruption && !c.interruption.can_redirect) {
+        reject('command_rejected', 'Only stopped narration accepts replacement input');
       }
       const attempt = { attempt_id: args.attemptId, input_id: args.attemptId, message_id: args.messageId,
         text: args.userText };

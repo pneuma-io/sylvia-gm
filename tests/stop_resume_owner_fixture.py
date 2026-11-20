@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -29,7 +30,7 @@ PARTIAL = "Partial narration that Stop must discard."
 def scripted_reply(player_text: str) -> str:
     """The narration the scripted GM gives once a message is answered."""
 
-    return "The Game Master answers: " + player_text.replace(FAIL, "").strip()
+    return "The Game Master answers: " + re.sub(r"\[(hold|fail|late)\]", "", player_text).strip()
 
 
 class JourneyGM(_ScriptedProvider):
