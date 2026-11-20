@@ -251,6 +251,37 @@ test('Home navigation keeps session selection and drafts, and dialogs cancel cle
   } finally { await browser.close(); }
 });
 
+test('Home and Play return to a stopped Game Master before the campaign Builder', { timeout: 60000 }, async () => {
+  const browser = await launch();
+  try {
+    const { page, errors } = await openHome(browser, { width: 1400, height: 900 });
+    // Stop Session (as Update campaign rules asks) leaves the GM stopped and the campaign Builder active.
+    await page.evaluate(() => {
+      const lantern = window.homeTest.state.campaigns.find((c) => c.campaign_id === 'lantern');
+      lantern.sessions = [
+        { session_id: 'lantern-builder', role: 'builder', status: 'active' },
+        { session_id: 'lantern-gm', role: 'dm', status: 'stopped' },
+      ];
+      window.homeTest.renderHome();
+    });
+    assert.equal(await page.locator('.home-continue').getAttribute('data-home-session-id'), 'lantern-gm');
+    const card = page.locator('.campaign-shelf-item[data-home-campaign-id="lantern"]');
+    assert.equal(await card.getAttribute('data-home-session-id'), 'lantern-gm');
+    assert.equal(await card.locator('.campaign-shelf-meta').innerText(), 'Game Master session · stopped');
+    await card.click();
+    assert.deepEqual(await view(page), { view: 'session', campaign: 'lantern', session: 'lantern-gm' });
+    assert.equal(await page.evaluate(() => window.homeTest.state.activeSessionRole), 'dm');
+    await page.locator('#resume-session-btn').waitFor({ state: 'visible' });
+    assert.equal(await page.locator('#finalize-construction-btn').isHidden(), true,
+      'the played campaign does not offer Admit Plan & Start DM');
+
+    await goHome(page);
+    await page.locator('#rail-play-btn').click();
+    assert.deepEqual(await view(page), { view: 'session', campaign: 'lantern', session: 'lantern-gm' });
+    assert.deepEqual(errors, []);
+  } finally { await browser.close(); }
+});
+
 test('Campaign data offers no export or campaign actions on Home', { timeout: 60000 }, async () => {
   const browser = await launch();
   try {
