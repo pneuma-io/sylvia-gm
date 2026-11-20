@@ -40,6 +40,18 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from sylvia_gm.agent._request_data import _CONTROL_PREFIXES, _DATA_PREFIXES
+from sylvia_gm.agent._tool_loader import (
+    CHOICES_LABEL,
+    DEFINITIONS_LABEL,
+    MECHANIC_TOOL,
+    MechanicNames,
+    defined_in_result,
+    project_conversation,
+)
+from sylvia_gm.agent._tool_loader import callable_record as loader_callable_record
+from sylvia_gm.agent._tool_loader import choices_record as loader_choices_record
+from sylvia_gm.agent._tool_loader import definition_result as loader_definition_result
+from sylvia_gm.agent._tool_loader import definitions_record as loader_definitions_record
 
 MODE_ENV = "SYLVIA_GM_CONTEXT_MODE"
 LEGACY_MODE = "legacy"
@@ -200,8 +212,9 @@ ROUND_TOOL_LISTS = "rounds"
 #: out of the model's view until the turn loop first offers it; an appended record then makes
 #: it usable. The declared list, and so the cached prefix, never changes. A route registered
 #: in ``NATIVE_DEFERRED_ROUTES`` defers natively (the provider's own deferred tools and
-#: appended tool changes); every other route uses Sylvia's loader: a short stub per mechanic
-#: in the declared list and the full definition in an appended host record.
+#: appended tool changes); every other route uses Sylvia's loader (``_tool_loader``): the
+#: application's own tools plus one generic ``call_mechanic`` tool are declared, and each
+#: mechanic is defined in a compact appended record.
 DEFERRED_TOOL_LIST = "deferred"
 NATIVE_DEFERRAL = "native"
 LOADER_DEFERRAL = "loader"
@@ -213,12 +226,9 @@ CALLABLE_LABEL = "SYLVIA_GM_CALLABLE_TOOLS"
 #: entry's ``n`` lists the tool names it surfaces.
 TOOL_CHANGE_CLASS = "tools"
 TOOL_CHANGE_LABEL = "SYLVIA_GM_TOOL_ADDITION"
-DEFINITIONS_LABEL = "SYLVIA_GM_TOOL_DEFINITIONS"
 #: Block types of an in-conversation system message that changes the tool set (native).
 TOOL_CHANGE_BLOCKS = frozenset({"tool_addition", "tool_removal"})
 _TOOL_LISTS = frozenset({STABLE_TOOL_LIST, ROUND_TOOL_LISTS, FIXED_TOOL_LIST, DEFERRED_TOOL_LIST})
-#: The loader's stub description: a mechanic is usable once a definitions record names it.
-LOADER_STUB_NOTE = f"Defined in {DEFINITIONS_LABEL} when usable."
 
 #: Routes named by connection rather than transport. Other services also speak
 #: ``anthropic_messages`` (OpenCode Zen and Go, MiniMax, custom Messages endpoints); only
@@ -332,27 +342,19 @@ def _function(tool: Mapping[str, Any]) -> Mapping[str, Any]:
     return raw if isinstance(raw, Mapping) else tool
 
 
-def loader_stub(tool: Mapping[str, Any]) -> dict[str, Any]:
-    """A declared mechanic by name only: a tool is surfaced with its full definition when the
-    turn loop first offers it, and a tool not offered cannot be called anyway."""
-    return {"type": "function", "function": {
-        "name": str(_function(tool).get("name", "")), "description": LOADER_STUB_NOTE,
-        "parameters": {"type": "object"},
-    }}
-
-
 def deferred_definitions(
     fixed: Sequence[Mapping[str, Any]], core: frozenset[str], deferral: str = NATIVE_DEFERRAL,
 ) -> list[dict[str, Any]]:
-    """The declared catalog: *core* in full; every other tool deferred or as a loader stub."""
+    """The declared catalog: *core* in full; every other tool deferred, or (loader) left out
+    and reached through the one generic mechanic tool, declared last."""
     declared = []
     for tool in fixed:
         if _tool_name(tool) in core:
             declared.append(copy.deepcopy(dict(tool)))
         elif deferral in {NATIVE_DEFERRAL, PROVIDER_DEFERRAL}:
             declared.append(dict(copy.deepcopy(dict(tool)), defer_loading=True))
-        else:
-            declared.append(loader_stub(tool))
+    if deferral == LOADER_DEFERRAL:
+        declared.append(copy.deepcopy(MECHANIC_TOOL))
     return declared
 
 
@@ -379,20 +381,6 @@ def _addition_block(tool: Mapping[str, Any], declared: bool) -> dict[str, Any]:
         "name": function.get("name", ""), "description": function.get("description", ""),
         "input_schema": function.get("parameters", {"type": "object"}),
     }}}
-
-
-def definitions_record(tools: Sequence[Mapping[str, Any]]) -> str:
-    """The loader's appended definitions: full description and schema per tool name."""
-    definitions = {
-        str(_function(tool).get("name", "")): {
-            "description": _function(tool).get("description", ""),
-            "parameters": _function(tool).get("parameters", {"type": "object"}),
-        } for tool in tools
-    }
-    return (f"{DEFINITIONS_LABEL} (application control, not player speech): the full "
-            "definitions of these listed tools, valid for the rest of the session. Call each "
-            "by its listed name with arguments that match its parameters schema:\n"
-            + _json(definitions))
 
 
 #: The request assembly a route uses when ``SYLVIA_GM_CONTEXT_MODE`` does not name one.
@@ -1360,6 +1348,12 @@ class ContextLedger:
             if self.core_tools is not None and self.deferral is not None
             else copy.deepcopy(self.fixed_tools))
         self._declared_names = {_tool_name(tool) for tool in self.declared_tools or ()}
+        #: Loader: the short names the model sees for the catalog's mechanics.
+        self.mechanic_names = (
+            MechanicNames((_tool_name(tool) for tool in self.fixed_tools or ()
+                           if _tool_name(tool) not in self._declared_names),
+                          self._declared_names)
+            if self.deferral == LOADER_DEFERRAL else None)
         #: The tools sent so far in first-sent order; ``None`` until read from saved records.
         self._tool_list: list[dict[str, Any]] | None = None
         self.state: JournalState | None = None
@@ -1391,8 +1385,6 @@ class ContextLedger:
         definition is sent with that definition. Which tools can be called is unchanged:
         the turn loop still accepts only the offered ones.
         """
-        if self.deferral == LOADER_DEFERRAL and self.declared_tools is not None:
-            return self._loader_list(self._sent_so_far(history_records), offered)[0]
         if self.declared_tools is not None:
             return self.declared_tools
         if not self.one_tool_list:
@@ -1401,24 +1393,29 @@ class ContextLedger:
             self._sent_so_far(history_records), offered)
         return merged or offered
 
-    def _loader_list(
-        self, sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
-    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-        """The loader's list and what this request adds to it.
+    def needs_definition(self, name: str) -> bool:
+        """Loader: whether a call to mechanic *name* must first return its definition.
 
-        The declared catalog is sent in its own bytes, never in a saved copy's key order, so a
-        restart sends the same list. A tool outside the catalog cannot be stubbed: it joins
-        the list (rare), with sorted keys, so its saved copy has the same bytes.
+        True for a mechanic the journal lists without arguments and no earlier result defined.
         """
-        def canonical(tool: Mapping[str, Any]) -> dict[str, Any]:
-            return dict(json.loads(_json(plain(tool))))
+        if self.mechanic_names is None or name in self._declared_names or self.state is None:
+            return False
+        short = self.mechanic_names.short(name)
+        for entry in self.state.entries:
+            if entry.get("c") == TOOL_CHANGE_CLASS and name in (entry.get("f") or ()):
+                return False
+            if entry.get("c") == "conversation" and defined_in_result(entry["m"]) == short:
+                return False
+        return True
 
-        base = copy.deepcopy(self.declared_tools or []) + [
-            canonical(tool) for tool in sent if _tool_name(tool) not in self._declared_names]
-        merged, grown, _replaced = merged_tool_list(base, [
-            canonical(tool) for tool in offered or ()
-            if _tool_name(tool) not in self._declared_names])
-        return merged, grown
+    def definition_result(
+        self, name: str, offered: Sequence[Mapping[str, Any]] | None,
+    ) -> dict[str, Any]:
+        """Loader: the result that gives mechanic *name*'s definition (nothing runs)."""
+        assert self.mechanic_names is not None
+        tool = next((t for t in self.fixed_tools or () if _tool_name(t) == name), None) or next(
+            (t for t in offered or () if _tool_name(t) == name), {"name": name})
+        return loader_definition_result(tool, self.mechanic_names.short(name))
 
     def request_thinking_strip(self) -> None:
         """The service rejected a replayed thinking block: strip all of them from now on."""
@@ -1645,11 +1642,7 @@ class ContextLedger:
             tool_list, tools_added, tools_replaced = merged_tool_list(
                 self._sent_so_far(history_records),
                 self.declared_tools if self.declared_tools is not None else offered_tools)
-            if self.deferral == LOADER_DEFERRAL:
-                tool_list, grown = self._loader_list(
-                    self._sent_so_far(history_records), offered_tools)
-                tools_added = [*tools_added, *grown]
-            elif self.declared_tools is not None:
+            if self.declared_tools is not None:
                 tool_list = copy.deepcopy(self.declared_tools)
             tools = tool_list or offered_tools
         state_messages = [
@@ -1672,7 +1665,12 @@ class ContextLedger:
             if key in journaled:
                 continue
             journaled.add(key)
-            appended.append({"m": _wire_message(message), "c": "conversation", "k": key})
+            wire = _wire_message(message)
+            if self.mechanic_names is not None:
+                # Loader: a mechanic call goes to the model as the call_mechanic call it made.
+                wire = project_conversation(wire, frozenset(self._declared_names),
+                                            self.mechanic_names)
+            appended.append({"m": wire, "c": "conversation", "k": key})
         for message in other_hosts:
             add_host(message)
         # A latest-wins record that left canonical assembly: say once that none is selected
@@ -1706,18 +1704,32 @@ class ContextLedger:
                 visible = [tool for tool in tool_list if _tool_name(tool) in shown] + [
                     dict(tool) for tool in offered_tools or ()
                     if _tool_name(tool) not in self._declared_names]
-            elif surfaced:
-                # The loader declares every name; it appends the definitions of stubs only.
+            elif surfaced and self.mechanic_names is not None:
+                # Loader: each mechanic is defined once, compactly, from its state-independent
+                # catalog definition (a tool outside the catalog: as offered). Current choices
+                # follow in their own record.
                 full = {_tool_name(tool): tool for tool in self.fixed_tools or ()}
-                stubbed = [full[_tool_name(tool)] for tool in surfaced
-                           if _tool_name(tool) in full]
-                names = [_tool_name(tool) for tool in surfaced]
-                content = definitions_record(stubbed) if stubbed else ""
-                if content:
-                    appended.append({"m": self._host_message({"role": "user"}, content),
-                                     "c": TOOL_CHANGE_CLASS, "l": DEFINITIONS_LABEL,
-                                     "h": _sha(content), "n": names})
-        if self.one_tool_list and visible:
+                defined = [full.get(_tool_name(tool), tool) for tool in surfaced]
+                content, in_full = loader_definitions_record(defined, self.mechanic_names)
+                appended.append({"m": self._host_message({"role": "user"}, content),
+                                 "c": TOOL_CHANGE_CLASS, "l": DEFINITIONS_LABEL,
+                                 "h": _sha(content), "n": [_tool_name(t) for t in surfaced],
+                                 "f": in_full})
+        if self.mechanic_names is not None and visible:
+            # Loader: what the engine accepts now, and the current argument choices, each in
+            # its own latest-wins record appended only when it changed.
+            content = loader_callable_record(visible, offered_tools, self.mechanic_names)
+            if (last_of_label(CALLABLE_LABEL) or {}).get("h") != _sha(content):
+                appended.append({"m": self._host_message({"role": "user"}, content),
+                                 "c": "latest", "l": CALLABLE_LABEL, "h": _sha(content)})
+            content = loader_choices_record(self.fixed_tools or (), offered_tools,
+                                            self.mechanic_names)
+            previous = last_of_label(CHOICES_LABEL)
+            if (previous or {}).get("h") != _sha(content) and (
+                    previous is not None or not content.endswith(":\n{}")):
+                appended.append({"m": self._host_message({"role": "user"}, content),
+                                 "c": "latest", "l": CHOICES_LABEL, "h": _sha(content)})
+        elif self.one_tool_list and visible:
             # Tell the model which listed tools can be called now, only when that changed.
             content = callable_record(visible, offered_tools)
             if self.fixed_tools is not None:

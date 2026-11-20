@@ -676,6 +676,91 @@ def record_final_narration(
     yield ProviderEvent.talk(state.narration)
 
 
+def loader_mechanic_names(
+    self: ProviderSessionAdapter, provider_input: SessionProviderInput,
+) -> Any:
+    """The session ledger's mechanic names when Sylvia's tool loader serves this request."""
+    from sylvia_gm.agent._context_ledger import LOADER_DEFERRAL
+
+    if (getattr(self, "_deferred_tool_list", None) != LOADER_DEFERRAL
+            or not self._ledger_active(provider_input)):
+        return None
+    ledger = self._ledger_store().get(provider_input.session.session_id)
+    return getattr(ledger, "mechanic_names", None)
+
+
+def unwrap_loader_calls(
+    self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
+) -> None:
+    """Loader: admit a ``call_mechanic`` call as the mechanic it names, with its arguments.
+
+    Canonical history, evidence, admission and validation then see the mechanic itself; the
+    ledger renders it back as the ``call_mechanic`` call for the model. A call whose envelope
+    cannot be read keeps its name and is refused with what a valid one needs.
+    """
+    from sylvia_gm.agent._tool_loader import MECHANIC_TOOL_NAME, unwrap_mechanic_call
+
+    names = loader_mechanic_names(self, provider_input)
+    if names is None:
+        return
+    for assembly in state.ordered:
+        if assembly.name != MECHANIC_TOOL_NAME:
+            # A route that lets a model call a mechanic by its short name directly.
+            assembly.name = names.alias(assembly.name, state.aliases)
+            continue
+        unwrapped = unwrap_mechanic_call(assembly.arguments)
+        if unwrapped is not None:
+            assembly.name = names.alias(unwrapped[0], state.aliases)
+            assembly.arguments = unwrapped[1]
+
+
+def give_loader_definition(
+    self: ProviderSessionAdapter, state: ProviderTurnState, provider_input: SessionProviderInput,
+    name: str,
+) -> bool:
+    """Loader: answer a first call to a mechanic listed without arguments with its definition.
+
+    Nothing runs and it is not a failed call: the model calls again with the shape it now has.
+    """
+    if loader_mechanic_names(self, provider_input) is None:
+        return False
+    ledger = self._ledger_store().get(provider_input.session.session_id)
+    if ledger is None or not ledger.needs_definition(name):
+        return False
+    state.local_tool_results[state.assembly.call_id] = ledger.definition_result(
+        name, state.tools)
+    return True
+
+
+def _reject_loader_call(
+    self: ProviderSessionAdapter, state: ProviderTurnState, names: Any,
+) -> None:
+    from sylvia_gm.agent._tool_loader import DEFINITIONS_LABEL, MECHANIC_TOOL_NAME
+
+    application_tools = {
+        alias for alias, tool in state.aliases.items() if tool.category != "mechanic"}
+    invalid = state.assembly.name == MECHANIC_TOOL_NAME
+    state.local_tool_results[state.assembly.call_id] = {
+        "status": "rejected",
+        "code": "mechanic_call_invalid" if invalid else "unavailable_catalog_tool",
+        "state_changed": False,
+        "requested_provider_tool_name": names.short(state.assembly.name),
+        "mechanics_usable_now": sorted(
+            names.short(alias) for alias in state.aliases if alias not in application_tools),
+        "tools_callable_now": sorted(application_tools),
+        "instruction": (
+            f"{MECHANIC_TOOL_NAME} needs an object with name, one of mechanics_usable_now, "
+            "and arguments, an object of the shape its "
+            f"{DEFINITIONS_LABEL} entry shows. Call it again only with both."
+            if invalid else
+            "This cannot be used at this step. Do not call it again in this correction. "
+            f"Use one of mechanics_usable_now through {MECHANIC_TOOL_NAME}, or a tool from "
+            "tools_callable_now, only when it fits the current Ruleset state. If an engine "
+            "transition is marked required, call that transition first."
+        ),
+    }
+
+
 def reject_unavailable_tool(
     self: ProviderSessionAdapter,
     state: ProviderTurnState,
@@ -683,6 +768,17 @@ def reject_unavailable_tool(
     *,
     turn_id: str,
 ) -> None:
+    names = loader_mechanic_names(self, provider_input)
+    if names is not None:
+        from sylvia_gm.agent._tool_loader import MECHANIC_TOOL_NAME
+
+        _reject_loader_call(self, state, names)
+        state.local_tool_failures.add(state.assembly.call_id)
+        record_fixed_tool_refusal(
+            self, state, provider_input, turn_id=turn_id,
+            reason=("mechanic_call_invalid" if state.assembly.name == MECHANIC_TOOL_NAME
+                    else "not_callable"))
+        return
     state.local_tool_results[state.assembly.call_id] = {
         "status": "rejected",
         "code": "unavailable_catalog_tool",
@@ -1709,6 +1805,7 @@ def prepare_tool_batch(
         state.assembly = _turn_assembly
         if not state.assembly.call_id:
             state.assembly.call_id = f"call-{uuid.uuid4().hex}"
+    unwrap_loader_calls(self, state, provider_input)
     for _turn_assembly in state.ordered:
         state.assembly = _turn_assembly
         resolved_tool = _resolve_provider_tool_alias(state.assembly.name, state.aliases)
@@ -1823,6 +1920,8 @@ def execute_tool_batch(
             reject_unavailable_tool(self, state, provider_input, turn_id=turn_id)
             continue
         _, state.catalog_tool = resolved_tool
+        if give_loader_definition(self, state, provider_input, resolved_tool[0]):
+            continue
         if _tool_call_needs_fresh_catalog(state, position):
             state.local_tool_results[state.assembly.call_id] = {
                 "status": "superseded_by_catalog_refresh",
