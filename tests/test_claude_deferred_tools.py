@@ -558,9 +558,11 @@ def offline_runtime(monkeypatch, tmp_path: Path, endpoint: ScriptedEndpoint,
 
 
 def run_session(tmp_path: Path, monkeypatch, *, binary: str, seed: tuple[Path, dict],
-                mode: str, process: str, refused_call: bool,
+                mode: str | None, process: str, refused_call: bool,
                 thinking: bool = False) -> dict[str, Any]:
     """The scripted D&D session of PR 208 on ``claude_code``; every request body is kept.
+
+    ``mode`` is a ``SYLVIA_GM_TOOL_LIST`` value, or None for the route's shipped default.
 
     Exploration (optionally a refused call first), a fight with a summoned dragon, an owner
     restart, exploration, a second fight and a rest.
@@ -571,7 +573,10 @@ def run_session(tmp_path: Path, monkeypatch, *, binary: str, seed: tuple[Path, d
     from tests.test_gm_context_contract import settle
     from tests.test_srd_public_spell_casting import SRD
 
-    monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
+    if mode is None:
+        monkeypatch.delenv("SYLVIA_GM_TOOL_LIST", raising=False)
+    else:
+        monkeypatch.setenv("SYLVIA_GM_TOOL_LIST", mode)
     monkeypatch.setenv("SYLVIA_CLAUDE_PROCESS", process)
     endpoint = ScriptedEndpoint()
     endpoint.thinking = thinking
@@ -742,8 +747,9 @@ def test_real_claude_code_deferred_session_keeps_one_tool_list(
 ):
     # Opt-in prerequisite, run by hand, like tests/test_claude_native_wire.py.
     assert BINARY
+    # No setting: ``deferred`` is the route's shipped default.
     run = run_session(tmp_path, monkeypatch, binary=BINARY, seed=claude_seed,
-                      mode="deferred", process=process, refused_call=True, thinking=thinking)
+                      mode=None, process=process, refused_call=True, thinking=thinking)
     requests = run["requests"]
     assert run["offsite"] == []
     assert len(requests) >= 12

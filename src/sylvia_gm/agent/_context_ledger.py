@@ -243,10 +243,12 @@ def gm_route(transport: str | None, provider_key: str | None = None) -> str:
 #: stable list). Live on Opus 5.5, 20 November 2026: no prefix rewrite after the first
 #: request (``stable``: two), 95.7% of later input read from cache (79.8%), about half the
 #: cost per request.
+#: ``claude_code`` is ``deferred`` (Claude Code's own tool search), measured offline on 20
+#: November 2026 (#204): no prefix breaks and 65% less cache-weighted input than ``stable``.
 DEFAULT_TOOL_LIST = ROUND_TOOL_LISTS
 DEFAULT_TOOL_LIST_BY_TRANSPORT: Mapping[str, str] = {
     # One route per line, so each route's own change edits only its line.
-    "claude_code": STABLE_TOOL_LIST,
+    "claude_code": DEFERRED_TOOL_LIST,
     "codex_app_server": STABLE_TOOL_LIST,
     ANTHROPIC_API_ROUTE: DEFERRED_TOOL_LIST,
 }
