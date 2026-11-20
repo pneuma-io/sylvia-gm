@@ -1371,11 +1371,7 @@ class ContextLedger:
         the turn loop still accepts only the offered ones.
         """
         if self.deferral == LOADER_DEFERRAL and self.declared_tools is not None:
-            # A tool outside the catalog cannot be stubbed: it joins the list (rare).
-            merged, _added, _replaced = merged_tool_list(
-                self._sent_so_far(history_records) or self.declared_tools,
-                [tool for tool in offered or () if _tool_name(tool) not in self._declared_names])
-            return merged
+            return self._loader_list(self._sent_so_far(history_records), offered)[0]
         if self.declared_tools is not None:
             return self.declared_tools
         if not self.one_tool_list:
@@ -1383,6 +1379,25 @@ class ContextLedger:
         merged, _added, _replaced = merged_tool_list(
             self._sent_so_far(history_records), offered)
         return merged or offered
+
+    def _loader_list(
+        self, sent: Sequence[Mapping[str, Any]], offered: Sequence[Mapping[str, Any]] | None,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        """The loader's list and what this request adds to it.
+
+        The declared catalog is sent in its own bytes, never in a saved copy's key order, so a
+        restart sends the same list. A tool outside the catalog cannot be stubbed: it joins
+        the list (rare), with sorted keys, so its saved copy has the same bytes.
+        """
+        def canonical(tool: Mapping[str, Any]) -> dict[str, Any]:
+            return dict(json.loads(_json(plain(tool))))
+
+        base = copy.deepcopy(self.declared_tools or []) + [
+            canonical(tool) for tool in sent if _tool_name(tool) not in self._declared_names]
+        merged, grown, _replaced = merged_tool_list(base, [
+            canonical(tool) for tool in offered or ()
+            if _tool_name(tool) not in self._declared_names])
+        return merged, grown
 
     def request_thinking_strip(self) -> None:
         """The service rejected a replayed thinking block: strip all of them from now on."""
@@ -1610,9 +1625,8 @@ class ContextLedger:
                 self._sent_so_far(history_records),
                 self.declared_tools if self.declared_tools is not None else offered_tools)
             if self.deferral == LOADER_DEFERRAL:
-                tool_list, grown, _replaced = merged_tool_list(tool_list, [
-                    tool for tool in offered_tools or ()
-                    if _tool_name(tool) not in self._declared_names])
+                tool_list, grown = self._loader_list(
+                    self._sent_so_far(history_records), offered_tools)
                 tools_added = [*tools_added, *grown]
             elif self.declared_tools is not None:
                 tool_list = copy.deepcopy(self.declared_tools)

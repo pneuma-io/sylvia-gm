@@ -162,6 +162,11 @@ def test_loader_declares_stubs_and_appends_each_definition_once(transport):
     rebuilt = restarted.plan(_canonical(*dialogue), request_context_id=CONTEXT,
                              tools=rounds[-1], history_records=lambda: _history(records))
     assert rebuilt.wire == frames[-1].wire and rebuilt.record is None
+    # Saved records come back with sorted keys; the list sent keeps its own bytes.
+    sorted_records = [json.loads(json.dumps(r, sort_keys=True)) for r in records]
+    resent = _ledger(LOADER_DEFERRAL, transport).sent_tools(
+        rounds[-1], history_records=lambda: sorted_records)
+    assert json.dumps(resent) == json.dumps(declared)
 
 
 def test_loader_adds_a_tool_outside_the_catalog_to_the_list():
@@ -396,8 +401,9 @@ def test_deferred_session_fight_summon_restart(casting_seed, tmp_path, monkeypat
     requests = gm.requests
     assert len(requests) >= 6
     declared = [_clean(request["tools"]) for request in requests]
-    # One declared list for the whole session, including across the owner restart.
-    assert all(tools == declared[0] for tools in declared)
+    # One declared list for the whole session, byte for byte (key order included), across
+    # the owner restart.
+    assert all(json.dumps(tools) == json.dumps(declared[0]) for tools in declared)
     if deferral == NATIVE_DEFERRAL:
         loaded = [tool["name"] for tool in declared[0] if not tool.get("defer_loading")]
         for request in requests:
