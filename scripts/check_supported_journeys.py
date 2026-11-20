@@ -729,6 +729,7 @@ UI_JOURNEY = [
     'tests/frontend_weapon_reload.browser.cjs',
     'tests/frontend_weapon_reload.test.cjs',
     'tests/frontend_weapon_reload_queue.test.cjs',
+    'tests/frontend_stop_resume_journeys.browser.cjs',
 ]
 
 
