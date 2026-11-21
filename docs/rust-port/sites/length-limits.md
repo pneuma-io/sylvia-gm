@@ -44,7 +44,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/plan_bundle.py:84` | `_read_bundle` | len() against a limit | `if len(data) > PLAN_BUNDLE_BYTE_LIMIT:` | |
 | `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` | |
 | `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` | |
-| `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` | |
+| `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` |  `sylvia-app` plan_state_vectors |
 | `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
 | `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
 | `application/reusable_participants.py:264` | `parse_setting_character` | len() against a limit | `or len(source.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
