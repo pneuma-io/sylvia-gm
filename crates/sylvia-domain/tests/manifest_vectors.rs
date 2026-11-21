@@ -153,13 +153,11 @@ fn lock(l: &PackageLock) -> Json {
         "capabilities": strings(e.capabilities())})).collect::<Vec<_>>()})
 }
 
-/// Rust's outcome in the vector's form. Python's operator exceptions (`TypeError`, `KeyError`,
-/// `AttributeError`, `IndexError`) all escape to the owner's internal error, so they compare
-/// by class only, as `TypeError`.
+/// Rust's outcome in the vector's form: Python's operator exceptions (`TypeError`, `KeyError`,
+/// `AttributeError`, `IndexError`) compare by class and text like every other exception.
 fn outcome<T>(result: DomainResult<T>, project: impl Fn(&T) -> Json) -> Json {
     match result {
         Ok(value) => json!(["ok", digest(&project(&value))]),
-        Err(DomainError::Type(_)) => json!(["TypeError"]),
         Err(DomainError::Diagnosed { error_type, message, diagnostics }) => {
             json!([
                 error_type,
@@ -172,11 +170,7 @@ fn outcome<T>(result: DomainResult<T>, project: impl Fn(&T) -> Json) -> Json {
 }
 
 fn expected(case: &Json) -> Json {
-    let raw = &case["outcome"];
-    match raw[0].as_str().unwrap() {
-        "TypeError" | "KeyError" | "AttributeError" | "IndexError" => json!(["TypeError"]),
-        _ => raw.clone(),
-    }
+    case["outcome"].clone()
 }
 
 fn step<'v>(node: &'v mut Json, part: &Json) -> &'v mut Json {

@@ -11,7 +11,8 @@ use crate::error::{DomainError, DomainResult};
 use crate::inventory::inventory_holding_schema;
 use crate::model_capability::validate_capability_tier_id;
 use crate::pyops::{
-    py_eq, py_get, py_hashable, py_in, py_index, py_set, py_set_equals, py_subscript, py_truthy, PyFault,
+    py_eq, py_get, py_hashable, py_in, py_index, py_set, py_set_equals, py_subscript, py_truthy,
+    py_type_name, py_unhashable, PyFault,
 };
 use crate::starting_state::{
     parse_state_schemas, StateSchema, PRIVATE_STATE_FEATURE, REQUIRED_STARTING_STATE_FEATURE,
@@ -134,9 +135,9 @@ fn value(message: &str) -> DomainError {
     DomainError::value(message)
 }
 
-/// A `TypeError` Python raises outside any handler (unhashable values and the like).
-fn fault(_: PyFault) -> DomainError {
-    DomainError::type_error("Python operator failed on a value of the wrong type")
+/// The `IndexError` of `list[index]` beyond the list, which Python does not catch here.
+fn index_error() -> DomainError {
+    DomainError::uncaught("IndexError", "list index out of range")
 }
 
 fn text_in(value: &Json, options: &[&str]) -> bool {
@@ -325,7 +326,7 @@ impl From<PyFault> for Bookkeeping {
     fn from(error: PyFault) -> Self {
         match error {
             // `IndexError` is not in the `except (KeyError, TypeError, AttributeError)` tuple.
-            PyFault::Index => Bookkeeping::Raise(fault(error)),
+            PyFault::Index => Bookkeeping::Raise(index_error()),
             _ => Bookkeeping::Caught,
         }
     }
@@ -461,7 +462,7 @@ fn validate_inventory_targets(
     if !inventory.get("format").is_some_and(|format| py_eq(format, &Json::from("mechanics"))) {
         return Ok(());
     }
-    let raw_names = inventory.get("tools").ok_or_else(|| DomainError::type_error("KeyError: 'tools'"))?;
+    let raw_names = inventory.get("tools").ok_or_else(|| DomainError::uncaught("KeyError", "'tools'"))?;
     let mut names = Vec::new();
     for name in array(raw_names, "Inventory tools")? {
         names.push(validate_authority_identity_value(name, "Inventory tool", false)?);
@@ -557,14 +558,17 @@ fn surface_source(value: &Json, depth: usize) -> DomainResult<JsonMap> {
 /// Python `value in a_frozenset` of strings: `TypeError` for an unhashable value.
 fn in_names(value: &Json, names: &[&str]) -> DomainResult<bool> {
     if !py_hashable(value) {
-        return Err(fault(PyFault::Type));
+        return Err(py_unhashable(value));
     }
     Ok(text_in(value, names))
 }
 
 /// `set(values)` of hashable values, `TypeError` otherwise; de-duplicated with `==`.
 fn hashable_set(values: &[&Json]) -> DomainResult<Vec<Json>> {
-    py_set(&Json::Array(values.iter().map(|v| (*v).clone()).collect())).map_err(fault)
+    if let Some(unhashable) = values.iter().find(|value| !py_hashable(value)) {
+        return Err(py_unhashable(unhashable));
+    }
+    Ok(py_set(&Json::Array(values.iter().map(|v| (*v).clone()).collect())).expect("every member is hashable"))
 }
 
 /// `_ui_surface(value, capabilities, tools)`.
@@ -674,7 +678,12 @@ fn ui_surface(value: &Json, capabilities: &[String], tools: &[String]) -> Domain
             let sources = match action.get("bindings") {
                 None => Vec::new(),
                 Some(Json::Object(bindings)) => hashable_set(&bindings.values().collect::<Vec<_>>())?,
-                Some(_) => return Err(DomainError::type_error("'bindings' has no values()")),
+                Some(other) => {
+                    return Err(DomainError::uncaught(
+                        "AttributeError",
+                        format!("'{}' object has no attribute 'values'", py_type_name(other)),
+                    ))
+                }
             };
             let has = |name: &str| sources.iter().any(|source| py_eq(source, &Json::from(name)));
             if !["coordinate_map", "tactical_grid"].contains(&renderer)
@@ -743,7 +752,7 @@ fn ui_surface(value: &Json, capabilities: &[String], tools: &[String]) -> Domain
         if binds_actor {
             let reference = action.get("actor_reference").cloned().unwrap_or(Json::Null);
             if !py_hashable(&reference) {
-                return Err(fault(PyFault::Type));
+                return Err(py_unhashable(&reference));
             }
             if !actor_references.iter().any(|existing| py_eq(existing, &reference)) {
                 actor_references.push(reference);

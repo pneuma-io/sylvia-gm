@@ -149,6 +149,15 @@ pub enum DomainError {
         /// The fields of a `MechanicsRejected`.
         mechanics: Option<Box<MechanicsDetails>>,
     },
+    /// An exception neither the domain nor the owner catches (`KeyError`, `AttributeError`,
+    /// `IndexError`, `zlib.error`, `EOFError`): the owner's `internal_error`.
+    #[error("{message}")]
+    Uncaught {
+        /// `type(error).__name__`.
+        error_type: &'static str,
+        /// `str(error)`.
+        message: String,
+    },
 }
 
 /// `reason` is model-safe: nonempty, trimmed, at most 500 code points, no control characters.
@@ -258,13 +267,19 @@ impl DomainError {
         }
     }
 
+    /// An uncaught exception of the named class.
+    pub fn uncaught(error_type: &'static str, message: impl Into<String>) -> Self {
+        Self::Uncaught { error_type, message: message.into() }
+    }
+
     /// `str(error)`.
     pub fn message(&self) -> &str {
         match self {
             Self::Value(message)
             | Self::Type(message)
             | Self::Diagnosed { message, .. }
-            | Self::Rejected { message, .. } => message,
+            | Self::Rejected { message, .. }
+            | Self::Uncaught { message, .. } => message,
         }
     }
 
@@ -297,7 +312,9 @@ impl DomainError {
         match self {
             Self::Value(_) => "ValueError",
             Self::Type(_) => "TypeError",
-            Self::Diagnosed { error_type, .. } | Self::Rejected { error_type, .. } => error_type,
+            Self::Diagnosed { error_type, .. }
+            | Self::Rejected { error_type, .. }
+            | Self::Uncaught { error_type, .. } => error_type,
         }
     }
 
@@ -311,10 +328,10 @@ impl DomainError {
     ///
     /// The Python owner catches `ValueError` and `AuthorityError`, and replies with
     /// `getattr(error, "code", "command_rejected")`, `str(error)` and the diagnostics payloads;
-    /// `error_type` is `type(error).__name__`. It does not catch `TypeError`: that becomes its
-    /// `internal_error` reply, which the owner lane writes, so this returns `None`.
+    /// `error_type` is `type(error).__name__`. It does not catch `TypeError` or the
+    /// [`DomainError::Uncaught`] classes: those become its `internal_error` reply, which the owner lane writes, so this returns `None`.
     pub fn rejection(&self) -> Option<CodedError> {
-        if let Self::Type(_) = self {
+        if let Self::Type(_) | Self::Uncaught { .. } = self {
             return None;
         }
         let code = self.code().unwrap_or("command_rejected");

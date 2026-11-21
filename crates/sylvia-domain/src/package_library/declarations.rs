@@ -6,7 +6,7 @@ use super::{parse_canonical_json_bytes, validate_portable_path_value, JsonShapeL
 use crate::authority::validate_authority_identity_value;
 use crate::content::validate_content_shape;
 use crate::error::{DomainError, DomainResult};
-use crate::pyops::{py_eq, py_hashable};
+use crate::pyops::{py_eq, py_hashable, py_unhashable};
 use std::collections::BTreeSet;
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{pystr, Json};
@@ -156,7 +156,7 @@ fn sha(value: &Json, label: &str) -> DomainResult<String> {
 /// Python `value in a_set_of_strings`: `TypeError` for an unhashable value.
 fn member(value: &Json, names: &[&str]) -> DomainResult<bool> {
     if !py_hashable(value) {
-        return Err(DomainError::type_error("unhashable value in a set membership test"));
+        return Err(py_unhashable(value));
     }
     Ok(value.as_str().is_some_and(|text| names.contains(&text)))
 }

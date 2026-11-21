@@ -113,9 +113,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/package_library.py:1587` | `_surface_source` | len() against a limit | `if not fields or len(fields) > 16:` | `sylvia-domain` manifest_vectors |
 | `domain/package_library.py:1698` | `_ui_surface` | len() against a limit | `or len(bindings) > 16` | `sylvia-domain` manifest_vectors |
 | `domain/package_library.py:1713` | `_ui_surface` | len() against a limit | `if len(actions) > 16:` | `sylvia-domain` manifest_vectors |
-| `domain/panel_layout.py:18` | `parse_panel_layout` | len() against a limit | `if len(value) > PANEL_LAYOUT_BYTE_LIMIT:` | |
-| `domain/panel_layout.py:53` | `parse_panel_layout.tree` | len() against a limit | `if not isinstance(value, Mapping) or depth > 16 or len(node_ids) >= 256:` | |
-| `domain/panel_layout.py:84` | `parse_panel_layout` | len() against a limit | `if len(title.encode("utf-8")) > 256:` | |
+| `domain/panel_layout.py:18` | `parse_panel_layout` | len() against a limit | `if len(value) > PANEL_LAYOUT_BYTE_LIMIT:` | `sylvia-domain` panel_layout_vectors |
+| `domain/panel_layout.py:53` | `parse_panel_layout.tree` | len() against a limit | `if not isinstance(value, Mapping) or depth > 16 or len(node_ids) >= 256:` || `sylvia-domain` panel_layout_vectors (the 256-node limit at its boundary, and depth 16 accepted; a deeper tree is already beyond the 20-level JSON limit) |
+| `domain/panel_layout.py:84` | `parse_panel_layout` | len() against a limit | `if len(title.encode("utf-8")) > 256:` | `sylvia-domain` panel_layout_vectors |
 | `domain/session.py:252` | `SessionRecord.__post_init__` | len() against a limit | `not isinstance(value, str) or not 1 <= len(value) <= 32` | `sylvia-domain` session_vectors |
 | `domain/session.py:263` | `SessionRecord.__post_init__` | len() against a limit | `if not self.scope or len(self.scope) > 8 or any(not item for item in self.scope):` | `sylvia-domain` session_vectors |
 | `domain/session.py:479` | `BuilderChatRecord.__post_init__` | len() against a limit | `if len(self.display_name) > 120:` | `sylvia-domain` session_vectors |

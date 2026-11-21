@@ -1,0 +1,218 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "class": "ValueError",
+   "message": "Archive member name is not normalized",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "Archive member name is not normalized",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "TypeError",
+   "message": "unhashable type: 'list'",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "unhashable type: 'list'",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "TypeError",
+   "message": "unhashable type: 'dict'",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "unhashable type: 'dict'",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "RuntimeError",
+   "message": "File 'x' is encrypted, password required for extraction",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "File 'x' is encrypted, password required for extraction",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "NotImplementedError",
+   "message": "That compression method is not supported",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "That compression method is not supported",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "BadZipFile",
+   "message": "Bad CRC-32 for file 'x'",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "Bad CRC-32 for file 'x'",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "UnicodeDecodeError",
+   "message": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "OwnerConflict",
+   "message": "Another owner holds the database",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "Another owner holds the database",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "StaleRevision",
+   "message": "Campaign revision is stale",
+   "outcome": [
+    "CommandRejected",
+    "archive_invalid",
+    "Package archive admission failed",
+    [
+     {
+      "code": "archive_invalid",
+      "phase": "archive",
+      "message": "Campaign revision is stale",
+      "file": "manifest.json"
+     }
+    ]
+   ]
+  },
+  {
+   "class": "CommandRejected",
+   "message": "Package contents are too large",
+   "outcome": [
+    "CommandRejected",
+    "archive_limit",
+    "Package contents are too large",
+    []
+   ]
+  },
+  {
+   "class": "RulesetPreconditionRejected",
+   "message": "The table is not ready",
+   "outcome": [
+    "RulesetPreconditionRejected",
+    "ruleset_precondition_failed",
+    "The table is not ready",
+    []
+   ]
+  },
+  {
+   "class": "KeyError",
+   "message": "'tools'",
+   "outcome": [
+    "uncaught",
+    "KeyError"
+   ]
+  },
+  {
+   "class": "AttributeError",
+   "message": "'list' object has no attribute 'values'",
+   "outcome": [
+    "uncaught",
+    "AttributeError"
+   ]
+  },
+  {
+   "class": "IndexError",
+   "message": "list index out of range",
+   "outcome": [
+    "uncaught",
+    "IndexError"
+   ]
+  },
+  {
+   "class": "error",
+   "message": "Error -3 while decompressing data: invalid block type",
+   "outcome": [
+    "uncaught",
+    "error"
+   ]
+  },
+  {
+   "class": "EOFError",
+   "message": "",
+   "outcome": [
+    "uncaught",
+    "EOFError"
+   ]
+  }
+ ]
+}
