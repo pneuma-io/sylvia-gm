@@ -26,6 +26,7 @@ pub mod sequel;
 pub mod sessions;
 pub mod sql;
 pub mod store;
+pub mod stored;
 mod verify;
 
 pub use error::{StoreError, StoreResult};

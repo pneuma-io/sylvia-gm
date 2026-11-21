@@ -134,7 +134,7 @@ fn one_row(
     Ok(row)
 }
 
-fn current_package_ids(connection: &Connection, campaign_id: &str) -> StoreResult<Vec<String>> {
+pub(crate) fn current_package_ids(connection: &Connection, campaign_id: &str) -> StoreResult<Vec<String>> {
     Ok(all_rows_with(
         connection,
         "SELECT membership.package_id FROM campaigns AS campaign \
