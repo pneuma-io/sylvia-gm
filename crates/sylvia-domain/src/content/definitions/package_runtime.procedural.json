@@ -1,0 +1,636 @@
+{
+ "executable": {
+  "parameters": {
+   "required": [
+    "name"
+   ],
+   "optional": [
+    "type",
+    "description",
+    "required",
+    "enum_values",
+    "minimum",
+    "maximum",
+    "items",
+    "from_state",
+    "default",
+    "resolve",
+    "model_derive",
+    "model_hidden",
+    "model_required",
+    "min_items",
+    "max_items",
+    "unique_items"
+   ],
+   "types": [
+    "array",
+    "boolean",
+    "entity_id",
+    "entity_id_list",
+    "enum",
+    "integer",
+    "number",
+    "object",
+    "string"
+   ],
+   "declaration_sharing": {
+    "pool": "optional top-level parameter_declarations map of complete literal descriptors",
+    "entry": "an inline descriptor or a literal package-local snake-case declaration ID",
+    "resolution": "one exact lookup per parameter-list entry, preserving order and copying every use",
+    "rejections": "unknown IDs, malformed or unused-invalid descriptors, overrides and chained references",
+    "bounds": "encoded YAML and the fully resolved graph independently retain their existing shape limits"
+   },
+   "conditional": [
+    "omitted type defaults to string; explicit types must be valid",
+    "enum requires enum_values",
+    "array requires an admitted definition items schema",
+    "entity_id_list requires resolve: entity_list",
+    "from_state starts with state. or combat. and excludes default",
+    "object parameters require from_state and are never caller-provided model inputs",
+    "list bounds apply only to array and entity_id_list"
+   ]
+  },
+  "effects": {
+   "envelope": {
+    "handler": "exactly one registered effect key",
+    "optional_fields": [
+     "condition",
+     "store_as"
+    ],
+    "handler_specific_siblings": {
+     "call": [
+      "params",
+      "export_context"
+     ],
+     "trigger": [
+      "context"
+     ],
+     "flat condition": [
+      "on_true",
+      "on_false"
+     ]
+    },
+    "private_result": "store_as values used for internal results begin with _ where required",
+    "call_context_exports": {
+     "omitted_or_null": "Do not export the child's context variables.",
+     "mapping": "Map private destination names to private child source names; every named source must exist. Values are deep copies.",
+     "wildcard": {
+      "value": "*",
+      "behavior": "Deep-copy only underscore-prefixed string keys that exist in a successful child's result context, keeping the same names. Conditional absent keys are omitted. Public fields, parameters and entity bindings are not exported."
+     },
+     "scope": "Exports go into the caller's ephemeral context only. The child receives only explicit Call params, never the caller's private context. Existing entity and participant aliases refresh after successful nested execution."
+    },
+    "recursive_branches": [
+     "on_true",
+     "on_false",
+     "do",
+     "consequence"
+    ],
+    "neutral_handlers": [
+     "advance_initiative",
+     "advance_time",
+     "aoe",
+     "apply_condition",
+     "call",
+     "clock_create",
+     "clock_tick",
+     "condition",
+     "count_successes",
+     "create_entity",
+     "decrement",
+     "defer",
+     "dice",
+     "for_each",
+     "increment",
+     "initiative",
+     "list_pop",
+     "list_push",
+     "log",
+     "narrate",
+     "publish",
+     "random_table",
+     "register_initiative_trigger",
+     "remove_condition",
+     "request_choice",
+     "require",
+     "reroll",
+     "set",
+     "set_flag",
+     "set_participant",
+     "shot_effect",
+     "shuffle",
+     "sort",
+     "spatial_mutation",
+     "spatial_query",
+     "table_lookup",
+     "transition_scene",
+     "trigger"
+    ],
+    "compatibility_handlers": [
+     "apply_ability_damage",
+     "apply_damage",
+     "heal",
+     "hunger_dice",
+     "save_throw"
+    ]
+   },
+   "body_fields": {
+    "publish": [
+     "fields"
+    ],
+    "shuffle": [
+     "collection"
+    ],
+    "dice": [
+     "expression",
+     "modifier",
+     "advantage",
+     "disadvantage",
+     "critical",
+     "explode",
+     "explode_on",
+     "max_explosions"
+    ],
+    "set": [
+     "field",
+     "value"
+    ],
+    "set_participant": [
+     "participant",
+     "field",
+     "value"
+    ],
+    "create_entity": [
+     "id",
+     "value"
+    ],
+    "require": [
+     "condition",
+     "error"
+    ],
+    "request_choice": [
+     "choice_id",
+     "prompt",
+     "options"
+    ],
+    "apply_damage": [
+     "target",
+     "amount"
+    ],
+    "apply_condition": [
+     "target",
+     "condition"
+    ],
+    "remove_condition": [
+     "target",
+     "condition"
+    ],
+    "call": [
+     "call",
+     "name",
+     "params"
+    ],
+    "trigger": [
+     "trigger",
+     "name",
+     "context"
+    ],
+    "save_throw": [
+     "target",
+     "ability",
+     "dc",
+     "on_save"
+    ],
+    "heal": [
+     "target",
+     "amount"
+    ],
+    "decrement": [
+     "field",
+     "amount"
+    ],
+    "increment": [
+     "field",
+     "amount"
+    ],
+    "condition": [
+     "condition",
+     "on_true",
+     "on_false"
+    ],
+    "log": [
+     "level",
+     "message"
+    ],
+    "table_lookup": [
+     "table",
+     "key",
+     "default",
+     "required",
+     "exact_selector"
+    ],
+    "spatial_query": [
+     "scene",
+     "operation",
+     "query",
+     "snapshot"
+    ],
+    "spatial_mutation": [
+     "scene",
+     "map_id",
+     "expected_revision",
+     "target",
+     "patch"
+    ],
+    "shot_effect": [
+     "scene",
+     "snapshot",
+     "source_id",
+     "target_id",
+     "origin",
+     "destination",
+     "delay_ms",
+     "miss",
+     "contacts",
+     "style",
+     "target_kind"
+    ],
+    "for_each": [
+     "collection",
+     "as",
+     "do"
+    ],
+    "sort": [
+     "collection",
+     "by",
+     "direction"
+    ],
+    "apply_ability_damage": [
+     "target",
+     "ability",
+     "amount"
+    ],
+    "count_successes": [
+     "pool",
+     "modifier",
+     "threshold"
+    ],
+    "reroll": [
+     "source",
+     "predicate",
+     "modifier",
+     "threshold",
+     "consequence"
+    ],
+    "hunger_dice": [
+     "pool",
+     "hunger",
+     "sides",
+     "modifier",
+     "threshold"
+    ],
+    "set_flag": [
+     "flag",
+     "set_flag",
+     "value"
+    ],
+    "advance_time": [
+     "advance_time",
+     "duration"
+    ],
+    "list_push": [
+     "list",
+     "value"
+    ],
+    "list_pop": [
+     "list"
+    ],
+    "initiative": [
+     "combatants",
+     "expression",
+     "modifier_field",
+     "modifier_minimum",
+     "modifier_maximum",
+     "required_truthy_field",
+     "label_field",
+     "roll"
+    ],
+    "advance_initiative": [
+     "skip_field",
+     "skip_equals"
+    ],
+    "random_table": [
+     "table",
+     "roll",
+     "weight_field",
+     "default"
+    ],
+    "transition_scene": [
+     "scene",
+     "transition_scene"
+    ],
+    "aoe": [
+     "aoe",
+     "as",
+     "do"
+    ],
+    "defer": [
+     "tool",
+     "call",
+     "params",
+     "priority",
+     "reason",
+     "context_vars"
+    ],
+    "narrate": [
+     "narrate",
+     "text",
+     "style",
+     "priority"
+    ],
+    "register_initiative_trigger": [
+     "id",
+     "trigger_id",
+     "procedure",
+     "procedure_name",
+     "source",
+     "count",
+     "repeats",
+     "context_data"
+    ],
+    "clock_create": [
+     "id",
+     "clock_id",
+     "name",
+     "max_segments",
+     "thresholds",
+     "metadata"
+    ],
+    "clock_tick": [
+     "id",
+     "clock_id",
+     "segments"
+    ]
+   },
+   "dice_result": {
+    "fields": [
+     "sides",
+     "count",
+     "results",
+     "total",
+     "modifier"
+    ],
+    "total": "Sum of die faces only. The modifier is stored separately.",
+    "effective_result": "Compute _roll.total + _roll.modifier when the rule adds a bonus.",
+    "expression": "Use NdS (for example 1d2); supply a flat bonus through modifier.",
+    "reporting_example": [
+     {
+      "dice": {
+       "expression": "1d2",
+       "modifier": "1"
+      },
+      "store_as": "_roll"
+     },
+     {
+      "set": {
+       "field": "_result",
+       "value": "_roll.total + _roll.modifier"
+      }
+     }
+    ],
+    "test_example": "For the example above, a controlled face of 2 produces scalar _result = 3. Assert receipt.result.context._result, not the raw _roll.total. There is no modified_total field. A missing-path failure identifies an assertion error, not proof of an arithmetic defect."
+   }
+  },
+  "expressions": {
+   "literals": [
+    "number",
+    "single-quoted string",
+    "double-quoted string",
+    "true",
+    "false",
+    "null"
+   ],
+   "field_access": "identifier followed by .field or [expression] segments",
+   "unary_operators": [
+    "-",
+    "not"
+   ],
+   "binary_operators": [
+    "or",
+    "and",
+    "==",
+    "!=",
+    ">",
+    ">=",
+    "<",
+    "<=",
+    "in",
+    "contains",
+    "+",
+    "-",
+    "*",
+    "//",
+    "%",
+    "**"
+   ],
+   "functions": [
+    "abs",
+    "ceil",
+    "completions",
+    "floor",
+    "indices",
+    "joined",
+    "len",
+    "max",
+    "merge",
+    "min",
+    "occurrences",
+    "one",
+    "ordered",
+    "partitions",
+    "portion",
+    "replaced",
+    "text",
+    "total",
+    "without"
+   ],
+   "maximum_characters": 500,
+   "maximum_nesting_depth": 20,
+   "maximum_string_characters": 200,
+   "notes": [
+    "There is no attribute or function-call escape beyond this parser.",
+    "Available root identifiers depend on the owning tool, calculation, or procedure context.",
+    "len(value) counts array elements, object fields or string characters. It takes one argument."
+   ]
+  },
+  "procedures": {
+   "required": [
+    "trigger"
+   ],
+   "optional": [
+    "description",
+    "condition",
+    "steps",
+    "narrative"
+   ],
+   "triggers": [
+    "on_ally_down",
+    "on_combat_end",
+    "on_combat_start",
+    "on_condition_applied",
+    "on_condition_removed",
+    "on_critical",
+    "on_damage_taken",
+    "on_death",
+    "on_hp_restored",
+    "on_hp_zero",
+    "on_level_up",
+    "on_rest",
+    "on_spell_cast",
+    "on_turn_end",
+    "on_turn_start"
+   ],
+   "trigger_extension": "other neutral on_<snake_case> identities are admitted"
+  },
+  "valid_example": {
+   "tools": {
+    "resolve_signal": {
+     "description": "Resolve a signal check.",
+     "parameters": [
+      {
+       "name": "difficulty",
+       "type": "integer",
+       "minimum": 1,
+       "required": true
+      }
+     ],
+     "pre_conditions": [
+      {
+       "condition": "state.ready == true",
+       "error": "The signal is unavailable."
+      }
+     ],
+     "effects": [
+      {
+       "dice": {
+        "expression": "d20"
+       },
+       "store_as": "_roll"
+      },
+      {
+       "condition": "_roll.total >= difficulty",
+       "on_true": [
+        {
+         "set": {
+          "field": "state.success",
+          "value": true
+         }
+        }
+       ]
+      }
+     ],
+     "metadata": {
+      "category": "signal",
+      "model_behavior": "optional"
+     }
+    }
+   },
+   "procedures": {},
+   "definitions": {},
+   "definition_row_schemas": {},
+   "narrative": {}
+  },
+  "invalid_examples": [
+   {
+    "problem": "unknown effect handler",
+    "effect": {
+     "execute_python": {
+      "code": "pass"
+     }
+    }
+   },
+   {
+    "problem": "unsupported expression function",
+    "effect": {
+     "condition": "eval('x')",
+     "on_true": []
+    }
+   },
+   {
+    "problem": "two effect handlers",
+    "effect": {
+     "increment": {
+      "field": "state.x",
+      "amount": 1
+     },
+     "decrement": {
+      "field": "state.y",
+      "amount": 1
+     }
+    }
+   }
+  ],
+  "extension_areas": [
+   "Tool metadata is retained for model behavior, result cards and player controls.",
+   "configuration Features and ModeConfig preserve compatibility or mode-specific keys",
+   "definition_row_schemas can close and type authored definition table rows."
+  ],
+  "validation_scope": [
+   "New package admission closes effect fields using the shared authoring shape checker.",
+   "Existing installed packages retain their runtime execution behavior.",
+   "Conditions and selected declarations are parsed before execution; some effect-value expressions parse only when the handler executes. Runtime values still need a context.",
+   "Use pre_conditions; the runtime does not consume a field named preconditions."
+  ]
+ },
+ "parser": "application.package_runtime.validate_package_runtime",
+ "configuration_owner": "ruleset.schema.RulesetFile",
+ "executable_owner": "runtime._schema_validator.validate_ruleset",
+ "execution_loader": "runtime._runtime.RulesetRuntime",
+ "expression_owner": "runtime._expression_parser.parse_expression",
+ "effect_owner": "runtime._effect_executor._EFFECT_HANDLERS",
+ "limits": {
+  "bytes": 16777216,
+  "depth": 64,
+  "nodes": 500000,
+  "object_members": 25000
+ },
+ "required_descriptor_fields": [
+  "format",
+  "state_namespace"
+ ],
+ "parameter_types": [
+  "array",
+  "object",
+  "boolean",
+  "entity_id",
+  "entity_id_list",
+  "enum",
+  "integer",
+  "number",
+  "string"
+ ],
+ "definition_schema_fields": [
+  "type",
+  "properties",
+  "required",
+  "additionalProperties",
+  "items",
+  "enum",
+  "minimum",
+  "maximum",
+  "minLength",
+  "maxLength"
+ ],
+ "definition_variant_fields": [
+  "discriminator",
+  "variants"
+ ],
+ "validation": [
+  "UTF-8 safe YAML and bounded finite JSON-compatible values",
+  "descriptor format and exact manifest package state namespace",
+  "Pydantic configuration fields and cross-references",
+  "tool parameters, metadata, effects, expressions and nested calls",
+  "procedures, triggers, definition rows/lookups and narrative shape",
+  "runtime loader, trigger links, static call graph and manifest tool-schema agreement"
+ ]
+}

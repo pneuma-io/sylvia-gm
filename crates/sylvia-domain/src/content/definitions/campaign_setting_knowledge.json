@@ -1,0 +1,96 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pneuma.io/sylvia-gm/campaign-setting-knowledge-v1.schema.json",
+  "title": "Sylvia GM Campaign Setting knowledge",
+  "type": "object",
+  "required": [
+   "format_id",
+   "format_version",
+   "facts",
+   "private_references"
+  ],
+  "properties": {
+   "format_id": {
+    "const": "sylvia-gm-campaign-setting-knowledge"
+   },
+   "format_version": {
+    "type": "integer",
+    "const": 1
+   },
+   "facts": {
+    "type": "array",
+    "maxItems": 128,
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "fact",
+      "known_by",
+      "source_path"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1
+      },
+      "fact": {
+       "type": "string",
+       "minLength": 1,
+       "pattern": ".*\\S.*",
+       "description": "A bounded GM knowledge fact."
+      },
+      "known_by": {
+       "type": "array",
+       "maxItems": 128,
+       "items": {
+        "type": "string",
+        "minLength": 1
+       },
+       "uniqueItems": true
+      },
+      "source_path": {
+       "type": "string",
+       "minLength": 1
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "private_references": {
+    "type": "array",
+    "maxItems": 256,
+    "items": {
+     "type": "string",
+     "minLength": 1
+    },
+    "uniqueItems": true
+   }
+  },
+  "additionalProperties": false
+ },
+ "example": {
+  "format_id": "sylvia-gm-campaign-setting-knowledge",
+  "format_version": 1,
+  "facts": [
+   {
+    "id": "relay-purpose",
+    "fact": "The relay was built to carry emergency messages.",
+    "known_by": [
+     "station-keeper"
+    ],
+    "source_path": "people/station-keeper.md"
+   }
+  ],
+  "private_references": [
+   "people/station-keeper.md"
+  ]
+ },
+ "notes": [
+  "The canonical UTF-8 JSON file is limited to 256 KiB and parser depth/node/member limits.",
+  "Fact ids, known_by ids, fact records, and private references use authority identity/path validation; arrays must be sorted and unique.",
+  "Each fact is limited to 4,000 UTF-8 bytes, has no surrounding whitespace, and names its package-owned source file.",
+  "Every source_path and private reference must occur in the same admitted package's file index."
+ ],
+ "file": "setting-knowledge.json"
+}

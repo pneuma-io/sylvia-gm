@@ -40,42 +40,42 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `builder/_interview_extractor.py:289` | `InterviewExtractor._parse_and_validate` | re.search; plain | `match = re.search(r''''(?:json)?\s*([\s\S]*?)\s*'''', content)` | |
 | `campaign/_folder.py:25` | `<module>` | re.compile; plain | `_CAMPAIGN_ID_RE = re.compile(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$")` | |
 | `campaign/_folder.py:266` | `_derive_campaign_slug` | re.sub; plain | `slug = re.sub(r"[^a-z0-9]+", "-", slug)` | |
-| `domain/_content_schema_campaign_export.py:9` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | |
-| `domain/_content_schema_character.py:105` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?![\s\S]*\u0000)\S(?:[\s\S]*\S)?$(?![\s\S])",` | |
-| `domain/_content_schema_character.py:107` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$(?![\s\S])"},` | |
-| `domain/_content_schema_character_profile.py:21` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?![\s\S]*\u0000)\S(?:[\s\S]*\S)?$(?![\s\S])",` | |
-| `domain/_content_schema_character_profile_v2.py:3` | `<module>` | JSON Schema pattern; plain | `TEXT = {"type": "string", "maxLength": 65536, "pattern": r"^[^\u0000]*$"}` | |
-| `domain/_content_schema_character_profile_v2.py:5` | `<module>` | JSON Schema pattern; plain | `ID = {"type": "string", "minLength": 1, "maxLength": 160, "pattern": r"^[A-Za-z0-9_.:-]+$"}` | |
-| `domain/_content_schema_character_profile_v2.py:59` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?![\s\S]*\u0000)\S(?:[\s\S]*\S)?$(?![\s\S])",` | |
-| `domain/_content_schema_character_profile_v2.py:126` | `<module>` | JSON Schema pattern; plain | `"pattern": r"^(?:https?://\|card://\|asset:sha256:)[^\u0000\s]+$",` | |
-| `domain/_content_schema_character_profile_v2.py:137` | `<module>` | JSON Schema pattern; plain | `"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},` | |
-| `domain/_content_schema_character_profile_v2.py:151` | `<module>` | JSON Schema pattern; plain | `"propertyNames": {"type": "string", "maxLength": 256, "pattern": r"^[^\u0000]*$"},` | |
-| `domain/_content_schema_declarations.py:8` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | |
-| `domain/_content_schema_map_card.py:494` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?=\S(?:[\s\S]*\S)?$)(?![\s\S]*\x00)[\s\S]+$",` | |
-| `domain/_content_schema_map_card.py:621` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | |
-| `domain/_content_schema_map_card.py:627` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | |
-| `domain/_content_schema_map_card.py:660` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | |
-| `domain/_content_schema_map_card.py:699` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | |
-| `domain/_content_schema_package.py:17` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | |
-| `domain/_content_schema_package_subformats.py:8` | `<module>` | JSON Schema pattern; plain | `_NONBLANK = {"type": "string", "minLength": 1, "pattern": r".*\S.*"}` | |
-| `domain/_content_schema_package_subformats.py:9` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | |
-| `domain/_content_schema_package_subformats.py:203` | `<module>` | JSON Schema pattern; plain | `"pattern": "^campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}$",` | |
-| `domain/_content_schema_package_subformats.py:213` | `<module>` | JSON Schema pattern; plain | `{"type": "string", "minLength": 1, "pattern": "^[^\\u0000]+$"},` | |
-| `domain/_content_schema_panel.py:7` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `IDENTITY = {"type": "string", "minLength": 1, "pattern": r"^\S(?:[\s\S]*\S)?$(?![\s\S])"}` | |
-| `domain/_content_schema_panel.py:185` | `<module>` | JSON Schema pattern; plain | `"pattern": "^[A-Za-z_][A-Za-z0-9_]*$",` | |
-| `domain/_content_schema_panel.py:190` | `<module>` | JSON Schema pattern; plain | `"pattern": "^[A-Za-z_][A-Za-z0-9_]*$",` | |
-| `domain/_content_schema_plan.py:228` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?=\S(?:[\s\S]*\S)?$)(?![\s\S]*\x00)[\s\S]+$",` | |
-| `domain/_content_schema_plan.py:255` | `<module>` | JSON Schema pattern; plain | `"pattern": "^[0-9a-f]{64}$",` | |
-| `domain/_content_schema_ruleset.py:16` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `TEMPLATE = {"type": "string", "pattern": r"^\{[^{}]+\}$(?![\s\S])"}` | |
-| `domain/_content_schema_ruleset.py:103` | `<module>` | JSON Schema pattern; plain | `"nonempty": {"type": "string", "minLength": 1, "pattern": r".*\S.*"},` | |
-| `domain/_content_schema_ruleset.py:359` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `r"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$(?![\s\S])"` | |
-| `domain/_content_schema_runtime.py:106` | `<module>` | JSON Schema pattern; plain | `_PARAMETER, {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},` | |
-| `domain/_content_schema_runtime.py:140` | `<module>` | JSON Schema pattern; plain | `"trigger": {"type": "string", "pattern": "^on_[a-z][a-z0-9_]*$"},` | |
-| `domain/_content_schema_runtime.py:170` | `<module>` | JSON Schema pattern; plain | `"propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},` | |
-| `domain/_content_schema_ui.py:28` | `trimmed_text` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^\S(?:[^\u0000]*\S)?$(?![\s\S])",` | |
-| `domain/_content_schema_ui.py:29` | `trimmed_text` | JSON Schema pattern; plain | `"not": {"pattern": r"\u0000"},` | |
-| `domain/_content_schema_ui.py:37` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\s\S])",` | |
-| `domain/_content_schema_ui.py:39` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `_LAYOUT_ID = {"type": "string", "pattern": r"^[A-Za-z0-9_-]{1,96}$(?![\s\S])"}` | |
+| `domain/_content_schema_campaign_export.py:9` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character.py:105` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?![\s\S]*\u0000)\S(?:[\s\S]*\S)?$(?![\s\S])",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character.py:107` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"sha256": {"type": "string", "pattern": r"^[0-9a-f]{64}$(?![\s\S])"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile.py:21` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?![\s\S]*\u0000)\S(?:[\s\S]*\S)?$(?![\s\S])",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile_v2.py:3` | `<module>` | JSON Schema pattern; plain | `TEXT = {"type": "string", "maxLength": 65536, "pattern": r"^[^\u0000]*$"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile_v2.py:5` | `<module>` | JSON Schema pattern; plain | `ID = {"type": "string", "minLength": 1, "maxLength": 160, "pattern": r"^[A-Za-z0-9_.:-]+$"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile_v2.py:59` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?![\s\S]*\u0000)\S(?:[\s\S]*\S)?$(?![\s\S])",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile_v2.py:126` | `<module>` | JSON Schema pattern; plain | `"pattern": r"^(?:https?://\|card://\|asset:sha256:)[^\u0000\s]+$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile_v2.py:137` | `<module>` | JSON Schema pattern; plain | `"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_character_profile_v2.py:151` | `<module>` | JSON Schema pattern; plain | `"propertyNames": {"type": "string", "maxLength": 256, "pattern": r"^[^\u0000]*$"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_declarations.py:8` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_map_card.py:494` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?=\S(?:[\s\S]*\S)?$)(?![\s\S]*\x00)[\s\S]+$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_map_card.py:621` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_map_card.py:627` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_map_card.py:660` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_map_card.py:699` | `<module>` | JSON Schema pattern; plain | `"pattern": r"[\s\S]*\S[\s\S]*",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_package.py:17` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_package_subformats.py:8` | `<module>` | JSON Schema pattern; plain | `_NONBLANK = {"type": "string", "minLength": 1, "pattern": r".*\S.*"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_package_subformats.py:9` | `<module>` | JSON Schema pattern; plain | `_SHA = {"type": "string", "pattern": "^[0-9a-f]{64}$"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_package_subformats.py:203` | `<module>` | JSON Schema pattern; plain | `"pattern": "^campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_package_subformats.py:213` | `<module>` | JSON Schema pattern; plain | `{"type": "string", "minLength": 1, "pattern": "^[^\\u0000]+$"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_panel.py:7` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `IDENTITY = {"type": "string", "minLength": 1, "pattern": r"^\S(?:[\s\S]*\S)?$(?![\s\S])"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_panel.py:185` | `<module>` | JSON Schema pattern; plain | `"pattern": "^[A-Za-z_][A-Za-z0-9_]*$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_panel.py:190` | `<module>` | JSON Schema pattern; plain | `"pattern": "^[A-Za-z_][A-Za-z0-9_]*$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_plan.py:228` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^(?=\S(?:[\s\S]*\S)?$)(?![\s\S]*\x00)[\s\S]+$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_plan.py:255` | `<module>` | JSON Schema pattern; plain | `"pattern": "^[0-9a-f]{64}$",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ruleset.py:16` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `TEMPLATE = {"type": "string", "pattern": r"^\{[^{}]+\}$(?![\s\S])"}` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ruleset.py:103` | `<module>` | JSON Schema pattern; plain | `"nonempty": {"type": "string", "minLength": 1, "pattern": r".*\S.*"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ruleset.py:359` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `r"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$(?![\s\S])"` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_runtime.py:106` | `<module>` | JSON Schema pattern; plain | `_PARAMETER, {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_runtime.py:140` | `<module>` | JSON Schema pattern; plain | `"trigger": {"type": "string", "pattern": "^on_[a-z][a-z0-9_]*$"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_runtime.py:170` | `<module>` | JSON Schema pattern; plain | `"propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ui.py:28` | `trimmed_text` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^\S(?:[^\u0000]*\S)?$(?![\s\S])",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ui.py:29` | `trimmed_text` | JSON Schema pattern; plain | `"not": {"pattern": r"\u0000"},` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ui.py:37` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\s\S])",` | `sylvia-domain` content_vectors |
+| `domain/_content_schema_ui.py:39` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `_LAYOUT_ID = {"type": "string", "pattern": r"^[A-Za-z0-9_-]{1,96}$(?![\s\S])"}` | `sylvia-domain` content_vectors |
 | `domain/authority.py:586` | `_is_reserved_canonical_channel` | re.sub; NEEDS fancy-regex: lookahead, lookbehind | `separated = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", name)` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:587` | `_is_reserved_canonical_channel` | re.split; plain | `tokens = tuple(token for token in re.split(r"[^a-z0-9]+", separated.casefold()) if token)` | `sylvia-domain` identity_vectors |
 | `domain/campaign_plan.py:26` | `<module>` | re.compile; plain | `_ABSOLUTE_PATH = re.compile(r"(?:^[A-Za-z]:[\\/]\|^/\|^\\\\)")` | |
@@ -83,8 +83,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/campaign_plan.py:209` | `_identity` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", text):` | |
 | `domain/campaign_plan.py:258` | `_validate_party_placements` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", state.key):` | |
 | `domain/campaign_plan.py:274` | `_package_binding` | re.fullmatch; plain | `if not re.fullmatch(r"[0-9a-f]{64}", content_sha256):` | |
-| `domain/content_validation.py:54` | `_field_path` | re.fullmatch; plain | `elif isinstance(part, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]{0,95}", part):` | |
-| `domain/content_validation.py:115` | `validate_content_shape` | re.search; pattern built at run time, check by hand | `and not any(re.search(pattern, field) for pattern in patterns)` | |
+| `domain/content_validation.py:54` | `_field_path` | re.fullmatch; plain | `elif isinstance(part, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]{0,95}", part):` | `sylvia-domain` content_vectors |
+| `domain/content_validation.py:115` | `validate_content_shape` | re.search; pattern built at run time, check by hand | `and not any(re.search(pattern, field) for pattern in patterns)` | `sylvia-domain` content_vectors (no shipped schema has `patternProperties`; the engine refuses it) |
 | `domain/package_library.py:757` | `validate_portable_path` | re.match; plain | `if re.match(r"^[A-Za-z]:", path):` | `sylvia-domain` identity_vectors |
 | `domain/starting_state.py:14` | `<module>` | re.compile; plain | `_BINDING = re.compile(r"\$[a-zA-Z_][a-zA-Z0-9_]{0,63}\Z")` | |
 | `state/_validators.py:133` | `_validate_spell_slots` | re.compile; pattern built at run time, check by hand | `_re = re.compile(_SPELL_SLOT_KEY_RE)` | |

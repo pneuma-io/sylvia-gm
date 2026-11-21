@@ -1,0 +1,349 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sylvia-gm:content:result-card:1",
+  "title": "Sylvia GM result-card declaration v1",
+  "description": "Ruleset-owned presentation attached to one tool declaration. Values resolve once from that action's admitted parameters and public result context, then remain historical.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+   "version"
+  ],
+  "properties": {
+   "version": {
+    "type": "integer",
+    "const": 1
+   },
+   "title": {
+    "oneOf": [
+     {
+      "$ref": "#/$defs/text200"
+     },
+     {
+      "$ref": "#/$defs/valueReference"
+     }
+    ]
+   },
+   "subtitle": {
+    "$ref": "#/$defs/value"
+   },
+   "equation": {
+    "$ref": "#/$defs/equation"
+   },
+   "equations": {
+    "oneOf": [
+     {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+       "$ref": "#/$defs/row"
+      }
+     },
+     {
+      "$ref": "#/$defs/rowsReference"
+     }
+    ]
+   },
+   "footprint": {
+    "type": "string",
+    "enum": [
+     "inline",
+     "compact"
+    ]
+   },
+   "details_label": {
+    "$ref": "#/$defs/text200"
+   },
+   "summary": {
+    "oneOf": [
+     {
+      "type": "array",
+      "maxItems": 16,
+      "items": {
+       "$ref": "#/$defs/row"
+      }
+     },
+     {
+      "$ref": "#/$defs/rowsReference"
+     }
+    ]
+   },
+   "details": {
+    "oneOf": [
+     {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+       "$ref": "#/$defs/row"
+      }
+     },
+     {
+      "$ref": "#/$defs/rowsReference"
+     }
+    ]
+   },
+   "actions": {
+    "type": "array",
+    "maxItems": 8,
+    "items": {
+     "$ref": "#/$defs/action"
+    }
+   }
+  },
+  "$defs": {
+   "equation": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "die_sides",
+     "roll",
+     "modifier",
+     "total"
+    ],
+    "properties": {
+     "die_sides": {
+      "oneOf": [
+       {
+        "type": "integer",
+        "minimum": 2,
+        "maximum": 1000
+       },
+       {
+        "$ref": "#/$defs/valueReference"
+       }
+      ]
+     },
+     "roll": {
+      "$ref": "#/$defs/value"
+     },
+     "modifier": {
+      "$ref": "#/$defs/value"
+     },
+     "total": {
+      "$ref": "#/$defs/value"
+     },
+     "rolls": {
+      "oneOf": [
+       {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 64,
+        "items": {
+         "type": "integer",
+         "minimum": 1,
+         "maximum": 1000
+        }
+       },
+       {
+        "$ref": "#/$defs/valueReference"
+       }
+      ]
+     },
+     "optional": {
+      "type": "boolean",
+      "default": false
+     }
+    }
+   },
+   "text200": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 200,
+    "pattern": "[\\s\\S]*\\S[\\s\\S]*"
+   },
+   "text4000": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 4000,
+    "pattern": "[\\s\\S]*\\S[\\s\\S]*"
+   },
+   "scalar": {
+    "oneOf": [
+     {
+      "type": "string",
+      "maxLength": 4000
+     },
+     {
+      "type": "number"
+     },
+     {
+      "type": "boolean"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   },
+   "scalarList": {
+    "type": "array",
+    "maxItems": 64,
+    "items": {
+     "$ref": "#/$defs/scalar"
+    }
+   },
+   "labels": {
+    "type": "object",
+    "maxProperties": 64,
+    "additionalProperties": {
+     "$ref": "#/$defs/text4000"
+    }
+   },
+   "rowsReference": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "path"
+    ],
+    "properties": {
+     "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+     }
+    }
+   },
+   "valueReference": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "path"
+    ],
+    "properties": {
+     "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "[\\s\\S]*\\S[\\s\\S]*"
+     },
+     "labels": {
+      "$ref": "#/$defs/labels"
+     }
+    }
+   },
+   "value": {
+    "oneOf": [
+     {
+      "$ref": "#/$defs/scalar"
+     },
+     {
+      "$ref": "#/$defs/scalarList"
+     },
+     {
+      "$ref": "#/$defs/valueReference"
+     }
+    ]
+   },
+   "row": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "value"
+    ],
+    "properties": {
+     "label": {
+      "$ref": "#/$defs/text200"
+     },
+     "value": {
+      "$ref": "#/$defs/value"
+     },
+     "emphasis": {
+      "type": "boolean",
+      "default": false
+     },
+     "optional": {
+      "type": "boolean",
+      "default": false
+     },
+     "omit_zero": {
+      "type": "boolean",
+      "default": false
+     },
+     "equation": {
+      "$ref": "#/$defs/equation"
+     }
+    }
+   },
+   "action": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "label",
+     "tool",
+     "parameters"
+    ],
+    "properties": {
+     "label": {
+      "$ref": "#/$defs/text200"
+     },
+     "tool": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+     },
+     "parameters": {
+      "type": "object",
+      "maxProperties": 64,
+      "propertyNames": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 128,
+       "pattern": "[\\s\\S]*\\S[\\s\\S]*"
+      },
+      "additionalProperties": {
+       "$ref": "#/$defs/value"
+      }
+     }
+    }
+   }
+  }
+ },
+ "example": {
+  "version": 1,
+  "title": "Relay check",
+  "summary": [
+   {
+    "label": "Signal",
+    "value": {
+     "path": "context.signal_status",
+     "labels": {
+      "clear": "Clear",
+      "broken": "Broken"
+     }
+    },
+    "emphasis": true
+   }
+  ],
+  "details": [
+   {
+    "label": "Channel",
+    "value": {
+     "path": "parameters.channel"
+    }
+   }
+  ],
+  "actions": [
+   {
+    "label": "Check again",
+    "tool": "check_relay",
+    "parameters": {
+     "channel": {
+      "path": "parameters.channel"
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  "summary and details may be authored row lists or one public path to recorded rows (at most 16 summary or 128 detail rows). Recorded rows contain literal scalar/list values, never further value references. Labels, length limits and escaping are unchanged, and the resolved rows are saved with the result. A row may include a recorded equation for a named recipient or damage component; equations in referenced rows contain literal numbers, never new references.",
+  "title may be text or a public value reference; subtitle is optional resolved text. An optional equation declares die_sides (a literal or recorded public value reference) plus recorded numeric roll, modifier and total values. The renderer does not calculate them. An equation marked optional is absent when its values are unavailable, such as an automatic outcome without a roll. Optional rolls holds one to 64 recorded die faces for a pool; roll remains its recorded subtotal and total remains authoritative, without frontend arithmetic. Optional equations declares at most 16 labelled equation rows shown initially; summary and details still select their own content independently.",
+  "footprint selects inline or compact presentation; omitted footprint uses compact. details_label optionally names the closed detail expander. A row with omit_zero true is omitted only when its resolved value is numeric zero, not false or a string. These presentation choices and resolved values are saved with the result.",
+  "At least one of title, resolved summary rows, resolved detail rows or actions must be nonempty. An empty or invalid declaration produces the generic operation card and never changes the mechanic's committed outcome.",
+  "A value is a finite scalar, a list of at most 64 finite scalars, or a reference object. Direct and resolved strings are limited to 4,000 characters.",
+  "Reference paths have at most 16 dot-separated segments, begin with parameters or context, and must resolve to an available public value. They cannot read state, private spatial evidence, source documents or arbitrary objects.",
+  "When labels is present, the resolved scalar's string form must have a declared label. Boolean keys use lowercase true and false. Label text is limited to 4,000 characters.",
+  "An optional row is omitted when its reference is unavailable or resolves to null. Other unavailable values invalidate the card. emphasis and optional default to false.",
+  "Action tool names are at most 128 characters and contain only alphanumeric characters and underscores under Python's alphanumeric rules. Parameter names are nonblank text of at most 128 characters.",
+  "Resolved cards contain saved values, not expressions. A button preserves the historical request, but the current action owner revalidates its tool and parameters when clicked."
+ ],
+ "file": "Ruleset tool metadata: result_card"
+}
