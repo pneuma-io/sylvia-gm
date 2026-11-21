@@ -70,6 +70,32 @@ pub enum AdvertisedTiers<'a> {
     Other,
 }
 
+impl<'a> AdvertisedTiers<'a> {
+    /// A configuration value as `speed_options` sees it (`None` for a missing key).
+    pub fn from_data(value: Option<&'a sylvia_base::pyyaml::Data>) -> Self {
+        use sylvia_base::pyyaml::Data;
+        match value {
+            None | Some(Data::None) => Self::Missing,
+            Some(Data::List(items) | Data::Tuple(items)) => Self::List(
+                items
+                    .iter()
+                    .map(|item| {
+                        item.as_dict().map(|_| AdvertisedTier {
+                            id: item.get_str("id").and_then(Data::as_str),
+                            name: item.get_str("name").and_then(Data::as_str),
+                            description: match item.get_str("description") {
+                                None => Some(""),
+                                Some(value) => value.as_str(),
+                            },
+                        })
+                    })
+                    .collect(),
+            ),
+            Some(_) => Self::Other,
+        }
+    }
+}
+
 /// `speed_options(values)`: saved runtime-advertised tiers, validated.
 pub fn speed_options(values: &AdvertisedTiers<'_>) -> Result<Option<Vec<SpeedOption>>, String> {
     let items = match values {

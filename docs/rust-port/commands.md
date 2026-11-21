@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 27 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 31 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -84,10 +84,10 @@ Ported: 27 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_ch
 | `detect_local_providers` | `providers.handle_detect_local_providers` | yes | no | |
 | `discover_provider_models` | `providers.handle_discover_provider_models` | yes | no | |
 | `validate_provider_model` | `providers.handle_validate_provider_model` | yes | no | |
-| `save_provider_settings` | `providers.handle_save_provider_settings` | yes | no | |
-| `remove_provider_settings` | `providers.handle_remove_provider_settings` | yes | no | |
-| `set_default_model` | `providers.handle_set_default_model` | yes | no | |
-| `set_chat_defaults` | `providers.handle_set_chat_defaults` | yes | no | |
+| `save_provider_settings` | `providers.handle_save_provider_settings` | yes | yes | `provider-settings` |
+| `remove_provider_settings` | `providers.handle_remove_provider_settings` | yes | yes | `provider-settings` |
+| `set_default_model` | `providers.handle_set_default_model` | yes | yes | `provider-settings` |
+| `set_chat_defaults` | `providers.handle_set_chat_defaults` | yes | yes | `provider-settings` |
 | `switch_session_model` | `providers.handle_switch_session_model` | yes | no | |
 | `switch_session_reasoning` | `sessions.handle_switch_session_reasoning` | yes | no | |
 | `switch_session_speed` | `sessions.handle_switch_session_speed` | yes | no | |
