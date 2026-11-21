@@ -54,5 +54,34 @@ impl PyError {
     }
 }
 
+impl PyError {
+    /// The owner's rejection for this exception: code `command_rejected`, `str(error)` as the
+    /// message, and the Python class name for diagnostics and saved reports.
+    pub fn to_coded(&self) -> sylvia_base::CodedError {
+        sylvia_base::CodedError::rejected(self.message.clone()).with_error_type(self.kind.name())
+    }
+}
+
+/// The refusal for an integer beyond the signed 64-bit range, which Python would compute
+/// exactly (`differences.md` row 5).
+pub fn int_range_error() -> PyError {
+    PyError::value(sylvia_base::pystr::INT_RANGE_MESSAGE)
+}
+
+/// `a + b` for engine integers, refused beyond `i64`.
+pub fn add(a: i64, b: i64) -> PyResult<i64> {
+    a.checked_add(b).ok_or_else(int_range_error)
+}
+
+/// `a - b` for engine integers, refused beyond `i64`.
+pub fn sub(a: i64, b: i64) -> PyResult<i64> {
+    a.checked_sub(b).ok_or_else(int_range_error)
+}
+
+/// `sum(values)` for engine integers, refused beyond `i64`.
+pub fn sum(values: &[i64]) -> PyResult<i64> {
+    values.iter().try_fold(0i64, |total, value| add(total, *value))
+}
+
 /// Result alias for engine code that mirrors a Python built-in exception.
 pub type PyResult<T> = Result<T, PyError>;

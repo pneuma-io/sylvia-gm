@@ -22,7 +22,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/shot_effects.py` | 376 | `sylvia-app::shot_effects` | pending | |
 | `src/sylvia_gm/application/spatial_preview.py` | 118 | `sylvia-app::spatial_preview` | pending | |
 | `src/sylvia_gm/application/tactical_grid.py` | 710 | `sylvia-app::tactical_grid` | pending | |
-| `src/sylvia_gm/dice.py` | 920 | `sylvia-engine::dice` | in progress | The seeded stream it draws from (`random.Random`: MT19937, `init_by_array`, `getrandbits`, `_randbelow`, `randrange`/`randint`/`choice`/`shuffle`/`random`) and the tool seed derivation are `sylvia-engine::pyrandom`, proven by `tests/vectors/pyrandom_vectors.json`. |
+| `src/sylvia_gm/dice.py` | 920 | `sylvia-engine::dice` | ported | `sylvia-engine::dice`, drawing from `sylvia-engine::pyrandom`. The three context-variable streams (`use_roll_source`, `seeded_rolls`, the module default) are a `Dice` value the caller passes down; a scripted source implements `RollSource` (Python's `ScenarioDice` overrides `randint` the same way). `weighted_pick` returns the picked row's index. Python's `TypeError` branches for non-`int` arguments cannot arise from typed Rust callers; the dynamic ones (`weighted_pick` weights, `sum()`) are kept. Sums, totals plus modifiers, margins and success counts beyond `i64` are refused (`differences.md` row 5). Vectors: `tests/vectors/dice_vectors.json`. |
 | `src/sylvia_gm/ruleset/__init__.py` | 5 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/ruleset/schema.py` | 273 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/ruleset/validator.py` | 195 | `sylvia-engine` | pending | |
@@ -39,16 +39,16 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_deferred_queue.py` | 186 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_distance_tracker.py` | 562 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_duration_tracker.py` | 189 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_effect_executor.py` | 2,351 | `sylvia-engine` | pending | `_handle_shuffle` draws from `secrets.SystemRandom` (OS entropy), not the seeded tool stream, so its order differs between any two runs, Python or Rust; it is ported as OS-random. Shipped tools that reach it: Riichi Mahjong `start_game` (through `_new_hand`, `shuffle indices(136)`) and every Riichi `take_action` that runs `refresh` (`shuffle indices(256)`). SRD Lite has none. Comparison sessions must avoid those tools or declare a rule for the shuffled values. |
+| `src/sylvia_gm/runtime/_effect_executor.py` | 2,351 | `sylvia-engine` | in progress | `_parse_dice_expr` is `sylvia-engine::dice_expr::parse_dice_expr` (vectors over 3,070 expressions). `_handle_shuffle` draws from `secrets.SystemRandom` (OS entropy), not the seeded tool stream, so its order differs between any two runs, Python or Rust; it is ported as OS-random. Shipped tools that reach it: Riichi Mahjong `start_game` (through `_new_hand`, `shuffle indices(136)`) and every Riichi `take_action` that runs `refresh` (`shuffle indices(256)`). SRD Lite has none. Comparison sessions must avoid those tools or declare a rule for the shuffled values. |
 | `src/sylvia_gm/runtime/_exceptions.py` | 110 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_expression_parser.py` | 595 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_flag_store.py` | 97 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_frontmatter.py` | 190 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_initiative.py` | 243 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_initiative.py` | 243 | `sylvia-engine` | in progress | `_roll_initiative_expr` is `sylvia-engine::dice_expr::roll_initiative_expr` (vectors over 3,070 expressions). The rest is pending. |
 | `src/sylvia_gm/runtime/_initiative_count_triggers.py` | 165 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_parameter_declarations.py` | 154 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_procedure_executor.py` | 357 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_rng_queue.py` | 389 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_rng_queue.py` | 389 | `sylvia-engine` | ported | `sylvia-engine::rng_queue`. No product code calls it (only exported). `from_dict` returns `None` for data `to_dict` would not write, where Python raises `KeyError`/`TypeError`. |
 | `src/sylvia_gm/runtime/_runtime.py` | 484 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_scene_awareness.py` | 499 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_schema_validator.py` | 1,734 | `sylvia-engine` | pending | |
