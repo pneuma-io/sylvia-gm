@@ -45,7 +45,7 @@ fn literal_match(matches: usize) -> DomainError {
 /// An `OSError` Python lets through (the owner's internal error), as its class and `str()` in
 /// CPython's `[Errno N] strerror: 'path'` form for the common kinds; other kinds keep the
 /// platform's own text.
-fn os_error(error: &std::io::Error, path: &Path) -> DomainError {
+pub(crate) fn os_error(error: &std::io::Error, path: &Path) -> DomainError {
     let (class, errno, text) = match error.kind() {
         std::io::ErrorKind::NotFound => ("FileNotFoundError", 2, "No such file or directory".to_owned()),
         std::io::ErrorKind::PermissionDenied => ("PermissionError", 13, "Permission denied".to_owned()),
