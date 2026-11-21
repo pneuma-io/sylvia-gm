@@ -46,6 +46,7 @@
   {"method": "shutdown"}
  ],
  "rules": {
+  "ignore_keys": ["diagnostic_id"],
   "alias": [
    {"name": "preview", "pattern": "^[0-9a-f]{32}$", "keys": ["preview_id"]},
    {"name": "report_record", "pattern": "[0-9a-f]{32}", "keys": ["content"]}

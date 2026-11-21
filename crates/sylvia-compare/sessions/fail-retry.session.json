@@ -279,7 +279,8 @@
   "ignore_keys": [
    "elapsed_ms",
    "quiet_ms",
-   "activity_timing/revision"
+   "activity_timing/revision",
+   "diagnostic_id"
   ],
   "alias": [
    {

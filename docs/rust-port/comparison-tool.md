@@ -130,6 +130,12 @@ header. A session adds its own under `rules`:
 - `volatile_files`: files that must exist but whose content is not compared.
 - `ignore_pointers`: exact JSON pointers into the recording, for the rare single value.
 
+Local diagnostics aggregates matching outcomes per wall-clock minute, so two error replies
+share one `diagnostic_id` only when both land in the same minute. A run that crosses a minute
+boundary between them gives the later reply a fresh identity, in Python too. A session that
+repeats an error outcome therefore declares `diagnostic_id` in `ignore_keys` (presence is still
+compared); `sylvia-owner`'s diagnostics tests cover the sharing itself.
+
 **How to find the rules for a new session:** record it from Python twice and `diff` the two
 recordings. Whatever differs between two Python runs is what a rule may cover. Add the
 narrowest rule that makes Python agree with itself, and nothing more. Never add a rule to make
