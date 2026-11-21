@@ -73,8 +73,8 @@ def outcome(call):
 
 def identity_cases():
     values: list[object] = [
-        "", " ", "a", "a b", "x" * 300, "café", "名前", "\u200b", "a\u200b", None, 1, 1.5, True, [], {},
-        SHA, SHA.upper(), SHA[:63], SHA + "a", "g" * 64, "é" * 64, "０" * 64, " " + SHA[1:],
+        "", " ", "a", "a b", "x" * 300, "caf\u00e9", "\u540d\u524d", "\u200b", "a\u200b", None, 1, 1.5, True, [], {},
+        SHA, SHA.upper(), SHA[:63], SHA + "a", "g" * 64, "\u00e9" * 64, "\uff10" * 64, " " + SHA[1:],
     ]
     for space in SPACES:
         values += [space, space + "a", "a" + space, "a" + space + "b"]
@@ -93,12 +93,12 @@ def identity_cases():
 
 def path_cases():
     values = [
-        "a", "a/b", "a/b/c.json", "", "/a", "a\\b", "a\x00", "C:a", "c:/x", "1:a", "é:a", "a:b", "a//b",
+        "a", "a/b", "a/b/c.json", "", "/a", "a\\b", "a\x00", "C:a", "c:/x", "1:a", "\u00e9:a", "a:b", "a//b",
         "./a", "a/.", "a/..", "a/../b", " a", "a ", "a/ b", "a/b ", "\x1ca", "a\x1f", "a\u3000",
         "a<b", "a>b", "a\"b", "a|b", "a?b", "a*b", "a\tb", "a\nb", "a\x7f", "a.", "a/b.", "a..b",
-        "CON", "con", "Con.txt", "aux.json", "NUL.tar.gz", "COM1", "com9.x", "COM0", "LPT¹", "lpt²",
-        "COM³.md", "CONIN$", "conout$.x", "CON .txt", "CON  .txt", "CONS", "console", "xcon", "a/prn",
-        "conın$", "ﬁle", "ǅ", "name with space.json", "日本/語.json", "\u202e", "a\u0085b", "a/\u00a0b",
+        "CON", "con", "Con.txt", "aux.json", "NUL.tar.gz", "COM1", "com9.x", "COM0", "LPT\u00b9", "lpt\u00b2",
+        "COM\u00b3.md", "CONIN$", "conout$.x", "CON .txt", "CON  .txt", "CONS", "console", "xcon", "a/prn",
+        "con\u0131n$", "\ufb01le", "\u01c5", "name with space.json", "\u65e5\u672c/\u8a9e.json", "\u202e", "a\u0085b", "a/\u00a0b",
         "-", "~", "$", "a$b", ".hidden", "a/.hidden", "...", "a/...", "COM\u00b9", "lpt\u00b3.txt",
     ]
     cases = []
@@ -249,7 +249,7 @@ def record_cases():
         ["c", "cand", "act", 0, "lock", "mig"], ["c", "cand", "act", -1, "lock", "mig"],
         [" c", "cand", "act", 0, "lock", "mig"], ["c", "", "act", 0, "lock", "mig"],
         ["c", "cand", "\u2028", 0, "lock", "mig"], ["c", "cand", "act", 3, "", "mig"],
-        ["c", "cand", "act", 3, "lock", "mig "], ["campaign-é", "candidate-1", "a", 12, "lock-1", "m"],
+        ["c", "cand", "act", 3, "lock", "mig "], ["campaign-\u00e9", "candidate-1", "a", 12, "lock-1", "m"],
     ):
         add("activation_command", args, lambda: activation_payload_sha256(ActivationCommand(*args)))
     for args in (
@@ -279,7 +279,7 @@ def record_cases():
 
 
 def schema_hash_cases():
-    schema = {"type": "object", "properties": {"name": {"type": "string"}, "é": {"const": 1.5}}}
+    schema = {"type": "object", "properties": {"name": {"type": "string"}, "\u00e9": {"const": 1.5}}}
     entity = {"type": "object", "properties": {"hp": {"type": "integer"}}}
     cases = []
     for args in (
@@ -302,7 +302,7 @@ def strict_json_texts():
         '{"a":1,"a":2}', '{"a":{"b":1,"b":1}}', '[{"x":1,"y":2,"x":3}]', '{"a":[[{"k":1,"k":1}]]}',
         '{"a":1,"\\u0061":1}', '{"a":1,"A":1}', '{"":1,"":2}', '[{"a":1},{"a":1}]',
         'NaN', '[Infinity]', '{"a":-Infinity}', '[1e400]', '{"a":1,}', '[1,]', "{'a':1}", '', ' ', '{',
-        '01', '1.', '.5', '+1', '"\\x41"', '"\t"', '"\\u00e9"', '"é"', '{"é":"名"}', '[1] [2]',
+        '01', '1.', '.5', '+1', '"\\x41"', '"\t"', '"\\u00e9"', '"\u00e9"', '{"\u00e9":"\u540d"}', '[1] [2]',
         '\ufeff{}', '"\\ud83d\\ude00"', '{"a":1}\x00', '123456789012345678901234567890',
         '"\\ud800"', '{"\\udc00":1}', deep_ok, "[" * 200 + "]" * 200,
         '{"a":true,"b":false,"c":null,"d":[],"e":{}}', '[18446744073709551615,-9223372036854775808]',
@@ -342,10 +342,10 @@ def strict_json_texts():
 def random_json(rng: random.Random, depth: int = 0) -> str:
     choice = rng.random()
     if depth > 3 or choice < 0.4:
-        return rng.choice(['1', '-2', '3.25', '"s"', '"é\\n"', 'null', 'false', '1e5', '-0', '[]', '{}'])
+        return rng.choice(['1', '-2', '3.25', '"s"', '"\u00e9\\n"', 'null', 'false', '1e5', '-0', '[]', '{}'])
     if choice < 0.7:
         return "[" + ",".join(random_json(rng, depth + 1) for _ in range(rng.randint(0, 3))) + "]"
-    keys = [rng.choice("abcdé") for _ in range(rng.randint(0, 4))]
+    keys = [rng.choice("abcd\u00e9") for _ in range(rng.randint(0, 4))]
     return "{" + ",".join(f'"{key}":{random_json(rng, depth + 1)}' for key in keys) + "}"
 
 
@@ -391,8 +391,8 @@ def channel_cases():
         "internal_monologue", "monologue", "scratchpad", "Scratch_Pad", "modelResponse", "model_output_raw",
         "chainOfThought", "thought_chain", "diagnostics", "DIAGNOSTIC", "traceback", "stack_trace",
         "trace_stack", "trace", "inspectorTrace", "private-trace", "stack", "exception", "name", "hp",
-        "reaſoning_private", "REASONING_PRİVATE", "ﬁnal", "privateſcratchpad", "ſcratchpad", "ＲＥＡＳＯＮＩＮＧ_raw",
-        "Straße", "diagnoſtic", "\u212aelvin", "tra\u0130ce_private", "scratch\u00adpad", "chain_of_thought",
+        "rea\u017foning_private", "REASONING_PR\u0130VATE", "\ufb01nal", "private\u017fcratchpad", "\u017fcratchpad", "\uff32\uff25\uff21\uff33\uff2f\uff2e\uff29\uff2e\uff27_raw",
+        "Stra\u00dfe", "diagno\u017ftic", "\u212aelvin", "tra\u0130ce_private", "scratch\u00adpad", "chain_of_thought",
         "thoughtchain", "raw", "provider_id", "model_response", "outputModel_raw", "", "_", "a1B2",
     ]
     cases = [{"name": name, "reserved": _is_reserved_canonical_channel(name)} for name in names]
@@ -419,8 +419,8 @@ def mechanic_outcome_cases():
         {"result": {}, "choice": {"choice_id": "c", "prompt": "Pick", "options": two[:1]}},
         {"result": {}, "choice": {"choice_id": "c", "prompt": "Pick",
                                    "options": [option(f"o{i}") for i in range(17)]}},
-        {"result": {}, "choice": {"choice_id": "c", "prompt": "é" * 2049, "options": two}},
-        {"result": {}, "choice": {"choice_id": "c", "prompt": "é" * 2048, "options": two}},
+        {"result": {}, "choice": {"choice_id": "c", "prompt": "\u00e9" * 2049, "options": two}},
+        {"result": {}, "choice": {"choice_id": "c", "prompt": "\u00e9" * 2048, "options": two}},
         {"result": {}, "choice": {"choice_id": " c", "prompt": "Pick", "options": two}},
         {"result": {}, "choice": {"choice_id": "c", "prompt": "Pick", "options": [option("a"), option("a")]}},
         {"result": {}, "choice": {"choice_id": "c", "prompt": "Pick", "options": [option("a"), option("b", "")]}},

@@ -11,7 +11,6 @@
 //! check for a [`Json`]; [`owned_payload`] keeps the one check that can fail.
 
 use crate::error::{DomainError, DomainResult};
-use crate::pytext;
 use std::collections::HashSet;
 use sylvia_base::{pystr, Json, JsonMap};
 
@@ -67,7 +66,7 @@ pub fn validate_authority_identity<'a>(value: &'a str, label: &str, sha256: bool
     if value != stripped {
         return Err(DomainError::value(format!("{label} must not have leading or trailing whitespace")));
     }
-    if sha256 && (pytext::len(value) != 64 || value.chars().any(|c| !"0123456789abcdef".contains(c))) {
+    if sha256 && (pystr::len(value) != 64 || value.chars().any(|c| !"0123456789abcdef".contains(c))) {
         return Err(DomainError::value(format!("{label} must be 64 lowercase hexadecimal characters")));
     }
     Ok(value)
@@ -625,7 +624,7 @@ pub struct MechanicOutcome {
 /// form is the ASCII lowercase letters and digits of the case-folded name, in order.
 pub fn is_reserved_canonical_channel(name: &str) -> bool {
     let compact: String =
-        pytext::casefold(name).chars().filter(|c| c.is_ascii_lowercase() || c.is_ascii_digit()).collect();
+        pystr::casefold(name).chars().filter(|c| c.is_ascii_lowercase() || c.is_ascii_digit()).collect();
     let has = |needle: &str| compact.contains(needle);
     let private_qualifier =
         ["private", "raw", "provider", "chain", "hidden", "internal"].iter().any(|q| has(q));

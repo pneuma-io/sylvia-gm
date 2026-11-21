@@ -19,7 +19,7 @@ use sylvia_domain::package_library::{
     validate_portable_path_value, ActivationCommand, CandidateStatus, ExactPackageDependency,
     JsonShapeLimits, PackageCandidate, PackageFile,
 };
-use sylvia_domain::{pytext, DomainError, DomainResult};
+use sylvia_domain::{DomainError, DomainResult};
 
 fn vectors() -> Json {
     pyjson::loads(include_str!("vectors/identity_vectors.json")).expect("vector file is valid JSON")
@@ -390,8 +390,8 @@ fn python_text_behaviour_matches() {
     for case in list(&vectors, "text") {
         let value = case["text"].as_str().unwrap();
         assert_eq!(pystr::strip(value), case["strip"].as_str().unwrap(), "strip {value:?}");
-        assert_eq!(pytext::casefold(value), case["casefold"].as_str().unwrap(), "casefold {value:?}");
-        assert_eq!(pytext::upper(value), case["upper"].as_str().unwrap(), "upper {value:?}");
-        assert_eq!(pytext::len(value) as u64, case["len"].as_u64().unwrap(), "len {value:?}");
+        assert_eq!(pystr::casefold(value), case["casefold"].as_str().unwrap(), "casefold {value:?}");
+        assert_eq!(pystr::upper(value), case["upper"].as_str().unwrap(), "upper {value:?}");
+        assert_eq!(pystr::len(value) as u64, case["len"].as_u64().unwrap(), "len {value:?}");
     }
 }
