@@ -8,10 +8,12 @@
 //! Ported so far: connection settings, the owner lock, the schema migration chain and the
 //! exact schema identity check. The stored-content verifiers and transaction families follow.
 
+pub mod backup;
 pub mod error;
 pub mod handle;
 pub mod owner_lock;
 pub mod pytext;
+pub mod safe_file;
 pub mod schema;
 pub mod sql;
 pub mod store;

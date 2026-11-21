@@ -1,0 +1,84 @@
+{
+ "python": "3.12.11",
+ "platform": "windows",
+ "scenarios": {
+  "new_target": {
+   "ok": true,
+   "copy": {
+    "user_version": 12,
+    "tables": 54,
+    "migrations": 12
+   },
+   "siblings": []
+  },
+  "existing_target_replaced": {
+   "ok": true,
+   "copy": {
+    "user_version": 12,
+    "tables": 54,
+    "migrations": 12
+   },
+   "siblings": []
+  },
+  "parent_missing": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_parent_invalid",
+   "message": "Database backup failed"
+  },
+  "target_is_directory": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_target_not_regular",
+   "message": "Database backup failed"
+  },
+  "target_is_source": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_source_alias",
+   "message": "Database backup failed"
+  },
+  "target_is_source_wal": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_source_alias",
+   "message": "Database backup failed"
+  },
+  "target_is_source_lock": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_source_alias",
+   "message": "Database backup failed"
+  },
+  "destination_owner_lock": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_destination_owner_lock",
+   "message": "Database backup failed"
+  },
+  "parent_is_file": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_parent_invalid",
+   "message": "Database backup failed"
+  },
+  "name_with_colon": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_unsupported",
+   "message": "Database backup failed"
+  },
+  "unc_admin_share": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_unsupported",
+   "message": "Database backup failed"
+  },
+  "unmapped_drive": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_volume_unsupported",
+   "message": "Database backup failed"
+  }
+ }
+}

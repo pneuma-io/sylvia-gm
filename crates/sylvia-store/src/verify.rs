@@ -108,17 +108,69 @@ fn owned(version: i64) -> (i64, String, String) {
     (version, name.to_owned(), sha256.to_owned())
 }
 
+/// Which Python check runs: they test the same identity with their own messages and order.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Flavor {
+    /// `_verify_exact_schema_identity`.
+    Authority,
+    /// The identity half of `_verify_backup_authority`.
+    Backup,
+}
+
+impl Flavor {
+    fn unsupported(self) -> &'static str {
+        match self {
+            Flavor::Authority => "Authority schema identity is incomplete",
+            Flavor::Backup => "Backup schema identity is unsupported",
+        }
+    }
+    fn tables(self) -> &'static str {
+        match self {
+            Flavor::Authority => "Authority schema identity does not match its version",
+            Flavor::Backup => "Backup schema identity does not match its version",
+        }
+    }
+    fn structure(self) -> &'static str {
+        match self {
+            Flavor::Authority => "Authority schema structure does not match its version",
+            Flavor::Backup => "Backup schema structure does not match its version",
+        }
+    }
+    fn migrations(self) -> &'static str {
+        match self {
+            Flavor::Authority => "Authority migration identity does not match its version",
+            Flavor::Backup => "Backup migration identity does not match its version",
+        }
+    }
+    fn extensions(self) -> &'static str {
+        match self {
+            Flavor::Authority => "Authority schema extension identity is invalid",
+            Flavor::Backup => "Backup schema extension identity is invalid",
+        }
+    }
+}
+
 /// Verify the exact identity of `version` (read from the database when `None`) and return it.
 pub(crate) fn verify_exact_schema_identity(
     connection: &Connection,
     version: Option<i64>,
 ) -> StoreResult<i64> {
+    check_identity(connection, version, Flavor::Authority)
+}
+
+/// The schema, trigger, migration and extension checks of `_verify_backup_authority`, on a
+/// backup copy opened read-only. Returns its version.
+pub(crate) fn verify_backup_identity(connection: &Connection) -> StoreResult<i64> {
+    check_identity(connection, None, Flavor::Backup)
+}
+
+fn check_identity(connection: &Connection, version: Option<i64>, flavor: Flavor) -> StoreResult<i64> {
     let version = match version {
         Some(version) => version,
         None => user_version(connection)?,
     };
     if !(SCHEMA_VERSION..=CAMPAIGN_SCHEMA_VERSION).contains(&version) {
-        return Err(schema_identity("Authority schema identity is incomplete"));
+        return Err(schema_identity(flavor.unsupported()));
     }
     let tables: BTreeSet<String> =
         all_rows(connection, "SELECT name FROM sqlite_master WHERE type = 'table'")?
@@ -214,10 +266,17 @@ pub(crate) fn verify_exact_schema_identity(
         Known::Base
     };
     if !required.iter().all(|table| tables.contains(*table)) {
-        return Err(schema_identity("Authority schema identity does not match its version"));
+        return Err(schema_identity(flavor.tables()));
     }
     if &schema_identity_of(connection)? != expected.identity() {
-        return Err(schema_identity("Authority schema structure does not match its version"));
+        return Err(schema_identity(flavor.structure()));
+    }
+    // The backup check tests the ownership triggers here, before the migration rows.
+    if flavor == Flavor::Backup
+        && version >= STATE_OWNERSHIP_SCHEMA_VERSION
+        && &trigger_identity_of(connection)? != expected_trigger_identity()
+    {
+        return Err(schema_identity("Backup state-ownership triggers are invalid"));
     }
     let rows = migration_rows(connection)?;
     let mut expected_migrations: MigrationRows = (1..=3).map(owned).collect();
@@ -238,7 +297,7 @@ pub(crate) fn verify_exact_schema_identity(
         });
         let supported: Vec<MigrationRows> = supported.collect();
         if !supported.contains(&rows) {
-            return Err(schema_identity("Authority migration identity does not match its version"));
+            return Err(schema_identity(flavor.migrations()));
         }
         let extension_rows = all_rows(
             connection,
@@ -256,15 +315,16 @@ pub(crate) fn verify_exact_schema_identity(
                         .all(|(value, text)| matches!(value, Value::Text(stored) if stored == text))
             });
         if !same {
-            return Err(schema_identity("Authority schema extension identity is invalid"));
+            return Err(schema_identity(flavor.extensions()));
         }
-        if version >= STATE_OWNERSHIP_SCHEMA_VERSION
+        if flavor == Flavor::Authority
+            && version >= STATE_OWNERSHIP_SCHEMA_VERSION
             && &trigger_identity_of(connection)? != expected_trigger_identity()
         {
             return Err(schema_identity("Authority state ownership trigger identity is invalid"));
         }
     } else if rows != expected_migrations {
-        return Err(schema_identity("Authority migration identity does not match its version"));
+        return Err(schema_identity(flavor.migrations()));
     }
     Ok(version)
 }
