@@ -7,9 +7,8 @@
 //! turns them into its `SchemaIdentityError`; a `CommandRejected` from a package or lock read,
 //! a SQLite error or anything else escapes, and startup words it as `_migrate` does.
 //!
-//! Not yet checked, only making this less strict until it lands: a reviewed sequel Plan's
-//! `verify_sequel` and its adoption evidence, which need lane 1's pending
-//! `domain/campaign_sequel.py`. Its predecessor must still exist.
+//! A reviewed sequel Plan is checked with `sqlite_sequel.verify_sequel` (`crate::sequel`, on lane
+//! 1's `campaign_sequel`) and its adoption evidence.
 
 use crate::actions::{dump, load_payload};
 use crate::campaigns::{handoff_from_row, named_rows, read_lock_record, session_from_row, Named};
@@ -392,11 +391,38 @@ fn reconcile(connection: &Connection, present: &[String]) -> Checked<()> {
                 return invalid();
             }
             if let Some(Json::Object(sequel)) = sequel {
-                // `verify_sequel` and the adoption evidence wait for lane 1's `campaign_sequel`.
-                let previous = sequel
+                let previous_id = sequel
                     .get("previous_plan_id")
                     .map_or_else(|| "None".to_owned(), sylvia_domain::pyops::py_str);
-                if !plans.contains_key(&previous) {
+                let Some(previous) = plans.get(&previous_id) else { return invalid() };
+                crate::sequel::verify_sequel(&plan, previous)?;
+                // The adoption evidence: the Plan's first provenance message, written right after
+                // the reviewed preview's last message.
+                let sequel_json = Json::Object(sequel.clone());
+                let request = sylvia_domain::pyops::py_item(&sequel_json, "request")?;
+                let mut adoption = JsonMap::new();
+                adoption.insert("kind".into(), "campaign_sequel_adoption".into());
+                adoption.insert("plan_id".into(), f.plan_id.clone().into());
+                adoption
+                    .insert("request_sha256".into(), sylvia_domain::campaign_sequel::digest(request).into());
+                let evidence = f
+                    .provenance_evidence_ids
+                    .first()
+                    .and_then(|id| source_messages.get(id.as_str()))
+                    .ok_or(Flow::Invalid)?;
+                let preview = sylvia_domain::pyops::py_item(&sequel_json, "preview")?;
+                let latest = sylvia_domain::pyops::py_item(preview, "latest_message_sequence")?;
+                let after_latest = match latest {
+                    Json::Number(number) if number.is_i64() => {
+                        Json::from(number.as_i64().unwrap_or_default() + 1)
+                    }
+                    Json::Bool(flag) => Json::from(i64::from(*flag) + 1),
+                    Json::Number(number) => Json::from(number.as_f64().unwrap_or_default() + 1.0),
+                    _ => return invalid(),
+                };
+                if !py_eq(&Json::Object(evidence.content().clone()), &Json::Object(adoption))
+                    || !py_eq(&Json::from(evidence.sequence()), &after_latest)
+                {
                     return invalid();
                 }
             }
