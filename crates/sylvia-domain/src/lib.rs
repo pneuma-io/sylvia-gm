@@ -21,18 +21,26 @@
 //! - [`schema_admission`]: `application/schema_admission.py`, the admitted JSON-schema subset.
 //! - [`pyops`]: Python `==`, `in`, `set()` and subscripting on JSON values, for untrusted records.
 //! - [`campaign_ending`], [`no_ruleset_plan`]: Campaign Plan endings and No Ruleset worlds.
+//! - [`interview_contribution`]: artifact-owned Campaign Interview questions.
+//! - [`campaign_sequel`]: appended adventures; [`mechanics_choices`], [`provider_records`],
+//!   [`ruleset_tests`]: saved choice records, private provider records and Ruleset test scenarios.
 
 pub mod authority;
 pub mod campaign_ending;
+pub mod campaign_sequel;
 pub mod content;
 pub mod error;
+pub mod interview_contribution;
 pub mod inventory;
+pub mod mechanics_choices;
 pub mod model_capability;
 pub mod no_ruleset_plan;
 pub mod package_archive;
 pub mod package_library;
 pub mod panel_layout;
+pub mod provider_records;
 pub mod pyops;
+pub mod ruleset_tests;
 pub mod schema_admission;
 pub mod session;
 pub mod starting_state;

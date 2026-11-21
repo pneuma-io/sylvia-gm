@@ -89,15 +89,15 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/campaign_plan.py:636` | `validate_campaign_plan` | len() against a limit | `or len(secrets) > 256` | |
 | `domain/campaign_plan.py:741` | `validate_campaign_plan` | len() against a limit | `if len(markdown.encode("utf-8")) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
 | `domain/campaign_plan.py:749` | `validate_campaign_plan` | len() against a limit | `if len(encoded) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
-| `domain/campaign_sequel.py:45` | `prepare_story` | len() against a limit | `if any(len(item) > 160 for item in mapping.values()):` | |
-| `domain/campaign_sequel.py:67` | `review_payload` | len() against a limit | `if not isinstance(note, str) or not note.strip() or len(note) > 4000:` | |
+| `domain/campaign_sequel.py:45` | `prepare_story` | len() against a limit | `if any(len(item) > 160 for item in mapping.values()):` || `sylvia-domain` domain_records_vectors |
+| `domain/campaign_sequel.py:67` | `review_payload` | len() against a limit | `if not isinstance(note, str) or not note.strip() or len(note) > 4000:` || `sylvia-domain` domain_records_vectors |
 | `domain/content_validation.py:138` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
 | `domain/content_validation.py:140` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
 | `domain/errors.py:150` | `MechanicsRejected.__init__` | len() against a limit | `or len(reason) > 500 or any(ord(character) < 32 for character in reason)` | `sylvia-domain` schema_admission_vectors |
 | `domain/errors.py:163` | `RulesetPreconditionRejected.__init__` | len() against a limit | `or len(safe_reason) > 500` | `sylvia-domain` schema_admission_vectors |
-| `domain/interview_contribution.py:76` | `parse_interview_contribution_bytes` | len() against a limit | `if not value or len(value) > INTERVIEW_CONTRIBUTION_BYTE_LIMIT:` | |
-| `domain/inventory.py:125` | `validate_holdings` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | |
-| `domain/mechanics_choices.py:63` | `answers_from_payload` | len() against a limit | `if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or len(value) >= 64:` | |
+| `domain/interview_contribution.py:76` | `parse_interview_contribution_bytes` | len() against a limit | `if not value or len(value) > INTERVIEW_CONTRIBUTION_BYTE_LIMIT:` || `sylvia-domain` domain_records_vectors |
+| `domain/inventory.py:125` | `validate_holdings` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` || `sylvia-domain` domain_records_vectors |
+| `domain/mechanics_choices.py:63` | `answers_from_payload` | len() against a limit | `if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or len(value) >= 64:` || `sylvia-domain` domain_records_vectors |
 | `domain/no_ruleset_plan.py:79` | `validate_no_ruleset_world` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | `sylvia-domain` plan_reading_vectors |
 | `domain/package_library.py:114` | `_validate_mechanical_inventory_declaration` | len() against a limit | `if not 1 <= len(names) <= 32:` | `sylvia-domain` manifest_vectors |
 | `domain/package_library.py:803` | `_safe_small_label` | len() against a limit | `if len(value.encode("utf-8")) > 256 or "/" in value or "\\" in value or ":" in value:` | `sylvia-domain` manifest_vectors |

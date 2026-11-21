@@ -83,23 +83,23 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/_content_schema_runtime.py` | 320 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/_content_schema_setting.py` | 62 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/_content_schema_ui.py` | 209 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
-| `src/sylvia_gm/domain/_runtime_executable_reference.py` | 225 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/_runtime_executable_reference.py` | 225 | `sylvia-domain::content::catalog` | ported | Data only, and read only by `_content_schema_runtime.py` and `_content_schema_ruleset.py`: exported with them as `content/definitions/package_runtime.procedural.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/authority.py` | 1,128 | `sylvia-domain::authority` | ported | Validated types keep private fields behind `new`; `Mechanic` and `NarrationStream` (callables) left to lanes 2 and 4 |
 | `src/sylvia_gm/domain/campaign_ending.py` | 99 | `sylvia-domain::campaign_ending` | ported | `plan_reading_vectors` (every shipped Campaign Plan) |
 | `src/sylvia_gm/domain/campaign_plan.py` | 759 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain::campaign_sequel` | ported | `domain_records_vectors` |
 | `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain::content::catalog` | ported | `list_content_definitions`, `get_content_definition` |
 | `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain::content::validation` | ported | `validate_content_shape`, `ContentShapeError`; the engine (`content::schema`) also serves lanes 2 and 4 and `state/_schema.py`, with jsonschema 4.26 messages |
 | `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain::error` | ported | `RulesetDiagnostic`, `MechanicsValidationIssue`; the `AuthorityError` classes are `DomainError::Rejected` with their codes |
-| `src/sylvia_gm/domain/interview_contribution.py` | 150 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain::inventory` | in progress | Shared schemas done (data, `generate_inventory_schema.py`); `validate_holdings`, `transfer_holding` and `player_inventory` follow |
-| `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/interview_contribution.py` | 150 | `sylvia-domain::interview_contribution` | ported | `domain_records_vectors` |
+| `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain::inventory` | ported | Shared schemas as data (`generate_inventory_schema.py`); `validate_holdings`, `transfer_holding` and `player_inventory` in `inventory/holdings.rs`; `domain_records_vectors` |
+| `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain::mechanics_choices` | ported | `domain_records_vectors` |
 | `src/sylvia_gm/domain/model_capability.py` | 333 | `sylvia-domain::model_capability` | ported | Tiers, placements, registry, guidance decisions and payloads |
 | `src/sylvia_gm/domain/no_ruleset_plan.py` | 124 | `sylvia-domain::no_ruleset_plan` | ported | `plan_reading_vectors` (synthetic No Ruleset worlds on shipped Plans) |
 | `src/sylvia_gm/domain/package_library.py` | 2,211 | `sylvia-domain::package_library` | ported | Manifests, declarations, gameplay support, setting knowledge and closures; Python operator quirks via `pyops` |
 | `src/sylvia_gm/domain/panel_layout.py` | 105 | `sylvia-domain::panel_layout` | ported | `panel_layout_vectors` (synthetic layouts: the only shipped ones are private) and `archive_vectors` |
-| `src/sylvia_gm/domain/provider_records.py` | 17 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/ruleset_tests.py` | 95 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/provider_records.py` | 17 | `sylvia-domain::provider_records` | ported | A record type; `Debug` leaves out `payload` as Python's `repr` does |
+| `src/sylvia_gm/domain/ruleset_tests.py` | 95 | `sylvia-domain::ruleset_tests` | ported | `domain_records_vectors`; nesting of 128 levels or more under differences row 4 |
 | `src/sylvia_gm/domain/session.py` | 499 | `sylvia-domain::session` | ported | Validated records keep private fields behind `new` (or `validated()` for the evidence records) |
 | `src/sylvia_gm/domain/starting_state.py` | 89 | `sylvia-domain::starting_state` | ported |  |
 | `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain::state_ownership` | ported | Replaces lane 3's marked private copy |

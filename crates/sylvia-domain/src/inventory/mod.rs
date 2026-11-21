@@ -1,9 +1,11 @@
 //! `domain/inventory.py`: rules-neutral holdings.
 //!
-//! This part holds the shared schemas the package format refers to. Holding validation and
-//! transfers (`validate_holdings`, `transfer_holding`, `player_inventory`) follow with the
-//! remaining domain modules.
+//! The shared schemas the package format refers to, and in [`holdings`] the holding
+//! validation, transfers and player projection.
 
+mod holdings;
+
+pub use holdings::{player_inventory, transfer_holding, validate_holdings, HoldingTransfer};
 use std::sync::OnceLock;
 use sylvia_base::{pyjson, Json};
 
