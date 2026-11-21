@@ -182,10 +182,9 @@ fn call(vectors: &Json, case: &Json) -> Json {
     outcome(result)
 }
 
-/// differences.md rows 2 and 4: `NaN`/`Infinity` literals and nesting of 128 levels or more are
-/// refused when the scenario JSON is read, with the reader's message, where Python reads them
-/// and then reports "Scenario values must be finite JSON data." or "Scenario data exceeds the
-/// nesting or size limit.".
+/// differences.md row 4: nesting of 128 levels or more is refused when the scenario JSON is
+/// read, with the reader's message, where Python reports "Scenario data exceeds the nesting or
+/// size limit.".
 fn unambiguous() -> Json {
     json!(["ContentShapeError", "Content fields do not match the declared format", [{
         "code": "ruleset_tests_invalid", "phase": "source",
@@ -202,7 +201,7 @@ fn domain_records_match_python() {
     for case in cases {
         let actual = call(&vectors, case);
         let expected = match case.get("difference").and_then(Json::as_str) {
-            Some("row 2" | "row 4") => unambiguous(),
+            Some("row 4") => unambiguous(),
             _ => case["outcome"].clone(),
         };
         if actual != expected {

@@ -99,7 +99,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/package_library.py` | 2,211 | `sylvia-domain::package_library` | ported | Manifests, declarations, gameplay support, setting knowledge and closures; Python operator quirks via `pyops` |
 | `src/sylvia_gm/domain/panel_layout.py` | 105 | `sylvia-domain::panel_layout` | ported | `panel_layout_vectors` (synthetic layouts: the only shipped ones are private) and `archive_vectors` |
 | `src/sylvia_gm/domain/provider_records.py` | 17 | `sylvia-domain::provider_records` | ported | A record type; `Debug` leaves out `payload` as Python's `repr` does |
-| `src/sylvia_gm/domain/ruleset_tests.py` | 95 | `sylvia-domain::ruleset_tests` | ported | `domain_records_vectors`; `NaN`/`Infinity` and deep nesting under differences rows 2 and 4 |
+| `src/sylvia_gm/domain/ruleset_tests.py` | 95 | `sylvia-domain::ruleset_tests` | ported | `domain_records_vectors`; nesting of 128 levels or more under differences row 4 |
 | `src/sylvia_gm/domain/session.py` | 499 | `sylvia-domain::session` | ported | Validated records keep private fields behind `new` (or `validated()` for the evidence records) |
 | `src/sylvia_gm/domain/starting_state.py` | 89 | `sylvia-domain::starting_state` | ported |  |
 | `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain::state_ownership` | ported | Replaces lane 3's marked private copy |

@@ -198,13 +198,37 @@ def ruleset_test_cases():
     for raw in raws:
         cases.append({"fn": "parse_ruleset_tests", "args": [{"raw": raw}],
                       "outcome": outcome(lambda: parse_ruleset_tests(raw.encode("utf-8")), project)})
-    # docs/rust-port/differences.md rows 2 and 4: Rust refuses these when it reads the JSON.
-    differences = [("row 2", base.replace('"value": 6}', '"value": NaN}', 1)),
-                   ("row 2", base.replace('"value": 6}', '"value": -Infinity}', 1)),
-                   ("row 4", base.replace('"equals": null', '"equals": ' + "[" * 130 + "]" * 130, 1))]
-    for row, raw in differences:
-        cases.append({"fn": "parse_ruleset_tests", "args": [{"raw": raw}], "difference": row,
+    # Non-finite floats: Python reads them, then the size walk refuses the first one it meets.
+    deep_list = "[" * 70 + "1" + "]" * 70
+    non_finite = [
+        base.replace('"value": 6}', '"value": NaN}', 1),
+        base.replace('"value": 6}', '"value": Infinity}', 1),
+        base.replace('"value": 6}', '"value": -Infinity}', 1),
+        base.replace('"value": 6}', '"value": 1e999}', 1),
+        base.replace('"value": 6}', '"value": -1.5E+400}', 1),
+        base.replace('"value": 6}', '"value": 1.7976931348623159e308}', 1),
+        base.replace('"value": 6}', '"value": 1.7976931348623157e308}', 1),
+        base.replace('"value": 6}', '"value": 1e-999}', 1),
+        base.replace('"value": 6}', '"value": 01e999}', 1),
+        base.replace('"value": 6}', '"value": -NaN}', 1),
+        base.replace('"value": 6}', '"value": NaNx}', 1),
+        base.replace('"value": 6}', '"value": [NaN, "NaN", "Infinity"]}', 1),
+        base.replace('"value": 6}', '"value": NaN}', 1).replace('"format": 1', '"format": 1, "format": 1'),
+        base.replace('"value": 6}', '"value": {"NaN": 1}}', 1),
+        base.replace('"description": "Opening"', '"description": "Opening NaN Infinity \\u0000non-finite-0"', 1)
+            .replace('"value": 6}', '"value": NaN}', 1),
+        '{"format": 1, "scenarios": [], "a": [NaN, ' + deep_list + ']}',
+        '{"format": 1, "scenarios": [], "a": [' + deep_list + ', NaN]}',
+        "NaN",
+        "[NaN]",
+    ]
+    for raw in non_finite:
+        cases.append({"fn": "parse_ruleset_tests", "args": [{"raw": raw}],
                       "outcome": outcome(lambda: parse_ruleset_tests(raw.encode("utf-8")), project)})
+    # docs/rust-port/differences.md row 4: Rust refuses this nesting when it reads the JSON.
+    raw = base.replace('"equals": null', '"equals": ' + "[" * 130 + "]" * 130, 1)
+    cases.append({"fn": "parse_ruleset_tests", "args": [{"raw": raw}], "difference": "row 4",
+                  "outcome": outcome(lambda: parse_ruleset_tests(raw.encode("utf-8")), project)})
     for count in (2 * 1024 * 1024, 2 * 1024 * 1024 + 1):
         cases.append({"fn": "parse_ruleset_tests", "args": [{"raw_spaces": count}],
                       "outcome": outcome(lambda: parse_ruleset_tests(b" " * count), project)})

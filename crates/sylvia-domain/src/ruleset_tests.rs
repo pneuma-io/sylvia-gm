@@ -1,12 +1,16 @@
 //! `domain/ruleset_tests.py`: validate saved scenario data before any disposable campaign is
 //! created.
 //!
-//! Two inputs Python accepts are refused when the JSON is read, under
-//! `docs/rust-port/differences.md` rows 2 and 4: the `NaN`/`Infinity` literals (Python reads
-//! them and then reports "Scenario values must be finite JSON data.") and nesting of 128
-//! levels or more (Python reports "Scenario data exceeds the nesting or size limit." up to its
-//! own recursion limit). Both are reported here as "Scenario file must contain unambiguous
-//! UTF-8 JSON.", with the same code, file and path.
+//! Python's `json.loads` reads `NaN`, `Infinity`, `-Infinity` and float literals beyond the
+//! float range (such as `1e999`) as non-finite floats, which the size walk then refuses with
+//! "Scenario values must be finite JSON data.". A Rust JSON value cannot hold them (differences
+//! row 2), so the reader first stands each one in for a text sentinel that no string in the
+//! file equals, and the walk treats that sentinel as Python treats a non-finite float. The walk
+//! runs in Python's order, so the first refusal is Python's too.
+//!
+//! Nesting of 128 levels or more is refused when the JSON is read (differences row 4), as
+//! "Scenario file must contain unambiguous UTF-8 JSON.", where Python reports "Scenario data
+//! exceeds the nesting or size limit." up to its own recursion limit.
 
 use crate::content::{validate_content_shape, ContentShapeError};
 use crate::error::{DomainResult, RulesetDiagnostic};
@@ -35,20 +39,7 @@ fn invalid(path: impl Into<String>, message: &str) -> ContentShapeError {
 /// `validate_ruleset_tests(value)`: shape and cross-field identities; execution owns real game
 /// validation.
 pub fn validate_ruleset_tests(value: &Json) -> DomainResult<JsonMap> {
-    // A JSON tree always has text keys and finite numbers, so the walk only bounds its size.
-    let mut pending: Vec<(&Json, usize)> = vec![(value, 0)];
-    let mut nodes = 0usize;
-    while let Some((item, depth)) = pending.pop() {
-        nodes += 1;
-        if depth > 64 || nodes > 250_000 {
-            return Err(invalid("$", "Scenario data exceeds the nesting or size limit.").into());
-        }
-        match item {
-            Json::Object(map) => pending.extend(map.values().map(|child| (child, depth + 1))),
-            Json::Array(items) => pending.extend(items.iter().map(|child| (child, depth + 1))),
-            _ => {}
-        }
-    }
+    walk(value, None)?;
     validate_content_shape("ruleset_tests", value, Some(RULESET_TESTS_PATH))?;
     // The schema has fixed every type read below.
     let suite = value.as_object().expect("the schema requires an object");
@@ -96,12 +87,164 @@ pub fn validate_ruleset_tests(value: &Json) -> DomainResult<JsonMap> {
     Ok(suite.clone())
 }
 
+/// The size walk at the top of `validate_ruleset_tests`, in Python's last-in, first-out order.
+/// JSON keys are always text; `non_finite` is the sentinel standing for a non-finite float.
+fn walk(value: &Json, non_finite: Option<&str>) -> Result<(), ContentShapeError> {
+    let mut pending: Vec<(&Json, usize)> = vec![(value, 0)];
+    let mut nodes = 0usize;
+    while let Some((item, depth)) = pending.pop() {
+        nodes += 1;
+        if depth > 64 || nodes > 250_000 {
+            return Err(invalid("$", "Scenario data exceeds the nesting or size limit."));
+        }
+        match item {
+            Json::Object(map) => pending.extend(map.values().map(|child| (child, depth + 1))),
+            Json::Array(items) => pending.extend(items.iter().map(|child| (child, depth + 1))),
+            Json::String(text) if Some(text.as_str()) == non_finite => {
+                return Err(invalid("$", "Scenario values must be finite JSON data."));
+            }
+            _ => {}
+        }
+    }
+    Ok(())
+}
+
+/// `-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]+)?`, Python's JSON number, with a fraction or an
+/// exponent (an integer token is an exact `int` in Python).
+fn json_float_token(token: &str) -> bool {
+    let bytes = token.strip_prefix('-').unwrap_or(token).as_bytes();
+    let digits = |at: usize| bytes[at..].iter().take_while(|b| b.is_ascii_digit()).count();
+    let whole = digits(0);
+    if whole == 0 || (bytes[0] == b'0' && whole > 1) {
+        return false;
+    }
+    let mut at = whole;
+    let mut float = false;
+    if bytes.get(at) == Some(&b'.') {
+        let fraction = digits(at + 1);
+        if fraction == 0 {
+            return false;
+        }
+        at += 1 + fraction;
+        float = true;
+    }
+    if matches!(bytes.get(at), Some(b'e' | b'E')) {
+        at += 1;
+        if matches!(bytes.get(at), Some(b'+' | b'-')) {
+            at += 1;
+        }
+        let exponent = digits(at);
+        if exponent == 0 {
+            return false;
+        }
+        at += exponent;
+        float = true;
+    }
+    float && at == bytes.len()
+}
+
+/// `text` with every non-finite literal outside strings replaced by `replacement`, and how many
+/// were replaced: `NaN`, `Infinity`, `-Infinity`, and float literals Python reads as infinite.
+fn replace_non_finite(text: &str, replacement: &str) -> (String, usize) {
+    let bytes = text.as_bytes();
+    let mut out = String::with_capacity(text.len());
+    let (mut at, mut start, mut count) = (0usize, 0usize, 0usize);
+    let mut in_string = false;
+    while at < bytes.len() {
+        let byte = bytes[at];
+        if in_string {
+            match byte {
+                b'\\' => at += 2,
+                b'"' => {
+                    in_string = false;
+                    at += 1;
+                }
+                _ => at += 1,
+            }
+            continue;
+        }
+        if byte == b'"' {
+            in_string = true;
+            at += 1;
+            continue;
+        }
+        // Bytes, not `str`: outside a string a stray non-ASCII character is only ever skipped.
+        let rest = &bytes[at..];
+        let literal = ["-Infinity", "Infinity", "NaN"]
+            .into_iter()
+            .find(|word| rest.starts_with(word.as_bytes()))
+            .map(str::len);
+        let number = if literal.is_none() && (byte == b'-' || byte.is_ascii_digit()) {
+            let length = rest
+                .iter()
+                .take_while(|b| b.is_ascii_digit() || matches!(b, b'-' | b'+' | b'.' | b'e' | b'E'))
+                .count();
+            let token = std::str::from_utf8(&rest[..length]).expect("ASCII");
+            if json_float_token(token) && token.parse::<f64>().is_ok_and(f64::is_infinite) {
+                Ok(length)
+            } else {
+                Err(length)
+            }
+        } else {
+            Err(1)
+        };
+        match (literal, number) {
+            (Some(length), _) | (None, Ok(length)) => {
+                out.push_str(&text[start..at]);
+                out.push_str(replacement);
+                at += length;
+                start = at;
+                count += 1;
+            }
+            (None, Err(length)) => at += length.max(1),
+        }
+    }
+    out.push_str(&text[start..]);
+    (out, count)
+}
+
+fn collect_strings<'a>(value: &'a Json, strings: &mut std::collections::BTreeSet<&'a str>) {
+    match value {
+        Json::String(text) => {
+            strings.insert(text);
+        }
+        Json::Array(items) => items.iter().for_each(|item| collect_strings(item, strings)),
+        Json::Object(map) => {
+            for (key, item) in map {
+                strings.insert(key);
+                collect_strings(item, strings);
+            }
+        }
+        _ => {}
+    }
+}
+
 /// `parse_ruleset_tests(data)`: bounded UTF-8 scenario JSON with unique member names.
 pub fn parse_ruleset_tests(data: &[u8]) -> DomainResult<JsonMap> {
     if data.len() > RULESET_TESTS_BYTE_LIMIT {
         return Err(invalid("$", "Scenario file exceeds the size limit.").into());
     }
-    let value = parse_content_json_bytes(data, "Scenario file", JsonShapeLimits::NONE)
-        .map_err(|_| invalid("$", "Scenario file must contain unambiguous UTF-8 JSON."))?;
-    validate_ruleset_tests(&value)
+    let ambiguous = || invalid("$", "Scenario file must contain unambiguous UTF-8 JSON.");
+    let read = |bytes: &[u8]| parse_content_json_bytes(bytes, "Scenario file", JsonShapeLimits::NONE);
+    let text = std::str::from_utf8(data).map_err(|_| ambiguous())?;
+    let (with_nulls, count) = replace_non_finite(text, "null");
+    if count == 0 {
+        let value = read(data).map_err(|_| ambiguous())?;
+        return validate_ruleset_tests(&value);
+    }
+    // Python reads the file whole; any other fault makes it ambiguous before the walk runs.
+    let plain = read(with_nulls.as_bytes()).map_err(|_| ambiguous())?;
+    let mut strings = std::collections::BTreeSet::new();
+    collect_strings(&plain, &mut strings);
+    let sentinel = (0..)
+        .map(|k| format!("\u{0}non-finite-{k}"))
+        .find(|s| !strings.contains(s.as_str()))
+        .expect("a free name");
+    let literal =
+        sylvia_base::pyjson::dumps(&Json::String(sentinel.clone()), sylvia_base::pyjson::Dump::DEFAULT);
+    let (marked, _) = replace_non_finite(text, &literal);
+    let value = read(marked.as_bytes()).map_err(|_| ambiguous())?;
+    walk(&value, Some(&sentinel))?;
+    // Every node is visited, so the walk has already refused the first non-finite value.
+    unreachable!("a non-finite value is always reached by the walk")
 }
