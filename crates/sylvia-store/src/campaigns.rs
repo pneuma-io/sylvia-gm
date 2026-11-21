@@ -96,7 +96,7 @@ pub(crate) fn parse<T>(text: &str, parse: fn(&str) -> Option<T>, name: &str) -> 
 }
 
 /// `sqlite_packages._parse`: `parse_canonical_json_bytes` with its default label.
-fn parse_canonical(text: &str) -> StoreResult<Json> {
+pub(crate) fn parse_canonical(text: &str) -> StoreResult<Json> {
     Ok(parse_canonical_json_bytes(text.as_bytes(), DEFAULT_LABEL, JsonShapeLimits::NONE)?)
 }
 
@@ -122,7 +122,10 @@ pub(crate) fn manifest_from_identity(
 }
 
 /// `_package_lock_from_membership_rows`.
-fn package_lock_from_memberships(connection: &Connection, rows: &[Vec<Value>]) -> StoreResult<PackageLock> {
+pub(crate) fn package_lock_from_memberships(
+    connection: &Connection,
+    rows: &[Vec<Value>],
+) -> StoreResult<PackageLock> {
     let mut entries = Vec::with_capacity(rows.len());
     for row in rows {
         // closure_order, package_id, version, content_sha256, role

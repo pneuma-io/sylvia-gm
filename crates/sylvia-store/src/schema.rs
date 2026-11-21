@@ -6,11 +6,11 @@
 //! `sqlite_reasoning.py` and `sqlite_effort.py`. Each step runs the same statements in the same
 //! order, so SQLite stores the same `sqlite_master` text.
 
-use crate::error::{schema_identity, StoreError, StoreResult};
+use crate::error::{schema_identity, StoreResult};
 use crate::pytext::{normalized_casefold, py_strip};
 use crate::sql;
 use rusqlite::types::Value;
-use rusqlite::Connection;
+use rusqlite::{params, Connection, OptionalExtension};
 use std::sync::OnceLock;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::pyjson::{canonical_bytes, Dump};
@@ -564,21 +564,91 @@ pub fn migrate_legacy_campaigns(connection: &Connection) -> StoreResult<()> {
     Ok(())
 }
 
+/// `sqlite_campaign._parse_mapping`.
+fn parse_mapping(text: &str) -> StoreResult<sylvia_base::JsonMap> {
+    match crate::campaigns::parse_canonical(text)? {
+        Json::Object(map) => Ok(map),
+        _ => Err(crate::error::value_error("Stored canonical JSON must be an object")),
+    }
+}
+
 /// `sqlite_campaign.migrate_v4_participants`: declaration proof backfilled from every published
-/// manifest, then each participant validated against it or quarantined.
-///
-/// It parses manifests and validates participant data against package schemas (lane 1) and
-/// is ported with the package family. Until then a database with a published manifest or a
-/// participant is refused rather than migrated without it; an empty one migrates exactly as
-/// Python migrates it.
+/// manifest, then each participant validated against its uniquely reachable revision-0
+/// declaration, or quarantined.
 pub fn migrate_v4_participants(connection: &Connection) -> StoreResult<()> {
-    let manifests =
-        all_rows(connection, "SELECT 1 FROM package_manifests WHERE status = 'published' LIMIT 1")?;
-    let participants = all_rows(connection, "SELECT 1 FROM participants LIMIT 1")?;
-    if !manifests.is_empty() || !participants.is_empty() {
-        return Err(StoreError::NotPorted(
-            "participant declaration backfill in migration 5 (package family pull request)",
-        ));
+    for row in all_rows(
+        connection,
+        "SELECT canonical_json FROM package_manifests          WHERE status = 'published' ORDER BY package_id, version, content_sha256",
+    )? {
+        let record = Json::Object(parse_mapping(&crate::pytext::py_str(&row[0]))?);
+        let manifest = sylvia_domain::package_library::manifest_from_record(&record, None)?;
+        crate::packages::insert_or_compare_declarations(connection, &manifest)?;
+    }
+    let text = |value: &Value| crate::pytext::py_str(value);
+    for row in all_rows(
+        connection,
+        "SELECT campaign_id, participant_id, kind, package_id, package_version, data_json          FROM participants ORDER BY campaign_id, participant_id",
+    )? {
+        let (campaign_id, participant_id) = (text(&row[0]), text(&row[1]));
+        let (package_id, package_version) = (text(&row[3]), text(&row[4]));
+        let content_rows: Vec<Vec<Value>> = {
+            let mut statement = connection.prepare(
+                "SELECT DISTINCT membership.content_sha256                  FROM campaign_locks AS lock                  JOIN campaign_lock_memberships AS membership ON membership.lock_id = lock.lock_id                  WHERE lock.campaign_id = ? AND lock.created_revision = 0                  AND membership.package_id = ? AND membership.version = ?",
+            )?;
+            let rows = statement.query_map(params![campaign_id, package_id, package_version], |row| {
+                Ok(vec![row.get::<_, Value>(0)?])
+            })?;
+            rows.collect::<Result<_, _>>()?
+        };
+        let mut package_sha256: Option<String> = None;
+        let mut declaration: Option<(Value, Value, Value)> = None;
+        if content_rows.len() == 1 {
+            let sha256 = text(&content_rows[0][0]);
+            declaration = connection
+                .query_row(
+                    "SELECT schema_id, schema_sha256, schema_json                      FROM package_participant_artifacts WHERE package_id = ? AND version = ?                      AND content_sha256 = ? AND kind = ?",
+                    params![package_id, package_version, sha256, text(&row[2])],
+                    |found| Ok((found.get(0)?, found.get(1)?, found.get(2)?)),
+                )
+                .optional()?;
+            package_sha256 = Some(sha256);
+        }
+        let mut validated = false;
+        if let Some((schema_id, schema_sha256, schema_json)) = &declaration {
+            let data = parse_mapping(&text(&row[5]))?;
+            let schema = parse_mapping(&text(schema_json))?;
+            match sylvia_domain::schema_admission::validate_json_value(
+                &Json::Object(data),
+                &schema,
+                &format!("Participant {participant_id}"),
+            ) {
+                Ok(()) => {
+                    connection.execute(
+                        "UPDATE participants SET package_sha256 = ?, schema_id = ?,                          schema_sha256 = ?, validation_status = 'validated'                          WHERE campaign_id = ? AND participant_id = ?",
+                        params![package_sha256, text(schema_id), text(schema_sha256), campaign_id, participant_id],
+                    )?;
+                    validated = true;
+                }
+                // Only `CommandRejected` is caught; anything else escapes, as in Python.
+                Err(sylvia_domain::DomainError::Rejected { error_type: "CommandRejected", .. }) => {}
+                Err(error) => return Err(error.into()),
+            }
+        }
+        if validated {
+            connection.execute(
+                "DELETE FROM participant_quarantines WHERE campaign_id = ? AND participant_id = ?",
+                params![campaign_id, participant_id],
+            )?;
+        } else {
+            connection.execute(
+                "UPDATE participants SET package_sha256 = ?, schema_id = NULL,                  schema_sha256 = NULL, validation_status = 'quarantined'                  WHERE campaign_id = ? AND participant_id = ?",
+                params![package_sha256, campaign_id, participant_id],
+            )?;
+            connection.execute(
+                "INSERT INTO participant_quarantines(campaign_id, participant_id, reason_code)                  VALUES (?, ?, 'exact_schema_proof_unavailable')",
+                params![campaign_id, participant_id],
+            )?;
+        }
     }
     Ok(())
 }

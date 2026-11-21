@@ -708,9 +708,14 @@ fn file_uri(path: &Path, query: &str) -> String {
     format!("{prefix}{encoded}?{query}")
 }
 
-/// `_verify_backup_authority`: the identity of a backup copy. The stored-content verifiers it
-/// also runs in Python arrive with the families that own their tables, as at startup.
+/// `_verify_backup_authority`: the identity of a backup copy, then the stored-content verifiers
+/// Python runs on it. `_verify_stored_authority` (first) and `verify_f5_campaign_authority`
+/// (from schema 5) are still to come, as at startup.
 fn verify_backup_authority(connection: &Connection) -> StoreResult<()> {
-    verify_backup_identity(connection)?;
+    let version = verify_backup_identity(connection)?;
+    crate::packages::verify_package_authority(connection)?;
+    if version >= crate::schema::PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION {
+        crate::continuity::verify_authority(connection)?;
+    }
     Ok(())
 }

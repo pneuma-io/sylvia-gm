@@ -1,0 +1,1928 @@
+{
+ "python": "3.12.11",
+ "runs": [
+  {
+   "name": "install",
+   "seed": "fresh",
+   "compare_db": true,
+   "operations": [
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "package_candidates"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "package_candidate",
+     "candidate_id": "candidate-install-1"
+    },
+    {
+     "op": "package_candidates"
+    },
+    {
+     "op": "exact_package_manifest",
+     "package": "pneuma.riichi-mahjong"
+    },
+    {
+     "op": "exact_package_manifest",
+     "package": "pneuma.riichi-club"
+    },
+    {
+     "op": "exact_package_manifest_missing"
+    },
+    {
+     "op": "package_participant_declarations",
+     "candidate_id": "candidate-install-1"
+    },
+    {
+     "op": "package_participant_declarations",
+     "candidate_id": "candidate-missing"
+    },
+    {
+     "op": "exact_participant_declarations",
+     "package": "pneuma.riichi-mahjong"
+    },
+    {
+     "op": "exact_participant_declarations",
+     "package": "pneuma.riichi-club"
+    },
+    {
+     "op": "package_candidate",
+     "candidate_id": "candidate-missing"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-missing"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "synthetic",
+     "install_id": "install-1"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": " install-2"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": ""
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "synthetic",
+     "install_id": "install-3"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-3"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "synthetic",
+     "install_id": "install-3",
+     "fault": false
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "synthetic",
+     "install_id": "install-4",
+     "fault": false
+    },
+    {
+     "op": "package_candidates"
+    },
+    {
+     "op": "reopen"
+    },
+    {
+     "op": "package_candidates"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "CommandRejected",
+     "code": "staging_unavailable",
+     "message": "Package staging is unavailable"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "install_id": "install-1",
+      "status": "staging",
+      "chunk_count": 8
+     }
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": {
+      "candidate_id": "candidate-install-1",
+      "install_id": "install-1",
+      "status": "validated",
+      "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+      "validation_report": {
+       "code": "validated",
+       "label": "Package candidate validated"
+      },
+      "entries": [
+       {
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ],
+        "dependencies": []
+       },
+       {
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "capabilities": [],
+        "dependencies": [
+         [
+          "pneuma.riichi-mahjong",
+          "0.1.1",
+          "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "ruleset_snapshot",
+          "ruleset_snapshot"
+         ]
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "ok": {
+      "install_id": "install-1",
+      "status": "published",
+      "chunk_count": 8
+     }
+    },
+    {
+     "ok": {
+      "candidate_id": "candidate-install-1",
+      "install_id": "install-1",
+      "status": "validated",
+      "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+      "validation_report": {
+       "code": "validated",
+       "label": "Package candidate validated"
+      },
+      "entries": [
+       {
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ],
+        "dependencies": []
+       },
+       {
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "capabilities": [],
+        "dependencies": [
+         [
+          "pneuma.riichi-mahjong",
+          "0.1.1",
+          "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "ruleset_snapshot",
+          "ruleset_snapshot"
+         ]
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "ok": [
+      {
+       "candidate_id": "candidate-install-1",
+       "install_id": "install-1",
+       "status": "validated",
+       "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "pneuma.riichi-mahjong",
+         "version": "0.1.1",
+         "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "pneuma.riichi-mahjong.guidance",
+          "pneuma.riichi-mahjong.play"
+         ],
+         "dependencies": []
+        },
+        {
+         "package_id": "pneuma.riichi-club",
+         "version": "0.1.1",
+         "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+         "role": "dependency",
+         "load_order": 1,
+         "capabilities": [],
+         "dependencies": [
+          [
+           "pneuma.riichi-mahjong",
+           "0.1.1",
+           "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+           "ruleset_snapshot",
+           "ruleset_snapshot"
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "ok": {
+      "identity": [
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+      ],
+      "canonical_json": "{\"capabilities\":[\"pneuma.riichi-mahjong.guidance\",\"pneuma.riichi-mahjong.play\"],\"compatibility\":{\"host_contract\":1,\"requires\":[\"collection_mechanics.v1\",\"private_state.v1\",\"public_results.v1\",\"starting_state_validation.v1\"],\"runtime_format\":1},\"content_declarations\":\"content/content-declarations.json\",\"content_kind\":\"ruleset\",\"content_sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"dependencies\":[],\"files\":[{\"bytes\":1142,\"path\":\"content/content-declarations.json\",\"sha256\":\"92f09c5dddffc18fa0a271653e4c19b71e8db8e173be156da4bf47c369d1d355\"},{\"bytes\":728,\"path\":\"prompts/gm-operating-guide.md\",\"sha256\":\"c8150e7306ccca7710c41ea5e6f08421d0410aee8934b353a179ca01f0063957\"},{\"bytes\":173509,\"path\":\"runtime/ruleset.yaml\",\"sha256\":\"3752141ff5e613d83818ccc0b40de0a406b6003e55656cf96024df346176db46\"},{\"bytes\":421,\"path\":\"support/gameplay-resolution.json\",\"sha256\":\"3a37a5008691f5d9e3f67ac4124d86fe51b9e282b272b91cee3b2c46a4d763c9\"}],\"id\":\"pneuma.riichi-mahjong\",\"metadata\":{\"label\":\"Riichi Mahjong\"},\"minimum_model_capability_tier\":\"sylvia.capability.t00\",\"participant_artifacts\":[{\"entity_state_schema\":{\"additionalProperties\":false,\"properties\":{},\"type\":\"object\"},\"initial_state_calculations\":[],\"kind\":\"player\",\"schema\":{\"$id\":\"pneuma.riichi-mahjong.player.v1\",\"additionalProperties\":false,\"properties\":{\"control\":{\"enum\":[\"player\"],\"type\":\"string\"},\"name\":{\"maxLength\":32,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"name\",\"control\"],\"type\":\"object\"},\"schema_id\":\"pneuma.riichi-mahjong.player.v1\",\"schema_sha256\":\"3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1\"}],\"prompt_fragments\":[{\"capability\":\"pneuma.riichi-mahjong.guidance\",\"id\":\"gm-operating-guide\"}],\"provenance\":{\"publisher\":\"Pneuma IO\",\"source_sha256\":\"c06d5e8fd84ed83cf5193ef5d8348335b45ee541147e767b36396985e117baf9\"},\"role\":\"primary\",\"state_schemas\":[{\"key\":\"state\",\"references\":[],\"schema\":{\"type\":\"object\"},\"visibility\":\"engine\"},{\"key\":\"entities\",\"references\":[],\"schema\":{\"type\":\"object\"},\"visibility\":\"engine\"}],\"tools\":[{\"capability\":\"pneuma.riichi-mahjong.play\",\"input_schema\":{\"additionalProperties\":false,\"properties\":{\"match_format\":{\"enum\":[\"east_only\",\"east_south\"],\"type\":\"string\",\"x-sylvia-gm-input-source\":\"choice\"},\"player\":{\"type\":\"string\",\"x-sylvia-gm-input-source\":\"choice\",\"x-sylvia-gm-reference\":\"participant\"}},\"required\":[\"player\",\"match_format\"],\"type\":\"object\"},\"name\":\"start_game\",\"state_predicates\":[],\"turn_statuses\":[\"open\"],\"writers\":[\"dm\"]},{\"capability\":\"pneuma.riichi-mahjong.play\",\"input_schema\":{\"additionalProperties\":false,\"properties\":{\"choice\":{\"type\":\"string\",\"x-sylvia-gm-input-source\":\"choice\"}},\"required\":[\"choice\"],\"type\":\"object\"},\"name\":\"take_action\",\"state_predicates\":[],\"turn_statuses\":[\"open\"],\"writers\":[\"dm\"]}],\"ui_surfaces\":[{\"actions\":[{\"bindings\":{\"choice\":\"piece\"},\"id\":\"play\",\"intent\":\"take_action\",\"label\":\"Play\",\"params\":{}}],\"allowed_placements\":[\"docked\",\"window\"],\"capability\":\"pneuma.riichi-mahjong.play\",\"default_placement\":\"docked\",\"default_size\":760,\"group\":null,\"icon\":\"\u25c7\",\"id\":\"riichi-table\",\"minimum_size\":300,\"order\":0,\"renderer\":\"piece_table\",\"source\":{\"key\":\"state.table\",\"kind\":\"state\",\"namespace\":\"pneuma.riichi-mahjong\"},\"title\":\"Riichi Mahjong\"}],\"version\":\"0.1.1\"}"
+     }
+    },
+    {
+     "ok": {
+      "identity": [
+       "pneuma.riichi-club",
+       "0.1.1",
+       "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+      ],
+      "canonical_json": "{\"capabilities\":[],\"compatibility\":{\"host_contract\":1,\"requires\":[],\"runtime_format\":1},\"content_declarations\":\"content/content-declarations.json\",\"content_kind\":\"campaign_setting\",\"content_sha256\":\"3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415\",\"dependencies\":[{\"content_sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"id\":\"pneuma.riichi-mahjong\",\"kind\":\"ruleset_snapshot\",\"namespace\":\"ruleset_snapshot\",\"version\":\"0.1.1\"}],\"files\":[{\"bytes\":880,\"path\":\"content/content-declarations.json\",\"sha256\":\"0430aa0cb13d09d2aee930bcba47b3f2c5c1a996314d7131ac82f3db57305f2e\"},{\"bytes\":1539,\"path\":\"world.md\",\"sha256\":\"b030067e9b22ff2d18ea46ba797d6e839762f1157fbc153a9ad837c42ffe3de4\"}],\"id\":\"pneuma.riichi-club\",\"metadata\":{\"label\":\"The Lantern Table\"},\"minimum_model_capability_tier\":\"sylvia.capability.t00\",\"participant_artifacts\":[],\"prompt_fragments\":[],\"provenance\":{\"publisher\":\"Local Builder\",\"source_sha256\":\"591205066ae1e5bd00c06d853b03b7ef163ae5e2dbec418662b68bae64bb0c62\"},\"role\":\"dependency\",\"tools\":[],\"ui_surfaces\":[],\"version\":\"0.1.1\"}"
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_unavailable",
+     "message": "Exact package manifest is unavailable"
+    },
+    {
+     "ok": [
+      {
+       "kind": "player",
+       "schema_id": "pneuma.riichi-mahjong.player.v1",
+       "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+       "schema": {
+        "$id": "pneuma.riichi-mahjong.player.v1",
+        "additionalProperties": false,
+        "properties": {
+         "control": {
+          "enum": [
+           "player"
+          ],
+          "type": "string"
+         },
+         "name": {
+          "maxLength": 32,
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "name",
+         "control"
+        ],
+        "type": "object"
+       }
+      }
+     ]
+    },
+    {
+     "error": "CommandRejected",
+     "code": "candidate_unavailable",
+     "message": "Package candidate is unavailable"
+    },
+    {
+     "ok": [
+      {
+       "kind": "player",
+       "schema_id": "pneuma.riichi-mahjong.player.v1",
+       "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+       "schema": {
+        "$id": "pneuma.riichi-mahjong.player.v1",
+        "additionalProperties": false,
+        "properties": {
+         "control": {
+          "enum": [
+           "player"
+          ],
+          "type": "string"
+         },
+         "name": {
+          "maxLength": 32,
+          "minLength": 1,
+          "type": "string"
+         }
+        },
+        "required": [
+         "name",
+         "control"
+        ],
+        "type": "object"
+       }
+      }
+     ]
+    },
+    {
+     "ok": []
+    },
+    {
+     "error": "CommandRejected",
+     "code": "candidate_unavailable",
+     "message": "Package candidate is unavailable"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_unavailable",
+     "message": "Package staging is unavailable"
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Install identity is already terminal"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_unavailable",
+     "message": "Package staging is unavailable"
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Install identity payload does not match"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Package install identity must not have leading or trailing whitespace"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Package install identity must be a non-whitespace string"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "candidate_id": "candidate-install-2",
+      "install_id": "install-2",
+      "status": "validated",
+      "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+      "validation_report": {
+       "code": "validated",
+       "label": "Package candidate validated"
+      },
+      "entries": [
+       {
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ],
+        "dependencies": []
+       },
+       {
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "capabilities": [],
+        "dependencies": [
+         [
+          "pneuma.riichi-mahjong",
+          "0.1.1",
+          "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "ruleset_snapshot",
+          "ruleset_snapshot"
+         ]
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "install_id": "install-3",
+      "status": "staging",
+      "chunk_count": 1
+     }
+    },
+    {
+     "ok": {
+      "candidate_id": "candidate-install-3",
+      "install_id": "install-3",
+      "status": "validated",
+      "closure_sha256": "3c1b153af197d3758fb389e538b10ac99f802c5eaafa272e965fc7aad0a57ffb",
+      "validation_report": {
+       "code": "validated",
+       "label": "Package candidate validated"
+      },
+      "entries": [
+       {
+        "package_id": "synthetic.packages",
+        "version": "1.0.0",
+        "sha256": "bf32e8f54fc62d7f5bf2384f517565943b8f5f78b1e122d51875ea4df4bdd54e",
+        "role": "primary",
+        "load_order": 0,
+        "capabilities": [
+         "synthetic.checks"
+        ],
+        "dependencies": []
+       }
+      ]
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_unavailable",
+     "message": "Package staging is unavailable"
+    },
+    {
+     "ok": [
+      {
+       "candidate_id": "candidate-install-3",
+       "install_id": "install-3",
+       "status": "validated",
+       "closure_sha256": "3c1b153af197d3758fb389e538b10ac99f802c5eaafa272e965fc7aad0a57ffb",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "synthetic.packages",
+         "version": "1.0.0",
+         "sha256": "bf32e8f54fc62d7f5bf2384f517565943b8f5f78b1e122d51875ea4df4bdd54e",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "synthetic.checks"
+         ],
+         "dependencies": []
+        }
+       ]
+      },
+      {
+       "candidate_id": "candidate-install-2",
+       "install_id": "install-2",
+       "status": "validated",
+       "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "pneuma.riichi-mahjong",
+         "version": "0.1.1",
+         "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "pneuma.riichi-mahjong.guidance",
+          "pneuma.riichi-mahjong.play"
+         ],
+         "dependencies": []
+        },
+        {
+         "package_id": "pneuma.riichi-club",
+         "version": "0.1.1",
+         "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+         "role": "dependency",
+         "load_order": 1,
+         "capabilities": [],
+         "dependencies": [
+          [
+           "pneuma.riichi-mahjong",
+           "0.1.1",
+           "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+           "ruleset_snapshot",
+           "ruleset_snapshot"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "candidate_id": "candidate-install-1",
+       "install_id": "install-1",
+       "status": "validated",
+       "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "pneuma.riichi-mahjong",
+         "version": "0.1.1",
+         "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "pneuma.riichi-mahjong.guidance",
+          "pneuma.riichi-mahjong.play"
+         ],
+         "dependencies": []
+        },
+        {
+         "package_id": "pneuma.riichi-club",
+         "version": "0.1.1",
+         "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+         "role": "dependency",
+         "load_order": 1,
+         "capabilities": [],
+         "dependencies": [
+          [
+           "pneuma.riichi-mahjong",
+           "0.1.1",
+           "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+           "ruleset_snapshot",
+           "ruleset_snapshot"
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": [
+      {
+       "candidate_id": "candidate-install-3",
+       "install_id": "install-3",
+       "status": "validated",
+       "closure_sha256": "3c1b153af197d3758fb389e538b10ac99f802c5eaafa272e965fc7aad0a57ffb",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "synthetic.packages",
+         "version": "1.0.0",
+         "sha256": "bf32e8f54fc62d7f5bf2384f517565943b8f5f78b1e122d51875ea4df4bdd54e",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "synthetic.checks"
+         ],
+         "dependencies": []
+        }
+       ]
+      },
+      {
+       "candidate_id": "candidate-install-2",
+       "install_id": "install-2",
+       "status": "validated",
+       "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "pneuma.riichi-mahjong",
+         "version": "0.1.1",
+         "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "pneuma.riichi-mahjong.guidance",
+          "pneuma.riichi-mahjong.play"
+         ],
+         "dependencies": []
+        },
+        {
+         "package_id": "pneuma.riichi-club",
+         "version": "0.1.1",
+         "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+         "role": "dependency",
+         "load_order": 1,
+         "capabilities": [],
+         "dependencies": [
+          [
+           "pneuma.riichi-mahjong",
+           "0.1.1",
+           "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+           "ruleset_snapshot",
+           "ruleset_snapshot"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "candidate_id": "candidate-install-1",
+       "install_id": "install-1",
+       "status": "validated",
+       "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "pneuma.riichi-mahjong",
+         "version": "0.1.1",
+         "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "pneuma.riichi-mahjong.guidance",
+          "pneuma.riichi-mahjong.play"
+         ],
+         "dependencies": []
+        },
+        {
+         "package_id": "pneuma.riichi-club",
+         "version": "0.1.1",
+         "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+         "role": "dependency",
+         "load_order": 1,
+         "capabilities": [],
+         "dependencies": [
+          [
+           "pneuma.riichi-mahjong",
+           "0.1.1",
+           "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+           "ruleset_snapshot",
+           "ruleset_snapshot"
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "retry_and_fault",
+   "seed": "fresh",
+   "compare_db": true,
+   "operations": [
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "DELETE FROM package_staging_chunks WHERE install_id = 'install-1' AND file_order >= 3"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "reopen"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": true
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    },
+    {
+     "op": "package_candidates"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "package_candidates"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "install_id": "install-1",
+      "status": "staging",
+      "chunk_count": 5
+     }
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "install_id": "install-1",
+      "status": "staging",
+      "chunk_count": 5
+     }
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "install_id": "install-1",
+      "status": "staging",
+      "chunk_count": 8
+     }
+    },
+    {
+     "error": "_Fault",
+     "code": null,
+     "message": "fault before publication"
+    },
+    {
+     "ok": {
+      "install_id": "install-1",
+      "status": "staging",
+      "chunk_count": 8
+     }
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": {
+      "candidate_id": "candidate-install-1",
+      "install_id": "install-1",
+      "status": "validated",
+      "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+      "validation_report": {
+       "code": "validated",
+       "label": "Package candidate validated"
+      },
+      "entries": [
+       {
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ],
+        "dependencies": []
+       },
+       {
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "capabilities": [],
+        "dependencies": [
+         [
+          "pneuma.riichi-mahjong",
+          "0.1.1",
+          "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "ruleset_snapshot",
+          "ruleset_snapshot"
+         ]
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "ok": [
+      {
+       "candidate_id": "candidate-install-1",
+       "install_id": "install-1",
+       "status": "validated",
+       "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+       "validation_report": {
+        "code": "validated",
+        "label": "Package candidate validated"
+       },
+       "entries": [
+        {
+         "package_id": "pneuma.riichi-mahjong",
+         "version": "0.1.1",
+         "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+         "role": "primary",
+         "load_order": 0,
+         "capabilities": [
+          "pneuma.riichi-mahjong.guidance",
+          "pneuma.riichi-mahjong.play"
+         ],
+         "dependencies": []
+        },
+        {
+         "package_id": "pneuma.riichi-club",
+         "version": "0.1.1",
+         "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+         "role": "dependency",
+         "load_order": 1,
+         "capabilities": [],
+         "dependencies": [
+          [
+           "pneuma.riichi-mahjong",
+           "0.1.1",
+           "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+           "ruleset_snapshot",
+           "ruleset_snapshot"
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  {
+   "name": "staging_damage",
+   "seed": "fresh",
+   "compare_db": true,
+   "operations": [
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "DELETE FROM package_staging_chunks WHERE install_id = 'install-1' AND file_order = 2 AND chunk_order = 1"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "UPDATE package_staging_chunks SET chunk_sha256 = '0000000000000000000000000000000000000000000000000000000000000000' WHERE install_id = 'install-1' AND file_order = 0"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "DELETE FROM package_staging_chunks WHERE install_id = 'install-1' AND file_order = 1"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "INSERT INTO package_staging_chunks SELECT install_id, 99, 0, package_id, version, content_sha256, portable_path, chunk_sha256, data FROM package_staging_chunks WHERE install_id = 'install-1' AND file_order = 0"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_invalid",
+     "message": "Staged chunk order is incomplete"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_invalid",
+     "message": "Staged chunk hash is invalid"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_invalid",
+     "message": "Staged file byte count is invalid"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "staging_invalid",
+     "message": "Staged file set is incomplete"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "candidate_id": "candidate-install-1",
+      "install_id": "install-1",
+      "status": "validated",
+      "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+      "validation_report": {
+       "code": "validated",
+       "label": "Package candidate validated"
+      },
+      "entries": [
+       {
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ],
+        "dependencies": []
+       },
+       {
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "capabilities": [],
+        "dependencies": [
+         [
+          "pneuma.riichi-mahjong",
+          "0.1.1",
+          "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "ruleset_snapshot",
+          "ruleset_snapshot"
+         ]
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  {
+   "name": "conflict_capabilities",
+   "seed": "riichi",
+   "compare_db": true,
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE packages SET capabilities_json = '[\"other\"]' WHERE package_id = 'pneuma.riichi-mahjong'"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_identity_conflict",
+     "message": "Package identity conflicts with immutable metadata"
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  {
+   "name": "conflict_dependencies",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_dependencies SET dependency_kind = 'other' WHERE package_id = 'pneuma.riichi-club'"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_identity_conflict",
+     "message": "Package dependency metadata conflicts"
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  {
+   "name": "conflict_manifest",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_manifests SET metadata_json = '{}' WHERE package_id = 'pneuma.riichi-mahjong'"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_identity_conflict",
+     "message": "Package manifest identity conflicts"
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "conflict_declarations",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_participant_artifacts SET schema_id = 'other' WHERE package_id = 'pneuma.riichi-mahjong'"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Immutable participant declarations conflict"
+    }
+   ]
+  },
+  {
+   "name": "conflict_blob",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_blob_chunks SET chunk_sha256 = '1111111111111111111111111111111111111111111111111111111111111111' WHERE chunk_order = 0 AND blob_sha256 = (SELECT blob_sha256 FROM package_manifest_files WHERE portable_path = 'world.md')"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_identity_conflict",
+     "message": "Immutable package blob conflicts with stored bytes"
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  {
+   "name": "conflict_file",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_manifest_files SET portable_path = 'moved.md' WHERE portable_path = 'world.md'"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_identity_conflict",
+     "message": "Package file metadata conflicts"
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "conflict_exact_dependencies",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_exact_dependencies SET dependency_kind = 'other' WHERE package_id = 'pneuma.riichi-club'"
+    },
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2"
+    },
+    {
+     "op": "publish_package_archive",
+     "archive": "riichi",
+     "install_id": "install-2",
+     "fault": false
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "package_identity_conflict",
+     "message": "Package dependency metadata conflicts"
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  {
+   "name": "damaged_staging_format",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_staging SET manifest_json = '{\"format\":9,\"packages\":[]}'"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_staging_report",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_staging SET report_json = '{\"code\":\"validated\"}'"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_staging_prefix",
+   "seed": "fresh",
+   "operations": [
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "DELETE FROM package_staging_chunks WHERE install_id = 'install-1' AND file_order = 0"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_staging_tail",
+   "seed": "fresh",
+   "operations": [
+    {
+     "op": "stage_package_archive",
+     "archive": "riichi",
+     "install_id": "install-1"
+    },
+    {
+     "op": "sql",
+     "statement": "DELETE FROM package_staging_chunks WHERE install_id = 'install-1' AND file_order = 2 AND chunk_order = 2"
+    },
+    {
+     "op": "reopen"
+    },
+    {
+     "op": "package_staging",
+     "install_id": "install-1"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_blob_bytes",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_blob_chunks SET data = X'00' WHERE chunk_order = 1"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_blob_count",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_blobs SET chunk_count = chunk_count + 1 WHERE byte_count > 100000"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_manifest_metadata",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_manifests SET metadata_json = '{\"label\":\"Other\"}' WHERE package_id = 'pneuma.riichi-mahjong' AND content_sha256 = (SELECT content_sha256 FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong')"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_manifest_files",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_manifest_files SET byte_count = byte_count + 1 WHERE portable_path = 'world.md'"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_candidate_closure",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "UPDATE package_candidates SET closure_sha256 = '2222222222222222222222222222222222222222222222222222222222222222'"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  },
+  {
+   "name": "damaged_candidate_membership",
+   "seed": "riichi",
+   "operations": [
+    {
+     "op": "sql",
+     "statement": "DELETE FROM package_candidate_memberships WHERE closure_order = 1"
+    },
+    {
+     "op": "reopen"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Saved package records failed an integrity check"
+    }
+   ]
+  }
+ ],
+ "participant_cases": [
+  {
+   "name": "backfill",
+   "sql": [
+    "\nALTER TABLE participants ADD COLUMN package_sha256 TEXT",
+    "\nALTER TABLE participants ADD COLUMN schema_id TEXT",
+    "\nALTER TABLE participants ADD COLUMN schema_sha256 TEXT",
+    "\nALTER TABLE participants ADD COLUMN validation_status TEXT NOT NULL DEFAULT 'quarantined'\n    CHECK (validation_status IN ('validated', 'quarantined'))",
+    "\n\nCREATE TABLE package_participant_artifacts (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    artifact_order INTEGER NOT NULL CHECK (artifact_order >= 0),\n    kind TEXT NOT NULL,\n    schema_id TEXT NOT NULL,\n    schema_sha256 TEXT NOT NULL,\n    schema_json TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, artifact_order),\n    UNIQUE (package_id, version, content_sha256, kind),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)",
+    "\nCREATE TABLE participant_quarantines (\n    campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    reason_code TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, participant_id),\n    FOREIGN KEY (campaign_id, participant_id)\n        REFERENCES participants(campaign_id, participant_id) ON DELETE CASCADE\n)",
+    "\nCREATE TABLE participant_adaptations (\n    operation_id TEXT PRIMARY KEY,\n    payload_sha256 TEXT NOT NULL,\n    source_campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    source_kind TEXT NOT NULL,\n    source_package_id TEXT NOT NULL,\n    source_package_version TEXT NOT NULL,\n    source_package_sha256 TEXT,\n    source_schema_id TEXT,\n    source_schema_sha256 TEXT,\n    source_data_sha256 TEXT NOT NULL,\n    destination_kind TEXT NOT NULL,\n    destination_package_id TEXT NOT NULL,\n    destination_package_version TEXT NOT NULL,\n    destination_package_sha256 TEXT NOT NULL,\n    destination_schema_id TEXT NOT NULL,\n    destination_schema_sha256 TEXT NOT NULL,\n    data_json TEXT NOT NULL,\n    FOREIGN KEY (\n        destination_package_id, destination_package_version,\n        destination_package_sha256, destination_kind\n    ) REFERENCES package_participant_artifacts(\n        package_id, version, content_sha256, kind\n    )\n)",
+    "\nALTER TABLE participants ADD COLUMN adaptation_id TEXT\n    REFERENCES participant_adaptations(operation_id)",
+    "\n\nALTER TABLE campaign_revisions ADD COLUMN construction_operation_id TEXT",
+    "\nCREATE TABLE authority_schema_extensions (\n    extension_name TEXT PRIMARY KEY,\n    extension_sha256 TEXT NOT NULL,\n    predecessor_migration_name TEXT NOT NULL,\n    predecessor_sql_sha256 TEXT NOT NULL\n)",
+    "\nCREATE TABLE campaign_operations (\n    operation_id TEXT PRIMARY KEY,\n    operation_kind TEXT NOT NULL,\n    campaign_id TEXT NOT NULL,\n    semantic_payload_json TEXT NOT NULL,\n    semantic_payload_sha256 TEXT NOT NULL,\n    result_json TEXT NOT NULL,\n    basis_turn_id TEXT NOT NULL,\n    basis_lock_id TEXT NOT NULL,\n    basis_revision INTEGER NOT NULL CHECK (basis_revision >= 0),\n    resulting_revision INTEGER NOT NULL CHECK (resulting_revision >= 0),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (campaign_id, basis_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (basis_lock_id) REFERENCES campaign_locks(lock_id)\n)",
+    "\nCREATE TABLE campaign_constructions (\n    campaign_id TEXT PRIMARY KEY,\n    confirmation_operation_id TEXT NOT NULL UNIQUE,\n    authority_turn_id TEXT NOT NULL,\n    authority_lock_id TEXT NOT NULL,\n    confirmation_revision INTEGER NOT NULL CHECK (confirmation_revision = 0),\n    lane TEXT CHECK (lane IN ('quick_start', 'customize')),\n    canonical_input_json TEXT,\n    begin_operation_id TEXT UNIQUE,\n    begin_revision INTEGER CHECK (begin_revision > 0),\n    canonical_plan_json TEXT,\n    completion_operation_id TEXT UNIQUE,\n    completion_revision INTEGER CHECK (completion_revision > 0),\n    canonical_representation_sha256 TEXT,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (confirmation_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (begin_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (completion_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (campaign_id, authority_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (authority_lock_id) REFERENCES campaign_locks(lock_id),\n    CHECK (\n        (lane IS NULL AND canonical_input_json IS NULL AND begin_operation_id IS NULL\n            AND begin_revision IS NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NOT NULL\n            AND completion_operation_id IS NOT NULL AND completion_revision IS NOT NULL\n            AND canonical_representation_sha256 IS NOT NULL)\n    )\n)",
+    "INSERT INTO campaign_locks VALUES ('lock-1', 'campaign-1', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'available', NULL, 0)",
+    "INSERT INTO campaign_lock_memberships VALUES ('lock-1', 0, 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), (SELECT content_sha256 FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), 'primary')",
+    "INSERT INTO campaign_locks VALUES ('lock-2', 'campaign-2', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'available', NULL, 0)",
+    "INSERT INTO campaign_lock_memberships VALUES ('lock-2', 0, 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), (SELECT content_sha256 FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), 'primary')",
+    "INSERT INTO campaign_locks VALUES ('lock-3a', 'campaign-3', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'available', NULL, 0)",
+    "INSERT INTO campaign_lock_memberships VALUES ('lock-3a', 0, 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), (SELECT content_sha256 FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), 'primary')",
+    "INSERT INTO campaign_locks VALUES ('lock-3b', 'campaign-3', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'available', NULL, 0)",
+    "INSERT INTO campaign_lock_memberships VALUES ('lock-3b', 0, 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'primary')",
+    "INSERT INTO campaign_locks VALUES ('lock-4', 'campaign-4', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'available', NULL, 1)",
+    "INSERT INTO campaign_lock_memberships VALUES ('lock-4', 0, 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), (SELECT content_sha256 FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), 'primary')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-1', 'p-valid', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"control\":\"player\",\"name\":\"Aki\"}')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-1', 'p-invalid', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"name\":\"\"}')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-1', 'p-other-kind', 'dealer', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"control\":\"player\",\"name\":\"Aki\"}')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-2', 'p-valid', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"control\":\"player\",\"name\":\"Bo\"}')",
+    "INSERT INTO participant_quarantines(campaign_id, participant_id, reason_code) VALUES ('campaign-2', 'p-valid', 'exact_schema_proof_unavailable')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-3', 'p-ambiguous', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"control\":\"player\",\"name\":\"Cy\"}')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-4', 'p-later-lock', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"control\":\"player\",\"name\":\"Di\"}')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-5', 'p-no-lock', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '{\"control\":\"player\",\"name\":\"Ed\"}')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-1', 'p-other-version', 'player', 'pneuma.riichi-mahjong', '9.9.9', '{\"control\":\"player\",\"name\":\"Fu\"}')"
+   ],
+   "outcome": {
+    "ok": null,
+    "rows": {
+     "participants": [
+      [
+       "campaign-1",
+       "p-invalid",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"name\":\"\"}",
+       "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+       null,
+       null,
+       "quarantined",
+       null
+      ],
+      [
+       "campaign-1",
+       "p-other-kind",
+       "dealer",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"control\":\"player\",\"name\":\"Aki\"}",
+       "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+       null,
+       null,
+       "quarantined",
+       null
+      ],
+      [
+       "campaign-1",
+       "p-other-version",
+       "player",
+       "pneuma.riichi-mahjong",
+       "9.9.9",
+       "{\"control\":\"player\",\"name\":\"Fu\"}",
+       null,
+       null,
+       null,
+       "quarantined",
+       null
+      ],
+      [
+       "campaign-1",
+       "p-valid",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"control\":\"player\",\"name\":\"Aki\"}",
+       "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+       "pneuma.riichi-mahjong.player.v1",
+       "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+       "validated",
+       null
+      ],
+      [
+       "campaign-2",
+       "p-valid",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"control\":\"player\",\"name\":\"Bo\"}",
+       "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+       "pneuma.riichi-mahjong.player.v1",
+       "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+       "validated",
+       null
+      ],
+      [
+       "campaign-3",
+       "p-ambiguous",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"control\":\"player\",\"name\":\"Cy\"}",
+       null,
+       null,
+       null,
+       "quarantined",
+       null
+      ],
+      [
+       "campaign-4",
+       "p-later-lock",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"control\":\"player\",\"name\":\"Di\"}",
+       null,
+       null,
+       null,
+       "quarantined",
+       null
+      ],
+      [
+       "campaign-5",
+       "p-no-lock",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "{\"control\":\"player\",\"name\":\"Ed\"}",
+       null,
+       null,
+       null,
+       "quarantined",
+       null
+      ]
+     ],
+     "quarantines": [
+      [
+       "campaign-1",
+       "p-invalid",
+       "exact_schema_proof_unavailable"
+      ],
+      [
+       "campaign-1",
+       "p-other-kind",
+       "exact_schema_proof_unavailable"
+      ],
+      [
+       "campaign-1",
+       "p-other-version",
+       "exact_schema_proof_unavailable"
+      ],
+      [
+       "campaign-3",
+       "p-ambiguous",
+       "exact_schema_proof_unavailable"
+      ],
+      [
+       "campaign-4",
+       "p-later-lock",
+       "exact_schema_proof_unavailable"
+      ],
+      [
+       "campaign-5",
+       "p-no-lock",
+       "exact_schema_proof_unavailable"
+      ]
+     ],
+     "declarations": [
+      [
+       "pneuma.riichi-mahjong",
+       0,
+       "player",
+       "pneuma.riichi-mahjong.player.v1",
+       "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+       "{\"$id\":\"pneuma.riichi-mahjong.player.v1\",\"additionalProperties\":false,\"properties\":{\"control\":{\"enum\":[\"player\"],\"type\":\"string\"},\"name\":{\"maxLength\":32,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"name\",\"control\"],\"type\":\"object\"}"
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "name": "data_not_object",
+   "sql": [
+    "\nALTER TABLE participants ADD COLUMN package_sha256 TEXT",
+    "\nALTER TABLE participants ADD COLUMN schema_id TEXT",
+    "\nALTER TABLE participants ADD COLUMN schema_sha256 TEXT",
+    "\nALTER TABLE participants ADD COLUMN validation_status TEXT NOT NULL DEFAULT 'quarantined'\n    CHECK (validation_status IN ('validated', 'quarantined'))",
+    "\n\nCREATE TABLE package_participant_artifacts (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    artifact_order INTEGER NOT NULL CHECK (artifact_order >= 0),\n    kind TEXT NOT NULL,\n    schema_id TEXT NOT NULL,\n    schema_sha256 TEXT NOT NULL,\n    schema_json TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, artifact_order),\n    UNIQUE (package_id, version, content_sha256, kind),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)",
+    "\nCREATE TABLE participant_quarantines (\n    campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    reason_code TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, participant_id),\n    FOREIGN KEY (campaign_id, participant_id)\n        REFERENCES participants(campaign_id, participant_id) ON DELETE CASCADE\n)",
+    "\nCREATE TABLE participant_adaptations (\n    operation_id TEXT PRIMARY KEY,\n    payload_sha256 TEXT NOT NULL,\n    source_campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    source_kind TEXT NOT NULL,\n    source_package_id TEXT NOT NULL,\n    source_package_version TEXT NOT NULL,\n    source_package_sha256 TEXT,\n    source_schema_id TEXT,\n    source_schema_sha256 TEXT,\n    source_data_sha256 TEXT NOT NULL,\n    destination_kind TEXT NOT NULL,\n    destination_package_id TEXT NOT NULL,\n    destination_package_version TEXT NOT NULL,\n    destination_package_sha256 TEXT NOT NULL,\n    destination_schema_id TEXT NOT NULL,\n    destination_schema_sha256 TEXT NOT NULL,\n    data_json TEXT NOT NULL,\n    FOREIGN KEY (\n        destination_package_id, destination_package_version,\n        destination_package_sha256, destination_kind\n    ) REFERENCES package_participant_artifacts(\n        package_id, version, content_sha256, kind\n    )\n)",
+    "\nALTER TABLE participants ADD COLUMN adaptation_id TEXT\n    REFERENCES participant_adaptations(operation_id)",
+    "\n\nALTER TABLE campaign_revisions ADD COLUMN construction_operation_id TEXT",
+    "\nCREATE TABLE authority_schema_extensions (\n    extension_name TEXT PRIMARY KEY,\n    extension_sha256 TEXT NOT NULL,\n    predecessor_migration_name TEXT NOT NULL,\n    predecessor_sql_sha256 TEXT NOT NULL\n)",
+    "\nCREATE TABLE campaign_operations (\n    operation_id TEXT PRIMARY KEY,\n    operation_kind TEXT NOT NULL,\n    campaign_id TEXT NOT NULL,\n    semantic_payload_json TEXT NOT NULL,\n    semantic_payload_sha256 TEXT NOT NULL,\n    result_json TEXT NOT NULL,\n    basis_turn_id TEXT NOT NULL,\n    basis_lock_id TEXT NOT NULL,\n    basis_revision INTEGER NOT NULL CHECK (basis_revision >= 0),\n    resulting_revision INTEGER NOT NULL CHECK (resulting_revision >= 0),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (campaign_id, basis_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (basis_lock_id) REFERENCES campaign_locks(lock_id)\n)",
+    "\nCREATE TABLE campaign_constructions (\n    campaign_id TEXT PRIMARY KEY,\n    confirmation_operation_id TEXT NOT NULL UNIQUE,\n    authority_turn_id TEXT NOT NULL,\n    authority_lock_id TEXT NOT NULL,\n    confirmation_revision INTEGER NOT NULL CHECK (confirmation_revision = 0),\n    lane TEXT CHECK (lane IN ('quick_start', 'customize')),\n    canonical_input_json TEXT,\n    begin_operation_id TEXT UNIQUE,\n    begin_revision INTEGER CHECK (begin_revision > 0),\n    canonical_plan_json TEXT,\n    completion_operation_id TEXT UNIQUE,\n    completion_revision INTEGER CHECK (completion_revision > 0),\n    canonical_representation_sha256 TEXT,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (confirmation_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (begin_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (completion_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (campaign_id, authority_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (authority_lock_id) REFERENCES campaign_locks(lock_id),\n    CHECK (\n        (lane IS NULL AND canonical_input_json IS NULL AND begin_operation_id IS NULL\n            AND begin_revision IS NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NOT NULL\n            AND completion_operation_id IS NOT NULL AND completion_revision IS NOT NULL\n            AND canonical_representation_sha256 IS NOT NULL)\n    )\n)",
+    "INSERT INTO campaign_locks VALUES ('lock-1', 'campaign-1', 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', 'available', NULL, 0)",
+    "INSERT INTO campaign_lock_memberships VALUES ('lock-1', 0, 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), (SELECT content_sha256 FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), 'primary')",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) VALUES ('campaign-1', 'p-list', 'player', 'pneuma.riichi-mahjong', (SELECT version FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'), '[\"Aki\"]')"
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Stored canonical JSON must be an object",
+    "rows": {
+     "participants": [
+      [
+       "campaign-1",
+       "p-list",
+       "player",
+       "pneuma.riichi-mahjong",
+       "0.1.1",
+       "[\"Aki\"]",
+       null,
+       null,
+       null,
+       "quarantined",
+       null
+      ]
+     ],
+     "quarantines": [],
+     "declarations": [
+      [
+       "pneuma.riichi-mahjong",
+       0,
+       "player",
+       "pneuma.riichi-mahjong.player.v1",
+       "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+       "{\"$id\":\"pneuma.riichi-mahjong.player.v1\",\"additionalProperties\":false,\"properties\":{\"control\":{\"enum\":[\"player\"],\"type\":\"string\"},\"name\":{\"maxLength\":32,\"minLength\":1,\"type\":\"string\"}},\"required\":[\"name\",\"control\"],\"type\":\"object\"}"
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "name": "declaration_conflict",
+   "sql": [
+    "\nALTER TABLE participants ADD COLUMN package_sha256 TEXT",
+    "\nALTER TABLE participants ADD COLUMN schema_id TEXT",
+    "\nALTER TABLE participants ADD COLUMN schema_sha256 TEXT",
+    "\nALTER TABLE participants ADD COLUMN validation_status TEXT NOT NULL DEFAULT 'quarantined'\n    CHECK (validation_status IN ('validated', 'quarantined'))",
+    "\n\nCREATE TABLE package_participant_artifacts (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    artifact_order INTEGER NOT NULL CHECK (artifact_order >= 0),\n    kind TEXT NOT NULL,\n    schema_id TEXT NOT NULL,\n    schema_sha256 TEXT NOT NULL,\n    schema_json TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, artifact_order),\n    UNIQUE (package_id, version, content_sha256, kind),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)",
+    "\nCREATE TABLE participant_quarantines (\n    campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    reason_code TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, participant_id),\n    FOREIGN KEY (campaign_id, participant_id)\n        REFERENCES participants(campaign_id, participant_id) ON DELETE CASCADE\n)",
+    "\nCREATE TABLE participant_adaptations (\n    operation_id TEXT PRIMARY KEY,\n    payload_sha256 TEXT NOT NULL,\n    source_campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    source_kind TEXT NOT NULL,\n    source_package_id TEXT NOT NULL,\n    source_package_version TEXT NOT NULL,\n    source_package_sha256 TEXT,\n    source_schema_id TEXT,\n    source_schema_sha256 TEXT,\n    source_data_sha256 TEXT NOT NULL,\n    destination_kind TEXT NOT NULL,\n    destination_package_id TEXT NOT NULL,\n    destination_package_version TEXT NOT NULL,\n    destination_package_sha256 TEXT NOT NULL,\n    destination_schema_id TEXT NOT NULL,\n    destination_schema_sha256 TEXT NOT NULL,\n    data_json TEXT NOT NULL,\n    FOREIGN KEY (\n        destination_package_id, destination_package_version,\n        destination_package_sha256, destination_kind\n    ) REFERENCES package_participant_artifacts(\n        package_id, version, content_sha256, kind\n    )\n)",
+    "\nALTER TABLE participants ADD COLUMN adaptation_id TEXT\n    REFERENCES participant_adaptations(operation_id)",
+    "\n\nALTER TABLE campaign_revisions ADD COLUMN construction_operation_id TEXT",
+    "\nCREATE TABLE authority_schema_extensions (\n    extension_name TEXT PRIMARY KEY,\n    extension_sha256 TEXT NOT NULL,\n    predecessor_migration_name TEXT NOT NULL,\n    predecessor_sql_sha256 TEXT NOT NULL\n)",
+    "\nCREATE TABLE campaign_operations (\n    operation_id TEXT PRIMARY KEY,\n    operation_kind TEXT NOT NULL,\n    campaign_id TEXT NOT NULL,\n    semantic_payload_json TEXT NOT NULL,\n    semantic_payload_sha256 TEXT NOT NULL,\n    result_json TEXT NOT NULL,\n    basis_turn_id TEXT NOT NULL,\n    basis_lock_id TEXT NOT NULL,\n    basis_revision INTEGER NOT NULL CHECK (basis_revision >= 0),\n    resulting_revision INTEGER NOT NULL CHECK (resulting_revision >= 0),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (campaign_id, basis_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (basis_lock_id) REFERENCES campaign_locks(lock_id)\n)",
+    "\nCREATE TABLE campaign_constructions (\n    campaign_id TEXT PRIMARY KEY,\n    confirmation_operation_id TEXT NOT NULL UNIQUE,\n    authority_turn_id TEXT NOT NULL,\n    authority_lock_id TEXT NOT NULL,\n    confirmation_revision INTEGER NOT NULL CHECK (confirmation_revision = 0),\n    lane TEXT CHECK (lane IN ('quick_start', 'customize')),\n    canonical_input_json TEXT,\n    begin_operation_id TEXT UNIQUE,\n    begin_revision INTEGER CHECK (begin_revision > 0),\n    canonical_plan_json TEXT,\n    completion_operation_id TEXT UNIQUE,\n    completion_revision INTEGER CHECK (completion_revision > 0),\n    canonical_representation_sha256 TEXT,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (confirmation_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (begin_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (completion_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (campaign_id, authority_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (authority_lock_id) REFERENCES campaign_locks(lock_id),\n    CHECK (\n        (lane IS NULL AND canonical_input_json IS NULL AND begin_operation_id IS NULL\n            AND begin_revision IS NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NOT NULL\n            AND completion_operation_id IS NOT NULL AND completion_revision IS NOT NULL\n            AND canonical_representation_sha256 IS NOT NULL)\n    )\n)",
+    "INSERT INTO package_participant_artifacts SELECT package_id, version, content_sha256, 0, 'player', 'other', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', '{}' FROM package_manifests WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Immutable participant declarations conflict",
+    "rows": {
+     "participants": [],
+     "quarantines": [],
+     "declarations": [
+      [
+       "pneuma.riichi-mahjong",
+       0,
+       "player",
+       "other",
+       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "{}"
+      ]
+     ]
+    }
+   }
+  }
+ ]
+}
