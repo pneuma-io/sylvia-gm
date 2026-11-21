@@ -24,6 +24,12 @@ pub struct OwnerCommand {
     pub env: Vec<(String, String)>,
 }
 
+/// What a launch gave: a ready owner, or the owner's refusal and its exit code.
+pub enum Launch {
+    Ready(Owner),
+    Refused { reply: Json, exit_code: Option<i32> },
+}
+
 /// A running owner.
 pub struct Owner {
     child: Child,
@@ -36,13 +42,17 @@ pub struct Owner {
 }
 
 impl Owner {
-    /// Start the owner, send the launch envelope and verify its handshake reply.
-    pub fn launch(
+    /// Start the owner with `extra` fields in its launch envelope (the desktop's update context,
+    /// for example), send it and verify the handshake reply. A launch the owner refuses with a
+    /// reply (`ok` is not true) is a result, not an error: the reply and the owner's exit code
+    /// are returned.
+    pub fn launch_with(
         command: &OwnerCommand,
         database: &Path,
         owner_id: &str,
+        extra: &JsonMap,
         timeout: Duration,
-    ) -> Result<Self, String> {
+    ) -> Result<Launch, String> {
         // The owner runs inside the data folder. On Linux a relative program path is looked
         // up after that change of folder (on Windows before it), so make a path absolute here.
         let program = std::path::Path::new(&command.program);
@@ -89,6 +99,9 @@ impl Owner {
         envelope.insert("secret_hex".into(), hex::encode(secret).into());
         envelope.insert("database_path".into(), database.to_string_lossy().into_owned().into());
         envelope.insert("owner_id".into(), owner_id.into());
+        for (key, value) in extra {
+            envelope.insert(key.clone(), value.clone());
+        }
         owner.send(&Json::Object(envelope))?;
 
         let mut ready = match owner.lines.recv_timeout(timeout) {
@@ -97,7 +110,8 @@ impl Owner {
             Err(_) => return Err(format!("the owner was not ready within {} s", timeout.as_secs())),
         };
         if ready.get("ok") != Some(&Json::Bool(true)) {
-            return Err(format!("the owner rejected the launch: {ready}"));
+            let exit_code = owner.close(Duration::from_secs(60))?;
+            return Ok(Launch::Refused { reply: ready, exit_code });
         }
         if ready.get("response_hex").and_then(Json::as_str) != Some(expected.as_str()) {
             return Err("the owner's handshake reply does not match the launch secret".into());
@@ -105,7 +119,7 @@ impl Owner {
         // The proof is per launch; keep only that it verified.
         ready["response_hex"] = Json::String("<verified>".into());
         owner.ready = ready;
-        Ok(owner)
+        Ok(Launch::Ready(owner))
     }
 
     fn send(&mut self, message: &Json) -> Result<(), String> {

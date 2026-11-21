@@ -1,6 +1,6 @@
 //! Run one scripted session against an owner and record everything observable.
 
-use crate::owner::{Owner, OwnerCommand};
+use crate::owner::{Launch, Owner, OwnerCommand};
 use crate::standin::{self, Standin};
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -43,6 +43,15 @@ pub struct Session {
     /// full (the installed packages), and only for tables without run-specific values.
     #[serde(default)]
     pub summarise_tables: Vec<String>,
+    /// Files and folders written under the work folder before the first launch, so a session
+    /// can start from state a desktop would leave behind (an interrupted update's receipt, for
+    /// example). Placeholders are replaced first.
+    #[serde(default)]
+    pub seed_files: Vec<SeedFile>,
+    /// Extra fields for the launch envelope (the desktop's `desktop_update_context`, for
+    /// example). Placeholders are replaced first. A relaunch step may give its own.
+    #[serde(default)]
+    pub launch: JsonMap,
     /// The requests, in order.
     pub steps: Vec<Step>,
     /// What may differ between runs of this session, on top of the built-in defaults.
@@ -90,10 +99,19 @@ pub struct Step {
     /// Keep the cookies this response sets as `${cookie}`.
     #[serde(default)]
     pub save_cookie: bool,
-    /// Start the owner again on the same data folder. Must follow a `shutdown` step. The
-    /// recording keeps the previous launch's exit code and the new launch's ready message.
+    /// Start the owner again on the same data folder. Must follow a `shutdown` step or a
+    /// refused launch. The recording keeps the previous launch's exit code and the new
+    /// launch's ready message. A launch the owner refuses is recorded with its reply and exit
+    /// code; only another relaunch may follow it.
     #[serde(default)]
     pub relaunch: bool,
+    /// With `relaunch`: files written before the owner starts again.
+    #[serde(default)]
+    pub seed: Vec<SeedFile>,
+    /// With `relaunch`: the extra launch-envelope fields for this launch, instead of the
+    /// session's `launch`.
+    #[serde(default, rename = "launch")]
+    pub relaunch_envelope: Option<JsonMap>,
     /// Values to keep from the reply: variable name to JSON pointer into the reply.
     #[serde(default)]
     pub save: HashMap<String, String>,
@@ -103,6 +121,57 @@ pub struct Step {
     /// Seconds to wait for the reply.
     #[serde(default = "default_step_timeout")]
     pub timeout_s: u64,
+}
+
+/// One file or folder a session writes under its work folder.
+#[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SeedFile {
+    /// Path relative to the work folder (`data/...` is inside the owner's data folder).
+    pub path: String,
+    /// Write this text.
+    #[serde(default)]
+    pub text: Option<String>,
+    /// Write this value in Python's canonical encoding (sorted keys, compact, UTF-8), as the
+    /// updater writes its receipts.
+    #[serde(default)]
+    pub json: Option<Json>,
+    /// Create a folder (and its parents) instead of a file.
+    #[serde(default)]
+    pub directory: bool,
+}
+
+/// Write `seeds` under `work`, replacing placeholders first.
+fn write_seeds(work: &Path, seeds: &[SeedFile], variables: &HashMap<String, Json>) -> Result<(), String> {
+    for seed in seeds {
+        let relative = match substitute(&Json::String(seed.path.clone()), variables)? {
+            Json::String(text) => text,
+            other => return Err(format!("seed path {} is not text: {other}", seed.path)),
+        };
+        if Path::new(&relative).is_absolute() || relative.split(['/', '\\']).any(|part| part == "..") {
+            return Err(format!("seed path {relative} must stay inside the work folder"));
+        }
+        let path = work.join(&relative);
+        if seed.directory {
+            std::fs::create_dir_all(&path)
+                .map_err(|error| format!("could not create {relative}: {error}"))?;
+            continue;
+        }
+        let bytes = match (&seed.text, &seed.json) {
+            (Some(text), None) => substitute(&Json::String(text.clone()), variables)?
+                .as_str()
+                .map(|text| text.as_bytes().to_vec())
+                .unwrap_or_default(),
+            (None, Some(value)) => sylvia_base::pyjson::canonical_bytes(&substitute(value, variables)?),
+            _ => return Err(format!("seed {relative} needs exactly one of text, json or directory")),
+        };
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent)
+                .map_err(|error| format!("could not create {relative}'s folder: {error}"))?;
+        }
+        std::fs::write(&path, bytes).map_err(|error| format!("could not write {relative}: {error}"))?;
+    }
+    Ok(())
 }
 
 /// A stand-in control step.
@@ -165,6 +234,13 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
     let mut variables: HashMap<String, Json> = HashMap::new();
     let plain_work = plain_path(&work);
     variables.insert("data_root".into(), plain_path(&data_root).into());
+    // A folder outside the data folder that a session may name as the application copy.
+    let app_root = work.join("app");
+    std::fs::create_dir_all(&app_root)
+        .map_err(|error| format!("could not create {}: {error}", app_root.display()))?;
+    variables.insert("app_root".into(), plain_path(&app_root).into());
+    variables.insert("work".into(), plain_work.clone().into());
+    write_seeds(&work, &session.seed_files, &variables)?;
     if let Some(standin) = &standin {
         variables.insert("standin_url".into(), standin.url.clone().into());
         variables.insert("standin_key".into(), standin::KEY.into());
@@ -174,7 +250,7 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
     let outcome = if session.webui {
         run_webui_steps(session, command, &data_root, &mut variables)
     } else {
-        run_steps(session, command, &database, &mut variables, standin.as_ref())
+        run_steps(session, command, &work, &database, &mut variables, standin.as_ref())
     };
     let model_requests = standin.map(Standin::finish).unwrap_or_default();
     let (ready, steps, exit_code, stopped) = outcome?;
@@ -249,13 +325,22 @@ type StepsOutcome = (Json, Vec<Json>, Option<i32>, Json);
 fn run_steps(
     session: &Session,
     command: &OwnerCommand,
+    work: &Path,
     database: &Path,
     variables: &mut HashMap<String, Json>,
     standin: Option<&Standin>,
 ) -> Result<StepsOutcome, String> {
     let ready_timeout = Duration::from_secs(session.ready_timeout_s);
-    let mut owner = Owner::launch(command, database, "sylvia-compare", ready_timeout)?;
-    let ready = owner.ready.clone();
+    let first = launch_fields(&session.launch, variables)?;
+    // `owner` is `None` after a refused launch; its exit code is then in `refused_exit`.
+    let (mut owner, ready, mut refused_exit) =
+        match Owner::launch_with(command, database, "sylvia-compare", &first, ready_timeout)? {
+            Launch::Ready(owner) => {
+                let ready = owner.ready.clone();
+                (Some(owner), ready, None)
+            }
+            Launch::Refused { reply, exit_code } => (None, reply, Some(exit_code)),
+        };
     let mut recorded = Vec::new();
     let mut closed_by_shutdown = false;
     let mut stopped = Json::Null;
@@ -263,18 +348,32 @@ fn run_steps(
         let id = step.id.clone().unwrap_or_else(|| format!("s{index}"));
         let mut entry = JsonMap::new();
         if step.relaunch {
-            if !closed_by_shutdown {
-                return Err(format!("step {index} relaunches the owner without a shutdown before it"));
-            }
-            let exit_code = owner.close(Duration::from_secs(60))?;
-            owner = Owner::launch(command, database, "sylvia-compare", ready_timeout)?;
-            closed_by_shutdown = false;
+            let exit_code = match (owner.take(), refused_exit.take()) {
+                (Some(running), _) if closed_by_shutdown => running.close(Duration::from_secs(60))?,
+                (None, Some(exit_code)) => exit_code,
+                _ => return Err(format!("step {index} relaunches the owner without a shutdown before it")),
+            };
+            write_seeds(work, &step.seed, variables)?;
+            let extra = launch_fields(step.relaunch_envelope.as_ref().unwrap_or(&session.launch), variables)?;
             entry.insert("relaunch".into(), true.into());
             entry.insert("exit_code".into(), exit_code.map_or(Json::Null, Json::from));
-            entry.insert("ready".into(), owner.ready.clone());
+            match Owner::launch_with(command, database, "sylvia-compare", &extra, ready_timeout)? {
+                Launch::Ready(started) => {
+                    entry.insert("ready".into(), started.ready.clone());
+                    owner = Some(started);
+                }
+                Launch::Refused { reply, exit_code } => {
+                    entry.insert("ready".into(), reply);
+                    refused_exit = Some(exit_code);
+                }
+            }
+            closed_by_shutdown = false;
             recorded.push(Json::Object(entry));
             continue;
         }
+        let Some(owner) = owner.as_mut() else {
+            return Err(format!("step {index} needs a running owner, but its launch was refused"));
+        };
         if let Some(control) = step.standin {
             let standin =
                 standin.ok_or(format!("step {index} controls the stand-in, which is not started"))?;
@@ -354,8 +453,19 @@ fn run_steps(
             break;
         }
     }
-    let exit_code = owner.close(Duration::from_secs(60))?;
+    let exit_code = match owner {
+        Some(owner) => owner.close(Duration::from_secs(60))?,
+        None => refused_exit.flatten(),
+    };
     Ok((ready, recorded, exit_code, stopped))
+}
+
+/// Extra launch-envelope fields with their placeholders replaced.
+fn launch_fields(extra: &JsonMap, variables: &HashMap<String, Json>) -> Result<JsonMap, String> {
+    match substitute(&Json::Object(extra.clone()), variables)? {
+        Json::Object(extra) => Ok(extra),
+        _ => unreachable!("an object stays an object"),
+    }
 }
 
 /// Run a WebUI session: start the host, send each request, then wait for the host to exit

@@ -8,24 +8,24 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 14 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat` and the eight run-loop commands: display-load cancellation, desktop drafts, local reports and faults, `renderer`).
+Ported: 25 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
 | Method | Rust | Comparison session |
 | --- | --- | --- |
 | `shutdown` | yes | every session |
-| `desktop_update_confirm_startup` | no |  |
-| `desktop_update_state` | no |  |
-| `desktop_update_check` | no |  |
-| `desktop_update_download` | no |  |
-| `desktop_update_cancel` | no |  |
-| `desktop_update_defer` | no |  |
-| `desktop_update_prepare` | no |  |
-| `desktop_update_handoff` | no |  |
-| `desktop_update_reserve` | no |  |
-| `desktop_update_abort` | no |  |
-| `desktop_update_shutdown` | no |  |
+| `desktop_update_confirm_startup` | yes | `desktop-update` (as shipped; past their checks they need update preparation) |
+| `desktop_update_state` | yes | `desktop-update` |
+| `desktop_update_check` | yes | `desktop-update` |
+| `desktop_update_download` | yes | `desktop-update` |
+| `desktop_update_cancel` | yes | `desktop-update` |
+| `desktop_update_defer` | yes | `desktop-update` |
+| `desktop_update_prepare` | yes | `desktop-update` (as shipped; past their checks they need update preparation) |
+| `desktop_update_handoff` | yes | `desktop-update` (as shipped; past their checks they need update preparation) |
+| `desktop_update_reserve` | yes | `desktop-update` |
+| `desktop_update_abort` | yes | `desktop-update` |
+| `desktop_update_shutdown` | yes | `desktop-update` |
 
 ## Registry commands
 

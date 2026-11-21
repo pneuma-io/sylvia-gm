@@ -2,14 +2,24 @@
 //!
 //! Ported so far: the signed manifest and its checks (`manifest.py`), release discovery
 //! (`discovery.py`), the official request rules and download staging of `transport.py` over
-//! a caller's transport, `payload.verify_artifact`, the folder and file checks and atomic
-//! receipt of `storage.py`, and all of `drafts.py`. `url` holds the parts of Python's
+//! a caller's transport, `payload.verify_artifact`, all of `storage.py`, `drafts.py`,
+//! `launch.py` and `controller.py`, the owner boundary of `service.py`, the ordinary-start
+//! check of `startup.py` and `runtime.child_environment`. `url` holds the parts of Python's
 //! `urllib.parse` and `ipaddress` the location checks depend on.
+//!
+//! Not ported yet: update preparation, checkpoint, replacement, restart, recovery and the
+//! helper. Where the owner reaches one of them it answers `rust_port_pending`; in the shipped
+//! build (no trusted key) it never does.
 
+pub mod controller;
 pub mod discovery;
 pub mod drafts;
+pub mod launch;
 pub mod manifest;
 pub mod payload;
+pub mod runtime;
+pub mod service;
+pub mod startup;
 pub mod storage;
 pub mod transport;
 pub mod url;
