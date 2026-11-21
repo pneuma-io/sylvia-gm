@@ -10,7 +10,7 @@ file; a row moves to another lane only through the manager.
 | Python file | Lines | Rust target | Status | Notes |
 | --- | ---: | --- | --- | --- |
 | `src/sylvia_gm/application/__init__.py` | 1 | `sylvia-app::__init__` | pending | |
-| `src/sylvia_gm/application/_srd_lite_character_legacy.py` | 315 | `sylvia-app::_srd_lite_character_legacy` | pending | |
+| `src/sylvia_gm/application/_srd_lite_character_legacy.py` | 315 | `sylvia-app::srd_lite_character_compatibility` | ported | Data only: the compressed Lite 0.2 contract is exported as `sylvia-app/src/srd_lite_legacy_character_contract.json` by `generate_srd_lite_legacy_contract.py`; read by `srd_lite_character_compatibility` |
 | `src/sylvia_gm/application/_yaml_bounds.py` | 71 | `sylvia-domain::yaml_bounds` | ported | In `sylvia-domain`, not `sylvia-app`: lane 2's `package_runtime` and the Builder's Ruleset source both run it from a `construct_document` hook. `yaml_bounds_vectors` |
 | `src/sylvia_gm/application/builder_references.py` | 435 | `sylvia-app::builder_references` | pending | |
 | `src/sylvia_gm/application/builder_session_migration.py` | 136 | `sylvia-app::builder_session_migration` | pending | |
@@ -46,7 +46,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |
 | `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-domain::schema_admission` | ported | In `sylvia-domain`, not `sylvia-app`: package archive admission (this crate) and the engine, store and agent lanes call it |
 | `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | ported | `app_leaves_vectors` |
-| `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | pending | |
+| `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | ported | `srd_lite_compat_vectors` (the bundled player declaration stands in for the lost 0.3.0 one) |
 | `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/builder/__init__.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::builder` | pending | |

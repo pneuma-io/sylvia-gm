@@ -1,0 +1,159 @@
+{
+ "python": "3.12.11",
+ "target": "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91",
+ "base": {
+  "package": {
+   "id": "sylvia.srd-lite.bg3",
+   "version": "0.3.0",
+   "role": "primary"
+  },
+  "declaration": {
+   "kind": "player_character",
+   "schema_id": "sylvia.srd-lite.bg3.player-character",
+   "schema_sha256": "target",
+   "schema": "bundled"
+  },
+  "source": {
+   "id": "sylvia.srd-lite.bg3.player-character",
+   "content_sha256": "f9386ab657153eadab17ff62e296fa40e863db70d8dcfd5a40832398100fdd88"
+  }
+ },
+ "cases": [
+  {
+   "change": {},
+   "outcome": [
+    "ok",
+    {
+     "kind": "player_character",
+     "schema_id": "sylvia.srd-lite.bg3.player-character",
+     "schema_sha256": "f9386ab657153eadab17ff62e296fa40e863db70d8dcfd5a40832398100fdd88",
+     "schema": "eb1669bd02652ba4aa908f88d3280c75309f5cc114e67948e65c70f77e1c7f7f",
+     "entity_state_schema": "b0f09ddba1932aacb6424554d066329690ecf86e66021b286c855014f88d3656",
+     "initial_state_calculations": "e8028e6d08bffd31fb29aa1c031a38861b573060f6efe46784d7bdd253f782d2",
+     "initial_state_validation": "2b42f349321844cfc664b352ff43e6426f87b7c599670e252d8ee12fa129f150"
+    }
+   ]
+  },
+  {
+   "change": {
+    "package": {
+     "id": "pneuma.other"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "package": {
+     "version": "0.3.1"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "package": {
+     "role": "dependency"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "declaration": {
+     "kind": "companion"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "declaration": {
+     "schema_id": "sylvia.srd-lite.bg3.other"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "declaration": {
+     "schema_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "declaration": {
+     "schema": "changed"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "source": {
+     "id": "x"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "source": {
+     "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "source": {
+     "id": null
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  },
+  {
+   "change": {
+    "source": {
+     "missing": true
+    }
+   },
+   "outcome": [
+    "ok",
+    null
+   ]
+  }
+ ]
+}
