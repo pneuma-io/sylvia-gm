@@ -5,17 +5,40 @@ use std::sync::Arc;
 
 // ── Reader ────────────────────────────────────────────────────────────────────────────────
 
-/// `Reader` for text input: the characters with a trailing NUL, and the position.
+/// `Reader`: the characters with a trailing NUL, and the position.
+///
+/// A `str` or `bytes` input is checked whole when the reader is made. A text file stream is
+/// read as `Reader.update_raw` reads it, 4,096 characters at a time, and each piece is checked
+/// only when the scanner first needs it ([`Reader::new_stream`]). Python then raises from the
+/// middle of a scan; here the read records the error and returns NUL, and the scanner's entry
+/// points return the recorded error instead of their result, which is what the caller of the
+/// Python scanner sees.
 pub(crate) struct Reader {
     buffer: Arc<[char]>,
     name: Arc<str>,
     /// Text input keeps its buffer for snippets; a file stream's marks have none.
     snippets: bool,
+    stream: Option<StreamState>,
     pointer: usize,
     index: usize,
     line: usize,
     column: usize,
 }
+
+/// The lazy reading of a text file stream (`Reader.update`).
+struct StreamState {
+    /// Characters read from the stream so far (`stream_pointer`).
+    read: std::cell::Cell<usize>,
+    /// Characters checked and moved into the buffer.
+    loaded: std::cell::Cell<usize>,
+    eof: std::cell::Cell<bool>,
+    /// The trailing NUL has been appended (`raw_buffer` is `None`).
+    finished: std::cell::Cell<bool>,
+    failed: std::cell::RefCell<Option<YamlError>>,
+}
+
+/// `Reader.update_raw`'s default size, in characters for a text stream.
+const STREAM_READ_SIZE: usize = 4096;
 
 /// `Reader.NON_PRINTABLE`'s complement: what YAML allows.
 fn printable(character: char) -> bool {
@@ -42,24 +65,139 @@ impl Reader {
         }
         buffer.push('\0');
         let snippets = true;
-        Ok(Self { buffer: buffer.into(), name, snippets, pointer: 0, index: 0, line: 0, column: 0 })
+        Ok(Self {
+            buffer: buffer.into(),
+            name,
+            snippets,
+            stream: None,
+            pointer: 0,
+            index: 0,
+            line: 0,
+            column: 0,
+        })
+    }
+
+    /// `Reader(stream)` for a text file stream: `text` is what the stream's `read()` returns
+    /// (with its newline translation already applied) and `name` is `stream.name`. Its marks
+    /// carry no snippet. The first two pieces are checked here, as Python's constructor does.
+    pub(crate) fn new_stream(text: &str, name: &str) -> Result<Self, YamlError> {
+        let mut buffer: Vec<char> = text.chars().collect();
+        buffer.push('\0');
+        let state = StreamState {
+            read: std::cell::Cell::new(0),
+            loaded: std::cell::Cell::new(0),
+            eof: std::cell::Cell::new(false),
+            finished: std::cell::Cell::new(false),
+            failed: std::cell::RefCell::new(None),
+        };
+        let reader = Self {
+            buffer: buffer.into(),
+            name: Arc::from(name),
+            snippets: false,
+            stream: Some(state),
+            pointer: 0,
+            index: 0,
+            line: 0,
+            column: 0,
+        };
+        // determine_encoding(): read until two characters are buffered, then update(1).
+        let state = reader.stream.as_ref().expect("a stream");
+        while !state.eof.get() && state.read.get() - state.loaded.get() < 2 {
+            reader.update_raw(state);
+        }
+        reader.update(1);
+        match reader.take_failure() {
+            Some(error) => Err(error),
+            None => Ok(reader),
+        }
+    }
+
+    /// The characters a text stream holds, without the trailing NUL.
+    fn text_len(&self) -> usize {
+        self.buffer.len() - 1
+    }
+
+    /// `len(self.buffer)` in Python's terms: what is loaded, counted from the start.
+    fn limit(&self) -> usize {
+        match &self.stream {
+            None => self.buffer.len(),
+            Some(state) => state.loaded.get() + usize::from(state.finished.get()),
+        }
+    }
+
+    fn update_raw(&self, state: &StreamState) {
+        let size = STREAM_READ_SIZE.min(self.text_len() - state.read.get());
+        state.read.set(state.read.get() + size);
+        if size == 0 {
+            state.eof.set(true);
+        }
+    }
+
+    /// `Reader.update(length)`: load pieces until `length` characters follow the pointer.
+    fn update(&self, length: usize) {
+        let Some(state) = &self.stream else { return };
+        if state.finished.get() || state.failed.borrow().is_some() {
+            return;
+        }
+        while self.limit() - self.pointer < length {
+            if !state.eof.get() {
+                self.update_raw(state);
+            }
+            let (start, end) = (state.loaded.get(), state.read.get());
+            if let Some(offset) = self.buffer[start..end].iter().position(|c| !printable(*c)) {
+                *state.failed.borrow_mut() = Some(YamlError::Reader {
+                    name: Arc::clone(&self.name),
+                    position: start + offset,
+                    character: u32::from(self.buffer[start + offset]),
+                    reason: "special characters are not allowed",
+                });
+                return;
+            }
+            state.loaded.set(end);
+            if state.eof.get() {
+                state.finished.set(true);
+                return;
+            }
+        }
+    }
+
+    /// A refused character a stream read met, once.
+    pub(crate) fn take_failure(&self) -> Option<YamlError> {
+        self.stream.as_ref().and_then(|state| state.failed.borrow().clone())
+    }
+
+    fn char_at(&self, position: usize) -> char {
+        if position < self.limit() {
+            self.buffer[position]
+        } else {
+            '\0'
+        }
     }
 
     pub(crate) fn peek(&self, index: usize) -> char {
-        self.buffer.get(self.pointer + index).copied().unwrap_or('\0')
+        if self.pointer + index >= self.limit() {
+            self.update(index + 1);
+        }
+        self.char_at(self.pointer + index)
     }
 
     pub(crate) fn prefix(&self, length: usize) -> String {
-        let end = (self.pointer + length).min(self.buffer.len());
+        if self.pointer + length >= self.limit() {
+            self.update(length);
+        }
+        let end = (self.pointer + length).min(self.limit());
         self.buffer[self.pointer.min(end)..end].iter().collect()
     }
 
     pub(crate) fn forward(&mut self, mut length: usize) {
-        while length > 0 && self.pointer < self.buffer.len() {
+        if self.pointer + length + 1 >= self.limit() {
+            self.update(length + 1);
+        }
+        while length > 0 && self.pointer < self.limit() {
             let ch = self.buffer[self.pointer];
             self.pointer += 1;
             self.index += 1;
-            let next = self.buffer.get(self.pointer).copied().unwrap_or('\0');
+            let next = self.char_at(self.pointer);
             if matches!(ch, '\n' | '\u{85}' | '\u{2028}' | '\u{2029}') || (ch == '\r' && next != '\n') {
                 self.line += 1;
                 self.column = 0;
@@ -305,10 +443,32 @@ impl Scanner {
 
     // Public methods.
 
-    pub(crate) fn check_token(&mut self, choices: &[TokenClass]) -> ScanResult<bool> {
-        while self.need_more_tokens()? {
-            self.fetch_more_tokens()?;
+    /// Fetch until the next token is decided. A refused character a stream read met wins over
+    /// whatever the scan made of the NUL it read instead: Python raised at that read.
+    fn fill_tokens(&mut self) -> ScanResult<()> {
+        let mut filled = Ok(());
+        loop {
+            match self.need_more_tokens() {
+                Ok(true) => {}
+                Ok(false) => break,
+                Err(error) => {
+                    filled = Err(error);
+                    break;
+                }
+            }
+            if let Err(error) = self.fetch_more_tokens() {
+                filled = Err(error);
+                break;
+            }
         }
+        match self.reader.take_failure() {
+            Some(error) => Err(error),
+            None => filled,
+        }
+    }
+
+    pub(crate) fn check_token(&mut self, choices: &[TokenClass]) -> ScanResult<bool> {
+        self.fill_tokens()?;
         Ok(match self.tokens.front() {
             Some(token) => choices.is_empty() || choices.iter().any(|choice| choice.matches(&token.kind)),
             None => false,
@@ -316,16 +476,12 @@ impl Scanner {
     }
 
     pub(crate) fn peek_token(&mut self) -> ScanResult<Option<&Token>> {
-        while self.need_more_tokens()? {
-            self.fetch_more_tokens()?;
-        }
+        self.fill_tokens()?;
         Ok(self.tokens.front())
     }
 
     pub(crate) fn get_token(&mut self) -> ScanResult<Option<Token>> {
-        while self.need_more_tokens()? {
-            self.fetch_more_tokens()?;
-        }
+        self.fill_tokens()?;
         let token = self.tokens.pop_front();
         if token.is_some() {
             self.tokens_taken += 1;

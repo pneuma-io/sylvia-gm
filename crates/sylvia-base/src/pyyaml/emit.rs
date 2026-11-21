@@ -32,27 +32,6 @@ struct Representer<'a> {
     represented: HashMap<ObjectId, usize>,
 }
 
-/// `base64.encodebytes`: lines of 76 characters (57 bytes), each ending in a newline.
-fn encodebytes(data: &[u8]) -> String {
-    const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = String::new();
-    for line in data.chunks(57) {
-        for chunk in line.chunks(3) {
-            let b = [chunk[0], *chunk.get(1).unwrap_or(&0), *chunk.get(2).unwrap_or(&0)];
-            let n = (u32::from(b[0]) << 16) | (u32::from(b[1]) << 8) | u32::from(b[2]);
-            for (i, shift) in [18, 12, 6, 0].into_iter().enumerate() {
-                if i <= chunk.len() {
-                    out.push(char::from(ALPHABET[((n >> shift) & 63) as usize]));
-                } else {
-                    out.push('=');
-                }
-            }
-        }
-        out.push('\n');
-    }
-    out
-}
-
 /// `SafeRepresenter.represent_float`.
 fn float_text(value: f64) -> String {
     if value.is_nan() {
@@ -94,7 +73,7 @@ impl Representer<'_> {
             Value::Str(text) => self.scalar(STR_TAG, text.clone()),
             Value::Bytes(bytes) => self.push(
                 "tag:yaml.org,2002:binary",
-                RepKind::Scalar { value: encodebytes(bytes), style: Some('|') },
+                RepKind::Scalar { value: crate::pybase64::encodebytes(bytes), style: Some('|') },
             ),
             Value::Date(date) => self.scalar("tag:yaml.org,2002:timestamp", date.isoformat()),
             Value::DateTime(datetime) => {

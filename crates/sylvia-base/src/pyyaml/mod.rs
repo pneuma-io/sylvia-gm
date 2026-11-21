@@ -135,3 +135,24 @@ pub fn load_named(text: &str, stream_name: &str, loader: Loader, hooks: Hooks) -
 pub fn safe_load(text: &str) -> Result<Loaded, YamlError> {
     load(text, Loader::Pure, Hooks::default())
 }
+
+/// `yaml.safe_load(stream)` for a text file stream, as `config/loader.py` reads the shipped
+/// defaults (`with open(path, encoding="utf-8") as fh: yaml.safe_load(fh)`).
+///
+/// `text` is what `fh.read()` returns, newlines already translated (see [`read_text`]), and
+/// `stream_name` is `fh.name`. PyYAML reads the stream 4,096 characters at a time and checks
+/// each piece when the scanner first needs it, so a refused character is reported only once the
+/// scan reaches its piece; marks carry no snippet.
+pub fn safe_load_stream(text: &str, stream_name: &str) -> Result<Loaded, YamlError> {
+    let reader = Reader::new_stream(text, stream_name)?;
+    let source = EventSource::Pure(Box::new(Parser::new(Scanner::new(reader))));
+    let mut composed = Composer::new(source, Loader::Pure).single_node()?;
+    construct(&mut composed, Hooks::default())
+}
+
+/// The text Python's text mode reads (`open(path, encoding="utf-8").read()` and
+/// `Path.read_text(encoding="utf-8")`): UTF-8, with `\r\n` and `\r` read as `\n`.
+pub fn read_text(bytes: &[u8]) -> Result<String, std::string::FromUtf8Error> {
+    let text = String::from_utf8(bytes.to_vec())?;
+    Ok(if text.contains('\r') { text.replace("\r\n", "\n").replace('\r', "\n") } else { text })
+}
