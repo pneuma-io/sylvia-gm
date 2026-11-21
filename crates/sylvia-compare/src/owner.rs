@@ -43,7 +43,15 @@ impl Owner {
         owner_id: &str,
         timeout: Duration,
     ) -> Result<Self, String> {
-        let mut process = Command::new(&command.program);
+        // The owner runs inside the data folder. On Linux a relative program path is looked
+        // up after that change of folder (on Windows before it), so make a path absolute here.
+        let program = std::path::Path::new(&command.program);
+        let program = if program.components().count() > 1 && program.is_relative() {
+            std::env::current_dir().map_err(|error| error.to_string())?.join(program)
+        } else {
+            program.to_path_buf()
+        };
+        let mut process = Command::new(&program);
         process
             .args(&command.args)
             .envs(command.env.iter().cloned())
