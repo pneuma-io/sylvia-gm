@@ -13,6 +13,7 @@ from the pieces the checks look at. Reference tooling only; retired with the Pyt
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import random
 import sys
@@ -55,6 +56,17 @@ UNQUOTES = [
 ]
 
 
+def updater_corpus() -> tuple[list[str], list[str]]:
+    """Lane 5's updater locations and unquote texts, exactly as its update vectors build them,
+    so every case the desktop updater was checked on stays in the shared corpus."""
+    source = Path(__file__).resolve().parents[3] / "sylvia-owner/tests/vectors/generate_update_vectors.py"
+    spec = importlib.util.spec_from_file_location("lane5_update_vectors", source)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    splits, unquotes, *_ = module.url_vectors()
+    return [case["url"] for case in splits], [case["text"] for case in unquotes]
+
+
 def split_case(url: str) -> dict:
     try:
         parts = urlsplit(url)
@@ -87,13 +99,16 @@ def main() -> int:
               "\\", " ", "\t", "", "\u00e9", "\u2100", "\uff0f", "pneuma-io/", "a", "fe80::1%25eth0", "user:pw@"]
     for _ in range(800):
         urls.append("".join(rng.choice(pieces) for _ in range(rng.randint(1, 9))))
+    updater_urls, updater_unquotes = updater_corpus()
+    urls += [url for url in updater_urls if url not in set(urls)]
+    texts = UNQUOTES + [text for text in updater_unquotes if text not in UNQUOTES]
     document = {
         "python": sys.version.split()[0],
         "urlsplit": [split_case(url) for url in urls],
-        "unquote": [unquote_case(text) for text in UNQUOTES],
+        "unquote": [unquote_case(text) for text in texts],
     }
     OUTPUT.write_bytes((json.dumps(document, ensure_ascii=True, indent=0) + "\n").encode("ascii"))
-    print(f"{len(document['urlsplit'])} URLs, {len(UNQUOTES)} unquotes -> {OUTPUT}")
+    print(f"{len(document['urlsplit'])} URLs, {len(texts)} unquotes -> {OUTPUT}")
     return 0
 
 

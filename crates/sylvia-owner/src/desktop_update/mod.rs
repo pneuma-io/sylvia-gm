@@ -5,8 +5,8 @@
 //! a caller's transport, all of `payload.py`, `storage.py`, `drafts.py`, `launch.py`,
 //! `controller.py`, `startup.py` and `runtime.py` (one function retired), `service.py`, and
 //! update preparation for a portable copy: `preparation.py`, `checkpoint.py`, the portable
-//! `replacement.py` and `restart.py`. `url` holds the parts of Python's `urllib.parse` and
-//! `ipaddress` the location checks depend on; `windows` the approved direct Windows calls.
+//! `replacement.py` and `restart.py`. The location checks use the shared `sylvia_base::pyurl`
+//! (CPython's `urllib.parse`); `windows` holds the approved direct Windows calls.
 //!
 //! Not ported yet: recovery (`recovery.py`, `recovery_service.py`), the installed copy
 //! (`installed.py`) and the helper (`helper.py`, `processes.py`, `progress.py`). Where the
@@ -28,7 +28,6 @@ pub mod service;
 pub mod startup;
 pub mod storage;
 pub mod transport;
-pub mod url;
 #[cfg(windows)]
 mod windows;
 

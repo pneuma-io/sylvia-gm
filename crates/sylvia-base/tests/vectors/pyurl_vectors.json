@@ -13175,6 +13175,8714 @@
 "password": null,
 "unsplit": "1.2.3.4...%C3%A9%ff",
 "port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-setup.exe",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-setup.exe",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-setup.exe",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-SETUP.EXE",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-SETUP.EXE",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-SETUP.EXE",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip?x=1",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip",
+"x=1",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip?x=1",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip#frag",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip",
+"",
+"frag"
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/sylvia-gm-0.4.2-windows-x86_64-portable.zip#frag",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%zz-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%zz-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%zz-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%2-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%2-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%2-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%C3%A9-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%C3%A9-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%C3%A9-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%00-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%00-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%00-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%5Cb-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%5Cb-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a%5Cb-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/%2E%2E",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/%2E%2E",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/%2E%2E",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a/b-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a/b-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a/b-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\u00e9%ff-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\u00e9%ff-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\u00e9%ff-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-PORTABLE.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-PORTABLE.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-PORTABLE.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.ZIP",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.ZIP",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.ZIP",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-Portable.Zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-Portable.Zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-Portable.Zip",
+"port": null
+},
+{
+"url": "HTTPS://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "http://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"parts": [
+"http",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "http://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "https:github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"parts": [
+"https",
+"",
+"github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.3/x-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.3/x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.3/x-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2x/y-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2x/y-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2x/y-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/PNEUMA-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/PNEUMA-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/PNEUMA-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2//x-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2//x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2//x-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip ",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip ",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip ",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\\-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\\-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\\-portable.zip",
+"port": null
+},
+{
+"url": " https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\t-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\u007f-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\u007f-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x\u007f-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-portable.zip",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-portable.zip",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-portable.zip",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-portable.zip",
+"port": null
+},
+{
+"url": "1https://github.com/x",
+"parts": [
+"",
+"",
+"1https://github.com/x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1https://github.com/x",
+"port": null
+},
+{
+"url": "h+t.p-s://github.com/x",
+"parts": [
+"h+t.p-s",
+"github.com",
+"/x",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "h+t.p-s://github.com/x",
+"port": null
+},
+{
+"url": "https",
+"parts": [
+"",
+"",
+"https",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https",
+"port": null
+},
+{
+"url": "//github.com/x",
+"parts": [
+"",
+"github.com",
+"/x",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "//github.com/x",
+"port": null
+},
+{
+"url": "https://github.com",
+"parts": [
+"https",
+"github.com",
+"",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com",
+"port": null
+},
+{
+"url": "https://github.com?",
+"parts": [
+"https",
+"github.com",
+"",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a/b",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a/b",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a/b",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/a",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/a",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/x",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/x",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/x",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/x/",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/.",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/x/.",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/.",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/%2e%2e",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/x/%2e%2e",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/%2e%2e",
+"port": null
+},
+{
+"url": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/y%0a",
+"parts": [
+"https",
+"github.com",
+"/pneuma-io/sylvia-gm/releases/download/x/y%0a",
+"",
+""
+],
+"hostname": "github.com",
+"username": null,
+"password": null,
+"unsplit": "https://github.com/pneuma-io/sylvia-gm/releases/download/x/y%0a",
+"port": null
+},
+{
+"url": "https://release-assets.githubusercontent.com/github-production/abc?sig=1",
+"parts": [
+"https",
+"release-assets.githubusercontent.com",
+"/github-production/abc",
+"sig=1",
+""
+],
+"hostname": "release-assets.githubusercontent.com",
+"username": null,
+"password": null,
+"unsplit": "https://release-assets.githubusercontent.com/github-production/abc?sig=1",
+"port": null
+},
+{
+"url": "https://release-assets.githubusercontent.com/x#f",
+"parts": [
+"https",
+"release-assets.githubusercontent.com",
+"/x",
+"",
+"f"
+],
+"hostname": "release-assets.githubusercontent.com",
+"username": null,
+"password": null,
+"unsplit": "https://release-assets.githubusercontent.com/x#f",
+"port": null
+},
+{
+"url": "https://evil.com/x",
+"parts": [
+"https",
+"evil.com",
+"/x",
+"",
+""
+],
+"hostname": "evil.com",
+"username": null,
+"password": null,
+"unsplit": "https://evil.com/x",
+"port": null
+},
+{
+"url": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30",
+"parts": [
+"https",
+"api.github.com",
+"/repos/pneuma-io/sylvia-gm/releases",
+"per_page=30",
+""
+],
+"hostname": "api.github.com",
+"username": null,
+"password": null,
+"unsplit": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30",
+"port": null
+},
+{
+"url": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30&x",
+"parts": [
+"https",
+"api.github.com",
+"/repos/pneuma-io/sylvia-gm/releases",
+"per_page=30&x",
+""
+],
+"hostname": "api.github.com",
+"username": null,
+"password": null,
+"unsplit": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30&x",
+"port": null
+},
+{
+"url": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30",
+"parts": [
+"https",
+"api.github.com",
+"/repos/pneuma-io/sylvia-gm/releases",
+"per_page=30",
+""
+],
+"hostname": "api.github.com",
+"username": null,
+"password": null,
+"unsplit": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30",
+"port": null
+},
+{
+"url": "https://release-assets.githubusercontent.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"parts": [
+"https",
+"release-assets.githubusercontent.com",
+"/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"",
+""
+],
+"hostname": "release-assets.githubusercontent.com",
+"username": null,
+"password": null,
+"unsplit": "https://release-assets.githubusercontent.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/x-portable.zip",
+"port": null
+},
+{
+"url": "1.2.3.4%2f?fe80::1%25eth0github.com///https://1.2.3.4",
+"parts": [
+"",
+"",
+"1.2.3.4%2f",
+"fe80::1%25eth0github.com///https://1.2.3.4",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4%2f?fe80::1%25eth0github.com///https://1.2.3.4",
+"port": null
+},
+{
+"url": "#?v1.x",
+"parts": [
+"",
+"",
+"",
+"",
+"?v1.x"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#?v1.x",
+"port": null
+},
+{
+"url": "fe80::1%25eth0#..",
+"parts": [
+"fe80",
+"",
+":1%25eth0",
+"",
+".."
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0#..",
+"port": null
+},
+{
+"url": "?fe80::1%25eth0[%\\//",
+"parts": [
+"",
+"",
+"",
+"fe80::1%25eth0[%\\//",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?fe80::1%25eth0[%\\//",
+"port": null
+},
+{
+"url": "github.com%ff::1github.com:443:#https://",
+"parts": [
+"",
+"",
+"github.com%ff::1github.com:443:",
+"",
+"https://"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com%ff::1github.com:443:#https://",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/ HTTPS://:@1.2.3.4",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/ HTTPS://:@1.2.3.4",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/ HTTPS://:@1.2.3.4",
+"port": null
+},
+{
+"url": "%2F##",
+"parts": [
+"",
+"",
+"%2F",
+"",
+"#"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F##",
+"port": null
+},
+{
+"url": " a\u007f %2Fpneuma-io/sylvia-gm/releases/download/HTTPS://",
+"parts": [
+"",
+"",
+"a\u007f %2Fpneuma-io/sylvia-gm/releases/download/HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a\u007f %2Fpneuma-io/sylvia-gm/releases/download/HTTPS://",
+"port": null
+},
+{
+"url": "fe80::1%25eth0%\u007fpneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"fe80",
+"",
+":1%25eth0%\u007fpneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0%\u007fpneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "..\u00e9\u007f[\u2100a#//",
+"parts": [
+"",
+"",
+"..\u00e9\u007f[\u2100a",
+"",
+"//"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..\u00e9\u007f[\u2100a#//",
+"port": null
+},
+{
+"url": "[\u007f/%C3%A9api.github.com1.2.3.4%C3%A9",
+"parts": [
+"",
+"",
+"[\u007f/%C3%A9api.github.com1.2.3.4%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[\u007f/%C3%A9api.github.com1.2.3.4%C3%A9",
+"port": null
+},
+{
+"url": "%2Fhttps://-setup.exe..",
+"parts": [
+"",
+"",
+"%2Fhttps://-setup.exe..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2Fhttps://-setup.exe..",
+"port": null
+},
+{
+"url": "\u00e9%C3%A9%ffHTTPS://\u00e9v0.4.2/",
+"parts": [
+"",
+"",
+"\u00e9%C3%A9%ffHTTPS://\u00e9v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9%C3%A9%ffHTTPS://\u00e9v0.4.2/",
+"port": null
+},
+{
+"url": "\\-setup.exex-portable.zip",
+"parts": [
+"",
+"",
+"\\-setup.exex-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\-setup.exex-portable.zip",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/v0.4.2/\uff0f",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/v0.4.2/\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/v0.4.2/\uff0f",
+"port": null
+},
+{
+"url": ":443\u2100api.github.com?//.%C3%A9%",
+"parts": [
+"",
+"",
+":443\u2100api.github.com",
+"//.%C3%A9%",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443\u2100api.github.com?//.%C3%A9%",
+"port": null
+},
+{
+"url": "HTTPS://http://fe80::1%25eth0%v1.x",
+"parts": [
+"https",
+"http:",
+"//fe80::1%25eth0%v1.x",
+"",
+""
+],
+"hostname": "http",
+"username": null,
+"password": null,
+"unsplit": "https://http://fe80::1%25eth0%v1.x",
+"port": null
+},
+{
+"url": "fe80::1%25eth0-setup.exe[\u00e9\u2100fe80::1%25eth0%C3%A9%C3%A9",
+"parts": [
+"fe80",
+"",
+":1%25eth0-setup.exe[\u00e9\u2100fe80::1%25eth0%C3%A9%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0-setup.exe[\u00e9\u2100fe80::1%25eth0%C3%A9%C3%A9",
+"port": null
+},
+{
+"url": "//http://%C3%A9v0.4.2/https:@https:pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"http:",
+"//%C3%A9v0.4.2/https:@https:pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": "http",
+"username": null,
+"password": null,
+"unsplit": "//http://%C3%A9v0.4.2/https:@https:pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "http://http://@.",
+"parts": [
+"http",
+"http:",
+"//@.",
+"",
+""
+],
+"hostname": "http",
+"username": null,
+"password": null,
+"unsplit": "http://http://@.",
+"port": null
+},
+{
+"url": ":v1.x\uff0fv0.4.2/",
+"parts": [
+"",
+"",
+":v1.x\uff0fv0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":v1.x\uff0fv0.4.2/",
+"port": null
+},
+{
+"url": "%C3%A9%zz%2f",
+"parts": [
+"",
+"",
+"%C3%A9%zz%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9%zz%2f",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/github.com\uff0f",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/github.com\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/github.com\uff0f",
+"port": null
+},
+{
+"url": "x-portable.zip-setup.exe",
+"parts": [
+"",
+"",
+"x-portable.zip-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip-setup.exe",
+"port": null
+},
+{
+"url": "%2f%ff:v0.4.2/\tpneuma-io/sylvia-gm/releases/download/:443@",
+"parts": [
+"",
+"",
+"%2f%ff:v0.4.2/pneuma-io/sylvia-gm/releases/download/:443@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f%ff:v0.4.2/pneuma-io/sylvia-gm/releases/download/:443@",
+"port": null
+},
+{
+"url": " api.github.com:443https://-setup.exe",
+"parts": [
+"api.github.com",
+"",
+"443https://-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com:443https://-setup.exe",
+"port": null
+},
+{
+"url": "%2f:fe80::1%25eth0.#https:",
+"parts": [
+"",
+"",
+"%2f:fe80::1%25eth0.",
+"",
+"https:"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f:fe80::1%25eth0.#https:",
+"port": null
+},
+{
+"url": "% \uff0f#a%2f.//x-portable.zip",
+"parts": [
+"",
+"",
+"% \uff0f",
+"",
+"a%2f.//x-portable.zip"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "% \uff0f#a%2f.//x-portable.zip",
+"port": null
+},
+{
+"url": ":443x-portable.zip%ff%2F%zzhttps:",
+"parts": [
+"",
+"",
+":443x-portable.zip%ff%2F%zzhttps:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443x-portable.zip%ff%2F%zzhttps:",
+"port": null
+},
+{
+"url": "v0.4.2/ ",
+"parts": [
+"",
+"",
+"v0.4.2/ ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/ ",
+"port": null
+},
+{
+"url": "http://%2f\u007ffe80::1%25eth0%ff [//",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "1.2.3.4[pneuma-io/sylvia-gm/releases/download/\u007f::1HTTPS://",
+"parts": [
+"",
+"",
+"1.2.3.4[pneuma-io/sylvia-gm/releases/download/\u007f::1HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4[pneuma-io/sylvia-gm/releases/download/\u007f::1HTTPS://",
+"port": null
+},
+{
+"url": "#%\uff0fpneuma-io/sylvia-gm/releases/download/api.github.com %zzapi.github.com",
+"parts": [
+"",
+"",
+"",
+"",
+"%\uff0fpneuma-io/sylvia-gm/releases/download/api.github.com %zzapi.github.com"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#%\uff0fpneuma-io/sylvia-gm/releases/download/api.github.com %zzapi.github.com",
+"port": null
+},
+{
+"url": "[..%zzhttps:?v0.4.2/",
+"parts": [
+"",
+"",
+"[..%zzhttps:",
+"v0.4.2/",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[..%zzhttps:?v0.4.2/",
+"port": null
+},
+{
+"url": "\u2100%x-portable.zip\u00e9@",
+"parts": [
+"",
+"",
+"\u2100%x-portable.zip\u00e9@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100%x-portable.zip\u00e9@",
+"port": null
+},
+{
+"url": "..%zz\u2100a\u00e9?",
+"parts": [
+"",
+"",
+"..%zz\u2100a\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..%zz\u2100a\u00e9",
+"port": null
+},
+{
+"url": "1.2.3.4:443/%C3%A9%C3%A9::%zz",
+"parts": [
+"",
+"",
+"1.2.3.4:443/%C3%A9%C3%A9::%zz",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4:443/%C3%A9%C3%A9::%zz",
+"port": null
+},
+{
+"url": "v0.4.2//https://:443::1[HTTPS://v0.4.2/",
+"parts": [
+"",
+"",
+"v0.4.2//https://:443::1[HTTPS://v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2//https://:443::1[HTTPS://v0.4.2/",
+"port": null
+},
+{
+"url": "/\uff0f@%2Fv0.4.2/%zz.//",
+"parts": [
+"",
+"",
+"/\uff0f@%2Fv0.4.2/%zz.//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/\uff0f@%2Fv0.4.2/%zz.//",
+"port": null
+},
+{
+"url": ":::1https://\u007f::1api.github.com..https:",
+"parts": [
+"",
+"",
+":::1https://\u007f::1api.github.com..https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":::1https://\u007f::1api.github.com..https:",
+"port": null
+},
+{
+"url": "1.2.3.4\u00e9v0.4.2//?%",
+"parts": [
+"",
+"",
+"1.2.3.4\u00e9v0.4.2//",
+"%",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4\u00e9v0.4.2//?%",
+"port": null
+},
+{
+"url": "//\\%2f%2F",
+"parts": [
+"",
+"\\%2f%2F",
+"",
+"",
+""
+],
+"hostname": "\\%2f%2F",
+"username": null,
+"password": null,
+"unsplit": "//\\%2f%2F",
+"port": null
+},
+{
+"url": "%.https://\\::1",
+"parts": [
+"",
+"",
+"%.https://\\::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%.https://\\::1",
+"port": null
+},
+{
+"url": "\t\\\uff0fa1.2.3.4\u00e9",
+"parts": [
+"",
+"",
+"\\\uff0fa1.2.3.4\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\\uff0fa1.2.3.4\u00e9",
+"port": null
+},
+{
+"url": "x-portable.zip",
+"parts": [
+"",
+"",
+"x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip",
+"port": null
+},
+{
+"url": "%2Fv1.x/http://..v0.4.2/api.github.com",
+"parts": [
+"",
+"",
+"%2Fv1.x/http://..v0.4.2/api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2Fv1.x/http://..v0.4.2/api.github.com",
+"port": null
+},
+{
+"url": "https:\t1.2.3.4v0.4.2/fe80::1%25eth0",
+"parts": [
+"https",
+"",
+"1.2.3.4v0.4.2/fe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:1.2.3.4v0.4.2/fe80::1%25eth0",
+"port": null
+},
+{
+"url": "\\%C3%A9\uff0f1.2.3.4]https://x-portable.ziphttps:",
+"parts": [
+"",
+"",
+"\\%C3%A9\uff0f1.2.3.4]https://x-portable.ziphttps:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\%C3%A9\uff0f1.2.3.4]https://x-portable.ziphttps:",
+"port": null
+},
+{
+"url": "%C3%A9\u00e9:\t%ff::1",
+"parts": [
+"",
+"",
+"%C3%A9\u00e9:%ff::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9\u00e9:%ff::1",
+"port": null
+},
+{
+"url": "\thttps://https://1.2.3.4http://#%ff",
+"parts": [
+"https",
+"https:",
+"//1.2.3.4http://",
+"",
+"%ff"
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "https://https://1.2.3.4http://#%ff",
+"port": null
+},
+{
+"url": " :443%https://v1.x#\uff0f",
+"parts": [
+"",
+"",
+":443%https://v1.x",
+"",
+"\uff0f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443%https://v1.x#\uff0f",
+"port": null
+},
+{
+"url": "HTTPS://%http://\u00e9:443x-portable.ziphttps://",
+"parts": [
+"https",
+"%http:",
+"//\u00e9:443x-portable.ziphttps://",
+"",
+""
+],
+"hostname": "%http",
+"username": null,
+"password": null,
+"unsplit": "https://%http://\u00e9:443x-portable.ziphttps://",
+"port": null
+},
+{
+"url": "%C3%A9:443x-portable.zip//-setup.exe\u2100::1\t",
+"parts": [
+"",
+"",
+"%C3%A9:443x-portable.zip//-setup.exe\u2100::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9:443x-portable.zip//-setup.exe\u2100::1",
+"port": null
+},
+{
+"url": "[v1.x",
+"parts": [
+"",
+"",
+"[v1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[v1.x",
+"port": null
+},
+{
+"url": "\u2100\uff0f\u2100#:443",
+"parts": [
+"",
+"",
+"\u2100\uff0f\u2100",
+"",
+":443"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100\uff0f\u2100#:443",
+"port": null
+},
+{
+"url": "\u007f%2f ",
+"parts": [
+"",
+"",
+"\u007f%2f ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f%2f ",
+"port": null
+},
+{
+"url": "%2f\tx-portable.zipHTTPS://\u007f",
+"parts": [
+"",
+"",
+"%2fx-portable.zipHTTPS://\u007f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fx-portable.zipHTTPS://\u007f",
+"port": null
+},
+{
+"url": "github.com%\u2100%pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"github.com%\u2100%pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com%\u2100%pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "\u2100pneuma-io/sylvia-gm/releases/download/https::%C3%A9HTTPS://%C3%A9a",
+"parts": [
+"",
+"",
+"\u2100pneuma-io/sylvia-gm/releases/download/https::%C3%A9HTTPS://%C3%A9a",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100pneuma-io/sylvia-gm/releases/download/https::%C3%A9HTTPS://%C3%A9a",
+"port": null
+},
+{
+"url": "\u007f/%:443https:///]",
+"parts": [
+"",
+"",
+"\u007f/%:443https:///]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f/%:443https:///]",
+"port": null
+},
+{
+"url": "github.comapi.github.comhttps:",
+"parts": [
+"github.comapi.github.comhttps",
+"",
+"",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.comapi.github.comhttps:",
+"port": null
+},
+{
+"url": ":http://.-setup.exe]",
+"parts": [
+"",
+"",
+":http://.-setup.exe]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":http://.-setup.exe]",
+"port": null
+},
+{
+"url": "%C3%A9%2F.... v1.xa",
+"parts": [
+"",
+"",
+"%C3%A9%2F.... v1.xa",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9%2F.... v1.xa",
+"port": null
+},
+{
+"url": "http://@",
+"parts": [
+"http",
+"@",
+"",
+"",
+""
+],
+"hostname": null,
+"username": "",
+"password": null,
+"unsplit": "http://@",
+"port": null
+},
+{
+"url": "\u00e9/[::1HTTPS://[%%C3%A9:443",
+"parts": [
+"",
+"",
+"\u00e9/[::1HTTPS://[%%C3%A9:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9/[::1HTTPS://[%%C3%A9:443",
+"port": null
+},
+{
+"url": "1.2.3.4:apneuma-io/sylvia-gm/releases/download/http://\u2100?",
+"parts": [
+"",
+"",
+"1.2.3.4:apneuma-io/sylvia-gm/releases/download/http://\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4:apneuma-io/sylvia-gm/releases/download/http://\u2100",
+"port": null
+},
+{
+"url": "api.github.comHTTPS://\u007f#%C3%A9",
+"parts": [
+"api.github.comhttps",
+"\u007f",
+"",
+"",
+"%C3%A9"
+],
+"hostname": "\u007f",
+"username": null,
+"password": null,
+"unsplit": "api.github.comhttps://\u007f#%C3%A9",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/%%C3%A9https://-setup.exe..",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/%%C3%A9https://-setup.exe..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/%%C3%A9https://-setup.exe..",
+"port": null
+},
+{
+"url": "..?v0.4.2/https://",
+"parts": [
+"",
+"",
+"..",
+"v0.4.2/https://",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..?v0.4.2/https://",
+"port": null
+},
+{
+"url": "[/[.]%2F\u00e9",
+"parts": [
+"",
+"",
+"[/[.]%2F\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[/[.]%2F\u00e9",
+"port": null
+},
+{
+"url": "https:pneuma-io/sylvia-gm/releases/download/%zz#/",
+"parts": [
+"https",
+"",
+"pneuma-io/sylvia-gm/releases/download/%zz",
+"",
+"/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:pneuma-io/sylvia-gm/releases/download/%zz#/",
+"port": null
+},
+{
+"url": "?\u007f-setup.exe\u00e9%2f",
+"parts": [
+"",
+"",
+"",
+"\u007f-setup.exe\u00e9%2f",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?\u007f-setup.exe\u00e9%2f",
+"port": null
+},
+{
+"url": "-setup.exegithub.comgithub.com\u007f:",
+"parts": [
+"",
+"",
+"-setup.exegithub.comgithub.com\u007f:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exegithub.comgithub.com\u007f:",
+"port": null
+},
+{
+"url": "HTTPS://::1a:",
+"parts": [
+"https",
+"::1a:",
+"",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https://::1a:",
+"port_error": "Port could not be cast to integer value as ':1a:'"
+},
+{
+"url": "#%ff\\\u00e9/%C3%A9\\",
+"parts": [
+"",
+"",
+"",
+"",
+"%ff\\\u00e9/%C3%A9\\"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#%ff\\\u00e9/%C3%A9\\",
+"port": null
+},
+{
+"url": "/https::http://1.2.3.4http://[",
+"parts": [
+"",
+"",
+"/https::http://1.2.3.4http://[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/https::http://1.2.3.4http://[",
+"port": null
+},
+{
+"url": "\t%ff1.2.3.4\\%2F%#\u007fpneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"%ff1.2.3.4\\%2F%",
+"",
+"\u007fpneuma-io/sylvia-gm/releases/download/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ff1.2.3.4\\%2F%#\u007fpneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/]:443aapi.github.com.pneuma-io/sylvia-gm/releases/download/https:%2f",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/]:443aapi.github.com.pneuma-io/sylvia-gm/releases/download/https:%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/]:443aapi.github.com.pneuma-io/sylvia-gm/releases/download/https:%2f",
+"port": null
+},
+{
+"url": "fe80::1%25eth0#%C3%A9..[%2Fx-portable.zip",
+"parts": [
+"fe80",
+"",
+":1%25eth0",
+"",
+"%C3%A9..[%2Fx-portable.zip"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0#%C3%A9..[%2Fx-portable.zip",
+"port": null
+},
+{
+"url": "?..pneuma-io/sylvia-gm/releases/download/[/..",
+"parts": [
+"",
+"",
+"",
+"..pneuma-io/sylvia-gm/releases/download/[/..",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?..pneuma-io/sylvia-gm/releases/download/[/..",
+"port": null
+},
+{
+"url": ":1.2.3.4%2f-setup.exea:",
+"parts": [
+"",
+"",
+":1.2.3.4%2f-setup.exea:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":1.2.3.4%2f-setup.exea:",
+"port": null
+},
+{
+"url": "a[",
+"parts": [
+"",
+"",
+"a[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a[",
+"port": null
+},
+{
+"url": "1.2.3.4:443]\\\u007f?\u2100%2f-setup.exe",
+"parts": [
+"",
+"",
+"1.2.3.4:443]\\\u007f",
+"\u2100%2f-setup.exe",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4:443]\\\u007f?\u2100%2f-setup.exe",
+"port": null
+},
+{
+"url": "https:pneuma-io/sylvia-gm/releases/download/%zzhttps://%ff\u00e9",
+"parts": [
+"https",
+"",
+"pneuma-io/sylvia-gm/releases/download/%zzhttps://%ff\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:pneuma-io/sylvia-gm/releases/download/%zzhttps://%ff\u00e9",
+"port": null
+},
+{
+"url": ".1.2.3.4\uff0f",
+"parts": [
+"",
+"",
+".1.2.3.4\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".1.2.3.4\uff0f",
+"port": null
+},
+{
+"url": "\u2100%\u2100",
+"parts": [
+"",
+"",
+"\u2100%\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100%\u2100",
+"port": null
+},
+{
+"url": "%2F:443HTTPS://HTTPS://:https:.v1.x",
+"parts": [
+"",
+"",
+"%2F:443HTTPS://HTTPS://:https:.v1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F:443HTTPS://HTTPS://:https:.v1.x",
+"port": null
+},
+{
+"url": "?HTTPS://#..//",
+"parts": [
+"",
+"",
+"",
+"HTTPS://",
+"..//"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?HTTPS://#..//",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/[pneuma-io/sylvia-gm/releases/download/.%C3%A9v0.4.2///",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/[pneuma-io/sylvia-gm/releases/download/.%C3%A9v0.4.2///",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/[pneuma-io/sylvia-gm/releases/download/.%C3%A9v0.4.2///",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/https:github.com:4431.2.3.4%2F",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/https:github.com:4431.2.3.4%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/https:github.com:4431.2.3.4%2F",
+"port": null
+},
+{
+"url": "%1.2.3.4\uff0fav1.xHTTPS://",
+"parts": [
+"",
+"",
+"%1.2.3.4\uff0fav1.xHTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%1.2.3.4\uff0fav1.xHTTPS://",
+"port": null
+},
+{
+"url": "//\u007f%C3%A9v0.4.2/a",
+"parts": [
+"",
+"\u007f%C3%A9v0.4.2",
+"/a",
+"",
+""
+],
+"hostname": "\u007f%C3%A9v0.4.2",
+"username": null,
+"password": null,
+"unsplit": "//\u007f%C3%A9v0.4.2/a",
+"port": null
+},
+{
+"url": "v0.4.2//%2f..%2Fhttp://",
+"parts": [
+"",
+"",
+"v0.4.2//%2f..%2Fhttp://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2//%2f..%2Fhttp://",
+"port": null
+},
+{
+"url": "http://[.fe80::1%25eth0].%ff",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "\\fe80::1%25eth0 /\\github.com\\",
+"parts": [
+"",
+"",
+"\\fe80::1%25eth0 /\\github.com\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\fe80::1%25eth0 /\\github.com\\",
+"port": null
+},
+{
+"url": "https:::1:443%C3%A9\uff0f",
+"parts": [
+"https",
+"",
+"::1:443%C3%A9\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:::1:443%C3%A9\uff0f",
+"port": null
+},
+{
+"url": "%zz%zz%ff?/",
+"parts": [
+"",
+"",
+"%zz%zz%ff",
+"/",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz%zz%ff?/",
+"port": null
+},
+{
+"url": "\u00e9\u2100pneuma-io/sylvia-gm/releases/download//..",
+"parts": [
+"",
+"",
+"\u00e9\u2100pneuma-io/sylvia-gm/releases/download//..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9\u2100pneuma-io/sylvia-gm/releases/download//..",
+"port": null
+},
+{
+"url": "av1.x%%ffpneuma-io/sylvia-gm/releases/download/x-portable.zip\uff0f",
+"parts": [
+"",
+"",
+"av1.x%%ffpneuma-io/sylvia-gm/releases/download/x-portable.zip\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "av1.x%%ffpneuma-io/sylvia-gm/releases/download/x-portable.zip\uff0f",
+"port": null
+},
+{
+"url": " api.github.com-setup.exe%2f%ffapi.github.com]\u2100https://",
+"parts": [
+"",
+"",
+"api.github.com-setup.exe%2f%ffapi.github.com]\u2100https://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com-setup.exe%2f%ffapi.github.com]\u2100https://",
+"port": null
+},
+{
+"url": "%https:// %fffe80::1%25eth0v1.x]",
+"parts": [
+"",
+"",
+"%https:// %fffe80::1%25eth0v1.x]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%https:// %fffe80::1%25eth0v1.x]",
+"port": null
+},
+{
+"url": "..\t",
+"parts": [
+"",
+"",
+"..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..",
+"port": null
+},
+{
+"url": "HTTPS://\u2100[",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "//[https:\u00e9",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "..[#\\\u007f",
+"parts": [
+"",
+"",
+"..[",
+"",
+"\\\u007f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..[#\\\u007f",
+"port": null
+},
+{
+"url": "#]https://..github.com]%zz%ff",
+"parts": [
+"",
+"",
+"",
+"",
+"]https://..github.com]%zz%ff"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#]https://..github.com]%zz%ff",
+"port": null
+},
+{
+"url": "fe80::1%25eth0x-portable.zip",
+"parts": [
+"fe80",
+"",
+":1%25eth0x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0x-portable.zip",
+"port": null
+},
+{
+"url": "\t\u00e9pneuma-io/sylvia-gm/releases/download/\t:HTTPS://github.comhttps:////",
+"parts": [
+"",
+"",
+"\u00e9pneuma-io/sylvia-gm/releases/download/:HTTPS://github.comhttps:////",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9pneuma-io/sylvia-gm/releases/download/:HTTPS://github.comhttps:////",
+"port": null
+},
+{
+"url": "x-portable.zip%ff?\u2100v0.4.2/v0.4.2//-setup.exe",
+"parts": [
+"",
+"",
+"x-portable.zip%ff",
+"\u2100v0.4.2/v0.4.2//-setup.exe",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip%ff?\u2100v0.4.2/v0.4.2//-setup.exe",
+"port": null
+},
+{
+"url": "\u2100[//",
+"parts": [
+"",
+"",
+"\u2100[//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100[//",
+"port": null
+},
+{
+"url": "\thttp://api.github.comv1.x%zz",
+"parts": [
+"http",
+"api.github.comv1.x%zz",
+"",
+"",
+""
+],
+"hostname": "api.github.comv1.x%zz",
+"username": null,
+"password": null,
+"unsplit": "http://api.github.comv1.x%zz",
+"port": null
+},
+{
+"url": "github.com[#",
+"parts": [
+"",
+"",
+"github.com[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com[",
+"port": null
+},
+{
+"url": "1.2.3.4\\/v0.4.2/%2f\u2100github.com%github.com",
+"parts": [
+"",
+"",
+"1.2.3.4\\/v0.4.2/%2f\u2100github.com%github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4\\/v0.4.2/%2f\u2100github.com%github.com",
+"port": null
+},
+{
+"url": "::1%ff]pneuma-io/sylvia-gm/releases/download/a/% ",
+"parts": [
+"",
+"",
+"::1%ff]pneuma-io/sylvia-gm/releases/download/a/% ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1%ff]pneuma-io/sylvia-gm/releases/download/a/% ",
+"port": null
+},
+{
+"url": "\tgithub.com..api.github.comhttps://",
+"parts": [
+"github.com..api.github.comhttps",
+"",
+"",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com..api.github.comhttps:",
+"port": null
+},
+{
+"url": "v0.4.2/\uff0f%C3%A9v0.4.2/pneuma-io/sylvia-gm/releases/download/\t%2F",
+"parts": [
+"",
+"",
+"v0.4.2/\uff0f%C3%A9v0.4.2/pneuma-io/sylvia-gm/releases/download/%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/\uff0f%C3%A9v0.4.2/pneuma-io/sylvia-gm/releases/download/%2F",
+"port": null
+},
+{
+"url": "api.github.comv1.x]v0.4.2/v0.4.2/",
+"parts": [
+"",
+"",
+"api.github.comv1.x]v0.4.2/v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.comv1.x]v0.4.2/v0.4.2/",
+"port": null
+},
+{
+"url": "%2F-setup.exefe80::1%25eth0..",
+"parts": [
+"",
+"",
+"%2F-setup.exefe80::1%25eth0..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F-setup.exefe80::1%25eth0..",
+"port": null
+},
+{
+"url": "1.2.3.4https:%C3%A9# %2f..x-portable.zip",
+"parts": [
+"",
+"",
+"1.2.3.4https:%C3%A9",
+"",
+" %2f..x-portable.zip"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4https:%C3%A9# %2f..x-portable.zip",
+"port": null
+},
+{
+"url": "https://HTTPS://github.com",
+"parts": [
+"https",
+"HTTPS:",
+"//github.com",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "https://HTTPS://github.com",
+"port": null
+},
+{
+"url": "#////api.github.com\u00e9pneuma-io/sylvia-gm/releases/download/-setup.exe%ff\u00e9",
+"parts": [
+"",
+"",
+"",
+"",
+"////api.github.com\u00e9pneuma-io/sylvia-gm/releases/download/-setup.exe%ff\u00e9"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#////api.github.com\u00e9pneuma-io/sylvia-gm/releases/download/-setup.exe%ff\u00e9",
+"port": null
+},
+{
+"url": "github.com%C3%A9\\",
+"parts": [
+"",
+"",
+"github.com%C3%A9\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com%C3%A9\\",
+"port": null
+},
+{
+"url": "%C3%A9HTTPS://api.github.compneuma-io/sylvia-gm/releases/download/%C3%A9",
+"parts": [
+"",
+"",
+"%C3%A9HTTPS://api.github.compneuma-io/sylvia-gm/releases/download/%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9HTTPS://api.github.compneuma-io/sylvia-gm/releases/download/%C3%A9",
+"port": null
+},
+{
+"url": "https://[\u007fhttps:v1.x",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": ":443::1.",
+"parts": [
+"",
+"",
+":443::1.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443::1.",
+"port": null
+},
+{
+"url": "%ff ?fe80::1%25eth0%C3%A9",
+"parts": [
+"",
+"",
+"%ff ",
+"fe80::1%25eth0%C3%A9",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ff ?fe80::1%25eth0%C3%A9",
+"port": null
+},
+{
+"url": "%2F%ff\u2100",
+"parts": [
+"",
+"",
+"%2F%ff\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F%ff\u2100",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/HTTPS://pneuma-io/sylvia-gm/releases/download/%",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/HTTPS://pneuma-io/sylvia-gm/releases/download/%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/HTTPS://pneuma-io/sylvia-gm/releases/download/%",
+"port": null
+},
+{
+"url": "\t:443\uff0f:443v1.xv0.4.2/%2fv1.x ",
+"parts": [
+"",
+"",
+":443\uff0f:443v1.xv0.4.2/%2fv1.x ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443\uff0f:443v1.xv0.4.2/%2fv1.x ",
+"port": null
+},
+{
+"url": ":443https://pneuma-io/sylvia-gm/releases/download/#v0.4.2/\u2100",
+"parts": [
+"",
+"",
+":443https://pneuma-io/sylvia-gm/releases/download/",
+"",
+"v0.4.2/\u2100"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443https://pneuma-io/sylvia-gm/releases/download/#v0.4.2/\u2100",
+"port": null
+},
+{
+"url": "\t\u007f%ffx-portable.zip:443%zz:",
+"parts": [
+"",
+"",
+"\u007f%ffx-portable.zip:443%zz:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f%ffx-portable.zip:443%zz:",
+"port": null
+},
+{
+"url": "HTTPS:///]github.comapi.github.com\\@x-portable.zip",
+"parts": [
+"https",
+"",
+"/]github.comapi.github.com\\@x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:///]github.comapi.github.com\\@x-portable.zip",
+"port": null
+},
+{
+"url": "x-portable.zip]",
+"parts": [
+"",
+"",
+"x-portable.zip]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip]",
+"port": null
+},
+{
+"url": ".",
+"parts": [
+"",
+"",
+".",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/%HTTPS://%2F",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/%HTTPS://%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/%HTTPS://%2F",
+"port": null
+},
+{
+"url": "%2fHTTPS://https://:443",
+"parts": [
+"",
+"",
+"%2fHTTPS://https://:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fHTTPS://https://:443",
+"port": null
+},
+{
+"url": "\uff0f::1-setup.exepneuma-io/sylvia-gm/releases/download/%\u2100\\@:",
+"parts": [
+"",
+"",
+"\uff0f::1-setup.exepneuma-io/sylvia-gm/releases/download/%\u2100\\@:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f::1-setup.exepneuma-io/sylvia-gm/releases/download/%\u2100\\@:",
+"port": null
+},
+{
+"url": "]api.github.comx-portable.zip\t\u00e9fe80::1%25eth0",
+"parts": [
+"",
+"",
+"]api.github.comx-portable.zip\u00e9fe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]api.github.comx-portable.zip\u00e9fe80::1%25eth0",
+"port": null
+},
+{
+"url": "-setup.exe",
+"parts": [
+"",
+"",
+"-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe",
+"port": null
+},
+{
+"url": "\u00e9\u007fapi.github.com\u007fpneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"\u00e9\u007fapi.github.com\u007fpneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9\u007fapi.github.com\u007fpneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "\u2100pneuma-io/sylvia-gm/releases/download/v0.4.2/github.com%2F/\\\uff0f",
+"parts": [
+"",
+"",
+"\u2100pneuma-io/sylvia-gm/releases/download/v0.4.2/github.com%2F/\\\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100pneuma-io/sylvia-gm/releases/download/v0.4.2/github.com%2F/\\\uff0f",
+"port": null
+},
+{
+"url": "\uff0f]]// #%2f@\u2100",
+"parts": [
+"",
+"",
+"\uff0f]]// ",
+"",
+"%2f@\u2100"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f]]// #%2f@\u2100",
+"port": null
+},
+{
+"url": "::1[https://::1\u007f]\u2100https://",
+"parts": [
+"",
+"",
+"::1[https://::1\u007f]\u2100https://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1[https://::1\u007f]\u2100https://",
+"port": null
+},
+{
+"url": "https:?http://",
+"parts": [
+"https",
+"",
+"",
+"http://",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https://?http://",
+"port": null
+},
+{
+"url": " \u2100/HTTPS:////",
+"parts": [
+"",
+"",
+"\u2100/HTTPS:////",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100/HTTPS:////",
+"port": null
+},
+{
+"url": "#pneuma-io/sylvia-gm/releases/download/HTTPS://] https://%zz\t",
+"parts": [
+"",
+"",
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/HTTPS://] https://%zz"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#pneuma-io/sylvia-gm/releases/download/HTTPS://] https://%zz",
+"port": null
+},
+{
+"url": ":443\\HTTPS://",
+"parts": [
+"",
+"",
+":443\\HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443\\HTTPS://",
+"port": null
+},
+{
+"url": "%C3%A9fe80::1%25eth0https:a%%2F#",
+"parts": [
+"",
+"",
+"%C3%A9fe80::1%25eth0https:a%%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9fe80::1%25eth0https:a%%2F",
+"port": null
+},
+{
+"url": "%2fx-portable.zipv0.4.2/.",
+"parts": [
+"",
+"",
+"%2fx-portable.zipv0.4.2/.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fx-portable.zipv0.4.2/.",
+"port": null
+},
+{
+"url": "http://HTTPS://@\t api.github.com-setup.exe",
+"parts": [
+"http",
+"HTTPS:",
+"//@ api.github.com-setup.exe",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "http://HTTPS://@ api.github.com-setup.exe",
+"port": null
+},
+{
+"url": "#.1.2.3.4https://%",
+"parts": [
+"",
+"",
+"",
+"",
+".1.2.3.4https://%"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#.1.2.3.4https://%",
+"port": null
+},
+{
+"url": "-setup.exe\u2100\uff0f..#github.comahttps://",
+"parts": [
+"",
+"",
+"-setup.exe\u2100\uff0f..",
+"",
+"github.comahttps://"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe\u2100\uff0f..#github.comahttps://",
+"port": null
+},
+{
+"url": ":1.2.3.4:443%zz@github.com\u2100%zz",
+"parts": [
+"",
+"",
+":1.2.3.4:443%zz@github.com\u2100%zz",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":1.2.3.4:443%zz@github.com\u2100%zz",
+"port": null
+},
+{
+"url": "::1\uff0fhttps:v1.x",
+"parts": [
+"",
+"",
+"::1\uff0fhttps:v1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1\uff0fhttps:v1.x",
+"port": null
+},
+{
+"url": "fe80::1%25eth0[%ff",
+"parts": [
+"fe80",
+"",
+":1%25eth0[%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0[%ff",
+"port": null
+},
+{
+"url": "api.github.comgithub.com//",
+"parts": [
+"",
+"",
+"api.github.comgithub.com//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.comgithub.com//",
+"port": null
+},
+{
+"url": "v1.x%C3%A9\u2100\t%//-setup.exe\u00e9",
+"parts": [
+"",
+"",
+"v1.x%C3%A9\u2100%//-setup.exe\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x%C3%A9\u2100%//-setup.exe\u00e9",
+"port": null
+},
+{
+"url": "%zz\u2100.",
+"parts": [
+"",
+"",
+"%zz\u2100.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz\u2100.",
+"port": null
+},
+{
+"url": "%%::1http://::1v0.4.2/%:443\\",
+"parts": [
+"",
+"",
+"%%::1http://::1v0.4.2/%:443\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%%::1http://::1v0.4.2/%:443\\",
+"port": null
+},
+{
+"url": "%zzhttp://HTTPS://1.2.3.4...x-portable.zip ]",
+"parts": [
+"",
+"",
+"%zzhttp://HTTPS://1.2.3.4...x-portable.zip ]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zzhttp://HTTPS://1.2.3.4...x-portable.zip ]",
+"port": null
+},
+{
+"url": "::1:%2Fgithub.com::1%C3%A9\t",
+"parts": [
+"",
+"",
+"::1:%2Fgithub.com::1%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1:%2Fgithub.com::1%C3%A9",
+"port": null
+},
+{
+"url": "v0.4.2/https://x-portable.zip\\:443//http://::1[",
+"parts": [
+"",
+"",
+"v0.4.2/https://x-portable.zip\\:443//http://::1[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/https://x-portable.zip\\:443//http://::1[",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/github.comv1.x?\t..http://a",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/github.comv1.x",
+"..http://a",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/github.comv1.x?..http://a",
+"port": null
+},
+{
+"url": "\u2100v1.x1.2.3.4:443\u00e9HTTPS://",
+"parts": [
+"",
+"",
+"\u2100v1.x1.2.3.4:443\u00e9HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100v1.x1.2.3.4:443\u00e9HTTPS://",
+"port": null
+},
+{
+"url": "\\github.com]%[.http://",
+"parts": [
+"",
+"",
+"\\github.com]%[.http://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\github.com]%[.http://",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "\u2100\t\\%2fhttps://%2fgithub.com",
+"parts": [
+"",
+"",
+"\u2100\\%2fhttps://%2fgithub.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100\\%2fhttps://%2fgithub.com",
+"port": null
+},
+{
+"url": "v0.4.2/.%zz%..%2f\t%github.com",
+"parts": [
+"",
+"",
+"v0.4.2/.%zz%..%2f%github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/.%zz%..%2f%github.com",
+"port": null
+},
+{
+"url": "-setup.exe\uff0fa:::1",
+"parts": [
+"",
+"",
+"-setup.exe\uff0fa:::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe\uff0fa:::1",
+"port": null
+},
+{
+"url": ":443\u007f",
+"parts": [
+"",
+"",
+":443\u007f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443\u007f",
+"port": null
+},
+{
+"url": "::1api.github.comapi.github.com%ffv0.4.2/fe80::1%25eth0:443-setup.exe-setup.exe",
+"parts": [
+"",
+"",
+"::1api.github.comapi.github.com%ffv0.4.2/fe80::1%25eth0:443-setup.exe-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1api.github.comapi.github.com%ffv0.4.2/fe80::1%25eth0:443-setup.exe-setup.exe",
+"port": null
+},
+{
+"url": "#https:%%zzfe80::1%25eth0 ",
+"parts": [
+"",
+"",
+"",
+"",
+"https:%%zzfe80::1%25eth0 "
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#https:%%zzfe80::1%25eth0 ",
+"port": null
+},
+{
+"url": "@github.com\\api.github.com%2Fgithub.com%2F",
+"parts": [
+"",
+"",
+"@github.com\\api.github.com%2Fgithub.com%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@github.com\\api.github.com%2Fgithub.com%2F",
+"port": null
+},
+{
+"url": "fe80::1%25eth0%ff%zz",
+"parts": [
+"fe80",
+"",
+":1%25eth0%ff%zz",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0%ff%zz",
+"port": null
+},
+{
+"url": ":@.",
+"parts": [
+"",
+"",
+":@.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":@.",
+"port": null
+},
+{
+"url": "//\u007f]::1\t:443\u2100a",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "%C3%A9]",
+"parts": [
+"",
+"",
+"%C3%A9]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9]",
+"port": null
+},
+{
+"url": "https:]\u007f\tv1.x..?",
+"parts": [
+"https",
+"",
+"]\u007fv1.x..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:]\u007fv1.x..",
+"port": null
+},
+{
+"url": ":[%C3%A9HTTPS://x-portable.zip@",
+"parts": [
+"",
+"",
+":[%C3%A9HTTPS://x-portable.zip@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":[%C3%A9HTTPS://x-portable.zip@",
+"port": null
+},
+{
+"url": " fe80::1%25eth0%2fhttp://github.com\u2100%v0.4.2/https://",
+"parts": [
+"fe80",
+"",
+":1%25eth0%2fhttp://github.com\u2100%v0.4.2/https://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0%2fhttp://github.com\u2100%v0.4.2/https://",
+"port": null
+},
+{
+"url": "/http://https:",
+"parts": [
+"",
+"",
+"/http://https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/http://https:",
+"port": null
+},
+{
+"url": "\u2100fe80::1%25eth0",
+"parts": [
+"",
+"",
+"\u2100fe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100fe80::1%25eth0",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/\t",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "\u2100%x-portable.zip\\https:",
+"parts": [
+"",
+"",
+"\u2100%x-portable.zip\\https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100%x-portable.zip\\https:",
+"port": null
+},
+{
+"url": " %2fv1.x",
+"parts": [
+"",
+"",
+"%2fv1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fv1.x",
+"port": null
+},
+{
+"url": "\u007f1.2.3.4%2f::1::1api.github.com//..%C3%A9",
+"parts": [
+"",
+"",
+"\u007f1.2.3.4%2f::1::1api.github.com//..%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f1.2.3.4%2f::1::1api.github.com//..%C3%A9",
+"port": null
+},
+{
+"url": "-setup.exe%2f%zz1.2.3.4\\%https:",
+"parts": [
+"",
+"",
+"-setup.exe%2f%zz1.2.3.4\\%https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe%2f%zz1.2.3.4\\%https:",
+"port": null
+},
+{
+"url": "%C3%A9x-portable.zipapi.github.com",
+"parts": [
+"",
+"",
+"%C3%A9x-portable.zipapi.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9x-portable.zipapi.github.com",
+"port": null
+},
+{
+"url": "http://a\u2100%\tx-portable.zip.pneuma-io/sylvia-gm/releases/download/@",
+"error": "netloc 'a\u2100%x-portable.zip.pneuma-io' contains invalid characters under NFKC normalization"
+},
+{
+"url": "%zz..?::1 1.2.3.4-setup.exev1.x",
+"parts": [
+"",
+"",
+"%zz..",
+"::1 1.2.3.4-setup.exev1.x",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz..?::1 1.2.3.4-setup.exev1.x",
+"port": null
+},
+{
+"url": "-setup.exex-portable.zip",
+"parts": [
+"",
+"",
+"-setup.exex-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exex-portable.zip",
+"port": null
+},
+{
+"url": " api.github.com-setup.exev0.4.2/%zz#",
+"parts": [
+"",
+"",
+"api.github.com-setup.exev0.4.2/%zz",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com-setup.exev0.4.2/%zz",
+"port": null
+},
+{
+"url": "/%-setup.exe%ffhttps://",
+"parts": [
+"",
+"",
+"/%-setup.exe%ffhttps://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/%-setup.exe%ffhttps://",
+"port": null
+},
+{
+"url": "@?https::443::1#",
+"parts": [
+"",
+"",
+"@",
+"https::443::1",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@?https::443::1",
+"port": null
+},
+{
+"url": "//",
+"parts": [
+"",
+"",
+"",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "",
+"port": null
+},
+{
+"url": "[https://\thttps:[%C3%A9@",
+"parts": [
+"",
+"",
+"[https://https:[%C3%A9@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[https://https:[%C3%A9@",
+"port": null
+},
+{
+"url": "1.2.3.4]/github.com//#\u2100%2f",
+"parts": [
+"",
+"",
+"1.2.3.4]/github.com//",
+"",
+"\u2100%2f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4]/github.com//#\u2100%2f",
+"port": null
+},
+{
+"url": "\u007f:443\\.@%ff?api.github.com",
+"parts": [
+"",
+"",
+"\u007f:443\\.@%ff",
+"api.github.com",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f:443\\.@%ff?api.github.com",
+"port": null
+},
+{
+"url": "%?\u2100//::1\u007f",
+"parts": [
+"",
+"",
+"%",
+"\u2100//::1\u007f",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%?\u2100//::1\u007f",
+"port": null
+},
+{
+"url": "v1.x/:443v0.4.2/",
+"parts": [
+"",
+"",
+"v1.x/:443v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x/:443v0.4.2/",
+"port": null
+},
+{
+"url": "//api.github.com\t@%2fgithub.com%zz\t",
+"parts": [
+"",
+"api.github.com@%2fgithub.com%zz",
+"",
+"",
+""
+],
+"hostname": "%2fgithub.com%zz",
+"username": "api.github.com",
+"password": null,
+"unsplit": "//api.github.com@%2fgithub.com%zz",
+"port": null
+},
+{
+"url": "fe80::1%25eth0.\\afe80::1%25eth0::1::1",
+"parts": [
+"fe80",
+"",
+":1%25eth0.\\afe80::1%25eth0::1::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0.\\afe80::1%25eth0::1::1",
+"port": null
+},
+{
+"url": "\uff0fa%https:?",
+"parts": [
+"",
+"",
+"\uff0fa%https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0fa%https:",
+"port": null
+},
+{
+"url": "1.2.3.4http://..\uff0f#",
+"parts": [
+"",
+"",
+"1.2.3.4http://..\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4http://..\uff0f",
+"port": null
+},
+{
+"url": ":v1.x?fe80::1%25eth0\u2100..]\\[",
+"parts": [
+"",
+"",
+":v1.x",
+"fe80::1%25eth0\u2100..]\\[",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":v1.x?fe80::1%25eth0\u2100..]\\[",
+"port": null
+},
+{
+"url": "\u00e9\tgithub.compneuma-io/sylvia-gm/releases/download/%2F]%2f",
+"parts": [
+"",
+"",
+"\u00e9github.compneuma-io/sylvia-gm/releases/download/%2F]%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9github.compneuma-io/sylvia-gm/releases/download/%2F]%2f",
+"port": null
+},
+{
+"url": "//\u007f1.2.3.4%v0.4.2/.%2fhttp://",
+"parts": [
+"",
+"\u007f1.2.3.4%v0.4.2",
+"/.%2fhttp://",
+"",
+""
+],
+"hostname": "\u007f1.2.3.4%v0.4.2",
+"username": null,
+"password": null,
+"unsplit": "//\u007f1.2.3.4%v0.4.2/.%2fhttp://",
+"port": null
+},
+{
+"url": "a-setup.exe//%2F",
+"parts": [
+"",
+"",
+"a-setup.exe//%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a-setup.exe//%2F",
+"port": null
+},
+{
+"url": "http://HTTPS://%C3%A9\u2100%2Ffe80::1%25eth0]1.2.3.4//",
+"parts": [
+"http",
+"HTTPS:",
+"//%C3%A9\u2100%2Ffe80::1%25eth0]1.2.3.4//",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "http://HTTPS://%C3%A9\u2100%2Ffe80::1%25eth0]1.2.3.4//",
+"port": null
+},
+{
+"url": "%2f%ff",
+"parts": [
+"",
+"",
+"%2f%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f%ff",
+"port": null
+},
+{
+"url": "%ffhttps:@%",
+"parts": [
+"",
+"",
+"%ffhttps:@%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ffhttps:@%",
+"port": null
+},
+{
+"url": "..\t",
+"parts": [
+"",
+"",
+"..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..",
+"port": null
+},
+{
+"url": ":443%\\/%2Fpneuma-io/sylvia-gm/releases/download/pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+":443%\\/%2Fpneuma-io/sylvia-gm/releases/download/pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443%\\/%2Fpneuma-io/sylvia-gm/releases/download/pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "%2fhttps:?a\u007f%2f%zz\uff0fhttp://",
+"parts": [
+"",
+"",
+"%2fhttps:",
+"a\u007f%2f%zz\uff0fhttp://",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fhttps:?a\u007f%2f%zz\uff0fhttp://",
+"port": null
+},
+{
+"url": "HTTPS://@.x-portable.zip\u2100\u2100-setup.exe",
+"error": "netloc '@.x-portable.zip\u2100\u2100-setup.exe' contains invalid characters under NFKC normalization"
+},
+{
+"url": "?//\u2100\u2100",
+"parts": [
+"",
+"",
+"",
+"//\u2100\u2100",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?//\u2100\u2100",
+"port": null
+},
+{
+"url": "a/1.2.3.4pneuma-io/sylvia-gm/releases/download/\\.\u2100\\x-portable.zip",
+"parts": [
+"",
+"",
+"a/1.2.3.4pneuma-io/sylvia-gm/releases/download/\\.\u2100\\x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a/1.2.3.4pneuma-io/sylvia-gm/releases/download/\\.\u2100\\x-portable.zip",
+"port": null
+},
+{
+"url": "?]",
+"parts": [
+"",
+"",
+"",
+"]",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?]",
+"port": null
+},
+{
+"url": "::11.2.3.4  :443%2F%2F x-portable.zip",
+"parts": [
+"",
+"",
+"::11.2.3.4  :443%2F%2F x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::11.2.3.4  :443%2F%2F x-portable.zip",
+"port": null
+},
+{
+"url": "a\u00e9",
+"parts": [
+"",
+"",
+"a\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a\u00e9",
+"port": null
+},
+{
+"url": "[::1..",
+"parts": [
+"",
+"",
+"[::1..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[::1..",
+"port": null
+},
+{
+"url": "HTTPS://api.github.com\u007f.\u007fapi.github.com:443\u00e9",
+"parts": [
+"https",
+"api.github.com\u007f.\u007fapi.github.com:443\u00e9",
+"",
+"",
+""
+],
+"hostname": "api.github.com\u007f.\u007fapi.github.com",
+"username": null,
+"password": null,
+"unsplit": "https://api.github.com\u007f.\u007fapi.github.com:443\u00e9",
+"port_error": "Port could not be cast to integer value as '443\u00e9'"
+},
+{
+"url": "%ffx-portable.zipapi.github.com",
+"parts": [
+"",
+"",
+"%ffx-portable.zipapi.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ffx-portable.zipapi.github.com",
+"port": null
+},
+{
+"url": "%ffv0.4.2/::1:https://-setup.exe#HTTPS://-setup.exe",
+"parts": [
+"",
+"",
+"%ffv0.4.2/::1:https://-setup.exe",
+"",
+"HTTPS://-setup.exe"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ffv0.4.2/::1:https://-setup.exe#HTTPS://-setup.exe",
+"port": null
+},
+{
+"url": "..github.com\thttp://api.github.com..:x-portable.zip%2f",
+"parts": [
+"",
+"",
+"..github.comhttp://api.github.com..:x-portable.zip%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..github.comhttp://api.github.com..:x-portable.zip%2f",
+"port": null
+},
+{
+"url": "%C3%A9:443] %zz%2f@",
+"parts": [
+"",
+"",
+"%C3%A9:443] %zz%2f@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9:443] %zz%2f@",
+"port": null
+},
+{
+"url": "\u00e9 \u007f//\uff0f/api.github.com#",
+"parts": [
+"",
+"",
+"\u00e9 \u007f//\uff0f/api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9 \u007f//\uff0f/api.github.com",
+"port": null
+},
+{
+"url": "%2Fv1.xhttp://a/",
+"parts": [
+"",
+"",
+"%2Fv1.xhttp://a/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2Fv1.xhttp://a/",
+"port": null
+},
+{
+"url": "%\u2100x-portable.zip.pneuma-io/sylvia-gm/releases/download/[github.com/",
+"parts": [
+"",
+"",
+"%\u2100x-portable.zip.pneuma-io/sylvia-gm/releases/download/[github.com/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%\u2100x-portable.zip.pneuma-io/sylvia-gm/releases/download/[github.com/",
+"port": null
+},
+{
+"url": ":.@github.com",
+"parts": [
+"",
+"",
+":.@github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":.@github.com",
+"port": null
+},
+{
+"url": "fe80::1%25eth0%zz%2fx-portable.zip:",
+"parts": [
+"fe80",
+"",
+":1%25eth0%zz%2fx-portable.zip:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0%zz%2fx-portable.zip:",
+"port": null
+},
+{
+"url": "%2f#fe80::1%25eth0v0.4.2/ \u007f",
+"parts": [
+"",
+"",
+"%2f",
+"",
+"fe80::1%25eth0v0.4.2/ \u007f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f#fe80::1%25eth0v0.4.2/ \u007f",
+"port": null
+},
+{
+"url": "%ff\u007f-setup.exe..#",
+"parts": [
+"",
+"",
+"%ff\u007f-setup.exe..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ff\u007f-setup.exe..",
+"port": null
+},
+{
+"url": "%2f",
+"parts": [
+"",
+"",
+"%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f",
+"port": null
+},
+{
+"url": "\u007f/1.2.3.4/x-portable.zip",
+"parts": [
+"",
+"",
+"\u007f/1.2.3.4/x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f/1.2.3.4/x-portable.zip",
+"port": null
+},
+{
+"url": "x-portable.zipx-portable.zip\u2100\u007f\uff0f//\t\t",
+"parts": [
+"",
+"",
+"x-portable.zipx-portable.zip\u2100\u007f\uff0f//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zipx-portable.zip\u2100\u007f\uff0f//",
+"port": null
+},
+{
+"url": "..pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"..pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "/#%2F[api.github.comHTTPS://",
+"parts": [
+"",
+"",
+"/",
+"",
+"%2F[api.github.comHTTPS://"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/#%2F[api.github.comHTTPS://",
+"port": null
+},
+{
+"url": "\\pneuma-io/sylvia-gm/releases/download/..",
+"parts": [
+"",
+"",
+"\\pneuma-io/sylvia-gm/releases/download/..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\pneuma-io/sylvia-gm/releases/download/..",
+"port": null
+},
+{
+"url": "\u00e9:443:443fe80::1%25eth0%2Fapi.github.com\t",
+"parts": [
+"",
+"",
+"\u00e9:443:443fe80::1%25eth0%2Fapi.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9:443:443fe80::1%25eth0%2Fapi.github.com",
+"port": null
+},
+{
+"url": "/pneuma-io/sylvia-gm/releases/download/@",
+"parts": [
+"",
+"",
+"/pneuma-io/sylvia-gm/releases/download/@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/pneuma-io/sylvia-gm/releases/download/@",
+"port": null
+},
+{
+"url": "  :\u007f\u2100%ff",
+"parts": [
+"",
+"",
+":\u007f\u2100%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":\u007f\u2100%ff",
+"port": null
+},
+{
+"url": "@#fe80::1%25eth0x-portable.zip",
+"parts": [
+"",
+"",
+"@",
+"",
+"fe80::1%25eth0x-portable.zip"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@#fe80::1%25eth0x-portable.zip",
+"port": null
+},
+{
+"url": "//1.2.3.4////\t%]\t",
+"parts": [
+"",
+"1.2.3.4",
+"////%]",
+"",
+""
+],
+"hostname": "1.2.3.4",
+"username": null,
+"password": null,
+"unsplit": "//1.2.3.4////%]",
+"port": null
+},
+{
+"url": "ahttps://",
+"parts": [
+"ahttps",
+"",
+"",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "ahttps:",
+"port": null
+},
+{
+"url": "a:\u2100@%zz.",
+"parts": [
+"a",
+"",
+"\u2100@%zz.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a:\u2100@%zz.",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/https:",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/https:",
+"port": null
+},
+{
+"url": "\\HTTPS://]%2F#:http://",
+"parts": [
+"",
+"",
+"\\HTTPS://]%2F",
+"",
+":http://"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\HTTPS://]%2F#:http://",
+"port": null
+},
+{
+"url": "%C3%A9pneuma-io/sylvia-gm/releases/download/x-portable.zip]%C3%A9%2F[",
+"parts": [
+"",
+"",
+"%C3%A9pneuma-io/sylvia-gm/releases/download/x-portable.zip]%C3%A9%2F[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9pneuma-io/sylvia-gm/releases/download/x-portable.zip]%C3%A9%2F[",
+"port": null
+},
+{
+"url": " ]\u00e9",
+"parts": [
+"",
+"",
+"]\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]\u00e9",
+"port": null
+},
+{
+"url": "a%C3%A9[pneuma-io/sylvia-gm/releases/download/::1api.github.com%zz",
+"parts": [
+"",
+"",
+"a%C3%A9[pneuma-io/sylvia-gm/releases/download/::1api.github.com%zz",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a%C3%A9[pneuma-io/sylvia-gm/releases/download/::1api.github.com%zz",
+"port": null
+},
+{
+"url": "api.github.com http://",
+"parts": [
+"",
+"",
+"api.github.com http://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com http://",
+"port": null
+},
+{
+"url": "#\u2100[1.2.3.4//HTTPS://%ffgithub.com:443",
+"parts": [
+"",
+"",
+"",
+"",
+"\u2100[1.2.3.4//HTTPS://%ffgithub.com:443"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#\u2100[1.2.3.4//HTTPS://%ffgithub.com:443",
+"port": null
+},
+{
+"url": "?::1\u007ffe80::1%25eth0%2Fhttps:v0.4.2/",
+"parts": [
+"",
+"",
+"",
+"::1\u007ffe80::1%25eth0%2Fhttps:v0.4.2/",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?::1\u007ffe80::1%25eth0%2Fhttps:v0.4.2/",
+"port": null
+},
+{
+"url": "\uff0f%2fhttps:\\pneuma-io/sylvia-gm/releases/download/pneuma-io/sylvia-gm/releases/download/\uff0fapi.github.comhttps://",
+"parts": [
+"",
+"",
+"\uff0f%2fhttps:\\pneuma-io/sylvia-gm/releases/download/pneuma-io/sylvia-gm/releases/download/\uff0fapi.github.comhttps://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f%2fhttps:\\pneuma-io/sylvia-gm/releases/download/pneuma-io/sylvia-gm/releases/download/\uff0fapi.github.comhttps://",
+"port": null
+},
+{
+"url": "\u00e9HTTPS://HTTPS://",
+"parts": [
+"",
+"",
+"\u00e9HTTPS://HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9HTTPS://HTTPS://",
+"port": null
+},
+{
+"url": "\uff0fHTTPS://\u2100@ \uff0f]@\uff0f",
+"parts": [
+"",
+"",
+"\uff0fHTTPS://\u2100@ \uff0f]@\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0fHTTPS://\u2100@ \uff0f]@\uff0f",
+"port": null
+},
+{
+"url": "HTTPS://x-portable.zip:\u007f@",
+"parts": [
+"https",
+"x-portable.zip:\u007f@",
+"",
+"",
+""
+],
+"hostname": null,
+"username": "x-portable.zip",
+"password": "\u007f",
+"unsplit": "https://x-portable.zip:\u007f@",
+"port": null
+},
+{
+"url": "-setup.exe\u00e9%C3%A9\\",
+"parts": [
+"",
+"",
+"-setup.exe\u00e9%C3%A9\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe\u00e9%C3%A9\\",
+"port": null
+},
+{
+"url": "?#v1.x1.2.3.4%2f",
+"parts": [
+"",
+"",
+"",
+"",
+"v1.x1.2.3.4%2f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#v1.x1.2.3.4%2f",
+"port": null
+},
+{
+"url": "fe80::1%25eth0https::443\t:443%2F/:\t",
+"parts": [
+"fe80",
+"",
+":1%25eth0https::443:443%2F/:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0https::443:443%2F/:",
+"port": null
+},
+{
+"url": "https://https:1.2.3.4?/.::1",
+"parts": [
+"https",
+"https:1.2.3.4",
+"",
+"/.::1",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "https://https:1.2.3.4?/.::1",
+"port_error": "Port could not be cast to integer value as '1.2.3.4'"
+},
+{
+"url": "\t:443:443%2F..:443:.::1",
+"parts": [
+"",
+"",
+":443:443%2F..:443:.::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443:443%2F..:443:.::1",
+"port": null
+},
+{
+"url": ".1.2.3.4.github.comHTTPS://",
+"parts": [
+"",
+"",
+".1.2.3.4.github.comHTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".1.2.3.4.github.comHTTPS://",
+"port": null
+},
+{
+"url": "%zz\u00e9",
+"parts": [
+"",
+"",
+"%zz\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz\u00e9",
+"port": null
+},
+{
+"url": "..[\\ ",
+"parts": [
+"",
+"",
+"..[\\ ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..[\\ ",
+"port": null
+},
+{
+"url": "1.2.3.4:v1.x%ffx-portable.zip\\",
+"parts": [
+"",
+"",
+"1.2.3.4:v1.x%ffx-portable.zip\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4:v1.x%ffx-portable.zip\\",
+"port": null
+},
+{
+"url": "v0.4.2///\u00e9",
+"parts": [
+"",
+"",
+"v0.4.2///\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2///\u00e9",
+"port": null
+},
+{
+"url": ":? \u2100-setup.exe%zz::1",
+"parts": [
+"",
+"",
+":",
+" \u2100-setup.exe%zz::1",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":? \u2100-setup.exe%zz::1",
+"port": null
+},
+{
+"url": "1.2.3.4v1.x",
+"parts": [
+"",
+"",
+"1.2.3.4v1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4v1.x",
+"port": null
+},
+{
+"url": "\u00e9\\",
+"parts": [
+"",
+"",
+"\u00e9\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9\\",
+"port": null
+},
+{
+"url": "github.com.. ",
+"parts": [
+"",
+"",
+"github.com.. ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com.. ",
+"port": null
+},
+{
+"url": "\u2100-setup.exe",
+"parts": [
+"",
+"",
+"\u2100-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100-setup.exe",
+"port": null
+},
+{
+"url": "a@%ff\uff0f",
+"parts": [
+"",
+"",
+"a@%ff\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a@%ff\uff0f",
+"port": null
+},
+{
+"url": ":443@fe80::1%25eth0https:%zz\\%2f@v0.4.2/",
+"parts": [
+"",
+"",
+":443@fe80::1%25eth0https:%zz\\%2f@v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443@fe80::1%25eth0https:%zz\\%2f@v0.4.2/",
+"port": null
+},
+{
+"url": ":1.2.3.4%pneuma-io/sylvia-gm/releases/download/]//http://%C3%A9",
+"parts": [
+"",
+"",
+":1.2.3.4%pneuma-io/sylvia-gm/releases/download/]//http://%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":1.2.3.4%pneuma-io/sylvia-gm/releases/download/]//http://%C3%A9",
+"port": null
+},
+{
+"url": "..%%2fpneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"..%%2fpneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..%%2fpneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "@\thttps://\u2100",
+"parts": [
+"",
+"",
+"@https://\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@https://\u2100",
+"port": null
+},
+{
+"url": "\uff0f//[..",
+"parts": [
+"",
+"",
+"\uff0f//[..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f//[..",
+"port": null
+},
+{
+"url": "[%C3%A9a[%2f@",
+"parts": [
+"",
+"",
+"[%C3%A9a[%2f@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[%C3%A9a[%2f@",
+"port": null
+},
+{
+"url": "v0.4.2///\u007f/",
+"parts": [
+"",
+"",
+"v0.4.2///\u007f/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2///\u007f/",
+"port": null
+},
+{
+"url": "https://..:-setup.exe//:",
+"parts": [
+"https",
+"..:-setup.exe",
+"//:",
+"",
+""
+],
+"hostname": "..",
+"username": null,
+"password": null,
+"unsplit": "https://..:-setup.exe//:",
+"port_error": "Port could not be cast to integer value as '-setup.exe'"
+},
+{
+"url": "%zz/1.2.3.4fe80::1%25eth0%\t",
+"parts": [
+"",
+"",
+"%zz/1.2.3.4fe80::1%25eth0%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz/1.2.3.4fe80::1%25eth0%",
+"port": null
+},
+{
+"url": "v0.4.2/::1-setup.exe:[%2F",
+"parts": [
+"",
+"",
+"v0.4.2/::1-setup.exe:[%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/::1-setup.exe:[%2F",
+"port": null
+},
+{
+"url": "%2fHTTPS://1.2.3.4:443fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"%2fHTTPS://1.2.3.4:443fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fHTTPS://1.2.3.4:443fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": ":443\t%ff\uff0f?",
+"parts": [
+"",
+"",
+":443%ff\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443%ff\uff0f",
+"port": null
+},
+{
+"url": "v0.4.2/@v0.4.2/..%C3%A9http://%%",
+"parts": [
+"",
+"",
+"v0.4.2/@v0.4.2/..%C3%A9http://%%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/@v0.4.2/..%C3%A9http://%%",
+"port": null
+},
+{
+"url": "%C3%A9v0.4.2/http://.https:%C3%A9",
+"parts": [
+"",
+"",
+"%C3%A9v0.4.2/http://.https:%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9v0.4.2/http://.https:%C3%A9",
+"port": null
+},
+{
+"url": "v1.xgithub.com.. /v0.4.2/",
+"parts": [
+"",
+"",
+"v1.xgithub.com.. /v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.xgithub.com.. /v0.4.2/",
+"port": null
+},
+{
+"url": "%C3%A9http://a]/api.github.com\\\u2100",
+"parts": [
+"",
+"",
+"%C3%A9http://a]/api.github.com\\\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9http://a]/api.github.com\\\u2100",
+"port": null
+},
+{
+"url": "v1.x[v1.x%ffgithub.com\t::1\u00e9",
+"parts": [
+"",
+"",
+"v1.x[v1.x%ffgithub.com::1\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x[v1.x%ffgithub.com::1\u00e9",
+"port": null
+},
+{
+"url": "%2fhttps::",
+"parts": [
+"",
+"",
+"%2fhttps::",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fhttps::",
+"port": null
+},
+{
+"url": "]pneuma-io/sylvia-gm/releases/download/https:1.2.3.4%\t-setup.exe",
+"parts": [
+"",
+"",
+"]pneuma-io/sylvia-gm/releases/download/https:1.2.3.4%-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]pneuma-io/sylvia-gm/releases/download/https:1.2.3.4%-setup.exe",
+"port": null
+},
+{
+"url": "http://pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"http",
+"pneuma-io",
+"/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": "pneuma-io",
+"username": null,
+"password": null,
+"unsplit": "http://pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "# ",
+"parts": [
+"",
+"",
+"",
+"",
+" "
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "# ",
+"port": null
+},
+{
+"url": ":%zz:\uff0f//v1.x%C3%A9",
+"parts": [
+"",
+"",
+":%zz:\uff0f//v1.x%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":%zz:\uff0f//v1.x%C3%A9",
+"port": null
+},
+{
+"url": ". \u007f\\/%zzpneuma-io/sylvia-gm/releases/download/https://.",
+"parts": [
+"",
+"",
+". \u007f\\/%zzpneuma-io/sylvia-gm/releases/download/https://.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ". \u007f\\/%zzpneuma-io/sylvia-gm/releases/download/https://.",
+"port": null
+},
+{
+"url": "\\fe80::1%25eth0",
+"parts": [
+"",
+"",
+"\\fe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\fe80::1%25eth0",
+"port": null
+},
+{
+"url": "\u2100%ff//%2F",
+"parts": [
+"",
+"",
+"\u2100%ff//%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100%ff//%2F",
+"port": null
+},
+{
+"url": "::1]",
+"parts": [
+"",
+"",
+"::1]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1]",
+"port": null
+},
+{
+"url": "%zz%2F",
+"parts": [
+"",
+"",
+"%zz%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz%2F",
+"port": null
+},
+{
+"url": "v1.x%2fx-portable.zip.\u2100?#%v1.x",
+"parts": [
+"",
+"",
+"v1.x%2fx-portable.zip.\u2100",
+"",
+"%v1.x"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x%2fx-portable.zip.\u2100#%v1.x",
+"port": null
+},
+{
+"url": "[api.github.comhttps:[fe80::1%25eth0github.com%ff:",
+"parts": [
+"",
+"",
+"[api.github.comhttps:[fe80::1%25eth0github.com%ff:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[api.github.comhttps:[fe80::1%25eth0github.com%ff:",
+"port": null
+},
+{
+"url": "..%2F1.2.3.4%2F@",
+"parts": [
+"",
+"",
+"..%2F1.2.3.4%2F@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..%2F1.2.3.4%2F@",
+"port": null
+},
+{
+"url": "-setup.exehttps://",
+"parts": [
+"",
+"",
+"-setup.exehttps://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exehttps://",
+"port": null
+},
+{
+"url": "..-setup.exe",
+"parts": [
+"",
+"",
+"..-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..-setup.exe",
+"port": null
+},
+{
+"url": "https:a\\http://http://%C3%A9v0.4.2/api.github.com",
+"parts": [
+"https",
+"",
+"a\\http://http://%C3%A9v0.4.2/api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:a\\http://http://%C3%A9v0.4.2/api.github.com",
+"port": null
+},
+{
+"url": " fe80::1%25eth0:443\u00e9",
+"parts": [
+"fe80",
+"",
+":1%25eth0:443\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0:443\u00e9",
+"port": null
+},
+{
+"url": ":..%2f\uff0f#[[",
+"parts": [
+"",
+"",
+":..%2f\uff0f",
+"",
+"[["
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":..%2f\uff0f#[[",
+"port": null
+},
+{
+"url": "v0.4.2/#%2f%ff].github.com%",
+"parts": [
+"",
+"",
+"v0.4.2/",
+"",
+"%2f%ff].github.com%"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/#%2f%ff].github.com%",
+"port": null
+},
+{
+"url": "@fe80::1%25eth0x-portable.ziphttp://:443%C3%A9%2F1.2.3.4]",
+"parts": [
+"",
+"",
+"@fe80::1%25eth0x-portable.ziphttp://:443%C3%A9%2F1.2.3.4]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@fe80::1%25eth0x-portable.ziphttp://:443%C3%A9%2F1.2.3.4]",
+"port": null
+},
+{
+"url": "https://%2F:443%HTTPS://github.com\thttps://\\",
+"parts": [
+"https",
+"%2F:443%HTTPS:",
+"//github.comhttps://\\",
+"",
+""
+],
+"hostname": "%2F",
+"username": null,
+"password": null,
+"unsplit": "https://%2F:443%HTTPS://github.comhttps://\\",
+"port_error": "Port could not be cast to integer value as '443%HTTPS:'"
+},
+{
+"url": "fe80::1%25eth0https:https:/: ",
+"parts": [
+"fe80",
+"",
+":1%25eth0https:https:/: ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0https:https:/: ",
+"port": null
+},
+{
+"url": " %2F//[%2f",
+"parts": [
+"",
+"",
+"%2F//[%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F//[%2f",
+"port": null
+},
+{
+"url": "@\uff0fhttp://",
+"parts": [
+"",
+"",
+"@\uff0fhttp://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@\uff0fhttp://",
+"port": null
+},
+{
+"url": "//\t//github.com",
+"parts": [
+"",
+"",
+"//github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "////github.com",
+"port": null
+},
+{
+"url": "#http://https:github.coma1.2.3.4github.com%C3%A9",
+"parts": [
+"",
+"",
+"",
+"",
+"http://https:github.coma1.2.3.4github.com%C3%A9"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#http://https:github.coma1.2.3.4github.com%C3%A9",
+"port": null
+},
+{
+"url": "%zz..:\\HTTPS://x-portable.zip@-setup.exe",
+"parts": [
+"",
+"",
+"%zz..:\\HTTPS://x-portable.zip@-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz..:\\HTTPS://x-portable.zip@-setup.exe",
+"port": null
+},
+{
+"url": "%C3%A9v0.4.2/github.com",
+"parts": [
+"",
+"",
+"%C3%A9v0.4.2/github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9v0.4.2/github.com",
+"port": null
+},
+{
+"url": "@/\uff0f",
+"parts": [
+"",
+"",
+"@/\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@/\uff0f",
+"port": null
+},
+{
+"url": " a%zz\u2100//@",
+"parts": [
+"",
+"",
+"a%zz\u2100//@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a%zz\u2100//@",
+"port": null
+},
+{
+"url": "?%",
+"parts": [
+"",
+"",
+"",
+"%",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?%",
+"port": null
+},
+{
+"url": "../-setup.exe%ff-setup.exe\u007f",
+"parts": [
+"",
+"",
+"../-setup.exe%ff-setup.exe\u007f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "../-setup.exe%ff-setup.exe\u007f",
+"port": null
+},
+{
+"url": "v0.4.2///github.com\u007f%ff1.2.3.4",
+"parts": [
+"",
+"",
+"v0.4.2///github.com\u007f%ff1.2.3.4",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2///github.com\u007f%ff1.2.3.4",
+"port": null
+},
+{
+"url": "]\u00e9-setup.exeapi.github.com",
+"parts": [
+"",
+"",
+"]\u00e9-setup.exeapi.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]\u00e9-setup.exeapi.github.com",
+"port": null
+},
+{
+"url": ".//pneuma-io/sylvia-gm/releases/download/\uff0f\uff0f",
+"parts": [
+"",
+"",
+".//pneuma-io/sylvia-gm/releases/download/\uff0f\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".//pneuma-io/sylvia-gm/releases/download/\uff0f\uff0f",
+"port": null
+},
+{
+"url": "fe80::1%25eth0%fe80::1%25eth0\u007f\t a%2f",
+"parts": [
+"fe80",
+"",
+":1%25eth0%fe80::1%25eth0\u007f a%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0%fe80::1%25eth0\u007f a%2f",
+"port": null
+},
+{
+"url": "http://#?x-portable.zipgithub.com\u007f%ff%ff/",
+"parts": [
+"http",
+"",
+"",
+"",
+"?x-portable.zipgithub.com\u007f%ff%ff/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "http://#?x-portable.zipgithub.com\u007f%ff%ff/",
+"port": null
+},
+{
+"url": " %ffgithub.com",
+"parts": [
+"",
+"",
+"%ffgithub.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ffgithub.com",
+"port": null
+},
+{
+"url": "?\u2100[v1.xx-portable.zip",
+"parts": [
+"",
+"",
+"",
+"\u2100[v1.xx-portable.zip",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?\u2100[v1.xx-portable.zip",
+"port": null
+},
+{
+"url": ":443#/v1.xv1.x x-portable.zip",
+"parts": [
+"",
+"",
+":443",
+"",
+"/v1.xv1.x x-portable.zip"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443#/v1.xv1.x x-portable.zip",
+"port": null
+},
+{
+"url": "@github.com::1%C3%A9",
+"parts": [
+"",
+"",
+"@github.com::1%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@github.com::1%C3%A9",
+"port": null
+},
+{
+"url": "\uff0fhttps:///[:443//%ff\\",
+"parts": [
+"",
+"",
+"\uff0fhttps:///[:443//%ff\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0fhttps:///[:443//%ff\\",
+"port": null
+},
+{
+"url": "%2F@\u00e9\t:",
+"parts": [
+"",
+"",
+"%2F@\u00e9:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F@\u00e9:",
+"port": null
+},
+{
+"url": "x-portable.zip",
+"parts": [
+"",
+"",
+"x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip",
+"port": null
+},
+{
+"url": "[/%%",
+"parts": [
+"",
+"",
+"[/%%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[/%%",
+"port": null
+},
+{
+"url": "%zz-setup.exefe80::1%25eth0]github.com@",
+"parts": [
+"",
+"",
+"%zz-setup.exefe80::1%25eth0]github.com@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz-setup.exefe80::1%25eth0]github.com@",
+"port": null
+},
+{
+"url": ".%2f-setup.exe:443http://// ",
+"parts": [
+"",
+"",
+".%2f-setup.exe:443http://// ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".%2f-setup.exe:443http://// ",
+"port": null
+},
+{
+"url": "\\%:443",
+"parts": [
+"",
+"",
+"\\%:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\%:443",
+"port": null
+},
+{
+"url": "fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/.%C3%A9api.github.com",
+"parts": [
+"fe80",
+"",
+":1%25eth0pneuma-io/sylvia-gm/releases/download/.%C3%A9api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/.%C3%A9api.github.com",
+"port": null
+},
+{
+"url": "#:?",
+"parts": [
+"",
+"",
+"",
+"",
+":?"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#:?",
+"port": null
+},
+{
+"url": "%2Fv0.4.2/",
+"parts": [
+"",
+"",
+"%2Fv0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2Fv0.4.2/",
+"port": null
+},
+{
+"url": "@ \\api.github.com]]",
+"parts": [
+"",
+"",
+"@ \\api.github.com]]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@ \\api.github.com]]",
+"port": null
+},
+{
+"url": "v1.xHTTPS://https://\\",
+"parts": [
+"v1.xhttps",
+"https:",
+"//\\",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "v1.xhttps://https://\\",
+"port": null
+},
+{
+"url": "%ff]:443x-portable.zippneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"%ff]:443x-portable.zippneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ff]:443x-portable.zippneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": ":::1github.com\u00e9",
+"parts": [
+"",
+"",
+":::1github.com\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":::1github.com\u00e9",
+"port": null
+},
+{
+"url": "\u007f::1\\",
+"parts": [
+"",
+"",
+"\u007f::1\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f::1\\",
+"port": null
+},
+{
+"url": "\\%2F%.%ffv1.x%2fhttps:\u007f",
+"parts": [
+"",
+"",
+"\\%2F%.%ffv1.x%2fhttps:\u007f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\%2F%.%ffv1.x%2fhttps:\u007f",
+"port": null
+},
+{
+"url": "-setup.exe #https://fe80::1%25eth0",
+"parts": [
+"",
+"",
+"-setup.exe ",
+"",
+"https://fe80::1%25eth0"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe #https://fe80::1%25eth0",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/\u007f%2f]%ffv0.4.2/]",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/\u007f%2f]%ffv0.4.2/]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/\u007f%2f]%ffv0.4.2/]",
+"port": null
+},
+{
+"url": "%x-portable.zip",
+"parts": [
+"",
+"",
+"%x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%x-portable.zip",
+"port": null
+},
+{
+"url": "%2f%2F",
+"parts": [
+"",
+"",
+"%2f%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f%2F",
+"port": null
+},
+{
+"url": "%zz%C3%A9",
+"parts": [
+"",
+"",
+"%zz%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz%C3%A9",
+"port": null
+},
+{
+"url": "?%@\u007f%::11.2.3.4",
+"parts": [
+"",
+"",
+"",
+"%@\u007f%::11.2.3.4",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?%@\u007f%::11.2.3.4",
+"port": null
+},
+{
+"url": "#\u007f\u007fapi.github.com",
+"parts": [
+"",
+"",
+"",
+"",
+"\u007f\u007fapi.github.com"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#\u007f\u007fapi.github.com",
+"port": null
+},
+{
+"url": "#https:v0.4.2/@%C3%A9%2f\t",
+"parts": [
+"",
+"",
+"",
+"",
+"https:v0.4.2/@%C3%A9%2f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#https:v0.4.2/@%C3%A9%2f",
+"port": null
+},
+{
+"url": ".v0.4.2/ ",
+"parts": [
+"",
+"",
+".v0.4.2/ ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".v0.4.2/ ",
+"port": null
+},
+{
+"url": "v0.4.2/\u00e9\u00e9https:",
+"parts": [
+"",
+"",
+"v0.4.2/\u00e9\u00e9https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/\u00e9\u00e9https:",
+"port": null
+},
+{
+"url": "@\u00e9http://1.2.3.4",
+"parts": [
+"",
+"",
+"@\u00e9http://1.2.3.4",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@\u00e9http://1.2.3.4",
+"port": null
+},
+{
+"url": ".%C3%A9..github.com\u2100",
+"parts": [
+"",
+"",
+".%C3%A9..github.com\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".%C3%A9..github.com\u2100",
+"port": null
+},
+{
+"url": ":%C3%A9[@ \u00e9",
+"parts": [
+"",
+"",
+":%C3%A9[@ \u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":%C3%A9[@ \u00e9",
+"port": null
+},
+{
+"url": "https:https:%2F]https:#a-setup.exepneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"https",
+"",
+"https:%2F]https:",
+"",
+"a-setup.exepneuma-io/sylvia-gm/releases/download/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:https:%2F]https:#a-setup.exepneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "\u2100v1.xv0.4.2/\u00e9\\\u2100[%ff",
+"parts": [
+"",
+"",
+"\u2100v1.xv0.4.2/\u00e9\\\u2100[%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100v1.xv0.4.2/\u00e9\\\u2100[%ff",
+"port": null
+},
+{
+"url": "::1\u00e9..https://",
+"parts": [
+"",
+"",
+"::1\u00e9..https://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1\u00e9..https://",
+"port": null
+},
+{
+"url": "https:1.2.3.4]...api.github.comHTTPS://",
+"parts": [
+"https",
+"",
+"1.2.3.4]...api.github.comHTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:1.2.3.4]...api.github.comHTTPS://",
+"port": null
+},
+{
+"url": "[? %C3%A9%ffapi.github.com//:443",
+"parts": [
+"",
+"",
+"[",
+" %C3%A9%ffapi.github.com//:443",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[? %C3%A9%ffapi.github.com//:443",
+"port": null
+},
+{
+"url": "https:///%pneuma-io/sylvia-gm/releases/download//..%api.github.com",
+"parts": [
+"https",
+"",
+"/%pneuma-io/sylvia-gm/releases/download//..%api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:///%pneuma-io/sylvia-gm/releases/download//..%api.github.com",
+"port": null
+},
+{
+"url": "@[/.",
+"parts": [
+"",
+"",
+"@[/.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@[/.",
+"port": null
+},
+{
+"url": ":fe80::1%25eth0-setup.exe\u00e9",
+"parts": [
+"",
+"",
+":fe80::1%25eth0-setup.exe\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":fe80::1%25eth0-setup.exe\u00e9",
+"port": null
+},
+{
+"url": " ]http://#%zz\u00e9https:v1.x",
+"parts": [
+"",
+"",
+"]http://",
+"",
+"%zz\u00e9https:v1.x"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]http://#%zz\u00e9https:v1.x",
+"port": null
+},
+{
+"url": "https:%]\u2100%C3%A9%ff\t?::1",
+"parts": [
+"https",
+"",
+"%]\u2100%C3%A9%ff",
+"::1",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:%]\u2100%C3%A9%ff?::1",
+"port": null
+},
+{
+"url": "::1]-setup.exe\u00e9",
+"parts": [
+"",
+"",
+"::1]-setup.exe\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1]-setup.exe\u00e9",
+"port": null
+},
+{
+"url": "1.2.3.4\\%2Fv1.x%zz%2Fapi.github.com\u007f..",
+"parts": [
+"",
+"",
+"1.2.3.4\\%2Fv1.x%zz%2Fapi.github.com\u007f..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4\\%2Fv1.x%zz%2Fapi.github.com\u007f..",
+"port": null
+},
+{
+"url": "a\t?http://fe80::1%25eth0",
+"parts": [
+"",
+"",
+"a",
+"http://fe80::1%25eth0",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a?http://fe80::1%25eth0",
+"port": null
+},
+{
+"url": "fe80::1%25eth0-setup.exe\uff0f%///",
+"parts": [
+"fe80",
+"",
+":1%25eth0-setup.exe\uff0f%///",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0-setup.exe\uff0f%///",
+"port": null
+},
+{
+"url": "%ff[::1\tHTTPS://..%2F%ff1.2.3.4",
+"parts": [
+"",
+"",
+"%ff[::1HTTPS://..%2F%ff1.2.3.4",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ff[::1HTTPS://..%2F%ff1.2.3.4",
+"port": null
+},
+{
+"url": "//https:%ff%2F",
+"parts": [
+"",
+"https:%ff%2F",
+"",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "//https:%ff%2F",
+"port_error": "Port could not be cast to integer value as '%ff%2F'"
+},
+{
+"url": ":%zz%2f \t",
+"parts": [
+"",
+"",
+":%zz%2f ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":%zz%2f ",
+"port": null
+},
+{
+"url": "a]] github.com ",
+"parts": [
+"",
+"",
+"a]] github.com ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a]] github.com ",
+"port": null
+},
+{
+"url": "-setup.exegithub.coma::1\t%2fhttp://:443",
+"parts": [
+"",
+"",
+"-setup.exegithub.coma::1%2fhttp://:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exegithub.coma::1%2fhttp://:443",
+"port": null
+},
+{
+"url": "api.github.comhttp://#",
+"parts": [
+"api.github.comhttp",
+"",
+"",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.comhttp:",
+"port": null
+},
+{
+"url": "v0.4.2/v0.4.2/",
+"parts": [
+"",
+"",
+"v0.4.2/v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/v0.4.2/",
+"port": null
+},
+{
+"url": "]%ff\u00e9]::1",
+"parts": [
+"",
+"",
+"]%ff\u00e9]::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]%ff\u00e9]::1",
+"port": null
+},
+{
+"url": "\\%2f/-setup.exe%::1%C3%A9HTTPS://::1",
+"parts": [
+"",
+"",
+"\\%2f/-setup.exe%::1%C3%A9HTTPS://::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\%2f/-setup.exe%::1%C3%A9HTTPS://::1",
+"port": null
+},
+{
+"url": "x-portable.zip\u2100fe80::1%25eth0",
+"parts": [
+"",
+"",
+"x-portable.zip\u2100fe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip\u2100fe80::1%25eth0",
+"port": null
+},
+{
+"url": "\u00e9.",
+"parts": [
+"",
+"",
+"\u00e9.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9.",
+"port": null
+},
+{
+"url": "fe80::1%25eth0:443http://// ",
+"parts": [
+"fe80",
+"",
+":1%25eth0:443http://// ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0:443http://// ",
+"port": null
+},
+{
+"url": "%zz1.2.3.4%ff",
+"parts": [
+"",
+"",
+"%zz1.2.3.4%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz1.2.3.4%ff",
+"port": null
+},
+{
+"url": "v1.x  \u2100",
+"parts": [
+"",
+"",
+"v1.x  \u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x  \u2100",
+"port": null
+},
+{
+"url": "?/1.2.3.4",
+"parts": [
+"",
+"",
+"",
+"/1.2.3.4",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?/1.2.3.4",
+"port": null
+},
+{
+"url": "::1https:%ff[\t%2F/HTTPS://%2F",
+"parts": [
+"",
+"",
+"::1https:%ff[%2F/HTTPS://%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1https:%ff[%2F/HTTPS://%2F",
+"port": null
+},
+{
+"url": "%?http://\\x-portable.ziphttps://v1.xhttp://fe80::1%25eth0",
+"parts": [
+"",
+"",
+"%",
+"http://\\x-portable.ziphttps://v1.xhttp://fe80::1%25eth0",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%?http://\\x-portable.ziphttps://v1.xhttp://fe80::1%25eth0",
+"port": null
+},
+{
+"url": "https://]//#/@",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "%zz1.2.3.4HTTPS://fe80::1%25eth0::1:443%/",
+"parts": [
+"",
+"",
+"%zz1.2.3.4HTTPS://fe80::1%25eth0::1:443%/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz1.2.3.4HTTPS://fe80::1%25eth0::1:443%/",
+"port": null
+},
+{
+"url": "HTTPS://???",
+"parts": [
+"https",
+"",
+"",
+"??",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https://???",
+"port": null
+},
+{
+"url": "?v0.4.2/HTTPS:///%zz%2f%C3%A9@%ff",
+"parts": [
+"",
+"",
+"",
+"v0.4.2/HTTPS:///%zz%2f%C3%A9@%ff",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?v0.4.2/HTTPS:///%zz%2f%C3%A9@%ff",
+"port": null
+},
+{
+"url": "https://\uff0f",
+"error": "netloc '\uff0f' contains invalid characters under NFKC normalization"
+},
+{
+"url": "1.2.3.4pneuma-io/sylvia-gm/releases/download/\uff0fv0.4.2/\u2100.?https://",
+"parts": [
+"",
+"",
+"1.2.3.4pneuma-io/sylvia-gm/releases/download/\uff0fv0.4.2/\u2100.",
+"https://",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4pneuma-io/sylvia-gm/releases/download/\uff0fv0.4.2/\u2100.?https://",
+"port": null
+},
+{
+"url": "  %C3%A9HTTPS://%ff",
+"parts": [
+"",
+"",
+"%C3%A9HTTPS://%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9HTTPS://%ff",
+"port": null
+},
+{
+"url": "..api.github.com/https:]https:..",
+"parts": [
+"",
+"",
+"..api.github.com/https:]https:..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..api.github.com/https:]https:..",
+"port": null
+},
+{
+"url": "HTTPS://\t\uff0f::1",
+"error": "netloc '\uff0f::1' contains invalid characters under NFKC normalization"
+},
+{
+"url": "x-portable.zipgithub.com:443%2f.1.2.3.4]v1.x",
+"parts": [
+"x-portable.zipgithub.com",
+"",
+"443%2f.1.2.3.4]v1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zipgithub.com:443%2f.1.2.3.4]v1.x",
+"port": null
+},
+{
+"url": "x-portable.zip",
+"parts": [
+"",
+"",
+"x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip",
+"port": null
+},
+{
+"url": "\u00e9\u00e9afe80::1%25eth0v0.4.2/",
+"parts": [
+"",
+"",
+"\u00e9\u00e9afe80::1%25eth0v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9\u00e9afe80::1%25eth0v0.4.2/",
+"port": null
+},
+{
+"url": "/%ff//-setup.exe::1%C3%A9%",
+"parts": [
+"",
+"",
+"/%ff//-setup.exe::1%C3%A9%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/%ff//-setup.exe::1%C3%A9%",
+"port": null
+},
+{
+"url": "%2f%2F:443",
+"parts": [
+"",
+"",
+"%2f%2F:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f%2F:443",
+"port": null
+},
+{
+"url": "1.2.3.4api.github.com ",
+"parts": [
+"",
+"",
+"1.2.3.4api.github.com ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4api.github.com ",
+"port": null
+},
+{
+"url": ":%\t]1.2.3.4pneuma-io/sylvia-gm/releases/download/\u00e9-setup.exehttps:",
+"parts": [
+"",
+"",
+":%]1.2.3.4pneuma-io/sylvia-gm/releases/download/\u00e9-setup.exehttps:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":%]1.2.3.4pneuma-io/sylvia-gm/releases/download/\u00e9-setup.exehttps:",
+"port": null
+},
+{
+"url": ":?\\\u2100HTTPS://::\u007f",
+"parts": [
+"",
+"",
+":",
+"\\\u2100HTTPS://::\u007f",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":?\\\u2100HTTPS://::\u007f",
+"port": null
+},
+{
+"url": "api.github.com//:]..",
+"parts": [
+"",
+"",
+"api.github.com//:]..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com//:]..",
+"port": null
+},
+{
+"url": "#\uff0f",
+"parts": [
+"",
+"",
+"",
+"",
+"\uff0f"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#\uff0f",
+"port": null
+},
+{
+"url": "v0.4.2/#-setup.exev0.4.2/github.com",
+"parts": [
+"",
+"",
+"v0.4.2/",
+"",
+"-setup.exev0.4.2/github.com"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/#-setup.exev0.4.2/github.com",
+"port": null
+},
+{
+"url": "HTTPS://\u00e9%zz:4431.2.3.4",
+"parts": [
+"https",
+"\u00e9%zz:4431.2.3.4",
+"",
+"",
+""
+],
+"hostname": "\u00e9%zz",
+"username": null,
+"password": null,
+"unsplit": "https://\u00e9%zz:4431.2.3.4",
+"port_error": "Port could not be cast to integer value as '4431.2.3.4'"
+},
+{
+"url": "1.2.3.4https:\u2100%2f%zz%C3%A9:443HTTPS://\\",
+"parts": [
+"",
+"",
+"1.2.3.4https:\u2100%2f%zz%C3%A9:443HTTPS://\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4https:\u2100%2f%zz%C3%A9:443HTTPS://\\",
+"port": null
+},
+{
+"url": ":api.github.com\u007f%zzapi.github.comhttp://",
+"parts": [
+"",
+"",
+":api.github.com\u007f%zzapi.github.comhttp://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":api.github.com\u007f%zzapi.github.comhttp://",
+"port": null
+},
+{
+"url": "..\\%ff%ffhttp://]@\t@",
+"parts": [
+"",
+"",
+"..\\%ff%ffhttp://]@@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..\\%ff%ffhttp://]@@",
+"port": null
+},
+{
+"url": "\uff0f:443pneuma-io/sylvia-gm/releases/download/\\\t@",
+"parts": [
+"",
+"",
+"\uff0f:443pneuma-io/sylvia-gm/releases/download/\\@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f:443pneuma-io/sylvia-gm/releases/download/\\@",
+"port": null
+},
+{
+"url": "https://[HTTPS://#",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "\\https:%:.x-portable.zip//",
+"parts": [
+"",
+"",
+"\\https:%:.x-portable.zip//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\https:%:.x-portable.zip//",
+"port": null
+},
+{
+"url": "#x-portable.zip..-setup.exe-setup.exe%fffe80::1%25eth0https:?",
+"parts": [
+"",
+"",
+"",
+"",
+"x-portable.zip..-setup.exe-setup.exe%fffe80::1%25eth0https:?"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#x-portable.zip..-setup.exe-setup.exe%fffe80::1%25eth0https:?",
+"port": null
+},
+{
+"url": ".pneuma-io/sylvia-gm/releases/download/v0.4.2//http://..%C3%A9a ",
+"parts": [
+"",
+"",
+".pneuma-io/sylvia-gm/releases/download/v0.4.2//http://..%C3%A9a ",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".pneuma-io/sylvia-gm/releases/download/v0.4.2//http://..%C3%A9a ",
+"port": null
+},
+{
+"url": "https:///a%2Fhttp://::1%2Fgithub.com",
+"parts": [
+"https",
+"",
+"/a%2Fhttp://::1%2Fgithub.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https:///a%2Fhttp://::1%2Fgithub.com",
+"port": null
+},
+{
+"url": "fe80::1%25eth0 %ff%2Fv1.x//:",
+"parts": [
+"fe80",
+"",
+":1%25eth0 %ff%2Fv1.x//:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0 %ff%2Fv1.x//:",
+"port": null
+},
+{
+"url": "%zzv0.4.2/\t\\github.com[pneuma-io/sylvia-gm/releases/download/a",
+"parts": [
+"",
+"",
+"%zzv0.4.2/\\github.com[pneuma-io/sylvia-gm/releases/download/a",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zzv0.4.2/\\github.com[pneuma-io/sylvia-gm/releases/download/a",
+"port": null
+},
+{
+"url": "\u2100\uff0ffe80::1%25eth0",
+"parts": [
+"",
+"",
+"\u2100\uff0ffe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100\uff0ffe80::1%25eth0",
+"port": null
+},
+{
+"url": ":443a%2F\uff0f/",
+"parts": [
+"",
+"",
+":443a%2F\uff0f/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443a%2F\uff0f/",
+"port": null
+},
+{
+"url": "\\v1.x%2f-setup.exe",
+"parts": [
+"",
+"",
+"\\v1.x%2f-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\v1.x%2f-setup.exe",
+"port": null
+},
+{
+"url": " :\\]",
+"parts": [
+"",
+"",
+":\\]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":\\]",
+"port": null
+},
+{
+"url": "1.2.3.4v1.x %\uff0f@%2f\t//",
+"parts": [
+"",
+"",
+"1.2.3.4v1.x %\uff0f@%2f//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4v1.x %\uff0f@%2f//",
+"port": null
+},
+{
+"url": "..%ffa",
+"parts": [
+"",
+"",
+"..%ffa",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..%ffa",
+"port": null
+},
+{
+"url": "x-portable.zip\\%zz%ff//?\u00e9",
+"parts": [
+"",
+"",
+"x-portable.zip\\%zz%ff//",
+"\u00e9",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip\\%zz%ff//?\u00e9",
+"port": null
+},
+{
+"url": "%%ffx-portable.zip::1::fe80::1%25eth0",
+"parts": [
+"",
+"",
+"%%ffx-portable.zip::1::fe80::1%25eth0",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%%ffx-portable.zip::1::fe80::1%25eth0",
+"port": null
+},
+{
+"url": "%2fv0.4.2/https://https:\u2100github.com",
+"parts": [
+"",
+"",
+"%2fv0.4.2/https://https:\u2100github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2fv0.4.2/https://https:\u2100github.com",
+"port": null
+},
+{
+"url": "::1x-portable.zipfe80::1%25eth0@",
+"parts": [
+"",
+"",
+"::1x-portable.zipfe80::1%25eth0@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1x-portable.zipfe80::1%25eth0@",
+"port": null
+},
+{
+"url": "HTTPS://%2F%2f\t\tgithub.com",
+"parts": [
+"https",
+"%2F%2fgithub.com",
+"",
+"",
+""
+],
+"hostname": "%2F%2fgithub.com",
+"username": null,
+"password": null,
+"unsplit": "https://%2F%2fgithub.com",
+"port": null
+},
+{
+"url": "v0.4.2/:",
+"parts": [
+"",
+"",
+"v0.4.2/:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/:",
+"port": null
+},
+{
+"url": "\t//api.github.com\u2100pneuma-io/sylvia-gm/releases/download/v1.x\u007f %2f",
+"error": "netloc 'api.github.com\u2100pneuma-io' contains invalid characters under NFKC normalization"
+},
+{
+"url": "\uff0f\\[",
+"parts": [
+"",
+"",
+"\uff0f\\[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f\\[",
+"port": null
+},
+{
+"url": "%zz:443%C3%A9https:github.com..",
+"parts": [
+"",
+"",
+"%zz:443%C3%A9https:github.com..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz:443%C3%A9https:github.com..",
+"port": null
+},
+{
+"url": " .pneuma-io/sylvia-gm/releases/download/%2F",
+"parts": [
+"",
+"",
+".pneuma-io/sylvia-gm/releases/download/%2F",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".pneuma-io/sylvia-gm/releases/download/%2F",
+"port": null
+},
+{
+"url": "1.2.3.4pneuma-io/sylvia-gm/releases/download/?\uff0f %2f\u2100//v1.x",
+"parts": [
+"",
+"",
+"1.2.3.4pneuma-io/sylvia-gm/releases/download/",
+"\uff0f %2f\u2100//v1.x",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4pneuma-io/sylvia-gm/releases/download/?\uff0f %2f\u2100//v1.x",
+"port": null
+},
+{
+"url": "\uff0fv0.4.2/:443",
+"parts": [
+"",
+"",
+"\uff0fv0.4.2/:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0fv0.4.2/:443",
+"port": null
+},
+{
+"url": "#\uff0fv0.4.2/a",
+"parts": [
+"",
+"",
+"",
+"",
+"\uff0fv0.4.2/a"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#\uff0fv0.4.2/a",
+"port": null
+},
+{
+"url": "::1.",
+"parts": [
+"",
+"",
+"::1.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1.",
+"port": null
+},
+{
+"url": "///",
+"parts": [
+"",
+"",
+"/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/",
+"port": null
+},
+{
+"url": "github.com\u007f@#%2F",
+"parts": [
+"",
+"",
+"github.com\u007f@",
+"",
+"%2F"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.com\u007f@#%2F",
+"port": null
+},
+{
+"url": "\\/:https://",
+"parts": [
+"",
+"",
+"\\/:https://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\/:https://",
+"port": null
+},
+{
+"url": "https://[ https://%2F?\uff0f:443https:",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "\t\u00e9\t",
+"parts": [
+"",
+"",
+"\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9",
+"port": null
+},
+{
+"url": "%C3%A9HTTPS://.[:443HTTPS:///::1",
+"parts": [
+"",
+"",
+"%C3%A9HTTPS://.[:443HTTPS:///::1",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9HTTPS://.[:443HTTPS:///::1",
+"port": null
+},
+{
+"url": ":443fe80::1%25eth0v1.x\\",
+"parts": [
+"",
+"",
+":443fe80::1%25eth0v1.x\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443fe80::1%25eth0v1.x\\",
+"port": null
+},
+{
+"url": "\u007f\\api.github.com",
+"parts": [
+"",
+"",
+"\u007f\\api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f\\api.github.com",
+"port": null
+},
+{
+"url": "%zz%zz\u2100\u00e9..%2f#@]",
+"parts": [
+"",
+"",
+"%zz%zz\u2100\u00e9..%2f",
+"",
+"@]"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz%zz\u2100\u00e9..%2f#@]",
+"port": null
+},
+{
+"url": "%2f",
+"parts": [
+"",
+"",
+"%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2f",
+"port": null
+},
+{
+"url": "https:// v0.4.2/\\",
+"parts": [
+"https",
+" v0.4.2",
+"/\\",
+"",
+""
+],
+"hostname": " v0.4.2",
+"username": null,
+"password": null,
+"unsplit": "https:// v0.4.2/\\",
+"port": null
+},
+{
+"url": "#fe80::1%25eth0[/\t:v0.4.2/",
+"parts": [
+"",
+"",
+"",
+"",
+"fe80::1%25eth0[/:v0.4.2/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#fe80::1%25eth0[/:v0.4.2/",
+"port": null
+},
+{
+"url": "HTTPS://x-portable.zip]:443\u007fv0.4.2/",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "a%C3%A9https://https:x-portable.zip",
+"parts": [
+"",
+"",
+"a%C3%A9https://https:x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a%C3%A9https://https:x-portable.zip",
+"port": null
+},
+{
+"url": "\uff0f#%ff v1.xhttps:\uff0f%zz-setup.exe",
+"parts": [
+"",
+"",
+"\uff0f",
+"",
+"%ff v1.xhttps:\uff0f%zz-setup.exe"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f#%ff v1.xhttps:\uff0f%zz-setup.exe",
+"port": null
+},
+{
+"url": "fe80::1%25eth0../:443pneuma-io/sylvia-gm/releases/download/\uff0f\u007f\u00e9",
+"parts": [
+"fe80",
+"",
+":1%25eth0../:443pneuma-io/sylvia-gm/releases/download/\uff0f\u007f\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0../:443pneuma-io/sylvia-gm/releases/download/\uff0f\u007f\u00e9",
+"port": null
+},
+{
+"url": "%C3%A9fe80::1%25eth0HTTPS://a%zzv1.xpneuma-io/sylvia-gm/releases/download/?%",
+"parts": [
+"",
+"",
+"%C3%A9fe80::1%25eth0HTTPS://a%zzv1.xpneuma-io/sylvia-gm/releases/download/",
+"%",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A9fe80::1%25eth0HTTPS://a%zzv1.xpneuma-io/sylvia-gm/releases/download/?%",
+"port": null
+},
+{
+"url": "//https://fe80::1%25eth0/%2fhttps://%2f\u2100http://",
+"parts": [
+"",
+"https:",
+"//fe80::1%25eth0/%2fhttps://%2f\u2100http://",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "//https://fe80::1%25eth0/%2fhttps://%2f\u2100http://",
+"port": null
+},
+{
+"url": "#v1.x//..",
+"parts": [
+"",
+"",
+"",
+"",
+"v1.x//.."
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#v1.x//..",
+"port": null
+},
+{
+"url": "]%2f",
+"parts": [
+"",
+"",
+"]%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]%2f",
+"port": null
+},
+{
+"url": "::1[% @api.github.com",
+"parts": [
+"",
+"",
+"::1[% @api.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1[% @api.github.com",
+"port": null
+},
+{
+"url": "?%v0.4.2/\u2100%pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"",
+"%v0.4.2/\u2100%pneuma-io/sylvia-gm/releases/download/",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?%v0.4.2/\u2100%pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "]github.com%2Fx-portable.zip%ff%zz..",
+"parts": [
+"",
+"",
+"]github.com%2Fx-portable.zip%ff%zz..",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]github.com%2Fx-portable.zip%ff%zz..",
+"port": null
+},
+{
+"url": "\uff0f[??:443%\u007f%2fHTTPS://",
+"parts": [
+"",
+"",
+"\uff0f[",
+"?:443%\u007f%2fHTTPS://",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f[??:443%\u007f%2fHTTPS://",
+"port": null
+},
+{
+"url": "\u00e9v0.4.2/\u007f",
+"parts": [
+"",
+"",
+"\u00e9v0.4.2/\u007f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9v0.4.2/\u007f",
+"port": null
+},
+{
+"url": "//%ff%2F",
+"parts": [
+"",
+"%ff%2F",
+"",
+"",
+""
+],
+"hostname": "%ff%2F",
+"username": null,
+"password": null,
+"unsplit": "//%ff%2F",
+"port": null
+},
+{
+"url": "]pneuma-io/sylvia-gm/releases/download/:@::1-setup.exe",
+"parts": [
+"",
+"",
+"]pneuma-io/sylvia-gm/releases/download/:@::1-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "]pneuma-io/sylvia-gm/releases/download/:@::1-setup.exe",
+"port": null
+},
+{
+"url": "a:443///\\:443",
+"parts": [
+"a",
+"",
+"443///\\:443",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a:443///\\:443",
+"port": null
+},
+{
+"url": "%ffx-portable.zip%2f",
+"parts": [
+"",
+"",
+"%ffx-portable.zip%2f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ffx-portable.zip%2f",
+"port": null
+},
+{
+"url": "\uff0f:443-setup.exe::1%zz",
+"parts": [
+"",
+"",
+"\uff0f:443-setup.exe::1%zz",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\uff0f:443-setup.exe::1%zz",
+"port": null
+},
+{
+"url": "x-portable.zipv1.x#%x-portable.ziphttp://%zzfe80::1%25eth0/",
+"parts": [
+"",
+"",
+"x-portable.zipv1.x",
+"",
+"%x-portable.ziphttp://%zzfe80::1%25eth0/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zipv1.x#%x-portable.ziphttp://%zzfe80::1%25eth0/",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/github.com%ff?",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/github.com%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/github.com%ff",
+"port": null
+},
+{
+"url": "1.2.3.4\\?%2F:443",
+"parts": [
+"",
+"",
+"1.2.3.4\\",
+"%2F:443",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4\\?%2F:443",
+"port": null
+},
+{
+"url": "%zz-setup.exe :%2fx-portable.zip",
+"parts": [
+"",
+"",
+"%zz-setup.exe :%2fx-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zz-setup.exe :%2fx-portable.zip",
+"port": null
+},
+{
+"url": ".//HTTPS://",
+"parts": [
+"",
+"",
+".//HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".//HTTPS://",
+"port": null
+},
+{
+"url": "api.github.comgithub.comx-portable.zip",
+"parts": [
+"",
+"",
+"api.github.comgithub.comx-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.comgithub.comx-portable.zip",
+"port": null
+},
+{
+"url": "-setup.exe%2Ffe80::1%25eth0\\x-portable.zip",
+"parts": [
+"",
+"",
+"-setup.exe%2Ffe80::1%25eth0\\x-portable.zip",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "-setup.exe%2Ffe80::1%25eth0\\x-portable.zip",
+"port": null
+},
+{
+"url": "http://https://api.github.com//https://]",
+"parts": [
+"http",
+"https:",
+"//api.github.com//https://]",
+"",
+""
+],
+"hostname": "https",
+"username": null,
+"password": null,
+"unsplit": "http://https://api.github.com//https://]",
+"port": null
+},
+{
+"url": "v1.x%zz::1][",
+"parts": [
+"",
+"",
+"v1.x%zz::1][",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x%zz::1][",
+"port": null
+},
+{
+"url": "https:?fe80::1%25eth0%github.com?",
+"parts": [
+"https",
+"",
+"",
+"fe80::1%25eth0%github.com?",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https://?fe80::1%25eth0%github.com?",
+"port": null
+},
+{
+"url": "github.comx-portable.zip\u2100HTTPS://]v1.x:443[",
+"parts": [
+"",
+"",
+"github.comx-portable.zip\u2100HTTPS://]v1.x:443[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "github.comx-portable.zip\u2100HTTPS://]v1.x:443[",
+"port": null
+},
+{
+"url": "api.github.com:api.github.com\u2100\uff0f]",
+"parts": [
+"api.github.com",
+"",
+"api.github.com\u2100\uff0f]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com:api.github.com\u2100\uff0f]",
+"port": null
+},
+{
+"url": "v0.4.2/%ffapi.github.com%ff%C3%A9",
+"parts": [
+"",
+"",
+"v0.4.2/%ffapi.github.com%ff%C3%A9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/%ffapi.github.com%ff%C3%A9",
+"port": null
+},
+{
+"url": "1.2.3.4\\",
+"parts": [
+"",
+"",
+"1.2.3.4\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.4\\",
+"port": null
+},
+{
+"url": "\u2100https:][-setup.exeapi.github.com%ff.github.com",
+"parts": [
+"",
+"",
+"\u2100https:][-setup.exeapi.github.com%ff.github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100https:][-setup.exeapi.github.com%ff.github.com",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/https://agithub.com\\\u00e9.",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/https://agithub.com\\\u00e9.",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/https://agithub.com\\\u00e9.",
+"port": null
+},
+{
+"url": "%ffa%",
+"parts": [
+"",
+"",
+"%ffa%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ffa%",
+"port": null
+},
+{
+"url": "..pneuma-io/sylvia-gm/releases/download/-setup.exe]@",
+"parts": [
+"",
+"",
+"..pneuma-io/sylvia-gm/releases/download/-setup.exe]@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..pneuma-io/sylvia-gm/releases/download/-setup.exe]@",
+"port": null
+},
+{
+"url": "\\v0.4.2/pneuma-io/sylvia-gm/releases/download/\u2100",
+"parts": [
+"",
+"",
+"\\v0.4.2/pneuma-io/sylvia-gm/releases/download/\u2100",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\\v0.4.2/pneuma-io/sylvia-gm/releases/download/\u2100",
+"port": null
+},
+{
+"url": "\u007f%zz\u00e9",
+"parts": [
+"",
+"",
+"\u007f%zz\u00e9",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f%zz\u00e9",
+"port": null
+},
+{
+"url": "v1.x\\%2F#v0.4.2/",
+"parts": [
+"",
+"",
+"v1.x\\%2F",
+"",
+"v0.4.2/"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v1.x\\%2F#v0.4.2/",
+"port": null
+},
+{
+"url": "\u007f\u2100v0.4.2/%%ff\\",
+"parts": [
+"",
+"",
+"\u007f\u2100v0.4.2/%%ff\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f\u2100v0.4.2/%%ff\\",
+"port": null
+},
+{
+"url": ":443//a::1@",
+"parts": [
+"",
+"",
+":443//a::1@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443//a::1@",
+"port": null
+},
+{
+"url": "fe80::1%25eth0\u2100/%2fhttp://",
+"parts": [
+"fe80",
+"",
+":1%25eth0\u2100/%2fhttp://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "fe80::1%25eth0\u2100/%2fhttp://",
+"port": null
+},
+{
+"url": ".https:%2F\u007f\\http://https:%2f[",
+"parts": [
+"",
+"",
+".https:%2F\u007f\\http://https:%2f[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".https:%2F\u007f\\http://https:%2f[",
+"port": null
+},
+{
+"url": "%zzapneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"%zzapneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%zzapneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "#::1::1",
+"parts": [
+"",
+"",
+"",
+"",
+"::1::1"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#::1::1",
+"port": null
+},
+{
+"url": ".]github.com#%zz%C3%A9",
+"parts": [
+"",
+"",
+".]github.com",
+"",
+"%zz%C3%A9"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".]github.com#%zz%C3%A9",
+"port": null
+},
+{
+"url": ".\tv0.4.2/",
+"parts": [
+"",
+"",
+".v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ".v0.4.2/",
+"port": null
+},
+{
+"url": "\u2100http://fe80::1%25eth0\uff0f\uff0f::1HTTPS://v1.x",
+"parts": [
+"",
+"",
+"\u2100http://fe80::1%25eth0\uff0f\uff0f::1HTTPS://v1.x",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100http://fe80::1%25eth0\uff0f\uff0f::1HTTPS://v1.x",
+"port": null
+},
+{
+"url": "#1.2.3.4a",
+"parts": [
+"",
+"",
+"",
+"",
+"1.2.3.4a"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#1.2.3.4a",
+"port": null
+},
+{
+"url": "@%ffx-portable.zip-setup.exehttps:",
+"parts": [
+"",
+"",
+"@%ffx-portable.zip-setup.exehttps:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@%ffx-portable.zip-setup.exehttps:",
+"port": null
+},
+{
+"url": "\u2100\uff0f",
+"parts": [
+"",
+"",
+"\u2100\uff0f",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100\uff0f",
+"port": null
+},
+{
+"url": ":443]https://http://][%ffhttp://:",
+"parts": [
+"",
+"",
+":443]https://http://][%ffhttp://:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443]https://http://][%ffhttp://:",
+"port": null
+},
+{
+"url": "\u2100%v0.4.2/\u007f::1-setup.exe",
+"parts": [
+"",
+"",
+"\u2100%v0.4.2/\u007f::1-setup.exe",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100%v0.4.2/\u007f::1-setup.exe",
+"port": null
+},
+{
+"url": "..%[%2F :443@",
+"parts": [
+"",
+"",
+"..%[%2F :443@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..%[%2F :443@",
+"port": null
+},
+{
+"url": "a\u21001.2.3.4.x-portable.ziphttps:",
+"parts": [
+"",
+"",
+"a\u21001.2.3.4.x-portable.ziphttps:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "a\u21001.2.3.4.x-portable.ziphttps:",
+"port": null
+},
+{
+"url": ":fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/::1https://%zz\uff0f%",
+"parts": [
+"",
+"",
+":fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/::1https://%zz\uff0f%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":fe80::1%25eth0pneuma-io/sylvia-gm/releases/download/::1https://%zz\uff0f%",
+"port": null
+},
+{
+"url": "@HTTPS://",
+"parts": [
+"",
+"",
+"@HTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "@HTTPS://",
+"port": null
+},
+{
+"url": "api.github.comhttp://@https::443\\v1.x",
+"parts": [
+"api.github.comhttp",
+"@https::443\\v1.x",
+"",
+"",
+""
+],
+"hostname": "https",
+"username": "",
+"password": null,
+"unsplit": "api.github.comhttp://@https::443\\v1.x",
+"port_error": "Port could not be cast to integer value as ':443\\\\v1.x'"
+},
+{
+"url": "::1api.github.comav1.xhttp://fe80::1%25eth0pneuma-io/sylvia-gm/releases/download//",
+"parts": [
+"",
+"",
+"::1api.github.comav1.xhttp://fe80::1%25eth0pneuma-io/sylvia-gm/releases/download//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "::1api.github.comav1.xhttp://fe80::1%25eth0pneuma-io/sylvia-gm/releases/download//",
+"port": null
+},
+{
+"url": " %2F\uff0f%https://\\\t%",
+"parts": [
+"",
+"",
+"%2F\uff0f%https://\\%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%2F\uff0f%https://\\%",
+"port": null
+},
+{
+"url": ":443HTTPS://..v1.x%ff",
+"parts": [
+"",
+"",
+":443HTTPS://..v1.x%ff",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443HTTPS://..v1.x%ff",
+"port": null
+},
+{
+"url": "%C3%A91.2.3.4",
+"parts": [
+"",
+"",
+"%C3%A91.2.3.4",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%C3%A91.2.3.4",
+"port": null
+},
+{
+"url": "x-portable.zip?github.comx-portable.zip%v1.x/%ff",
+"parts": [
+"",
+"",
+"x-portable.zip",
+"github.comx-portable.zip%v1.x/%ff",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip?github.comx-portable.zip%v1.x/%ff",
+"port": null
+},
+{
+"url": "..\u2100\\%2F?\u007f\u00e9HTTPS://",
+"parts": [
+"",
+"",
+"..\u2100\\%2F",
+"\u007f\u00e9HTTPS://",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "..\u2100\\%2F?\u007f\u00e9HTTPS://",
+"port": null
+},
+{
+"url": "v0.4.2/..pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"v0.4.2/..pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "v0.4.2/..pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "[",
+"parts": [
+"",
+"",
+"[",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[",
+"port": null
+},
+{
+"url": ":443]a\t",
+"parts": [
+"",
+"",
+":443]a",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": ":443]a",
+"port": null
+},
+{
+"url": "\u00e9api.github.com:\u007fx-portable.zip%zza",
+"parts": [
+"",
+"",
+"\u00e9api.github.com:\u007fx-portable.zip%zza",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u00e9api.github.com:\u007fx-portable.zip%zza",
+"port": null
+},
+{
+"url": "pneuma-io/sylvia-gm/releases/download/a@",
+"parts": [
+"",
+"",
+"pneuma-io/sylvia-gm/releases/download/a@",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "pneuma-io/sylvia-gm/releases/download/a@",
+"port": null
+},
+{
+"url": "api.github.com\\\\",
+"parts": [
+"",
+"",
+"api.github.com\\\\",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "api.github.com\\\\",
+"port": null
+},
+{
+"url": "#%C3%A9",
+"parts": [
+"",
+"",
+"",
+"",
+"%C3%A9"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "#%C3%A9",
+"port": null
+},
+{
+"url": "/?",
+"parts": [
+"",
+"",
+"/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "/",
+"port": null
+},
+{
+"url": "1.2.3.41.2.3.4\u007fapi.github.com:443fe80::1%25eth0?/%ff",
+"parts": [
+"",
+"",
+"1.2.3.41.2.3.4\u007fapi.github.com:443fe80::1%25eth0",
+"/%ff",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "1.2.3.41.2.3.4\u007fapi.github.com:443fe80::1%25eth0?/%ff",
+"port": null
+},
+{
+"url": "//:#?//1.2.3.4a",
+"parts": [
+"",
+":",
+"",
+"",
+"?//1.2.3.4a"
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "//:#?//1.2.3.4a",
+"port": null
+},
+{
+"url": "%ff@x-portable.zip]",
+"parts": [
+"",
+"",
+"%ff@x-portable.zip]",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%ff@x-portable.zip]",
+"port": null
+},
+{
+"url": "?github.com",
+"parts": [
+"",
+"",
+"",
+"github.com",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "?github.com",
+"port": null
+},
+{
+"url": "https://api.github.com%..1.2.3.4]",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "https://%2fgithub.comhttps://::1%ff..-setup.exe\\",
+"parts": [
+"https",
+"%2fgithub.comhttps:",
+"//::1%ff..-setup.exe\\",
+"",
+""
+],
+"hostname": "%2fgithub.comhttps",
+"username": null,
+"password": null,
+"unsplit": "https://%2fgithub.comhttps://::1%ff..-setup.exe\\",
+"port": null
+},
+{
+"url": "https://::1http://",
+"parts": [
+"https",
+"::1http:",
+"//",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https://::1http://",
+"port_error": "Port could not be cast to integer value as ':1http:'"
+},
+{
+"url": "HTTPS://https:%C3%A9]",
+"error": "Invalid IPv6 URL"
+},
+{
+"url": "https::443pneuma-io/sylvia-gm/releases/download//https:",
+"parts": [
+"https",
+"",
+":443pneuma-io/sylvia-gm/releases/download//https:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "https::443pneuma-io/sylvia-gm/releases/download//https:",
+"port": null
+},
+{
+"url": "%.fe80::1%25eth0:443%C3%A9-setup.exe%ffx-portable.zipHTTPS://",
+"parts": [
+"",
+"",
+"%.fe80::1%25eth0:443%C3%A9-setup.exe%ffx-portable.zipHTTPS://",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "%.fe80::1%25eth0:443%C3%A9-setup.exe%ffx-portable.zipHTTPS://",
+"port": null
+},
+{
+"url": "\u2100%2f@\\%2Fapi.github.com%ff/github.com",
+"parts": [
+"",
+"",
+"\u2100%2f@\\%2Fapi.github.com%ff/github.com",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u2100%2f@\\%2Fapi.github.com%ff/github.com",
+"port": null
+},
+{
+"url": "\tx-portable.zip%C3%A9github.comx-portable.zip%",
+"parts": [
+"",
+"",
+"x-portable.zip%C3%A9github.comx-portable.zip%",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "x-portable.zip%C3%A9github.comx-portable.zip%",
+"port": null
+},
+{
+"url": "\u007f\uff0f[\tv0.4.2/",
+"parts": [
+"",
+"",
+"\u007f\uff0f[v0.4.2/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f\uff0f[v0.4.2/",
+"port": null
+},
+{
+"url": "\u007f\u2100github.com%C3%A9pneuma-io/sylvia-gm/releases/download/",
+"parts": [
+"",
+"",
+"\u007f\u2100github.com%C3%A9pneuma-io/sylvia-gm/releases/download/",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "\u007f\u2100github.com%C3%A9pneuma-io/sylvia-gm/releases/download/",
+"port": null
+},
+{
+"url": "[%ff-setup.exe:a/:",
+"parts": [
+"",
+"",
+"[%ff-setup.exe:a/:",
+"",
+""
+],
+"hostname": null,
+"username": null,
+"password": null,
+"unsplit": "[%ff-setup.exe:a/:",
+"port": null
 }
 ],
 "unquote": [
@@ -13249,6 +21957,54 @@
 {
 "text": "%41%42%43",
 "result": "ABC"
+},
+{
+"text": "abc",
+"result": "abc"
+},
+{
+"text": "a%2Fb",
+"result": "a/b"
+},
+{
+"text": "%",
+"result": "%"
+},
+{
+"text": "%zz%41",
+"result": "%zzA"
+},
+{
+"text": "%C3%A9",
+"result": "\u00e9"
+},
+{
+"text": "\u00e9%C3%A9",
+"result": "\u00e9\u00e9"
+},
+{
+"text": "%C3\u00e9%A9",
+"error": "'utf-8' codec can't decode byte 0xc3 in position 0: unexpected end of data"
+},
+{
+"text": "%E2%82",
+"error": "'utf-8' codec can't decode bytes in position 0-1: unexpected end of data"
+},
+{
+"text": "a%",
+"result": "a%"
+},
+{
+"text": "%00",
+"result": "\u0000"
+},
+{
+"text": "%f0%9f%98%80",
+"result": "\ud83d\ude00"
+},
+{
+"text": "x%C0%AF",
+"error": "'utf-8' codec can't decode byte 0xc0 in position 1: invalid start byte"
 }
 ]
 }
