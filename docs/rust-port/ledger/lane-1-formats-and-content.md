@@ -64,8 +64,8 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_setting_materializer.py` | 150 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_workspace_files.py` | 114 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/campaign/__init__.py` | 10 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/campaign/_folder.py` | 600 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/campaign/__init__.py` | 10 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/campaign/_folder.py` | 600 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/campaign/rift.py` | 543 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/__init__.py` | 1 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/_content_schema_campaign_export.py` | 276 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
@@ -105,18 +105,33 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain::state_ownership` | ported | Replaces lane 3's marked private copy |
 | `src/sylvia_gm/infrastructure/package_archive.py` | 365 | `sylvia-domain::package_archive` | ported | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. CPython's `zipfile` read path is ported in `package_archive/zipfile.rs`. `archive_vectors` |
 | `src/sylvia_gm/infrastructure/zip_bounds.py` | 97 | `sylvia-domain::package_archive` | ported | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. `package_archive/zip_bounds.rs`; `archive_vectors` |
-| `src/sylvia_gm/planning/__init__.py` | 52 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/planning/_campaign_bible.py` | 178 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/planning/_planning_output.py` | 71 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/planning/_reveal_registry.py` | 94 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/__init__.py` | 70 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_changelog.py` | 373 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_exceptions.py` | 144 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_migrate.py` | 140 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_pre_init.py` | 209 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_ruleset_config.py` | 131 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_schema.py` | 113 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_snapshot.py` | 136 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_store.py` | 290 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/_validators.py` | 316 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/state/state_api.py` | 2,359 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/planning/__init__.py` | 52 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/planning/_campaign_bible.py` | 178 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/planning/_planning_output.py` | 71 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/planning/_reveal_registry.py` | 94 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/__init__.py` | 70 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_changelog.py` | 373 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_exceptions.py` | 144 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_migrate.py` | 140 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_pre_init.py` | 209 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_ruleset_config.py` | 131 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_schema.py` | 113 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_snapshot.py` | 136 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_store.py` | 290 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/_validators.py` | 316 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/state/state_api.py` | 2,359 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+
+## Retired files
+
+Agreed with the manager on 21 Nov 2026: `state/` (the legacy file-backed `StateAPI`), `planning/`
+and `campaign/_folder.py` with `campaign/__init__.py` have no live caller in the 0.4.1 snapshot
+(0da1010). Nothing outside `state/` constructs a `StateAPI` (in `src/`, `scripts/`, `tests/`,
+SylviaBench or Trigger Discipline); the remaining references are type annotations in
+`agent/_runner.py`, `session/_context.py` and `session/_npc_dialogue.py`, and `runtime`'s
+`StateBridge` is built only when a `StateAPI` is passed, which never happens. `planning/` is
+read only by `session/_reveal_guard.py`, whose `RevealGuard` is never constructed.
+`campaign/_folder.py` is reached only from `tools/_builder_handlers.py`'s
+`tool_create_campaign_folder`, which is never registered (`tests/test_alpha_f6f_builder_executor.py`
+asserts it is not). Lane 4 drops the type-only references when it ports those files. The
+Builder prompt text that names `create_campaign_folder` (`builder/_prompts.py`) is model-read
+and stays byte for byte. `campaign/rift.py` is live and is ported.
