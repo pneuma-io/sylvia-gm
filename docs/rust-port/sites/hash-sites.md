@@ -32,9 +32,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_card_import.py:524` | `_read_pending_preview` | hashlib.sha256 | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
 | `application/character_card_import.py:535` | `_confirmed_card_result` | hashlib.sha256 | `profile_digest = hashlib.sha256(canonical_json_bytes(preview.profile)).hexdigest()` | |
 | `application/character_card_import.py:536` | `_confirmed_card_result` | hashlib.sha256 | `operation_hash = hashlib.sha256(("desktop-card:" + digest).encode()).hexdigest()[:24]` | |
-| `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` | |
-| `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` | |
-| `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
+| `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:124` | `_read_selected_source` | hashlib.sha256 | `return hashlib.sha256(data).hexdigest(), data` | |
 | `application/import_repair.py:237` | `inspect_repair_source` | hashlib.sha256 | `_read_safe_zip(snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest())` | |
 | `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | |

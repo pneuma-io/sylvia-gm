@@ -20,8 +20,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_card_import.py:435` | `_original_path` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
 | `application/character_card_import.py:558` | `_retire_completed_previews` | re.fullmatch; plain | `if re.fullmatch("[0-9a-f]{64}", target.name) is None:` | |
 | `application/character_card_import.py:611` | `confirm_card_preview` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
-| `application/character_profiles.py:29` | `<module>` | re.compile; plain | `PROFILE_ID = re.compile(r"character-profile-[0-9a-f]{24}-[0-9a-f]{16}")` | |
-| `application/character_profiles.py:30` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` | |
+| `application/character_profiles.py:29` | `<module>` | re.compile; plain | `PROFILE_ID = re.compile(r"character-profile-[0-9a-f]{24}-[0-9a-f]{16}")` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:30` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` |  `sylvia-app` character_profile_vectors |
 | `application/character_rules.py:18` | `<module>` | re.compile; plain | `_LOCAL = re.compile(r"_[A-Za-z0-9_]+\Z")` | |
 | `application/compatible_character_copy.py:23` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` | |
 | `application/import_repair.py:55` | `<module>` | re.compile; plain | `_PLAN_ID_PATTERN = re.compile(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}")` | |
