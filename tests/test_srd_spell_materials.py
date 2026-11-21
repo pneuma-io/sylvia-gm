@@ -114,6 +114,11 @@ def test_removing_other_inventory_keeps_carried_materials_usable_and_preserves_s
 
 def test_last_material_unit_leaves_inventory_and_failed_cast_restores_it():
     state, data, parameters = _materials_case(quantity=1)
+    # In combat the saved scene decides touch (SRD Lite 0.3.29 measures Stoneskin), so the
+    # refused cast's recipient actually stands out of reach, as its claimed facts say.
+    scene = state[f"{SRD}.state"]["spatial_scene"]
+    guard = next(body for body in scene["entities"] if body["id"] == "guard")
+    guard["position"] = [60, 0, 0]
     before = deepcopy(state)
     with pytest.raises(RulesetPreconditionRejected):
         _run(
@@ -129,6 +134,7 @@ def test_last_material_unit_leaves_inventory_and_failed_cast_restores_it():
             ),
         )
     assert state == before
+    guard["position"] = [5, 0, 0]
     _run("cast_spell", state, participant_data=data, **parameters)
     assert state[f"{SRD}.entities"]["hero"]["spell_materials"][0]["quantity"] == 0
     assert state[f"{SRD}.entities"]["hero"]["inventory"] == []

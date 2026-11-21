@@ -32759,17 +32759,26 @@ definitions:
     mage_armour: mage_armor
     hunter_s_mark: hunters_mark
   srd_lite_scalar_geometry_spells:
+  - acid_arrow
+  - befuddlement
   - blight
+  - chill_touch
   - chromatic_orb
   - cure_wounds
   - darkvision
   - death_ward
+  - disintegrate
+  - dispel_magic
+  - dissonant_whispers
   - dragons_breath
+  - finger_of_death
   - greater_restoration
   - guidance
   - guiding_bolt
+  - harm
   - heal
   - healing_word
+  - inflict_wounds
   - lesser_restoration
   - mage_armor
   - polymorph
@@ -32781,18 +32790,30 @@ definitions:
   - ray_of_sickness
   - revivify
   - shield_of_faith
+  - starry_wisp
+  - stoneskin
   srd_lite_multi_geometry_spells:
+  - acid_arrow
   - aid
+  - bane
   - beacon_of_hope
+  - befuddlement
   - bless
   - blight
+  - blindness_deafness
   - charm_monster
+  - chill_touch
   - chromatic_orb
   - command
   - cure_wounds
   - darkvision
   - death_ward
+  - disintegrate
+  - dispel_magic
+  - dissonant_whispers
   - dragons_breath
+  - enhance_ability
+  - finger_of_death
   - fly
   - foresight
   - freedom_of_movement
@@ -32800,10 +32821,12 @@ definitions:
   - greater_restoration
   - guidance
   - guiding_bolt
+  - harm
   - heal
   - healing_word
   - hold_monster
   - hold_person
+  - inflict_wounds
   - lesser_restoration
   - longstrider
   - mage_armor
@@ -32817,6 +32840,8 @@ definitions:
   - ray_of_sickness
   - revivify
   - shield_of_faith
+  - starry_wisp
+  - stoneskin
   - suggestion
   srd_lite_recipient_contracts:
     r0:
@@ -62343,7 +62368,8 @@ tools:
     - require:
         condition: lasting_state.pending_srd_action_stack == null or len(lasting_state.pending_srd_action_stack)
           == 0
-        error: Complete the pending reaction window before advancing its turn or time.
+        error: Complete the pending reaction window before advancing its turn or time. If its completion
+          is refused, close that casting window with release_srd_unresolved_spell_cast.
     - call: interrupt_srd_extended_castings
     - set:
         field: _elapsed_ticks
@@ -67753,7 +67779,7 @@ tools:
           params:
             caster_state: '{_caster_state_id}'
             target_state: '{_instant_cast__target_id}'
-            target_distance: '{target_distance}'
+            target_distance: '{_coord_fact_target_distance}'
             cover: '{cover}'
       - condition: recovery_choice == 'illumination_object' or recovery_choice == 'illumination_effect'
         on_true:
@@ -71220,6 +71246,13 @@ tools:
           - '''illumination_effect'''
       - condition: _ms == 'dispel_magic' and recovery_choice in _recovery_source_intents
         on_true:
+        - set:
+            field: _recovery_touch_fact
+            value: _coord_fact_caster_can_touch_target
+        - set:
+            field: _recovery_touch_fact
+            value: false
+          condition: _recovery_touch_fact == null and (definitions.spells[_ms].range_kind != 'touch')
         - call: cast_srd_recovery
           params:
             caster_state: '{_caster_state_id}'
@@ -71230,7 +71263,7 @@ tools:
             casting_ability: '{_casting_profile.ability}'
             save_dc: '{_casting_profile.save_dc}'
             concentration_save_modifier: '{_casting_profile.concentration_save_modifier}'
-            can_touch: '{_coord_fact_caster_can_touch_target}'
+            can_touch: '{_recovery_touch_fact}'
             recovery_choice: '{recovery_choice}'
             recovery_item: '{recovery_item}'
             recovery_source_id: '{recovery_source_id}'
@@ -71262,6 +71295,13 @@ tools:
             field: _recovery_target
             value: _caster_state_id
           condition: _spell_definition.range_kind == 'self' or _ms == 'prayer_of_healing'
+        - set:
+            field: _recovery_touch_fact
+            value: _coord_fact_caster_can_touch_target
+        - set:
+            field: _recovery_touch_fact
+            value: false
+          condition: _recovery_touch_fact == null and (definitions.spells[_ms].range_kind != 'touch')
         - call: cast_srd_recovery
           params:
             target_state: '{_recovery_target}'
@@ -71274,7 +71314,7 @@ tools:
             save_dc: '{_casting_profile.save_dc}'
             concentration_save_modifier: '{_casting_profile.concentration_save_modifier}'
             target_distance: '{_cantrip_fact_target_distance}'
-            can_touch: '{_coord_fact_caster_can_touch_target}'
+            can_touch: '{_recovery_touch_fact}'
             recovery_choice: '{recovery_choice}'
             recovery_item: '{recovery_item}'
             recovery_source_id: '{recovery_source_id}'
@@ -71347,6 +71387,13 @@ tools:
           _spell_detail_rows: _spell_detail_rows
           _order_save_rolls: _order_save_rolls
         condition: _spell_cast_failed != true and (_spell_definition.family == 'timed_control_orders')
+      - set:
+          field: _control_sight_fact
+          value: _multi_fact_caster_can_see_all_targets
+      - set:
+          field: _control_sight_fact
+          value: false
+        condition: _control_sight_fact == null and (definitions.spells[_ms].requires_sight != true)
       - call: cast_srd_control_behavior
         params:
           caster_state: '{_caster_state_id}'
@@ -71356,7 +71403,7 @@ tools:
           concentration_save_modifier: '{_casting_profile.concentration_save_modifier}'
           targets: '{_fire_dispatch_retained_ice_dispatch_targets}'
           targets_max_distance: '{_multi_fact_targets_max_distance}'
-          caster_can_see_all_targets: '{_multi_fact_caster_can_see_all_targets}'
+          caster_can_see_all_targets: '{_control_sight_fact}'
           all_targets_have_clear_path: '{_multi_fact_all_targets_have_clear_path}'
           forego_save_targets: '{_forego_save_targets}'
           fighting_caster_targets: '{fighting_caster_targets}'
@@ -71708,6 +71755,13 @@ tools:
             field: _defense_dispatch_targets
             value: _fire_dispatch_retained_ice_dispatch_targets
           condition: _fire_dispatch_retained_ice_dispatch_targets != null
+        - set:
+            field: _defense_touch_fact
+            value: _multi_fact_caster_can_touch_all_targets
+        - set:
+            field: _defense_touch_fact
+            value: true
+          condition: _defense_touch_fact == null and (definitions.spells[_ms].range_kind == 'self')
         - call: cast_spell_timed_actor_defense
           params:
             spell: '{_ms}'
@@ -71722,7 +71776,7 @@ tools:
             target_willing: '{target_willing}'
             caster_can_touch_target: '{_caster_can_touch_target}'
             all_targets_willing: '{all_targets_willing}'
-            caster_can_touch_all_targets: '{_multi_fact_caster_can_touch_all_targets}'
+            caster_can_touch_all_targets: '{_defense_touch_fact}'
             actual_spell_level: '{_slot_level}'
             spell_cast_id: '{_spell_source_cast_id}'
             spell_cast_owner: '{_caster_state_id}'
@@ -75997,7 +76051,7 @@ tools:
       error: The concentration resistance spell profile is incoherent.
     - condition: (selection == 'none' and selected_damage_type == null) or (selection == 'damage_type'
         and selected_damage_type != null)
-      error: The selected damage type does not match this spell profile.
+      error: The selected damage type does not match this spell profile. Check input 'selected_damage_type'.
     - condition: selection != 'damage_type' or selected_damage_type != 'acid' or resists_acid == true
       error: Acid is unavailable for this spell profile.
     - condition: selection != 'damage_type' or selected_damage_type != 'bludgeoning' or resists_bludgeoning
@@ -77597,7 +77651,7 @@ tools:
       error: The caster does not have the selected spell prepared.
     - condition: (damage_type_mode == 'fixed' and selected_damage_type == null) or (damage_type_mode ==
         'selected' and selected_damage_type != null)
-      error: The spell's damage-type selection does not match its package definition.
+      error: The spell's damage-type selection does not match its package definition. Check input 'selected_damage_type'.
     - condition: damage_type_mode != 'selected' or selected_damage_type != 'acid' or allows_acid == true
       error: The selected Acid damage type is not allowed by this spell.
     - condition: damage_type_mode != 'selected' or selected_damage_type != 'bludgeoning' or allows_bludgeoning
@@ -84481,7 +84535,8 @@ tools:
     - condition: target.hp <= hit_point_threshold or (target.max_hp != null and target.temp_hp != null
         and target.creature_kind != null and target.bloodied != null and target.damage_immunities != null
         and target.damage_resistances != null and target.damage_vulnerabilities != null)
-      error: Above-threshold damage needs authoritative Hit Point lifecycle and defense state.
+      error: Above-threshold damage needs authoritative Hit Point lifecycle and defense state. Check input
+        'target'.
     - condition: target.hp <= hit_point_threshold or target.creature_kind == 'monster' or (target.death_successes
         != null and target.death_failures != null and target.stable != null and target.stable_recovery_hours_remaining
         != null)
@@ -87236,7 +87291,7 @@ tools:
       - require:
           condition: _defense_target_dexterity != null
           error: Mage Armor needs the target's validated Character File or saved NPC equipment ability
-            profile.
+            profile. Check input 'target'.
       - set:
           field: _defense_target_ac
           value: _defense_target_profile.base_ac + (_defense_target_dexterity - 10) // 2
@@ -88332,7 +88387,8 @@ tools:
       - require:
           condition: lasting_state.pending_srd_action_stack == null or len(lasting_state.pending_srd_action_stack)
             == 0
-          error: Complete the pending reaction window before advancing its turn or time.
+          error: Complete the pending reaction window before advancing its turn or time. If its completion
+            is refused, close that casting window with release_srd_unresolved_spell_cast.
       - set:
           field: _elapsed_ticks
           value: elapsed_rounds * 2
@@ -97494,6 +97550,9 @@ tools:
           caster_state: '{_pending_action.actor_state_id}'
           pending_action_id: '{pending_action_id}'
       - set:
+          field: lasting_state.srd_resolving_cast_id
+          value: pending_action_id
+      - set:
           field: _fire_pending_public_half_cover_targets
           value: null
       - condition: _pending_action.parameters.half_cover_targets != null
@@ -98160,6 +98219,9 @@ tools:
         params:
           caster_state: '{_pending_action.actor_state_id}'
           pending_action_id: ''
+      - set:
+          field: lasting_state.srd_resolving_cast_id
+          value: null
       - call: end_srd_invisibility_spell_source
         params:
           caster_state: '{_pending_action.actor_state_id}'
@@ -98178,6 +98240,19 @@ tools:
         - call: record_srd_result_text
           params:
             text: '{_pending_card_title}: casting window {_pending_action.status}.'
+          export_context:
+            _recorded_result_text: _recorded_result_text
+        - set:
+            field: _pending_card_summary
+            value:
+            - label: '''Casting'''
+              value: _recorded_result_text
+      - condition: _pending_action.released_unresolved == true
+        on_true:
+        - call: record_srd_result_text
+          params:
+            text: '{_pending_card_title}: casting released; the spell could not resolve. Its Action stays
+              used and no spell slot is spent.'
           export_context:
             _recorded_result_text: _recorded_result_text
         - set:
@@ -99011,20 +99086,17 @@ tools:
       error: Missing input 'targets'. Select the actual recipients for this spell.
     - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
         != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
-        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
-        == 0)) or caster_can_touch_target != null
+        true and spell in definitions.srd_lite_multi_geometry_spells) or caster_can_touch_target != null
       error: Missing input 'caster_can_touch_target'. Supply true if the caster can touch this other creature
         now; otherwise select a reachable target. Self-touch is automatic.
     - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
         != 'touch' or target == null or _caster_state_id == _target_id or (combat.encounter_active ==
-        true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
-        == 0)) or caster_can_touch_target != false
+        true and spell in definitions.srd_lite_multi_geometry_spells) or caster_can_touch_target != false
       error: 'Input ''caster_can_touch_target'' is false: the selected target is out of touch reach. Select
         a reachable target; do not claim contact.'
     - condition: spell not in definitions.srd_lite_scalar_geometry_spells or definitions.spells[spell].range_kind
         != 'distance' or target == null or _caster_state_id == _target_id or (combat.encounter_active
-        == true and spell in definitions.srd_lite_scalar_geometry_spells and (targets == null or len(targets)
-        == 0)) or target_distance != null
+        == true and spell in definitions.srd_lite_multi_geometry_spells) or target_distance != null
       error: Missing input 'target_distance'. Supply the current distance to the target in feet from established
         scene facts.
     - condition: spell in definitions.srd_lite_catalogue or spell in definitions.srd_lite_aliases
@@ -99088,6 +99160,43 @@ tools:
       error: Fire Shield affects its actual caster only.
     - condition: spell != 'fire_shield' or actor_spell_choice == 'warm' or actor_spell_choice == 'chill'
       error: Choose a warm or chill Fire Shield.
+    - condition: spell != 'ice_knife' or combat.encounter_active != true or targets == null or len(targets)
+        == 0 or target_distance != null
+      error: Missing input 'target_distance'. Supply the current distance in feet to Ice Knife's attack
+        target, or omit targets so the saved scene measures it.
+    - condition: spell != 'chain_lightning' or combat.encounter_active != true or caster_can_see_target
+        == true
+      error: Missing input 'caster_can_see_target'. Chain Lightning's primary target must be in the caster's
+        sight; supply true only when it is.
+    - condition: spell != 'arcane_eye' or information_lighting == 'bright' or information_lighting ==
+        'dim' or information_lighting == 'darkness' or information_lighting == 'magical_darkness'
+      error: 'Missing input ''information_lighting''. Specify the actual ambient lighting at the sensor
+        position: bright, dim, darkness or magical_darkness.'
+    - condition: spell != 'light' or (illumination_object != null and illumination_object != '')
+      error: Missing input 'illumination_object'. Choose the touched scene object.
+    - condition: spell != 'sunburst' or (sunburst_origin != null and len(sunburst_origin) == 3)
+      error: Missing input 'sunburst_origin'. Choose Sunburst's actual three-dimensional point.
+    - condition: spell != 'mage_hand' or (utility_output_id != null and utility_output_id != '' and utility_form_id
+        != null and utility_form_id != '')
+      error: Missing input 'utility_output_id'. Mage Hand needs utility_output_id and utility_form_id
+        for the hand it creates.
+    - condition: spell != 'summon_dragon' or (summon_id != null and summon_id != '')
+      error: Missing input 'summon_id'. Choose the summoned dragon's identity.
+    - condition: spell != 'polymorph' or (transformation_form != null and transformation_form != '')
+      error: Missing input 'transformation_form'. Choose Polymorph's new form.
+    - condition: spell != 'dragons_breath' or selected_damage_type != null
+      error: Missing input 'selected_damage_type'. Choose the breath's damage type.
+    - condition: spell != 'suggestion' or (targets != null and len(targets) > 0)
+      error: Missing input 'targets'. Select Suggestion's actual recipients.
+    - condition: spell != 'blindness_deafness' or (blinded_targets != null and len(blinded_targets) >
+        0) or (deafened_targets != null and len(deafened_targets) > 0)
+      error: Missing input 'blinded_targets'. Assign each recipient to blinded_targets or deafened_targets.
+    - condition: spell != 'enhance_ability' or (strength_targets != null and len(strength_targets) > 0)
+        or (dexterity_targets != null and len(dexterity_targets) > 0) or (intelligence_targets != null
+        and len(intelligence_targets) > 0) or (wisdom_targets != null and len(wisdom_targets) > 0) or
+        (charisma_targets != null and len(charisma_targets) > 0)
+      error: Missing input 'strength_targets'. Assign each recipient to one ability's targets list (strength_targets,
+        dexterity_targets, intelligence_targets, wisdom_targets or charisma_targets).
     effects:
     - call: initialize_srd_lite_constants_67df34cdeb2e
       export_context: '*'
@@ -99831,6 +99940,30 @@ tools:
       - set:
           field: _multi_fact_target_distance
           value: _multi_fact_targets_max_distance
+    - condition: combat.encounter_active == true and spell == 'true_strike' and _target_id != null and
+        true_strike_weapon != null
+      on_true:
+      - call: resolve_srd_scene_relation_node
+        params:
+          actor_state: '{_caster_state_id}'
+          target_state: '{_target_id}'
+          lasting_state: '{_lasting_state_id}'
+        export_context:
+          _ts_scene_distance: _scene_distance
+          _ts_scene_same_plane: _scene_same_plane
+          _ts_scene_line_of_sight: _scene_line_of_sight
+      - set:
+          field: _ts_weapon
+          value: definitions.weapons[true_strike_weapon]
+      - require:
+          condition: _ts_scene_same_plane == true and _ts_scene_line_of_sight == true and ceil(_ts_scene_distance)
+            <= _ts_weapon.long_range and (true_strike_attack_mode != 'melee' or ceil(_ts_scene_distance)
+            <= _ts_weapon.normal_range) and ((true_strike_attack_mode == 'melee' and (('reach' in _ts_weapon.properties
+            and _ts_scene_distance <= caster_state.melee_reach + 5) or ('reach' not in _ts_weapon.properties
+            and _ts_scene_distance <= caster_state.melee_reach))) or (true_strike_attack_mode != 'melee'
+            and _ts_scene_distance <= _ts_weapon.long_range))
+          error: The actual True Strike target is beyond the chosen weapon's range or reach, or lacks
+            a clear path on this plane. Check input 'target'.
     - condition: _multi_fact_target_distance != null
       on_true:
       - set:
@@ -106683,7 +106816,8 @@ tools:
         value: lasting_state.pending_srd_actions[pending_action_id]
     - require:
         condition: _countered_cast.actor_state_id == _caster_state_id and _countered_cast.kind == 'spell_cast'
-          and _countered_cast.status == 'lost' and _countered_cast.countered_by != null
+          and _countered_cast.status == 'lost' and (_countered_cast.countered_by != null or _countered_cast.released_unresolved
+          == true)
         error: Only the actual countered casting action can settle this use.
     - set:
         field: _countered_spell
@@ -114105,7 +114239,7 @@ tools:
         condition: _order_definition.behavior != 'suggestion' or (len(activity_words) > 0 and activity_achievable
           == true and activity_harmful != true)
         error: Suggestion requires at most 25 words describing achievable activity without obvious harm
-          to targets or allies.
+          to targets or allies. Check input 'activity_words'.
     - require:
         condition: _order_definition.behavior != 'geas' or len(geas_command) > 0
         error: Geas requires its actual verbal command.
@@ -116278,10 +116412,13 @@ tools:
         error: Settle the queued Mirage support loss before another ordinary action or time advance.
     - require:
         condition: lasting_state.pending_srd_action_stack == null or len(lasting_state.pending_srd_action_stack)
-          == 0
+          == 0 or (len(lasting_state.pending_srd_action_stack) == 1 and lasting_state.srd_resolving_cast_id
+          != null and lasting_state.pending_srd_action_stack[0] == lasting_state.srd_resolving_cast_id)
         error: Complete the pending reaction window before another ordinary spell action.
     - require:
-        condition: lasting_state.pending_srd_movement == null or lasting_state.pending_srd_movement.stage == 'resuming' or lasting_state.pending_srd_movement.stage == 'preparing' or lasting_state.pending_srd_movement.stage == 'resolving'
+        condition: lasting_state.pending_srd_movement == null or lasting_state.pending_srd_movement.stage
+          == 'resuming' or lasting_state.pending_srd_movement.stage == 'preparing' or lasting_state.pending_srd_movement.stage
+          == 'resolving'
         error: Resolve the saved coordinate movement Reaction and completion first.
     metadata:
       category: internal
@@ -131518,7 +131655,8 @@ tools:
         - require:
             condition: (slot_level == 7 and len(_travel_targets) == 0) or (slot_level > 7 and len(_travel_targets)
               + 1 <= 3 * (slot_level - 7))
-            error: Each slot above seventh permits three total travelers, including the caster.
+            error: Each slot above seventh permits three total travelers, including the caster. Check
+              input 'targets'.
         - require:
             condition: len(_travel_targets) == 0 or all_targets_willing == true
             error: Every additional Ethereal traveler must be willing.
@@ -141828,7 +141966,7 @@ tools:
             == plane
     - require:
         condition: _environment_ground_id != null
-        error: Choose a point on actual same-plane supporting ground.
+        error: Choose a point on actual same-plane supporting ground. Check input 'environment_origin'.
     metadata:
       category: internal
       visible_to_player: false
@@ -234317,7 +234455,7 @@ tools:
                 > _solid_wall_volume.min[0] and _solid_wall_body_frame.min[1] < _solid_wall_volume.max[1]
                 and _solid_wall_body_frame.max[1] > _solid_wall_volume.min[1] and _solid_wall_body_frame.min[2]
                 < _solid_wall_volume.max[2] and _solid_wall_body_frame.max[2] > _solid_wall_volume.min[2])
-              error: Formation crossing an actual body needs the printed push owner.
+              error: Formation crossing an actual body needs the printed push owner. Check input 'solid_wall_origin'.
     - set:
         field: _solid_wall_existing_geometry
         value: lasting_state.spatial_scene.geometry
@@ -235083,7 +235221,7 @@ tools:
                 > _solid_wall_volume.min[0] and _solid_wall_body_frame.min[1] < _solid_wall_volume.max[1]
                 and _solid_wall_body_frame.max[1] > _solid_wall_volume.min[1] and _solid_wall_body_frame.min[2]
                 < _solid_wall_volume.max[2] and _solid_wall_body_frame.max[2] > _solid_wall_volume.min[2])
-              error: Formation crossing an actual body needs the printed push owner.
+              error: Formation crossing an actual body needs the printed push owner. Check input 'solid_wall_origin'.
     - set:
         field: _solid_wall_existing_geometry
         value: lasting_state.spatial_scene.geometry
@@ -256398,7 +256536,7 @@ tools:
       error: The concentration resistance spell profile is incoherent.
     - condition: (selection == 'none' and selected_damage_type == null) or (selection == 'damage_type'
         and selected_damage_type != null)
-      error: The selected damage type does not match this spell profile.
+      error: The selected damage type does not match this spell profile. Check input 'selected_damage_type'.
     - condition: selection != 'damage_type' or selected_damage_type != 'acid' or resists_acid == true
       error: Acid is unavailable for this spell profile.
     - condition: selection != 'damage_type' or selected_damage_type != 'bludgeoning' or resists_bludgeoning
@@ -273190,7 +273328,7 @@ tools:
       - require:
           condition: _defense_target_dexterity != null
           error: Mage Armor needs the target's validated Character File or saved NPC equipment ability
-            profile.
+            profile. Check input 'target'.
       - set:
           field: _defense_target_dexterity
           value: jar_armor_caster.ability_scores.dexterity
@@ -299881,7 +300019,8 @@ tools:
         value: target.spell_fire_shield
     - require:
         condition: lasting_state.pending_srd_action_stack == null or len(lasting_state.pending_srd_action_stack)
-          == 0
+          == 0 or (len(lasting_state.pending_srd_action_stack) == 1 and lasting_state.srd_resolving_cast_id
+          != null and lasting_state.pending_srd_action_stack[0] == lasting_state.srd_resolving_cast_id)
         error: Complete the previous attack's reaction window first.
     - call: derive_srd_martial_arts
       params:
@@ -301447,7 +301586,7 @@ tools:
     pre_conditions:
     - condition: (damage_type_mode == 'fixed' and selected_damage_type == null) or (damage_type_mode ==
         'selected' and selected_damage_type != null)
-      error: The spell's damage-type selection does not match its package definition.
+      error: The spell's damage-type selection does not match its package definition. Check input 'selected_damage_type'.
     - condition: damage_type_mode != 'selected' or selected_damage_type != 'acid' or allows_acid == true
       error: The selected Acid damage type is not allowed by this spell.
     - condition: damage_type_mode != 'selected' or selected_damage_type != 'bludgeoning' or allows_bludgeoning
@@ -338591,7 +338730,7 @@ tools:
       - require:
           condition: _defense_target_dexterity != null
           error: Mage Armor needs the target's validated Character File or saved NPC equipment ability
-            profile.
+            profile. Check input 'target'.
       - set:
           field: _defense_target_ac
           value: _defense_target_profile.base_ac + (_defense_target_dexterity - 10) // 2
@@ -341845,7 +341984,8 @@ tools:
     - require:
         condition: lasting_state.pending_srd_action_stack == null or len(lasting_state.pending_srd_action_stack)
           == 0
-        error: Complete the pending reaction window before advancing its turn or time.
+        error: Complete the pending reaction window before advancing its turn or time. If its completion
+          is refused, close that casting window with release_srd_unresolved_spell_cast.
     - call: refresh_srd_respiration
       params:
         target_state: '{_actor_id}'
@@ -342095,8 +342235,8 @@ tools:
           target_state: '{_actor_id}'
           lasting_state: state
     - call: prepare_srd_telekinesis_releases
-    - condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.active ==
-        true and time_stop_state.time_stop_source.turn_running == true and _actor_id == time_stop_state.time_stop_source.caster
+    - condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.active
+        == true and time_stop_state.time_stop_source.turn_running == true and _actor_id == time_stop_state.time_stop_source.caster
       on_true:
       - set:
           field: time_stop_state.time_stop_source.turn_running
@@ -342124,8 +342264,8 @@ tools:
         value: false
       condition: time_stop_state.time_stop_source != null
     - call: finalize_srd_time_stop
-      condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.ending ==
-        true
+      condition: time_stop_state.time_stop_source != null and time_stop_state.time_stop_source.ending
+        == true
     - call: expire_srd_created_ghoul_claw_sources
       params:
         target_state: '{_actor_id}'
@@ -342209,8 +342349,8 @@ tools:
       - poisoned
       required: false
       default: none
-      description: For a Monk of level 10 or higher, choose one condition to remove at the end of this turn.
-        This is optional and does not spend an action.
+      description: For a Monk of level 10 or higher, choose one condition to remove at the end of this
+        turn. This is optional and does not spend an action.
     - name: lasting_state
       required: false
       default: state
@@ -365567,6 +365707,65 @@ tools:
       category: internal
       visible_to_player: false
       costs_action: false
+  release_srd_unresolved_spell_cast:
+    description: 'In combat, close an open casting window that complete_srd_pending_action refused and
+      that no corrected input can complete. The cast fails without resolving: its Action stays used, no
+      spell slot is spent, and a creature''s reserved daily or feature use is settled as for a countered
+      spell. Use it only after a refused completion, never to cancel a spell that can still resolve.'
+    effects:
+    - require:
+        condition: lasting_state.pending_srd_actions != null and pending_action_id in lasting_state.pending_srd_actions
+        error: This pending action does not exist.
+    - set:
+        field: _release_action
+        value: lasting_state.pending_srd_actions[pending_action_id]
+    - set:
+        field: _release_stack
+        value: lasting_state.pending_srd_action_stack
+    - require:
+        condition: len(_release_stack) > 0 and _release_stack[len(_release_stack) - 1] == pending_action_id
+        error: Release the innermost pending action first.
+    - require:
+        condition: _release_action.kind == 'spell_cast' and _release_action.status == 'open' and _release_action.owner_kind
+          != 'extended_casting'
+        error: Only an open casting window can be released.
+    - require:
+        condition: _release_action.turn_actor != null and combat.turn_active == true and combat.active_actor
+          == _release_action.turn_actor
+        error: Release the casting window on its original turn.
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.status
+        value: '''lost'''
+    - set:
+        field: lasting_state.pending_srd_actions.{pending_action_id}.released_unresolved
+        value: true
+    - call: complete_srd_pending_action
+      params:
+        pending_action_id: '{pending_action_id}'
+      export_context:
+        _pending_card_title: _pending_card_title
+        _pending_card_summary: _pending_card_summary
+        _pending_card_details: _pending_card_details
+    metadata:
+      category: combat
+      result_card:
+        version: 1
+        footprint: compact
+        title:
+          path: context._pending_card_title
+        summary:
+          path: context._pending_card_summary
+        details_label: Targets and calculations
+        details:
+          path: context._pending_card_details
+    parameters:
+    - name: pending_action_id
+      type: string
+    - name: lasting_state
+      required: false
+      default: state
+      resolve: entity
+      model_hidden: true
 parameter_declarations:
   param_contingent_fact_tag_6ddb058d82da6cce:
     name: contingent_fact_tag
