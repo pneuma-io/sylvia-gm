@@ -16,7 +16,7 @@
 //! - [`pyobj`] holds Python's view of provider JSON.
 //! - [`openai_compat`] holds `OpenAICompatProvider` over the HTTP seam.
 //! - [`hooks`] holds `provider/_hooks.py`'s context and manager.
-//! - [`pyurl`] and [`httpx_url`] hold `urllib.parse.urlsplit` and `httpx.URL`.
+//! - [`httpx_url`] holds `httpx.URL`; `urllib.parse.urlsplit` is [`sylvia_base::pyurl`].
 //! - [`pyfmt`] holds Python's `:g` number formatting.
 
 pub mod chat;
@@ -32,7 +32,8 @@ pub mod openai_compat;
 pub mod provider;
 pub mod pyfmt;
 pub mod pyobj;
-pub mod pyurl;
+/// `urllib.parse`, now shared in `sylvia_base`.
+pub use sylvia_base::pyurl;
 pub mod reply;
 pub mod retry;
 pub mod routes;

@@ -48,6 +48,7 @@ pub use value::{fresh_float, key_eq, Date, DateTime, Loaded, NotJson, Object, Ob
 use compose::Composer;
 use parser::Parser;
 use parser_c::CParser;
+pub(crate) use scanner::utf8_error_text;
 use scanner::{Reader, Scanner};
 use scanner_c::CScanner;
 
