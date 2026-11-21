@@ -97,11 +97,13 @@ fn launch_validation_and_shutdown() {
     );
 
     // An unknown method is rejected with Python's words; a known one is still pending.
+    // Every command error carries its local diagnostics record's identity.
     owner.send(r#"{"id":"d","method":"no_such_method","params":{}}"#);
-    assert_eq!(
-        owner.read(),
-        r#"{"id":"d","ok":false,"error":{"code":"command_rejected","message":"Unsupported owner method: no_such_method","diagnostics":[]}}"#
-    );
+    let reply = owner.read();
+    let prefix = r#"{"id":"d","ok":false,"error":{"code":"command_rejected","message":"Unsupported owner method: no_such_method","diagnostics":[],"diagnostic_id":""#;
+    assert!(reply.starts_with(prefix), "{reply}");
+    let identity = &reply[prefix.len()..reply.len() - 3];
+    assert!(identity.len() == 32 && identity.bytes().all(|byte| byte.is_ascii_hexdigit()), "{reply}");
     owner.send(r#"{"id":"e","method":"campaign_index"}"#);
     assert!(owner.read().contains(r#""code":"rust_port_pending""#));
 

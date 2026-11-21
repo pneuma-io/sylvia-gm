@@ -183,12 +183,12 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | --- | --- | --- | --- | --- |
 | `application/desktop_update/helper.py:260` | `_write` | Dump::WIRE | `stream.write(json.dumps(value, separators=(",", ":")) + "\n")` | |
 | `application/desktop_update/identity.py:34` | `main` | Dump::WIRE | `print(json.dumps(runtime_identity(), separators=(",", ":")))` | |
-| `application/desktop_update/manifest.py:140` | `canonical_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False ).encode("utf-8")` | |
+| `application/desktop_update/manifest.py:140` | `canonical_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False ).encode("utf-8")` | `local-services`, `sylvia-owner` diagnostics tests |
 | `application/desktop_update/recovery_service.py:138` | `_write` | Dump::WIRE | `stream.write(json.dumps(row, separators=(",", ":")) + "\n")` | |
 | `build_workspace.py:29` | `BuildWorkspace.create` | Dump::DEFAULT | `(path / ".invocation.json").write_text(json.dumps({"token": token, "pid": os.getpid()}))` | |
 | `build_workspace.py:65` | `BuildWorkspace.finish` | Dump::INDENT2 | `json.dump(record, stream, indent=2)` | |
-| `interfaces/_local_diagnostics.py:137` | `_encode` | Dump::WIRE + allow_nan= | `(json.dumps(row, separators=(",", ":"), allow_nan=False) + "\n").encode("ascii")` | |
-| `interfaces/_local_diagnostics.py:373` | `LocalDiagnostics.preview` | Dump::INDENT2 + allow_nan= | `content = json.dumps(payload, ensure_ascii=True, indent=2, allow_nan=False) + "\n"` | |
+| `interfaces/_local_diagnostics.py:137` | `_encode` | Dump::WIRE + allow_nan= | `(json.dumps(row, separators=(",", ":"), allow_nan=False) + "\n").encode("ascii")` | `local-services`, `sylvia-owner` diagnostics tests |
+| `interfaces/_local_diagnostics.py:373` | `LocalDiagnostics.preview` | Dump::INDENT2 + allow_nan= | `content = json.dumps(payload, ensure_ascii=True, indent=2, allow_nan=False) + "\n"` | `local-services`, `sylvia-owner` diagnostics tests |
 | `interfaces/commands/providers.py:96` | `handle_admin_full_audit_record` | Dump::WIRE + allow_nan= | `encoded = json.dumps( _json_value(record), ensure_ascii=True, separators=(",", ":"), allow_nan=False, ).encode("utf-8")` | |
 | `interfaces/owner_process.py:847` | `_write_message` | Dump::WIRE + allow_nan= | `encoded = json.dumps(payload, ensure_ascii=True, separators=(",", ":"), allow_nan=False)` | |
 | `interfaces/owner_process.py:903` | `_json_value` | Dump::CANONICAL | `key=lambda item: json.dumps( item, ensure_ascii=False, separators=(",", ":"), sort_keys=True ),` | |

@@ -7,6 +7,7 @@
 //! exported by the lane that owns the service, and return the reply's result. See "Command
 //! handlers" in `docs/rust-port/README.md` for who writes what.
 
+pub mod campaigns;
 mod table;
 
 pub use table::{find, Command, Status, REGISTRY, RUN_LOOP_METHODS};

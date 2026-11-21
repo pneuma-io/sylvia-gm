@@ -1,0 +1,65 @@
+{
+ "name": "local-services",
+ "description": "The owner's own services without the store: handshake status, renderer faults and local reports (preview, cancel, save), desktop drafts (refused, saved, loaded), display-load cancellation and the run loop's request checks. Before the first report preview every diagnostics outcome occurs once, so its content does not depend on minute boundaries.",
+ "summarise_tables": ["^package_", "^packages$"],
+ "steps": [
+  {"method": "handshake_status"},
+  {"method": "record_local_fault", "params": {"category": "renderer_error", "delta": 2}},
+  {"method": "record_local_fault", "params": {"category": "renderer_crash", "delta": 1}},
+  {"method": "load_desktop_drafts", "params": {"unexpected": true}},
+  {"method": "save_desktop_drafts", "params": {"drafts": {"format_version": 2, "sessions": []}}},
+  {"method": "renderer"},
+  {"method": "cancel_local_report", "params": {}},
+  {"method": "preview_local_report", "params": {"kind": "app_problem", "reproduction": "Open the app, then close it é", "feedback": "Fine"},
+   "save": {"preview_id": "/result/preview_id"}},
+  {"method": "cancel_local_report", "params": {"preview_id": "${preview_id}"}},
+  {"method": "save_local_report", "params": {"preview_id": "${preview_id}", "destination_path": "${data_root}/../saved-report.json"}},
+  {"method": "preview_local_report", "params": {"kind": "model_feedback"},
+   "save": {"preview_id": "/result/preview_id"}},
+  {"method": "save_local_report", "params": {"preview_id": "${preview_id}", "destination_path": "saved-report.json"}},
+  {"method": "save_local_report", "params": {"preview_id": "${preview_id}", "destination_path": "${data_root}/../saved-report.json"}},
+  {"method": "save_local_report", "params": {"preview_id": "${preview_id}", "destination_path": "${data_root}/../saved-report.json"}},
+  {"method": "preview_local_report", "params": {"kind": "bug"}},
+  {"method": "preview_local_report", "params": {"kind": "app_problem", "reproduction": null}},
+  {"method": "record_local_fault", "params": {"category": "renderer_rejection", "delta": 65536}},
+  {"method": "record_local_fault", "params": {"category": "renderer_rejection", "delta": true}},
+  {"method": "load_desktop_drafts"},
+  {"method": "save_desktop_drafts", "params": {"drafts": {"format_version": 1, "sessions": [
+    {"session_id": "session-a", "text": "Half-written plan — été", "ooc_text": "", "ooc_open": false,
+     "questions": [{"question_key": "q1", "text": "Maybe", "selection": "b"}]}
+  ], "update_view": {"operation_id": "0123456789abcdef0123456789abcdef", "kind": "session",
+     "campaign_id": "campaign-a", "session_id": "session-a"}}}},
+  {"method": "load_desktop_drafts"},
+  {"method": "save_desktop_drafts", "params": {"drafts": {"format_version": 1, "sessions": [], "update_view":
+    {"operation_id": "not-hex", "kind": "home", "campaign_id": null, "session_id": null}}}},
+  {"method": "save_desktop_drafts", "params": {"drafts": {"format_version": 1, "sessions": [
+    {"session_id": "s", "text": "", "ooc_text": "", "ooc_open": false, "questions": [{"question_key": "q", "custom": 3}]}]}}},
+  {"method": "save_desktop_drafts", "params": {}},
+  {"method": "cancel_display_load", "params": {"load_id": "load-gone"}},
+  {"method": "display_snapshot", "params": {"campaign_id": "campaign-that-does-not-exist", "load_id": "load-gone"}},
+  {"method": "cancel_display_load", "params": {}},
+  {"method": "cancel_display_load", "params": {"load_id": 7}},
+  {"method": "player_projection_page", "params": {"campaign_id": "x", "after_sequence": 0, "load_id": "load-gone"}},
+  {"method": "display_snapshot", "params": {"campaign_id": "x", "load_id": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"}},
+  {"method": "no_such_method", "params": {"anything": 1}},
+  {"method": "handshake_status", "params": {"ignored": true}},
+  {"method": "shutdown"}
+ ],
+ "rules": {
+  "alias": [
+   {"name": "preview", "pattern": "^[0-9a-f]{32}$", "keys": ["preview_id"]},
+   {"name": "report_record", "pattern": "[0-9a-f]{32}", "keys": ["content"]}
+  ],
+  "scrub": [
+   {"pattern": "\"first_seen\": [0-9.e+-]+", "with": "\"first_seen\": <time>"},
+   {"pattern": "\"last_seen\": [0-9.e+-]+", "with": "\"last_seen\": <time>"},
+   {"pattern": "\"duration_ms\": [0-9.e+-]+", "with": "\"duration_ms\": <duration>"}
+  ],
+  "ignore_pointers": [
+   "/steps/7/reply/result/bytes",
+   "/steps/10/reply/result/bytes",
+   "/steps/12/reply/result/bytes"
+  ],
+  "volatile_files": ["^diagnostics/"]
+ }
+}

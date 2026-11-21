@@ -344,9 +344,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/checkpoint.py:138` | `schema_identity` | len() against a limit | `if len(raw) > MANIFEST_LIMIT:` | |
 | `application/desktop_update/discovery.py:59` | `discover` | len() against a limit | `if not isinstance(releases, list) or len(releases) > 30:` | |
 | `application/desktop_update/discovery.py:96` | `discover` | len() against a limit | `if not isinstance(assets, list) or len(assets) > 128:` | |
-| `application/desktop_update/drafts.py:29` | `validate_drafts` | len() against a limit | `or len(value["sessions"]) > MAX_SESSIONS` | |
-| `application/desktop_update/drafts.py:57` | `validate_drafts` | len() against a limit | `or len(row["questions"]) > MAX_QUESTIONS` | |
-| `application/desktop_update/drafts.py:75` | `validate_drafts` | len() against a limit | `if len(canonical_bytes(value)) > MANIFEST_LIMIT:` | |
+| `application/desktop_update/drafts.py:29` | `validate_drafts` | len() against a limit | `or len(value["sessions"]) > MAX_SESSIONS` | `local-services`, `sylvia-owner` tests |
+| `application/desktop_update/drafts.py:57` | `validate_drafts` | len() against a limit | `or len(row["questions"]) > MAX_QUESTIONS` | `local-services`, `sylvia-owner` tests |
+| `application/desktop_update/drafts.py:75` | `validate_drafts` | len() against a limit | `if len(canonical_bytes(value)) > MANIFEST_LIMIT:` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/helper.py:335` | `main` | len() against a limit | `or not 0 < len(row[name]) <= 4096` | |
 | `application/desktop_update/installed.py:78` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
 | `application/desktop_update/installed.py:85` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
@@ -361,15 +361,15 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/replacement.py:129` | `_inventory` | len() against a limit | `if not isinstance(entries, dict) or not 3 <= len(entries) <= 4096:` | |
 | `application/desktop_update/replacement.py:253` | `PortableReplacement._restore_receipt` | len() against a limit | `or not 3 <= len(row["old"]) <= 4097` | |
 | `application/desktop_update/service.py:109` | `DesktopUpdateService.handle` | len() against a limit | `or len(host["target"]) > 64` | |
-| `application/desktop_update/storage.py:278` | `atomic_receipt` | len() against a limit | `if len(raw) > MANIFEST_LIMIT:` | |
+| `application/desktop_update/storage.py:278` | `atomic_receipt` | len() against a limit | `if len(raw) > MANIFEST_LIMIT:` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/transport.py:239` | `content_length` | len() against a limit | `or len(length) > 20` | |
 | `application/desktop_update/transport.py:278` | `metadata_bytes` | len() against a limit | `if len(result) > MANIFEST_LIMIT:` | |
-| `interfaces/_display_reads.py:46` | `DisplayReads.cancel` | len() against a limit | `while len(self._cancelled) > 128:` | |
-| `interfaces/_local_diagnostics.py:182` | `LocalDiagnostics._load` | len() against a limit | `if len(data) > MAX_SNAPSHOT_BYTES:` | |
-| `interfaces/_local_diagnostics.py:298` | `LocalDiagnostics.record` | len() against a limit | `while len(self._records) > MAX_RECORDS:` | |
-| `interfaces/_local_diagnostics.py:316` | `LocalDiagnostics._write_snapshot` | len() against a limit | `while len(data) > MAX_SNAPSHOT_BYTES:` | |
-| `interfaces/_local_diagnostics.py:354` | `LocalDiagnostics.preview` | len() against a limit | `type(value) is not str or len(value) > MAX_REPORT_TEXT` | |
-| `interfaces/_local_diagnostics.py:374` | `LocalDiagnostics.preview` | len() against a limit | `if len(content.encode("utf-8")) > MAX_REPORT_BYTES:` | |
+| `interfaces/_display_reads.py:46` | `DisplayReads.cancel` | len() against a limit | `while len(self._cancelled) > 128:` | `local-services`, `sylvia-owner` tests |
+| `interfaces/_local_diagnostics.py:182` | `LocalDiagnostics._load` | len() against a limit | `if len(data) > MAX_SNAPSHOT_BYTES:` | `local-services`, `sylvia-owner` tests |
+| `interfaces/_local_diagnostics.py:298` | `LocalDiagnostics.record` | len() against a limit | `while len(self._records) > MAX_RECORDS:` | `local-services`, `sylvia-owner` tests |
+| `interfaces/_local_diagnostics.py:316` | `LocalDiagnostics._write_snapshot` | len() against a limit | `while len(data) > MAX_SNAPSHOT_BYTES:` | `local-services`, `sylvia-owner` tests |
+| `interfaces/_local_diagnostics.py:354` | `LocalDiagnostics.preview` | len() against a limit | `type(value) is not str or len(value) > MAX_REPORT_TEXT` | `local-services`, `sylvia-owner` tests |
+| `interfaces/_local_diagnostics.py:374` | `LocalDiagnostics.preview` | len() against a limit | `if len(content.encode("utf-8")) > MAX_REPORT_BYTES:` | `local-services`, `sylvia-owner` tests |
 | `interfaces/commands/builder.py:128` | `handle_ingest_builder_sources` | len() against a limit | `or not 1 <= len(raw_paths) <= MAX_SOURCE_FILES` | |
 | `interfaces/commands/campaigns.py:270` | `handle_start_guided_campaign` | len() against a limit | `if not isinstance(premise, str) or len(premise) > _MAX_USER_TEXT_CHARS:` | |
 | `interfaces/commands/campaigns.py:283` | `handle_start_guided_campaign` | len() against a limit | `or len(raw_companions) > 64` | |
@@ -383,7 +383,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/owner_process.py:835` | `_read_message` | len() against a limit | `if len(line.encode("utf-8")) > _MAX_MESSAGE_BYTES or not line.endswith("\n"):` | |
 | `interfaces/owner_process.py:999` | `_seed_campaign_plan` | len() against a limit | `if not encoded or len(encoded) > _MAX_CAMPAIGN_PLAN_BYTES:` | |
 | `interfaces/owner_process.py:1029` | `_seed_campaign_plan` | len() against a limit | `if len(structured_bytes) > _MAX_CAMPAIGN_PLAN_BYTES:` | |
-| `interfaces/owner_process.py:2069` | `run` | len() against a limit | `not isinstance(load_id, str) or not 1 <= len(load_id) <= 128` | |
+| `interfaces/owner_process.py:2069` | `run` | len() against a limit | `not isinstance(load_id, str) or not 1 <= len(load_id) <= 128` | `local-services`, `sylvia-owner` tests |
 | `interfaces/webui.py:94` | `RemoteAccess.from_file` | len() against a limit | `if port == 443 or len(parsed.hostname or "") > 253:` | |
 | `interfaces/webui.py:165` | `OwnerProcess._write` | len() against a limit | `if len(raw) > MAX_BYTES:` | |
 | `interfaces/webui.py:182` | `OwnerProcess._read` | len() against a limit | `if not raw or len(raw) > MAX_BYTES:` | |
