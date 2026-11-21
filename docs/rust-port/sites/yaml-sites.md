@@ -25,7 +25,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | --- | --- | --- | --- | --- |
 | `application/package_runtime.py:929` | `_load_runtime` | yaml.load | `raw = yaml.load(text, Loader=_UniqueRuntimeLoader if authoring else _BoundedRuntimeLoader)` | |
 | `runtime/_frontmatter.py:43` | `parse_frontmatter` | yaml.safe_load | `fm = yaml.safe_load(yaml_text) or {}` | |
-| `runtime/_schema_validator.py:172` | `validate_ruleset` | yaml.safe_load | `data = yaml.safe_load(yaml_content)` | |
+| `runtime/_schema_validator.py:172` | `validate_ruleset` | yaml.safe_load | `data = yaml.safe_load(yaml_content)` |  `sylvia-engine` ruleset_validation_vectors |
 
 ## Lane 3: Storage and authority
 

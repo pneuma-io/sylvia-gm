@@ -109,7 +109,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_effect_executor.py:2151` | `_resolve_value` | re.match; plain | `match = re.match(r"^([A-Za-z_][A-Za-z_0-9]*)", expr)` | |
 | `runtime/_expression_parser.py:156` | `<module>` | re.compile; pattern built at run time, check by hand | `_TOKEN_PATTERN = re.compile(_TOKEN_REGEX)` | yes: `expression_parse_vectors` |
 | `runtime/_frontmatter.py:18` | `<module>` | re.compile; plain | `_FRONTMATTER_RE = re.compile( r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL )` | |
-| `runtime/_parameter_declarations.py:84` | `resolve_parameter_declarations` | re.fullmatch; pattern built at run time, check by hand | `if not isinstance(name, str) or not re.fullmatch(PARAMETER_DECLARATION_ID_PATTERN, name):` | |
+| `runtime/_parameter_declarations.py:84` | `resolve_parameter_declarations` | re.fullmatch; pattern built at run time, check by hand | `if not isinstance(name, str) or not re.fullmatch(PARAMETER_DECLARATION_ID_PATTERN, name):` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_scene_awareness.py:359` | `SceneAwarenessBuilder._read_faction_cs` | re.compile; pattern built at run time, check by hand | `pattern = re.compile( rf"(?:^\|\n)#{{1,3}}\s+[^\n]*{re.escape(faction_name)}[^\n]*\n" rf"((?:(?!\n#{{1,3}}\s).\|\n)*)", re.IGNORECASE, )` | |
 | `runtime/_scene_awareness.py:423` | `_parse_location_md` | re.match; plain | `heading_match = re.match(r"^#\s+(.+)$", body, re.MULTILINE)` | |
 | `runtime/_scene_awareness.py:428` | `_parse_location_md` | re.search; plain | `type_match = re.search(r"\*\*Type:\*\*\s*(.+)$", body, re.MULTILINE)` | |
@@ -120,21 +120,21 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_scene_awareness.py:483` | `_parse_npc_md` | re.match; plain | `heading_match = re.match(r"^#\s+(.+)$", body, re.MULTILINE)` | |
 | `runtime/_scene_awareness.py:488` | `_parse_npc_md` | re.search; NEEDS fancy-regex: lookahead | `pers_match = re.search( r"^##\s+Personality\s*\n\n((?:(?!^##\s).\|\n)+?)(?=\n##\s\|\Z)", body, re.MULTILINE, )` | |
 | `runtime/_scene_awareness.py:496` | `_parse_npc_md` | re.split; NEEDS fancy-regex: lookbehind | `first_sentence = re.split(r"(?<=[.!?])\s+", pers_text)[0].strip()` | |
-| `runtime/_schema_validator.py:103` | `<module>` | re.compile; plain | `_SPATIAL_TEMPLATE = re.compile(r"^\{[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*\}$")` | |
-| `runtime/_schema_validator.py:150` | `<module>` | re.compile; plain | `VALID_TRIGGER_PATTERN: re.Pattern[str] = re.compile(r"^on_[a-z][a-z0-9_]*$")` | |
-| `runtime/_schema_validator.py:199` | `validate_ruleset_data` | re.match; plain | `elif not re.match(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", str(meta["id"])):` | |
-| `runtime/_schema_validator.py:511` | `_validate_definition_row_schema` | re.fullmatch; plain | `if not isinstance(discriminator, str) or not re.fullmatch( r"[A-Za-z_][A-Za-z0-9_]*", discriminator ):` | |
-| `runtime/_schema_validator.py:610` | `_validate_definition_lookups` | re.fullmatch; plain | `if not isinstance(store_as, str) or not re.fullmatch(r"_[A-Za-z0-9_]+", store_as):` | |
-| `runtime/_schema_validator.py:681` | `_validate_tools` | re.match; plain | `if not re.match(r"^[a-z_][a-z0-9_]*$", tool_name):` | |
-| `runtime/_schema_validator.py:825` | `_validate_model_decision_boundary` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]) is None` | |
-| `runtime/_schema_validator.py:858` | `_validate_model_decision_boundary` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", part) is None` | |
-| `runtime/_schema_validator.py:1204` | `_validate_spatial_mutation_effect` | re.fullmatch; plain | `or re.fullmatch(r"state\.[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", scene)` | |
-| `runtime/_schema_validator.py:1215` | `_validate_spatial_mutation_effect` | re.fullmatch; plain | `if not isinstance(store_as, str) or re.fullmatch(r"_[A-Za-z0-9_]+", store_as) is None:` | |
-| `runtime/_schema_validator.py:1264` | `_validate_spatial_query_effect` | re.fullmatch; plain | `or re.fullmatch(r"state\.[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", scene)` | |
-| `runtime/_schema_validator.py:1269` | `_validate_spatial_query_effect` | re.fullmatch; plain | `if not isinstance(store_as, str) or re.fullmatch(r"_[A-Za-z0-9_]+", store_as) is None:` | |
-| `runtime/_schema_validator.py:1607` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", choice_id) is None` | |
-| `runtime/_schema_validator.py:1615` | `_validate_request_choice_effect` | re.fullmatch; plain | `if isinstance(options, str) and re.fullmatch(r"_[A-Za-z0-9_]+", options):` | |
-| `runtime/_schema_validator.py:1629` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` | |
+| `runtime/_schema_validator.py:103` | `<module>` | re.compile; plain | `_SPATIAL_TEMPLATE = re.compile(r"^\{[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*\}$")` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:150` | `<module>` | re.compile; plain | `VALID_TRIGGER_PATTERN: re.Pattern[str] = re.compile(r"^on_[a-z][a-z0-9_]*$")` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:199` | `validate_ruleset_data` | re.match; plain | `elif not re.match(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", str(meta["id"])):` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:511` | `_validate_definition_row_schema` | re.fullmatch; plain | `if not isinstance(discriminator, str) or not re.fullmatch( r"[A-Za-z_][A-Za-z0-9_]*", discriminator ):` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:610` | `_validate_definition_lookups` | re.fullmatch; plain | `if not isinstance(store_as, str) or not re.fullmatch(r"_[A-Za-z0-9_]+", store_as):` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:681` | `_validate_tools` | re.match; plain | `if not re.match(r"^[a-z_][a-z0-9_]*$", tool_name):` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:825` | `_validate_model_decision_boundary` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", control["actor_participant_field"]) is None` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:858` | `_validate_model_decision_boundary` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", part) is None` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1204` | `_validate_spatial_mutation_effect` | re.fullmatch; plain | `or re.fullmatch(r"state\.[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", scene)` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1215` | `_validate_spatial_mutation_effect` | re.fullmatch; plain | `if not isinstance(store_as, str) or re.fullmatch(r"_[A-Za-z0-9_]+", store_as) is None:` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1264` | `_validate_spatial_query_effect` | re.fullmatch; plain | `or re.fullmatch(r"state\.[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", scene)` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1269` | `_validate_spatial_query_effect` | re.fullmatch; plain | `if not isinstance(store_as, str) or re.fullmatch(r"_[A-Za-z0-9_]+", store_as) is None:` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1607` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", choice_id) is None` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1615` | `_validate_request_choice_effect` | re.fullmatch; plain | `if isinstance(options, str) and re.fullmatch(r"_[A-Za-z0-9_]+", options):` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1629` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_template_resolver.py:19` | `<module>` | re.compile; plain | `_TEMPLATE_RE: re.Pattern[str] = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}")  # noqa: E501` | |
 | `runtime/_template_resolver.py:67` | `resolve_params` | re.fullmatch; plain | `match = re.fullmatch(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}", value)  # noqa: E501` | |
 | `runtime/_time_manager.py:55` | `<module>` | re.compile; plain | `_DURATION_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$")` | |

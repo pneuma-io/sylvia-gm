@@ -16,7 +16,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/map_segment_preview.py` | 59 | `sylvia-app::map_segment_preview` | pending | |
 | `src/sylvia_gm/application/package_runtime.py` | 1,643 | `sylvia-app::package_runtime` | pending | |
 | `src/sylvia_gm/application/piece_table.py` | 274 | `sylvia-app::piece_table` | pending | |
-| `src/sylvia_gm/application/player_actions.py` | 343 | `sylvia-app::player_actions` | pending | |
+| `src/sylvia_gm/application/player_actions.py` | 343 | `sylvia-app::player_actions` | pending | Must close before cutover: lane 3's stored-authority verifier (PR 315) checks a failed player action's consequence through `valid_player_action_consequence` (with `player_control_origin`). Until both are ported, the Rust startup check accepts consequences Python refuses. Port them first, as a small PR, and tell lane 3 so it can switch its call over. |
 | `src/sylvia_gm/application/result_card_admission.py` | 179 | `sylvia-app::result_card_admission` | pending | |
 | `src/sylvia_gm/application/result_cards.py` | 243 | `sylvia-app::result_cards` | pending | |
 | `src/sylvia_gm/application/shot_effects.py` | 376 | `sylvia-app::shot_effects` | pending | |
@@ -28,8 +28,8 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/ruleset/validator.py` | 195 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/__init__.py` | 199 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_aoe_resolver.py` | 326 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_authoring_declarations.py` | 101 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_authoring_shape.py` | 101 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_authoring_declarations.py` | 101 | `sylvia-engine` | ported | Constants in `sylvia-engine::ruleset::authoring_shape`, checked against Python by the vectors. |
+| `src/sylvia_gm/runtime/_authoring_shape.py` | 101 | `sylvia-engine` | ported | `sylvia-engine::ruleset::authoring_shape::runtime_authoring_shape_errors`. |
 | `src/sylvia_gm/runtime/_clock_manager.py` | 291 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_collections.py` | 160 | `sylvia-engine` | ported | `sylvia-engine::expr::collections`, including `partitions`/`completions` with Counter order and the budget. Proven by both expression evaluation vector files. |
 | `src/sylvia_gm/runtime/_companion_registry.py` | 105 | `sylvia-engine` | pending | |
@@ -46,12 +46,12 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_frontmatter.py` | 190 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_initiative.py` | 243 | `sylvia-engine` | in progress | `_roll_initiative_expr` is `sylvia-engine::dice_expr::roll_initiative_expr` (vectors over 3,070 expressions). The rest is pending. |
 | `src/sylvia_gm/runtime/_initiative_count_triggers.py` | 165 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_parameter_declarations.py` | 154 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_parameter_declarations.py` | 154 | `sylvia-engine` | ported | `sylvia-engine::ruleset::parameter_declarations`: `resolve_parameter_declarations` (and `_with` for the shape callback), the descriptor schema checked by lane 1's `content::schema::Validator`. |
 | `src/sylvia_gm/runtime/_procedure_executor.py` | 357 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_rng_queue.py` | 389 | `sylvia-engine` | ported | `sylvia-engine::rng_queue`. No product code calls it (only exported). `from_dict` returns `None` for data `to_dict` would not write, where Python raises `KeyError`/`TypeError`. |
 | `src/sylvia_gm/runtime/_runtime.py` | 484 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_scene_awareness.py` | 499 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_schema_validator.py` | 1,734 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_schema_validator.py` | 1,734 | `sylvia-engine` | ported | `sylvia-engine::ruleset::schema_validator`: `validate_ruleset` (YAML text, `Loader::Pure`), `validate_ruleset_data`, `validate_parameter_declarations`, `validate_effects` and every private check, returning Python's messages or its `TypeError`. Python's object model is in `ruleset::pydata` (equality, membership, `sorted`, `repr`, `str`, `isalnum`). Suggestion ties, handler order, aliased branches and recursive YAML: `differences.md` rows 21 to 24. |
 | `src/sylvia_gm/runtime/_simulation_mode.py` | 415 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_state_bridge.py` | 322 | `sylvia-engine` | retired | Retired: no live caller in the 0.4.1 snapshot (manager's decision, 21 Nov 2026). Nothing constructs the legacy `StateAPI` it wraps (`state/` is retired), and `RulesetRuntime.__init__`'s `StateBridge(state_api)`, its `state_api` parameter and `set_state_api` have no caller in src/, tests/ or scripts/. The `state_bridge` parameter the runtime managers take (`_clock_manager`, `_distance_tracker`, `_duration_tracker`, `_flag_store`, `_simulation_mode`, `_state_memo`) stays: the live path fills it with `AuthorityMemoryStateBridge` (`application/package_runtime.py`), and that interface is ported as the managers use it, None checks included. |
 | `src/sylvia_gm/runtime/_state_memo.py` | 274 | `sylvia-engine` | pending | |

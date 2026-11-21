@@ -188,17 +188,17 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_expression_parser.py:206` | `tokenize` | len() against a limit | `if len(value) > MAX_STRING_LENGTH:` | yes: `expression_parse_vectors` |
 | `runtime/_initiative.py:86` | `roll_initiative` | len() against a limit | `if not isinstance(label, str) or not label.strip() or len(label) > 200:` | |
 | `runtime/_scene_awareness.py:368` | `SceneAwarenessBuilder._read_faction_cs` | len() against a limit | `if len(text) > 300:` | |
-| `runtime/_schema_validator.py:789` | `_validate_campaign_preparation` | len() against a limit | `or any(not isinstance(value[name], str) or not 1 <= len(value[name]) <= 2000` | |
-| `runtime/_schema_validator.py:850` | `_validate_model_decision_boundary` | len() against a limit | `or len(isolated["instructions"].encode("utf-8")) > 8192):` | |
-| `runtime/_schema_validator.py:856` | `_validate_model_decision_boundary` | len() against a limit | `if (not isinstance(path, list) or len(path) > 8` | |
-| `runtime/_schema_validator.py:1355` | `_validate_spatial_query_effect` | len() against a limit | `isinstance(circles, list) and len(circles) <= 64` | |
-| `runtime/_schema_validator.py:1364` | `_validate_spatial_query_effect` | len() against a limit | `isinstance(edge_costs, list) and len(edge_costs) <= 16384` | |
-| `runtime/_schema_validator.py:1394` | `_validate_spatial_query_effect` | len() against a limit | `and len(excluded) <= 64` | |
-| `runtime/_schema_validator.py:1439` | `_validate_spatial_query_effect` | len() against a limit | `and len(excluded) <= 64` | |
-| `runtime/_schema_validator.py:1492` | `_validate_spatial_query_effect` | len() against a limit | `and 2 <= len(value) <= 256` | |
-| `runtime/_schema_validator.py:1610` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(prompt, str) or not prompt or len(prompt.encode("utf-8")) > 4096:` | |
-| `runtime/_schema_validator.py:1617` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(options, list) or not 2 <= len(options) <= 16:` | |
-| `runtime/_schema_validator.py:1635` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(label, str) or not label or len(label.encode("utf-8")) > 1024:` | |
+| `runtime/_schema_validator.py:789` | `_validate_campaign_preparation` | len() against a limit | `or any(not isinstance(value[name], str) or not 1 <= len(value[name]) <= 2000` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:850` | `_validate_model_decision_boundary` | len() against a limit | `or len(isolated["instructions"].encode("utf-8")) > 8192):` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:856` | `_validate_model_decision_boundary` | len() against a limit | `if (not isinstance(path, list) or len(path) > 8` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1355` | `_validate_spatial_query_effect` | len() against a limit | `isinstance(circles, list) and len(circles) <= 64` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1364` | `_validate_spatial_query_effect` | len() against a limit | `isinstance(edge_costs, list) and len(edge_costs) <= 16384` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1394` | `_validate_spatial_query_effect` | len() against a limit | `and len(excluded) <= 64` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1439` | `_validate_spatial_query_effect` | len() against a limit | `and len(excluded) <= 64` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1492` | `_validate_spatial_query_effect` | len() against a limit | `and 2 <= len(value) <= 256` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1610` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(prompt, str) or not prompt or len(prompt.encode("utf-8")) > 4096:` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1617` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(options, list) or not 2 <= len(options) <= 16:` |  `sylvia-engine` ruleset_validation_vectors |
+| `runtime/_schema_validator.py:1635` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(label, str) or not label or len(label.encode("utf-8")) > 1024:` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_tool_executor.py:211` | `prepare_tool_context` | len() against a limit | `if error_msg not in failures and len(failures) < 64:` | |
 | `runtime/_tool_executor.py:218` | `prepare_tool_context` | len() against a limit | `if evaluation_error is not None and len(failures) < 64:` | |
 | `spatial/_engine.py:1496` | `_resolve_circle_route` | len() against a limit | `if len(blocking) > 16:` | |
