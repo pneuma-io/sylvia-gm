@@ -31,9 +31,9 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_authoring_declarations.py` | 101 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_authoring_shape.py` | 101 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_clock_manager.py` | 291 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_collections.py` | 160 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_collections.py` | 160 | `sylvia-engine` | ported | `sylvia-engine::expr::collections`, including `partitions`/`completions` with Counter order and the budget. Proven by both expression evaluation vector files. |
 | `src/sylvia_gm/runtime/_companion_registry.py` | 105 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_condition_evaluator.py` | 481 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_condition_evaluator.py` | 481 | `sylvia-engine` | ported | `sylvia-engine::expr::{eval, ops, compare, value}`: field resolution and traversal (dicts, lists, tuples, strings, dice result dataclasses, `int`/`float`/`str`/`bool` attributes from a table generated from 3.12), every operator with CPython 3.12's type rules, messages and float algorithms, comparisons, membership and the builtins. Proven by `expression_eval_vectors` (30,101 generated cases in one rich context) and `expression_recorded_vectors` (every evaluation recorded while the snapshot's SRD Lite and Riichi tests run). Integers are `i64` with the row 5 refusal; rows 16 to 20 list the other declared differences. |
 | `src/sylvia_gm/runtime/_content_registry.py` | 375 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_cs_loader.py` | 248 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_deferred_queue.py` | 186 | `sylvia-engine` | pending | |
@@ -41,7 +41,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_duration_tracker.py` | 189 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_effect_executor.py` | 2,351 | `sylvia-engine` | in progress | `_parse_dice_expr` is `sylvia-engine::dice_expr::parse_dice_expr` (vectors over 3,070 expressions). `_handle_shuffle` draws from `secrets.SystemRandom` (OS entropy), not the seeded tool stream, so its order differs between any two runs, Python or Rust; it is ported as OS-random. Shipped tools that reach it: Riichi Mahjong `start_game` (through `_new_hand`, `shuffle indices(136)`) and every Riichi `take_action` that runs `refresh` (`shuffle indices(256)`). SRD Lite has none. Comparison sessions must avoid those tools or declare a rule for the shuffled values. |
 | `src/sylvia_gm/runtime/_exceptions.py` | 110 | `sylvia-engine` | in progress | `ExpressionError` and `FieldNotFoundError` are `sylvia-engine::expr::error` (message rules, class names). The other runtime exceptions come with the code that raises them. |
-| `src/sylvia_gm/runtime/_expression_parser.py` | 595 | `sylvia-engine` | in progress | The tokenizer, limits, AST and parser are `sylvia-engine::expr::{token, parser}`, proven over 65,848 texts (`tests/vectors/expression_parse_vectors.json`): every expression the schema validator parses in the shipped rulesets, every other ruleset string, edge cases and token soup. Python's `\b` uses a `\w` table generated from 3.12 (`expr/word_table.rs`). An integer literal beyond `i64` parses as in Python and is refused when evaluated (`differences.md` row 5). The sandboxed functions at the end of the file come with the evaluator. |
+| `src/sylvia_gm/runtime/_expression_parser.py` | 595 | `sylvia-engine` | ported | Tokenizer, limits, AST and parser are `sylvia-engine::expr::{token, parser}` (`expression_parse_vectors`, 65,848 texts); the sandboxed functions (`len`, `merge`, the builtins and their arity errors) are in `expr::eval` (`expression_eval_vectors`). An integer literal beyond `i64` parses as in Python and is refused when evaluated (row 5). |
 | `src/sylvia_gm/runtime/_flag_store.py` | 97 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_frontmatter.py` | 190 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_initiative.py` | 243 | `sylvia-engine` | in progress | `_roll_initiative_expr` is `sylvia-engine::dice_expr::roll_initiative_expr` (vectors over 3,070 expressions). The rest is pending. |
@@ -53,14 +53,14 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_scene_awareness.py` | 499 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_schema_validator.py` | 1,734 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_simulation_mode.py` | 415 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_state_bridge.py` | 322 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_state_bridge.py` | 322 | `sylvia-engine` | retired | Retired: no live caller in the 0.4.1 snapshot (manager's decision, 21 Nov 2026). Nothing constructs the legacy `StateAPI` it wraps (`state/` is retired), and `RulesetRuntime.__init__`'s `StateBridge(state_api)`, its `state_api` parameter and `set_state_api` have no caller in src/, tests/ or scripts/. The `state_bridge` parameter the runtime managers take (`_clock_manager`, `_distance_tracker`, `_duration_tracker`, `_flag_store`, `_simulation_mode`, `_state_memo`) stays: the live path fills it with `AuthorityMemoryStateBridge` (`application/package_runtime.py`), and that interface is ported as the managers use it, None checks included. |
 | `src/sylvia_gm/runtime/_state_memo.py` | 274 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_strictness.py` | 519 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_template_resolver.py` | 75 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_time_manager.py` | 336 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_tool_executor.py` | 528 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_turn_system.py` | 174 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_types.py` | 327 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_types.py` | 327 | `sylvia-engine` | in progress | `ExecutionBudget` is `sylvia-engine::expr::ExecutionBudget`; `ExecutionContext`'s expression-facing fields are `EvalContext`. The rest comes with the effects. |
 | `src/sylvia_gm/spatial/__init__.py` | 29 | `sylvia-engine::spatial` | pending | |
 | `src/sylvia_gm/spatial/_clearance.py` | 73 | `sylvia-engine::spatial` | pending | |
 | `src/sylvia_gm/spatial/_convex.py` | 102 | `sylvia-engine::spatial` | pending | |

@@ -14,6 +14,14 @@ pub enum PyErrorKind {
     TypeError,
     /// `IndexError`.
     IndexError,
+    /// `OverflowError`.
+    OverflowError,
+    /// `ZeroDivisionError`.
+    ZeroDivisionError,
+    /// `RuntimeError` (the package budget; the evaluator lets it through unwrapped).
+    RuntimeError,
+    /// `MemoryError`.
+    MemoryError,
 }
 
 impl PyErrorKind {
@@ -23,6 +31,10 @@ impl PyErrorKind {
             Self::ValueError => "ValueError",
             Self::TypeError => "TypeError",
             Self::IndexError => "IndexError",
+            Self::OverflowError => "OverflowError",
+            Self::ZeroDivisionError => "ZeroDivisionError",
+            Self::RuntimeError => "RuntimeError",
+            Self::MemoryError => "MemoryError",
         }
     }
 }
@@ -51,6 +63,11 @@ impl PyError {
     /// `IndexError(message)`.
     pub fn index(message: impl Into<String>) -> Self {
         Self { kind: PyErrorKind::IndexError, message: message.into() }
+    }
+
+    /// An exception of any class.
+    pub fn of(kind: PyErrorKind, message: impl Into<String>) -> Self {
+        Self { kind, message: message.into() }
     }
 }
 
