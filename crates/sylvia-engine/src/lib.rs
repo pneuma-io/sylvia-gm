@@ -12,6 +12,7 @@ pub mod pyerror;
 pub mod pynum;
 pub mod pyrandom;
 pub mod rng_queue;
+pub mod ruleset;
 
 pub use dice::Dice;
 pub use pyerror::{PyError, PyErrorKind, PyResult};
