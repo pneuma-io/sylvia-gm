@@ -27,7 +27,21 @@ use std::time::{Duration, Instant};
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{Json, JsonMap};
 
-type Body = Full<Bytes>;
+/// A response body: whole bytes with their length, or (aiohttp's empty streamed body) none of
+/// known length, which goes out chunked.
+type Body = http_body_util::Either<
+    Full<Bytes>,
+    http_body_util::StreamBody<futures_util::stream::Empty<Result<hyper::body::Frame<Bytes>, Infallible>>>,
+>;
+
+/// An empty body of unknown length (`Transfer-Encoding: chunked`).
+fn unsized_body() -> Body {
+    http_body_util::Either::Right(http_body_util::StreamBody::new(futures_util::stream::empty()))
+}
+
+/// aiohttp's answer to an exception a handler lets escape: a bare 500, outside the middleware
+/// that adds the security headers.
+const UNHANDLED_TEXT: &str = "500 Internal Server Error\n\nServer got itself in trouble";
 type Outcome = Result<Json, WebUIError>;
 
 /// The headers the guard adds to every response it handles.
@@ -75,6 +89,8 @@ impl HttpError {
 enum Failure {
     Http(HttpError),
     WebUI(WebUIError),
+    /// An exception Python lets escape (`shutil.copyfile` failing in `export`, for example).
+    Unhandled,
 }
 
 impl From<HttpError> for Failure {
@@ -92,7 +108,7 @@ impl From<WebUIError> for Failure {
 type Handled = Result<Response<Body>, Failure>;
 
 fn response(status: StatusCode, content_type: &str, body: impl Into<Bytes>) -> Response<Body> {
-    let mut response = Response::new(Full::new(body.into()));
+    let mut response = Response::new(http_body_util::Either::Left(Full::new(body.into())));
     *response.status_mut() = status;
     response
         .headers_mut()
@@ -361,6 +377,15 @@ impl LocalWebUI {
                 Ok(reply) => reply,
                 Err(Failure::Http(error)) => http_response(error),
                 Err(Failure::WebUI(error)) => error_response(&error),
+                Err(Failure::Unhandled) => {
+                    let mut reply = response(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "text/plain; charset=utf-8",
+                        UNHANDLED_TEXT,
+                    );
+                    reply.headers_mut().insert("Server", HeaderValue::from_static(SERVER));
+                    return Ok(reply);
+                }
             },
         };
         let headers = reply.headers_mut();
@@ -467,7 +492,7 @@ impl LocalWebUI {
         }
         if is_get {
             if let Some(identity) = segment("/api/download/") {
-                return self.download(&identity);
+                return self.download(&request, &identity);
             }
             return self.asset(path);
         }
@@ -679,7 +704,11 @@ impl LocalWebUI {
                 }
             }
         };
-        Ok(ok_result(outcome.await?))
+        match outcome.await {
+            Ok(result) => Ok(ok_result(result)),
+            Err(error) if error.is_unhandled() => Err(Failure::Unhandled),
+            Err(error) => Err(error.into()),
+        }
     }
 
     /// `trim_receipts`: bound transient replay memory.
@@ -769,7 +798,8 @@ impl LocalWebUI {
         let _guard = self.export_lock.lock().await;
         let owner_method = if method == "backup_authority" { "backup_database" } else { method };
         let result = self.owner.call(owner_method, params).await?;
-        let failed = |_| WebUIError::unavailable("The export could not be prepared for download.");
+        // `tempfile.TemporaryDirectory` or `shutil.copyfile` failing escapes Python's handler.
+        let failed = |_| WebUIError::unhandled();
         let directory = {
             let mut state = self.state.lock().expect("webui state");
             match &state.download_directory {
@@ -812,8 +842,9 @@ impl LocalWebUI {
         Ok(Json::Object(reply))
     }
 
-    /// `download`: a handle made by `export`.
-    fn download(&self, identity: &str) -> Handled {
+    /// `download`: a handle made by `export`, served as aiohttp's `FileResponse` serves it
+    /// (`file_response`), with the attachment name.
+    fn download(&self, request: &Request<Incoming>, identity: &str) -> Handled {
         let path = {
             let state = self.state.lock().expect("webui state");
             state.downloads.iter().find(|(token, _)| token == identity).map(|(_, path)| path.clone())
@@ -821,10 +852,49 @@ impl LocalWebUI {
         let Some(path) = path.filter(|path| path.is_file()) else {
             return Err(HttpError::plain(StatusCode::NOT_FOUND).into());
         };
-        let bytes = std::fs::read(&path).map_err(|_| HttpError::plain(StatusCode::NOT_FOUND))?;
+        let header = |name: &str| {
+            request.headers().get(name).map(|value| String::from_utf8_lossy(value.as_bytes()).into_owned())
+        };
+        let (if_match, if_none_match, if_modified_since, if_unmodified_since, if_range, range) = (
+            header("If-Match"),
+            header("If-None-Match"),
+            header("If-Modified-Since"),
+            header("If-Unmodified-Since"),
+            header("If-Range"),
+            header("Range"),
+        );
+        let conditions = super::file_response::Conditions {
+            head: request.method() == Method::HEAD,
+            if_match: if_match.as_deref(),
+            if_none_match: if_none_match.as_deref(),
+            if_modified_since: if_modified_since.as_deref(),
+            if_unmodified_since: if_unmodified_since.as_deref(),
+            if_range: if_range.as_deref(),
+            range: range.as_deref(),
+        };
+        let prepared = super::file_response::prepare(&path, &conditions);
+        let status = StatusCode::from_u16(prepared.status).expect("a known status");
+        let mut reply = match (prepared.framing, prepared.body) {
+            (super::file_response::Framing::Sized, Some(body)) => {
+                Response::new(http_body_util::Either::Left(Full::new(Bytes::from(body))))
+            }
+            (super::file_response::Framing::None, _) => {
+                Response::new(http_body_util::Either::Left(Full::new(Bytes::new())))
+            }
+            _ => Response::new(unsized_body()),
+        };
+        *reply.status_mut() = status;
+        if prepared.status == 416 {
+            // aiohttp names 416 by its RFC 7233 phrase.
+            reply
+                .extensions_mut()
+                .insert(hyper::ext::ReasonPhrase::from_static(b"Requested Range Not Satisfiable"));
+        }
+        for (name, value) in prepared.headers {
+            reply.headers_mut().insert(name, HeaderValue::from_str(&value).expect("ascii header"));
+        }
         let suffix =
             path.extension().map(|suffix| format!(".{}", suffix.to_string_lossy())).unwrap_or_default();
-        let mut reply = response(StatusCode::OK, "application/octet-stream", bytes);
         let disposition = format!("attachment; filename=\"sylvia{suffix}\"");
         reply
             .headers_mut()

@@ -384,15 +384,15 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/owner_process.py:999` | `_seed_campaign_plan` | len() against a limit | `if not encoded or len(encoded) > _MAX_CAMPAIGN_PLAN_BYTES:` | |
 | `interfaces/owner_process.py:1029` | `_seed_campaign_plan` | len() against a limit | `if len(structured_bytes) > _MAX_CAMPAIGN_PLAN_BYTES:` | |
 | `interfaces/owner_process.py:2069` | `run` | len() against a limit | `not isinstance(load_id, str) or not 1 <= len(load_id) <= 128` | `local-services`, `sylvia-owner` tests |
-| `interfaces/webui.py:94` | `RemoteAccess.from_file` | len() against a limit | `if port == 443 or len(parsed.hostname or "") > 253:` | |
-| `interfaces/webui.py:165` | `OwnerProcess._write` | len() against a limit | `if len(raw) > MAX_BYTES:` | |
-| `interfaces/webui.py:182` | `OwnerProcess._read` | len() against a limit | `if not raw or len(raw) > MAX_BYTES:` | |
-| `interfaces/webui.py:450` | `LocalWebUI.login` | len() against a limit | `if len(self.remote_sessions) >= 32:` | |
-| `interfaces/webui.py:545` | `LocalWebUI.command` | len() against a limit | `if len(self.requests) < 128:` | |
-| `interfaces/webui.py:550` | `LocalWebUI.command` | len() against a limit | `if len(self.requests) >= 128:` | |
-| `interfaces/webui.py:642` | `LocalWebUI.export` | len() against a limit | `if len(self.downloads) >= 128:` | |
-| `interfaces/webui.py:718` | `LocalWebUI.upload` | len() against a limit | `if len(text) > MAX_UPLOAD_PARAMS_BYTES:` | |
-| `interfaces/webui.py:736` | `LocalWebUI.upload` | len() against a limit | `or len(name) > 180` | |
+| `interfaces/webui.py:94` | `RemoteAccess.from_file` | len() against a limit | `if port == 443 or len(parsed.hostname or "") > 253:` | `webui::tests::remote_origins_follow_pythons_rules` (`:443`, a 253-character host kept and a 254-character one refused, against Python) |
+| `interfaces/webui.py:165` | `OwnerProcess._write` | len() against a limit | `if len(raw) > MAX_BYTES:` | not driven: it needs a 64 MiB owner request; `OwnerProcess::write` keeps the bound and the message |
+| `interfaces/webui.py:182` | `OwnerProcess._read` | len() against a limit | `if not raw or len(raw) > MAX_BYTES:` | not driven: it needs a 64 MiB owner reply; `read_line` keeps the bound |
+| `interfaces/webui.py:450` | `LocalWebUI.login` | len() against a limit | `if len(self.remote_sessions) >= 32:` | not driven: it needs 32 live remote sessions; `login` keeps the bound and the message |
+| `interfaces/webui.py:545` | `LocalWebUI.command` | len() against a limit | `if len(self.requests) < 128:` | not driven: it needs 128 receipts at once; `command` keeps the bound |
+| `interfaces/webui.py:550` | `LocalWebUI.command` | len() against a limit | `if len(self.requests) >= 128:` | not driven: it needs 128 unfinished commands at once; `command` keeps the bound and the message |
+| `interfaces/webui.py:642` | `LocalWebUI.export` | len() against a limit | `if len(self.downloads) >= 128:` | not driven: it needs 128 exports; `export` keeps the bound (`webui_file_vectors` makes five) |
+| `interfaces/webui.py:718` | `LocalWebUI.upload` | len() against a limit | `if len(text) > MAX_UPLOAD_PARAMS_BYTES:` | `webui-guard` (upload parameters over 16 KiB: `Maximum request body size 16384 exceeded.`) |
+| `interfaces/webui.py:736` | `LocalWebUI.upload` | len() against a limit | `or len(name) > 180` | `webui-guard` (upload names), `webui::tests::upload_names_are_checked_like_python` |
 | `local_dictation.py:172` | `transcribe` | len() against a limit | `if len(result.encode("utf-8")) > 128_000:` | |
 | `local_dictation_process.py:63` | `serve` | len() against a limit | `if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:` | |
 | `local_dictation_process.py:117` | `serve_session` | len() against a limit | `if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:` | |

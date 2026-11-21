@@ -5,6 +5,7 @@
 //! serves the unchanged frontend plus a JSON command endpoint ([`host`]). The child keeps all
 //! campaign admission, stream leases, recovery and persistence.
 
+pub mod file_response;
 pub mod host;
 pub mod owner;
 
@@ -54,6 +55,9 @@ pub fn is_webui_command(method: &str) -> bool {
     REGISTRY.iter().any(|command| command.webui && command.name == method)
 }
 
+/// The code [`WebUIError::unhandled`] carries; no Python error uses it.
+const UNHANDLED_CODE: &str = "__unhandled__";
+
 /// `WebUIError(message, code)`: a safe error for the browser or the launch terminal.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WebUIError {
@@ -72,6 +76,18 @@ impl WebUIError {
     /// `WebUIError(message)`: the default code `webui_unavailable`.
     pub fn unavailable(message: impl Into<String>) -> Self {
         Self::new(message, "webui_unavailable")
+    }
+
+    /// An exception Python's handler lets escape, which aiohttp answers with a bare 500. It
+    /// travels as an error so a stored command receipt replays it, and never reaches the
+    /// browser as JSON.
+    pub fn unhandled() -> Self {
+        Self::new("500 Internal Server Error", UNHANDLED_CODE)
+    }
+
+    /// Whether this is [`WebUIError::unhandled`].
+    pub fn is_unhandled(&self) -> bool {
+        self.code == UNHANDLED_CODE
     }
 }
 
@@ -337,6 +353,15 @@ mod tests {
             "Remote HTTPS port is invalid."
         );
         assert!(RemoteAccess::from_file("https://Node.tail1.ts.net", &key).is_err());
+        // A host name of 253 characters is kept and one of 254 refused, with Python's message.
+        let host = |last: usize| {
+            format!("https://{}.{}.ts.net", vec!["a".repeat(63); 3].join("."), "b".repeat(last))
+        };
+        assert!(RemoteAccess::from_file(&host(54), &key).is_ok());
+        assert_eq!(
+            RemoteAccess::from_file(&host(55), &key).unwrap_err().message,
+            "Use the canonical HTTPS origin (omit the default :443 port)."
+        );
         std::fs::write(&key, "short").unwrap();
         assert!(RemoteAccess::from_file("https://node.tail1.ts.net", &key)
             .unwrap_err()

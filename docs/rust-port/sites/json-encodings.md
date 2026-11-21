@@ -193,9 +193,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/owner_process.py:847` | `_write_message` | Dump::WIRE + allow_nan= | `encoded = json.dumps(payload, ensure_ascii=True, separators=(",", ":"), allow_nan=False)` | |
 | `interfaces/owner_process.py:903` | `_json_value` | Dump::CANONICAL | `key=lambda item: json.dumps( item, ensure_ascii=False, separators=(",", ":"), sort_keys=True ),` | |
 | `interfaces/ruleset_test_worker.py:91` | `main` | Dump::DEFAULT | `args.result.write_text(json.dumps(result, ensure_ascii=True), encoding="utf-8")` | |
-| `interfaces/webui.py:164` | `OwnerProcess._write` | Dump::DEFAULT + allow_nan= | `raw = json.dumps(payload, ensure_ascii=True, allow_nan=False).encode() + b"\n"` | |
-| `interfaces/webui.py:526` | `LocalWebUI.command` | Dump::DEFAULT.sorted(true) + allow_nan= | `json.dumps( [method, params], sort_keys=True, allow_nan=False, ).encode()` | |
-| `interfaces/webui.py:564` | `LocalWebUI.trim_receipts` | Dump::DEFAULT | `self.receipt_sizes[identity] = 1024 if error else len(json.dumps(task.result()).encode())` | |
+| `interfaces/webui.py:164` | `OwnerProcess._write` | Dump::DEFAULT + allow_nan= | `raw = json.dumps(payload, ensure_ascii=True, allow_nan=False).encode() + b"\n"` | `webui-guard`, `webui-remote`, `webui_file_vectors` (every command reaches the owner through it) |
+| `interfaces/webui.py:526` | `LocalWebUI.command` | Dump::DEFAULT.sorted(true) + allow_nan= | `json.dumps( [method, params], sort_keys=True, allow_nan=False, ).encode()` | `webui-guard` (the request digest behind `idempotency_conflict`) |
+| `interfaces/webui.py:564` | `LocalWebUI.trim_receipts` | Dump::DEFAULT | `self.receipt_sizes[identity] = 1024 if error else len(json.dumps(task.result()).encode())` | `webui-guard` (receipts are kept and replayed); the 16 MiB eviction bound itself is not driven: it needs 16 MiB of results |
 | `local_dictation_process.py:57` | `serve.reply` | Dump::WIRE | `output.write(json.dumps(value, ensure_ascii=True, separators=(",", ":")) + "\n")` | |
 | `portable_artifact.py:76` | `_json` | Dump::WIRE.sorted(true) | `return (json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n").encode()` | |
 | `release_artifact.py:117` | `_canonical_json_bytes` | Dump::CANONICAL | `json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"` | |

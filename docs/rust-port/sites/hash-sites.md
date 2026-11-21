@@ -287,9 +287,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/owner_process.py:1146` | `_preinstall_bundled_srd` | hashlib.sha256 | `install_seed = hashlib.sha256(f"{RIFT_RULESET_ID}\0{version}".encode()).hexdigest()` | |
 | `interfaces/owner_process.py:1167` | `_preinstall_bundled_riichi` | hashlib.sha256 | `install_id=f"install-bundled-riichi-{hashlib.sha256(archive).hexdigest()[:24]}",` | |
 | `interfaces/owner_process.py:1460` | `_preflight_guided_start` | hashlib.sha256 | `"session-preflight-" + hashlib.sha256(campaign_id.encode("utf-8")).hexdigest()[:24]` | |
-| `interfaces/webui.py:107` | `RemoteAccess.from_file` | hashlib.sha256 | `return cls(origin, hashlib.sha256(matched[1]).digest())` | |
-| `interfaces/webui.py:442` | `LocalWebUI.login` | hashlib.sha256 | `hashlib.sha256(key.encode()).digest(), self.remote.key_digest` | |
-| `interfaces/webui.py:525` | `LocalWebUI.command` | hashlib.sha256 | `digest = hashlib.sha256( json.dumps( [method, params], sort_keys=True, allow_nan=False, ).encode() ).hexdigest()` | |
+| `interfaces/webui.py:107` | `RemoteAccess.from_file` | hashlib.sha256 | `return cls(origin, hashlib.sha256(matched[1]).digest())` | `webui-remote` (the access-key file's digest, then a key sign-in) |
+| `interfaces/webui.py:442` | `LocalWebUI.login` | hashlib.sha256 | `hashlib.sha256(key.encode()).digest(), self.remote.key_digest` | `webui-remote` (right and wrong access keys) |
+| `interfaces/webui.py:525` | `LocalWebUI.command` | hashlib.sha256 | `digest = hashlib.sha256( json.dumps( [method, params], sort_keys=True, allow_nan=False, ).encode() ).hexdigest()` | `webui-guard` (a repeated request identity with other parameters: `idempotency_conflict`) |
 | `local_dictation.py:42` | `_verified` | hashlib.file_digest | `return hashlib.file_digest(stream, "sha256").hexdigest() == expected[1]` | |
 | `local_dictation.py:210` | `_device_id` | hashlib.sha256 | `identity = hashlib.sha256( f"{host}\n{row['name']}\n{row['default_samplerate']}".encode() ).hexdigest()[:16]` | |
 | `portable_artifact.py:80` | `_digest` | hashlib.sha256 | `return hashlib.sha256(raw).hexdigest()` | |
