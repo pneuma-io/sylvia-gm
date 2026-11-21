@@ -25,6 +25,7 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-provider/src/pyurl.rs` | CPython's `urllib.parse.urlsplit` and `urlunsplit`, with `hostname` and `port` (`Lib/urllib/parse.py`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
 | `sylvia-store/src/launch.rs` (`py_fromhex`) | CPython's `bytes.fromhex` (`Objects/bytesobject.c`, `_PyBytes_FromHex`): whitespace skipped before each pair | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 | `sylvia-store/src/safe_file/linux.rs` (`normpath`, `abspath`) | CPython's `posixpath.normpath` and `posixpath.abspath` (`Lib/posixpath.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
+| `sylvia-store/src/sessions.rs` (`is_reserved_windows_name`) | CPython's `PureWindowsPath.is_reserved` and `_WIN_RESERVED_NAMES` (`Lib/pathlib.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.

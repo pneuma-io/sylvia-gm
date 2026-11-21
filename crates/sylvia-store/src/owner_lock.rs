@@ -58,7 +58,7 @@ impl OwnerLock {
             Ok(()) => Ok(Self { path, file: Some(file) }),
             // Python turns every OSError from the lock call into OwnerConflict.
             Err(TryLockError::WouldBlock | TryLockError::Error(_)) => Err(OwnerLockError::Conflict(
-                CodedError::rejected(OWNER_CONFLICT_MESSAGE).with_error_type("OwnerConflict"),
+                crate::error::authority_coded("OwnerConflict", OWNER_CONFLICT_MESSAGE),
             )),
         }
     }

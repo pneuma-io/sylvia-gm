@@ -1,0 +1,1177 @@
+{
+ "python": "3.12.11",
+ "runs": {
+  "agent_sessions": {
+   "operations": [
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "other.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "builder-on-dm",
+      "campaign_id": "campaign-sessions",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "dm-elsewhere",
+      "campaign_id": "campaign-missing",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "dm-effort",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": "high",
+      "reasoning_effort_once": "low"
+     }
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m1",
+     "kind": "talk",
+     "content": {
+      "text": "Hello.",
+      "count": 1
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m1",
+     "kind": "talk",
+     "content": {
+      "text": "Hello.",
+      "count": 1
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m1",
+     "kind": "talk",
+     "content": {
+      "count": 1.0,
+      "text": "Hello."
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m1",
+     "kind": "talk",
+     "content": {
+      "text": "Changed."
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m2",
+     "kind": "canonical_reference",
+     "content": {
+      "event": "x"
+     },
+     "canonical_sequence": 999
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m3",
+     "kind": "talk",
+     "content": {
+      "reasoning_private": "x"
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "missing-session",
+     "message_id": "m1",
+     "kind": "talk",
+     "content": {
+      "text": "x"
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "update_agent_session_status",
+     "session_id": "dm-1",
+     "status": "stopped"
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m4",
+     "kind": "talk",
+     "content": {
+      "text": "Not while stopped."
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "dm-1",
+     "message_id": "m5",
+     "kind": "evidence",
+     "content": {
+      "kind": "session_attempt_terminal",
+      "attempt_id": "a1"
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "update_agent_session_status",
+     "session_id": "dm-1",
+     "status": "completed"
+    },
+    {
+     "op": "resume_agent_session",
+     "session_id": "dm-1"
+    },
+    {
+     "op": "resume_agent_session",
+     "session_id": "dm-1"
+    },
+    {
+     "op": "update_agent_session_model",
+     "session_id": "dm-1",
+     "provider_id": "next.provider",
+     "model_id": "next.provider/model"
+    },
+    {
+     "op": "update_agent_session_reasoning",
+     "session_id": "dm-1",
+     "effort": "medium",
+     "once": null
+    },
+    {
+     "op": "update_agent_session_reasoning",
+     "session_id": "dm-1",
+     "effort": "Not A Name",
+     "once": null
+    },
+    {
+     "op": "session_context",
+     "session_id": "dm-1"
+    },
+    {
+     "op": "session_context",
+     "session_id": "missing-session"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Agent session identity payload does not match"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "wrong_writer",
+     "message": "Agent session role is not the campaign writer"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "campaign_unavailable",
+     "message": "Campaign is unavailable"
+    },
+    {
+     "ok": {
+      "session_id": "dm-effort",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": "high",
+      "reasoning_effort_once": "low"
+     }
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "sequence": 1,
+      "message_id": "m1",
+      "kind": "talk",
+      "content": {
+       "count": 1,
+       "text": "Hello."
+      },
+      "canonical_sequence": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "sequence": 1,
+      "message_id": "m1",
+      "kind": "talk",
+      "content": {
+       "count": 1,
+       "text": "Hello."
+      },
+      "canonical_sequence": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "sequence": 1,
+      "message_id": "m1",
+      "kind": "talk",
+      "content": {
+       "count": 1,
+       "text": "Hello."
+      },
+      "canonical_sequence": null
+     }
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Agent message identity payload does not match"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Canonical session reference is unavailable"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Agent message content must be canonical-safe"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable"
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "stopped",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Agent session is not active"
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "sequence": 2,
+      "message_id": "m5",
+      "kind": "evidence",
+      "content": {
+       "attempt_id": "a1",
+       "kind": "session_attempt_terminal"
+      },
+      "canonical_sequence": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Agent session is not active"
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Designated campaign session is not stopped"
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "next.provider",
+      "model_id": "next.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "dm-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "next.provider",
+      "model_id": "next.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": "medium",
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Reasoning preference must be a native setting name"
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-sessions",
+       "role": "dm",
+       "provider_id": "next.provider",
+       "model_id": "next.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": "medium",
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "dm-1",
+        "sequence": 1,
+        "message_id": "m1",
+        "kind": "talk",
+        "content": {
+         "count": 1,
+         "text": "Hello."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 2,
+        "message_id": "m5",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "a1",
+         "kind": "session_attempt_terminal"
+        },
+        "canonical_sequence": null
+       }
+      ]
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable"
+    }
+   ]
+  },
+  "builder_campaign_session": {
+   "operations": [
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "builder-1",
+      "campaign_id": "campaign-builder",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "builder-1",
+     "message_id": "u1",
+     "kind": "user",
+     "content": {
+      "text": "Make it rain."
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "update_agent_session_status",
+     "session_id": "builder-1",
+     "status": "review_required"
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "builder-1",
+     "message_id": "u2",
+     "kind": "user",
+     "content": {
+      "text": "Not while reviewing."
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "update_agent_session_status",
+     "session_id": "builder-1",
+     "status": "active"
+    },
+    {
+     "op": "update_agent_session_status",
+     "session_id": "builder-1",
+     "status": "stopped"
+    },
+    {
+     "op": "session_context",
+     "session_id": "builder-1"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "session_id": "builder-1",
+      "campaign_id": "campaign-builder",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "builder-1",
+      "sequence": 1,
+      "message_id": "u1",
+      "kind": "user",
+      "content": {
+       "text": "Make it rain."
+      },
+      "canonical_sequence": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "builder-1",
+      "campaign_id": "campaign-builder",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "review_required",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Agent session is not active"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Agent session is not active"
+    },
+    {
+     "ok": {
+      "session_id": "builder-1",
+      "campaign_id": "campaign-builder",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "stopped",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-1",
+       "campaign_id": "campaign-builder",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "stopped",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "builder-1",
+        "sequence": 1,
+        "message_id": "u1",
+        "kind": "user",
+        "content": {
+         "text": "Make it rain."
+        },
+        "canonical_sequence": null
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "builder_chats": {
+   "operations": [
+    {
+     "op": "create_builder_chat",
+     "session_id": "chat-1",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "display_name": "First chat"
+    },
+    {
+     "op": "create_builder_chat",
+     "session_id": "chat-1",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "display_name": "First chat"
+    },
+    {
+     "op": "create_builder_chat",
+     "session_id": "chat-1",
+     "provider_id": "other.provider",
+     "model_id": "synthetic.provider/model",
+     "display_name": "First chat"
+    },
+    {
+     "op": "create_builder_chat",
+     "session_id": "chat-2",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "display_name": "Second chat"
+    },
+    {
+     "op": "create_agent_session",
+     "record": {
+      "session_id": "chat-1",
+      "campaign_id": "campaign-sessions",
+      "role": "dm",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "builder_chat_index"
+    },
+    {
+     "op": "rename_builder_chat",
+     "session_id": "chat-1",
+     "display_name": "Automatic title",
+     "automatic": true
+    },
+    {
+     "op": "rename_builder_chat",
+     "session_id": "chat-1",
+     "display_name": "My title",
+     "automatic": false
+    },
+    {
+     "op": "rename_builder_chat",
+     "session_id": "chat-1",
+     "display_name": "Another automatic",
+     "automatic": true
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "chat-1",
+     "message_id": "c1",
+     "kind": "user",
+     "content": {
+      "text": "Hi."
+     },
+     "canonical_sequence": null
+    },
+    {
+     "op": "append_agent_message",
+     "session_id": "chat-1",
+     "message_id": "c2",
+     "kind": "canonical_reference",
+     "content": {
+      "event": "x"
+     },
+     "canonical_sequence": 1
+    },
+    {
+     "op": "update_agent_session_status",
+     "session_id": "chat-2",
+     "status": "stopped"
+    },
+    {
+     "op": "resume_agent_session",
+     "session_id": "chat-2"
+    },
+    {
+     "op": "update_agent_session_model",
+     "session_id": "chat-2",
+     "provider_id": "next.provider",
+     "model_id": "next.provider/model"
+    },
+    {
+     "op": "update_agent_session_reasoning",
+     "session_id": "chat-2",
+     "effort": "high",
+     "once": "low"
+    },
+    {
+     "op": "session_context",
+     "session_id": "chat-1"
+    },
+    {
+     "op": "make_workspace",
+     "session_id": "chat-2"
+    },
+    {
+     "op": "delete_builder_chat",
+     "session_id": "chat-2"
+    },
+    {
+     "op": "workspace_exists",
+     "session_id": "chat-2"
+    },
+    {
+     "op": "delete_builder_chat",
+     "session_id": "chat-2"
+    },
+    {
+     "op": "create_builder_chat",
+     "session_id": "CON",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "display_name": "Reserved name"
+    },
+    {
+     "op": "delete_builder_chat",
+     "session_id": "CON"
+    },
+    {
+     "op": "builder_chat_index"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "First chat",
+      "created_ordinal": 1
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "First chat",
+      "created_ordinal": 1
+     }
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Builder chat identity payload does not match"
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-2",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "Second chat",
+      "created_ordinal": 2
+     }
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Agent session identity collides with a Builder chat"
+    },
+    {
+     "ok": [
+      {
+       "session": {
+        "session_id": "chat-2",
+        "campaign_id": null,
+        "role": "builder",
+        "provider_id": "synthetic.provider",
+        "model_id": "synthetic.provider/model",
+        "status": "active",
+        "parent_session_id": null,
+        "selected_skill": null,
+        "scope": [],
+        "reasoning_effort": null,
+        "reasoning_effort_once": null
+       },
+       "display_name": "Second chat",
+       "created_ordinal": 2
+      },
+      {
+       "session": {
+        "session_id": "chat-1",
+        "campaign_id": null,
+        "role": "builder",
+        "provider_id": "synthetic.provider",
+        "model_id": "synthetic.provider/model",
+        "status": "active",
+        "parent_session_id": null,
+        "selected_skill": null,
+        "scope": [],
+        "reasoning_effort": null,
+        "reasoning_effort_once": null
+       },
+       "display_name": "First chat",
+       "created_ordinal": 1
+      }
+     ]
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "Automatic title",
+      "created_ordinal": 1
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "My title",
+      "created_ordinal": 1
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "My title",
+      "created_ordinal": 1
+     }
+    },
+    {
+     "ok": {
+      "session_id": "chat-1",
+      "sequence": 2,
+      "message_id": "c1",
+      "kind": "user",
+      "content": {
+       "text": "Hi."
+      },
+      "canonical_sequence": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Standalone Builder chats have no campaign chronology"
+    },
+    {
+     "ok": {
+      "session_id": "chat-2",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "stopped",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "chat-2",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "chat-2",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "next.provider",
+      "model_id": "next.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "chat-2",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "next.provider",
+      "model_id": "next.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": "high",
+      "reasoning_effort_once": "low"
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "chat-1",
+        "sequence": 1,
+        "message_id": "builder-title-user-eaeb9111b1c6744278e80397",
+        "kind": "evidence",
+        "content": {
+         "automatic": false,
+         "kind": "builder_title_preference"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 2,
+        "message_id": "c1",
+        "kind": "user",
+        "content": {
+         "text": "Hi."
+        },
+        "canonical_sequence": null
+       }
+      ]
+     }
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-2",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "next.provider",
+       "model_id": "next.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": "high",
+       "reasoning_effort_once": "low"
+      },
+      "display_name": "Second chat",
+      "created_ordinal": 2
+     }
+    },
+    {
+     "ok": false
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Builder chat is unavailable"
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "CON",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "display_name": "Reserved name",
+      "created_ordinal": 2
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Builder workspace identity is not a directory name"
+    },
+    {
+     "ok": [
+      {
+       "session": {
+        "session_id": "CON",
+        "campaign_id": null,
+        "role": "builder",
+        "provider_id": "synthetic.provider",
+        "model_id": "synthetic.provider/model",
+        "status": "active",
+        "parent_session_id": null,
+        "selected_skill": null,
+        "scope": [],
+        "reasoning_effort": null,
+        "reasoning_effort_once": null
+       },
+       "display_name": "Reserved name",
+       "created_ordinal": 2
+      },
+      {
+       "session": {
+        "session_id": "chat-1",
+        "campaign_id": null,
+        "role": "builder",
+        "provider_id": "synthetic.provider",
+        "model_id": "synthetic.provider/model",
+        "status": "active",
+        "parent_session_id": null,
+        "selected_skill": null,
+        "scope": [],
+        "reasoning_effort": null,
+        "reasoning_effort_once": null
+       },
+       "display_name": "My title",
+       "created_ordinal": 1
+      }
+     ]
+    }
+   ]
+  }
+ }
+}
