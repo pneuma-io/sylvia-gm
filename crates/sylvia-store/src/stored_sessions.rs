@@ -103,7 +103,10 @@ fn text_of(value: &Value) -> Option<&str> {
 }
 
 /// `_handoff_candidate_matches_lock`.
-fn handoff_candidate_matches_lock(lock: &PackageLockRecord, candidate: Option<&PackageCandidate>) -> bool {
+pub(crate) fn handoff_candidate_matches_lock(
+    lock: &PackageLockRecord,
+    candidate: Option<&PackageCandidate>,
+) -> bool {
     if lock.availability != PackageLockAvailability::Available {
         return false;
     }

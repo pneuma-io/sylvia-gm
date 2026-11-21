@@ -830,7 +830,7 @@ pub(crate) fn activation_result_from_row(row: &Named<'_>) -> StoreResult<Activat
 }
 
 /// `sqlite_draft_history.DRAFT_LIFECYCLE_KINDS`.
-const DRAFT_LIFECYCLE_KINDS: [&str; 4] =
+pub(crate) const DRAFT_LIFECYCLE_KINDS: [&str; 4] =
     ["rename_campaign", "archive_campaign", "restore_campaign", "trash_campaign"];
 
 /// `sqlite_draft_history.has_only_draft_lifecycle_history`: every pre-binding revision has its

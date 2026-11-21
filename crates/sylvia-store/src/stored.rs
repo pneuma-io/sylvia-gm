@@ -5,12 +5,13 @@
 //! `_lock_representation`, `_read_lock` and `sqlite_state_ownership.verify_authority`
 //! (`_historical_writers`).
 //!
-//! Parts 1 to 3. In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`,
-//! the stored identities, the session graph (`crate::stored_sessions`), the state-ownership
-//! verifier (from schema 6), the `packages` rows, and each campaign's lock binding and
-//! `_verify_campaign_authority` (`crate::stored_campaigns`). Still to come, each only making this
-//! less strict until it lands: `sqlite_recovery.verify_recovery_receipts` (with the archive
-//! family, which owns `campaign_archive.py`) and `_verify_construction_authority` (part 4).
+//! In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`, the stored
+//! identities, the session graph (`crate::stored_sessions`), the state-ownership verifier (from
+//! schema 6), the `packages` rows, each campaign's lock binding and `_verify_campaign_authority`
+//! (`crate::stored_campaigns`), and `_verify_construction_authority`
+//! (`crate::stored_construction`). Still to come, only making this less strict until it lands:
+//! `sqlite_recovery.verify_recovery_receipts` (with the archive family, which owns
+//! `campaign_archive.py`).
 //!
 //! Only the failures Python raises itself become its `SchemaIdentityError`; anything else
 //! escapes as it does in Python, and startup words it as `_migrate` does
@@ -481,7 +482,8 @@ pub fn verify_stored_authority(connection: &Connection) -> StoreResult<()> {
             },
         )?;
     }
-    // `_verify_construction_authority` runs here in Python when `campaign_operations` exists
-    // (part 4).
+    if tables(connection)?.iter().any(|name| name == "campaign_operations") {
+        crate::stored_construction::verify_construction_authority(connection)?;
+    }
     Ok(())
 }

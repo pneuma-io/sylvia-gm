@@ -19,6 +19,7 @@ pub mod lanes;
 pub mod launch;
 pub mod owner_lock;
 pub mod packages;
+mod participant_history;
 pub mod pytext;
 pub mod safe_file;
 pub mod schema;
@@ -28,6 +29,7 @@ pub mod sql;
 pub mod store;
 pub mod stored;
 mod stored_campaigns;
+mod stored_construction;
 pub mod stored_sessions;
 mod verify;
 

@@ -32,7 +32,40 @@ OUT = HERE / "stored_authority"
 BASES = {
     "riichi": HERE / "packages" / "seed_riichi.sqlite3.gz",
     "story": HERE / "session_pages" / "seed.sqlite3.gz",
+    # A No Ruleset campaign confirmed, begun and completed, and a confirmed interview campaign.
+    "constructed": HERE / "campaigns" / "seed.sqlite3.gz",
 }
+
+
+def payload_edit(connection: sqlite3.Connection, operation_id: str, column: str, change) -> str:  # noqa: ANN001
+    """SQL replacing one operation's stored JSON with `change(value)`, as Python's store would
+    write it: canonical text, and for the semantic payload its SHA-256 too. The SQL is recorded,
+    so the Rust test replays the same bytes."""
+    import hashlib
+
+    from sylvia_gm.domain.package_library import canonical_json_bytes
+
+    row = connection.execute(
+        f"SELECT {column}_json FROM campaign_operations WHERE operation_id = ?", (operation_id,)).fetchone()
+    value = change(json.loads(row[0]))
+    text = a._dump(value).replace("'", "''")
+    digest = (f", semantic_payload_sha256 = '{hashlib.sha256(canonical_json_bytes(value)).hexdigest()}'"
+              if column == "semantic_payload" else "")
+    return f"UPDATE campaign_operations SET {column}_json = '{text}'{digest} WHERE operation_id = '{operation_id}'"
+
+
+def edited(value: dict, **changes: object) -> dict:
+    """`value` with `changes` applied; a change to `DROP` removes the key."""
+    result = dict(value)
+    for key, item in changes.items():
+        if item is DROP:
+            result.pop(key, None)
+        else:
+            result[key] = item
+    return result
+
+
+DROP = object()
 
 
 def children_base(folder: Path) -> bytes:
@@ -370,6 +403,138 @@ CASES: list[dict[str, object]] = [
         f"UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = 'tombstoned' WHERE {STORY}"]},
     {"name": "trashed_transitions_out_of_order", "base": "trashed", "sql": [
         "UPDATE campaign_lifecycle_transitions SET from_lifecycle = 'active' WHERE to_lifecycle = 'tombstoned'"]},
+    # Part 4: `_verify_construction_authority`. Operation receipts and their results.
+    {"name": "constructed_untouched", "base": "constructed", "sql": []},
+    {"name": "operation_kind_other", "base": "constructed", "sql": [
+        "UPDATE campaign_operations SET operation_kind = 'rename_campaign' WHERE operation_id = 'begin-ruleless'"]},
+    {"name": "operation_hash_other", "base": "constructed", "sql": [
+        "UPDATE campaign_operations SET semantic_payload_sha256 = '" + "a" * 64 + "' WHERE operation_id = 'begin-ruleless'"]},
+    {"name": "operation_payload_unsafe", "base": "constructed", "sql": [], "edits": [
+        ("begin-ruleless", "semantic_payload", lambda p: edited(p, canonical_input={"private_reasoning": 1}))]},
+    {"name": "operation_payload_kind_other", "base": "constructed", "sql": [], "edits": [
+        ("begin-ruleless", "semantic_payload", lambda p: edited(p, operation_kind="rename_campaign"))]},
+    {"name": "result_revision_other", "base": "constructed", "sql": [], "edits": [
+        ("begin-ruleless", "result", lambda r: edited(r, resulting_revision=5))]},
+    {"name": "result_revision_float", "base": "constructed", "sql": [], "edits": [
+        ("begin-ruleless", "result", lambda r: edited(r, resulting_revision=1.0))]},
+    {"name": "result_lane_other", "base": "constructed", "sql": [], "edits": [
+        ("begin-ruleless", "result", lambda r: edited(r, lane="speedrun"))]},
+    {"name": "result_lane_differs_from_construction", "base": "constructed", "sql": [], "edits": [
+        ("begin-ruleless", "result", lambda r: edited(r, lane="quick_start"))]},
+    {"name": "confirmation_result_extra_key", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "result", lambda r: edited(r, note="x"))]},
+    {"name": "completion_result_sha_uppercase", "base": "constructed", "sql": [], "edits": [
+        ("construction-complete-4a4b97133864fe33934ec185", "result",
+         lambda r: edited(r, canonical_representation_sha256=r["canonical_representation_sha256"].upper()))]},
+    {"name": "completion_result_without_sha", "base": "constructed", "sql": [], "edits": [
+        ("construction-complete-4a4b97133864fe33934ec185", "result",
+         lambda r: edited(r, canonical_representation_sha256=DROP))]},
+    {"name": "completion_result_sha_number", "base": "constructed", "sql": [], "edits": [
+        ("construction-complete-4a4b97133864fe33934ec185", "result",
+         lambda r: edited(r, canonical_representation_sha256=7))]},
+    {"name": "result_not_object", "base": "constructed", "sql": [
+        "UPDATE campaign_operations SET result_json = '[]' WHERE operation_id = 'begin-ruleless'"]},
+    {"name": "operation_basis_turn_missing", "base": "constructed", "sql": [
+        "UPDATE campaign_operations SET basis_turn_id = 'turn-gone' WHERE operation_id = 'begin-ruleless'"]},
+    {"name": "operation_basis_after_result", "base": "constructed", "sql": [
+        "UPDATE campaign_operations SET basis_revision = 3 WHERE operation_id = 'begin-ruleless'"]},
+    {"name": "operation_orphaned", "base": "constructed", "sql": [
+        "INSERT INTO campaign_operations (operation_id, operation_kind, campaign_id, semantic_payload_json, "
+        "semantic_payload_sha256, result_json, basis_turn_id, basis_lock_id, basis_revision, resulting_revision) "
+        "SELECT 'confirm-spare', operation_kind, campaign_id, semantic_payload_json, semantic_payload_sha256, "
+        "result_json, basis_turn_id, basis_lock_id, basis_revision, resulting_revision "
+        "FROM campaign_operations WHERE operation_id = 'confirm-interview'"], "edits": [
+        ("confirm-spare", "semantic_payload", lambda p: edited(p, operation_id="confirm-spare"))]},
+    # Saved construction inputs.
+    {"name": "construction_begin_revision_other", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET begin_revision = 2 WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_begin_revision_text", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET begin_revision = 'one' WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_input_changed", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET canonical_input_json = '{\"fixture\":\"other\"}' "
+        "WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_input_not_canonical", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET canonical_input_json = '{\"fixture\": \"campaign-index\"}' "
+        "WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_plan_changed", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET canonical_plan_json = '{\"campaign_plan_markdown\":\"# Other\\n\"}' "
+        "WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_representation_other", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET canonical_representation_sha256 = '" + "b" * 64 + "' "
+        "WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_lane_other", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET lane = 'quick_start' WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "unbegun_with_lane", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET lane = 'customize' WHERE confirmation_operation_id = 'confirm-interview'"]},
+    {"name": "incomplete_with_plan", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET completion_operation_id = NULL WHERE begin_operation_id = 'begin-ruleless'"]},
+    {"name": "construction_confirmation_revision_other", "base": "constructed", "sql": [
+        "UPDATE campaign_constructions SET confirmation_revision = 1 WHERE confirmation_operation_id = 'confirm-interview'"]},
+    # The signed confirmation payload.
+    {"name": "confirmation_display_name_edited", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, display_name="Another Name"))]},
+    {"name": "confirmation_display_name_blank", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, display_name=" "))]},
+    {"name": "confirmation_display_name_missing", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, display_name=DROP))]},
+    {"name": "confirmation_turn_other", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, turn_id="turn-other"))]},
+    {"name": "confirmation_lock_payload_changed", "base": "constructed", "sql": [], "edits": [
+        ("confirm-ruleless", "semantic_payload", lambda p: edited(p, package_lock=[{"package_id": "pneuma.other"}]))]},
+    {"name": "confirmation_extra_member", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, note="x"))]},
+    {"name": "confirmation_participants_signed", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, participants=[]))]},
+    {"name": "confirmation_participants_differ", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, participants=[{"participant_id": "hero"}]))]},
+    {"name": "confirmation_initial_state_list", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, initial_state=[]))]},
+    {"name": "confirmation_initial_state_object", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, initial_state={}))]},
+    {"name": "confirmation_candidate_number", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, package_candidate_id=5))]},
+    {"name": "confirmation_candidate_unknown", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, package_candidate_id="candidate-gone"))]},
+    {"name": "confirmation_builder_not_object", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, builder_session="builder-interview"))]},
+    {"name": "confirmation_builder_skill_other", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload",
+         lambda p: edited(p, builder_session=edited(p["builder_session"], selected_skill="BUILD RULESET")))]},
+    {"name": "confirmation_builder_skill_unknown", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload",
+         lambda p: edited(p, builder_session=edited(p["builder_session"], selected_skill="BUILD CASTLE")))]},
+    {"name": "confirmation_builder_session_unknown", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload",
+         lambda p: edited(p, builder_session=edited(p["builder_session"], session_id="builder-gone")))]},
+    {"name": "confirmation_builder_provider_padded", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload",
+         lambda p: edited(p, builder_session=edited(p["builder_session"], provider_id=" synthetic.provider")))]},
+    {"name": "confirmation_builder_model_number", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload",
+         lambda p: edited(p, builder_session=edited(p["builder_session"], model_id=3)))]},
+    {"name": "confirmation_builder_dropped", "base": "constructed", "sql": [], "edits": [
+        ("confirm-interview", "semantic_payload", lambda p: edited(p, builder_session=DROP))]},
+    # Continuity and lifecycle receipts.
+    {"name": "continuity_session_dropped", "base": "story", "sql": [], "edits": [
+        ("op-1", "semantic_payload", lambda p: edited(p, session_id=DROP))]},
+    {"name": "continuity_status_other", "base": "story", "sql": [], "edits": [
+        ("op-1", "semantic_payload", lambda p: edited(p, status="withdrawn"))]},
+    {"name": "continuity_result_record_other", "base": "story", "sql": [], "edits": [
+        ("op-1", "result", lambda r: edited(r, record_id="record-other"))]},
+    {"name": "continuity_resulting_two_ahead", "base": "story", "sql": [
+        "UPDATE campaign_operations SET basis_revision = 1 WHERE operation_id = 'op-1'"]},
+    {"name": "archived_transition_session_dropped", "base": "archived", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET designated_session_id = NULL"]},
+    {"name": "archived_result_writer_other", "base": "archived", "sql": [], "edits": [
+        ("life-0", "result", lambda r: edited(r, writer="dm"))]},
+    {"name": "archived_result_lifecycle_unknown", "base": "archived", "sql": [], "edits": [
+        ("life-0", "result", lambda r: edited(r, lifecycle="gone"))]},
+    {"name": "archived_result_session_number", "base": "archived", "sql": [], "edits": [
+        ("life-0", "result", lambda r: edited(r, session_id=5))]},
+    {"name": "archived_result_extra_key", "base": "archived", "sql": [], "edits": [
+        ("life-0", "result", lambda r: edited(r, note="x"))]},
+    {"name": "archived_operation_basis_other", "base": "archived", "sql": [
+        "UPDATE campaign_operations SET basis_revision = 7 WHERE operation_id = 'life-0'"]},
 ]
 
 
@@ -414,6 +579,10 @@ def main() -> None:
                                   + [sql for _, sql in triggers])
                 for statement in statements:
                     connection.execute(statement)
+                # Payload edits read the damaged row, so they follow the case's SQL.
+                for edit in case.pop("edits", ()):  # type: ignore[attr-defined]
+                    statements.append(payload_edit(connection, *edit))
+                    connection.execute(statements[-1])
             finally:
                 connection.close()
             results.append({**case, "sql": statements, "outcome": outcome(path)})
