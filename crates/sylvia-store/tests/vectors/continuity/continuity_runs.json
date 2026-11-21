@@ -1,0 +1,2304 @@
+{
+ "python": "3.12.11",
+ "runs": {
+  "commit_and_replay": {
+   "operations": [
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Different."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-2",
+       "session_id": "dm-1",
+       "expected_revision": 1,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-2"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "campaign_continuity_view",
+     "campaign_id": "campaign-continuity"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 1
+      }
+     ]
+    },
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 1
+      }
+     ]
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Campaign operation identity payload does not match"
+    },
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-2",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 2
+      }
+     ]
+    },
+    {
+     "ok": {
+      "current_scene": {
+       "act_id": "act-2"
+      },
+      "facts": [],
+      "reveals": {},
+      "plan_progress": [],
+      "records": [
+       {
+        "entry_id": "op-scene-1",
+        "record_id": "current_scene",
+        "kind": "scene",
+        "status": "active",
+        "payload": {
+         "act_id": "act-1",
+         "summary": "Arrival."
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 1,
+        "operation_id": "op-scene-1"
+       },
+       {
+        "entry_id": "op-scene-2",
+        "record_id": "current_scene",
+        "kind": "scene",
+        "status": "active",
+        "payload": {
+         "act_id": "act-2"
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 2,
+        "operation_id": "op-scene-2"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "batch_and_view": {
+   "operations": [
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-fact-b",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "fact",
+       "record_id": "fact-b",
+       "status": "active",
+       "payload": {
+        "text": "The bridge is out.",
+        "visibility": "player_known"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-fact-a",
+       "session_id": "dm-1",
+       "expected_revision": 1,
+       "kind": "fact",
+       "record_id": "fact-a",
+       "status": "active",
+       "payload": {
+        "text": "A storm is coming.",
+        "record_id": "kept-by-merge"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-entity",
+       "session_id": "dm-1",
+       "expected_revision": 2,
+       "kind": "entity",
+       "record_id": "npc-stern",
+       "status": "active",
+       "payload": {
+        "name": "Stern"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-progress",
+       "session_id": "dm-1",
+       "expected_revision": 3,
+       "kind": "plan_progress",
+       "record_id": "act-1",
+       "status": "active",
+       "payload": {
+        "status": "resolved",
+        "record_id": "payload-wins"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-reveal-1",
+       "session_id": "dm-1",
+       "expected_revision": 4,
+       "kind": "reveal",
+       "record_id": "secret-1",
+       "status": "active",
+       "payload": {
+        "audience": [
+         "player",
+         "dm",
+         "player"
+        ]
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-reveal-2",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "kind": "reveal",
+       "record_id": "secret-2",
+       "status": "active",
+       "payload": {},
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-reveal-3",
+       "session_id": "dm-1",
+       "expected_revision": 6,
+       "kind": "reveal",
+       "record_id": "secret-3",
+       "status": "active",
+       "payload": {
+        "audience": "player"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-fact-b-retired",
+       "session_id": "dm-1",
+       "expected_revision": 7,
+       "kind": "fact",
+       "record_id": "fact-b",
+       "status": "retired",
+       "payload": {},
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "campaign_continuity_view",
+     "campaign_id": "campaign-continuity"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-fact-b",
+       "record_id": "fact-b",
+       "kind": "fact",
+       "resulting_revision": 1
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-fact-a",
+       "record_id": "fact-a",
+       "kind": "fact",
+       "resulting_revision": 2
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-entity",
+       "record_id": "npc-stern",
+       "kind": "entity",
+       "resulting_revision": 3
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-progress",
+       "record_id": "act-1",
+       "kind": "plan_progress",
+       "resulting_revision": 4
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-reveal-1",
+       "record_id": "secret-1",
+       "kind": "reveal",
+       "resulting_revision": 5
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-reveal-2",
+       "record_id": "secret-2",
+       "kind": "reveal",
+       "resulting_revision": 6
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-reveal-3",
+       "record_id": "secret-3",
+       "kind": "reveal",
+       "resulting_revision": 7
+      }
+     ]
+    },
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-fact-b-retired",
+       "record_id": "fact-b",
+       "kind": "fact",
+       "resulting_revision": 8
+      }
+     ]
+    },
+    {
+     "ok": {
+      "current_scene": null,
+      "facts": [
+       {
+        "admitted_revision": 2,
+        "record_id": "fact-a",
+        "record_kind": "fact",
+        "text": "A storm is coming."
+       },
+       {
+        "admitted_revision": 3,
+        "name": "Stern",
+        "record_id": "npc-stern",
+        "record_kind": "entity"
+       }
+      ],
+      "reveals": {
+       "secret-1": [
+        "dm",
+        "player"
+       ],
+       "secret-2": []
+      },
+      "plan_progress": [
+       {
+        "record_id": "payload-wins",
+        "status": "resolved"
+       }
+      ],
+      "records": [
+       {
+        "entry_id": "op-fact-b",
+        "record_id": "fact-b",
+        "kind": "fact",
+        "status": "active",
+        "payload": {
+         "text": "The bridge is out.",
+         "visibility": "player_known"
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 1,
+        "operation_id": "op-fact-b"
+       },
+       {
+        "entry_id": "op-fact-a",
+        "record_id": "fact-a",
+        "kind": "fact",
+        "status": "active",
+        "payload": {
+         "record_id": "kept-by-merge",
+         "text": "A storm is coming."
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 2,
+        "operation_id": "op-fact-a"
+       },
+       {
+        "entry_id": "op-entity",
+        "record_id": "npc-stern",
+        "kind": "entity",
+        "status": "active",
+        "payload": {
+         "name": "Stern"
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 3,
+        "operation_id": "op-entity"
+       },
+       {
+        "entry_id": "op-progress",
+        "record_id": "act-1",
+        "kind": "plan_progress",
+        "status": "active",
+        "payload": {
+         "record_id": "payload-wins",
+         "status": "resolved"
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 4,
+        "operation_id": "op-progress"
+       },
+       {
+        "entry_id": "op-reveal-1",
+        "record_id": "secret-1",
+        "kind": "reveal",
+        "status": "active",
+        "payload": {
+         "audience": [
+          "player",
+          "dm",
+          "player"
+         ]
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 5,
+        "operation_id": "op-reveal-1"
+       },
+       {
+        "entry_id": "op-reveal-2",
+        "record_id": "secret-2",
+        "kind": "reveal",
+        "status": "active",
+        "payload": {},
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 6,
+        "operation_id": "op-reveal-2"
+       },
+       {
+        "entry_id": "op-reveal-3",
+        "record_id": "secret-3",
+        "kind": "reveal",
+        "status": "active",
+        "payload": {
+         "audience": "player"
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 7,
+        "operation_id": "op-reveal-3"
+       },
+       {
+        "entry_id": "op-fact-b-retired",
+        "record_id": "fact-b",
+        "kind": "fact",
+        "status": "retired",
+        "payload": {},
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 8,
+        "operation_id": "op-fact-b-retired"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "refusals": {
+   "operations": [
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-0",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-1",
+       "session_id": "dm-1",
+       "expected_revision": 1,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-2",
+       "session_id": "dm-1",
+       "expected_revision": 2,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-3",
+       "session_id": "dm-1",
+       "expected_revision": 3,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-4",
+       "session_id": "dm-1",
+       "expected_revision": 4,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-5",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-6",
+       "session_id": "dm-1",
+       "expected_revision": 6,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-7",
+       "session_id": "dm-1",
+       "expected_revision": 7,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-8",
+       "session_id": "dm-1",
+       "expected_revision": 8,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-9",
+       "session_id": "dm-1",
+       "expected_revision": 9,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-10",
+       "session_id": "dm-1",
+       "expected_revision": 10,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-11",
+       "session_id": "dm-1",
+       "expected_revision": 11,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-12",
+       "session_id": "dm-1",
+       "expected_revision": 12,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-13",
+       "session_id": "dm-1",
+       "expected_revision": 13,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-14",
+       "session_id": "dm-1",
+       "expected_revision": 14,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-15",
+       "session_id": "dm-1",
+       "expected_revision": 15,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-16",
+       "session_id": "dm-1",
+       "expected_revision": 16,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-17",
+       "session_id": "dm-1",
+       "expected_revision": 17,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-18",
+       "session_id": "dm-1",
+       "expected_revision": 18,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-19",
+       "session_id": "dm-1",
+       "expected_revision": 19,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-20",
+       "session_id": "dm-1",
+       "expected_revision": 20,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-21",
+       "session_id": "dm-1",
+       "expected_revision": 21,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-22",
+       "session_id": "dm-1",
+       "expected_revision": 22,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-23",
+       "session_id": "dm-1",
+       "expected_revision": 23,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-24",
+       "session_id": "dm-1",
+       "expected_revision": 24,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-25",
+       "session_id": "dm-1",
+       "expected_revision": 25,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-26",
+       "session_id": "dm-1",
+       "expected_revision": 26,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-27",
+       "session_id": "dm-1",
+       "expected_revision": 27,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-28",
+       "session_id": "dm-1",
+       "expected_revision": 28,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-29",
+       "session_id": "dm-1",
+       "expected_revision": 29,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-30",
+       "session_id": "dm-1",
+       "expected_revision": 30,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-31",
+       "session_id": "dm-1",
+       "expected_revision": 31,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-32",
+       "session_id": "dm-1",
+       "expected_revision": 32,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-33",
+       "session_id": "dm-1",
+       "expected_revision": 33,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-34",
+       "session_id": "dm-1",
+       "expected_revision": 34,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-35",
+       "session_id": "dm-1",
+       "expected_revision": 35,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-36",
+       "session_id": "dm-1",
+       "expected_revision": 36,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-37",
+       "session_id": "dm-1",
+       "expected_revision": 37,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-38",
+       "session_id": "dm-1",
+       "expected_revision": 38,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-39",
+       "session_id": "dm-1",
+       "expected_revision": 39,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-40",
+       "session_id": "dm-1",
+       "expected_revision": 40,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-41",
+       "session_id": "dm-1",
+       "expected_revision": 41,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-42",
+       "session_id": "dm-1",
+       "expected_revision": 42,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-43",
+       "session_id": "dm-1",
+       "expected_revision": 43,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-44",
+       "session_id": "dm-1",
+       "expected_revision": 44,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-45",
+       "session_id": "dm-1",
+       "expected_revision": 45,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-46",
+       "session_id": "dm-1",
+       "expected_revision": 46,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-47",
+       "session_id": "dm-1",
+       "expected_revision": 47,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-48",
+       "session_id": "dm-1",
+       "expected_revision": 48,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-49",
+       "session_id": "dm-1",
+       "expected_revision": 49,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-50",
+       "session_id": "dm-1",
+       "expected_revision": 50,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-51",
+       "session_id": "dm-1",
+       "expected_revision": 51,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-52",
+       "session_id": "dm-1",
+       "expected_revision": 52,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-53",
+       "session_id": "dm-1",
+       "expected_revision": 53,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-54",
+       "session_id": "dm-1",
+       "expected_revision": 54,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-55",
+       "session_id": "dm-1",
+       "expected_revision": 55,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-56",
+       "session_id": "dm-1",
+       "expected_revision": 56,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-57",
+       "session_id": "dm-1",
+       "expected_revision": 57,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-58",
+       "session_id": "dm-1",
+       "expected_revision": 58,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-59",
+       "session_id": "dm-1",
+       "expected_revision": 59,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-60",
+       "session_id": "dm-1",
+       "expected_revision": 60,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-61",
+       "session_id": "dm-1",
+       "expected_revision": 61,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-62",
+       "session_id": "dm-1",
+       "expected_revision": 62,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-63",
+       "session_id": "dm-1",
+       "expected_revision": 63,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-64",
+       "session_id": "dm-1",
+       "expected_revision": 64,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "memory",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "deleted",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "reasoning_private": "x"
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": -1,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-2",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 1,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": " ",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        ""
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 3,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-missing",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-missing"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-missing",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-builder",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-builder"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      },
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-new",
+       "session_id": "dm-1",
+       "expected_revision": 1,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "campaign_continuity_view",
+     "campaign_id": "campaign-continuity"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity batch is empty"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity batch is too large"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity kind is unsupported"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity status is unsupported"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity payload is invalid"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity payload is invalid"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity batch basis is inconsistent"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity batch operation is duplicated"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Campaign continuity record must be a non-whitespace string"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Campaign continuity basis message must be a non-whitespace string"
+    },
+    {
+     "error": "StaleRevision",
+     "code": "stale_revision",
+     "message": "Campaign continuity expected revision is stale"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity basis is unavailable"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity basis is unavailable"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign continuity campaign is unavailable"
+    },
+    {
+     "error": "WrongWriter",
+     "code": "wrong_writer",
+     "message": "Campaign State can be changed only by the active DM"
+    },
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 1
+      }
+     ]
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Campaign continuity batch replay is partial"
+    },
+    {
+     "ok": {
+      "current_scene": {
+       "act_id": "act-1",
+       "summary": "Arrival."
+      },
+      "facts": [],
+      "reveals": {},
+      "plan_progress": [],
+      "records": [
+       {
+        "entry_id": "op-scene-1",
+        "record_id": "current_scene",
+        "kind": "scene",
+        "status": "active",
+        "payload": {
+         "act_id": "act-1",
+         "summary": "Arrival."
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 1,
+        "operation_id": "op-scene-1"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "interrupted_before_commit": {
+   "operations": [
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": true
+    },
+    {
+     "op": "campaign_continuity_view",
+     "campaign_id": "campaign-continuity"
+    },
+    {
+     "op": "commit_campaign_continuity_batch",
+     "commands": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "session_id": "dm-1",
+       "expected_revision": 0,
+       "kind": "scene",
+       "record_id": "current_scene",
+       "status": "active",
+       "payload": {
+        "act_id": "act-1",
+        "summary": "Arrival."
+       },
+       "basis_message_ids": [
+        "m-1"
+       ],
+       "turn_id": "turn-1"
+      }
+     ],
+     "fault": false
+    },
+    {
+     "op": "campaign_continuity_view",
+     "campaign_id": "campaign-continuity"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "_Fault",
+     "code": null,
+     "message": "fault before commit"
+    },
+    {
+     "ok": {
+      "current_scene": null,
+      "facts": [],
+      "reveals": {},
+      "plan_progress": [],
+      "records": []
+     }
+    },
+    {
+     "ok": [
+      {
+       "campaign_id": "campaign-continuity",
+       "operation_id": "op-scene-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 1
+      }
+     ]
+    },
+    {
+     "ok": {
+      "current_scene": {
+       "act_id": "act-1",
+       "summary": "Arrival."
+      },
+      "facts": [],
+      "reveals": {},
+      "plan_progress": [],
+      "records": [
+       {
+        "entry_id": "op-scene-1",
+        "record_id": "current_scene",
+        "kind": "scene",
+        "status": "active",
+        "payload": {
+         "act_id": "act-1",
+         "summary": "Arrival."
+        },
+        "basis_message_ids": [
+         "m-1"
+        ],
+        "admitted_revision": 1,
+        "operation_id": "op-scene-1"
+       }
+      ]
+     }
+    }
+   ]
+  }
+ }
+}

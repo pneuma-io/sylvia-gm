@@ -202,7 +202,7 @@ fn package_lock_from_memberships(connection: &Connection, rows: &[Vec<Value>]) -
 }
 
 /// Python's `str(item)` of a parsed JSON value, exact for the strings stored here.
-fn json_str(value: &Json) -> String {
+pub(crate) fn json_str(value: &Json) -> String {
     match value {
         Json::String(text) => text.clone(),
         Json::Bool(true) => "True".into(),

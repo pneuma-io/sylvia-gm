@@ -463,31 +463,32 @@ pub fn apply_mechanics_choice_migration(connection: &Connection) -> StoreResult<
 /// `sqlite_continuity.apply_migration`: the schema-9 DDL, then continuity seeded from accepted
 /// campaign plans and legacy DM evidence.
 ///
-/// The seeding reads plan and evidence content (lane 1 formats) and is ported with the
-/// continuity family. Until then a database that has anything to seed is refused rather than
-/// migrated without it; an empty one migrates exactly as Python migrates it.
+/// The legacy DM evidence backfill is ported. Seeding from accepted plans uses lane 1's pending
+/// `no_ruleset_plan`, so a database with an accepted plan to seed is refused until it lands,
+/// rather than migrated without it.
 pub fn apply_continuity_migration(connection: &Connection) -> StoreResult<()> {
     execute_statements(connection, sql::MIGRATION_9)?;
     let plans = all_rows(
         connection,
-        "SELECT plan.campaign_id FROM campaign_plans AS plan JOIN (\
+        "SELECT plan.content_json FROM campaign_plans AS plan JOIN (\
          SELECT campaign_id, MAX(plan_revision) AS plan_revision FROM campaign_plans \
          WHERE acceptance_status = 'accepted' GROUP BY campaign_id\
          ) AS accepted ON accepted.campaign_id = plan.campaign_id \
-         AND accepted.plan_revision = plan.plan_revision LIMIT 1",
+         AND accepted.plan_revision = plan.plan_revision ORDER BY plan.campaign_id",
     )?;
-    let evidence = all_rows(
-        connection,
-        "SELECT 1 FROM agent_session_messages AS message \
-         JOIN agent_sessions AS session ON session.session_id = message.session_id \
-         WHERE session.role = 'dm' AND session.campaign_id IS NOT NULL \
-         AND message.kind = 'evidence' LIMIT 1",
-    )?;
-    if !plans.is_empty() || !evidence.is_empty() {
+    // Python seeds only plans whose content holds a structured `campaign_plan` object.
+    let seeds = plans.iter().any(|row| {
+        matches!(
+            sylvia_base::pyjson::loads(&crate::pytext::py_str(&row[0])),
+            Ok(Json::Object(content)) if matches!(content.get("campaign_plan"), Some(Json::Object(_)))
+        )
+    });
+    if seeds {
         return Err(StoreError::NotPorted(
-            "continuity seeding in migration 9 (continuity family pull request)",
+            "continuity seeding from accepted plans in migration 9 (lane 1's no_ruleset_plan)",
         ));
     }
+    crate::continuity::backfill_legacy_messages(connection)?;
     Ok(())
 }
 
