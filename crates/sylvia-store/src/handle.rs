@@ -1,0 +1,109 @@
+//! The store thread: one dedicated thread owns the [`AuthorityStore`] and every SQLite
+//! connection it opens, and runs requests one at a time from a channel. That keeps the
+//! single-writer behaviour the Python store relies on, while the rest of the owner stays on
+//! tokio and awaits replies.
+
+use crate::error::{StoreError, StoreResult};
+use crate::store::AuthorityStore;
+use std::sync::mpsc;
+use std::thread::JoinHandle;
+
+type Job = Box<dyn FnOnce(&mut AuthorityStore) + Send>;
+
+/// The store thread is gone (it panicked or was shut down).
+pub const STORE_STOPPED: &str = "SQLite authority store thread has stopped";
+
+/// A cloneable handle to the store thread. The owner's dispatch context holds one.
+#[derive(Debug, Clone)]
+pub struct StoreHandle {
+    jobs: mpsc::Sender<Job>,
+}
+
+/// Joins the store thread; returned once by [`StoreHandle::spawn`].
+#[derive(Debug)]
+pub struct StoreThread {
+    thread: Option<JoinHandle<()>>,
+}
+
+impl StoreHandle {
+    /// Start the store thread and open the store on it with `open`. Returns once opening has
+    /// finished, with its error if it failed (the thread then exits).
+    pub fn spawn<F>(open: F) -> StoreResult<(Self, StoreThread)>
+    where
+        F: FnOnce() -> StoreResult<AuthorityStore> + Send + 'static,
+    {
+        let (jobs, receiver) = mpsc::channel::<Job>();
+        let (opened, opened_receiver) = mpsc::sync_channel::<StoreResult<()>>(1);
+        let thread = std::thread::Builder::new()
+            .name("sylvia-store".into())
+            .spawn(move || {
+                let mut store = match open() {
+                    Ok(store) => {
+                        let _ = opened.send(Ok(()));
+                        store
+                    }
+                    Err(error) => {
+                        let _ = opened.send(Err(error));
+                        return;
+                    }
+                };
+                while let Ok(job) = receiver.recv() {
+                    job(&mut store);
+                }
+                store.close();
+            })
+            .map_err(StoreError::from)?;
+        match opened_receiver.recv() {
+            Ok(Ok(())) => Ok((Self { jobs }, StoreThread { thread: Some(thread) })),
+            Ok(Err(error)) => {
+                let _ = thread.join();
+                Err(error)
+            }
+            Err(_) => {
+                let _ = thread.join();
+                Err(StoreError::Other(STORE_STOPPED.into()))
+            }
+        }
+    }
+
+    /// Run `operation` on the store thread and await its result.
+    pub async fn call<R, F>(&self, operation: F) -> StoreResult<R>
+    where
+        R: Send + 'static,
+        F: FnOnce(&mut AuthorityStore) -> StoreResult<R> + Send + 'static,
+    {
+        let (reply, receiver) = tokio::sync::oneshot::channel();
+        self.jobs
+            .send(Box::new(move |store| {
+                let _ = reply.send(operation(store));
+            }))
+            .map_err(|_| StoreError::Other(STORE_STOPPED.into()))?;
+        receiver.await.map_err(|_| StoreError::Other(STORE_STOPPED.into()))?
+    }
+
+    /// Run `operation` on the store thread and block until it finishes. For callers outside
+    /// the tokio runtime (startup, tests, tools).
+    pub fn call_blocking<R, F>(&self, operation: F) -> StoreResult<R>
+    where
+        R: Send + 'static,
+        F: FnOnce(&mut AuthorityStore) -> StoreResult<R> + Send + 'static,
+    {
+        let (reply, receiver) = mpsc::sync_channel(1);
+        self.jobs
+            .send(Box::new(move |store| {
+                let _ = reply.send(operation(store));
+            }))
+            .map_err(|_| StoreError::Other(STORE_STOPPED.into()))?;
+        receiver.recv().map_err(|_| StoreError::Other(STORE_STOPPED.into()))?
+    }
+}
+
+impl StoreThread {
+    /// Wait for the store thread to finish. It finishes once every [`StoreHandle`] clone has
+    /// been dropped; the store is then closed and its owner lock released.
+    pub fn join(mut self) {
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
+}

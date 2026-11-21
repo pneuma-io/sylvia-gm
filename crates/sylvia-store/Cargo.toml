@@ -10,11 +10,13 @@ publish.workspace = true
 
 [dependencies]
 sylvia-base.workspace = true
-sylvia-domain.workspace = true
-sylvia-engine.workspace = true
-serde.workspace = true
-serde_json.workspace = true
 thiserror.workspace = true
+rusqlite.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+flate2.workspace = true
 
 [lints]
 workspace = true

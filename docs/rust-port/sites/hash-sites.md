@@ -153,12 +153,12 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/launch_handshake.py:108` | `LaunchHandshake.verify` | hmac.new | `hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(),` | |
 | `infrastructure/launch_handshake.py:138` | `derive_owner_response` | hmac.new | `return hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | |
 | `infrastructure/package_archive.py:238` | `admit_package_archive` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:509` | `<module>` | hashlib.sha256 | `_MIGRATION_1_SHA256 = hashlib.sha256(_MIGRATION_1.strip().encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:587` | `<module>` | hashlib.sha256 | `_MIGRATION_2_SHA256 = hashlib.sha256(_MIGRATION_2.strip().encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:590` | `<module>` | hashlib.sha256 | `_MIGRATION_3_SHA256 = hashlib.sha256(_MIGRATION_3.strip().encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:593` | `<module>` | hashlib.sha256 | `_MIGRATION_4_SHA256 = hashlib.sha256(_MIGRATION_4.strip().encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:598` | `<module>` | hashlib.sha256 | `_MIGRATION_5_SHA256 = hashlib.sha256(_MIGRATION_5.strip().encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:607` | `<module>` | hashlib.sha256 | `_MIGRATION_8_SHA256 = hashlib.sha256(_MIGRATION_8.strip().encode("utf-8")).hexdigest()` | |
+| `infrastructure/sqlite_authority.py:509` | `<module>` | hashlib.sha256 | `_MIGRATION_1_SHA256 = hashlib.sha256(_MIGRATION_1.strip().encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_authority.py:587` | `<module>` | hashlib.sha256 | `_MIGRATION_2_SHA256 = hashlib.sha256(_MIGRATION_2.strip().encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_authority.py:590` | `<module>` | hashlib.sha256 | `_MIGRATION_3_SHA256 = hashlib.sha256(_MIGRATION_3.strip().encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_authority.py:593` | `<module>` | hashlib.sha256 | `_MIGRATION_4_SHA256 = hashlib.sha256(_MIGRATION_4.strip().encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_authority.py:598` | `<module>` | hashlib.sha256 | `_MIGRATION_5_SHA256 = hashlib.sha256(_MIGRATION_5.strip().encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_authority.py:607` | `<module>` | hashlib.sha256 | `_MIGRATION_8_SHA256 = hashlib.sha256(_MIGRATION_8.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:944` | `_stored_action_hash` | hashlib.sha256 | `return hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
 | `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | |
 | `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | |
@@ -189,30 +189,30 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:13445` | `SQLiteAuthorityStore.advance_mechanics_choice` | hashlib.sha256 | `digest = hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
 | `infrastructure/sqlite_builder_launch.py:148` | `detach_legacy_chat` | hashlib.sha256 | `suffix = hashlib.sha256(session_id.encode("utf-8")).hexdigest()[:24]` | |
 | `infrastructure/sqlite_builder_launch.py:200` | `launch_from_interview` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `infrastructure/sqlite_campaign.py:152` | `<module>` | hashlib.sha256 | `CAMPAIGN_IDENTITY_DELTA_SHA256 = hashlib.sha256( CAMPAIGN_IDENTITY_DELTA_SQL.strip().encode("utf-8") ).hexdigest()` | |
-| `infrastructure/sqlite_campaign.py:214` | `<module>` | hashlib.sha256 | `LIFECYCLE_EXTENSION_SHA256 = hashlib.sha256(LIFECYCLE_EXTENSION_SQL.encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_campaign.py:259` | `<module>` | hashlib.sha256 | `PURGE_EXTENSION_SHA256 = hashlib.sha256(PURGE_EXTENSION_SQL.encode("utf-8")).hexdigest()` | |
+| `infrastructure/sqlite_campaign.py:152` | `<module>` | hashlib.sha256 | `CAMPAIGN_IDENTITY_DELTA_SHA256 = hashlib.sha256( CAMPAIGN_IDENTITY_DELTA_SQL.strip().encode("utf-8") ).hexdigest()` | yes |
+| `infrastructure/sqlite_campaign.py:214` | `<module>` | hashlib.sha256 | `LIFECYCLE_EXTENSION_SHA256 = hashlib.sha256(LIFECYCLE_EXTENSION_SQL.encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_campaign.py:259` | `<module>` | hashlib.sha256 | `PURGE_EXTENSION_SHA256 = hashlib.sha256(PURGE_EXTENSION_SQL.encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_campaign.py:361` | `adaptation_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | |
 | `infrastructure/sqlite_campaign.py:589` | `verify_f5_campaign_authority` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(source_data)).hexdigest(),` | |
 | `infrastructure/sqlite_campaign.py:626` | `verify_f5_campaign_authority` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(value)).hexdigest()` | |
-| `infrastructure/sqlite_continuity.py:45` | `<module>` | hashlib.sha256 | `MIGRATION_9_SHA256 = hashlib.sha256(MIGRATION_9_SQL.strip().encode("utf-8")).hexdigest()` | |
+| `infrastructure/sqlite_continuity.py:45` | `<module>` | hashlib.sha256 | `MIGRATION_9_SHA256 = hashlib.sha256(MIGRATION_9_SQL.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_continuity.py:111` | `_initial_entry_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{campaign_id}\0{kind}\0{record_id}".encode()).hexdigest()[:32]` | |
 | `infrastructure/sqlite_continuity.py:266` | `_backfill_legacy_messages` | hashlib.sha256 | `entry_id = f"legacy-{hashlib.sha256(legacy_key.encode()).hexdigest()[:32]}"` | |
-| `infrastructure/sqlite_draft_lifecycle.py:93` | `<module>` | hashlib.sha256 | `MIGRATION_10_SHA256 = hashlib.sha256(MIGRATION_10_SQL.strip().encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_effort.py:23` | `<module>` | hashlib.sha256 | `MIGRATION_12_SHA256 = hashlib.sha256(MIGRATION_12_SQL.encode("utf-8")).hexdigest()` | |
+| `infrastructure/sqlite_draft_lifecycle.py:93` | `<module>` | hashlib.sha256 | `MIGRATION_10_SHA256 = hashlib.sha256(MIGRATION_10_SQL.strip().encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_effort.py:23` | `<module>` | hashlib.sha256 | `MIGRATION_12_SHA256 = hashlib.sha256(MIGRATION_12_SQL.encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_interview_navigation.py:38` | `navigate` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `infrastructure/sqlite_mechanics_choice.py:60` | `<module>` | hashlib.sha256 | `MIGRATION_7_SHA256 = hashlib.sha256(MIGRATION_7_SQL.strip().encode("utf-8")).hexdigest()` | |
+| `infrastructure/sqlite_mechanics_choice.py:60` | `<module>` | hashlib.sha256 | `MIGRATION_7_SHA256 = hashlib.sha256(MIGRATION_7_SQL.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_packages.py:278` | `_sha` | hashlib.sha256 | `return hashlib.sha256(value).hexdigest()` | |
 | `infrastructure/sqlite_packages.py:282` | `_legacy_lock_id` | hashlib.sha256 | `return "legacy-lock-" + hashlib.sha256(campaign_id.encode("utf-8")).hexdigest()[:32]` | |
 | `infrastructure/sqlite_packages.py:1637` | `verify_package_authority` | hashlib.sha256 | `digest = staged_sha256s.setdefault(file_order, hashlib.sha256())` | |
-| `infrastructure/sqlite_reasoning.py:39` | `<module>` | hashlib.sha256 | `MIGRATION_11_SHA256 = hashlib.sha256(MIGRATION_11_SQL.encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_recovery.py:35` | `<module>` | hashlib.sha256 | `RECOVERY_EXTENSION_SHA256 = hashlib.sha256( RECOVERY_EXTENSION_SQL.strip().encode("utf-8") ).hexdigest()` | |
+| `infrastructure/sqlite_reasoning.py:39` | `<module>` | hashlib.sha256 | `MIGRATION_11_SHA256 = hashlib.sha256(MIGRATION_11_SQL.encode("utf-8")).hexdigest()` | yes |
+| `infrastructure/sqlite_recovery.py:35` | `<module>` | hashlib.sha256 | `RECOVERY_EXTENSION_SHA256 = hashlib.sha256( RECOVERY_EXTENSION_SQL.strip().encode("utf-8") ).hexdigest()` | yes |
 | `infrastructure/sqlite_recovery.py:252` | `semantic_payload` | hashlib.sha256 | `return encoded.decode("utf-8"), hashlib.sha256(encoded).hexdigest()` | |
 | `infrastructure/sqlite_recovery.py:350` | `verify_recovery_receipts` | hashlib.sha256 | `or hashlib.sha256(payload_json.encode("utf-8")).hexdigest() != payload_sha256` | |
 | `infrastructure/sqlite_recovery.py:491` | `_blob_chunk_rows` | hashlib.sha256 | `"chunk_sha256": hashlib.sha256(chunk).hexdigest(),` | |
 | `infrastructure/sqlite_recovery.py:543` | `_staging_chunk_rows` | hashlib.sha256 | `"chunk_sha256": hashlib.sha256(chunk).hexdigest(),` | |
 | `infrastructure/sqlite_session.py:908` | `rename_builder_chat` | hashlib.sha256 | `message_id="builder-title-user-" + hashlib.sha256(session_id.encode()).hexdigest()[:24],` | |
-| `infrastructure/sqlite_state_ownership.py:106` | `<module>` | hashlib.sha256 | `MIGRATION_6_SHA256 = hashlib.sha256(MIGRATION_6_SQL.strip().encode("utf-8")).hexdigest()` | |
+| `infrastructure/sqlite_state_ownership.py:106` | `<module>` | hashlib.sha256 | `MIGRATION_6_SHA256 = hashlib.sha256(MIGRATION_6_SQL.strip().encode("utf-8")).hexdigest()` | yes |
 
 ## Lane 4: Providers and agents
 
