@@ -139,6 +139,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "builder_chat_index" => commands::builder::handle_builder_chat_index(context, params).await,
         // A command marked Ported must have an arm above this one.
         _ => Err(CodedError::new("internal_error", format!("{method} is marked ported but has no handler."))),
     };

@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 11 of 137 (`shutdown`, `handshake_status`, `campaign_index` and the eight run-loop commands: display-load cancellation, desktop drafts, local reports and faults, `renderer`).
+Ported: 12 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index` and the eight run-loop commands: display-load cancellation, desktop drafts, local reports and faults, `renderer`).
 
 ## Run-loop methods
 
@@ -40,7 +40,7 @@ Ported: 11 of 137 (`shutdown`, `handshake_status`, `campaign_index` and the eigh
 | `delete_reusable_library_entry` | `campaigns.handle_delete_reusable_library_entry` | yes | no | |
 | `character_chat` | `character_chat.handle_character_chat` | yes | no | |
 | `send_character_chat_message` | `character_chat.handle_send_character_chat_message` | yes | no | |
-| `builder_chat_index` | `builder.handle_builder_chat_index` | yes | no | |
+| `builder_chat_index` | `builder.handle_builder_chat_index` | yes | yes | `startup` |
 | `start_import_repair` | `builder.handle_start_import_repair` | yes | no | |
 | `create_builder_chat` | `builder.handle_create_builder_chat` | yes | no | |
 | `rename_builder_chat` | `builder.handle_rename_builder_chat` | yes | no | |

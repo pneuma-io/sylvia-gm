@@ -19,7 +19,7 @@ pub async fn handle_handshake_status(ctx: &DispatchContext, _params: &JsonMap) -
 
 /// A store failure as a handler's error: a rejection Python's owner catches keeps its code,
 /// message and class; anything else is the owner's internal error.
-fn store_error(error: sylvia_store::StoreError) -> sylvia_base::CodedError {
+pub(crate) fn store_error(error: sylvia_store::StoreError) -> sylvia_base::CodedError {
     error.rejection().unwrap_or_else(|| sylvia_base::CodedError::new("internal_error", error.to_string()))
 }
 
