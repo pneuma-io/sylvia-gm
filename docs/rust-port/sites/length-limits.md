@@ -31,7 +31,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_profiles.py:254` | `validate_source_profile` | len() against a limit | `or len(name) > 160` | |
 | `application/character_profiles.py:344` | `save_character_profile` | len() against a limit | `if len(tuple(root.iterdir())) >= 256:` | |
 | `application/character_profiles.py:383` | `character_profile_catalog` | len() against a limit | `if len(paths) > 256:` | |
-| `application/character_rules.py:42` | `validate_character_rules` | len() against a limit | `if (not isinstance(value["description"], str) or not 1 <= len(value["description"]) <= 2000` | |
+| `application/character_rules.py:42` | `validate_character_rules` | len() against a limit | `if (not isinstance(value["description"], str) or not 1 <= len(value["description"]) <= 2000` |  `sylvia-app` character_rules_vectors |
 | `application/import_repair.py:119` | `_read_selected_source` | len() against a limit | `if len(value) > _SOURCE_BYTE_LIMIT:` | |
 | `application/import_repair.py:148` | `_read_safe_zip` | len() against a limit | `if not infos or len(infos) > _MEMBER_COUNT_LIMIT:` | |
 | `application/import_repair.py:380` | `_read_draft_files` | len() against a limit | `if len(value) > _MEMBER_BYTE_LIMIT:` | |

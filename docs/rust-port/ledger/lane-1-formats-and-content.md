@@ -23,7 +23,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/campaign_starting_world.py` | 97 | `sylvia-app::campaign_starting_world` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/character_card_import.py` | 628 | `sylvia-app::character_card_import` | pending | |
 | `src/sylvia_gm/application/character_profiles.py` | 391 | `sylvia-app::character_profiles` | pending | |
-| `src/sylvia_gm/application/character_rules.py` | 145 | `sylvia-app::character_rules` | pending | |
+| `src/sylvia_gm/application/character_rules.py` | 145 | `sylvia-app::character_rules` | in progress | `validate_character_rules` and `campaign_character_state` ported (`character_rules_vectors`). `prepare_character_rules` and `verify_character_rules` wait for lane 2's `execute_effects` (`runtime/_effect_executor.py`) |
 | `src/sylvia_gm/application/compatible_character_copy.py` | 171 | `sylvia-app::compatible_character_copy` | pending | |
 | `src/sylvia_gm/application/import_repair.py` | 621 | `sylvia-app::import_repair` | pending | |
 | `src/sylvia_gm/application/import_repair_sessions.py` | 147 | `sylvia-app::import_repair_sessions` | pending | |

@@ -909,6 +909,7 @@ dependencies = [
  "serde_json",
  "sylvia-base",
  "sylvia-domain",
+ "sylvia-engine",
 ]
 
 [[package]]
