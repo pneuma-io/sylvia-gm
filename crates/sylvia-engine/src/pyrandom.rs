@@ -55,6 +55,15 @@ impl PyRandom {
         Self::from_u64(seed.unsigned_abs())
     }
 
+    /// `random.Random(seed)` for any `int` in the `i128` range.
+    pub fn from_i128(seed: i128) -> Self {
+        let magnitude = seed.unsigned_abs();
+        // Truncation is intended: these are the four 32-bit limbs.
+        #[allow(clippy::cast_possible_truncation)]
+        let limbs: [u32; 4] = std::array::from_fn(|i| (magnitude >> (32 * i)) as u32);
+        Self::from_int_limbs(&limbs)
+    }
+
     /// `random.Random(seed)` for an integer of any size, given as the 32-bit limbs of its
     /// absolute value, least significant first.
     pub fn from_int_limbs(limbs: &[u32]) -> Self {
