@@ -4,10 +4,16 @@ Sylvia GM is being ported from Python to Rust. This folder is the working agreem
 everyone doing that port: who owns what, the rules, and how a change is checked.
 
 - **Reference:** the Python source in `src/sylvia_gm` at the 0.4.1 release commit,
-  `0da1010feb5a520f917f5d69ff8553ddb174e9e7` (the commit `rust-rewrite` branches from). It is
-  frozen: nothing under `src/sylvia_gm`, `tests` or `scripts` changes on this branch. It is the
-  definition of correct behaviour until the port is finished. If a release fix lands on
-  Python `main`, the manager brings it over deliberately.
+  `c19eee455b35679703a574a4db51767d32f1af1b` (tagged `v0.4.1` when published). It is frozen:
+  nothing under `src/sylvia_gm`, `tests` or `scripts` changes on this branch except release
+  fixes the manager merges in from Python `main`. It is the definition of correct behaviour
+  until the port is finished.
+- **Release fixes merged in so far:** `rust-rewrite` branched from `0da1010`. The release
+  commit then moved to `c19eee4` for issue #240, which changed only the frontend (owner
+  refusals shown without the desktop host's code) and two frontend tests; it was merged into
+  `rust-rewrite`. `src/sylvia_gm` is identical at both commits, so the ledgers, site lists,
+  vectors and recordings that name `0da1010` stay valid. The owner keeps rejecting with
+  `code: message` through the desktop host, as Python does.
 - **Goal:** the supported product builds, tests and runs with no Python interpreter.
 - **Integration branch:** `rust-rewrite`. Lane workers open pull requests against it. `main`
   receives the port once, at cutover.
