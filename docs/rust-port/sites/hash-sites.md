@@ -70,8 +70,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `builder/_setting_materializer.py:36` | `_world_draft` | hashlib.sha256 | `source_sha = hashlib.sha256( canonical_json_bytes( {path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())} ) ).hexdigest()` | |
 | `builder/_setting_materializer.py:38` | `_world_draft` | hashlib.sha256 | `{path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())}` | |
 | `builder/_workspace_files.py:38` | `content_version` | hashlib.sha256 | `return hashlib.sha256(content).hexdigest()` | |
-| `domain/campaign_plan.py:751` | `validate_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256(encoded).hexdigest()` || `sylvia-domain` campaign_plan_vectors |
-| `domain/campaign_sequel.py:24` | `digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(value)).hexdigest()` || `sylvia-domain` domain_records_vectors |
+| `domain/campaign_plan.py:751` | `validate_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256(encoded).hexdigest()` | `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_sequel.py:24` | `digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(value)).hexdigest()` | `sylvia-domain` domain_records_vectors |
 | `domain/model_capability.py:108` | `ModelCapabilityPlacement.evidence_sha256` | hashlib.sha256 | `return hashlib.sha256(_canonical_bytes(payload)).hexdigest()` | `sylvia-domain` session_vectors |
 | `domain/model_capability.py:323` | `model_guidance_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(_canonical_bytes(model_guidance_payload(decision))).hexdigest()` | `sylvia-domain` session_vectors |
 | `domain/package_library.py:600` | `participant_schema_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | `sylvia-domain` identity_vectors |

@@ -78,11 +78,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/_content_schema_ui.py:39` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `_LAYOUT_ID = {"type": "string", "pattern": r"^[A-Za-z0-9_-]{1,96}$(?![\s\S])"}` | `sylvia-domain` content_vectors |
 | `domain/authority.py:586` | `_is_reserved_canonical_channel` | re.sub; NEEDS fancy-regex: lookahead, lookbehind | `separated = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", name)` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:587` | `_is_reserved_canonical_channel` | re.split; plain | `tokens = tuple(token for token in re.split(r"[^a-z0-9]+", separated.casefold()) if token)` | `sylvia-domain` identity_vectors |
-| `domain/campaign_plan.py:26` | `<module>` | re.compile; plain | `_ABSOLUTE_PATH = re.compile(r"(?:^[A-Za-z]:[\\/]\|^/\|^\\\\)")` || `sylvia-domain` campaign_plan_vectors |
-| `domain/campaign_plan.py:129` | `CampaignPlanFieldsError.__init__` | re.fullmatch; plain | `if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", name)` || `sylvia-domain` campaign_plan_vectors |
-| `domain/campaign_plan.py:209` | `_identity` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", text):` || `sylvia-domain` campaign_plan_vectors |
-| `domain/campaign_plan.py:258` | `_validate_party_placements` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", state.key):` || `sylvia-domain` campaign_plan_vectors |
-| `domain/campaign_plan.py:274` | `_package_binding` | re.fullmatch; plain | `if not re.fullmatch(r"[0-9a-f]{64}", content_sha256):` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:26` | `<module>` | re.compile; plain | `_ABSOLUTE_PATH = re.compile(r"(?:^[A-Za-z]:[\\/]\|^/\|^\\\\)")` | `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:129` | `CampaignPlanFieldsError.__init__` | re.fullmatch; plain | `if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", name)` | `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:209` | `_identity` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", text):` | `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:258` | `_validate_party_placements` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", state.key):` | `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:274` | `_package_binding` | re.fullmatch; plain | `if not re.fullmatch(r"[0-9a-f]{64}", content_sha256):` | `sylvia-domain` campaign_plan_vectors |
 | `domain/content_validation.py:54` | `_field_path` | re.fullmatch; plain | `elif isinstance(part, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]{0,95}", part):` | `sylvia-domain` content_vectors |
 | `domain/content_validation.py:115` | `validate_content_shape` | re.search; pattern built at run time, check by hand | `and not any(re.search(pattern, field) for pattern in patterns)` | `sylvia-domain` content_vectors (no shipped schema has `patternProperties`; the engine refuses it) |
 | `domain/package_library.py:757` | `validate_portable_path` | re.match; plain | `if re.match(r"^[A-Za-z]:", path):` | `sylvia-domain` identity_vectors |
