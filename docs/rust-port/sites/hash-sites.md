@@ -252,13 +252,13 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/desktop_update/checkpoint.py:78` | `_fingerprint` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | |
-| `application/desktop_update/checkpoint.py:142` | `schema_identity` | hashlib.sha256 | `return version, hashlib.sha256(raw).hexdigest()` | |
+| `application/desktop_update/checkpoint.py:78` | `_fingerprint` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | `preparation_vectors` |
+| `application/desktop_update/checkpoint.py:142` | `schema_identity` | hashlib.sha256 | `return version, hashlib.sha256(raw).hexdigest()` | `preparation_vectors` |
 | `application/desktop_update/payload.py:28` | `verify_artifact` | hashlib.sha256 | `digest = hashlib.sha256()` | `update_vectors` |
-| `application/desktop_update/payload.py:102` | `extract_portable` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | |
-| `application/desktop_update/preparation.py:138` | `PreparedUpdate._checkpoint_binding` | hashlib.sha256 | `"sha256": hashlib.sha256(raw).hexdigest(),` | |
-| `application/desktop_update/replacement.py:80` | `file_matches` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | |
-| `application/desktop_update/replacement.py:156` | `_inventory` | hashlib.sha256 | `files.append(PayloadFile(ENTRY_MANIFEST, len(raw), hashlib.sha256(raw).hexdigest()))` | |
+| `application/desktop_update/payload.py:102` | `extract_portable` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | `preparation_vectors` |
+| `application/desktop_update/preparation.py:138` | `PreparedUpdate._checkpoint_binding` | hashlib.sha256 | `"sha256": hashlib.sha256(raw).hexdigest(),` | `preparation_vectors` |
+| `application/desktop_update/replacement.py:80` | `file_matches` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | `preparation_vectors` |
+| `application/desktop_update/replacement.py:156` | `_inventory` | hashlib.sha256 | `files.append(PayloadFile(ENTRY_MANIFEST, len(raw), hashlib.sha256(raw).hexdigest()))` | `preparation_vectors` |
 | `application/desktop_update/transport.py:327` | `download_artifact` | hashlib.sha256 | `digest, count = hashlib.sha256(), 0` | `update_vectors` |
 | `build_workspace.py:51` | `BuildWorkspace.finish` | hashlib.sha256 | `"output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),` | |
 | `covered_source_delivery.py:39` | `_validate_archive` | hashlib.sha256 | `or archive_record.get("sha256") != hashlib.sha256(blob).hexdigest()` | |

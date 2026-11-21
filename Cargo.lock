@@ -998,6 +998,8 @@ dependencies = [
  "hyper-util",
  "multer",
  "regex",
+ "rusqlite",
+ "rustix",
  "serde",
  "serde_json",
  "sha2",
@@ -1008,6 +1010,7 @@ dependencies = [
  "tokio",
  "unicode-normalization",
  "winapi-util",
+ "windows-sys",
  "windows-version",
 ]
 

@@ -14,6 +14,7 @@
 use super::controller::{Setup, UpdateController, SOURCE};
 use super::launch::Installation;
 use super::manifest::{KeyRing, Version, APP_VERSION, RELEASE_CHANNEL};
+use super::preparation::{new_attempt, PreparedUpdate};
 use super::storage::{is_update_error, operation_id, phase};
 use super::transport::Transport;
 use super::update_error;
@@ -38,6 +39,8 @@ pub type TransportFactory = Arc<dyn Fn() -> Arc<dyn Transport> + Send + Sync>;
 /// `reserved(identity)` and `release(identity)` from the run loop.
 pub type Reserved = Arc<dyn Fn(&str) -> bool + Send + Sync>;
 pub type Release = Arc<dyn Fn(&str) -> CodedResult<()> + Send + Sync>;
+/// `backup_database(target)`: the owning authority's coherent online backup.
+pub type Backup = Arc<dyn Fn(&Path) -> CodedResult<()> + Send + Sync>;
 
 /// A transport for a build without update trust: it is never asked for anything, because
 /// every request is refused before a controller exists.
@@ -71,6 +74,7 @@ pub struct DesktopUpdateService {
     storage: PathBuf,
     root: PathBuf,
     installation: Option<Installation>,
+    backup: Option<Backup>,
     reserved: Option<Reserved>,
     release: Option<Release>,
     keys: BTreeMap<String, [u8; 32]>,
@@ -91,12 +95,14 @@ impl DesktopUpdateService {
     pub fn new(
         storage_root: &Path,
         installation: Option<Installation>,
+        backup: Option<Backup>,
         reserved: Option<Reserved>,
         release: Option<Release>,
     ) -> Self {
         Self::with_trust(
             storage_root,
             installation,
+            backup,
             reserved,
             release,
             public_keys(),
@@ -110,6 +116,7 @@ impl DesktopUpdateService {
     pub fn with_trust(
         storage_root: &Path,
         installation: Option<Installation>,
+        backup: Option<Backup>,
         reserved: Option<Reserved>,
         release: Option<Release>,
         keys: BTreeMap<String, [u8; 32]>,
@@ -119,6 +126,7 @@ impl DesktopUpdateService {
             storage: storage_root.to_path_buf(),
             root: storage_root.join(".application-updates"),
             installation,
+            backup,
             reserved,
             release,
             keys,
@@ -303,11 +311,11 @@ impl DesktopUpdateService {
             "check" => controller.check()?,
             "prepare" => {
                 let identity = operation_id(&params["operation_id"])?;
-                return Err(self.prepare_checks(&identity, &target, &distribution));
+                self.prepare(&controller, &identity, &keyring, &target, &distribution)?
             }
             "handoff" => {
                 let identity = operation_id(&params["operation_id"])?;
-                return Err(self.handoff_checks(&controller, &identity, &target, &distribution));
+                return self.handoff(&controller, &identity, &keyring, &target, &distribution);
             }
             _ => {
                 let identity = operation_id(&params["operation_id"])?;
@@ -327,64 +335,110 @@ impl DesktopUpdateService {
         Ok(result)
     }
 
-    /// `_prepare(...)` up to the checkpoint: an update launch context, the same copy, no
-    /// engineering overrides and a reservation of the idle owner. What follows (the checkpoint
-    /// and file preparation) needs `preparation.py`, which is not ported yet.
-    fn prepare_checks(&self, identity: &str, target: &str, distribution: &str) -> CodedError {
-        let checks = || -> CodedResult<()> {
-            let (Some(installation), Some(reserved), Some(_)) =
-                (&self.installation, &self.reserved, &self.release)
-            else {
-                return Err(update_error(
-                    "unsupported_launch_context",
-                    "This launch cannot prepare an application update.",
-                ));
-            };
-            installation.check(target, distribution)?;
-            // Refuse engineering overrides before any checkpoint or file preparation.
-            super::runtime::child_environment()?;
-            if !reserved(identity) {
-                return Err(update_error("update_busy", "Reserve an idle application before preparing."));
-            }
-            Ok(())
-        };
-        checks().err().unwrap_or_else(preparation_pending)
-    }
-
-    /// `_handoff(...)` up to the retained preparation: a matching prepared reservation, the
-    /// same copy and no engineering overrides. Reading the prepared attempt needs
-    /// `preparation.py`, which is not ported yet.
-    fn handoff_checks(
+    /// `_prepare(...)`: an update launch context, the same copy, no engineering overrides and a
+    /// reservation of the idle owner; then the checkpoint and file preparation run as the
+    /// controller's operation, which releases the reservation if it fails.
+    fn prepare(
         &self,
         controller: &UpdateController,
         identity: &str,
+        keyring: &KeyRing,
         target: &str,
         distribution: &str,
-    ) -> CodedError {
-        let checks = || -> CodedResult<()> {
-            let state = controller.state();
-            let installation = match (&self.installation, &self.reserved) {
-                (Some(installation), Some(reserved))
-                    if reserved(identity)
-                        && state["operation_id"] == identity
-                        && state["phase"] == phase::PREPARED
-                        && state["busy"] != true =>
-                {
-                    installation
-                }
-                _ => {
-                    return Err(update_error(
-                        "update_busy",
-                        "A matching prepared owner reservation is required.",
-                    ))
-                }
-            };
-            installation.check(target, distribution)?;
-            super::runtime::child_environment()?;
-            operation_id(&state["prepared_attempt"])?;
-            Ok(())
+    ) -> CodedResult<JsonMap> {
+        let (Some(installation), Some(backup), Some(reserved), Some(_)) =
+            (&self.installation, &self.backup, &self.reserved, &self.release)
+        else {
+            return Err(update_error(
+                "unsupported_launch_context",
+                "This launch cannot prepare an application update.",
+            ));
         };
-        checks().err().unwrap_or_else(preparation_pending)
+        installation.check(target, distribution)?;
+        // Refuse engineering overrides before any checkpoint or file preparation.
+        super::runtime::child_environment()?;
+        if !reserved(identity) {
+            return Err(update_error("update_busy", "Reserve an idle application before preparing."));
+        }
+        let (inner, reserved_check) = (Arc::clone(&self.inner), Arc::clone(reserved));
+        let quiet_identity = identity.to_string();
+        let quiesced = move || !lock(&inner).closed && reserved_check(&quiet_identity);
+        let (storage, live, backup) = (self.storage.clone(), installation.live.clone(), Arc::clone(backup));
+        let (action_identity, keyring) = (identity.to_string(), keyring.clone());
+        let (target, distribution) = (target.to_string(), distribution.to_string());
+        let action = move || -> CodedResult<String> {
+            let mut update = PreparedUpdate::new(
+                &storage,
+                &live,
+                &action_identity,
+                &new_attempt(),
+                &Version::parse_text(APP_VERSION).expect("the build version is SemVer"),
+                &target,
+                &distribution,
+                &keyring,
+            )?;
+            update.prepare(&|target: &Path| backup(target), &quiesced)?;
+            Ok(update.attempt)
+        };
+        let (release_reserved, release) = (self.reserved.clone(), self.release.clone());
+        let failure_identity = identity.to_string();
+        let on_failure = move || {
+            if let (Some(reserved), Some(release)) = (&release_reserved, &release) {
+                if reserved(&failure_identity) {
+                    let _ = release(&failure_identity);
+                }
+            }
+        };
+        controller.prepare(identity, action, on_failure)
+    }
+
+    /// `_handoff(...)`: private owner-pipe metadata for the native helper launch, never a
+    /// renderer-selected path or executable.
+    fn handoff(
+        &self,
+        controller: &UpdateController,
+        identity: &str,
+        keyring: &KeyRing,
+        target: &str,
+        distribution: &str,
+    ) -> CodedResult<JsonMap> {
+        let state = controller.state();
+        let installation = match (&self.installation, &self.reserved) {
+            (Some(installation), Some(reserved))
+                if reserved(identity)
+                    && state["operation_id"] == identity
+                    && state["phase"] == phase::PREPARED
+                    && state["busy"] != true =>
+            {
+                installation
+            }
+            _ => {
+                return Err(update_error("update_busy", "A matching prepared owner reservation is required."))
+            }
+        };
+        installation.check(target, distribution)?;
+        super::runtime::child_environment()?;
+        let attempt = operation_id(&state["prepared_attempt"])?;
+        let mut prepared = PreparedUpdate::new(
+            &self.storage,
+            &installation.live,
+            identity,
+            &attempt,
+            &Version::parse_text(APP_VERSION).expect("the build version is SemVer"),
+            target,
+            distribution,
+            keyring,
+        )?;
+        prepared.require_selected(None)?;
+        let (_, helper) = prepared.replacement()?.helper_payload()?;
+        let mut helper_row = JsonMap::new();
+        helper_row.insert("size".into(), helper.size.into());
+        helper_row.insert("sha256".into(), helper.sha256.into());
+        let mut result = JsonMap::new();
+        result.insert("operation_id".into(), identity.into());
+        result.insert("attempt".into(), attempt.into());
+        result.insert("helper".into(), Json::Object(helper_row));
+        Ok(result)
     }
 
     /// `_release_if_reserved(identity)`.
@@ -442,7 +496,14 @@ impl DesktopUpdateService {
         };
         let state = controller.state();
         let text = |key: &str| state[key].as_str().unwrap_or_default().to_string();
-        Err(self.handoff_checks(&controller, identity, &text("target"), &text("distribution")))
+        self.handoff(
+            &controller,
+            identity,
+            &KeyRing::new(self.keys.clone()),
+            &text("target"),
+            &text("distribution"),
+        )?;
+        controller.arm_shutdown(identity)
     }
 
     /// Wait for the background restore and the controller's running operation, as Python's
@@ -482,9 +543,4 @@ impl DesktopUpdateService {
             controller.wait().await;
         }
     }
-}
-
-/// The reply of a preparation step that is not ported yet.
-fn preparation_pending() -> CodedError {
-    CodedError::new(PREPARATION_PENDING, "The Rust owner does not prepare application updates yet.")
 }
