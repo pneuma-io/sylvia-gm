@@ -15,6 +15,7 @@ pub mod campaigns;
 pub mod continuity;
 pub mod error;
 pub mod handle;
+pub mod lanes;
 pub mod launch;
 pub mod owner_lock;
 pub mod pytext;
@@ -27,6 +28,7 @@ mod verify;
 
 pub use error::{StoreError, StoreResult};
 pub use handle::{StoreHandle, StoreThread};
+pub use lanes::{LaneGuard, LaneHold, LaneRegistry, OwnerLanes};
 pub use store::AuthorityStore;
 
 /// The SQLite library this crate is built with (`sqlite3.sqlite_version` in Python).

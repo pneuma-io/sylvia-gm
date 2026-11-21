@@ -3,6 +3,9 @@
 //! So far: `AuthorityOwner.campaign_index` with `_campaign_index_entry`, and the
 //! `CampaignIndexEntry` and `CampaignSessionIndexEntry` it returns. The owner's reply field order
 //! (`_json_value`) is lane 5's handler.
+//!
+//! `rename_builder_chat` and `delete_builder_chat` are [`StoreHandle`](crate::StoreHandle)
+//! operations, because they hold the owner's lanes ([`crate::lanes`]) around the store call.
 
 use crate::campaigns::CampaignIndexRecord;
 use crate::error::StoreResult;
@@ -187,5 +190,64 @@ pub fn campaign_index_entry(record: &CampaignIndexRecord) -> CampaignIndexEntry 
         provider_id,
         model_id,
         sessions,
+    }
+}
+
+/// `AuthorityOwner.delete_builder_chat`'s identity refusal.
+fn invalid_builder_chat_identity() -> crate::error::StoreError {
+    crate::actions::rejected("Builder chat identity is invalid", "invalid_authority_identity")
+}
+
+impl crate::handle::StoreHandle {
+    /// `AuthorityOwner.rename_builder_chat`: `_operation()`, then `SessionApplication`'s
+    /// session lane (waiting for it), then the store's rename.
+    ///
+    /// `_operation()` refuses work once the owner is closing. Here the store thread outlives every
+    /// handle, so closing waits for each operation as Python's does, and a stopped store thread
+    /// fails like Python's `RuntimeError`, as an internal fault.
+    pub async fn rename_builder_chat(
+        &self,
+        session_id: &str,
+        display_name: &str,
+        automatic: bool,
+    ) -> StoreResult<sylvia_domain::session::BuilderChatRecord> {
+        let _session = self.lanes().sessions.acquire(session_id).await;
+        let (session_id, display_name) = (session_id.to_owned(), display_name.to_owned());
+        self.call(move |store| store.rename_builder_chat(&session_id, &display_name, automatic)).await
+    }
+
+    /// `AuthorityOwner.delete_builder_chat`: the identity and exact-confirmation checks, the
+    /// non-blocking `builder-chat:<id>` owner lane (refused, never queued, while Builder work
+    /// holds it), `_operation()`, `SessionApplication`'s session lane (waiting for it), then the
+    /// store's delete.
+    pub async fn delete_builder_chat(
+        &self,
+        session_id: &str,
+        confirmation: &str,
+    ) -> StoreResult<sylvia_domain::session::BuilderChatRecord> {
+        if sylvia_domain::authority::validate_authority_identity(session_id, "Builder chat identity", false)
+            .is_err()
+        {
+            return Err(invalid_builder_chat_identity());
+        }
+        if session_id == "." || session_id == ".." || session_id.contains(['/', '\\', ':']) {
+            return Err(invalid_builder_chat_identity());
+        }
+        if confirmation != format!("permanently delete {session_id}") {
+            return Err(crate::actions::rejected(
+                "Builder chat deletion confirmation is not exact",
+                "builder_chat_delete_confirmation_inexact",
+            ));
+        }
+        let Some(_owner) = self.lanes().owner.try_acquire(&crate::lanes::builder_chat_lane(session_id))
+        else {
+            return Err(crate::actions::rejected(
+                "Builder chat has active work; deletion is not queued",
+                "builder_chat_work_in_progress",
+            ));
+        };
+        let _session = self.lanes().sessions.acquire(session_id).await;
+        let session_id = session_id.to_owned();
+        self.call(move |store| store.delete_builder_chat(&session_id)).await
     }
 }
