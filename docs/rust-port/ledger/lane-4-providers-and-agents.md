@@ -1,0 +1,122 @@
+# Lane 4 ledger: Providers and agents
+
+Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 111 files, 48,215 lines.
+
+One row per Python file this lane retires. Status is `pending`, `in progress`,
+`ported` (Rust replacement merged and its comparison checks pass) or `retired`
+(no Rust replacement needed; say why in Notes). Only this lane's worker edits this
+file; a row moves to another lane only through the manager.
+
+| Python file | Lines | Rust target | Status | Notes |
+| --- | ---: | --- | --- | --- |
+| `src/sylvia_gm/agent/__init__.py` | 49 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_activity.py` | 114 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_actor_decisions.py` | 318 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_argument_contracts.py` | 258 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_builder_question_answers.py` | 127 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_builder_reference_copy_tool.py` | 98 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_builder_session.py` | 2,709 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_builder_source_tool.py` | 75 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_builder_title.py` | 64 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_campaign_memory.py` | 97 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_character_draft_tool.py` | 99 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_character_profile_tools.py` | 350 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_character_reuse_tool.py` | 106 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_content_definition_tool.py` | 140 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_context_ledger.py` | 1,991 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_fixed_tool_projection.py` | 124 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_history.py` | 62 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_import_repair_tools.py` | 73 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_inference_identity.py` | 18 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_library_source_copy_tool.py` | 156 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_library_source_tool.py` | 146 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_mode.py` | 13 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_native_continuation.py` | 151 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_participant_file_tool.py` | 82 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_plan_draft_check_tool.py` | 50 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_resolver.py` | 636 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_runtime.py` | 38 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_session.py` | 4,258 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_turn_decisions.py` | 250 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_turn_phases.py` | 3,156 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_turn_state.py` | 185 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_request_data.py` | 129 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_ruleset_draft_check_tool.py` | 75 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_coverage.py` | 93 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_provider.py` | 153 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_runner.py` | 348 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_tool.py` | 70 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_runner.py` | 2,549 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_session_loop.py` | 1,953 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_skills.py` | 59 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_stateless_mcp.py` | 2,828 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_tool_exposure.py` | 209 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_tool_loader.py` | 464 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_working_context.py` | 766 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/application/character_chat.py` | 697 | `sylvia-app::character_chat` | pending | |
+| `src/sylvia_gm/config/__init__.py` | 23 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_credential_protection.py` | 291 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_env.py` | 101 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_host_browser.py` | 94 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_merge.py` | 29 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_resolver.py` | 68 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_user_settings.py` | 103 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/chatgpt_settings.py` | 169 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/claude_settings.py` | 293 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/loader.py` | 293 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/provider_settings.py` | 2,250 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/provider/__init__.py` | 144 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_admin_audit.py` | 417 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_anthropic.py` | 1,145 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_base.py` | 519 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_chat_metadata.py` | 93 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_chatgpt.py` | 1,522 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_chatgpt_account.py` | 177 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_chatgpt_model_facts.py` | 61 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_claude.py` | 1,601 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_claude_install.py` | 387 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_claude_kept.py` | 365 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_claude_native.py` | 484 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_claude_runtime.py` | 453 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_codex_rpc.py` | 427 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_context_capacity.py` | 150 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_context_fit.py` | 408 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_diagnostics.py` | 135 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_exceptions.py` | 179 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_factory.py` | 98 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_gemini.py` | 418 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_hooks.py` | 642 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_lifecycle.py` | 75 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_model_facts.py` | 277 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_models.py` | 235 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_native_output.py` | 87 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_openai_compat.py` | 1,339 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_output_policy.py` | 26 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_protocol_routes.py` | 63 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_reasoning.py` | 379 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_registry.py` | 393 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_request_metadata.py` | 139 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_retry.py` | 113 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_retry_after.py` | 25 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_speed.py` | 178 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_stream_health.py` | 76 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_token_estimate.py` | 52 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_tool_delta.py` | 32 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_usage_tracker.py` | 171 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/session/__init__.py` | 57 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_context.py` | 302 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_context_compressor.py` | 508 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_divergence.py` | 235 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_history.py` | 8 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_narrative_scanner.py` | 234 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_npc_dialogue.py` | 210 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_prompt_assembler.py` | 1,133 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_reveal_guard.py` | 223 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_token_budget.py` | 442 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/__init__.py` | 22 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/_builder_handlers.py` | 504 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/_converter.py` | 65 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/_dm_campaign_handlers.py` | 252 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/_registry.py` | 254 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/_spec.py` | 126 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/tools/_toolsets.py` | 55 | `sylvia-agent` | pending | |

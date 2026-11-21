@@ -1,0 +1,67 @@
+# Sylvia GM Rust port workspace. See docs/rust-port/README.md for lanes, rules and checks.
+#
+# src-tauri (the desktop shell) stays outside the workspace for now: the release and
+# qualification scripts pin its own Cargo.lock and src-tauri/target. Lane 5 joins it to the
+# workspace when packaging moves off PyInstaller.
+[workspace]
+resolver = "2"
+members = [
+    "crates/sylvia-base",
+    "crates/sylvia-domain",
+    "crates/sylvia-engine",
+    "crates/sylvia-store",
+    "crates/sylvia-app",
+    "crates/sylvia-provider",
+    "crates/sylvia-agent",
+    "crates/sylvia-owner",
+    "crates/sylvia-compare",
+]
+exclude = ["src-tauri"]
+
+[workspace.package]
+version = "0.4.1"
+edition = "2021"
+rust-version = "1.85"
+authors = ["Daniel Young"]
+license-file = "LICENSE"
+publish = false
+
+# One pinned set of shared dependencies. A lane that needs a new crate adds it here in its own
+# pull request and says why, so two lanes never pull in two libraries for the same job.
+[workspace.dependencies]
+sylvia-base = { path = "crates/sylvia-base" }
+sylvia-domain = { path = "crates/sylvia-domain" }
+sylvia-engine = { path = "crates/sylvia-engine" }
+sylvia-store = { path = "crates/sylvia-store" }
+sylvia-app = { path = "crates/sylvia-app" }
+sylvia-provider = { path = "crates/sylvia-provider" }
+sylvia-agent = { path = "crates/sylvia-agent" }
+
+# preserve_order: Python dicts keep insertion order and several encodings depend on it.
+# float_roundtrip: parse floats exactly, as Python does.
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+thiserror = "2"
+sha2 = "0.10"
+hmac = "0.12"
+hex = "0.4"
+# Comparison tool only: reads finished databases, serves the stand-in model endpoint.
+# The store's own SQLite binding is lane 3's decision and is added by that lane.
+rusqlite = { version = "0.32", features = ["bundled"] }
+tiny_http = "0.12"
+getrandom = "0.2"
+regex = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net"] }
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.dev]
+# Engine and comparison runs are slow unoptimised; keep debug assertions.
+opt-level = 1
+
+[profile.release]
+# Matches the desktop shell: Cargo's normal optimised release profile.

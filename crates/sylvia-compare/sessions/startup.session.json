@@ -1,0 +1,22 @@
+{
+  "name": "startup",
+  "description": "First start on an empty data folder: launch, install the bundled packages, answer the reads the desktop makes while opening, reject an unknown method, shut down.",
+  "steps": [
+    {"method": "handshake_status"},
+    {"method": "campaign_index"},
+    {"method": "builder_chat_index"},
+    {"method": "provider_settings"},
+    {"method": "model_choices"},
+    {"method": "campaign_creation_catalog"},
+    {"method": "package_candidates"},
+    {"method": "catalog"},
+    {"method": "load_desktop_drafts"},
+    {"method": "no_such_method", "params": {"anything": 1}},
+    {"method": "campaign_index", "params": {"unexpected": true}},
+    {"method": "display_snapshot", "params": {"campaign_id": "campaign-that-does-not-exist"}},
+    {"method": "shutdown"}
+  ],
+  "rules": {
+    "volatile_files": ["^diagnostics/"]
+  }
+}

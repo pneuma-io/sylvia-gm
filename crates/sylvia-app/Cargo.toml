@@ -1,0 +1,21 @@
+[package]
+name = "sylvia-app"
+description = "Application services above the store, one module per service family (lanes 1 to 3 by family)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[dependencies]
+sylvia-base.workspace = true
+sylvia-domain.workspace = true
+sylvia-engine.workspace = true
+sylvia-store.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,24 @@
+[package]
+name = "sylvia-compare"
+description = "Runs one scripted session against a Sylvia owner and compares replies, database and model requests with a recording"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[dependencies]
+sylvia-base.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+hmac.workspace = true
+hex.workspace = true
+rusqlite.workspace = true
+tiny_http.workspace = true
+getrandom.workspace = true
+regex.workspace = true
+
+[lints]
+workspace = true

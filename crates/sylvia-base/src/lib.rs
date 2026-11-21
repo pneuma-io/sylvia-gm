@@ -1,0 +1,24 @@
+//! Shared foundations for the Sylvia GM Rust port.
+//!
+//! Owned by the rewrite manager. Every lane depends on this crate, so changes here go through
+//! the manager, not through a lane's own pull request.
+//!
+//! - [`pyjson`]: JSON text byte-for-byte as Python's `json.dumps` writes it. Anything hashed or
+//!   stored must go through it, never through `serde_json::to_string`.
+//! - [`hash`]: SHA-256 helpers with the hex form Python's `hexdigest()` gives.
+//! - [`error`]: the coded error every owner reply is built from.
+
+pub mod error;
+pub mod hash;
+pub mod pyjson;
+
+pub use error::{CodedError, CodedResult};
+
+/// JSON value used at Sylvia's extension points (package-declared fields, provider payloads).
+///
+/// Object keys keep insertion order (`serde_json` is built with `preserve_order`), which is what
+/// a Python `dict` does. Integers and floats stay distinct, as in Python: `1` and `1.0` encode
+/// differently.
+pub type Json = serde_json::Value;
+/// Ordered JSON object, the counterpart of a Python `dict[str, Any]`.
+pub type JsonMap = serde_json::Map<String, serde_json::Value>;

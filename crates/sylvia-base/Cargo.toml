@@ -1,0 +1,19 @@
+[package]
+name = "sylvia-base"
+description = "Shared foundations for the Sylvia GM Rust port: Python-compatible JSON bytes, hashing, coded errors"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+sha2.workspace = true
+hex.workspace = true
+
+[lints]
+workspace = true

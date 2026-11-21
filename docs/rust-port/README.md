@@ -1,0 +1,132 @@
+# Sylvia GM Rust port
+
+Sylvia GM is being ported from Python to Rust. This folder is the working agreement for
+everyone doing that port: who owns what, the rules, and how a change is checked.
+
+- **Reference:** the Python source in `src/sylvia_gm` at the 0.4.1 release commit,
+  `0da1010feb5a520f917f5d69ff8553ddb174e9e7` (the commit `rust-rewrite` branches from). It is
+  frozen: nothing under `src/sylvia_gm`, `tests` or `scripts` changes on this branch. It is the
+  definition of correct behaviour until the port is finished. If a release fix lands on
+  Python `main`, the manager brings it over deliberately.
+- **Goal:** the supported product builds, tests and runs with no Python interpreter.
+- **Integration branch:** `rust-rewrite`. Lane workers open pull requests against it. `main`
+  receives the port once, at cutover.
+- **Manager:** the "Sylvia | Rust Rewrite Manager" thread reviews and merges every pull
+  request, owns `crates/sylvia-base`, the workspace `Cargo.toml` and this folder's rules, and
+  keeps Dot Desk current. Workers report to that thread.
+
+The full plan and its reasons are in the deliverable
+`Sylvia-GM/Rust Rewrite/Rewrite plan.md`. This file is the part you need while working.
+
+## Lanes
+
+Five lanes, one worker thread each. A lane owns its crates and its ledger file. Nobody edits
+another lane's crate; ask that lane's worker or the manager.
+
+| Lane | Crates | Python it retires | Ledger |
+| --- | --- | --- | --- |
+| 1. Formats and content | `sylvia-domain`, content modules of `sylvia-app` | `domain`, `state`, `campaign`, `planning`, `builder`, content and library services | `ledger/lane-1-formats-and-content.md` |
+| 2. Game engine | `sylvia-engine`, mechanics modules of `sylvia-app` | `runtime`, `ruleset`, `spatial`, `dice.py`, mechanics-facing services | `ledger/lane-2-game-engine.md` |
+| 3. Storage and authority | `sylvia-store`, lifecycle modules of `sylvia-app` | `infrastructure`, `application/authority.py`, lifecycle services | `ledger/lane-3-storage-and-authority.md` |
+| 4. Providers and agents | `sylvia-provider`, `sylvia-agent` | `provider`, `config`, `session`, `tools`, `agent`, character chat | `ledger/lane-4-providers-and-agents.md` |
+| 5. Owner, clients and release | `sylvia-owner`, `sylvia-compare` upkeep | `interfaces`, desktop update, package root, packaging | `ledger/lane-5-owner-clients-and-release.md` |
+
+Dependencies run one way: `sylvia-base` ← `sylvia-domain` ← `sylvia-engine` ← `sylvia-store`
+← `sylvia-app` ← `sylvia-agent` ← `sylvia-owner`; `sylvia-provider` depends on `sylvia-base`
+and `sylvia-domain` only. `sylvia-app` has one module per Python service file, and the ledger
+row names the lane that owns it.
+
+`src-tauri` (the desktop shell) stays outside the Cargo workspace until lane 5 moves
+packaging off PyInstaller. The release scripts pin its own lock file and target folder.
+
+## Rules
+
+1. **Port behaviour as it is.** No redesign, no new features, no clean-ups that change
+   behaviour. Restructure only where Python's shape cannot be expressed in Rust.
+2. **A Python bug is ported, then reported.** Tell the manager. If a fix is agreed, the
+   difference goes in `differences.md` with its reason and its test. Nothing differs silently.
+3. **Text the model or the player reads is data.** Prompts, tool names, tool descriptions,
+   tool schemas and error messages are copied from the snapshot byte for byte. Long texts go
+   in data files that Rust loads; short messages are string literals copied exactly. Never
+   reword one. A reworded error changes model behaviour and breaks prompt caching.
+4. **Bytes that are hashed or stored must match exactly.** Use `sylvia_base::pyjson` for
+   every JSON encoding, never `serde_json::to_string`. `sites/json-encodings.md` names the
+   options for each Python call. "Parses to the same value" is not enough.
+5. **Prove it against Python.** Library code gets reference vectors generated from the
+   snapshot (see `crates/sylvia-base/tests/vectors` for the pattern). Owner commands get a
+   comparison session (see `comparison-tool.md`). A port without one of the two is not done.
+6. **Every pull request says** which ledger rows it retires, which commands it ticks in
+   `commands.md`, which rows it ticks in `sites/`, and which vectors or sessions now pass.
+7. **New dependencies go in the workspace `Cargo.toml`** in the pull request that needs them,
+   with one line on why. One library per job across the workspace.
+8. **Python is reference tooling only.** A generator script that reads the snapshot to write
+   vectors may be Python and lives beside its output. Nothing the product or its tests need at
+   run time may call Python.
+
+## Concurrency
+
+One model for the whole port; do not introduce another without the manager.
+
+- One tokio runtime in the owner, for provider streams, child processes, the command loop
+  and timers.
+- SQLite runs on one dedicated thread that owns the connection and takes requests over a
+  channel. That keeps the single-writer behaviour the Python store relies on.
+- `sylvia-domain` and `sylvia-engine` are synchronous and have no runtime dependency, so
+  tools and SylviaBench can call them directly.
+- Python's worker threads become tasks. Python's locks become ownership by one task, or a
+  `tokio::sync::Mutex` held across an await only when Python held the lock across the same
+  work.
+
+## Where Python and Rust differ without telling you
+
+The lists in `sites/` give every occurrence by lane. The traps behind them:
+
+| Trap | Python | Rust | What to do |
+| --- | --- | --- | --- |
+| Float text | `repr`: `1e+16`, `1e-05`, half-to-even on ties | `Display`: `10000000000000000`, half-up | `pyjson::float_repr` |
+| Integer versus float | `1` and `1.0` are different and encode differently | same in `serde_json`, lost by `as f64` | keep `Json` numbers as they arrive |
+| Big integers | unlimited | 64-bit | `pyjson::loads` refuses them; see `differences.md` |
+| Dict order | insertion order | `HashMap` is random | `JsonMap` (ordered) or `IndexMap`; `BTreeMap` only where Python sorted |
+| String length | `len(str)` counts code points | `str::len` counts bytes | `chars().count()` |
+| Slicing | by code point | by byte | slice by `char_indices` |
+| `str.strip()` | strips `\x1c`–`\x1f` too | `trim` does not | port the exact set where input is untrusted |
+| Case and identity | `casefold`, `unicodedata` on Unicode 15.0 | crate tables | pin crates to Unicode 15.0 |
+| Regular expressions | lookaround, backreferences, `$` before final newline | `regex` has none of these | `fancy-regex`; test each pattern |
+| Sorting | stable; tuples compare element-wise | `sort` is stable, `sort_unstable` is not | `sort_by` with the same key |
+| Rounding | `round()` is half-to-even | `f64::round` is half-away-from-zero | port `round` explicitly |
+| Integer division | `//` and `%` floor toward negative infinity | `/` and `%` truncate toward zero | `div_euclid` / `rem_euclid`, checking the sign cases |
+| Random numbers | `random.Random(seed)`: MT19937, seeded by `init_by_array`, `randrange` by rejection | no crate matches | port CPython's algorithm; compare whole roll sequences |
+| YAML | PyYAML, YAML 1.1 (`yes`, `no`, dates, octal) | YAML 1.2 crates | test every shipped file |
+| Exceptions | `str(error)` is the message; `ValueError` is caught by the owner | no exceptions | `CodedError` with the same code and message |
+
+## Checks
+
+Run these before opening a pull request, on Linux first (boat.dev) and on Windows for
+anything platform-specific.
+
+```
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo build -p sylvia-owner -p sylvia-compare
+target/debug/sylvia-compare check --session crates/sylvia-compare/sessions/<name>.session.json \
+    --reference crates/sylvia-compare/recordings/<platform>/<name>.recording.json \
+    --owner target/debug/sylvia-gm-owner
+```
+
+`sylvia-compare check` exits 1 while the Rust owner still differs from the Python recording,
+and prints where. Report the count of remaining differences per session in the pull request;
+it should only go down.
+
+No GitHub Actions run for this branch. State in the pull request what you ran and where.
+
+## Files in this folder
+
+| File | What it is |
+| --- | --- |
+| `ledger/lane-N-*.md` | One row per Python file with its Rust target and status |
+| `commands.md` | The 137 owner commands and which the Rust owner answers |
+| `comparison-tool.md` | How to record and check sessions, and how to write one |
+| `differences.md` | Every agreed difference between the Python and Rust behaviour |
+| `sites/*.md` | Hash, JSON encoding, regex, Unicode, length-limit and YAML call sites by lane |
+| `tools/*.py` | Reference tooling that reads the Python snapshot; retired with it |

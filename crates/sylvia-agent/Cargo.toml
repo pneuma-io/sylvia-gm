@@ -1,0 +1,23 @@
+[package]
+name = "sylvia-agent"
+description = "Lane 4: GM and Builder orchestration, context ledger, tools, continuation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[dependencies]
+sylvia-base.workspace = true
+sylvia-domain.workspace = true
+sylvia-engine.workspace = true
+sylvia-store.workspace = true
+sylvia-app.workspace = true
+sylvia-provider.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

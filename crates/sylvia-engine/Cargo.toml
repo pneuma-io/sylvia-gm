@@ -1,0 +1,19 @@
+[package]
+name = "sylvia-engine"
+description = "Lane 2: ruleset interpreter, expressions, effects, procedures, dice, spatial engine, state bridge"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[dependencies]
+sylvia-base.workspace = true
+sylvia-domain.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,20 @@
+[package]
+name = "sylvia-store"
+description = "Lane 3: SQLite store, migrations, locks, safe files, backup and the campaign authority"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[dependencies]
+sylvia-base.workspace = true
+sylvia-domain.workspace = true
+sylvia-engine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

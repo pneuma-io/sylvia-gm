@@ -1,0 +1,24 @@
+[package]
+name = "sylvia-owner"
+description = "Lane 5: the Sylvia GM owner process, the Rust replacement for sylvia_gm.interfaces.owner_process"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license-file = "../../LICENSE"
+publish.workspace = true
+
+[[bin]]
+name = "sylvia-gm-owner"
+path = "src/main.rs"
+
+[dependencies]
+sylvia-base.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+hmac.workspace = true
+hex.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true
