@@ -20,7 +20,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/bundled_starter_characters.py` | 150 | `sylvia-app::bundled_starter_characters` | pending | |
 | `src/sylvia_gm/application/campaign_library_selection.py` | 668 | `sylvia-app::campaign_library_selection` | pending | |
 | `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | pending | |
-| `src/sylvia_gm/application/campaign_starting_world.py` | 97 | `sylvia-app::campaign_starting_world` | pending | |
+| `src/sylvia_gm/application/campaign_starting_world.py` | 97 | `sylvia-app::campaign_starting_world` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/character_card_import.py` | 628 | `sylvia-app::character_card_import` | pending | |
 | `src/sylvia_gm/application/character_profiles.py` | 391 | `sylvia-app::character_profiles` | pending | |
 | `src/sylvia_gm/application/character_rules.py` | 145 | `sylvia-app::character_rules` | pending | |
@@ -30,7 +30,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/initial_character_state.py` | 532 | `sylvia-app::initial_character_state` | pending | |
 | `src/sylvia_gm/application/interview_content.py` | 152 | `sylvia-app::interview_content` | pending | |
 | `src/sylvia_gm/application/library_sources.py` | 223 | `sylvia-app::library_sources` | pending | |
-| `src/sylvia_gm/application/network_graph.py` | 433 | `sylvia-app::network_graph` | pending | |
+| `src/sylvia_gm/application/network_graph.py` | 433 | `sylvia-app::network_graph` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | pending | |
 | `src/sylvia_gm/application/package_materialization.py` | 260 | `sylvia-app::package_materialization` | pending | |
 | `src/sylvia_gm/application/plan_bundle.py` | 164 | `sylvia-app::plan_bundle` | pending | |
@@ -45,9 +45,9 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/reusable_plans.py` | 575 | `sylvia-app::reusable_plans` | pending | |
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |
 | `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-domain::schema_admission` | ported | In `sylvia-domain`, not `sylvia-app`: package archive admission (this crate) and the engine, store and agent lanes call it |
-| `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | pending | |
+| `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | pending | |
-| `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | pending | |
+| `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/builder/__init__.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::builder` | pending | |
