@@ -54,10 +54,17 @@ flate2 = "1"
 # Store safe-file primitives (`infrastructure/safe_file.py`). Linux: safe openat/statat/
 # unlinkat/renameat/fsync on descriptors. Windows: handle identity without unsafe code, and the
 # three kernel32 calls with no safe binding (GetDriveTypeW, the delete disposition, MoveFileExW).
-rustix = { version = "1", features = ["fs"] }
+# Lane 4 adds `process` for `geteuid` (the Linux credential key file checks its owner).
+rustix = { version = "1", features = ["fs", "process"] }
 # (winapi-util, for handle identity, is declared once below with the owner's use.)
-windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem"] }
+# Lane 4 adds `Win32_Security_Cryptography` and `Win32_Foundation` for current-user DPAPI
+# (`CryptProtectData`, `CryptUnprotectData`, `LocalFree`), the saved-credential protection of
+# `config/_credential_protection.py` on Windows.
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem", "Win32_Security_Cryptography", "Win32_Foundation"] }
 getrandom = "0.2"
+# AES-256-GCM for the Linux saved-credential key file (`config/_credential_protection.py`,
+# Python's `cryptography` AESGCM). RustCrypto, pure Rust.
+aes-gcm = "0.10"
 regex = "1"
 # Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate
 # rejects (content schema patterns, docs/rust-port/sites/regex-sites.md). Added by lane 1.

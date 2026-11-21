@@ -28,6 +28,7 @@
 
 mod compose;
 mod construct;
+mod data;
 mod emit;
 mod error;
 mod parser;
@@ -38,6 +39,7 @@ mod value;
 
 pub use compose::{resolve_scalar, Composed, Node, NodeGraph, NodeId, NodeKind, MAP_TAG, SEQ_TAG, STR_TAG};
 pub use construct::{construct, Constructor, DocumentHook, FlattenHook, Hooks, MappingHook};
+pub use data::{data_key_eq, Data, Recursive};
 pub use emit::safe_dump;
 pub use error::{Mark, MarkedError, MarkedKind, YamlError};
 pub use parser::{Event, EventKind};
@@ -151,8 +153,9 @@ pub fn safe_load_stream(text: &str, stream_name: &str) -> Result<Loaded, YamlErr
 }
 
 /// The text Python's text mode reads (`open(path, encoding="utf-8").read()` and
-/// `Path.read_text(encoding="utf-8")`): UTF-8, with `\r\n` and `\r` read as `\n`.
-pub fn read_text(bytes: &[u8]) -> Result<String, std::string::FromUtf8Error> {
-    let text = String::from_utf8(bytes.to_vec())?;
+/// `Path.read_text(encoding="utf-8")`): UTF-8, with `\r\n` and `\r` read as `\n`. Invalid
+/// UTF-8 gives the `UnicodeDecodeError` text Python raises.
+pub fn read_text(bytes: &[u8]) -> Result<String, String> {
+    let text = String::from_utf8(bytes.to_vec()).map_err(|error| scanner::utf8_error_text(bytes, &error))?;
     Ok(if text.contains('\r') { text.replace("\r\n", "\n").replace('\r', "\n") } else { text })
 }
