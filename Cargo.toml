@@ -47,9 +47,8 @@ hex = "0.4"
 # SQLite for the store and the comparison tool. 0.34 bundles SQLite 3.49.1, the library the
 # Python reference environment ships (sqlite3.sqlite_version); sylvia-store's vector tests
 # assert it so a later bump cannot move it silently. `backup` is the online copy the store
-# makes before schema migrations.
+# makes before schema migrations. The comparison tool's stand-in model endpoint is std::net.
 rusqlite = { version = "0.34", features = ["bundled", "backup"] }
-tiny_http = "0.12"
 # Store tests only: the Python-made fixture databases are kept gzip-compressed.
 flate2 = "1"
 getrandom = "0.2"

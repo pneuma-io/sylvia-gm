@@ -1232,7 +1232,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b-assistant-tools",
+       "message_id": "inference-16e00e10d9064599b135ecd718b32c7f-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1255,7 +1255,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b",
+        "inference_id": "inference-16e00e10d9064599b135ecd718b32c7f",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1271,7 +1271,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b-tool-results",
+       "message_id": "inference-16e00e10d9064599b135ecd718b32c7f-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1280,7 +1280,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b",
+        "inference_id": "inference-16e00e10d9064599b135ecd718b32c7f",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1302,11 +1302,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 563,
+         "elapsed_ms": 506,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 6,
+         "quiet_ms": 5,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -1354,7 +1354,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 9,
-       "message_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317-assistant-tools",
+       "message_id": "inference-7a25c3ed67234a218d28e5439219e5b6-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1377,7 +1377,7 @@
          ]
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317",
+        "inference_id": "inference-7a25c3ed67234a218d28e5439219e5b6",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1393,7 +1393,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 10,
-       "message_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317-tool-results",
+       "message_id": "inference-7a25c3ed67234a218d28e5439219e5b6-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1402,7 +1402,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317",
+        "inference_id": "inference-7a25c3ed67234a218d28e5439219e5b6",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1424,7 +1424,7 @@
        "content": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 141,
+         "elapsed_ms": 116,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
@@ -1633,6 +1633,77 @@
    "method": "POST",
    "path": "/v1/chat/completions",
    "authorised": true,
+   "headers": [
+    [
+     "Host",
+     "127.0.0.1:46341"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     null
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Linux"
+    ],
+    [
+     "X-Stainless-Arch",
+     "x64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.3"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "37814"
+    ]
+   ],
+   "body_encoding": "wire",
    "body": {
     "messages": [
      {
@@ -2147,6 +2218,77 @@
    "method": "POST",
    "path": "/v1/chat/completions",
    "authorised": true,
+   "headers": [
+    [
+     "Host",
+     "127.0.0.1:46341"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     null
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Linux"
+    ],
+    [
+     "X-Stainless-Arch",
+     "x64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.3"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "37896"
+    ]
+   ],
+   "body_encoding": "wire",
    "body": {
     "messages": [
      {
@@ -3961,7 +4103,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 4,
-      "message_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b-assistant-tools",
+      "message_id": "inference-16e00e10d9064599b135ecd718b32c7f-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -3986,7 +4128,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b",
+        "inference_id": "inference-16e00e10d9064599b135ecd718b32c7f",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -4003,7 +4145,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 5,
-      "message_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b-tool-results",
+      "message_id": "inference-16e00e10d9064599b135ecd718b32c7f-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -4014,7 +4156,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-1fe5d60ef1d64538becc95b1b3c77f2b",
+        "inference_id": "inference-16e00e10d9064599b135ecd718b32c7f",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -4039,11 +4181,11 @@
        "$json": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 563,
+         "elapsed_ms": 506,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 6,
+         "quiet_ms": 5,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -4098,7 +4240,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 9,
-      "message_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317-assistant-tools",
+      "message_id": "inference-7a25c3ed67234a218d28e5439219e5b6-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -4123,7 +4265,7 @@
          ]
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317",
+        "inference_id": "inference-7a25c3ed67234a218d28e5439219e5b6",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -4140,7 +4282,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 10,
-      "message_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317-tool-results",
+      "message_id": "inference-7a25c3ed67234a218d28e5439219e5b6-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -4151,7 +4293,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-a3f6985132af4e1eaf93ab4f3a4ce317",
+        "inference_id": "inference-7a25c3ed67234a218d28e5439219e5b6",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -4176,7 +4318,7 @@
        "$json": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 141,
+         "elapsed_ms": 116,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
@@ -5407,10 +5549,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "e4a59148b7bf491680ac34fbff3d87de",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230528.2570279,
-     "last_seen": 1795230528.2570279,
+     "id": "caea5c33ebc843268ff3a4ae1a596a39",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232322.9176085,
+     "last_seen": 1795232322.9176085,
      "count": 1
     },
     {
@@ -5427,11 +5569,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 26.7,
-     "id": "890dc6d2c91641088d430ffbe09feef9",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230542.9437788,
-     "last_seen": 1795230542.9437788,
+     "duration_ms": 29.2,
+     "id": "13d1bea433bc4d99af940817a5fe6f2d",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232339.5197532,
+     "last_seen": 1795232339.5197532,
      "count": 1
     },
     {
@@ -5448,11 +5590,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 4.6,
-     "id": "00f82d24eb1941fb82877ec1304b25ed",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230542.94908,
-     "last_seen": 1795230542.94908,
+     "duration_ms": 5.1,
+     "id": "a99437a0d5ec41bdac5bfb05b0650d3f",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232339.5252082,
+     "last_seen": 1795232339.5252082,
      "count": 1
     },
     {
@@ -5470,10 +5612,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.1,
-     "id": "8cc4d618e46f47cf9cc975af99204f1a",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230542.9499125,
-     "last_seen": 1795230542.9499125,
+     "id": "1b179876bef54648971ee5ef40e6295d",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232339.52586,
+     "last_seen": 1795232339.52586,
      "count": 1
     },
     {
@@ -5490,11 +5632,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 567.9,
-     "id": "0565a752e9794a1e92d835e299281942",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230543.5179513,
-     "last_seen": 1795230543.5179513,
+     "duration_ms": 642.1,
+     "id": "549aa4d138184739a936fcf4bb337489",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232340.1680958,
+     "last_seen": 1795232340.1680958,
      "count": 1
     },
     {
@@ -5511,11 +5653,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 20.8,
-     "id": "e2f1873689c146719185d0833f9cd5b4",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230543.5360694,
-     "last_seen": 1795230543.592615,
+     "duration_ms": 16.7,
+     "id": "084261a6a9b1421c9992712297b1ec09",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232340.1828337,
+     "last_seen": 1795232340.2320938,
      "count": 4
     },
     {
@@ -5532,11 +5674,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 760.1,
-     "id": "c44e9b9f38ec4b789ea3ea45e0a2fb41",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230544.3528688,
-     "last_seen": 1795230544.3528688,
+     "duration_ms": 877.7,
+     "id": "6f12f0e872464b03a5dda1462a7c7bac",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232341.1100814,
+     "last_seen": 1795232341.1100814,
      "count": 1
     },
     {
@@ -5553,11 +5695,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 1082.9,
-     "id": "4cd40b7db79940838a205d849486c31e",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230545.436063,
-     "last_seen": 1795230545.436063,
+     "duration_ms": 1202.9,
+     "id": "32202f6563004175b20725168498fadb",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232342.3133063,
+     "last_seen": 1795232342.3133063,
      "count": 1
     },
     {
@@ -5574,11 +5716,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 1.7,
-     "id": "11069ce9c57e445181d446075111262c",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230545.4382586,
-     "last_seen": 1795230546.3292863,
+     "duration_ms": 2.0,
+     "id": "abbd8ad760594365841b507654436ae0",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232342.3156908,
+     "last_seen": 1795232343.0842557,
      "count": 3
     },
     {
@@ -5595,11 +5737,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 664.2,
-     "id": "e9583c1ae3b84e6f8436274bff4e35f6",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230546.1029923,
-     "last_seen": 1795230546.1029923,
+     "duration_ms": 573.0,
+     "id": "a8b9709fb33c4e3ba6104a058aa6286a",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232342.889118,
+     "last_seen": 1795232342.889118,
      "count": 1
     },
     {
@@ -5616,11 +5758,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 194.2,
-     "id": "eeaaa05528c142faa0e4b06406886f15",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230546.2994163,
-     "last_seen": 1795230546.2994163,
+     "duration_ms": 166.5,
+     "id": "775f16231a31473e9f142ad28943b2fe",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232343.0578182,
+     "last_seen": 1795232343.0578182,
      "count": 1
     },
     {
@@ -5637,11 +5779,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 6.0,
-     "id": "5c8902166bec4ba789d46dcf4b7ebc37",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230546.3061101,
-     "last_seen": 1795230546.3061101,
+     "duration_ms": 5.1,
+     "id": "c627a2a4bebf4ac58c0d0d58bf67dd06",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232343.0635624,
+     "last_seen": 1795232343.0635624,
      "count": 1
     },
     {
@@ -5658,11 +5800,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 17.8,
-     "id": "3bde70cfdbcd455c92abec970676ec6e",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230546.324179,
-     "last_seen": 1795230546.324179,
+     "duration_ms": 16.8,
+     "id": "aa43e02977fe4c9fb0164d40d84c53fc",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232343.080719,
+     "last_seen": 1795232343.080719,
      "count": 1
     },
     {
@@ -5679,11 +5821,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 2.3,
-     "id": "f5be19a45a1647ec8bc96380bd7a2c44",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230546.3272088,
-     "last_seen": 1795230546.3272088,
+     "duration_ms": 1.3,
+     "id": "d0add52d8b1e45cfa4a4e7856979eb90",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232343.0825963,
+     "last_seen": 1795232343.0825963,
      "count": 1
     },
     {
@@ -5701,10 +5843,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "992133c3fd6f46c198a3de87c90bd355",
-     "session": "b9ed97cf631a4bc4987a2e0ef4dd0c9f",
-     "first_seen": 1795230546.3299882,
-     "last_seen": 1795230546.3299882,
+     "id": "eb1ff6fa42dd48428cadbbb0f34f9328",
+     "session": "49bfc346cbb042b8a82a8f761c1d4e54",
+     "first_seen": 1795232343.084603,
+     "last_seen": 1795232343.084603,
      "count": 1
     }
    ]

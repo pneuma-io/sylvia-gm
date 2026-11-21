@@ -1,0 +1,371 @@
+{
+ "name": "reopen",
+ "description": "Stop a held reply and a failed reply, shutting the owner down and starting it again after each: the Retry offer survives the restart, a redirect answers the Stop and Manual Retry answers the failure.",
+ "standin": true,
+ "standin_narration": "journey",
+ "summarise_tables": [
+  "^package_",
+  "^packages$"
+ ],
+ "steps": [
+  {
+   "method": "save_provider_settings",
+   "expect_ok": true,
+   "params": {
+    "provider_id": "standin",
+    "preset_id": "custom",
+    "display_name": "Stand-in",
+    "base_url": "${standin_url}",
+    "credential": "${standin_key}",
+    "model_id": "${standin_model}",
+    "model_name": "Stand-in Narrator",
+    "context_window": 4000000,
+    "max_output_tokens": 4096,
+    "transport": "chat_completions"
+   }
+  },
+  {
+   "method": "model_choices",
+   "expect_ok": true,
+   "save": {
+    "provider_id": "/result/0/provider_id",
+    "model_id": "/result/0/model_id"
+   }
+  },
+  {
+   "method": "create_guided_campaign_draft",
+   "expect_ok": true,
+   "params": {
+    "operation_id": "contract-reopen-draft",
+    "display_name": "Contract Reopen",
+    "provider_id": "${provider_id}",
+    "model_id": "${model_id}"
+   },
+   "save": {
+    "campaign_id": "/result/campaign_id",
+    "builder_session_id": "/result/builder_session_id"
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "expect_ok": true,
+   "params": {
+    "operation_id": "contract-reopen-ruleset",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 0,
+    "current_step": "ruleset",
+    "visible_answer": "No Ruleset",
+    "answer": {
+     "candidate_id": null
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "expect_ok": true,
+   "params": {
+    "operation_id": "contract-reopen-name",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 1,
+    "current_step": "name",
+    "visible_answer": "Contract Reopen",
+    "answer": {
+     "display_name": "Contract Reopen"
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "expect_ok": true,
+   "params": {
+    "operation_id": "contract-reopen-boundaries_preferences",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 2,
+    "current_step": "boundaries_preferences",
+    "visible_answer": "None; Mystery",
+    "answer": {
+     "boundaries": "None",
+     "preferences": "Mystery"
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "expect_ok": true,
+   "params": {
+    "operation_id": "contract-reopen-specific_requests",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 3,
+    "current_step": "specific_requests",
+    "visible_answer": "No additional requests",
+    "answer": {
+     "no_additional_requests": true,
+     "requests": ""
+    }
+   }
+  },
+  {
+   "method": "start_guided_campaign",
+   "expect_ok": true,
+   "timeout_s": 600,
+   "params": {
+    "operation_id": "contract-reopen-start",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "display_name": "Contract Reopen",
+    "candidate_id": null,
+    "setting_id": null,
+    "plan_id": null,
+    "player_character_id": null,
+    "companion_ids": [],
+    "premise": "A courier shelters from a storm."
+   }
+  },
+  {
+   "method": "finalize_campaign_construction",
+   "expect_ok": true,
+   "timeout_s": 600,
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "dm_provider_id": "${provider_id}",
+    "dm_model_id": "${model_id}"
+   },
+   "save": {
+    "session_id": "/result/handoff/dm_session_id",
+    "turn_id": "/result/dm_turn_id"
+   }
+  },
+  {
+   "method": "start_dm_session",
+   "expect_ok": true,
+   "timeout_s": 600,
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "session_id": "${session_id}",
+    "turn_id": "${turn_id}"
+   }
+  },
+  {
+   "method": "campaign_index",
+   "expect_ok": true,
+   "save": {
+    "turn_id": "/result/0/turn_id"
+   }
+  },
+  {
+   "method": "submit_session_input",
+   "timeout_s": 600,
+   "id": "held",
+   "background": true,
+   "params": {
+    "session_id": "${session_id}",
+    "turn_id": "${turn_id}",
+    "attempt_id": "attempt-reopen-1",
+    "message_id": "message-reopen-1",
+    "user_text": "[hold] I listen at the door.",
+    "ooc_text": null,
+    "allow_public_web": false,
+    "builder_start": false,
+    "player_action_id": null,
+    "automatic_response": false,
+    "redirect_interruption_id": null,
+    "campaign_ending_choice": null
+   }
+  },
+  {
+   "standin": "wait_held"
+  },
+  {
+   "method": "interrupt_stream",
+   "expect_ok": true,
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "attempt_id": "attempt-reopen-1"
+   },
+   "save": {
+    "interruption_id": "/result/interruption_id"
+   }
+  },
+  {
+   "await": "held"
+  },
+  {
+   "method": "shutdown"
+  },
+  {
+   "relaunch": true
+  },
+  {
+   "method": "campaign_index"
+  },
+  {
+   "method": "player_projection_page",
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "after_sequence": 0,
+    "load_id": null
+   }
+  },
+  {
+   "method": "session_history_page",
+   "params": {
+    "session_id": "${session_id}",
+    "before_sequence": null,
+    "limit": 50
+   }
+  },
+  {
+   "method": "retryable_interruption",
+   "expect_ok": true,
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "failed_attempt_id": "attempt-reopen-1"
+   },
+   "save": {
+    "interruption_id": "/result/interruption_id"
+   }
+  },
+  {
+   "method": "submit_session_input",
+   "timeout_s": 600,
+   "params": {
+    "session_id": "${session_id}",
+    "turn_id": "${turn_id}",
+    "attempt_id": "attempt-reopen-2",
+    "message_id": "message-reopen-2",
+    "user_text": "I knock instead.",
+    "ooc_text": null,
+    "allow_public_web": false,
+    "builder_start": false,
+    "player_action_id": null,
+    "automatic_response": false,
+    "redirect_interruption_id": "${interruption_id}",
+    "campaign_ending_choice": null
+   }
+  },
+  {
+   "method": "player_projection_page",
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "after_sequence": 0,
+    "load_id": null
+   }
+  },
+  {
+   "method": "campaign_index",
+   "expect_ok": true,
+   "save": {
+    "turn_id": "/result/0/turn_id"
+   }
+  },
+  {
+   "method": "submit_session_input",
+   "timeout_s": 600,
+   "params": {
+    "session_id": "${session_id}",
+    "turn_id": "${turn_id}",
+    "attempt_id": "attempt-reopen-3",
+    "message_id": "message-reopen-3",
+    "user_text": "[fail] I open the door.",
+    "ooc_text": null,
+    "allow_public_web": false,
+    "builder_start": false,
+    "player_action_id": null,
+    "automatic_response": false,
+    "redirect_interruption_id": null,
+    "campaign_ending_choice": null
+   }
+  },
+  {
+   "method": "shutdown"
+  },
+  {
+   "relaunch": true
+  },
+  {
+   "method": "player_projection_page",
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "after_sequence": 0,
+    "load_id": null
+   }
+  },
+  {
+   "method": "retryable_interruption",
+   "expect_ok": true,
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "failed_attempt_id": "attempt-reopen-3"
+   },
+   "save": {
+    "interruption_id": "/result/interruption_id"
+   }
+  },
+  {
+   "method": "manual_retry_session",
+   "timeout_s": 600,
+   "params": {
+    "session_id": "${session_id}",
+    "interruption_id": "${interruption_id}",
+    "retry_id": "retry-reopen-1"
+   }
+  },
+  {
+   "method": "player_projection_page",
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "after_sequence": 0,
+    "load_id": null
+   }
+  },
+  {
+   "method": "session_history_page",
+   "params": {
+    "session_id": "${session_id}",
+    "before_sequence": null,
+    "limit": 50
+   }
+  },
+  {
+   "method": "shutdown"
+  }
+ ],
+ "rules": {
+  "ignore_keys": [
+   "elapsed_ms",
+   "quiet_ms",
+   "activity_timing/revision"
+  ],
+  "alias": [
+   {
+    "name": "inference",
+    "pattern": "inference-[0-9a-f]{32}",
+    "keys": [
+     "message_id",
+     "inference_id"
+    ]
+   },
+   {
+    "name": "interruption",
+    "pattern": "^interruption-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    "keys": [
+     "interruption_id",
+     "redirect_interruption_id"
+    ]
+   }
+  ],
+  "scrub": [
+   {
+    "pattern": "data: [A-Za-z0-9+/=]{40,}",
+    "with": "data: <protected credential>"
+   }
+  ],
+  "volatile_files": [
+   "^diagnostics/"
+  ]
+ }
+}

@@ -1232,7 +1232,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-c784c210c9de48d095a71803cfe133da-assistant-tools",
+       "message_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1255,7 +1255,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-c784c210c9de48d095a71803cfe133da",
+        "inference_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1271,7 +1271,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-c784c210c9de48d095a71803cfe133da-tool-results",
+       "message_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1280,7 +1280,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-c784c210c9de48d095a71803cfe133da",
+        "inference_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1302,11 +1302,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 2266,
+         "elapsed_ms": 2078,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 16,
+         "quiet_ms": 31,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -1354,7 +1354,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 9,
-       "message_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b-assistant-tools",
+       "message_id": "inference-f78a92c37cef4569a4611266921ea3f6-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1377,7 +1377,7 @@
          ]
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b",
+        "inference_id": "inference-f78a92c37cef4569a4611266921ea3f6",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1393,7 +1393,7 @@
       {
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 10,
-       "message_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b-tool-results",
+       "message_id": "inference-f78a92c37cef4569a4611266921ea3f6-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1402,7 +1402,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b",
+        "inference_id": "inference-f78a92c37cef4569a4611266921ea3f6",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1424,11 +1424,11 @@
        "content": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 561,
+         "elapsed_ms": 359,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 30,
+         "quiet_ms": 31,
          "revision": 5
         },
         "attempt_id": "attempt-storm-1",
@@ -1633,6 +1633,77 @@
    "method": "POST",
    "path": "/v1/chat/completions",
    "authorised": true,
+   "headers": [
+    [
+     "Host",
+     "127.0.0.1:51296"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     null
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "37814"
+    ]
+   ],
+   "body_encoding": "wire",
    "body": {
     "messages": [
      {
@@ -2147,6 +2218,77 @@
    "method": "POST",
    "path": "/v1/chat/completions",
    "authorised": true,
+   "headers": [
+    [
+     "Host",
+     "127.0.0.1:51296"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     null
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "37896"
+    ]
+   ],
+   "body_encoding": "wire",
    "body": {
     "messages": [
      {
@@ -3961,7 +4103,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 4,
-      "message_id": "inference-c784c210c9de48d095a71803cfe133da-assistant-tools",
+      "message_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -3986,7 +4128,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-c784c210c9de48d095a71803cfe133da",
+        "inference_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -4003,7 +4145,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 5,
-      "message_id": "inference-c784c210c9de48d095a71803cfe133da-tool-results",
+      "message_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -4014,7 +4156,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-c784c210c9de48d095a71803cfe133da",
+        "inference_id": "inference-4f38c8b12bd14b2a9b4c5f935b41869f",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -4039,11 +4181,11 @@
        "$json": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 2266,
+         "elapsed_ms": 2078,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 16,
+         "quiet_ms": 31,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -4098,7 +4240,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 9,
-      "message_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b-assistant-tools",
+      "message_id": "inference-f78a92c37cef4569a4611266921ea3f6-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -4123,7 +4265,7 @@
          ]
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b",
+        "inference_id": "inference-f78a92c37cef4569a4611266921ea3f6",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -4140,7 +4282,7 @@
      {
       "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
       "sequence": 10,
-      "message_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b-tool-results",
+      "message_id": "inference-f78a92c37cef4569a4611266921ea3f6-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -4151,7 +4293,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-storm-1",
-        "inference_id": "inference-7fb4bfb1c91349efa221c5d500cc9c1b",
+        "inference_id": "inference-f78a92c37cef4569a4611266921ea3f6",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -4176,11 +4318,11 @@
        "$json": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 561,
+         "elapsed_ms": 359,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 30,
+         "quiet_ms": 31,
          "revision": 5
         },
         "attempt_id": "attempt-storm-1",
@@ -5410,10 +5552,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "08723db3c1274a35adf7c61f724f0a52",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230085.9712613,
-     "last_seen": 1795230085.9712613,
+     "id": "8c67bc5f599f4d6881e2bf94fb18d474",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231438.89211,
+     "last_seen": 1795231438.89211,
      "count": 1
     },
     {
@@ -5433,11 +5575,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 47.0,
-     "id": "167c42f776094e7eaf199cbea9ad670a",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230106.1452034,
-     "last_seen": 1795230106.1452034,
+     "duration_ms": 46.0,
+     "id": "1221126e6fca4c2fbb1974d4fe8158bd",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231484.0876849,
+     "last_seen": 1795231484.0876849,
      "count": 1
     },
     {
@@ -5457,11 +5599,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 15.0,
-     "id": "33d72472cd904d69b19ec1c98f3e094d",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230106.1603167,
-     "last_seen": 1795230106.1603167,
+     "duration_ms": 16.0,
+     "id": "a0d943de8e764ec699872399339eb9e2",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231484.0996451,
+     "last_seen": 1795231484.0996451,
      "count": 1
     },
     {
@@ -5482,10 +5624,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "a684dfcc80d4416db964696bcb4f8fd8",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230106.1618228,
-     "last_seen": 1795230106.1618228,
+     "id": "3eca9303061a47f7b6de6677c42f6c3e",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231484.1006508,
+     "last_seen": 1795231484.1006508,
      "count": 1
     },
     {
@@ -5505,11 +5647,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 1235.0,
-     "id": "4e0d949348b84c28af267a5271b00614",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230107.3871484,
-     "last_seen": 1795230107.3871484,
+     "duration_ms": 1156.0,
+     "id": "77b6ebdce74044afba57c4eee130f496",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231485.2559197,
+     "last_seen": 1795231485.2559197,
      "count": 1
     },
     {
@@ -5529,11 +5671,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 94.0,
-     "id": "50dc3a0629d94710aa34a1d79616f56a",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230107.4606135,
-     "last_seen": 1795230107.7050269,
+     "duration_ms": 78.0,
+     "id": "f225fd6170f54bc2bfbaab7f79145f62",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231485.32479,
+     "last_seen": 1795231485.541087,
      "count": 4
     },
     {
@@ -5553,11 +5695,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 2250.0,
-     "id": "263eb7a8993d4432b81253d3fb282b3f",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230109.95947,
-     "last_seen": 1795230109.95947,
+     "duration_ms": 2375.0,
+     "id": "a26d8a3480284265a8c547b7319ab02a",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231487.9117138,
+     "last_seen": 1795231487.9117138,
      "count": 1
     },
     {
@@ -5577,11 +5719,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 2813.0,
-     "id": "bb23768bd347422e8f3f9aea00a29945",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230112.7672596,
-     "last_seen": 1795230112.7672596,
+     "duration_ms": 2734.0,
+     "id": "79a8d870ce714393ba9102a398caf94f",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231490.6389923,
+     "last_seen": 1795231490.6389923,
      "count": 1
     },
     {
@@ -5602,10 +5744,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "97d470d234c9435b9b2e55151388eb80",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230112.7718947,
-     "last_seen": 1795230116.1936605,
+     "id": "4a7723c84ab94e65aebb0e3de0da7f23",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231490.64251,
+     "last_seen": 1795231493.4694004,
      "count": 3
     },
     {
@@ -5625,11 +5767,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 2515.0,
-     "id": "7edaa721700142809ae68eb3313fe6bd",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230115.2784033,
-     "last_seen": 1795230115.2784033,
+     "duration_ms": 2250.0,
+     "id": "c1776f8ab87248079d18d651ad5a0f3e",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231492.8926675,
+     "last_seen": 1795231492.8926675,
      "count": 1
     },
     {
@@ -5649,11 +5791,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 813.0,
-     "id": "e4dac715c2a54391b58ea53d4b16b19b",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230116.090052,
-     "last_seen": 1795230116.090052,
+     "duration_ms": 500.0,
+     "id": "223c604e68f94fe38c54aa20c358963d",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231493.3991513,
+     "last_seen": 1795231493.3991513,
      "count": 1
     },
     {
@@ -5673,11 +5815,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 31.0,
-     "id": "227895a8339446e894de335970c69787",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230116.1256185,
-     "last_seen": 1795230116.1256185,
+     "duration_ms": 16.0,
+     "id": "5d1f81d1c37c475d9bb24ff4d84bcb2f",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231493.417058,
+     "last_seen": 1795231493.417058,
      "count": 1
     },
     {
@@ -5697,11 +5839,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 62.0,
-     "id": "31f6c5162d474db58f86f420cecb75fd",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230116.1822574,
-     "last_seen": 1795230116.1822574,
+     "duration_ms": 46.0,
+     "id": "bbe9eadddf2e4f8c9644dd86a1f56b79",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231493.4615717,
+     "last_seen": 1795231493.4615717,
      "count": 1
     },
     {
@@ -5721,11 +5863,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 0.0,
-     "id": "c50b4961c63c406ba582589c5c3d85ab",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230116.1883492,
-     "last_seen": 1795230116.1883492,
+     "duration_ms": 16.0,
+     "id": "017bde02fe73441cb2aefa3424e5df4c",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231493.465785,
+     "last_seen": 1795231493.465785,
      "count": 1
     },
     {
@@ -5746,10 +5888,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "11e28f0529354cf88afba937a22428e1",
-     "session": "bc864df45f3b429b851749d857efbfcb",
-     "first_seen": 1795230116.194671,
-     "last_seen": 1795230116.194671,
+     "id": "32cd3c612ebc4b52bef842f9baecc930",
+     "session": "e4e3f879768240f599297a65797995b9",
+     "first_seen": 1795231493.4709253,
+     "last_seen": 1795231493.4709253,
      "count": 1
     }
    ]
