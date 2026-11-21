@@ -148,15 +148,18 @@ anything platform-specific.
 **Toolchain.** `rust-toolchain.toml` pins Rust 1.100.0 with clippy and rustfmt, so format and
 lint give the same verdict on every machine. `rustup` installs it on first use. On Windows,
 rustup on this PC resolves a bare version to the GNU toolchain, which cannot build the bundled
-SQLite; in each Windows checkout run once:
+SQLite. The MSVC toolchain is already installed on this PC, so in each Windows checkout run
+only:
 
 ```
-rustup toolchain install 1.100.0-x86_64-pc-windows-msvc --profile minimal -c clippy -c rustfmt
 rustup override set 1.100.0-x86_64-pc-windows-msvc
 ```
 
-The override applies to that folder only. A toolchain change is its own pull request, with
-the fixes for any new lints in the same change.
+The override applies to that folder only. Do not run `rustup toolchain install`, `rustup
+update` or anything else that changes the shared rustup installation: several sessions share
+`~/.cargo/bin`, and on 21 Nov 2026 two concurrent installs broke its proxies for a while. If
+a toolchain is missing, ask the manager, who installs it once for everyone. A toolchain change
+is its own pull request, with the fixes for any new lints in the same change.
 
 ```
 cargo fmt --all --check
