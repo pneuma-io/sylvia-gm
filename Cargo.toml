@@ -113,6 +113,11 @@ result_large_err = "allow"
 [profile.dev]
 # Engine and comparison runs are slow unoptimised; keep debug assertions.
 opt-level = 1
+# Five lane checkouts share one drive: full debug info and incremental caches grew each
+# target/ to 15-19 GB in an afternoon (21 Nov 2026). Line tables keep file and line numbers in
+# panics and backtraces; variable-level debug info and incremental caches are dropped.
+debug = "line-tables-only"
+incremental = false
 
 [profile.release]
 # Matches the desktop shell: Cargo's normal optimised release profile.
