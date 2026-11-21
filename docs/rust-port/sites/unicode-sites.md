@@ -29,7 +29,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `builder/_plan_snapshot_materializer.py:179` | `_removed_paths` | .casefold() | `if len({item.casefold() for item in result}) != len(result):` | |
 | `builder/_plan_snapshot_materializer.py:200` | `_apply_plan_file_edits` | .casefold() | `if {path.casefold() for path in removed} & {path.casefold() for path in changed}:` | |
 | `domain/authority.py:587` | `_is_reserved_canonical_channel` | .casefold() | `tokens = tuple(token for token in re.split(r"[^a-z0-9]+", separated.casefold()) if token)` | `sylvia-domain` identity_vectors |
-| `domain/campaign_plan.py:377` | `_scan_private` | .casefold() | `if key_text.casefold() in _PRIVATE_KEYS:` | |
+| `domain/campaign_plan.py:377` | `_scan_private` | .casefold() | `if key_text.casefold() in _PRIVATE_KEYS:` || `sylvia-domain` campaign_plan_vectors |
 | `domain/package_library.py:2033` | `manifest_from_record` | .casefold() | `if len({file.path.casefold() for file in files}) != len(files):` | `sylvia-domain` manifest_vectors |
 | `state/_exceptions.py:51` | `EntityNotFoundError.__init__` | .capitalize() | `super().__init__(f"{entity_type.capitalize()} {entity_id!r} not found")` | |
 | `state/_exceptions.py:66` | `DuplicateEntityError.__init__` | .capitalize() | `f"{entity_type.capitalize()} {entity_id!r} already exists"` | |

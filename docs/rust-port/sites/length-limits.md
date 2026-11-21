@@ -78,17 +78,17 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/authority.py:652` | `mechanic_outcome_is_safe` | len() against a limit | `or not 2 <= len(choice.options) <= 16` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:653` | `mechanic_outcome_is_safe` | len() against a limit | `or len(choice.prompt.encode("utf-8")) > 4096` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:667` | `mechanic_outcome_is_safe` | len() against a limit | `or len(option.label.encode("utf-8")) > 1024` | `sylvia-domain` identity_vectors |
-| `domain/campaign_plan.py:219` | `_validate_party_placements` | len() against a limit | `or not 1 <= len(value) <= 64` | |
-| `domain/campaign_plan.py:249` | `_validate_party_placements` | len() against a limit | `or len(appends) > 16` | |
-| `domain/campaign_plan.py:335` | `parse_starting_party_policy` | len() against a limit | `or len(required) > 64` | |
-| `domain/campaign_plan.py:502` | `validate_campaign_plan` | len() against a limit | `or len(mechanics) > 256` | |
-| `domain/campaign_plan.py:525` | `validate_campaign_plan` | len() against a limit | `or len(entities) > 128` | |
-| `domain/campaign_plan.py:555` | `validate_campaign_plan` | len() against a limit | `or len(facts) > 256` | |
-| `domain/campaign_plan.py:580` | `validate_campaign_plan` | len() against a limit | `if len(references) > CAMPAIGN_PLAN_REFERENCE_LIMIT:` | |
-| `domain/campaign_plan.py:590` | `validate_campaign_plan` | len() against a limit | `or not 1 <= len(structure) <= 64` | |
-| `domain/campaign_plan.py:636` | `validate_campaign_plan` | len() against a limit | `or len(secrets) > 256` | |
-| `domain/campaign_plan.py:741` | `validate_campaign_plan` | len() against a limit | `if len(markdown.encode("utf-8")) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
-| `domain/campaign_plan.py:749` | `validate_campaign_plan` | len() against a limit | `if len(encoded) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
+| `domain/campaign_plan.py:219` | `_validate_party_placements` | len() against a limit | `or not 1 <= len(value) <= 64` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:249` | `_validate_party_placements` | len() against a limit | `or len(appends) > 16` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:335` | `parse_starting_party_policy` | len() against a limit | `or len(required) > 64` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:502` | `validate_campaign_plan` | len() against a limit | `or len(mechanics) > 256` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:525` | `validate_campaign_plan` | len() against a limit | `or len(entities) > 128` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:555` | `validate_campaign_plan` | len() against a limit | `or len(facts) > 256` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:580` | `validate_campaign_plan` | len() against a limit | `if len(references) > CAMPAIGN_PLAN_REFERENCE_LIMIT:` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:590` | `validate_campaign_plan` | len() against a limit | `or not 1 <= len(structure) <= 64` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:636` | `validate_campaign_plan` | len() against a limit | `or len(secrets) > 256` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:741` | `validate_campaign_plan` | len() against a limit | `if len(markdown.encode("utf-8")) > CAMPAIGN_PLAN_BYTE_LIMIT:` || `sylvia-domain` campaign_plan_vectors |
+| `domain/campaign_plan.py:749` | `validate_campaign_plan` | len() against a limit | `if len(encoded) > CAMPAIGN_PLAN_BYTE_LIMIT:` || `sylvia-domain` campaign_plan_vectors |
 | `domain/campaign_sequel.py:45` | `prepare_story` | len() against a limit | `if any(len(item) > 160 for item in mapping.values()):` || `sylvia-domain` domain_records_vectors |
 | `domain/campaign_sequel.py:67` | `review_payload` | len() against a limit | `if not isinstance(note, str) or not note.strip() or len(note) > 4000:` || `sylvia-domain` domain_records_vectors |
 | `domain/content_validation.py:138` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
