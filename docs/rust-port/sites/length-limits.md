@@ -184,8 +184,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_effect_executor.py:402` | `_handle_request_choice` | len() against a limit | `len(option.label.encode("utf-8")) > 1024 for option in options` | |
 | `runtime/_effect_executor.py:413` | `_handle_request_choice` | len() against a limit | `if len(control.prior_answers) >= 64:` | |
 | `runtime/_effect_executor.py:423` | `_handle_request_choice` | len() against a limit | `if len(control.prior_answers) >= 63:` | |
-| `runtime/_expression_parser.py:164` | `tokenize` | len() against a limit | `if len(expr) > MAX_EXPRESSION_LENGTH:` | |
-| `runtime/_expression_parser.py:206` | `tokenize` | len() against a limit | `if len(value) > MAX_STRING_LENGTH:` | |
+| `runtime/_expression_parser.py:164` | `tokenize` | len() against a limit | `if len(expr) > MAX_EXPRESSION_LENGTH:` | yes: `expression_parse_vectors` |
+| `runtime/_expression_parser.py:206` | `tokenize` | len() against a limit | `if len(value) > MAX_STRING_LENGTH:` | yes: `expression_parse_vectors` |
 | `runtime/_initiative.py:86` | `roll_initiative` | len() against a limit | `if not isinstance(label, str) or not label.strip() or len(label) > 200:` | |
 | `runtime/_scene_awareness.py:368` | `SceneAwarenessBuilder._read_faction_cs` | len() against a limit | `if len(text) > 300:` | |
 | `runtime/_schema_validator.py:789` | `_validate_campaign_preparation` | len() against a limit | `or any(not isinstance(value[name], str) or not 1 <= len(value[name]) <= 2000` | |

@@ -107,7 +107,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_effect_executor.py:367` | `_handle_request_choice` | re.fullmatch; plain | `if isinstance(raw_options, str) and re.fullmatch(r"_[A-Za-z0-9_]+", raw_options):` | |
 | `runtime/_effect_executor.py:390` | `_handle_request_choice` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` | |
 | `runtime/_effect_executor.py:2151` | `_resolve_value` | re.match; plain | `match = re.match(r"^([A-Za-z_][A-Za-z_0-9]*)", expr)` | |
-| `runtime/_expression_parser.py:156` | `<module>` | re.compile; pattern built at run time, check by hand | `_TOKEN_PATTERN = re.compile(_TOKEN_REGEX)` | |
+| `runtime/_expression_parser.py:156` | `<module>` | re.compile; pattern built at run time, check by hand | `_TOKEN_PATTERN = re.compile(_TOKEN_REGEX)` | yes: `expression_parse_vectors` |
 | `runtime/_frontmatter.py:18` | `<module>` | re.compile; plain | `_FRONTMATTER_RE = re.compile( r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL )` | |
 | `runtime/_parameter_declarations.py:84` | `resolve_parameter_declarations` | re.fullmatch; pattern built at run time, check by hand | `if not isinstance(name, str) or not re.fullmatch(PARAMETER_DECLARATION_ID_PATTERN, name):` | |
 | `runtime/_scene_awareness.py:359` | `SceneAwarenessBuilder._read_faction_cs` | re.compile; pattern built at run time, check by hand | `pattern = re.compile( rf"(?:^\|\n)#{{1,3}}\s+[^\n]*{re.escape(faction_name)}[^\n]*\n" rf"((?:(?!\n#{{1,3}}\s).\|\n)*)", re.IGNORECASE, )` | |
