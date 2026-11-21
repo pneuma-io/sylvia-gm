@@ -135,7 +135,8 @@ recordings. Whatever differs between two Python runs is what a rule may cover. A
 narrowest rule that makes Python agree with itself, and nothing more. Never add a rule to make
 the Rust owner pass. Then `check` the reference against the Python owner at least five more
 times on each platform before calling it reproducible: a race that hits one run in three
-(how far a stopped reply got) is easily missed by two.
+(how far a stopped reply got) is easily missed by two. `crates/sylvia-compare/reproduce.sh 5
+<session>...` does that from the checkout root after `cargo build -p sylvia-compare`.
 
 Everything else is compared exactly, including the order of object keys and whether a number
 is an integer or a float.
