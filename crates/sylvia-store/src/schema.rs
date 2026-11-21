@@ -340,25 +340,12 @@ pub fn apply_purge_extension(connection: &Connection) -> StoreResult<()> {
 /// `tuple(str(row[0]).casefold() for row in PRAGMA integrity_check) == ("ok",)`.
 fn integrity_ok(connection: &Connection) -> StoreResult<bool> {
     let rows = all_rows(connection, "PRAGMA integrity_check")?;
-    Ok(rows.len() == 1 && normalized_casefold_exact(&crate::pytext::py_str(&rows[0][0])) == "ok")
+    Ok(rows.len() == 1 && casefold_equals(&crate::pytext::py_str(&rows[0][0]), "ok"))
 }
 
-/// `str.casefold()` alone (no whitespace folding), exact for comparison with ASCII.
-fn normalized_casefold_exact(text: &str) -> String {
-    text.chars()
-        .map(|c| {
-            if c.is_ascii() {
-                c.to_ascii_lowercase().to_string()
-            } else {
-                crate::pytext::casefold_to_ascii(c).map_or_else(|| c.to_string(), str::to_owned)
-            }
-        })
-        .collect()
-}
-
-/// `PRAGMA journal_mode` result compared with `str(...).casefold() != "wal"`.
+/// `str(text).casefold() == ascii`, as Python compares `PRAGMA journal_mode`.
 pub(crate) fn casefold_equals(text: &str, ascii: &str) -> bool {
-    normalized_casefold_exact(text) == ascii
+    sylvia_base::pystr::casefold(text) == ascii
 }
 
 /// `sqlite_state_ownership._TRIGGER_NAMES`.

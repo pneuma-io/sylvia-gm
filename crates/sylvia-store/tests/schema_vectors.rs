@@ -3,8 +3,8 @@
 
 mod common;
 
+use sylvia_base::pystr;
 use sylvia_base::Json;
-use sylvia_store::pytext::{casefold_to_ascii, PY_WHITESPACE};
 use sylvia_store::schema::{self, identity_digest, Known};
 
 fn vectors() -> Json {
@@ -88,15 +88,20 @@ fn trigger_identity_matches_python() {
 #[test]
 fn python_whitespace_and_casefold_tables_match_python() {
     let vectors = vectors();
+    // The store folds schema text with the shared `sylvia_base::pystr` tables; check them
+    // against what the generator read from this snapshot's interpreter.
     let whitespace: Vec<u32> = serde_json::from_value(vectors["python_whitespace"].clone()).unwrap();
-    assert_eq!(PY_WHITESPACE.iter().map(|c| *c as u32).collect::<Vec<_>>(), whitespace);
     let table = vectors["casefold_to_ascii"].as_object().unwrap();
     let mut listed = 0;
-    for code in 0x80..=0x10FFFF_u32 {
+    for code in 0..=0x10FFFF_u32 {
         let Some(c) = char::from_u32(code) else { continue };
-        let expected = table.get(&format!("{code:04X}")).and_then(Json::as_str);
-        assert_eq!(casefold_to_ascii(c), expected, "U+{code:04X}");
-        listed += usize::from(expected.is_some());
+        assert_eq!(pystr::is_space(c), whitespace.contains(&code), "U+{code:04X} isspace");
+        if code >= 0x80 {
+            let folded = pystr::casefold(&c.to_string());
+            let expected = table.get(&format!("{code:04X}")).and_then(Json::as_str);
+            assert_eq!(folded.is_ascii().then_some(folded.as_str()), expected, "U+{code:04X} casefold");
+            listed += usize::from(expected.is_some());
+        }
     }
     assert_eq!(listed, table.len());
 }
