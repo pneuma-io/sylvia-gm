@@ -60,6 +60,11 @@ fn source_bytes(spec: &Json, bases: &Json) -> Vec<u8> {
     if let Some(text) = spec.get("text") {
         return text.as_str().unwrap().as_bytes().to_vec();
     }
+    if let Some(nest) = spec.get("nest") {
+        let depth = nest[0].as_u64().unwrap() as usize;
+        return format!("{}{}{}", "[".repeat(depth), nest[1].as_str().unwrap(), "]".repeat(depth))
+            .into_bytes();
+    }
     if let Some(text) = spec.get("latin1") {
         return text.as_str().unwrap().chars().map(|c| u8::try_from(u32::from(c)).unwrap()).collect();
     }

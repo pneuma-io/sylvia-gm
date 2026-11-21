@@ -54,7 +54,8 @@ BACKSLASH, NUL, NEWLINE = chr(92), chr(0), chr(10)
 rng = random.Random(20261121)
 BASES = {"v1": V1, "v2": V2}
 JUNK = [None, True, False, 0, 2, 1.5, -1, "", " x", "x", "y" * 161, [], ["x"], {}, {"k": 1}, NUL]
-PYTHON_DEPTH_LIMIT = 2997  # deepest nesting json.loads reads here before RecursionError
+PYTHON_DEPTH_LIMIT = 2997  # deepest nesting the Windows reference json.loads reads; Linux reads deeper
+BEYOND_ANY_LIMIT = 120_000  # past every interpreter's limit, and still within 256 KiB
 
 
 def digest(data: bytes) -> str:
@@ -98,6 +99,8 @@ def source_bytes(spec) -> bytes:
         return canonical_json_bytes(apply(BASES[spec["base"]], spec.get("edits", [])))
     if "text" in spec:
         return spec["text"].encode("utf-8")
+    if "nest" in spec:
+        return nested(*spec["nest"]).encode("utf-8")
     if "latin1" in spec:
         return spec["latin1"].encode("latin-1")
     prefix, unit, count, suffix = spec["repeat"]
@@ -170,7 +173,7 @@ def validate_cases() -> list:
     cases.append(validate_case({"latin1": "{" + chr(0xff) + "}"}))
     cases.append(validate_case({"latin1": '{"name":"' + chr(0xed) + chr(0xa0) + chr(0x80) + '"}'}))
     # Row 4: beyond Python's nesting, or malformed past 128 levels, Python reports malformed JSON.
-    cases.append(validate_case({"text": nested(PYTHON_DEPTH_LIMIT + 1)}, row=4))
+    cases.append(validate_case({"nest": [BEYOND_ANY_LIMIT, "0"]}, row=4))
     cases.append(validate_case({"text": "[" * 200}, row=4))
     cases.append(validate_case({"text": nested(150, "NaN")}, row=4))
     # Row 1: an integer beyond 64 bits; row 3: a lone surrogate.
