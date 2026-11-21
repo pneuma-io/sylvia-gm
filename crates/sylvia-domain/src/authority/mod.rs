@@ -13,7 +13,7 @@
 use crate::error::{DomainError, DomainResult};
 use crate::pytext;
 use std::collections::HashSet;
-use sylvia_base::{Json, JsonMap};
+use sylvia_base::{pystr, Json, JsonMap};
 
 mod records;
 pub use records::*;
@@ -60,7 +60,7 @@ pub(crate) use str_enum;
 ///
 /// Whitespace is Python's `str.strip()` set and the SHA-256 length counts code points.
 pub fn validate_authority_identity<'a>(value: &'a str, label: &str, sha256: bool) -> DomainResult<&'a str> {
-    let stripped = pytext::strip(value);
+    let stripped = pystr::strip(value);
     if stripped.is_empty() {
         return Err(DomainError::value(format!("{label} must be a non-whitespace string")));
     }
@@ -759,7 +759,7 @@ pub fn validate_response_blocks(value: &Json) -> DomainResult<Vec<JsonMap>> {
             if kind == Some("npc_dialogue") { &["kind", "speaker_label", "text"] } else { &["kind", "text"] };
         let keys_match = item.len() == expected.len() && expected.iter().all(|key| item.contains_key(*key));
         let text_ok =
-            item.get("text").and_then(Json::as_str).is_some_and(|text| !pytext::strip(text).is_empty());
+            item.get("text").and_then(Json::as_str).is_some_and(|text| !pystr::strip(text).is_empty());
         if !matches!(kind, Some("narration" | "npc_dialogue" | "ooc")) || !keys_match || !text_ok {
             return Err(DomainError::value("Response block fields are invalid"));
         }
@@ -767,7 +767,7 @@ pub fn validate_response_blocks(value: &Json) -> DomainResult<Vec<JsonMap>> {
             && !item
                 .get("speaker_label")
                 .and_then(Json::as_str)
-                .is_some_and(|label| !pytext::strip(label).is_empty())
+                .is_some_and(|label| !pystr::strip(label).is_empty())
         {
             return Err(DomainError::value("NPC dialogue requires a safe speaker label"));
         }

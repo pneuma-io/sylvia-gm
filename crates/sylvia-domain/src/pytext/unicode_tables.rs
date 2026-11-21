@@ -2,39 +2,6 @@
 
 pub(crate) const UNICODE_VERSION: &str = "15.0.0";
 
-/// Every character `str.isspace()` accepts (what `str.strip()` removes).
-pub(crate) static WHITESPACE: &[char] = &[
-    '\u{9}',
-    '\u{a}',
-    '\u{b}',
-    '\u{c}',
-    '\u{d}',
-    '\u{1c}',
-    '\u{1d}',
-    '\u{1e}',
-    '\u{1f}',
-    '\u{20}',
-    '\u{85}',
-    '\u{a0}',
-    '\u{1680}',
-    '\u{2000}',
-    '\u{2001}',
-    '\u{2002}',
-    '\u{2003}',
-    '\u{2004}',
-    '\u{2005}',
-    '\u{2006}',
-    '\u{2007}',
-    '\u{2008}',
-    '\u{2009}',
-    '\u{200a}',
-    '\u{2028}',
-    '\u{2029}',
-    '\u{202f}',
-    '\u{205f}',
-    '\u{3000}',
-];
-
 /// Every character whose `str.casefold()` differs from itself, sorted by code point.
 pub(crate) static CASEFOLD: &[(char, &str)] = &[
     ('\u{41}', "\u{61}"),

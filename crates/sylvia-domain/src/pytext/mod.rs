@@ -1,41 +1,22 @@
-//! Python `str` behaviour that Rust's `str` does not share.
+//! Python `str` behaviour that Rust's `str` does not share, beyond whitespace.
 //!
-//! - [`is_space`] / [`strip`]: `str.isspace()` and argument-less `str.strip()`. Python's set
-//!   includes the information separators `\x1c`–`\x1f`; Rust's `char::is_whitespace` does not.
+//! Whitespace (`str.isspace`, `str.strip`) is `sylvia_base::pystr`, shared by every lane.
+//!
 //! - [`casefold`] / [`upper`]: `str.casefold()` and `str.upper()` with CPython 3.12's
 //!   Unicode 15.0 tables, not Rust's newer ones.
 //! - [`len`]: `len(str)` counts code points, not UTF-8 bytes.
 //!
 //! The tables are generated from the reference interpreter by `generate_unicode_tables.py`.
+//! Lane 4 is adding `casefold` to `sylvia_base::pystr`; when it lands, [`casefold`] moves there.
 
 // Generated; kept exactly as the generator writes it.
 #[rustfmt::skip]
 mod unicode_tables;
 
-use unicode_tables::{CASEFOLD, UPPER, WHITESPACE};
+use unicode_tables::{CASEFOLD, UPPER};
 
 /// The Unicode version of the tables (`unicodedata.unidata_version` of the reference).
 pub const UNICODE_VERSION: &str = unicode_tables::UNICODE_VERSION;
-
-/// `character.isspace()`.
-pub fn is_space(character: char) -> bool {
-    WHITESPACE.binary_search(&character).is_ok()
-}
-
-/// `text.strip()` with no argument.
-pub fn strip(text: &str) -> &str {
-    text.trim_matches(is_space)
-}
-
-/// `text.lstrip()` with no argument.
-pub fn lstrip(text: &str) -> &str {
-    text.trim_start_matches(is_space)
-}
-
-/// `text.rstrip()` with no argument.
-pub fn rstrip(text: &str) -> &str {
-    text.trim_end_matches(is_space)
-}
 
 /// `len(text)` for a Python `str`: the number of code points.
 pub fn len(text: &str) -> usize {
@@ -69,19 +50,9 @@ mod tests {
 
     #[test]
     fn tables_are_sorted_for_binary_search() {
-        assert!(WHITESPACE.windows(2).all(|pair| pair[0] < pair[1]));
         assert!(CASEFOLD.windows(2).all(|pair| pair[0].0 < pair[1].0));
         assert!(UPPER.windows(2).all(|pair| pair[0].0 < pair[1].0));
         assert_eq!(UNICODE_VERSION, "15.0.0");
-    }
-
-    #[test]
-    fn python_whitespace_is_not_rust_whitespace() {
-        assert_eq!(strip("\x1c a \x1f"), "a");
-        assert_eq!(strip("\u{200b}a"), "\u{200b}a");
-        assert!(!'\x1c'.is_whitespace() && is_space('\x1c'));
-        assert_eq!(rstrip(" a\u{3000}"), " a");
-        assert_eq!(lstrip("\u{85}a "), "a ");
     }
 
     #[test]

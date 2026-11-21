@@ -16,7 +16,7 @@ use crate::authority::{str_enum, validate_authority_identity, PackageLock};
 use crate::error::{DomainError, DomainResult};
 use crate::pytext;
 use sylvia_base::hash::sha256_hex;
-use sylvia_base::{pyjson, Json, JsonMap};
+use sylvia_base::{pyjson, pystr, Json, JsonMap};
 
 str_enum! {
     /// Package candidate lifecycle.
@@ -268,7 +268,7 @@ pub fn validate_portable_path(path: &str) -> DomainResult<&str> {
     if pieces.iter().any(|piece| matches!(*piece, "" | "." | "..")) {
         return Err(DomainError::value("Portable package path contains an alias"));
     }
-    if pieces.iter().any(|piece| *piece != pytext::strip(piece)) {
+    if pieces.iter().any(|piece| *piece != pystr::strip(piece)) {
         return Err(DomainError::value("Portable package path contains ambiguous whitespace"));
     }
     if path.chars().any(|c| (c as u32) < 32 || "<>:\"|?*".contains(c)) {

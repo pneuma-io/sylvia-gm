@@ -7,10 +7,12 @@
 //!   stored must go through it, never through `serde_json::to_string`.
 //! - [`hash`]: SHA-256 helpers with the hex form Python's `hexdigest()` gives.
 //! - [`error`]: the coded error every owner reply is built from.
+//! - [`pystr`]: Python `str` behaviour Rust lacks (whitespace for now), on Unicode 15.0.
 
 pub mod error;
 pub mod hash;
 pub mod pyjson;
+pub mod pystr;
 
 pub use error::{CodedError, CodedResult};
 

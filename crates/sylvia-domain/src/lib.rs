@@ -10,7 +10,8 @@
 //! - [`authority`]: `domain/authority.py`, identities, roles, package locks and campaign records.
 //! - [`package_library`]: `domain/package_library.py`, canonical bytes, closure and content
 //!   hashes, package files, portable paths and the strict JSON readers.
-//! - [`pytext`]: Python `str` behaviour (whitespace, case folding, length) on Unicode 15.0.
+//! - [`pytext`]: Python case folding, `upper` and `len` on Unicode 15.0 (whitespace is
+//!   `sylvia_base::pystr`).
 //! - [`error`]: the `ValueError` / `TypeError` pair the domain raises.
 
 pub mod authority;

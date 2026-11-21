@@ -6,7 +6,7 @@
 
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::pyjson::{self, Dump};
-use sylvia_base::{Json, JsonMap};
+use sylvia_base::{pystr, Json, JsonMap};
 use sylvia_domain::authority::{
     canonical_payload_is_safe, is_reserved_canonical_channel, mechanic_outcome_is_safe, response_blocks_text,
     validate_authority_identity_value, validate_response_blocks, MechanicOutcome, MechanicsChoiceOption,
@@ -389,7 +389,7 @@ fn python_text_behaviour_matches() {
     let vectors = vectors();
     for case in list(&vectors, "text") {
         let value = case["text"].as_str().unwrap();
-        assert_eq!(pytext::strip(value), case["strip"].as_str().unwrap(), "strip {value:?}");
+        assert_eq!(pystr::strip(value), case["strip"].as_str().unwrap(), "strip {value:?}");
         assert_eq!(pytext::casefold(value), case["casefold"].as_str().unwrap(), "casefold {value:?}");
         assert_eq!(pytext::upper(value), case["upper"].as_str().unwrap(), "upper {value:?}");
         assert_eq!(pytext::len(value) as u64, case["len"].as_u64().unwrap(), "len {value:?}");
