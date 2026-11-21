@@ -68,8 +68,12 @@ impl DateTime {
 
     fn utc_micros(&self) -> Option<i128> {
         let offset = self.offset_seconds?;
-        let days = days_from_civil(i64::from(self.date.year), i64::from(self.date.month), i64::from(self.date.day));
-        let seconds = days * 86_400 + i64::from(self.hour) * 3600 + i64::from(self.minute) * 60 + i64::from(self.second)
+        let days =
+            days_from_civil(i64::from(self.date.year), i64::from(self.date.month), i64::from(self.date.day));
+        let seconds = days * 86_400
+            + i64::from(self.hour) * 3600
+            + i64::from(self.minute) * 60
+            + i64::from(self.second)
             - i64::from(offset);
         Some(i128::from(seconds) * 1_000_000 + i128::from(self.microsecond))
     }
@@ -151,13 +155,14 @@ impl Value {
             _ => true,
         }
     }
-
 }
 
 /// `int == float` as Python compares them: exactly, never through a rounded conversion.
 fn int_float_eq(int: i64, float: f64) -> bool {
     // -2**63 <= float < 2**63, and whole: then the conversion to i64 is exact.
-    float.fract() == 0.0 && (-9_223_372_036_854_775_808.0..9_223_372_036_854_775_808.0).contains(&float) && float as i64 == int
+    float.fract() == 0.0
+        && (-9_223_372_036_854_775_808.0..9_223_372_036_854_775_808.0).contains(&float)
+        && float as i64 == int
 }
 
 /// `a == b` for two hashable keys, as a `dict` compares them: `True == 1 == 1.0`, the shared
@@ -179,9 +184,13 @@ pub fn key_eq(a: &Value, b: &Value) -> bool {
             (None, None) => x == y,
             _ => false,
         },
-        (Value::Tuple(x), Value::Tuple(y)) => x.len() == y.len() && x.iter().zip(y).all(|(p, q)| key_eq(p, q)),
+        (Value::Tuple(x), Value::Tuple(y)) => {
+            x.len() == y.len() && x.iter().zip(y).all(|(p, q)| key_eq(p, q))
+        }
         (Value::Float(x), Value::Float(y)) => x == y || (is_shared_nan(*x) && is_shared_nan(*y)),
-        (Value::Float(x), other) | (other, Value::Float(x)) => as_int(other).is_some_and(|int| int_float_eq(int, *x)),
+        (Value::Float(x), other) | (other, Value::Float(x)) => {
+            as_int(other).is_some_and(|int| int_float_eq(int, *x))
+        }
         _ => match (as_int(a), as_int(b)) {
             (Some(x), Some(y)) => x == y,
             _ => false,
@@ -215,9 +224,9 @@ impl Loaded {
             Value::None => Json::Null,
             Value::Bool(flag) => Json::Bool(*flag),
             Value::Int(number) => Json::from(*number),
-            Value::Float(number) => {
-                serde_json::Number::from_f64(*number).map(Json::Number).ok_or_else(|| NotJson("a non-finite float".into()))?
-            }
+            Value::Float(number) => serde_json::Number::from_f64(*number)
+                .map(Json::Number)
+                .ok_or_else(|| NotJson("a non-finite float".into()))?,
             Value::Str(text) => Json::String(text.clone()),
             Value::List(id) | Value::Dict(id) | Value::Set(id) => {
                 if path.contains(id) {
@@ -225,9 +234,9 @@ impl Loaded {
                 }
                 path.push(*id);
                 let result = match self.object(*id) {
-                    Object::List(items) => {
-                        Json::Array(items.iter().map(|item| self.value_json(item, path)).collect::<Result<_, _>>()?)
-                    }
+                    Object::List(items) => Json::Array(
+                        items.iter().map(|item| self.value_json(item, path)).collect::<Result<_, _>>()?,
+                    ),
                     Object::Dict(pairs) => {
                         let mut map = JsonMap::new();
                         for (key, item) in pairs {

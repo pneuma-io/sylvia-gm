@@ -31,9 +31,15 @@ pub(crate) struct CMark {
 pub(crate) enum CTok {
     StreamStart,
     StreamEnd,
-    VersionDirective { major: i64, minor: i64 },
+    VersionDirective {
+        major: i64,
+        minor: i64,
+    },
     /// Handle and prefix as libyaml holds them: bytes, cut at the first NUL as C reads them.
-    TagDirective { handle: Vec<u8>, prefix: Vec<u8> },
+    TagDirective {
+        handle: Vec<u8>,
+        prefix: Vec<u8>,
+    },
     DocumentStart,
     DocumentEnd,
     BlockSequenceStart,
@@ -49,9 +55,15 @@ pub(crate) enum CTok {
     Value,
     Alias(Vec<u8>),
     Anchor(Vec<u8>),
-    Tag { handle: Vec<u8>, suffix: Vec<u8> },
+    Tag {
+        handle: Vec<u8>,
+        suffix: Vec<u8>,
+    },
     /// The value, and the style as `_yaml.pyx` names it (`None` for plain).
-    Scalar { value: String, style: Option<char> },
+    Scalar {
+        value: String,
+        style: Option<char>,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -146,7 +158,13 @@ impl CScanner {
 
     /// A libyaml mark as `_yaml.pyx` turns it into a `yaml.Mark` (no snippet).
     pub(crate) fn py_mark(&self, mark: CMark) -> Mark {
-        Mark { name: Rc::clone(&self.name), index: mark.index, line: mark.line, column: mark.column, buffer: None }
+        Mark {
+            name: Rc::clone(&self.name),
+            index: mark.index,
+            line: mark.line,
+            column: mark.column,
+            buffer: None,
+        }
     }
 
     // ── Reader ────────────────────────────────────────────────────────────────────────
@@ -420,10 +438,20 @@ impl CScanner {
         if column == 0 && self.check('%') {
             return self.fetch_directive();
         }
-        if column == 0 && self.check_at('-', 0) && self.check_at('-', 1) && self.check_at('-', 2) && self.is_blankz_at(3) {
+        if column == 0
+            && self.check_at('-', 0)
+            && self.check_at('-', 1)
+            && self.check_at('-', 2)
+            && self.is_blankz_at(3)
+        {
             return self.fetch_document_indicator(CTok::DocumentStart);
         }
-        if column == 0 && self.check_at('.', 0) && self.check_at('.', 1) && self.check_at('.', 2) && self.is_blankz_at(3) {
+        if column == 0
+            && self.check_at('.', 0)
+            && self.check_at('.', 1)
+            && self.check_at('.', 2)
+            && self.is_blankz_at(3)
+        {
             return self.fetch_document_indicator(CTok::DocumentEnd);
         }
         match self.at(0) {
@@ -460,7 +488,11 @@ impl CScanner {
         {
             return self.fetch_plain_scalar();
         }
-        Err(self.error(Some("while scanning for the next token"), self.mark, "found character that cannot start any token"))
+        Err(self.error(
+            Some("while scanning for the next token"),
+            self.mark,
+            "found character that cannot start any token",
+        ))
     }
 
     fn stale_simple_keys(&mut self) -> CResult<()> {
@@ -469,7 +501,11 @@ impl CScanner {
             let key = self.simple_keys[index];
             if key.possible && (key.mark.line < mark.line || key.mark.index + 1024 < mark.index) {
                 if key.required {
-                    return Err(self.error(Some("while scanning a simple key"), key.mark, "could not find expected ':'"));
+                    return Err(self.error(
+                        Some("while scanning a simple key"),
+                        key.mark,
+                        "could not find expected ':'",
+                    ));
                 }
                 self.simple_keys[index].possible = false;
             }
@@ -495,7 +531,11 @@ impl CScanner {
     fn remove_simple_key(&mut self) -> CResult<()> {
         let key = *self.simple_keys.last().expect("the stream start pushes a key");
         if key.possible && key.required {
-            return Err(self.error(Some("while scanning a simple key"), key.mark, "could not find expected ':'"));
+            return Err(self.error(
+                Some("while scanning a simple key"),
+                key.mark,
+                "could not find expected ':'",
+            ));
         }
         self.simple_keys.last_mut().expect("present").possible = false;
         Ok(())
@@ -618,7 +658,11 @@ impl CScanner {
     fn fetch_block_entry(&mut self) -> CResult<()> {
         if self.flow_level == 0 {
             if !self.simple_key_allowed {
-                return Err(self.error(None, self.mark, "block sequence entries are not allowed in this context"));
+                return Err(self.error(
+                    None,
+                    self.mark,
+                    "block sequence entries are not allowed in this context",
+                ));
             }
             let mark = self.mark;
             self.roll_indent(mark.column as isize, None, CTok::BlockSequenceStart, mark);
@@ -652,14 +696,26 @@ impl CScanner {
     fn fetch_value(&mut self) -> CResult<()> {
         let key = *self.simple_keys.last().expect("the stream start pushes a key");
         if key.possible {
-            self.tokens.insert(key.token_number - self.tokens_parsed, CToken { kind: CTok::Key, start: key.mark, end: key.mark });
-            self.roll_indent(key.mark.column as isize, Some(key.token_number), CTok::BlockMappingStart, key.mark);
+            self.tokens.insert(
+                key.token_number - self.tokens_parsed,
+                CToken { kind: CTok::Key, start: key.mark, end: key.mark },
+            );
+            self.roll_indent(
+                key.mark.column as isize,
+                Some(key.token_number),
+                CTok::BlockMappingStart,
+                key.mark,
+            );
             self.simple_keys.last_mut().expect("present").possible = false;
             self.simple_key_allowed = false;
         } else {
             if self.flow_level == 0 {
                 if !self.simple_key_allowed {
-                    return Err(self.error(None, self.mark, "mapping values are not allowed in this context"));
+                    return Err(self.error(
+                        None,
+                        self.mark,
+                        "mapping values are not allowed in this context",
+                    ));
                 }
                 let mark = self.mark;
                 self.roll_indent(mark.column as isize, None, CTok::BlockMappingStart, mark);
@@ -778,7 +834,11 @@ impl CScanner {
             let (handle, prefix) = self.scan_tag_directive_value(start)?;
             CTok::TagDirective { handle, prefix }
         } else {
-            return Err(self.error(Some("while scanning a directive"), start, "found unknown directive name"));
+            return Err(self.error(
+                Some("while scanning a directive"),
+                start,
+                "found unknown directive name",
+            ));
         };
         let end = self.mark;
         self.eat_line_end("while scanning a directive", start)?;
@@ -793,10 +853,18 @@ impl CScanner {
             self.cache(1)?;
         }
         if string.is_empty() {
-            return Err(self.error(Some("while scanning a directive"), start, "could not find expected directive name"));
+            return Err(self.error(
+                Some("while scanning a directive"),
+                start,
+                "could not find expected directive name",
+            ));
         }
         if !self.is_blankz() {
-            return Err(self.error(Some("while scanning a directive"), start, "found unexpected non-alphabetical character"));
+            return Err(self.error(
+                Some("while scanning a directive"),
+                start,
+                "found unexpected non-alphabetical character",
+            ));
         }
         Ok(string)
     }
@@ -809,7 +877,11 @@ impl CScanner {
         }
         let major = self.scan_version_directive_number(start)?;
         if !self.check('.') {
-            return Err(self.error(Some("while scanning a %YAML directive"), start, "did not find expected digit or '.' character"));
+            return Err(self.error(
+                Some("while scanning a %YAML directive"),
+                start,
+                "did not find expected digit or '.' character",
+            ));
         }
         self.skip();
         let minor = self.scan_version_directive_number(start)?;
@@ -823,14 +895,22 @@ impl CScanner {
         while self.is_digit() {
             length += 1;
             if length > 9 {
-                return Err(self.error(Some("while scanning a %YAML directive"), start, "found extremely long version number"));
+                return Err(self.error(
+                    Some("while scanning a %YAML directive"),
+                    start,
+                    "found extremely long version number",
+                ));
             }
             value = value * 10 + i64::from(self.at(0).to_digit(10).unwrap_or(0));
             self.skip();
             self.cache(1)?;
         }
         if length == 0 {
-            return Err(self.error(Some("while scanning a %YAML directive"), start, "did not find expected version number"));
+            return Err(self.error(
+                Some("while scanning a %YAML directive"),
+                start,
+                "did not find expected version number",
+            ));
         }
         Ok(value)
     }
@@ -844,7 +924,11 @@ impl CScanner {
         let handle = self.scan_tag_handle(true, start)?;
         self.cache(1)?;
         if !self.is_blank() {
-            return Err(self.error(Some("while scanning a %TAG directive"), start, "did not find expected whitespace"));
+            return Err(self.error(
+                Some("while scanning a %TAG directive"),
+                start,
+                "did not find expected whitespace",
+            ));
         }
         while self.is_blank() {
             self.skip();
@@ -853,7 +937,11 @@ impl CScanner {
         let prefix = self.scan_tag_uri(true, true, None, start)?;
         self.cache(1)?;
         if !self.is_blankz() {
-            return Err(self.error(Some("while scanning a %TAG directive"), start, "did not find expected whitespace or line break"));
+            return Err(self.error(
+                Some("while scanning a %TAG directive"),
+                start,
+                "did not find expected whitespace or line break",
+            ));
         }
         Ok((handle, prefix))
     }
@@ -872,7 +960,11 @@ impl CScanner {
         let end = self.mark;
         if length == 0 || !(self.is_blankz() || "?:,]}%@`".contains(self.at(0))) {
             let context = if anchor { "while scanning an anchor" } else { "while scanning an alias" };
-            return Err(self.error(Some(context), start, "did not find expected alphabetic or numeric character"));
+            return Err(self.error(
+                Some(context),
+                start,
+                "did not find expected alphabetic or numeric character",
+            ));
         }
         let kind = if anchor { CTok::Anchor(string) } else { CTok::Alias(string) };
         Ok(CToken { kind, start, end })
@@ -910,7 +1002,11 @@ impl CScanner {
         }
         self.cache(1)?;
         if !self.is_blankz() && (self.flow_level == 0 || !self.check(',')) {
-            return Err(self.error(Some("while scanning a tag"), start, "did not find expected whitespace or line break"));
+            return Err(self.error(
+                Some("while scanning a tag"),
+                start,
+                "did not find expected whitespace or line break",
+            ));
         }
         let end = self.mark;
         Ok(CToken { kind: CTok::Tag { handle, suffix }, start, end })
@@ -932,19 +1028,30 @@ impl CScanner {
         if self.check('!') {
             self.read_bytes(&mut string);
         } else if directive && string != b"!" {
-            return Err(self.error(Some("while parsing a tag directive"), start, "did not find expected '!'"));
+            return Err(self.error(
+                Some("while parsing a tag directive"),
+                start,
+                "did not find expected '!'",
+            ));
         }
         Ok(string)
     }
 
-    fn scan_tag_uri(&mut self, uri_char: bool, directive: bool, head: Option<&[u8]>, start: CMark) -> CResult<Vec<u8>> {
+    fn scan_tag_uri(
+        &mut self,
+        uri_char: bool,
+        directive: bool,
+        head: Option<&[u8]>,
+        start: CMark,
+    ) -> CResult<Vec<u8>> {
         let head = head.unwrap_or(&[]);
         let mut length = head.len();
         let mut string: Vec<u8> = if head.len() > 1 { head[1..].to_vec() } else { Vec::new() };
         self.cache(1)?;
         loop {
             let ch = self.at(0);
-            let allowed = self.is_alpha_at(0) || ";/?:@&=+$.%!~*'()".contains(ch) || (uri_char && ",[]".contains(ch));
+            let allowed =
+                self.is_alpha_at(0) || ";/?:@&=+$.%!~*'()".contains(ch) || (uri_char && ",[]".contains(ch));
             if !allowed || ch == '\0' {
                 break;
             }
@@ -1013,7 +1120,13 @@ impl CScanner {
         let start = self.mark;
         self.skip();
         self.cache(1)?;
-        let zero_indicator = |scanner: &Self| scanner.error(Some("while scanning a block scalar"), start, "found an indentation indicator equal to 0");
+        let zero_indicator = |scanner: &Self| {
+            scanner.error(
+                Some("while scanning a block scalar"),
+                start,
+                "found an indentation indicator equal to 0",
+            )
+        };
         if self.check('+') || self.check('-') {
             chomping = if self.check('+') { 1 } else { -1 };
             self.skip();
@@ -1049,7 +1162,11 @@ impl CScanner {
             }
         }
         if !self.is_breakz() {
-            return Err(self.error(Some("while scanning a block scalar"), start, "did not find expected comment or line break"));
+            return Err(self.error(
+                Some("while scanning a block scalar"),
+                start,
+                "did not find expected comment or line break",
+            ));
         }
         if self.is_break() {
             self.cache(2)?;
@@ -1093,7 +1210,13 @@ impl CScanner {
         Ok(CToken { kind: CTok::Scalar { value: string, style: Some(style) }, start, end })
     }
 
-    fn scan_block_scalar_breaks(&mut self, indent: &mut isize, breaks: &mut String, start: CMark, end: &mut CMark) -> CResult<()> {
+    fn scan_block_scalar_breaks(
+        &mut self,
+        indent: &mut isize,
+        breaks: &mut String,
+        start: CMark,
+        end: &mut CMark,
+    ) -> CResult<()> {
         let mut max_indent = 0isize;
         *end = self.mark;
         loop {
@@ -1166,10 +1289,18 @@ impl CScanner {
         loop {
             self.cache(4)?;
             if self.at_document_indicator() {
-                return Err(self.error(Some("while scanning a quoted scalar"), start, "found unexpected document indicator"));
+                return Err(self.error(
+                    Some("while scanning a quoted scalar"),
+                    start,
+                    "found unexpected document indicator",
+                ));
             }
             if self.is_z_at(0) {
-                return Err(self.error(Some("while scanning a quoted scalar"), start, "found unexpected end of stream"));
+                return Err(self.error(
+                    Some("while scanning a quoted scalar"),
+                    start,
+                    "found unexpected end of stream",
+                ));
             }
             self.cache(2)?;
             let mut leading_blanks = false;
@@ -1219,7 +1350,11 @@ impl CScanner {
                             None
                         }
                         _ => {
-                            return Err(self.error(Some("while parsing a quoted scalar"), start, "found unknown escape character"));
+                            return Err(self.error(
+                                Some("while parsing a quoted scalar"),
+                                start,
+                                "found unknown escape character",
+                            ));
                         }
                     };
                     if let Some(ch) = simple {
@@ -1311,10 +1446,20 @@ impl CScanner {
                 break;
             }
             while !self.is_blankz() {
-                if self.flow_level > 0 && self.check(':') && ",?[]{}".contains(self.at(1)) && self.at(1) != '\0' {
-                    return Err(self.error(Some("while scanning a plain scalar"), start, "found unexpected ':'"));
+                if self.flow_level > 0
+                    && self.check(':')
+                    && ",?[]{}".contains(self.at(1))
+                    && self.at(1) != '\0'
+                {
+                    return Err(self.error(
+                        Some("while scanning a plain scalar"),
+                        start,
+                        "found unexpected ':'",
+                    ));
                 }
-                if (self.check(':') && self.is_blankz_at(1)) || (self.flow_level > 0 && ",[]{}".contains(self.at(0))) {
+                if (self.check(':') && self.is_blankz_at(1))
+                    || (self.flow_level > 0 && ",[]{}".contains(self.at(0)))
+                {
                     break;
                 }
                 if leading_blanks || !whitespaces.is_empty() {

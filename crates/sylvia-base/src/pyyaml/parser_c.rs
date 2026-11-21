@@ -48,19 +48,43 @@ enum State {
 enum CEventKind {
     StreamStart,
     StreamEnd,
-    DocumentStart { implicit: bool, version: Option<(i64, i64)>, tags: Vec<(Vec<u8>, Vec<u8>)> },
-    DocumentEnd { implicit: bool },
+    DocumentStart {
+        implicit: bool,
+        version: Option<(i64, i64)>,
+        tags: Vec<(Vec<u8>, Vec<u8>)>,
+    },
+    DocumentEnd {
+        implicit: bool,
+    },
     Alias(Vec<u8>),
-    Scalar { anchor: Option<Vec<u8>>, tag: Option<Vec<u8>>, value: String, plain_implicit: bool, quoted_implicit: bool, style: Option<char> },
-    SequenceStart { anchor: Option<Vec<u8>>, tag: Option<Vec<u8>>, implicit: bool, flow: bool },
+    Scalar {
+        anchor: Option<Vec<u8>>,
+        tag: Option<Vec<u8>>,
+        value: String,
+        plain_implicit: bool,
+        quoted_implicit: bool,
+        style: Option<char>,
+    },
+    SequenceStart {
+        anchor: Option<Vec<u8>>,
+        tag: Option<Vec<u8>>,
+        implicit: bool,
+        flow: bool,
+    },
     SequenceEnd,
-    MappingStart { anchor: Option<Vec<u8>>, tag: Option<Vec<u8>>, implicit: bool, flow: bool },
+    MappingStart {
+        anchor: Option<Vec<u8>>,
+        tag: Option<Vec<u8>>,
+        implicit: bool,
+        flow: bool,
+    },
     MappingEnd,
 }
 
 /// `PyUnicode_FromYamlString`: strict UTF-8.
 fn decode(bytes: &[u8]) -> CResult<String> {
-    String::from_utf8(bytes.to_vec()).map_err(|error| YamlError::python("UnicodeDecodeError", utf8_error_text(bytes, &error)))
+    String::from_utf8(bytes.to_vec())
+        .map_err(|error| YamlError::python("UnicodeDecodeError", utf8_error_text(bytes, &error)))
 }
 
 fn decode_opt(bytes: &Option<Vec<u8>>) -> CResult<Option<String>> {
@@ -141,7 +165,10 @@ impl CParser {
                         let (handle, prefix) = if self.decode_document_tags {
                             (decode(handle)?, decode(prefix)?)
                         } else {
-                            (String::from_utf8_lossy(handle).into_owned(), String::from_utf8_lossy(prefix).into_owned())
+                            (
+                                String::from_utf8_lossy(handle).into_owned(),
+                                String::from_utf8_lossy(prefix).into_owned(),
+                            )
                         };
                         // A dict: a repeated handle keeps its first place and takes the last prefix.
                         match out.iter_mut().find(|(h, _)| *h == handle) {
@@ -159,13 +186,15 @@ impl CParser {
             }
             CEventKind::DocumentEnd { implicit } => EventKind::DocumentEnd { explicit: !implicit },
             CEventKind::Alias(anchor) => EventKind::Alias { anchor: decode(&anchor)? },
-            CEventKind::Scalar { anchor, tag, value, plain_implicit, quoted_implicit, style } => EventKind::Scalar {
-                anchor: decode_opt(&anchor)?,
-                tag: decode_opt(&tag)?,
-                implicit: (plain_implicit, quoted_implicit),
-                value,
-                style,
-            },
+            CEventKind::Scalar { anchor, tag, value, plain_implicit, quoted_implicit, style } => {
+                EventKind::Scalar {
+                    anchor: decode_opt(&anchor)?,
+                    tag: decode_opt(&tag)?,
+                    implicit: (plain_implicit, quoted_implicit),
+                    value,
+                    style,
+                }
+            }
             CEventKind::SequenceStart { anchor, tag, implicit, flow } => EventKind::SequenceStart {
                 anchor: decode_opt(&anchor)?,
                 tag: decode_opt(&tag)?,
@@ -255,13 +284,19 @@ impl CParser {
                 token = self.peek()?;
             }
         }
-        let directive_or_end =
-            matches!(token.kind, CTok::VersionDirective { .. } | CTok::TagDirective { .. } | CTok::DocumentStart | CTok::StreamEnd);
+        let directive_or_end = matches!(
+            token.kind,
+            CTok::VersionDirective { .. } | CTok::TagDirective { .. } | CTok::DocumentStart | CTok::StreamEnd
+        );
         if implicit && !directive_or_end {
             self.process_directives()?;
             self.states.push(State::DocumentEnd);
             self.state = State::BlockNode;
-            return Ok((CEventKind::DocumentStart { implicit: true, version: None, tags: Vec::new() }, token.start, token.start));
+            return Ok((
+                CEventKind::DocumentStart { implicit: true, version: None, tags: Vec::new() },
+                token.start,
+                token.start,
+            ));
         }
         if token.kind != CTok::StreamEnd {
             let start = token.start;
@@ -285,7 +320,11 @@ impl CParser {
         let token = self.peek()?;
         if matches!(
             token.kind,
-            CTok::VersionDirective { .. } | CTok::TagDirective { .. } | CTok::DocumentStart | CTok::DocumentEnd | CTok::StreamEnd
+            CTok::VersionDirective { .. }
+                | CTok::TagDirective { .. }
+                | CTok::DocumentStart
+                | CTok::DocumentEnd
+                | CTok::StreamEnd
         ) {
             self.state = self.pop_state();
             return Ok(Self::empty_scalar(token.start));
@@ -359,7 +398,11 @@ impl CParser {
                         tag = Some(full);
                     }
                     None => {
-                        return Err(self.error(Some(("while parsing a node", start)), "found undefined tag handle", tag_mark));
+                        return Err(self.error(
+                            Some(("while parsing a node", start)),
+                            "found undefined tag handle",
+                            tag_mark,
+                        ));
                     }
                 }
             }
@@ -380,7 +423,14 @@ impl CParser {
                     quoted_implicit = true;
                 }
                 self.state = self.pop_state();
-                let event = CEventKind::Scalar { anchor, tag, value: value.clone(), plain_implicit, quoted_implicit, style: *style };
+                let event = CEventKind::Scalar {
+                    anchor,
+                    tag,
+                    value: value.clone(),
+                    plain_implicit,
+                    quoted_implicit,
+                    style: *style,
+                };
                 self.skip();
                 Ok((event, start, end))
             }
@@ -451,7 +501,11 @@ impl CParser {
             }
             _ => {
                 let mark = self.pop_mark();
-                Err(self.error(Some(("while parsing a block collection", mark)), "did not find expected '-' indicator", token.start))
+                Err(self.error(
+                    Some(("while parsing a block collection", mark)),
+                    "did not find expected '-' indicator",
+                    token.start,
+                ))
             }
         }
     }
@@ -501,7 +555,11 @@ impl CParser {
             }
             _ => {
                 let mark = self.pop_mark();
-                Err(self.error(Some(("while parsing a block mapping", mark)), "did not find expected key", token.start))
+                Err(self.error(
+                    Some(("while parsing a block mapping", mark)),
+                    "did not find expected key",
+                    token.start,
+                ))
             }
         }
     }
@@ -537,13 +595,21 @@ impl CParser {
                     token = self.peek()?;
                 } else {
                     let mark = self.pop_mark();
-                    return Err(self.error(Some(("while parsing a flow sequence", mark)), "did not find expected ',' or ']'", token.start));
+                    return Err(self.error(
+                        Some(("while parsing a flow sequence", mark)),
+                        "did not find expected ',' or ']'",
+                        token.start,
+                    ));
                 }
             }
             if token.kind == CTok::Key {
                 self.state = State::FlowSequenceEntryMappingKey;
                 self.skip();
-                return Ok((CEventKind::MappingStart { anchor: None, tag: None, implicit: true, flow: true }, token.start, token.end));
+                return Ok((
+                    CEventKind::MappingStart { anchor: None, tag: None, implicit: true, flow: true },
+                    token.start,
+                    token.end,
+                ));
             } else if token.kind != CTok::FlowSequenceEnd {
                 self.states.push(State::FlowSequenceEntry);
                 return self.parse_node(false, false);
@@ -601,7 +667,11 @@ impl CParser {
                     token = self.peek()?;
                 } else {
                     let mark = self.pop_mark();
-                    return Err(self.error(Some(("while parsing a flow mapping", mark)), "did not find expected ',' or '}'", token.start));
+                    return Err(self.error(
+                        Some(("while parsing a flow mapping", mark)),
+                        "did not find expected ',' or '}'",
+                        token.start,
+                    ));
                 }
             }
             if token.kind == CTok::Key {
@@ -644,7 +714,14 @@ impl CParser {
 
     fn empty_scalar(mark: CMark) -> (CEventKind, CMark, CMark) {
         (
-            CEventKind::Scalar { anchor: None, tag: None, value: String::new(), plain_implicit: true, quoted_implicit: false, style: None },
+            CEventKind::Scalar {
+                anchor: None,
+                tag: None,
+                value: String::new(),
+                plain_implicit: true,
+                quoted_implicit: false,
+                style: None,
+            },
             mark,
             mark,
         )
@@ -683,7 +760,12 @@ impl CParser {
         Ok((version, tags))
     }
 
-    fn append_tag_directive(&mut self, value: (Vec<u8>, Vec<u8>), allow_duplicates: bool, mark: CMark) -> CResult<()> {
+    fn append_tag_directive(
+        &mut self,
+        value: (Vec<u8>, Vec<u8>),
+        allow_duplicates: bool,
+        mark: CMark,
+    ) -> CResult<()> {
         if self.tag_directives.iter().any(|(handle, _)| *handle == value.0) {
             if allow_duplicates {
                 return Ok(());

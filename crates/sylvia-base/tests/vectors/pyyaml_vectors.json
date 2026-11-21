@@ -801221,5 +801221,1177 @@ true
 ]
 }
 }
+],
+"byte_inputs": [
+{
+"text": "a: 1\n",
+"pure": {
+"events": [
+[
+"StreamStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+]
+],
+[
+"DocumentStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+false,
+null,
+null
+],
+[
+"MappingStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+null,
+null,
+true,
+false
+],
+[
+"ScalarEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+1,
+1
+],
+null,
+null,
+[
+true,
+false
+],
+"a",
+null
+],
+[
+"ScalarEvent",
+[
+0,
+3,
+3
+],
+[
+0,
+4,
+4
+],
+null,
+null,
+[
+true,
+false
+],
+"1",
+null
+],
+[
+"MappingEndEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+0,
+5
+]
+],
+[
+"DocumentEndEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+0,
+5
+],
+false
+],
+[
+"StreamEndEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+0,
+5
+]
+]
+],
+"node": [
+"map",
+0,
+"tag:yaml.org,2002:map",
+[
+0,
+0,
+0
+],
+[
+1,
+0,
+5
+],
+false,
+[
+[
+[
+"scalar",
+1,
+"tag:yaml.org,2002:str",
+[
+0,
+0,
+0
+],
+[
+0,
+1,
+1
+],
+"a",
+null
+],
+[
+"scalar",
+2,
+"tag:yaml.org,2002:int",
+[
+0,
+3,
+3
+],
+[
+0,
+4,
+4
+],
+"1",
+null
+]
+]
+]
+],
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"int",
+"1"
+]
+]
+]
+]
+},
+"c": {
+"events": [
+[
+"StreamStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+]
+],
+[
+"DocumentStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+false,
+null,
+null
+],
+[
+"MappingStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+null,
+null,
+true,
+false
+],
+[
+"ScalarEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+1,
+1
+],
+null,
+null,
+[
+true,
+false
+],
+"a",
+""
+],
+[
+"ScalarEvent",
+[
+0,
+3,
+3
+],
+[
+0,
+4,
+4
+],
+null,
+null,
+[
+true,
+false
+],
+"1",
+""
+],
+[
+"MappingEndEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+0,
+5
+]
+],
+[
+"DocumentEndEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+0,
+5
+],
+false
+],
+[
+"StreamEndEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+0,
+5
+]
+]
+],
+"node": [
+"map",
+0,
+"tag:yaml.org,2002:map",
+[
+0,
+0,
+0
+],
+[
+1,
+0,
+5
+],
+false,
+[
+[
+[
+"scalar",
+1,
+"tag:yaml.org,2002:str",
+[
+0,
+0,
+0
+],
+[
+0,
+1,
+1
+],
+"a",
+""
+],
+[
+"scalar",
+2,
+"tag:yaml.org,2002:int",
+[
+0,
+3,
+3
+],
+[
+0,
+4,
+4
+],
+"1",
+""
+]
+]
+]
+],
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"int",
+"1"
+]
+]
+]
+]
+}
+},
+{
+"text": "a: b: c\n",
+"pure": {
+"events_error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"<byte string>\", line 1, column 5:\n    a: b: c\n        ^",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+},
+"compose_error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"<byte string>\", line 1, column 5:\n    a: b: c\n        ^",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+},
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"<byte string>\", line 1, column 5:\n    a: b: c\n        ^",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+}
+},
+"c": {
+"events_error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed in this context\n  in \"<byte string>\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed in this context",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+},
+"compose_error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed in this context\n  in \"<byte string>\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed in this context",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+},
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed in this context\n  in \"<byte string>\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed in this context",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+}
+}
+},
+{
+"text": "a: 'x",
+"pure": {
+"events_error": {
+"class": "ScannerError",
+"text": "while scanning a quoted scalar\n  in \"<byte string>\", line 1, column 4:\n    a: 'x\n       ^\nfound unexpected end of stream\n  in \"<byte string>\", line 1, column 6:\n    a: 'x\n         ^",
+"context": "while scanning a quoted scalar",
+"problem": "found unexpected end of stream",
+"note": null,
+"context_mark": [
+0,
+3,
+3
+],
+"problem_mark": [
+0,
+5,
+5
+]
+},
+"compose_error": {
+"class": "ScannerError",
+"text": "while scanning a quoted scalar\n  in \"<byte string>\", line 1, column 4:\n    a: 'x\n       ^\nfound unexpected end of stream\n  in \"<byte string>\", line 1, column 6:\n    a: 'x\n         ^",
+"context": "while scanning a quoted scalar",
+"problem": "found unexpected end of stream",
+"note": null,
+"context_mark": [
+0,
+3,
+3
+],
+"problem_mark": [
+0,
+5,
+5
+]
+},
+"error": {
+"class": "ScannerError",
+"text": "while scanning a quoted scalar\n  in \"<byte string>\", line 1, column 4:\n    a: 'x\n       ^\nfound unexpected end of stream\n  in \"<byte string>\", line 1, column 6:\n    a: 'x\n         ^",
+"context": "while scanning a quoted scalar",
+"problem": "found unexpected end of stream",
+"note": null,
+"context_mark": [
+0,
+3,
+3
+],
+"problem_mark": [
+0,
+5,
+5
+]
+}
+},
+"c": {
+"events_error": {
+"class": "ScannerError",
+"text": "while scanning a quoted scalar\n  in \"<byte string>\", line 1, column 4\nfound unexpected end of stream\n  in \"<byte string>\", line 1, column 6",
+"context": "while scanning a quoted scalar",
+"problem": "found unexpected end of stream",
+"note": null,
+"context_mark": [
+0,
+3,
+3
+],
+"problem_mark": [
+0,
+5,
+5
+]
+},
+"compose_error": {
+"class": "ScannerError",
+"text": "while scanning a quoted scalar\n  in \"<byte string>\", line 1, column 4\nfound unexpected end of stream\n  in \"<byte string>\", line 1, column 6",
+"context": "while scanning a quoted scalar",
+"problem": "found unexpected end of stream",
+"note": null,
+"context_mark": [
+0,
+3,
+3
+],
+"problem_mark": [
+0,
+5,
+5
+]
+},
+"error": {
+"class": "ScannerError",
+"text": "while scanning a quoted scalar\n  in \"<byte string>\", line 1, column 4\nfound unexpected end of stream\n  in \"<byte string>\", line 1, column 6",
+"context": "while scanning a quoted scalar",
+"problem": "found unexpected end of stream",
+"note": null,
+"context_mark": [
+0,
+3,
+3
+],
+"problem_mark": [
+0,
+5,
+5
+]
+}
+}
+},
+{
+"text": "a: \u0007\n",
+"pure": {
+"events_error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"<byte string>\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+},
+"compose_error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"<byte string>\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+},
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"<byte string>\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+"c": {
+"events_error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: control characters are not allowed\n  in \"<byte string>\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+},
+"compose_error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: control characters are not allowed\n  in \"<byte string>\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+},
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: control characters are not allowed\n  in \"<byte string>\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+}
+},
+{
+"text": "\ufeffa: [1,\n",
+"pure": {
+"events_error": {
+"class": "ParserError",
+"text": "while parsing a flow node\nexpected the node content, but found '<stream end>'\n  in \"<byte string>\", line 2, column 1:\n    \n    ^",
+"context": "while parsing a flow node",
+"problem": "expected the node content, but found '<stream end>'",
+"note": null,
+"context_mark": [
+1,
+0,
+8
+],
+"problem_mark": [
+1,
+0,
+8
+]
+},
+"compose_error": {
+"class": "ParserError",
+"text": "while parsing a flow node\nexpected the node content, but found '<stream end>'\n  in \"<byte string>\", line 2, column 1:\n    \n    ^",
+"context": "while parsing a flow node",
+"problem": "expected the node content, but found '<stream end>'",
+"note": null,
+"context_mark": [
+1,
+0,
+8
+],
+"problem_mark": [
+1,
+0,
+8
+]
+},
+"error": {
+"class": "ParserError",
+"text": "while parsing a flow node\nexpected the node content, but found '<stream end>'\n  in \"<byte string>\", line 2, column 1:\n    \n    ^",
+"context": "while parsing a flow node",
+"problem": "expected the node content, but found '<stream end>'",
+"note": null,
+"context_mark": [
+1,
+0,
+8
+],
+"problem_mark": [
+1,
+0,
+8
+]
+}
+},
+"c": {
+"events_error": {
+"class": "ParserError",
+"text": "while parsing a flow node\ndid not find expected node content\n  in \"<byte string>\", line 2, column 1",
+"context": "while parsing a flow node",
+"problem": "did not find expected node content",
+"note": null,
+"context_mark": [
+1,
+0,
+7
+],
+"problem_mark": [
+1,
+0,
+7
+]
+},
+"compose_error": {
+"class": "ParserError",
+"text": "while parsing a flow node\ndid not find expected node content\n  in \"<byte string>\", line 2, column 1",
+"context": "while parsing a flow node",
+"problem": "did not find expected node content",
+"note": null,
+"context_mark": [
+1,
+0,
+7
+],
+"problem_mark": [
+1,
+0,
+7
+]
+},
+"error": {
+"class": "ParserError",
+"text": "while parsing a flow node\ndid not find expected node content\n  in \"<byte string>\", line 2, column 1",
+"context": "while parsing a flow node",
+"problem": "did not find expected node content",
+"note": null,
+"context_mark": [
+1,
+0,
+7
+],
+"problem_mark": [
+1,
+0,
+7
+]
+}
+}
+},
+{
+"text": "k: \u00e9\nx: *y\n",
+"pure": {
+"events": [
+[
+"StreamStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+]
+],
+[
+"DocumentStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+false,
+null,
+null
+],
+[
+"MappingStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+null,
+null,
+true,
+false
+],
+[
+"ScalarEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+1,
+1
+],
+null,
+null,
+[
+true,
+false
+],
+"k",
+null
+],
+[
+"ScalarEvent",
+[
+0,
+3,
+3
+],
+[
+0,
+4,
+4
+],
+null,
+null,
+[
+true,
+false
+],
+"\u00e9",
+null
+],
+[
+"ScalarEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+1,
+6
+],
+null,
+null,
+[
+true,
+false
+],
+"x",
+null
+],
+[
+"AliasEvent",
+[
+1,
+3,
+8
+],
+[
+1,
+5,
+10
+],
+"y"
+],
+[
+"MappingEndEvent",
+[
+2,
+0,
+11
+],
+[
+2,
+0,
+11
+]
+],
+[
+"DocumentEndEvent",
+[
+2,
+0,
+11
+],
+[
+2,
+0,
+11
+],
+false
+],
+[
+"StreamEndEvent",
+[
+2,
+0,
+11
+],
+[
+2,
+0,
+11
+]
+]
+],
+"compose_error": {
+"class": "ComposerError",
+"text": "found undefined alias 'y'\n  in \"<byte string>\", line 2, column 4:\n    x: *y\n       ^",
+"context": null,
+"problem": "found undefined alias 'y'",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+1,
+3,
+8
+]
+},
+"error": {
+"class": "ComposerError",
+"text": "found undefined alias 'y'\n  in \"<byte string>\", line 2, column 4:\n    x: *y\n       ^",
+"context": null,
+"problem": "found undefined alias 'y'",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+1,
+3,
+8
+]
+}
+},
+"c": {
+"events": [
+[
+"StreamStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+]
+],
+[
+"DocumentStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+false,
+null,
+null
+],
+[
+"MappingStartEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+0,
+0
+],
+null,
+null,
+true,
+false
+],
+[
+"ScalarEvent",
+[
+0,
+0,
+0
+],
+[
+0,
+1,
+1
+],
+null,
+null,
+[
+true,
+false
+],
+"k",
+""
+],
+[
+"ScalarEvent",
+[
+0,
+3,
+3
+],
+[
+0,
+4,
+4
+],
+null,
+null,
+[
+true,
+false
+],
+"\u00e9",
+""
+],
+[
+"ScalarEvent",
+[
+1,
+0,
+5
+],
+[
+1,
+1,
+6
+],
+null,
+null,
+[
+true,
+false
+],
+"x",
+""
+],
+[
+"AliasEvent",
+[
+1,
+3,
+8
+],
+[
+1,
+5,
+10
+],
+"y"
+],
+[
+"MappingEndEvent",
+[
+2,
+0,
+11
+],
+[
+2,
+0,
+11
+]
+],
+[
+"DocumentEndEvent",
+[
+2,
+0,
+11
+],
+[
+2,
+0,
+11
+],
+false
+],
+[
+"StreamEndEvent",
+[
+2,
+0,
+11
+],
+[
+2,
+0,
+11
+]
+]
+],
+"compose_error": {
+"class": "ComposerError",
+"text": "found undefined alias\n  in \"<byte string>\", line 2, column 4",
+"context": null,
+"problem": "found undefined alias",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+1,
+3,
+8
+]
+},
+"error": {
+"class": "ComposerError",
+"text": "found undefined alias\n  in \"<byte string>\", line 2, column 4",
+"context": null,
+"problem": "found undefined alias",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+1,
+3,
+8
+]
+}
+}
+}
+],
+"date_alias": [
+{
+"text": "a: &d 2026-01-01\nb: *d\n",
+"python": "a: &id001 2026-01-01\nb: *id001\n"
+},
+{
+"text": "- &t 2026-01-01 12:00:00\n- *t\n- *t\n",
+"python": "- &id001 2026-01-01 12:00:00\n- *id001\n- *id001\n"
+}
 ]
 }

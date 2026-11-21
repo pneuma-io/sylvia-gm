@@ -153,8 +153,19 @@ pub(crate) struct Composer {
     anchors: Vec<(String, NodeId)>,
 }
 
-fn composer_error(context: Option<String>, context_mark: Option<Mark>, problem: String, problem_mark: Mark) -> YamlError {
-    YamlError::Marked(MarkedError::new(MarkedKind::Composer, context, context_mark, problem, Some(problem_mark)))
+fn composer_error(
+    context: Option<String>,
+    context_mark: Option<Mark>,
+    problem: String,
+    problem_mark: Mark,
+) -> YamlError {
+    YamlError::Marked(MarkedError::new(
+        MarkedKind::Composer,
+        context,
+        context_mark,
+        problem,
+        Some(problem_mark),
+    ))
 }
 
 impl Composer {
@@ -220,7 +231,9 @@ impl Composer {
             };
         }
         let anchor = match self.peek_kind()? {
-            EventKind::Scalar { anchor, .. } | EventKind::SequenceStart { anchor, .. } | EventKind::MappingStart { anchor, .. } => anchor,
+            EventKind::Scalar { anchor, .. }
+            | EventKind::SequenceStart { anchor, .. }
+            | EventKind::MappingStart { anchor, .. } => anchor,
             _ => None,
         };
         if let Some(name) = &anchor {

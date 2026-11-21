@@ -19,19 +19,26 @@ use std::sync::OnceLock;
 
 type ConstructResult<T> = Result<T, YamlError>;
 
+/// A `construct_document(node)` override.
+pub type DocumentHook = fn(&mut Constructor, NodeId) -> Result<Option<Value>, YamlError>;
+/// A `flatten_mapping(node)` override.
+pub type FlattenHook = fn(&mut Constructor, NodeId) -> Result<(), YamlError>;
+/// A `construct_mapping(node, deep)` override.
+pub type MappingHook = fn(&mut Constructor, NodeId, bool) -> Result<Vec<(Value, Value)>, YamlError>;
+
 /// Overrides of the `SafeConstructor` methods a Python loader subclass replaces. `None` keeps
 /// the base behaviour.
 #[derive(Clone, Copy, Default)]
 pub struct Hooks {
     /// `construct_document(node)`. The bounded loaders check the node graph first, then call
     /// [`Constructor::base_construct_document`].
-    pub construct_document: Option<fn(&mut Constructor, NodeId) -> ConstructResult<Option<Value>>>,
+    pub construct_document: Option<DocumentHook>,
     /// `flatten_mapping(node)`. Call [`Constructor::base_flatten_mapping`] for `super()`.
-    pub flatten_mapping: Option<fn(&mut Constructor, NodeId) -> ConstructResult<()>>,
+    pub flatten_mapping: Option<FlattenHook>,
     /// `construct_mapping(node, deep)`, returning the mapping's pairs in order (Python's dict
     /// with later duplicate keys replacing earlier values). Call
     /// [`Constructor::base_construct_mapping`] for `super()`.
-    pub construct_mapping: Option<fn(&mut Constructor, NodeId, bool) -> ConstructResult<Vec<(Value, Value)>>>,
+    pub construct_mapping: Option<MappingHook>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -58,8 +65,19 @@ pub struct Constructor<'g> {
     pub flagged: HashSet<NodeId>,
 }
 
-fn constructor_error(context: Option<&str>, context_mark: Option<Mark>, problem: String, problem_mark: Mark) -> YamlError {
-    YamlError::Marked(MarkedError::new(MarkedKind::Constructor, context.map(str::to_owned), context_mark, problem, Some(problem_mark)))
+fn constructor_error(
+    context: Option<&str>,
+    context_mark: Option<Mark>,
+    problem: String,
+    problem_mark: Mark,
+) -> YamlError {
+    YamlError::Marked(MarkedError::new(
+        MarkedKind::Constructor,
+        context.map(str::to_owned),
+        context_mark,
+        problem,
+        Some(problem_mark),
+    ))
 }
 
 impl<'g> Constructor<'g> {
@@ -124,7 +142,12 @@ impl<'g> Constructor<'g> {
             self.deep = true;
         }
         if self.recursive.contains(&node) {
-            return Err(constructor_error(None, None, "found unconstructable recursive node".into(), self.node(node).start_mark.clone()));
+            return Err(constructor_error(
+                None,
+                None,
+                "found unconstructable recursive node".into(),
+                self.node(node).start_mark.clone(),
+            ));
         }
         self.recursive.insert(node);
         let tag = self.node(node).tag.clone();
@@ -163,7 +186,12 @@ impl<'g> Constructor<'g> {
 
     /// The first step of a generator constructor: create the empty container, then fill it now
     /// (deep) or later.
-    fn start_fill(&mut self, node: NodeId, empty: Object, fill: fn(NodeId, ObjectId) -> Fill) -> ConstructResult<Value> {
+    fn start_fill(
+        &mut self,
+        node: NodeId,
+        empty: Object,
+        fill: fn(NodeId, ObjectId) -> Fill,
+    ) -> ConstructResult<Value> {
         let id = ObjectId(self.objects.len());
         let value = match &empty {
             Object::Set(_) => Value::Set(id),
@@ -197,7 +225,11 @@ impl<'g> Constructor<'g> {
                 self.objects[id.0] = Object::Set(pairs.into_iter().map(|(key, _)| key).collect());
             }
             Fill::Omap(node, id) | Fill::Pairs(node, id) => {
-                let context = if matches!(fill, Fill::Omap(..)) { "while constructing an ordered map" } else { "while constructing pairs" };
+                let context = if matches!(fill, Fill::Omap(..)) {
+                    "while constructing an ordered map"
+                } else {
+                    "while constructing pairs"
+                };
                 let start = self.node(node).start_mark.clone();
                 let NodeKind::Sequence(items) = self.node(node).kind.clone() else {
                     return Err(constructor_error(
@@ -280,7 +312,11 @@ impl<'g> Constructor<'g> {
     }
 
     /// `SafeConstructor.construct_mapping`: flatten merges, then build the dict.
-    pub fn base_construct_mapping(&mut self, node: NodeId, deep: bool) -> ConstructResult<Vec<(Value, Value)>> {
+    pub fn base_construct_mapping(
+        &mut self,
+        node: NodeId,
+        deep: bool,
+    ) -> ConstructResult<Vec<(Value, Value)>> {
         if matches!(self.node(node).kind, NodeKind::Mapping(_)) {
             self.flatten_mapping(node)?;
         }
@@ -345,7 +381,10 @@ impl<'g> Constructor<'g> {
         match &self.node(node).kind {
             NodeKind::Scalar(text) if !text.is_empty() => {
                 // `node.value[0]` is the first character, a one-character str.
-                return Err(YamlError::python("ValueError", "not enough values to unpack (expected 2, got 1)"));
+                return Err(YamlError::python(
+                    "ValueError",
+                    "not enough values to unpack (expected 2, got 1)",
+                ));
             }
             NodeKind::Sequence(items) if !items.is_empty() => {
                 let class = match self.node(items[0]).kind {
@@ -353,15 +392,17 @@ impl<'g> Constructor<'g> {
                     NodeKind::Sequence(_) => "SequenceNode",
                     NodeKind::Mapping(_) => "MappingNode",
                 };
-                return Err(YamlError::python("TypeError", format!("cannot unpack non-iterable {class} object")));
+                return Err(YamlError::python(
+                    "TypeError",
+                    format!("cannot unpack non-iterable {class} object"),
+                ));
             }
             NodeKind::Scalar(_) | NodeKind::Sequence(_) => return Ok(()),
             NodeKind::Mapping(_) => {}
         }
         let mut merge: Vec<(NodeId, NodeId)> = Vec::new();
         let mut index = 0;
-        loop {
-            let NodeKind::Mapping(pairs) = &self.node(node).kind else { break };
+        while let NodeKind::Mapping(pairs) = &self.node(node).kind {
             if index >= pairs.len() {
                 break;
             }
@@ -385,7 +426,10 @@ impl<'g> Constructor<'g> {
                                 return Err(constructor_error(
                                     Some("while constructing a mapping"),
                                     Some(self.node(node).start_mark.clone()),
-                                    format!("expected a mapping for merging, but found {}", self.node(subnode).id()),
+                                    format!(
+                                        "expected a mapping for merging, but found {}",
+                                        self.node(subnode).id()
+                                    ),
                                     self.node(subnode).start_mark.clone(),
                                 ));
                             }
@@ -465,7 +509,10 @@ impl<'g> Constructor<'g> {
                 if place > 0 {
                     base = base.checked_mul(60).ok_or_else(int_refusal)?;
                 }
-                total = digit.checked_mul(base).and_then(|term| total.checked_add(term)).ok_or_else(int_refusal)?;
+                total = digit
+                    .checked_mul(base)
+                    .and_then(|term| total.checked_add(term))
+                    .ok_or_else(int_refusal)?;
             }
             total
         } else {
@@ -478,7 +525,8 @@ impl<'g> Constructor<'g> {
     fn construct_yaml_float(&mut self, node: NodeId) -> ConstructResult<Value> {
         let text = self.construct_scalar(node)?.replace('_', "").to_lowercase();
         let mut chars = text.chars();
-        let first = chars.next().ok_or_else(|| YamlError::python("IndexError", "string index out of range"))?;
+        let first =
+            chars.next().ok_or_else(|| YamlError::python("IndexError", "string index out of range"))?;
         let sign = if first == '-' { -1.0 } else { 1.0 };
         let value: String = if first == '+' || first == '-' { chars.collect() } else { text.clone() };
         if value == ".inf" {
@@ -488,7 +536,9 @@ impl<'g> Constructor<'g> {
             // SafeConstructor.nan_value: one shared object, so `.nan` keys are equal.
             return Ok(Value::Float(SHARED_NAN));
         }
-        let float = |part: &str| pystr::parse_float(part).map_err(|error| YamlError::python("ValueError", error.to_string()));
+        let float = |part: &str| {
+            pystr::parse_float(part).map_err(|error| YamlError::python("ValueError", error.to_string()))
+        };
         if value.contains(':') {
             let mut digits = Vec::new();
             for part in value.split(':') {
@@ -532,9 +582,9 @@ impl<'g> Constructor<'g> {
                 mark,
             ));
         }
-        a2b_base64(text.as_bytes())
-            .map(Value::Bytes)
-            .map_err(|reason| constructor_error(None, None, format!("failed to decode base64 data: {reason}"), mark))
+        a2b_base64(text.as_bytes()).map(Value::Bytes).map_err(|reason| {
+            constructor_error(None, None, format!("failed to decode base64 data: {reason}"), mark)
+        })
     }
 
     fn construct_yaml_timestamp(&mut self, node: NodeId) -> ConstructResult<Value> {
@@ -545,7 +595,10 @@ impl<'g> Constructor<'g> {
             return Err(YamlError::python("TypeError", "expected string or bytes-like object, got 'list'"));
         };
         let Some(captures) = timestamp_regexp().captures(&text) else {
-            return Err(YamlError::python("AttributeError", "'NoneType' object has no attribute 'groupdict'"));
+            return Err(YamlError::python(
+                "AttributeError",
+                "'NoneType' object has no attribute 'groupdict'",
+            ));
         };
         let number = |name: &str| captures.name(name).map(|m| m.as_str().parse::<i64>().unwrap_or(0));
         let year = number("year").unwrap_or(0);
@@ -663,7 +716,9 @@ fn int_with_base(text: &str, base: u32) -> ConstructResult<i128> {
         return match pystr::parse_int(text) {
             Ok(value) => Ok(i128::from(value)),
             // 2**63 itself, which only fits once the caller negates it.
-            Err(IntParseError::OutOfRange { negative: false }) if text.starts_with(|c: char| c.is_ascii_digit()) => {
+            Err(IntParseError::OutOfRange { negative: false })
+                if text.starts_with(|c: char| c.is_ascii_digit()) =>
+            {
                 match pystr::parse_int(&format!("-{text}")) {
                     Ok(value) => Ok(-i128::from(value)),
                     Err(_) => Err(int_refusal()),
@@ -673,7 +728,12 @@ fn int_with_base(text: &str, base: u32) -> ConstructResult<i128> {
             Err(IntParseError::Invalid(error)) => Err(YamlError::python("ValueError", error.to_string())),
         };
     }
-    let invalid = || YamlError::python("ValueError", format!("invalid literal for int() with base {base}: {}", pystr::repr_200(text)));
+    let invalid = || {
+        YamlError::python(
+            "ValueError",
+            format!("invalid literal for int() with base {base}: {}", pystr::repr_200(text)),
+        )
+    };
     let ascii: String = text
         .chars()
         .map(|c| {
@@ -708,7 +768,10 @@ fn int_with_base(text: &str, base: u32) -> ConstructResult<i128> {
     let mut value: i128 = 0;
     for character in digits.chars().filter(|c| *c != '_') {
         let digit = character.to_digit(base).ok_or_else(invalid)?;
-        value = value.checked_mul(i128::from(base)).and_then(|v| v.checked_add(i128::from(digit))).ok_or_else(int_refusal)?;
+        value = value
+            .checked_mul(i128::from(base))
+            .and_then(|v| v.checked_add(i128::from(digit)))
+            .ok_or_else(int_refusal)?;
     }
     Ok(if negative { -value } else { value })
 }

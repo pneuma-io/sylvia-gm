@@ -83,8 +83,19 @@ enum State {
 
 type ParseResult<T> = Result<T, YamlError>;
 
-fn parser_error(context: Option<String>, context_mark: Option<Mark>, problem: String, problem_mark: Mark) -> YamlError {
-    YamlError::Marked(MarkedError::new(MarkedKind::Parser, context, context_mark, problem, Some(problem_mark)))
+fn parser_error(
+    context: Option<String>,
+    context_mark: Option<Mark>,
+    problem: String,
+    problem_mark: Mark,
+) -> YamlError {
+    YamlError::Marked(MarkedError::new(
+        MarkedKind::Parser,
+        context,
+        context_mark,
+        problem,
+        Some(problem_mark),
+    ))
 }
 
 const DEFAULT_TAGS: [(&str, &str); 2] = [("!", "!"), ("!!", "tag:yaml.org,2002:")];
@@ -153,7 +164,11 @@ impl Parser {
             State::StreamStart => {
                 let token = self.get_token()?;
                 self.state = Some(State::ImplicitDocumentStart);
-                Ok(Event { kind: EventKind::StreamStart, start_mark: token.start_mark, end_mark: token.end_mark })
+                Ok(Event {
+                    kind: EventKind::StreamStart,
+                    start_mark: token.start_mark,
+                    end_mark: token.end_mark,
+                })
             }
             State::ImplicitDocumentStart => self.parse_implicit_document_start(),
             State::DocumentStart => self.parse_document_start(),
@@ -185,7 +200,11 @@ impl Parser {
             State::FlowSequenceEntryMappingEnd => {
                 self.state = Some(State::FlowSequenceEntry);
                 let token = self.peek_token()?;
-                Ok(Event { kind: EventKind::MappingEnd, start_mark: token.start_mark.clone(), end_mark: token.start_mark })
+                Ok(Event {
+                    kind: EventKind::MappingEnd,
+                    start_mark: token.start_mark.clone(),
+                    end_mark: token.start_mark,
+                })
             }
             State::FlowMappingFirstKey => {
                 let token = self.get_token()?;
@@ -262,7 +281,12 @@ impl Parser {
     }
 
     fn parse_document_content(&mut self) -> ParseResult<Event> {
-        if self.check(&[TokenClass::Directive, TokenClass::DocumentStart, TokenClass::DocumentEnd, TokenClass::StreamEnd])? {
+        if self.check(&[
+            TokenClass::Directive,
+            TokenClass::DocumentStart,
+            TokenClass::DocumentEnd,
+            TokenClass::StreamEnd,
+        ])? {
             let mark = self.peek_token()?.start_mark;
             self.state = self.pop_state();
             return Ok(empty_scalar(mark));
@@ -271,7 +295,9 @@ impl Parser {
     }
 
     #[allow(clippy::type_complexity)]
-    fn process_directives(&mut self) -> ParseResult<(Option<(String, String)>, Option<Vec<(String, String)>>)> {
+    fn process_directives(
+        &mut self,
+    ) -> ParseResult<(Option<(String, String)>, Option<Vec<(String, String)>>)> {
         let mut version: Option<(String, String)> = None;
         self.tag_handles = Vec::new();
         while self.check(&[TokenClass::Directive])? {
@@ -329,11 +355,16 @@ impl Parser {
             let token = self.get_token()?;
             let TokenKind::Alias(anchor) = token.kind else { unreachable!() };
             self.state = self.pop_state();
-            return Ok(Event { kind: EventKind::Alias { anchor }, start_mark: token.start_mark, end_mark: token.end_mark });
+            return Ok(Event {
+                kind: EventKind::Alias { anchor },
+                start_mark: token.start_mark,
+                end_mark: token.end_mark,
+            });
         }
         let mut anchor = None;
         let mut tag_token: Option<(Option<String>, String)> = None;
-        let (mut start_mark, mut end_mark, mut tag_mark): (Option<Mark>, Option<Mark>, Option<Mark>) = (None, None, None);
+        let (mut start_mark, mut end_mark, mut tag_mark): (Option<Mark>, Option<Mark>, Option<Mark>) =
+            (None, None, None);
         if self.check(&[TokenClass::Anchor])? {
             let token = self.get_token()?;
             start_mark = Some(token.start_mark);
@@ -395,7 +426,11 @@ impl Parser {
         if indentless_sequence && self.check(&[TokenClass::BlockEntry])? {
             end_mark = self.peek_token()?.end_mark;
             self.state = Some(State::IndentlessSequenceEntry);
-            return Ok(Event { kind: EventKind::SequenceStart { anchor, tag, implicit, flow_style: None }, start_mark, end_mark });
+            return Ok(Event {
+                kind: EventKind::SequenceStart { anchor, tag, implicit, flow_style: None },
+                start_mark,
+                end_mark,
+            });
         }
         if self.check(&[TokenClass::Scalar])? {
             let token = self.get_token()?;
@@ -409,32 +444,58 @@ impl Parser {
                 (false, false)
             };
             self.state = self.pop_state();
-            return Ok(Event { kind: EventKind::Scalar { anchor, tag, implicit, value, style }, start_mark, end_mark });
+            return Ok(Event {
+                kind: EventKind::Scalar { anchor, tag, implicit, value, style },
+                start_mark,
+                end_mark,
+            });
         }
         if self.check(&[TokenClass::FlowSequenceStart])? {
             end_mark = self.peek_token()?.end_mark;
             self.state = Some(State::FlowSequenceFirstEntry);
-            return Ok(Event { kind: EventKind::SequenceStart { anchor, tag, implicit, flow_style: Some(true) }, start_mark, end_mark });
+            return Ok(Event {
+                kind: EventKind::SequenceStart { anchor, tag, implicit, flow_style: Some(true) },
+                start_mark,
+                end_mark,
+            });
         }
         if self.check(&[TokenClass::FlowMappingStart])? {
             end_mark = self.peek_token()?.end_mark;
             self.state = Some(State::FlowMappingFirstKey);
-            return Ok(Event { kind: EventKind::MappingStart { anchor, tag, implicit, flow_style: Some(true) }, start_mark, end_mark });
+            return Ok(Event {
+                kind: EventKind::MappingStart { anchor, tag, implicit, flow_style: Some(true) },
+                start_mark,
+                end_mark,
+            });
         }
         if block && self.check(&[TokenClass::BlockSequenceStart])? {
             end_mark = self.peek_token()?.start_mark;
             self.state = Some(State::BlockSequenceFirstEntry);
-            return Ok(Event { kind: EventKind::SequenceStart { anchor, tag, implicit, flow_style: Some(false) }, start_mark, end_mark });
+            return Ok(Event {
+                kind: EventKind::SequenceStart { anchor, tag, implicit, flow_style: Some(false) },
+                start_mark,
+                end_mark,
+            });
         }
         if block && self.check(&[TokenClass::BlockMappingStart])? {
             end_mark = self.peek_token()?.start_mark;
             self.state = Some(State::BlockMappingFirstKey);
-            return Ok(Event { kind: EventKind::MappingStart { anchor, tag, implicit, flow_style: Some(false) }, start_mark, end_mark });
+            return Ok(Event {
+                kind: EventKind::MappingStart { anchor, tag, implicit, flow_style: Some(false) },
+                start_mark,
+                end_mark,
+            });
         }
         if anchor.is_some() || tag.is_some() {
             self.state = self.pop_state();
             return Ok(Event {
-                kind: EventKind::Scalar { anchor, tag, implicit: (implicit, false), value: String::new(), style: None },
+                kind: EventKind::Scalar {
+                    anchor,
+                    tag,
+                    implicit: (implicit, false),
+                    value: String::new(),
+                    style: None,
+                },
                 start_mark,
                 end_mark,
             });
@@ -477,7 +538,12 @@ impl Parser {
     fn parse_indentless_sequence_entry(&mut self) -> ParseResult<Event> {
         if self.check(&[TokenClass::BlockEntry])? {
             let token = self.get_token()?;
-            if !self.check(&[TokenClass::BlockEntry, TokenClass::Key, TokenClass::Value, TokenClass::BlockEnd])? {
+            if !self.check(&[
+                TokenClass::BlockEntry,
+                TokenClass::Key,
+                TokenClass::Value,
+                TokenClass::BlockEnd,
+            ])? {
                 self.states.push(State::IndentlessSequenceEntry);
                 return self.parse_node(true, false);
             }
@@ -486,7 +552,11 @@ impl Parser {
         }
         let token = self.peek_token()?;
         self.state = self.pop_state();
-        Ok(Event { kind: EventKind::SequenceEnd, start_mark: token.start_mark.clone(), end_mark: token.start_mark })
+        Ok(Event {
+            kind: EventKind::SequenceEnd,
+            start_mark: token.start_mark.clone(),
+            end_mark: token.start_mark,
+        })
     }
 
     fn parse_block_mapping_key(&mut self) -> ParseResult<Event> {
@@ -548,7 +618,12 @@ impl Parser {
                 let token = self.peek_token()?;
                 self.state = Some(State::FlowSequenceEntryMappingKey);
                 return Ok(Event {
-                    kind: EventKind::MappingStart { anchor: None, tag: None, implicit: true, flow_style: Some(true) },
+                    kind: EventKind::MappingStart {
+                        anchor: None,
+                        tag: None,
+                        implicit: true,
+                        flow_style: Some(true),
+                    },
                     start_mark: token.start_mark,
                     end_mark: token.end_mark,
                 });
@@ -641,7 +716,13 @@ impl Parser {
 /// `process_empty_scalar(mark)`.
 fn empty_scalar(mark: Mark) -> Event {
     Event {
-        kind: EventKind::Scalar { anchor: None, tag: None, implicit: (true, false), value: String::new(), style: None },
+        kind: EventKind::Scalar {
+            anchor: None,
+            tag: None,
+            implicit: (true, false),
+            value: String::new(),
+            style: None,
+        },
         start_mark: mark.clone(),
         end_mark: mark,
     }

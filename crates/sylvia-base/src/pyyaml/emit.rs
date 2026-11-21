@@ -86,15 +86,20 @@ impl Representer<'_> {
     fn represent(&mut self, value: &Value) -> usize {
         match value {
             Value::None => self.scalar("tag:yaml.org,2002:null", "null".into()),
-            Value::Bool(flag) => self.scalar("tag:yaml.org,2002:bool", if *flag { "true" } else { "false" }.into()),
+            Value::Bool(flag) => {
+                self.scalar("tag:yaml.org,2002:bool", if *flag { "true" } else { "false" }.into())
+            }
             Value::Int(number) => self.scalar("tag:yaml.org,2002:int", number.to_string()),
             Value::Float(number) => self.scalar("tag:yaml.org,2002:float", float_text(*number)),
             Value::Str(text) => self.scalar(STR_TAG, text.clone()),
-            Value::Bytes(bytes) => {
-                self.push("tag:yaml.org,2002:binary", RepKind::Scalar { value: encodebytes(bytes), style: Some('|') })
-            }
+            Value::Bytes(bytes) => self.push(
+                "tag:yaml.org,2002:binary",
+                RepKind::Scalar { value: encodebytes(bytes), style: Some('|') },
+            ),
             Value::Date(date) => self.scalar("tag:yaml.org,2002:timestamp", date.isoformat()),
-            Value::DateTime(datetime) => self.scalar("tag:yaml.org,2002:timestamp", datetime.isoformat_with(' ')),
+            Value::DateTime(datetime) => {
+                self.scalar("tag:yaml.org,2002:timestamp", datetime.isoformat_with(' '))
+            }
             Value::Tuple(items) => {
                 let node = self.push(SEQ_TAG, RepKind::Sequence(Vec::new()));
                 let children = items.iter().map(|item| self.represent(item)).collect();
@@ -117,14 +122,20 @@ impl Representer<'_> {
                     Object::Dict(pairs) => {
                         let node = self.push(MAP_TAG, RepKind::Mapping(Vec::new()));
                         self.represented.insert(*id, node);
-                        let children = pairs.iter().map(|(key, item)| (self.represent(key), self.represent(item))).collect();
+                        let children = pairs
+                            .iter()
+                            .map(|(key, item)| (self.represent(key), self.represent(item)))
+                            .collect();
                         self.nodes[node].kind = RepKind::Mapping(children);
                         node
                     }
                     Object::Set(items) => {
                         let node = self.push("tag:yaml.org,2002:set", RepKind::Mapping(Vec::new()));
                         self.represented.insert(*id, node);
-                        let children = items.iter().map(|key| (self.represent(key), self.represent(&Value::None))).collect();
+                        let children = items
+                            .iter()
+                            .map(|key| (self.represent(key), self.represent(&Value::None)))
+                            .collect();
                         self.nodes[node].kind = RepKind::Mapping(children);
                         node
                     }
@@ -288,8 +299,10 @@ fn analyze_scalar(text: &str) -> Analysis {
             allow_block: false,
         };
     }
-    let (mut block_indicators, mut flow_indicators, mut line_breaks, mut special_characters) = (false, false, false, false);
-    let (mut leading_space, mut leading_break, mut trailing_space, mut trailing_break) = (false, false, false, false);
+    let (mut block_indicators, mut flow_indicators, mut line_breaks, mut special_characters) =
+        (false, false, false, false);
+    let (mut leading_space, mut leading_break, mut trailing_space, mut trailing_break) =
+        (false, false, false, false);
     let (mut break_space, mut space_break) = (false, false);
     if text.starts_with("---") || text.starts_with("...") {
         block_indicators = true;
@@ -374,7 +387,8 @@ fn analyze_scalar(text: &str) -> Analysis {
         preceded_by_whitespace = is_blank_or_end(ch);
         followed_by_whitespace = index + 2 >= scalar.len() || is_blank_or_end(scalar[index + 2]);
     }
-    let (mut allow_flow_plain, mut allow_block_plain, mut allow_single_quoted, mut allow_block) = (true, true, true, true);
+    let (mut allow_flow_plain, mut allow_block_plain, mut allow_single_quoted, mut allow_block) =
+        (true, true, true, true);
     if leading_space || leading_break || trailing_space || trailing_break {
         allow_flow_plain = false;
         allow_block_plain = false;
@@ -403,7 +417,15 @@ fn analyze_scalar(text: &str) -> Analysis {
     if block_indicators {
         allow_block_plain = false;
     }
-    Analysis { scalar, empty: false, multiline: line_breaks, allow_flow_plain, allow_block_plain, allow_single_quoted, allow_block }
+    Analysis {
+        scalar,
+        empty: false,
+        multiline: line_breaks,
+        allow_flow_plain,
+        allow_block_plain,
+        allow_single_quoted,
+        allow_block,
+    }
 }
 
 fn anchor_ok(anchor: &str) -> Result<String, YamlError> {
@@ -436,7 +458,10 @@ fn prepare_tag(tag: &str) -> String {
     }
     let mut out = String::new();
     for ch in suffix.chars() {
-        if ch.is_ascii_alphanumeric() || "-;/?:@&=+$,_.~*'()[]".contains(ch) || (ch == '!' && handle != Some("!")) {
+        if ch.is_ascii_alphanumeric()
+            || "-;/?:@&=+$,_.~*'()[]".contains(ch)
+            || (ch == '!' && handle != Some("!"))
+        {
             out.push(ch);
         } else {
             let mut buffer = [0u8; 4];
@@ -688,11 +713,13 @@ impl<'e> Emitter<'e> {
     }
 
     fn check_empty_sequence(&self) -> bool {
-        matches!(self.event(), EventKind::SequenceStart { .. }) && matches!(self.next_event(), Some(EventKind::SequenceEnd))
+        matches!(self.event(), EventKind::SequenceStart { .. })
+            && matches!(self.next_event(), Some(EventKind::SequenceEnd))
     }
 
     fn check_empty_mapping(&self) -> bool {
-        matches!(self.event(), EventKind::MappingStart { .. }) && matches!(self.next_event(), Some(EventKind::MappingEnd))
+        matches!(self.event(), EventKind::MappingStart { .. })
+            && matches!(self.next_event(), Some(EventKind::MappingEnd))
     }
 
     fn check_empty_document(&self) -> bool {
@@ -742,9 +769,9 @@ impl<'e> Emitter<'e> {
     fn process_anchor(&mut self, indicator: &str) -> EmitResult {
         let anchor = match self.event() {
             EventKind::Alias { anchor } => Some(anchor),
-            EventKind::Scalar { anchor, .. } | EventKind::SequenceStart { anchor, .. } | EventKind::MappingStart { anchor, .. } => {
-                anchor.as_ref()
-            }
+            EventKind::Scalar { anchor, .. }
+            | EventKind::SequenceStart { anchor, .. }
+            | EventKind::MappingStart { anchor, .. } => anchor.as_ref(),
             _ => None,
         };
         let Some(anchor) = anchor else {
@@ -782,7 +809,8 @@ impl<'e> Emitter<'e> {
                     Some(tag) => tag.clone(),
                 }
             }
-            EventKind::SequenceStart { tag, implicit, .. } | EventKind::MappingStart { tag, implicit, .. } => {
+            EventKind::SequenceStart { tag, implicit, .. }
+            | EventKind::MappingStart { tag, implicit, .. } => {
                 if *implicit {
                     self.prepared_tag = None;
                     return;
@@ -807,7 +835,8 @@ impl<'e> Emitter<'e> {
             return Style::Double;
         }
         if style.is_none() && implicit.0 {
-            let plain_ok = if self.flow_level > 0 { analysis.allow_flow_plain } else { analysis.allow_block_plain };
+            let plain_ok =
+                if self.flow_level > 0 { analysis.allow_flow_plain } else { analysis.allow_block_plain };
             if !(self.simple_key_context && (analysis.empty || analysis.multiline)) && plain_ok {
                 return Style::Plain;
             }
@@ -817,7 +846,9 @@ impl<'e> Emitter<'e> {
                 return if *block == '|' { Style::Literal } else { Style::Folded };
             }
         }
-        if (style.is_none() || *style == Some('\'')) && analysis.allow_single_quoted && !(self.simple_key_context && analysis.multiline)
+        if (style.is_none() || *style == Some('\''))
+            && analysis.allow_single_quoted
+            && !(self.simple_key_context && analysis.multiline)
         {
             return Style::Single;
         }
@@ -855,7 +886,8 @@ impl<'e> Emitter<'e> {
     }
 
     fn write_indicator(&mut self, indicator: &str, need_whitespace: bool, whitespace: bool, indention: bool) {
-        let data = if self.whitespace || !need_whitespace { indicator.to_owned() } else { format!(" {indicator}") };
+        let data =
+            if self.whitespace || !need_whitespace { indicator.to_owned() } else { format!(" {indicator}") };
         self.whitespace = whitespace;
         self.indention = self.indention && indention;
         self.column += data.chars().count();
@@ -897,7 +929,12 @@ impl<'e> Emitter<'e> {
             let ch = text.get(end).copied();
             if spaces {
                 if ch != Some(' ') {
-                    if start + 1 == end && self.column > BEST_WIDTH && split && start != 0 && end != text.len() {
+                    if start + 1 == end
+                        && self.column > BEST_WIDTH
+                        && split
+                        && start != 0
+                        && end != text.len()
+                    {
                         self.write_indent();
                     } else {
                         self.write_chars(&text[start..end]);
@@ -940,7 +977,9 @@ impl<'e> Emitter<'e> {
                 None => true,
                 Some(c) => {
                     "\"\\\u{85}\u{2028}\u{2029}\u{FEFF}".contains(c)
-                        || !(('\x20'..='\x7E').contains(&c) || ('\u{A0}'..='\u{D7FF}').contains(&c) || ('\u{E000}'..='\u{FFFD}').contains(&c))
+                        || !(('\x20'..='\x7E').contains(&c)
+                            || ('\u{A0}'..='\u{D7FF}').contains(&c)
+                            || ('\u{E000}'..='\u{FFFD}').contains(&c))
                 }
             };
             if escape {
@@ -1164,7 +1203,10 @@ pub fn safe_dump(loaded: &Loaded) -> Result<String, YamlError> {
         anchors: HashMap::new(),
         last_anchor_id: 0,
         serialized: std::collections::HashSet::new(),
-        events: vec![EventKind::StreamStart, EventKind::DocumentStart { explicit: false, version: None, tags: None }],
+        events: vec![
+            EventKind::StreamStart,
+            EventKind::DocumentStart { explicit: false, version: None, tags: None },
+        ],
     };
     serializer.anchor_node(root_node);
     serializer.serialize_node(root_node);

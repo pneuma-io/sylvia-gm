@@ -17,9 +17,12 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-engine/src/pyrandom.rs` | CPython's `random.Random` (`Lib/random.py`, `Modules/_randommodule.c`), including MT19937 | CPython 3.12.11 | PSF License Version 2; MT19937 also BSD-3-Clause (Makoto Matsumoto and Takuji Nishimura) | lane 2 |
 | `sylvia-domain/src/content/schema.rs` | `jsonschema`'s Draft 2020-12 validation order and messages | jsonschema 4.26 | MIT | lane 1 |
 | `sylvia-domain` zip reading (lane 1's archive admission) | CPython's `zipfile` read path | CPython 3.12.11 | PSF License Version 2 | lane 1 |
-| `sylvia-base` PyYAML port (lane 4) | PyYAML's reader, scanner, parser, composer, constructor, representer, serializer and emitter | PyYAML 6.0.3 | MIT | lane 4 |
-| `sylvia-base` PyYAML port, `Loader::C` (lane 4) | libyaml's scanner and parser behaviour | libyaml 0.2.5 | MIT | lane 4 |
-| `sylvia-provider` SSE decoding, request building and URL normalisation (lane 4) | The OpenAI Python SDK's SSE decoder and request assembly; `httpx.URL` normalisation | openai 2.53.0; httpx 0.28.1 | Apache-2.0 (openai); BSD-3-Clause (httpx) | lane 4 |
+| `sylvia-base/src/pyyaml/` (`scanner.rs`, `parser.rs`, `compose.rs`, `construct.rs`, `emit.rs`, `error.rs`, `value.rs`) | PyYAML's reader, scanner, parser, composer, resolver, `SafeConstructor`, `SafeRepresenter`, serializer and emitter (`lib/yaml/*.py`), and the `CParser` composer and event conversion of `yaml/_yaml.pyx` | PyYAML 6.0.3 | MIT | lane 4 |
+| `sylvia-base/src/pyyaml/construct.rs` (`a2b_base64`), `emit.rs` (`encodebytes`) | CPython's `binascii.a2b_base64` and `binascii.b2a_base64` as `base64.decodebytes` and `base64.encodebytes` call them (`Modules/binascii.c`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
+| `sylvia-base/src/pyyaml/scanner_c.rs`, `parser_c.rs` (`Loader::C`) | libyaml's reader, scanner and parser (`src/reader.c`, `src/scanner.c`, `src/parser.c`) | libyaml 0.2.5 | MIT | lane 4 |
+| `sylvia-provider/src/sse.rs`, `openai_compat.rs`, `pyobj.rs`, `chat.rs` | The OpenAI Python SDK's SSE decoder (`_streaming.py`), request assembly (`_base_client.py`, `_utils/_json.py`) and `construct` model reading (`_models.py`) | openai 2.53.0 | Apache-2.0 | lane 4 |
+| `sylvia-provider/src/httpx_url.rs` | `httpx.URL` parsing and normalisation (`httpx/_urlparse.py`, `httpx/_urls.py`) | httpx 0.28.1 | BSD-3-Clause | lane 4 |
+| `sylvia-provider/src/pyurl.rs` | CPython's `urllib.parse.urlsplit` and `urlunsplit`, with `hostname` and `port` (`Lib/urllib/parse.py`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.

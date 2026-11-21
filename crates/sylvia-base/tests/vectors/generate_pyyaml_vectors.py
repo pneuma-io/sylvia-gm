@@ -453,6 +453,16 @@ def main() -> int:
     document = {
         "python": sys.version.split()[0], "pyyaml": yaml.__version__, "libyaml": yaml.__with_libyaml__,
         "cases": cases, "dumps": dump_values(loaded_values), "hooks": hook_vectors(),
+        # `yaml.load(bytes)` (campaign_rules_update.py): the same document, marks named "<byte string>".
+        "byte_inputs": [
+            {"text": text, **{name: load_record(text.encode("utf-8"), loader) for name, loader in LOADERS.items()}}
+            for text in ("a: 1\n", "a: b: c\n", "a: 'x", "a: \x07\n", "﻿a: [1,\n", "k: é\nx: *y\n")
+        ],
+        # differences.md: a date reached twice is one object in Python, so safe_dump anchors it.
+        "date_alias": [
+            {"text": text, "python": yaml.safe_dump(yaml.safe_load(text), sort_keys=False, allow_unicode=True)}
+            for text in ("a: &d 2026-01-01\nb: *d\n", "- &t 2026-01-01 12:00:00\n- *t\n- *t\n")
+        ],
     }
     OUTPUT.write_bytes((json.dumps(document, ensure_ascii=True, indent=0) + "\n").encode("ascii"))
     differing = sum(1 for c in cases if json.dumps(c["pure"].get("value"), sort_keys=True)

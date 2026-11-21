@@ -37,7 +37,7 @@ mod scanner_c;
 mod value;
 
 pub use compose::{resolve_scalar, Composed, Node, NodeGraph, NodeId, NodeKind, MAP_TAG, SEQ_TAG, STR_TAG};
-pub use construct::{construct, Constructor, Hooks};
+pub use construct::{construct, Constructor, DocumentHook, FlattenHook, Hooks, MappingHook};
 pub use emit::safe_dump;
 pub use error::{Mark, MarkedError, MarkedKind, YamlError};
 pub use parser::{Event, EventKind};
@@ -60,17 +60,24 @@ pub enum Loader {
 
 /// The parser behind a loader: PyYAML's own, or libyaml's under `CSafeLoader`.
 pub(crate) enum EventSource {
-    Pure(Parser),
-    C(CParser),
+    Pure(Box<Parser>),
+    C(Box<CParser>),
 }
 
 impl EventSource {
     /// `decode_document_tags`: whether `%TAG` directives must decode (`yaml.parse` converts
     /// every event; the C composer never reads them).
-    fn new(text: &str, loader: Loader, decode_document_tags: bool) -> Result<Self, YamlError> {
+    fn new(
+        text: &str,
+        stream_name: Option<&str>,
+        loader: Loader,
+        decode_document_tags: bool,
+    ) -> Result<Self, YamlError> {
         Ok(match loader {
-            Loader::Pure => Self::Pure(Parser::new(Scanner::new(Reader::new(text, None)?))),
-            Loader::C => Self::C(CParser::new(CScanner::new(text, None), decode_document_tags)),
+            Loader::Pure => Self::Pure(Box::new(Parser::new(Scanner::new(Reader::new(text, stream_name)?)))),
+            Loader::C => {
+                Self::C(Box::new(CParser::new(CScanner::new(text, stream_name), decode_document_tags)))
+            }
         })
     }
 
@@ -91,7 +98,7 @@ impl EventSource {
 
 /// `yaml.parse(text, Loader=...)`: every event of the stream.
 pub fn parse(text: &str, loader: Loader) -> Result<Vec<Event>, YamlError> {
-    let mut parser = EventSource::new(text, loader, true)?;
+    let mut parser = EventSource::new(text, None, loader, true)?;
     let mut events = Vec::new();
     while let Some(event) = parser.get_event()? {
         events.push(event);
@@ -101,12 +108,26 @@ pub fn parse(text: &str, loader: Loader) -> Result<Vec<Event>, YamlError> {
 
 /// `yaml.compose(text, Loader=...)`: the single document's node graph.
 pub fn compose(text: &str, loader: Loader) -> Result<Composed, YamlError> {
-    Composer::new(EventSource::new(text, loader, false)?, loader).single_node()
+    compose_named(text, None, loader)
+}
+
+fn compose_named(text: &str, stream_name: Option<&str>, loader: Loader) -> Result<Composed, YamlError> {
+    Composer::new(EventSource::new(text, stream_name, loader, false)?, loader).single_node()
 }
 
 /// `yaml.load(text, Loader=...)` for a loader with the given overrides.
 pub fn load(text: &str, loader: Loader, hooks: Hooks) -> Result<Loaded, YamlError> {
     let mut composed = compose(text, loader)?;
+    construct(&mut composed, hooks)
+}
+
+/// `yaml.load(source, Loader=...)` for a source whose marks carry another name: `bytes` input
+/// reads as `"<byte string>"` (`campaign_rules_update.py` passes the stored file's bytes).
+/// Pass the bytes decoded as UTF-8; that is exact for valid UTF-8 without a UTF-16 byte order
+/// mark, the only bytes Sylvia stores. A text file stream reads differently in PyYAML (in
+/// chunks, marks without a snippet) and is not covered here.
+pub fn load_named(text: &str, stream_name: &str, loader: Loader, hooks: Hooks) -> Result<Loaded, YamlError> {
+    let mut composed = compose_named(text, Some(stream_name), loader)?;
     construct(&mut composed, hooks)
 }
 

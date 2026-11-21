@@ -25,17 +25,23 @@ fn printable(character: char) -> bool {
 }
 
 impl Reader {
-    /// `Reader(stream)` for a `str` (`name` `None`, `"<unicode string>"`) or a text file stream.
-    /// It checks every character before scanning starts.
+    /// `Reader(stream)` for a `str` or `bytes` input (`stream_name` `None` gives
+    /// `"<unicode string>"`). It checks every character before scanning starts, and its marks
+    /// keep the input for snippets.
     pub(crate) fn new(text: &str, stream_name: Option<&str>) -> Result<Self, YamlError> {
         let name: Rc<str> = Rc::from(stream_name.unwrap_or("<unicode string>"));
         let mut buffer: Vec<char> = text.chars().collect();
         if let Some(position) = buffer.iter().position(|c| !printable(*c)) {
             let character = u32::from(buffer[position]);
-            return Err(YamlError::Reader { name, position, character, reason: "special characters are not allowed" });
+            return Err(YamlError::Reader {
+                name,
+                position,
+                character,
+                reason: "special characters are not allowed",
+            });
         }
         buffer.push('\0');
-        let snippets = stream_name.is_none();
+        let snippets = true;
         Ok(Self { buffer: buffer.into(), name, snippets, pointer: 0, index: 0, line: 0, column: 0 })
     }
 
@@ -80,7 +86,10 @@ impl Reader {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum TokenKind {
     /// `%YAML major.minor` (digits as written) or `%TAG handle prefix`, or another directive.
-    Directive { name: String, value: DirectiveValue },
+    Directive {
+        name: String,
+        value: DirectiveValue,
+    },
     DocumentStart,
     DocumentEnd,
     StreamStart,
@@ -101,7 +110,11 @@ pub(crate) enum TokenKind {
     /// `(handle, suffix)`.
     Tag(Option<String>, String),
     /// `style` is `None` for plain, else the indicator character.
-    Scalar { value: String, plain: bool, style: Option<char> },
+    Scalar {
+        value: String,
+        plain: bool,
+        style: Option<char>,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -224,7 +237,12 @@ struct SimpleKey {
 
 type ScanResult<T> = Result<T, YamlError>;
 
-fn scanner_error(context: Option<&str>, context_mark: Option<Mark>, problem: String, problem_mark: Mark) -> YamlError {
+fn scanner_error(
+    context: Option<&str>,
+    context_mark: Option<Mark>,
+    problem: String,
+    problem_mark: Mark,
+) -> YamlError {
     YamlError::Marked(MarkedError::new(
         MarkedKind::Scanner,
         context.map(str::to_owned),
@@ -261,7 +279,11 @@ impl Scanner {
             possible_simple_keys: Vec::new(),
         };
         let mark = scanner.reader.get_mark();
-        scanner.tokens.push_back(Token { kind: TokenKind::StreamStart, start_mark: mark.clone(), end_mark: mark });
+        scanner.tokens.push_back(Token {
+            kind: TokenKind::StreamStart,
+            start_mark: mark.clone(),
+            end_mark: mark,
+        });
         scanner
     }
 
@@ -332,7 +354,9 @@ impl Scanner {
         match ch {
             '\0' => return self.fetch_stream_end(),
             '%' if self.check_directive() => return self.fetch_directive(),
-            '-' if self.check_document_start() => return self.fetch_document_indicator(TokenKind::DocumentStart),
+            '-' if self.check_document_start() => {
+                return self.fetch_document_indicator(TokenKind::DocumentStart)
+            }
             '.' if self.check_document_end() => return self.fetch_document_indicator(TokenKind::DocumentEnd),
             '[' => return self.fetch_flow_collection_start(TokenKind::FlowSequenceStart),
             '{' => return self.fetch_flow_collection_start(TokenKind::FlowMappingStart),
@@ -418,7 +442,9 @@ impl Scanner {
     }
 
     fn remove_possible_simple_key(&mut self) -> ScanResult<()> {
-        if let Some(position) = self.possible_simple_keys.iter().position(|(level, _)| *level == self.flow_level) {
+        if let Some(position) =
+            self.possible_simple_keys.iter().position(|(level, _)| *level == self.flow_level)
+        {
             let key = &self.possible_simple_keys[position].1;
             if key.required {
                 return Err(scanner_error(
@@ -440,7 +466,11 @@ impl Scanner {
         while self.indent > column {
             let mark = self.mark();
             self.indent = self.indents.pop().unwrap_or(-1);
-            self.tokens.push_back(Token { kind: TokenKind::BlockEnd, start_mark: mark.clone(), end_mark: mark });
+            self.tokens.push_back(Token {
+                kind: TokenKind::BlockEnd,
+                start_mark: mark.clone(),
+                end_mark: mark,
+            });
         }
     }
 
@@ -525,7 +555,12 @@ impl Scanner {
     fn fetch_block_entry(&mut self) -> ScanResult<()> {
         if self.flow_level == 0 {
             if !self.allow_simple_key {
-                return Err(scanner_error(None, None, "sequence entries are not allowed here".into(), self.mark()));
+                return Err(scanner_error(
+                    None,
+                    None,
+                    "sequence entries are not allowed here".into(),
+                    self.mark(),
+                ));
             }
             if self.add_indent(self.reader.column as isize) {
                 let mark = self.mark();
@@ -544,7 +579,12 @@ impl Scanner {
     fn fetch_key(&mut self) -> ScanResult<()> {
         if self.flow_level == 0 {
             if !self.allow_simple_key {
-                return Err(scanner_error(None, None, "mapping keys are not allowed here".into(), self.mark()));
+                return Err(scanner_error(
+                    None,
+                    None,
+                    "mapping keys are not allowed here".into(),
+                    self.mark(),
+                ));
             }
             if self.add_indent(self.reader.column as isize) {
                 let mark = self.mark();
@@ -561,20 +601,34 @@ impl Scanner {
     }
 
     fn fetch_value(&mut self) -> ScanResult<()> {
-        if let Some(position) = self.possible_simple_keys.iter().position(|(level, _)| *level == self.flow_level) {
+        if let Some(position) =
+            self.possible_simple_keys.iter().position(|(level, _)| *level == self.flow_level)
+        {
             let (_, key) = self.possible_simple_keys.remove(position);
             let at = key.token_number - self.tokens_taken;
-            self.tokens.insert(at, Token { kind: TokenKind::Key, start_mark: key.mark.clone(), end_mark: key.mark.clone() });
+            self.tokens.insert(
+                at,
+                Token { kind: TokenKind::Key, start_mark: key.mark.clone(), end_mark: key.mark.clone() },
+            );
             if self.flow_level == 0 && self.add_indent(key.column as isize) {
                 self.tokens.insert(
                     at,
-                    Token { kind: TokenKind::BlockMappingStart, start_mark: key.mark.clone(), end_mark: key.mark },
+                    Token {
+                        kind: TokenKind::BlockMappingStart,
+                        start_mark: key.mark.clone(),
+                        end_mark: key.mark,
+                    },
                 );
             }
             self.allow_simple_key = false;
         } else {
             if self.flow_level == 0 && !self.allow_simple_key {
-                return Err(scanner_error(None, None, "mapping values are not allowed here".into(), self.mark()));
+                return Err(scanner_error(
+                    None,
+                    None,
+                    "mapping values are not allowed here".into(),
+                    self.mark(),
+                ));
             }
             if self.flow_level == 0 && self.add_indent(self.reader.column as isize) {
                 let mark = self.mark();
@@ -659,7 +713,8 @@ impl Scanner {
     fn check_plain(&self) -> bool {
         let ch = self.peek(0);
         !is_in(ch, "\0 \t\r\n\u{85}\u{2028}\u{2029}-?:,[]{}#&*!|>'\"%@`")
-            || (!is_in(self.peek(1), BLANK_BREAKS_Z) && (ch == '-' || (self.flow_level == 0 && is_in(ch, "?:"))))
+            || (!is_in(self.peek(1), BLANK_BREAKS_Z)
+                && (ch == '-' || (self.flow_level == 0 && is_in(ch, "?:"))))
     }
 
     // Scanners.
@@ -761,7 +816,9 @@ impl Scanner {
     fn scan_yaml_directive_number(&mut self, start_mark: &Mark) -> ScanResult<String> {
         let ch = self.peek(0);
         if !ch.is_ascii_digit() {
-            return Err(self.directive_error(start_mark, format!("expected a digit, but found {}", char_repr(ch))));
+            return Err(
+                self.directive_error(start_mark, format!("expected a digit, but found {}", char_repr(ch)))
+            );
         }
         let mut length = 0;
         while self.peek(length).is_ascii_digit() {
@@ -778,14 +835,20 @@ impl Scanner {
         }
         let handle = self.scan_tag_handle("directive", start_mark)?;
         if self.peek(0) != ' ' {
-            return Err(self.directive_error(start_mark, format!("expected ' ', but found {}", char_repr(self.peek(0)))));
+            return Err(self.directive_error(
+                start_mark,
+                format!("expected ' ', but found {}", char_repr(self.peek(0))),
+            ));
         }
         while self.peek(0) == ' ' {
             self.forward(1);
         }
         let prefix = self.scan_tag_uri("directive", start_mark)?;
         if !is_in(self.peek(0), SPACE_BREAKS_Z) {
-            return Err(self.directive_error(start_mark, format!("expected ' ', but found {}", char_repr(self.peek(0)))));
+            return Err(self.directive_error(
+                start_mark,
+                format!("expected ' ', but found {}", char_repr(self.peek(0))),
+            ));
         }
         Ok(DirectiveValue::Tag(handle, prefix))
     }
@@ -950,14 +1013,21 @@ impl Scanner {
         if chomping == Some(true) {
             chunks.append(&mut breaks);
         }
-        Ok(Token { kind: TokenKind::Scalar { value: chunks.concat(), plain: false, style: Some(style) }, start_mark, end_mark })
+        Ok(Token {
+            kind: TokenKind::Scalar { value: chunks.concat(), plain: false, style: Some(style) },
+            start_mark,
+            end_mark,
+        })
     }
 
     fn block_scalar_error(&self, start_mark: &Mark, problem: String) -> YamlError {
         scanner_error(Some("while scanning a block scalar"), Some(start_mark.clone()), problem, self.mark())
     }
 
-    fn scan_block_scalar_indicators(&mut self, start_mark: &Mark) -> ScanResult<(Option<bool>, Option<usize>)> {
+    fn scan_block_scalar_indicators(
+        &mut self,
+        start_mark: &Mark,
+    ) -> ScanResult<(Option<bool>, Option<usize>)> {
         let mut chomping = None;
         let mut increment = None;
         let mut ch = self.peek(0);
@@ -1069,7 +1139,11 @@ impl Scanner {
         }
         self.forward(1);
         let end_mark = self.mark();
-        Ok(Token { kind: TokenKind::Scalar { value: chunks.concat(), plain: false, style: Some(style) }, start_mark, end_mark })
+        Ok(Token {
+            kind: TokenKind::Scalar { value: chunks.concat(), plain: false, style: Some(style) },
+            start_mark,
+            end_mark,
+        })
     }
 
     fn scan_flow_scalar_non_spaces(&mut self, double: bool, start_mark: &Mark) -> ScanResult<Vec<String>> {
@@ -1124,9 +1198,14 @@ impl Scanner {
                         }
                         // chr() takes a C int: beyond it, the conversion overflows first.
                         None if code > 0x7FFF_FFFF => {
-                            return Err(YamlError::python("OverflowError", "Python int too large to convert to C int"))
+                            return Err(YamlError::python(
+                                "OverflowError",
+                                "Python int too large to convert to C int",
+                            ))
                         }
-                        None => return Err(YamlError::python("ValueError", "chr() arg not in range(0x110000)")),
+                        None => {
+                            return Err(YamlError::python("ValueError", "chr() arg not in range(0x110000)"))
+                        }
                     };
                     chunks.push(character.to_string());
                     self.forward(length);
@@ -1243,7 +1322,11 @@ impl Scanner {
                 }
             }
         }
-        Token { kind: TokenKind::Scalar { value: chunks.concat(), plain: true, style: None }, start_mark, end_mark }
+        Token {
+            kind: TokenKind::Scalar { value: chunks.concat(), plain: true, style: None },
+            start_mark,
+            end_mark,
+        }
     }
 
     /// `scan_plain_spaces`; `None` where Python returns `None` (a document separator).
@@ -1436,9 +1519,14 @@ pub(crate) fn utf8_error_text(codes: &[u8], error: &std::string::FromUtf8Error) 
     let byte = codes[start];
     match error.utf8_error().error_len() {
         None if codes.len() - start > 1 => {
-            format!("'utf-8' codec can't decode bytes in position {start}-{}: unexpected end of data", codes.len() - 1)
+            format!(
+                "'utf-8' codec can't decode bytes in position {start}-{}: unexpected end of data",
+                codes.len() - 1
+            )
         }
-        None => format!("'utf-8' codec can't decode byte 0x{byte:02x} in position {start}: unexpected end of data"),
+        None => format!(
+            "'utf-8' codec can't decode byte 0x{byte:02x} in position {start}: unexpected end of data"
+        ),
         Some(_) => {
             let reason = if (0x80..=0xC1).contains(&byte) || byte >= 0xF5 {
                 "invalid start byte"
