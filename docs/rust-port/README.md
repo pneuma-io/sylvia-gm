@@ -8,6 +8,12 @@ everyone doing that port: who owns what, the rules, and how a change is checked.
   nothing under `src/sylvia_gm`, `tests` or `scripts` changes on this branch except release
   fixes the manager merges in from Python `main`. It is the definition of correct behaviour
   until the port is finished.
+- **Reference interpreters.** Behaviour is recorded from the Python each platform's 0.4.1 build
+  runs. Windows: CPython 3.12.11 from uv, SQLite 3.49.1. Linux: Ubuntu 24.04's system CPython
+  3.12.3 (what `scripts/setup_linux_dev.sh` and the Linux release build use), SQLite 3.45.1.
+  Both are Unicode 15.0. The Rust build bundles SQLite 3.49.1 on both platforms; lane 3 showed
+  that every schema identity, migration digest and open/upgrade outcome is the same under
+  3.45.1, and Rust opens databases written by either.
 - **Release fixes merged in so far:** `rust-rewrite` branched from `0da1010`. The release
   commit then moved to `c19eee4` for issue #240, which changed only the frontend (owner
   refusals shown without the desktop host's code) and two frontend tests; it was merged into
