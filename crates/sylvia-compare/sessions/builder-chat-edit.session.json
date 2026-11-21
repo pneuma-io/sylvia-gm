@@ -1,0 +1,31 @@
+{
+ "name": "builder-chat-edit",
+ "description": "Renaming and deleting Builder chats before any exists: missing and empty parameters, display names that are untrimmed, empty or too long, invalid and reserved identities, an inexact deletion confirmation, and an unknown chat, each through the owner and the store's session and owner lanes.",
+ "summarise_tables": ["^package_", "^packages$"],
+ "steps": [
+  {"method": "rename_builder_chat", "params": {}},
+  {"method": "rename_builder_chat", "params": {"session_id": "builder-missing"}},
+  {"method": "rename_builder_chat", "params": {"session_id": "", "display_name": "Name"}},
+  {"method": "rename_builder_chat", "params": {"session_id": 7, "display_name": "Name"}},
+  {"method": "rename_builder_chat", "params": {"session_id": "builder-missing", "display_name": "Ruleset draft"}},
+  {"method": "rename_builder_chat", "params": {"session_id": "builder-missing", "display_name": " padded "}},
+  {"method": "rename_builder_chat", "params": {"session_id": "builder-missing", "display_name": "   "}},
+  {"method": "rename_builder_chat", "params": {"session_id": "builder-missing", "display_name": "x\u001fy"}},
+  {"method": "rename_builder_chat", "params": {"session_id": "builder-missing", "display_name": "Long name aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}},
+  {"method": "rename_builder_chat", "params": {"session_id": "bad id/with slash", "display_name": "Name"}},
+  {"method": "delete_builder_chat", "params": {}},
+  {"method": "delete_builder_chat", "params": {"session_id": "builder-missing"}},
+  {"method": "delete_builder_chat", "params": {"session_id": "builder-missing", "confirmation": "delete builder-missing"}},
+  {"method": "delete_builder_chat", "params": {"session_id": "builder-missing", "confirmation": "permanently delete builder-missing"}},
+  {"method": "delete_builder_chat", "params": {"session_id": "..", "confirmation": "permanently delete .."}},
+  {"method": "delete_builder_chat", "params": {"session_id": "a:b", "confirmation": "permanently delete a:b"}},
+  {"method": "delete_builder_chat", "params": {"session_id": "with space", "confirmation": "permanently delete with space"}},
+  {"method": "delete_builder_chat", "params": {"session_id": "été", "confirmation": "permanently delete été"}},
+  {"method": "builder_chat_index"},
+  {"method": "shutdown"}
+ ],
+ "rules": {
+  "ignore_keys": ["diagnostic_id"],
+  "volatile_files": ["^diagnostics/"]
+ }
+}

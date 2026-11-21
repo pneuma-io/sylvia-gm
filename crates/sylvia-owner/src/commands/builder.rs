@@ -39,6 +39,42 @@ pub async fn handle_builder_chat_index(ctx: &DispatchContext, _params: &JsonMap)
     Ok(Json::Array(chats.iter().map(builder_chat_value).collect()))
 }
 
+/// `_required_text(params, key)` as a handler's error.
+fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
+    crate::dispatch::required_text(params, key).map_err(|failure| match failure {
+        crate::dispatch::Failure::Rejected(error) => error,
+        _ => unreachable!("a missing parameter is a rejection"),
+    })
+}
+
+/// `handle_rename_builder_chat`: `application_owner.rename_builder_chat(session_id,
+/// display_name)`, a manual rename (`automatic=False`). Lane 3's store operation holds the
+/// session lane, as `AuthorityOwner` does.
+pub async fn handle_rename_builder_chat(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let session_id = required(params, "session_id")?;
+    let display_name = required(params, "display_name")?;
+    let chat = ctx
+        .store
+        .rename_builder_chat(&session_id, &display_name, false)
+        .await
+        .map_err(super::campaigns::store_error)?;
+    Ok(builder_chat_value(&chat))
+}
+
+/// `handle_delete_builder_chat`: `application_owner.delete_builder_chat(session_id,
+/// confirmation=)`. Lane 3's store operation makes `AuthorityOwner`'s identity and exact
+/// confirmation checks and takes the Builder chat's owner lane without waiting.
+pub async fn handle_delete_builder_chat(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let session_id = required(params, "session_id")?;
+    let confirmation = required(params, "confirmation")?;
+    let chat = ctx
+        .store
+        .delete_builder_chat(&session_id, &confirmation)
+        .await
+        .map_err(super::campaigns::store_error)?;
+    Ok(builder_chat_value(&chat))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -94,5 +130,31 @@ mod tests {
             }
         }
         assert!(checked >= 2, "the run lists Builder chats");
+    }
+
+    #[test]
+    fn renamed_and_deleted_chats_reply_in_pythons_field_order() {
+        // The records lane 3's Python run returned from a rename and a delete: the handlers'
+        // replies. The owner session `builder-chat-edit` covers the refusals; a rename and a
+        // delete of a real chat need `create_builder_chat` in the owner.
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../crates/sylvia-store/tests/vectors/sessions/session_runs.json");
+        let runs: Json = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
+        let run = &runs["runs"]["builder_chats"];
+        let mut checked = std::collections::BTreeMap::new();
+        for (operation, outcome) in
+            run["operations"].as_array().unwrap().iter().zip(run["outcomes"].as_array().unwrap())
+        {
+            let op = operation["op"].as_str().unwrap();
+            if !matches!(op, "rename_builder_chat" | "delete_builder_chat") {
+                continue;
+            }
+            if let Some(chat) = outcome.get("ok") {
+                assert_eq!(builder_chat_value(&chat_from(chat)).to_string(), chat.to_string());
+                *checked.entry(op).or_insert(0) += 1;
+            }
+        }
+        assert_eq!(checked.get("rename_builder_chat"), Some(&3));
+        assert_eq!(checked.get("delete_builder_chat"), Some(&1));
     }
 }

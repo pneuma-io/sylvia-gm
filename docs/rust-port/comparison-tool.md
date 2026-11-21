@@ -207,6 +207,7 @@ rules check, an attack); lane 4 says what those need.
 | `reopen` | Stop and a failed reply, each followed by a restart on the same data folder; the offer survives, a redirect and a Manual Retry answer | recorded on Windows and Linux; reproduces on a second run |
 | `webui-guard` | The local WebUI host's boundary, request by request: cookie, Host, Origin, Sec-Fetch, the same-origin header, command checks and idempotency, renamed arguments, asset path tricks, downloads, upload names and size limits, unknown routes, Stop | recorded on Windows and Linux; five reproductions on each |
 | `webui-remote` | Private HTTPS mode: the sign-in page, the remote Host only, access-key sign-in, the remote cookie, sign-out, the sign-in budget, Stop | recorded on Windows and Linux; five reproductions on each |
+| `builder-chat-edit` | Renaming and deleting Builder chats before any exists: missing parameters, display names, identities, the exact deletion confirmation, an unknown chat | recorded on Windows and Linux; five reproductions on each |
 
 The last three follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop
