@@ -130,6 +130,16 @@ fn unsupported(left: &str, right: &str) -> PyError {
 
 /// `sum(values)` with the default start `0`.
 pub fn py_sum<'a>(values: impl IntoIterator<Item = &'a Json>) -> PyResult<PyNumber> {
+    sum_operands(values.into_iter().map(operand))
+}
+
+/// `sum(values)` over numbers that need not be JSON (a float may be infinite or NaN).
+pub fn py_sum_numbers(values: impl IntoIterator<Item = PyNumber>) -> PyNumber {
+    sum_operands(values.into_iter().map(Ok)).expect("numbers always add")
+}
+
+/// The phases of `builtin_sum_impl` over operands: a number, or the type name `+` reports.
+fn sum_operands(values: impl IntoIterator<Item = Result<PyNumber, &'static str>>) -> PyResult<PyNumber> {
     enum Phase {
         IntFast(i128),
         FloatFast { sum: f64, compensation: f64 },
@@ -141,7 +151,7 @@ pub fn py_sum<'a>(values: impl IntoIterator<Item = &'a Json>) -> PyResult<PyNumb
     for item in values {
         phase = match phase {
             Phase::IntFast(total) => {
-                let right = operand(item).map_err(|right| unsupported("int", right))?;
+                let right = item.map_err(|right| unsupported("int", right))?;
                 match right {
                     // Py_ssize_t is 64 bits on every supported platform.
                     PyNumber::Int(b) if fits_long(b) && i64::try_from(total + b).is_ok() => {
@@ -155,7 +165,7 @@ pub fn py_sum<'a>(values: impl IntoIterator<Item = &'a Json>) -> PyResult<PyNumb
                 }
             }
             Phase::FloatFast { sum, compensation } => {
-                match operand(item) {
+                match item {
                     Ok(PyNumber::Float(x)) => {
                         // Neumaier's improvement of Kahan-Babuska summation, as CPython has it.
                         let t = sum + x;
@@ -177,7 +187,10 @@ pub fn py_sum<'a>(values: impl IntoIterator<Item = &'a Json>) -> PyResult<PyNumb
                     }
                 }
             }
-            Phase::Generic(total) => Phase::Generic(total.add_json(item)?),
+            Phase::Generic(total) => {
+                let right = item.map_err(|right| unsupported(total.type_name(), right))?;
+                Phase::Generic(total.plus(right))
+            }
         };
     }
     Ok(match phase {

@@ -69,6 +69,8 @@ getrandom = "0.2"
 # Python's `cryptography` AESGCM). RustCrypto, pure Rust.
 aes-gcm = "0.10"
 regex = "1"
+# Ordered maps for Python dicts in the expression evaluator (already locked through serde_json).
+indexmap = "2"
 # Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate
 # rejects (content schema patterns, docs/rust-port/sites/regex-sites.md). Added by lane 1.
 fancy-regex = "0.14"

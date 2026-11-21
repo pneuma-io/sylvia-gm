@@ -172,12 +172,12 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/tactical_grid.py:473` | `_project_occupied_space` | len() against a limit | `if (not isinstance(widths, (list, tuple)) or not 1 <= len(widths) <= 32` | |
 | `application/tactical_grid.py:476` | `_project_occupied_space` | len() against a limit | `or not isinstance(convention, str) or not 1 <= len(convention) <= 128):` | |
 | `application/tactical_grid.py:540` | `_selection_value_valid` | len() against a limit | `and 2 <= len(items) <= _MAX_PATH_POINTS` | |
-| `runtime/_collections.py:15` | `collection` | len() against a limit | `if not isinstance(value, (list, tuple)) or len(value) > LIMIT:` | |
-| `runtime/_collections.py:34` | `joined` | len() against a limit | `if len(values) > LIMIT:` | |
-| `runtime/_collections.py:61` | `text` | len() against a limit | `if not isinstance(value, (str, int, float, bool)) or len(str(value)) > 256:` | |
-| `runtime/_collections.py:90` | `partitions` | len() against a limit | `if len(values) > 32 or len(rows) > 128 or len(required) > 8:` | |
-| `runtime/_collections.py:110` | `partitions.visit` | len() against a limit | `if work > 16384 or len(found) > 256:` | |
-| `runtime/_collections.py:140` | `completions` | len() against a limit | `if len(candidates) > 128:` | |
+| `runtime/_collections.py:15` | `collection` | len() against a limit | `if not isinstance(value, (list, tuple)) or len(value) > LIMIT:` | yes: `expression_eval_vectors` |
+| `runtime/_collections.py:34` | `joined` | len() against a limit | `if len(values) > LIMIT:` | yes: `expression_eval_vectors` |
+| `runtime/_collections.py:61` | `text` | len() against a limit | `if not isinstance(value, (str, int, float, bool)) or len(str(value)) > 256:` | yes: `expression_eval_vectors` |
+| `runtime/_collections.py:90` | `partitions` | len() against a limit | `if len(values) > 32 or len(rows) > 128 or len(required) > 8:` | yes: `expression_eval_vectors` |
+| `runtime/_collections.py:110` | `partitions.visit` | len() against a limit | `if work > 16384 or len(found) > 256:` | yes: `expression_eval_vectors` |
+| `runtime/_collections.py:140` | `completions` | len() against a limit | `if len(candidates) > 128:` | yes: `expression_eval_vectors` |
 | `runtime/_effect_executor.py:56` | `_handle_publish` | len() against a limit | `if len(body["fields"]) > 32:` | |
 | `runtime/_effect_executor.py:399` | `_handle_request_choice` | len() against a limit | `if not 2 <= len(options) <= 16:` | |
 | `runtime/_effect_executor.py:401` | `_handle_request_choice` | len() against a limit | `if len(rendered_prompt.encode("utf-8")) > 4096 or any(` | |

@@ -146,6 +146,7 @@ The lists in `sites/` give every occurrence by lane. The traps behind them:
 | Regular expressions | lookaround, backreferences, `$` before final newline | `regex` has none of these | `fancy-regex`; test each pattern |
 | Sorting | stable; tuples compare element-wise | `sort` is stable, `sort_unstable` is not | `sort_by` with the same key |
 | Rounding | `round()` is half-to-even | `f64::round` is half-away-from-zero | port `round` explicitly |
+| Float powers | `x ** y` on floats calls the C library's `pow` (the Microsoft runtime on Windows, glibc on Linux), which can differ in the last bit | `f64::powf` calls the same platform `pow`, so it agrees with Python on each platform | port CPython's special cases around `pow` (`float_pow`); where a result depends on `pow`, record reference vectors per platform (`expression_recorded_vectors.<platform>.json`) |
 | Integer division | `//` and `%` floor toward negative infinity | `/` and `%` truncate toward zero | `div_euclid` / `rem_euclid`, checking the sign cases |
 | Random numbers | `random.Random(seed)`: MT19937, seeded by `init_by_array`, `randrange` by rejection | no crate matches | port CPython's algorithm; compare whole roll sequences |
 | YAML | PyYAML, YAML 1.1 (`yes`, `no`, dates, octal) | YAML 1.2 crates | test every shipped file |
