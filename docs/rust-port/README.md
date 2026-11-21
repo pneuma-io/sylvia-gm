@@ -103,9 +103,15 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    desktop shell's version); Linux calls use `rustix`. Approved so far:
    `sylvia-store/src/safe_file/windows.rs` (`GetDriveTypeW`, `SetFileInformationByHandle`
    with `FileDispositionInfo`, and `MoveFileExW` with `MOVEFILE_REPLACE_EXISTING |
-   MOVEFILE_WRITE_THROUGH`), mirroring `infrastructure/safe_file.py`'s ctypes calls; and
+   MOVEFILE_WRITE_THROUGH`), mirroring `infrastructure/safe_file.py`'s ctypes calls;
    `sylvia-provider/src/config/protection/windows.rs` (`CryptProtectData`,
-   `CryptUnprotectData`, `LocalFree`), mirroring `config/_credential_protection.py`'s DPAPI calls.
+   `CryptUnprotectData`, `LocalFree`), mirroring `config/_credential_protection.py`'s DPAPI calls;
+   and `sylvia-provider/src/config/host_browser/windows.rs` (`ShellExecuteW` with no verb,
+   parameters or folder, `SW_SHOWNORMAL`), mirroring `os.startfile` as `webbrowser` calls it. It
+   only ever receives a shipped preset's setup address.
+   Approved, not yet merged: `sylvia-owner/src/desktop_update/windows.rs` (process-barrier
+   handles, the two installed-copy registry keys, the progress `TaskDialogIndirect`, and
+   `GetDiskFreeSpaceExW`), to be listed in full when lane 5's helper PR merges.
 
 ## Concurrency
 
