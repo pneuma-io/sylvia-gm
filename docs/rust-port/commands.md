@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 1 of 137 (`shutdown`).
+Ported: 10 of 137 (`shutdown`, `handshake_status` and the eight run-loop commands: display-load cancellation, desktop drafts, local reports and faults, `renderer`).
 
 ## Run-loop methods
 
@@ -31,7 +31,7 @@ Ported: 1 of 137 (`shutdown`).
 
 | Command | Python handler | WebUI | Rust | Comparison session |
 | --- | --- | --- | --- | --- |
-| `handshake_status` | `campaigns.handle_handshake_status` | no | no | |
+| `handshake_status` | `campaigns.handle_handshake_status` | no | yes | `local-services` |
 | `campaign_index` | `campaigns.handle_campaign_index` | yes | no | |
 | `campaign_creation_catalog` | `campaigns.handle_campaign_creation_catalog` | yes | no | |
 | `ready_campaign_catalog` | `campaigns.handle_ready_campaign_catalog` | yes | no | |
@@ -148,11 +148,11 @@ Ported: 1 of 137 (`shutdown`).
 | `export_campaign_file` | `campaigns.handle_export_campaign` | no | no | |
 | `recover_campaign` | `campaigns.handle_recover_campaign` | no | no | |
 | `recover_campaign_file` | `campaigns.handle_recover_campaign_file` | no | no | |
-| `cancel_display_load` | run loop | yes | no | |
-| `cancel_local_report` | run loop | no | no | |
-| `load_desktop_drafts` | run loop | yes | no | |
-| `preview_local_report` | run loop | no | no | |
-| `record_local_fault` | run loop | yes | no | |
-| `renderer` | run loop | no | no | |
-| `save_desktop_drafts` | run loop | yes | no | |
-| `save_local_report` | run loop | no | no | |
+| `cancel_display_load` | run loop | yes | yes | `local-services` |
+| `cancel_local_report` | run loop | no | yes | `local-services` |
+| `load_desktop_drafts` | run loop | yes | yes | `local-services` |
+| `preview_local_report` | run loop | no | yes | `local-services` |
+| `record_local_fault` | run loop | yes | yes | `local-services` |
+| `renderer` | run loop | no | yes | `local-services` |
+| `save_desktop_drafts` | run loop | yes | yes | `local-services` |
+| `save_local_report` | run loop | no | yes | `local-services` |

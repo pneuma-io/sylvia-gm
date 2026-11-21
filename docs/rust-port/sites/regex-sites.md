@@ -225,7 +225,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/manifest.py:209` | `release_url` | re.search; NEEDS fancy-regex: lookahead | `or re.search(r"%(?![0-9A-Fa-f]{2})", parsed.path)` | |
 | `application/desktop_update/manifest.py:237` | `payload_path` | re.fullmatch; plain | `re.fullmatch(r"[A-Za-z0-9_. -]+", part) is None or part.endswith((".", " "))` | |
 | `application/desktop_update/manifest.py:346` | `_parse_manifest` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", key_id) is None` | |
-| `application/desktop_update/storage.py:204` | `operation_id` | re.fullmatch; plain | `if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{32}", value) is None:` | |
+| `application/desktop_update/storage.py:204` | `operation_id` | re.fullmatch; plain | `if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{32}", value) is None:` | `local-services`, `sylvia-owner` storage tests |
 | `application/desktop_update/storage.py:343` | `UpdateStore._move_update` | re.fullmatch; plain | `error_code is not None and re.fullmatch(r"[a-z_]{1,64}", error_code) is None` | |
 | `application/desktop_update/storage.py:375` | `UpdateStore.load` | re.fullmatch; plain | `or re.fullmatch(r"[a-z_]{1,64}", row["error_code"]) is None` | |
 | `application/desktop_update/transport.py:44` | `official_request` | re.search; NEEDS fancy-regex: lookahead | `or re.search(r"%(?![0-9A-Fa-f]{2})", parsed.path)` | |
