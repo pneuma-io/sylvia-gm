@@ -48,7 +48,7 @@ pub const REGISTRY: &[Command] = &[
     pending("delete_reusable_library_entry", "campaigns", true, true),
     pending("character_chat", "character_chat", true, true),
     pending("send_character_chat_message", "character_chat", true, true),
-    pending("builder_chat_index", "builder", true, true),
+    ported("builder_chat_index", "builder", true, true),
     pending("start_import_repair", "builder", true, true),
     pending("create_builder_chat", "builder", true, true),
     pending("rename_builder_chat", "builder", true, true),
