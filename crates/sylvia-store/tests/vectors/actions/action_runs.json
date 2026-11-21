@@ -1,0 +1,913 @@
+{
+ "python": "3.12.11",
+ "runs": {
+  "commit_then_replay": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "action_receipt",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1"
+    },
+    {
+     "op": "idempotency_hit",
+     "campaign_id": "campaign-actions",
+     "key": "key-1"
+    },
+    {
+     "op": "action_hit",
+     "campaign_id": "campaign-actions",
+     "action_id": "missing"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    },
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Idempotency key payload does not match"
+    },
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    },
+    {
+     "ok": {
+      "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "receipt": {
+       "campaign_id": "campaign-actions",
+       "action_id": "action-1",
+       "status": "committed",
+       "result": {
+        "success": true,
+        "total": 15
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  "stale_and_wrong_writer": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-2",
+     "idempotency_key": "key-2",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-2",
+     "idempotency_key": "key-2",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 1,
+     "writer": "builder",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-2",
+     "idempotency_key": "key-2",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 1,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 20
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       20
+      ]
+     ],
+     "consequences": [],
+     "status": "committed"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    },
+    {
+     "error": "StaleRevision",
+     "code": "stale_revision",
+     "message": "Expected campaign revision is stale"
+    },
+    {
+     "error": "WrongWriter",
+     "code": "wrong_writer",
+     "message": "Command writer is not authoritative"
+    },
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-2",
+      "status": "committed",
+      "result": {
+       "total": 20
+      },
+      "resulting_revision": 2
+     }
+    }
+   ]
+  },
+  "failed_action": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "error": "x"
+     },
+     "mutations": [],
+     "consequences": [],
+     "status": "failed"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "failed",
+      "result": {
+       "error": "x"
+      },
+      "resulting_revision": 1
+     }
+    }
+   ]
+  },
+  "foreign_namespace": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "unowned.namespace",
+       "k",
+       1
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    }
+   ]
+  },
+  "unsafe_payload": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "reasoning_private": "x"
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "scratchpad": "x"
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "CommandRejected",
+     "code": "unsafe_canonical_payload",
+     "message": "Persistence rejected an unsafe canonical payload"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "unsafe_canonical_payload",
+     "message": "Persistence rejected an unsafe canonical payload"
+    }
+   ]
+  },
+  "turn_closed_then_reopened": {
+   "operations": [
+    {
+     "op": "complete_turn",
+     "campaign_id": "campaign-actions",
+     "turn_id": "turn-actions-1"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "complete_turn",
+     "campaign_id": "campaign-actions",
+     "turn_id": "turn-actions-1"
+    },
+    {
+     "op": "open_turn",
+     "campaign_id": "campaign-actions",
+     "turn_id": "turn-actions-1"
+    },
+    {
+     "op": "open_turn",
+     "campaign_id": "campaign-actions",
+     "turn_id": "turn-actions-2"
+    },
+    {
+     "op": "open_turn",
+     "campaign_id": "campaign-actions",
+     "turn_id": "turn-actions-3"
+    },
+    {
+     "op": "current_open_turn",
+     "campaign_id": "campaign-actions"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-2",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "turn_is_completed",
+     "campaign_id": "campaign-actions",
+     "turn_id": "turn-actions-1"
+    },
+    {
+     "op": "turn_is_completed",
+     "campaign_id": "campaign-actions",
+     "turn_id": "missing"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "TURN does not admit actions"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "TURN cannot be completed"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "TURN identity is unavailable"
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign already has an open TURN"
+    },
+    {
+     "ok": "turn-actions-2"
+    },
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    },
+    {
+     "ok": true
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "TURN identity is unavailable"
+    }
+   ]
+  },
+  "interrupted_before_commit": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed",
+     "fault": "before_commit"
+    },
+    {
+     "op": "action_hit",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1"
+    },
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-actions",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "_Fault",
+     "code": null,
+     "message": "fault before commit"
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "campaign_id": "campaign-actions",
+      "action_id": "action-1",
+      "status": "committed",
+      "result": {
+       "success": true,
+       "total": 15
+      },
+      "resulting_revision": 1
+     }
+    }
+   ]
+  },
+  "unknown_campaign": {
+   "operations": [
+    {
+     "op": "commit_action",
+     "campaign_id": "campaign-missing",
+     "action_id": "action-1",
+     "idempotency_key": "key-1",
+     "payload_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "expected_revision": 0,
+     "writer": "dm",
+     "turn_id": "turn-actions-1",
+     "package_id": "synthetic.actions",
+     "package_version": "1.0.0",
+     "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "tool_name": "roll_check",
+     "parameters": {
+      "ability": "dexterity",
+      "dc": 12
+     },
+     "result": {
+      "total": 15,
+      "success": true
+     },
+     "mutations": [
+      [
+       "synthetic.actions.checks",
+       "last",
+       {
+        "total": 15
+       }
+      ]
+     ],
+     "consequences": [
+      {
+       "kind": "check_rolled",
+       "total": 15
+      }
+     ],
+     "status": "committed"
+    },
+    {
+     "op": "open_turn",
+     "campaign_id": "campaign-missing",
+     "turn_id": "t"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Campaign is unavailable"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "lifecycle_inactive",
+     "message": "Campaign lifecycle blocks mutation"
+    }
+   ]
+  }
+ },
+ "facts": {
+  "campaign_id": "campaign-actions",
+  "turn_id": "turn-actions-1",
+  "revision": 0,
+  "package_id": "synthetic.actions",
+  "package_version": "1.0.0",
+  "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+  "other_package_id": null
+ }
+}

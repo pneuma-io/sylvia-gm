@@ -38,6 +38,21 @@ pub struct AuthorityStore {
     owner_lock: OwnerLock,
     created_new_database: bool,
     closed: bool,
+    pub(crate) faults: Faults,
+}
+
+/// Python's private deterministic fault seams (`_before_commit` and its kin): tests set one to
+/// make an operation fail between its writes and its commit.
+#[derive(Default)]
+pub struct Faults {
+    /// `_before_commit`, in `commit_action`.
+    pub before_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
+}
+
+impl std::fmt::Debug for Faults {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.debug_struct("Faults").field("before_commit", &self.before_commit.is_some()).finish()
+    }
 }
 
 impl AuthorityStore {
@@ -49,13 +64,25 @@ impl AuthorityStore {
     ) -> StoreResult<Self> {
         let database_path = resolve(database_path);
         let owner_lock = OwnerLock::acquire(&authority_lock_identity(&database_path))?;
-        let mut store = Self { database_path, owner_lock, created_new_database: false, closed: false };
+        let mut store = Self {
+            database_path,
+            owner_lock,
+            created_new_database: false,
+            closed: false,
+            faults: Faults::default(),
+        };
         // Startup admission stays under the ownership lock through migrations.
         if let Some(before_migration) = before_migration {
             before_migration()?;
         }
         store.migrate()?;
         Ok(store)
+    }
+
+    /// Set or clear the fault seams, for tests.
+    #[doc(hidden)]
+    pub fn set_faults(&mut self, faults: Faults) {
+        self.faults = faults;
     }
 
     /// The resolved database path.

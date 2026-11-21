@@ -32,6 +32,7 @@ fn scenarios(data: &Path) -> Vec<(&'static str, PathBuf)> {
         ("target_is_source_lock", data.join("authority.sqlite3.authority-owner.owner.lock")),
         ("destination_owner_lock", backups.join("locked.sqlite3")),
         ("parent_is_file", backups.join("plain.txt").join("copy.sqlite3")),
+        ("nul_in_name", backups.join("co\u{0}py.sqlite3")),
     ];
     #[cfg(windows)]
     {

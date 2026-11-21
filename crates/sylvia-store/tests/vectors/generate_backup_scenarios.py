@@ -48,6 +48,8 @@ def scenarios(data: Path) -> dict[str, Path]:
         "target_is_source_lock": data / "authority.sqlite3.authority-owner.owner.lock",
         "destination_owner_lock": data / "backups" / "locked.sqlite3",
         "parent_is_file": data / "backups" / "plain.txt" / "copy.sqlite3",
+        # ctypes reads a path only up to U+0000; os.open refuses it.
+        "nul_in_name": data / "backups" / "co\x00py.sqlite3",
     }
     if PLATFORM == "windows":
         cases["name_with_colon"] = data / "backups" / "copy:stream.sqlite3"

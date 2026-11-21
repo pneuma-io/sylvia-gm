@@ -62,6 +62,12 @@
    "code": "backup_target_envelope_parent_invalid",
    "message": "Database backup failed"
   },
+  "nul_in_name": {
+   "ok": false,
+   "type": "_BackupFailure",
+   "code": "backup_target_envelope_unsupported",
+   "message": "Database backup failed"
+  },
   "target_is_symlink": {
    "ok": false,
    "type": "_BackupFailure",

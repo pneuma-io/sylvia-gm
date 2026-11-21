@@ -11,6 +11,7 @@ use super::{
     VOLUME_REMOVABLE, VOLUME_UNKNOWN, VOLUME_UNSUPPORTED,
 };
 use std::fs::{File, OpenOptions};
+use std::os::windows::ffi::{OsStrExt, OsStringExt};
 use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
 use std::path::{Component, Path, PathBuf};
 
@@ -89,18 +90,28 @@ pub(super) fn volume_admission(path: &Path) -> Option<&'static str> {
     if root.is_empty() {
         return Some(VOLUME_UNKNOWN);
     }
+    // `wide()` refuses a root with an embedded U+0000; such a root is not a drive (`std::path`
+    // only parses a drive or UNC prefix without one), so it is refused as unsupported.
     match ffi::drive_type(&root) {
-        DRIVE_FIXED => None,
-        DRIVE_UNKNOWN => Some(VOLUME_UNKNOWN),
-        DRIVE_REMOVABLE => Some(VOLUME_REMOVABLE),
-        DRIVE_REMOTE => Some(VOLUME_REMOTE),
-        _ => Some(VOLUME_UNSUPPORTED),
+        None => Some(VOLUME_UNSUPPORTED),
+        Some(DRIVE_FIXED) => None,
+        Some(DRIVE_UNKNOWN) => Some(VOLUME_UNKNOWN),
+        Some(DRIVE_REMOVABLE) => Some(VOLUME_REMOVABLE),
+        Some(DRIVE_REMOTE) => Some(VOLUME_REMOTE),
+        Some(_) => Some(VOLUME_UNSUPPORTED),
     }
 }
 
-/// `GetFileAttributesW` of the entry itself; `None` for file or path not found.
+/// The text Python's ctypes passes for a `c_wchar_p`: everything before the first U+0000.
+fn before_nul(path: &Path) -> PathBuf {
+    let units: Vec<u16> = path.as_os_str().encode_wide().take_while(|unit| *unit != 0).collect();
+    PathBuf::from(std::ffi::OsString::from_wide(&units))
+}
+
+/// `GetFileAttributesW` of the entry itself; `None` for file or path not found. Python's ctypes
+/// call reads the path only up to an embedded U+0000, so this does too.
 pub(super) fn entry_attributes(path: &Path) -> std::io::Result<Option<u32>> {
-    match std::fs::symlink_metadata(path) {
+    match std::fs::symlink_metadata(before_nul(path)) {
         Ok(metadata) => Ok(Some(metadata.file_attributes())),
         Err(error) if error.raw_os_error().is_some_and(|code| NOT_FOUND_ERRORS.contains(&code)) => Ok(None),
         Err(error) => Err(error),
@@ -189,7 +200,9 @@ pub(super) fn delete_by_handle(file: &File, _path: &Path) -> bool {
 }
 
 pub(super) fn publish_replace(source: &Path, target: &Path, _parent_identity: Identity) -> Publication {
-    if ffi::move_replace_write_through(source, target) {
+    // `wide()` refuses an embedded U+0000, which nothing reaches: the temporary is ours and a
+    // target with one fails earlier, at the claim. A refusal publishes nothing.
+    if ffi::move_replace_write_through(source, target) == Some(true) {
         Publication::Published
     } else {
         Publication::NotPublished
@@ -211,15 +224,25 @@ mod ffi {
         MOVEFILE_REPLACE_EXISTING, MOVEFILE_WRITE_THROUGH,
     };
 
-    fn wide(text: &OsStr) -> Vec<u16> {
-        text.encode_wide().chain(std::iter::once(0)).collect()
+    /// A NUL-terminated UTF-16 copy, or `None` when the text holds U+0000: the call would then
+    /// act on the text before it, a different path, so these wrappers refuse it themselves
+    /// instead of relying on their callers.
+    pub(super) fn wide(text: &OsStr) -> Option<Vec<u16>> {
+        let mut units: Vec<u16> = text.encode_wide().collect();
+        if units.contains(&0) {
+            return None;
+        }
+        units.push(0);
+        Some(units)
     }
 
     /// `GetDriveTypeW(volume_root)`.
-    pub(super) fn drive_type(root: &str) -> u32 {
-        let root = wide(OsStr::new(root));
-        // SAFETY: `root` is a NUL-terminated UTF-16 buffer that lives until the call returns.
-        unsafe { GetDriveTypeW(root.as_ptr()) }
+    /// `None` when the root holds U+0000.
+    pub(super) fn drive_type(root: &str) -> Option<u32> {
+        let root = wide(OsStr::new(root))?;
+        // SAFETY: `root` is a NUL-terminated UTF-16 buffer with no earlier NUL that lives until
+        // the call returns.
+        Some(unsafe { GetDriveTypeW(root.as_ptr()) })
     }
 
     /// `SetFileInformationByHandle(handle, FileDispositionInfo, {DeleteFile: TRUE})`.
@@ -238,13 +261,54 @@ mod ffi {
     }
 
     /// `MoveFileExW(source, target, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)`.
-    pub(super) fn move_replace_write_through(source: &Path, target: &Path) -> bool {
-        let source = wide(source.as_os_str());
-        let target = wide(target.as_os_str());
-        // SAFETY: both are NUL-terminated UTF-16 buffers that live until the call returns.
-        unsafe {
+    /// `None` when either path holds U+0000; nothing is moved then.
+    pub(super) fn move_replace_write_through(source: &Path, target: &Path) -> Option<bool> {
+        let source = wide(source.as_os_str())?;
+        let target = wide(target.as_os_str())?;
+        // SAFETY: both are NUL-terminated UTF-16 buffers with no earlier NUL that live until the
+        // call returns.
+        Some(unsafe {
             MoveFileExW(source.as_ptr(), target.as_ptr(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)
                 != 0
-        }
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wide_refuses_an_embedded_nul() {
+        assert_eq!(ffi::wide(std::ffi::OsStr::new("C:\\")), Some(vec![67, 58, 92, 0]));
+        assert_eq!(ffi::wide(std::ffi::OsStr::new("C:\\\u{0}x")), None);
+    }
+
+    #[test]
+    fn drive_type_refuses_an_embedded_nul() {
+        assert_eq!(ffi::drive_type("C:\\\u{0}"), None);
+        assert_eq!(
+            volume_admission(Path::new("C\u{0}:\\copy.sqlite3")),
+            Some(VOLUME_UNKNOWN),
+            "no drive is parsed"
+        );
+        assert!(ffi::drive_type("C:\\").is_some());
+    }
+
+    #[test]
+    fn move_replace_refuses_an_embedded_nul_and_moves_nothing() {
+        let folder = std::env::temp_dir().join(format!("sylvia-store-wide-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&folder);
+        std::fs::create_dir_all(&folder).unwrap();
+        let source = folder.join("a");
+        std::fs::write(&source, b"a").unwrap();
+        let with_nul = folder.join("a\u{0}b");
+        assert_eq!(ffi::move_replace_write_through(&with_nul, &folder.join("c")), None);
+        assert_eq!(ffi::move_replace_write_through(&source, &folder.join("c\u{0}d")), None);
+        assert_eq!(publish_replace(&source, &folder.join("c\u{0}d"), (0, 0)), Publication::NotPublished);
+        assert_eq!(std::fs::read(&source).unwrap(), b"a", "the source stays where it was");
+        assert!(!folder.join("c").exists());
+        assert_eq!(ffi::move_replace_write_through(&source, &folder.join("c")), Some(true));
+        let _ = std::fs::remove_dir_all(&folder);
     }
 }
