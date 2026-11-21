@@ -1,4 +1,4 @@
-"""SRD Lite 0.3.26 and 0.3.27 spell repairs, applied to the parsed runtime by
+"""SRD Lite 0.3.26 to 0.3.29 spell repairs, applied to the parsed runtime by
 update_srd_lite_spell_repairs.
 
 Each repair edits one owning tool or definition and is idempotent, so the update script can be
@@ -7,6 +7,7 @@ rerun against an already repaired runtime without changing it again.
 
 from .srd_lite_attack_repairs import ATTACK_REPAIRS
 from .srd_lite_profiles import lists
+from .srd_lite_window_repairs import WINDOW_REPAIRS
 
 
 def _set(field, value, condition=None):
@@ -361,6 +362,7 @@ REPAIRS = (
     repair_exploration_birth_known_spell_effect,
     repair_dwelling_face_ids,
     repair_begin_names_its_combat_use,
+    *WINDOW_REPAIRS,
 )
 
 
