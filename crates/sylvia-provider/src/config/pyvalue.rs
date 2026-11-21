@@ -220,7 +220,7 @@ fn write_json(value: &Data, ensure_ascii: bool, out: &mut String) -> Result<(), 
 }
 
 /// A JSON value as Python's `json.loads` returns it.
-pub(crate) fn from_json(value: &Json) -> Result<Data, ConfigFailure> {
+pub fn from_json(value: &Json) -> Result<Data, ConfigFailure> {
     Ok(match value {
         Json::Null => Data::None,
         Json::Bool(flag) => Data::Bool(*flag),
@@ -249,4 +249,44 @@ pub(crate) fn text_map_json(pairs: &[(String, String)]) -> Json {
         map.insert(key.clone(), Json::String(value.clone()));
     }
     Json::Object(map)
+}
+
+/// A reply as the owner sends it: `_json_value(result)` (keys as `str(key)`, sets sorted by
+/// their compact sorted JSON, tuples as lists, anything else refused with `TypeError`), then
+/// `json.dumps(..., allow_nan=False)`, which refuses a non-finite float with `ValueError`.
+pub fn reply_json(value: &Data) -> Result<Json, ConfigFailure> {
+    Ok(match value {
+        Data::None => Json::Null,
+        Data::Bool(flag) => Json::Bool(*flag),
+        Data::Int(number) => Json::from(*number),
+        Data::Float(number) => serde_json::Number::from_f64(*number).map(Json::Number).ok_or_else(|| {
+            ConfigFailure::python(
+                "ValueError",
+                format!("Out of range float values are not JSON compliant: {}", float_text(*number)),
+            )
+        })?,
+        Data::Str(text) => Json::String(text.clone()),
+        Data::List(items) | Data::Tuple(items) => {
+            Json::Array(items.iter().map(reply_json).collect::<Result<_, _>>()?)
+        }
+        Data::Set(items) => {
+            let mut projected = items.iter().map(reply_json).collect::<Result<Vec<_>, _>>()?;
+            let key = |item: &Json| sylvia_base::pyjson::dumps(item, sylvia_base::pyjson::Dump::CANONICAL);
+            projected.sort_by_key(key);
+            Json::Array(projected)
+        }
+        Data::Dict(pairs) => {
+            let mut map = JsonMap::new();
+            for (key, item) in pairs {
+                map.insert(py_str(key), reply_json(item)?);
+            }
+            Json::Object(map)
+        }
+        other => {
+            return Err(ConfigFailure::python(
+                "TypeError",
+                format!("Owner projection type is not JSON-compatible: {}", type_name(other)),
+            ))
+        }
+    })
 }

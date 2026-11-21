@@ -1,7 +1,6 @@
 //! `provider/_protocol_routes.py`: documented protocol routes for OpenCode.
 //!
-//! `model_protocol` comes with the model facts (`provider/_model_facts.py`) in the
-//! configuration work.
+//! `model_protocol` reads the documented families in [`crate::model_facts`].
 
 use crate::pyurl::{urlsplit, urlunsplit, SplitUrl, UrlError};
 
@@ -54,4 +53,18 @@ pub fn inference_base_url(base_url: &str, protocol: &str) -> Result<String, UrlE
         return Ok(base_url.to_owned());
     }
     Ok(urlunsplit(&SplitUrl { path: format!("{family}{suffix}"), ..url }))
+}
+
+/// `model_protocol(preset, model_id, declared, fallback=...)`: a declared supported protocol,
+/// else the documented family's, else the fallback.
+pub fn model_protocol<'a>(
+    preset: &str,
+    model_id: &str,
+    declared: Option<&'a str>,
+    fallback: &'a str,
+) -> &'a str {
+    if let Some(declared) = declared.filter(|protocol| SUPPORTED_PROTOCOLS.contains(protocol)) {
+        return declared;
+    }
+    crate::model_facts::inferred_model_protocol(preset, model_id).unwrap_or(fallback)
 }

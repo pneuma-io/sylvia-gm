@@ -697,3 +697,12 @@ fn owned_trees_round_trip_every_dumped_value() {
     }
     assert!(checked > 500);
 }
+
+/// differences.md (the `!!set` row): a set written back keeps the order it was loaded in.
+/// Python's set iterates in an order that follows string hashing, which changes from run to
+/// run unless `PYTHONHASHSEED` is fixed, so there is no single Python order to match.
+#[test]
+fn a_set_is_written_back_in_load_order() {
+    let loaded = pyyaml::safe_load("s: !!set {b, a, c}\n").unwrap();
+    assert_eq!(pyyaml::safe_dump(&loaded).unwrap(), "s: !!set\n  b: null\n  a: null\n  c: null\n");
+}

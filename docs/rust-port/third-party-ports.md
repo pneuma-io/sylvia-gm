@@ -23,6 +23,7 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-provider/src/sse.rs`, `openai_compat.rs`, `pyobj.rs`, `chat.rs` | The OpenAI Python SDK's SSE decoder (`_streaming.py`), request assembly (`_base_client.py`, `_utils/_json.py`) and `construct` model reading (`_models.py`) | openai 2.53.0 | Apache-2.0 | lane 4 |
 | `sylvia-provider/src/httpx_url.rs` | `httpx.URL` parsing and normalisation (`httpx/_urlparse.py`, `httpx/_urls.py`) | httpx 0.28.1 | BSD-3-Clause | lane 4 |
 | `sylvia-provider/src/pyurl.rs` | CPython's `urllib.parse.urlsplit` and `urlunsplit`, with `hostname` and `port` (`Lib/urllib/parse.py`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
+| `sylvia-provider/src/config/host_browser/mod.rs` (`posix_normpath`) | CPython's `posixpath.normpath` (`Lib/posixpath.py`, `_path_normpath` in `Python/fileutils.c`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
 | `sylvia-store/src/launch.rs` (`py_fromhex`) | CPython's `bytes.fromhex` (`Objects/bytesobject.c`, `_PyBytes_FromHex`): whitespace skipped before each pair | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 | `sylvia-store/src/safe_file/linux.rs` (`normpath`, `abspath`) | CPython's `posixpath.normpath` and `posixpath.abspath` (`Lib/posixpath.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 | `sylvia-store/src/sessions.rs` (`is_reserved_windows_name`) | CPython's `PureWindowsPath.is_reserved` and `_WIN_RESERVED_NAMES` (`Lib/pathlib.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |

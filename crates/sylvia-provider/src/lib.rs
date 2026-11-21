@@ -21,11 +21,13 @@
 
 pub mod chat;
 pub mod config;
+pub mod context_capacity;
 pub mod error;
 pub mod hooks;
 pub mod http;
 pub mod httpx_url;
 mod log;
+pub mod model_facts;
 pub mod openai_compat;
 pub mod provider;
 pub mod pyfmt;
