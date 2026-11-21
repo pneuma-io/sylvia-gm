@@ -1,0 +1,267 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "name": "riichi_untouched",
+   "base": "riichi",
+   "sql": [],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "story_untouched",
+   "base": "story",
+   "sql": [],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "unbound_campaign",
+   "base": "riichi",
+   "sql": [
+    "INSERT INTO campaigns (campaign_id, display_name, lifecycle, writer, revision, lock_hash, current_lock_id) VALUES ('campaign-unbound', 'Unbound', 'active', 'dm', 0, 'unbound', NULL)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "unbound_builder_without_interview",
+   "base": "riichi",
+   "sql": [
+    "INSERT INTO campaigns (campaign_id, display_name, lifecycle, writer, revision, lock_hash, current_lock_id) VALUES ('campaign-unbound', 'Unbound', 'active', 'builder', 0, 'unbound', NULL)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "activation_row",
+   "base": "riichi",
+   "sql": [
+    "INSERT INTO package_activations (activation_id, campaign_id, candidate_id, old_lock_id, new_lock_id, migration_id, status, resulting_revision, payload_sha256, result_json) VALUES ('activation-x', 'campaign-x', 'candidate-install-1', 'lock-a', 'lock-b', 'none', 'committed', 1, 'p', '{}')"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "package_sha_uppercase",
+   "base": "riichi",
+   "sql": [
+    "UPDATE packages SET sha256 = upper(sha256) WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "package_capabilities_object",
+   "base": "riichi",
+   "sql": [
+    "UPDATE packages SET capabilities_json = '{\"a\":1}' WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "package_capabilities_numbers",
+   "base": "riichi",
+   "sql": [
+    "UPDATE packages SET capabilities_json = '[1]' WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "package_capabilities_not_json",
+   "base": "riichi",
+   "sql": [
+    "UPDATE packages SET capabilities_json = 'x' WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "dependency_order_gap",
+   "base": "riichi",
+   "sql": [
+    "UPDATE package_dependencies SET dependency_order = 5"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "dependency_kind_blank",
+   "base": "riichi",
+   "sql": [
+    "UPDATE package_dependencies SET dependency_kind = ' '"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "campaign_name_padded",
+   "base": "story",
+   "sql": [
+    "UPDATE campaigns SET display_name = ' Story' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "campaign_lock_hash",
+   "base": "story",
+   "sql": [
+    "UPDATE campaigns SET lock_hash = '[]' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "event_attempt_blank",
+   "base": "story",
+   "sql": [
+    "UPDATE canonical_events SET attempt_id = ' ' WHERE sequence = (SELECT MIN(sequence) FROM canonical_events WHERE attempt_id IS NOT NULL)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_payload_hash_uppercase",
+   "base": "story",
+   "sql": [
+    "UPDATE actions SET payload_hash = upper(payload_hash)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "state_owner_missing",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_delete_requires_empty",
+    "DROP TRIGGER campaign_state_owner_immutable",
+    "DROP TRIGGER campaign_state_owner_matches_current_lock",
+    "DROP TRIGGER campaign_state_owner_required_insert",
+    "DROP TRIGGER campaign_state_owner_required_update",
+    "DELETE FROM campaign_state_namespace_owners",
+    "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
+    "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
+    "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign state namespace ownership is incomplete"
+   }
+  },
+  {
+   "name": "state_owner_without_state",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_delete_requires_empty",
+    "DROP TRIGGER campaign_state_owner_immutable",
+    "DROP TRIGGER campaign_state_owner_matches_current_lock",
+    "DROP TRIGGER campaign_state_owner_required_insert",
+    "DROP TRIGGER campaign_state_owner_required_update",
+    "INSERT INTO campaign_state_namespace_owners SELECT campaign_id, 'other.namespace', owner_package_id FROM campaign_state_namespace_owners LIMIT 1",
+    "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
+    "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
+    "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign state namespace ownership is not canonical"
+   }
+  },
+  {
+   "name": "state_owner_foreign",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_delete_requires_empty",
+    "DROP TRIGGER campaign_state_owner_immutable",
+    "DROP TRIGGER campaign_state_owner_matches_current_lock",
+    "DROP TRIGGER campaign_state_owner_required_insert",
+    "DROP TRIGGER campaign_state_owner_required_update",
+    "UPDATE campaign_state_namespace_owners SET owner_package_id = 'other.package'",
+    "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
+    "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
+    "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign state namespace owner conflicts with current lock"
+   }
+  },
+  {
+   "name": "state_trigger_dropped",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_immutable"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority state ownership trigger identity is invalid"
+   }
+  },
+  {
+   "name": "foreign_key_orphan",
+   "base": "story",
+   "sql": [
+    "INSERT INTO turns (campaign_id, turn_id, status, created_revision) VALUES ('campaign-gone', 'turn-x', 'open', 0)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  }
+ ]
+}

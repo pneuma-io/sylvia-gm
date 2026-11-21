@@ -286,9 +286,7 @@ impl AuthorityStore {
         verify_exact_schema_identity(connection, Some(version))?;
         // sqlite_packages.clear_stale_read_leases
         connection.execute("DELETE FROM package_read_leases", [])?;
-        // `_verify_stored_authority` runs here first in Python and is still to come (see the
-        // lane 3 ledger); until then a database it would refuse for an earlier reason may be
-        // refused here, or later, with a different message.
+        crate::stored::verify_stored_authority(connection)?;
         crate::packages::verify_package_authority(connection)?;
         if version == CAMPAIGN_SCHEMA_VERSION {
             // `verify_f5_campaign_authority` runs before this in Python; it is still to come.
