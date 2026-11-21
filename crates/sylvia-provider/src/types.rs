@@ -8,20 +8,142 @@ use std::collections::BTreeSet;
 use sylvia_base::{Json, JsonMap};
 
 /// `TokenUsage`: token counts for one request.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+///
+/// The three counts hold Python's value. A stream's usage is always an integer (Python coerces
+/// it with `int(...)`), but a complete response keeps what the SDK held: `None` when missing,
+/// or `3.9`, `"12"` from a malformed reply. Code that does arithmetic or comparisons on a count
+/// must go through the helper Python's code uses there ([`PyValue::int_or_zero`] for
+/// `int(x or 0)`, [`PyValue::as_int`] for an exact `int`), so it fails where Python fails.
+#[derive(Debug, Clone, PartialEq)]
 pub struct TokenUsage {
-    pub prompt_tokens: i64,
-    pub completion_tokens: i64,
-    pub total_tokens: i64,
+    pub prompt_tokens: PyValue,
+    pub completion_tokens: PyValue,
+    pub total_tokens: PyValue,
     pub reasoning_tokens: Option<i64>,
 }
 
-/// `ToolCall`: a completed tool call; `arguments` is the JSON text exactly as received.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+impl Default for TokenUsage {
+    /// `TokenUsage()`: zero counts, no reasoning count.
+    fn default() -> Self {
+        Self::from_ints(0, 0, 0, None)
+    }
+}
+
+impl TokenUsage {
+    /// Integer counts, as the streaming path and most providers produce them.
+    pub fn from_ints(prompt: i64, completion: i64, total: i64, reasoning: Option<i64>) -> Self {
+        Self {
+            prompt_tokens: PyValue::int(prompt),
+            completion_tokens: PyValue::int(completion),
+            total_tokens: PyValue::int(total),
+            reasoning_tokens: reasoning,
+        }
+    }
+}
+
+/// A field Python keeps as whatever the provider sent. Normally text; a malformed reply (common
+/// from small local models) can leave `None` or another JSON value, which Python then saves in
+/// history and sends back to the model unchanged.
+#[derive(Debug, Clone, PartialEq)]
+pub enum PyValue {
+    /// A Python `str`.
+    Text(String),
+    /// Anything else, `None` included (`Json::Null`). Never a JSON string.
+    Other(Json),
+}
+
+impl Default for PyValue {
+    fn default() -> Self {
+        Self::Text(String::new())
+    }
+}
+
+impl PyValue {
+    /// The value a JSON value stands for.
+    pub fn from_json(value: Json) -> Self {
+        match value {
+            Json::String(text) => Self::Text(text),
+            other => Self::Other(other),
+        }
+    }
+
+    /// Python's `None`.
+    pub fn none() -> Self {
+        Self::Other(Json::Null)
+    }
+
+    /// A Python `int`.
+    pub fn int(value: i64) -> Self {
+        Self::Other(Json::from(value))
+    }
+
+    /// The value when it is a Python `int` (not a `bool`, `float` or text), else `None`.
+    pub fn as_int(&self) -> Option<i64> {
+        match self {
+            Self::Other(Json::Number(number)) if !number.is_f64() => number.as_i64(),
+            _ => None,
+        }
+    }
+
+    /// `int(value or 0)`, with Python's failures as `Incidental` (and the integer-overflow
+    /// refusal for values beyond `i64`).
+    pub fn int_or_zero(&self) -> Result<i64, crate::pyobj::Incidental> {
+        crate::pyobj::int_or_zero(&self.to_json())
+    }
+
+    /// The text, when it is a `str`.
+    pub fn as_text(&self) -> Option<&str> {
+        match self {
+            Self::Text(text) => Some(text),
+            Self::Other(_) => None,
+        }
+    }
+
+    /// Whether it is Python's `None`.
+    pub fn is_none(&self) -> bool {
+        matches!(self, Self::Other(Json::Null))
+    }
+
+    /// As JSON, the way Python's `json.dumps` would write the value.
+    pub fn to_json(&self) -> Json {
+        match self {
+            Self::Text(text) => Json::String(text.clone()),
+            Self::Other(value) => value.clone(),
+        }
+    }
+}
+
+impl From<&str> for PyValue {
+    fn from(text: &str) -> Self {
+        Self::Text(text.to_owned())
+    }
+}
+
+impl From<String> for PyValue {
+    fn from(text: String) -> Self {
+        Self::Text(text)
+    }
+}
+
+/// `ToolCall`: a completed tool call. `arguments` is the JSON text exactly as received. Each
+/// field holds what Python held: text normally, but `None` or another value from a malformed
+/// complete response.
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct ToolCall {
-    pub id: String,
-    pub name: String,
-    pub arguments: String,
+    pub id: PyValue,
+    pub name: PyValue,
+    pub arguments: PyValue,
+}
+
+impl ToolCall {
+    /// A tool call with text fields.
+    pub fn new(id: impl Into<String>, name: impl Into<String>, arguments: impl Into<String>) -> Self {
+        Self {
+            id: PyValue::Text(id.into()),
+            name: PyValue::Text(name.into()),
+            arguments: PyValue::Text(arguments.into()),
+        }
+    }
 }
 
 /// `CacheUsage`: prompt-cache counts. A missing field is `None`; a reported zero is measured.
@@ -58,7 +180,8 @@ pub struct ProviderResponse {
     pub usage: TokenUsage,
     pub usage_reported: Option<bool>,
     pub model: String,
-    pub finish_reason: String,
+    /// `"stop"` by default; whatever truthy value the provider sent otherwise.
+    pub finish_reason: PyValue,
     pub cache_usage: CacheUsage,
     /// Opaque native continuation blocks; private, never canonical history.
     pub anthropic_content: Option<Vec<Json>>,
@@ -79,7 +202,7 @@ impl Default for ProviderResponse {
             usage: TokenUsage::default(),
             usage_reported: None,
             model: String::new(),
-            finish_reason: "stop".into(),
+            finish_reason: PyValue::from("stop"),
             cache_usage: CacheUsage::default(),
             anthropic_content: None,
             chat_completion_metadata: None,
@@ -100,7 +223,8 @@ pub struct ProviderStreamChunk {
     pub content: String,
     pub reasoning_content: String,
     pub tool_call_delta: Option<Json>,
-    pub finish_reason: Option<String>,
+    /// `None`, or the provider's value as Python held it (normally text).
+    pub finish_reason: Option<PyValue>,
     /// Complete native assistant content at message end, including signed thinking blocks.
     pub anthropic_content: Option<Vec<Json>>,
     /// Private signed/tool continuation fields, never canonical history.
@@ -117,7 +241,7 @@ impl ProviderStreamChunk {
 
     /// A chunk carrying only a finish reason.
     pub fn finish(reason: impl Into<String>) -> Self {
-        Self { finish_reason: Some(reason.into()), ..Self::default() }
+        Self { finish_reason: Some(PyValue::Text(reason.into())), ..Self::default() }
     }
 
     /// A chunk carrying only a tool-call fragment.

@@ -292,52 +292,11 @@ const CONTEXT_PHRASES: [&str; 11] = [
     "context length exceeded",
 ];
 
-/// `is_context_rejection(error)` applied to `str(error)`.
-///
-/// Python casefolds the text first. The phrases are ASCII, so only characters whose case fold
-/// produces ASCII letters can change the outcome; [`casefold`] covers those exactly.
+/// `is_context_rejection(error)` applied to `str(error)`: casefolded, then searched for the
+/// capacity phrases (unsupported token or schema options are not overflow).
 pub fn is_context_rejection(text: &str) -> bool {
-    let folded = casefold(text);
+    let folded = sylvia_base::pystr::casefold(text);
     CONTEXT_PHRASES.iter().any(|phrase| folded.contains(phrase))
-}
-
-/// `str.casefold()` as far as it matters for matching ASCII phrases.
-///
-/// Full Unicode case folding needs tables pinned to Unicode 15.0. Matching only ASCII phrases
-/// needs less: a character either folds to the same ASCII letters Python gives (ASCII letters,
-/// the Kelvin sign, the long s, `ß`→`ss`, the `ﬀ`-family ligatures and similar) or folds to
-/// something that cannot form part of an ASCII phrase. Non-ASCII characters whose fold is not
-/// ASCII are kept as they are, which is enough to stop a false match across them.
-pub fn casefold(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    for character in text.chars() {
-        match character {
-            'A'..='Z' => out.push(character.to_ascii_lowercase()),
-            '\u{212A}' => out.push('k'), // KELVIN SIGN
-            '\u{017F}' => out.push('s'), // LATIN SMALL LETTER LONG S
-            '\u{00DF}' => out.push_str("ss"),
-            '\u{1E9E}' => out.push_str("ss"),
-            '\u{FB00}' => out.push_str("ff"),
-            '\u{FB01}' => out.push_str("fi"),
-            '\u{FB02}' => out.push_str("fl"),
-            '\u{FB03}' => out.push_str("ffi"),
-            '\u{FB04}' => out.push_str("ffl"),
-            '\u{FB05}' | '\u{FB06}' => out.push_str("st"),
-            '\u{0130}' => out.push_str("i\u{0307}"),
-            '\u{1E96}' => out.push_str("h\u{0331}"),
-            '\u{1E97}' => out.push_str("t\u{0308}"),
-            '\u{1E98}' => out.push_str("w\u{030A}"),
-            '\u{1E99}' => out.push_str("y\u{030A}"),
-            '\u{1E9A}' => out.push_str("a\u{02BE}"),
-            '\u{01F0}' => out.push_str("j\u{030C}"),
-            '\u{0149}' => out.push_str("\u{02BC}n"),
-            _ => {
-                let lower: String = character.to_lowercase().collect();
-                out.push_str(&lower);
-            }
-        }
-    }
-    out
 }
 
 #[cfg(test)]

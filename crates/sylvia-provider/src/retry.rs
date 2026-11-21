@@ -40,80 +40,16 @@ fn now_micros() -> i64 {
     i64::try_from(since.as_micros()).unwrap_or(i64::MAX)
 }
 
-/// Python's whitespace for `str.split()` and `str.strip()`.
-pub fn is_python_space(character: char) -> bool {
-    matches!(
-        character,
-        '\t' | '\n' | '\u{0B}' | '\u{0C}' | '\r' | '\u{1C}'..='\u{1F}' | ' ' | '\u{85}' | '\u{A0}'
-            | '\u{1680}' | '\u{2000}'..='\u{200A}' | '\u{2028}' | '\u{2029}' | '\u{202F}'
-            | '\u{205F}' | '\u{3000}'
-    )
-}
-
-/// The whitespace `float()` and `int()` strip: ASCII space, tab, line feed, `\v`, `\f`, `\r`
-/// and the non-ASCII Unicode spaces. Unlike `str.split()`, they keep `\x1c` to `\x1f`.
-fn is_number_space(character: char) -> bool {
-    is_python_space(character) && !('\u{1C}'..='\u{1F}').contains(&character)
-}
-
-/// Remove single underscores between digits, as Python's numeric literals allow; `None` when an
-/// underscore is anywhere else.
-fn without_digit_underscores(text: &str) -> Option<String> {
-    let characters: Vec<char> = text.chars().collect();
-    let mut out = String::with_capacity(text.len());
-    for (position, character) in characters.iter().enumerate() {
-        if *character == '_' {
-            let before = position.checked_sub(1).and_then(|index| characters.get(index));
-            let after = characters.get(position + 1);
-            if !matches!(before, Some(c) if c.is_ascii_digit())
-                || !matches!(after, Some(c) if c.is_ascii_digit())
-            {
-                return None;
-            }
-        } else {
-            out.push(*character);
-        }
-    }
-    Some(out)
-}
-
-/// `float(text)` for ASCII input: surrounding whitespace, a sign, digit underscores, `inf`,
-/// `infinity` and `nan` in any case. Non-ASCII digits, which Python also accepts, are refused.
+/// `float(text)` (`sylvia_base::pystr::parse_float`, Python's string rules), `None` where
+/// Python raises `ValueError`.
 pub fn python_float(text: &str) -> Option<f64> {
-    let trimmed = text.trim_matches(is_number_space);
-    if trimmed.is_empty() || !trimmed.is_ascii() {
-        return None;
-    }
-    let plain = without_digit_underscores(trimmed)?;
-    let unsigned = plain.strip_prefix(['+', '-']).unwrap_or(&plain);
-    let lowered = unsigned.to_ascii_lowercase();
-    if matches!(lowered.as_str(), "inf" | "infinity" | "nan") {
-        let negative = plain.starts_with('-');
-        return Some(match (lowered.as_str(), negative) {
-            ("nan", _) => f64::NAN,
-            (_, true) => f64::NEG_INFINITY,
-            _ => f64::INFINITY,
-        });
-    }
-    // The remaining grammar is digits, an optional point and an optional exponent; Rust's
-    // parser agrees on it, but would also accept the words handled above.
-    if !unsigned.chars().all(|c| c.is_ascii_digit() || matches!(c, '.' | 'e' | 'E' | '+' | '-')) {
-        return None;
-    }
-    plain.parse::<f64>().ok()
+    sylvia_base::pystr::parse_float(text).ok()
 }
 
-/// `int(text)` for one token: a sign, ASCII digits and digit underscores.
+/// `int(text)` for a date token. The values are only compared with the date limits, so an
+/// integer beyond `i64` stands as the bound on its side and fails them as Python's would.
 fn python_int(text: &str) -> Option<i64> {
-    let trimmed = text.trim_matches(is_number_space);
-    let plain = without_digit_underscores(trimmed)?;
-    let unsigned = plain.strip_prefix(['+', '-']).unwrap_or(&plain);
-    if unsigned.is_empty() || !unsigned.chars().all(|c| c.is_ascii_digit()) {
-        return None;
-    }
-    // Beyond i64 the date is out of range for Python's datetime anyway; saturate so the range
-    // checks below reject it the same way.
-    Some(plain.parse::<i64>().unwrap_or(if plain.starts_with('-') { i64::MIN } else { i64::MAX }))
+    sylvia_base::pystr::parse_int(text).or_else(|error| error.bound_for_comparison()).ok()
 }
 
 const MONTH_NAMES: [&str; 24] = [
@@ -166,7 +102,7 @@ fn named_zone(zone: &str) -> Option<i64> {
 #[allow(clippy::type_complexity)]
 fn parsedate_tz(data: &str) -> Option<([i64; 6], Option<i64>)> {
     let mut data: Vec<String> =
-        data.split(is_python_space).filter(|s| !s.is_empty()).map(str::to_owned).collect();
+        data.split(sylvia_base::pystr::is_space).filter(|s| !s.is_empty()).map(str::to_owned).collect();
     if data.is_empty() {
         return None;
     }
@@ -228,7 +164,10 @@ fn parsedate_tz(data: &str) -> Option<([i64; 6], Option<i64>)> {
             return None;
         }
     }
-    if !yy.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+    // yy[0].isdigit(), read as "is a decimal digit of any script". str.isdigit also accepts
+    // superscript and other non-decimal digits; a date token starting with one is not handled
+    // as Python handles it (it cannot parse as a date in either).
+    if !yy.chars().next().is_some_and(|c| sylvia_base::pystr::decimal(c).is_some()) {
         std::mem::swap(&mut yy, &mut tz);
     }
     if tm.ends_with(',') {

@@ -10,14 +10,22 @@
 //! - [`retry`] holds `provider/_retry.py` and `provider/_retry_after.py`.
 //! - [`stream_health`] holds `provider/_stream_health.py`.
 //! - [`tool_delta`] holds `provider/_tool_delta.py`.
+//! - [`chat`] holds the Chat Completions transport (`provider/_openai_compat.py` without HTTP).
+//! - [`http`] holds the HTTP seam and the scripted transport for tests.
+//! - [`sse`] holds the OpenAI SDK's server-sent-event reading.
+//! - [`pyobj`] holds Python's view of provider JSON.
 //! - [`pyfmt`] holds Python's `:g` number formatting.
 
+pub mod chat;
 pub mod error;
+pub mod http;
 mod log;
 pub mod provider;
 pub mod pyfmt;
+pub mod pyobj;
 pub mod reply;
 pub mod retry;
+pub mod sse;
 pub mod stream_health;
 pub mod tool_delta;
 pub mod types;
