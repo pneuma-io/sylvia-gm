@@ -20,9 +20,9 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/infrastructure/builder_source_ingestion.py` | 571 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/builder_workspace_migration.py` | 130 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/campaign_archive.py` | 3,188 | `sylvia-store` | pending | |
-| `src/sylvia_gm/infrastructure/launch_handshake.py` | 138 | `sylvia-store` | pending | |
+| `src/sylvia_gm/infrastructure/launch_handshake.py` | 138 | `sylvia-store` | ported | `launch` (`LaunchHandshake`, `OwnerCredential`, `derive_owner_response`; `bytes.fromhex` and `compare_digest` as CPython 3.12). Ported as Python behaves, do not fix: any 64-character text `fromhex` accepts is a secret, so whitespace between pairs gives a shorter key and 64 spaces the empty key (vectors in `tests/vectors/handshake_vectors.json`). Lane 5 deletes `sylvia-owner::handshake` and calls this. |
 | `src/sylvia_gm/infrastructure/owner_lock.py` | 68 | `sylvia-store` | ported | `owner_lock` (`OwnerLock`, `authority_lock_identity`). Python and Rust owners exclude each other both ways on Windows and Linux: `tests/vectors/lock_interop.py`. |
-| `src/sylvia_gm/infrastructure/owner_process_probe.py` | 118 | `sylvia-store` | pending | |
+| `src/sylvia_gm/infrastructure/owner_process_probe.py` | 118 | `sylvia-store` | ported | `launch` (`probe_owner_live`, `OwnerProbeResult`, `write_recover_hint`), plus `launch::acquire_owner`, the store half of `LocalOwnerSupervisor.acquire_owner`. Python and Rust probes see each other's lock both ways: `tests/vectors/lock_interop.py`. |
 | `src/sylvia_gm/infrastructure/participant_history.py` | 32 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/private_records_archive.py` | 104 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/safe_file.py` | 607 | `sylvia-store` | ported | `safe_file` (Linux on `rustix`; Windows with the three approved kernel32 calls in `safe_file/windows.rs`, rule 9). Vectors: `tests/vectors/safe_file_vectors.json`; per-platform behaviour: `tests/safe_file.rs`. |
