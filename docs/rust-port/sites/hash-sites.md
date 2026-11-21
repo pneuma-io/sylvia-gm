@@ -74,10 +74,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/campaign_sequel.py:24` | `digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(value)).hexdigest()` | |
 | `domain/model_capability.py:108` | `ModelCapabilityPlacement.evidence_sha256` | hashlib.sha256 | `return hashlib.sha256(_canonical_bytes(payload)).hexdigest()` | |
 | `domain/model_capability.py:323` | `model_guidance_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(_canonical_bytes(model_guidance_payload(decision))).hexdigest()` | |
-| `domain/package_library.py:600` | `participant_schema_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | |
-| `domain/package_library.py:718` | `content_root_for_record` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(without_claim)).hexdigest()` | |
-| `domain/package_library.py:732` | `closure_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(membership)).hexdigest()` | |
-| `domain/package_library.py:738` | `activation_payload_sha256` | hashlib.sha256 | `return hashlib.sha256( canonical_json_bytes( { "campaign_id": command.campaign_id, "candidate_id": command.candidate_id, "expected_revision": comma...` | |
+| `domain/package_library.py:600` | `participant_schema_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | `sylvia-domain` identity_vectors |
+| `domain/package_library.py:718` | `content_root_for_record` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(without_claim)).hexdigest()` | `sylvia-domain` identity_vectors |
+| `domain/package_library.py:732` | `closure_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(membership)).hexdigest()` | `sylvia-domain` identity_vectors |
+| `domain/package_library.py:738` | `activation_payload_sha256` | hashlib.sha256 | `return hashlib.sha256( canonical_json_bytes( { "campaign_id": command.campaign_id, "candidate_id": command.candidate_id, "expected_revision": comma...` | `sylvia-domain` identity_vectors |
 | `domain/session.py:146` | `builder_dm_handoff_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(encoded).hexdigest()` | |
 | `domain/session.py:229` | `campaign_plan_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(encoded).hexdigest()` | |
 | `domain/session.py:311` | `agent_session_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(encoded).hexdigest()` | |

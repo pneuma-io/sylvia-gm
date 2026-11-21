@@ -76,8 +76,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/_content_schema_ui.py:29` | `trimmed_text` | JSON Schema pattern; plain | `"not": {"pattern": r"\u0000"},` | |
 | `domain/_content_schema_ui.py:37` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `"pattern": r"^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\s\S])",` | |
 | `domain/_content_schema_ui.py:39` | `<module>` | JSON Schema pattern; NEEDS fancy-regex: lookahead | `_LAYOUT_ID = {"type": "string", "pattern": r"^[A-Za-z0-9_-]{1,96}$(?![\s\S])"}` | |
-| `domain/authority.py:586` | `_is_reserved_canonical_channel` | re.sub; NEEDS fancy-regex: lookahead, lookbehind | `separated = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", name)` | |
-| `domain/authority.py:587` | `_is_reserved_canonical_channel` | re.split; plain | `tokens = tuple(token for token in re.split(r"[^a-z0-9]+", separated.casefold()) if token)` | |
+| `domain/authority.py:586` | `_is_reserved_canonical_channel` | re.sub; NEEDS fancy-regex: lookahead, lookbehind | `separated = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", name)` | `sylvia-domain` identity_vectors |
+| `domain/authority.py:587` | `_is_reserved_canonical_channel` | re.split; plain | `tokens = tuple(token for token in re.split(r"[^a-z0-9]+", separated.casefold()) if token)` | `sylvia-domain` identity_vectors |
 | `domain/campaign_plan.py:26` | `<module>` | re.compile; plain | `_ABSOLUTE_PATH = re.compile(r"(?:^[A-Za-z]:[\\/]\|^/\|^\\\\)")` | |
 | `domain/campaign_plan.py:129` | `CampaignPlanFieldsError.__init__` | re.fullmatch; plain | `if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", name)` | |
 | `domain/campaign_plan.py:209` | `_identity` | re.fullmatch; plain | `if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", text):` | |
@@ -85,7 +85,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/campaign_plan.py:274` | `_package_binding` | re.fullmatch; plain | `if not re.fullmatch(r"[0-9a-f]{64}", content_sha256):` | |
 | `domain/content_validation.py:54` | `_field_path` | re.fullmatch; plain | `elif isinstance(part, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]{0,95}", part):` | |
 | `domain/content_validation.py:115` | `validate_content_shape` | re.search; pattern built at run time, check by hand | `and not any(re.search(pattern, field) for pattern in patterns)` | |
-| `domain/package_library.py:757` | `validate_portable_path` | re.match; plain | `if re.match(r"^[A-Za-z]:", path):` | |
+| `domain/package_library.py:757` | `validate_portable_path` | re.match; plain | `if re.match(r"^[A-Za-z]:", path):` | `sylvia-domain` identity_vectors |
 | `domain/starting_state.py:14` | `<module>` | re.compile; plain | `_BINDING = re.compile(r"\$[a-zA-Z_][a-zA-Z0-9_]{0,63}\Z")` | |
 | `state/_validators.py:133` | `_validate_spell_slots` | re.compile; pattern built at run time, check by hand | `_re = re.compile(_SPELL_SLOT_KEY_RE)` | |
 | `state/_validators.py:305` | `validate_entity_id` | re.match; plain | `if not re.match(r"^[a-z0-9_-]+$", entity_id):` | |
