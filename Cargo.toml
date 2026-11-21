@@ -23,7 +23,6 @@ version = "0.4.1"
 edition = "2021"
 rust-version = "1.85"
 authors = ["Daniel Young"]
-license-file = "LICENSE"
 publish = false
 
 # One pinned set of shared dependencies. A lane that needs a new crate adds it here in its own
@@ -60,6 +59,10 @@ unsafe_code = "deny"
 
 [workspace.lints.clippy]
 all = { level = "warn", priority = -1 }
+# Errors in this port carry what the Python exception carried (class, exact message,
+# diagnostics, retry hints), so they are larger than clippy's 128-byte guideline. They are
+# returned rarely and never in a hot loop; boxing them would only add noise.
+result_large_err = "allow"
 
 [profile.dev]
 # Engine and comparison runs are slow unoptimised; keep debug assertions.

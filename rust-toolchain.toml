@@ -1,0 +1,7 @@
+# One toolchain for every lane and every machine, so format and lint give the same verdict on
+# Windows and on the Linux image. Change it only in its own pull request, with the fixes for
+# any new lints in the same change.
+[toolchain]
+channel = "1.100.0"
+components = ["clippy", "rustfmt"]
+profile = "minimal"

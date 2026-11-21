@@ -123,6 +123,19 @@ The lists in `sites/` give every occurrence by lane. The traps behind them:
 Run these before opening a pull request, on Linux first (boat.dev) and on Windows for
 anything platform-specific.
 
+**Toolchain.** `rust-toolchain.toml` pins Rust 1.100.0 with clippy and rustfmt, so format and
+lint give the same verdict on every machine. `rustup` installs it on first use. On Windows,
+rustup on this PC resolves a bare version to the GNU toolchain, which cannot build the bundled
+SQLite; in each Windows checkout run once:
+
+```
+rustup toolchain install 1.100.0-x86_64-pc-windows-msvc --profile minimal -c clippy -c rustfmt
+rustup override set 1.100.0-x86_64-pc-windows-msvc
+```
+
+The override applies to that folder only. A toolchain change is its own pull request, with
+the fixes for any new lints in the same change.
+
 ```
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
