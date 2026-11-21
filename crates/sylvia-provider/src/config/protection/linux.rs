@@ -134,6 +134,12 @@ impl KeyFile {
     }
 }
 
+impl super::Seal for KeyFile {
+    fn seal(&self, value: &[u8], decrypt: bool) -> Result<Vec<u8>, ConfigFailure> {
+        KeyFile::seal(self, value, decrypt)
+    }
+}
+
 /// AES-256-GCM: `nonce + AESGCM(key).encrypt(nonce, value, associated data)`.
 fn seal_with(key: &[u8], nonce: &[u8; NONCE_BYTES], value: &[u8]) -> Result<Vec<u8>, Failure> {
     let cipher = Aes256Gcm::new_from_slice(key).map_err(|_| Failure::Other)?;

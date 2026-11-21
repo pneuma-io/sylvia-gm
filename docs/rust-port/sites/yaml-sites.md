@@ -38,6 +38,6 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `config/_user_settings.py:55` | `_replace` | yaml.safe_dump | `payload = yaml.safe_dump(dict(document), sort_keys=False, allow_unicode=True)` | |
-| `config/_user_settings.py:87` | `read_user_settings` | yaml.safe_load | `document = yaml.safe_load(path.read_text(encoding="utf-8"))` | |
-| `config/loader.py:264` | `_load_yaml` | yaml.safe_load | `data = yaml.safe_load(fh)` | |
+| `config/_user_settings.py:55` | `_replace` | yaml.safe_dump | `payload = yaml.safe_dump(dict(document), sort_keys=False, allow_unicode=True)` | yes |
+| `config/_user_settings.py:87` | `read_user_settings` | yaml.safe_load | `document = yaml.safe_load(path.read_text(encoding="utf-8"))` | yes |
+| `config/loader.py:264` | `_load_yaml` | yaml.safe_load | `data = yaml.safe_load(fh)` | yes |
