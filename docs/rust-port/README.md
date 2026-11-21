@@ -36,6 +36,25 @@ Dependencies run one way: `sylvia-base` ← `sylvia-domain` ← `sylvia-engine` 
 and `sylvia-domain` only. `sylvia-app` has one module per Python service file, and the ledger
 row names the lane that owns it.
 
+### Command handlers
+
+Python's command handlers are `interfaces/commands/<topic>.py`: thin functions that read the
+request's parameters and call a service. The Rust handlers mirror them one to one in
+`crates/sylvia-owner/src/commands/<topic>.rs` and take the owner's dispatch context, which
+lives in `sylvia-owner` and holds a handle to each service (the store, the provider
+resolver, the session loop, the storage root).
+
+- A lower crate cannot name a type from `sylvia-owner`, so service crates do not export
+  command handlers. They export **typed service operations** (the Rust counterparts of the
+  Python functions a handler calls) and the handle type the dispatch context holds.
+- Lane 5 owns the handler files, the parameter parsing with Python's exact messages, and the
+  dispatch. When a lane lands a service operation it tells the manager which commands that
+  makes answerable.
+- The one shared area: the lane that ports a service **may** add the handler for its own
+  command in `crates/sylvia-owner/src/commands/<topic>.rs` in the same pull request, touching
+  only that handler, its status in `commands/table.rs` and its tick in `commands.md`. Say so in
+  the pull request; lane 5 is told and may adjust it afterwards.
+
 `src-tauri` (the desktop shell) stays outside the Cargo workspace until lane 5 moves
 packaging off PyInstaller. The release scripts pin its own lock file and target folder.
 

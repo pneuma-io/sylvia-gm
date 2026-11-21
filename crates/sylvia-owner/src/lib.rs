@@ -8,8 +8,8 @@
 //!
 //! What exists today is the frame: launch handshake, line protocol, request validation, the
 //! command table and shutdown. Every command in the table still answers `rust_port_pending`.
-//! A command is ported by adding its handler in [`dispatch`] and flipping its status in
-//! `commands.rs`; `docs/rust-port/commands.md` is the burn-down.
+//! A command is ported by adding its handler under [`commands`] and flipping its status in
+//! `commands/table.rs`; `docs/rust-port/commands.md` is the burn-down.
 
 pub mod commands;
 pub mod dispatch;

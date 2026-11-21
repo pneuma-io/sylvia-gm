@@ -4,8 +4,9 @@ Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 125 registry command
 
 A command is done when the Rust owner answers it and a comparison session covering it
 passes against the recorded Python owner. Tick it here in the same pull request that
-flips its status in `crates/sylvia-owner/src/commands.rs`. Handlers live with the lane
-that owns the service behind them; lane 5 owns the dispatch itself.
+flips its status in the owner's command table. Handlers live in
+`crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
+lane that owns the service; see "Command handlers" in `README.md`.
 
 Ported: 1 of 137 (`shutdown`).
 

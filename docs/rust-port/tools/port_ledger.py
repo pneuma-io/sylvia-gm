@@ -215,7 +215,7 @@ def commands(commit: str, overwrite: bool) -> None:
         "    }",
         "}",
     ]
-    write(ROOT / "crates/sylvia-owner/src/commands.rs", "\n".join(rust) + "\n",
+    write(ROOT / "crates/sylvia-owner/src/commands/table.rs", "\n".join(rust) + "\n",
           overwrite=overwrite)
 
     table = [
@@ -224,7 +224,7 @@ def commands(commit: str, overwrite: bool) -> None:
         "run-loop methods.", "",
         "A command is done when the Rust owner answers it and a comparison session covering it",
         "passes against the recorded Python owner. Tick it here in the same pull request that",
-        "flips its status in `crates/sylvia-owner/src/commands.rs`. Handlers live with the lane",
+        "flips its status in `crates/sylvia-owner/src/commands/table.rs`. Handlers live with the lane",
         "that owns the service behind them; lane 5 owns the dispatch itself.", "",
         f"Ported: 1 of {len(declared) + len(run_loop)} (`shutdown`).", "",
         "## Run-loop methods", "",

@@ -2,7 +2,7 @@
 //!
 //! Written once from `interfaces/commands/registry.py` at snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7` by
 //! `docs/rust-port/tools/port_ledger.py`, and maintained by hand since. When a command is
-//! ported, add its handler in `dispatch.rs`, change its status here to `Ported` and
+//! ported, add its handler in `commands/<topic>.rs`, change its status here to `Ported` and
 //! tick it in `docs/rust-port/commands.md`.
 
 /// Whether the Rust owner answers a command itself yet.
