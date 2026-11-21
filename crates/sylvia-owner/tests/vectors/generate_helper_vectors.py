@@ -587,8 +587,19 @@ def reg_file(key: str, case) -> str:
     return "\r\n".join(lines) + "\r\n"
 
 
+def delete_scratch_key(subkey: str) -> None:
+    """Delete a scratch HKCU key in both registry views, then make sure it is gone in both."""
+    for view in ("/reg:64", "/reg:32"):
+        # A view where the key is already gone answers 1; the query below is the check.
+        subprocess.run(["reg", "delete", "HKCU\\" + subkey, "/f", view], capture_output=True)
+    for view in ("/reg:64", "/reg:32"):
+        if subprocess.run(["reg", "query", "HKCU\\" + subkey, view], capture_output=True).returncode == 0:
+            raise RuntimeError(f"The scratch key HKCU\\{subkey} is still there ({view}).")
+
+
 def run_registry(case):
-    key = rf"Software\sylvia-gm-port-tests\helper-vectors-{os.getpid()}"
+    # A key of its own directly under Software, so deleting it leaves no parent behind.
+    key = rf"Software\sylvia-gm-port-test-helper-vectors-{os.getpid()}"
     folder = Path(tempfile.mkdtemp(prefix="sylvia-registry-"))
     saved = installed.UNINSTALL_KEY, installed.PRODUCT_KEY
     try:
@@ -603,7 +614,7 @@ def run_registry(case):
             return {"error": [error.code, str(error)]}
     finally:
         installed.UNINSTALL_KEY, installed.PRODUCT_KEY = saved
-        subprocess.run(["reg", "delete", "HKCU\\" + key, "/f"], capture_output=True)
+        delete_scratch_key(key)
         shutil.rmtree(folder)
 
 
