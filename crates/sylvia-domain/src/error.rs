@@ -54,7 +54,68 @@ impl RulesetDiagnostic {
     }
 }
 
-/// A Python `ValueError` or `TypeError` with its exact `str(error)`.
+/// One privacy-safe schema problem a model can correct without seeing values
+/// (`MechanicsValidationIssue`).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct MechanicsValidationIssue {
+    pub path: String,
+    pub kind: String,
+    pub expected_type: Option<String>,
+    pub actual_type: Option<String>,
+    pub parent_path: Option<String>,
+    pub allowed_values: Vec<String>,
+    /// A Python `int` of any size, so kept as the JSON number.
+    pub minimum: Option<serde_json::Number>,
+    pub maximum: Option<serde_json::Number>,
+    pub actual_length: Option<i64>,
+}
+
+impl MechanicsValidationIssue {
+    /// `as_payload()`: schema facts and submitted types and lengths, never submitted text.
+    pub fn as_payload(&self) -> JsonMap {
+        let mut payload = JsonMap::new();
+        payload.insert("path".into(), Json::from(self.path.as_str()));
+        payload.insert("kind".into(), Json::from(self.kind.as_str()));
+        let text = [
+            ("expected_type", &self.expected_type),
+            ("actual_type", &self.actual_type),
+            ("parent_path", &self.parent_path),
+        ];
+        for (name, value) in text {
+            if let Some(value) = value {
+                payload.insert(name.into(), Json::from(value.as_str()));
+            }
+        }
+        for (name, value) in [("minimum", &self.minimum), ("maximum", &self.maximum)] {
+            if let Some(value) = value {
+                payload.insert(name.into(), Json::Number(value.clone()));
+            }
+        }
+        if let Some(length) = self.actual_length {
+            payload.insert("actual_length".into(), Json::from(length));
+        }
+        if !self.allowed_values.is_empty() {
+            payload.insert(
+                "allowed_values".into(),
+                Json::Array(self.allowed_values.iter().map(|v| Json::from(v.as_str())).collect()),
+            );
+        }
+        payload
+    }
+}
+
+/// The extra fields of a `MechanicsRejected` (and `RulesetPreconditionRejected`).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct MechanicsDetails {
+    pub field_paths: Vec<String>,
+    /// At most 64, as Python keeps `validation_issues[:64]`.
+    pub validation_issues: Vec<MechanicsValidationIssue>,
+    pub state_changed: bool,
+    /// At most 64.
+    pub refusal_reasons: Vec<String>,
+}
+
+/// A Python exception the domain raises, with its exact `str(error)`.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum DomainError {
     /// `raise ValueError(message)`.
@@ -73,6 +134,29 @@ pub enum DomainError {
         /// `error.diagnostics`.
         diagnostics: Vec<RulesetDiagnostic>,
     },
+    /// An `AuthorityError` (a `RuntimeError` in Python): `CommandRejected`, `MechanicsRejected`,
+    /// `StaleRevision` and the rest, with the stable `code` the owner replies with.
+    #[error("{message}")]
+    Rejected {
+        /// `type(error).__name__`.
+        error_type: &'static str,
+        /// `error.code`.
+        code: String,
+        /// `str(error)`.
+        message: String,
+        /// `error.diagnostics` (at most 16).
+        diagnostics: Vec<RulesetDiagnostic>,
+        /// The fields of a `MechanicsRejected`.
+        mechanics: Option<Box<MechanicsDetails>>,
+    },
+}
+
+/// `reason` is model-safe: nonempty, trimmed, at most 500 code points, no control characters.
+fn model_safe(reason: &str) -> bool {
+    !reason.is_empty()
+        && reason == sylvia_base::pystr::strip(reason)
+        && sylvia_base::pystr::len(reason) <= 500
+        && !reason.chars().any(|c| (c as u32) < 32)
 }
 
 impl DomainError {
@@ -86,18 +170,125 @@ impl DomainError {
         Self::Type(message.into())
     }
 
+    /// `CommandRejected(message)` with the default code `command_rejected`.
+    pub fn command_rejected(message: impl Into<String>) -> Self {
+        Self::command_rejected_with(message, "command_rejected", Vec::new())
+    }
+
+    /// `CommandRejected(message, code=..., diagnostics=...)`; Python keeps `diagnostics[:16]`.
+    pub fn command_rejected_with(
+        message: impl Into<String>,
+        code: impl Into<String>,
+        mut diagnostics: Vec<RulesetDiagnostic>,
+    ) -> Self {
+        diagnostics.truncate(16);
+        Self::Rejected {
+            error_type: "CommandRejected",
+            code: code.into(),
+            message: message.into(),
+            diagnostics,
+            mechanics: None,
+        }
+    }
+
+    /// An `AuthorityError` subclass with a class code: `SchemaIdentityError`
+    /// (`schema_identity_mismatch`), `WrongOwner`, `WrongWriter`, `StaleRevision`,
+    /// `IdempotencyConflict`, or `OwnerConflict` (no code of its own: `command_rejected`).
+    pub fn authority(error_type: &'static str, message: impl Into<String>) -> Self {
+        let code = match error_type {
+            "SchemaIdentityError" => "schema_identity_mismatch",
+            "WrongOwner" => "wrong_owner",
+            "WrongWriter" => "wrong_writer",
+            "StaleRevision" => "stale_revision",
+            "IdempotencyConflict" => "idempotency_conflict",
+            _ => "command_rejected",
+        };
+        Self::Rejected {
+            error_type,
+            code: code.into(),
+            message: message.into(),
+            diagnostics: Vec::new(),
+            mechanics: None,
+        }
+    }
+
+    /// `MechanicsRejected(message, code=..., field_paths=..., validation_issues=...,
+    /// state_changed=..., refusal_reasons=...)`. Python raises `ValueError` while constructing
+    /// it when a refusal reason is not model-safe.
+    pub fn mechanics_rejected(
+        message: impl Into<String>,
+        code: impl Into<String>,
+        mut details: MechanicsDetails,
+    ) -> DomainResult<Self> {
+        details.validation_issues.truncate(64);
+        details.refusal_reasons.truncate(64);
+        if details.refusal_reasons.iter().any(|reason| !model_safe(reason)) {
+            return Err(Self::value("Ruleset precondition reasons are not model-safe"));
+        }
+        Ok(Self::Rejected {
+            error_type: "MechanicsRejected",
+            code: code.into(),
+            message: message.into(),
+            diagnostics: Vec::new(),
+            mechanics: Some(Box::new(details)),
+        })
+    }
+
+    /// `RulesetPreconditionRejected(safe_reason, reasons=...)`.
+    pub fn ruleset_precondition_rejected(safe_reason: &str, reasons: &[String]) -> DomainResult<Self> {
+        if !model_safe(safe_reason) {
+            return Err(Self::value("Ruleset precondition reason is not model-safe"));
+        }
+        let mut refusal_reasons: Vec<String> = Vec::new();
+        for reason in std::iter::once(safe_reason).chain(reasons.iter().map(String::as_str)) {
+            if !refusal_reasons.iter().any(|existing| existing == reason) {
+                refusal_reasons.push(reason.to_owned());
+            }
+        }
+        let details = MechanicsDetails { refusal_reasons, ..Default::default() };
+        match Self::mechanics_rejected(safe_reason, "ruleset_precondition_failed", details)? {
+            Self::Rejected { code, message, diagnostics, mechanics, .. } => Ok(Self::Rejected {
+                error_type: "RulesetPreconditionRejected",
+                code,
+                message,
+                diagnostics,
+                mechanics,
+            }),
+            _ => unreachable!("mechanics_rejected builds a rejection"),
+        }
+    }
+
     /// `str(error)`.
     pub fn message(&self) -> &str {
         match self {
-            Self::Value(message) | Self::Type(message) | Self::Diagnosed { message, .. } => message,
+            Self::Value(message)
+            | Self::Type(message)
+            | Self::Diagnosed { message, .. }
+            | Self::Rejected { message, .. } => message,
         }
     }
 
     /// `error.diagnostics`, empty for a plain `ValueError` or `TypeError`.
     pub fn diagnostics(&self) -> &[RulesetDiagnostic] {
         match self {
-            Self::Diagnosed { diagnostics, .. } => diagnostics,
+            Self::Diagnosed { diagnostics, .. } | Self::Rejected { diagnostics, .. } => diagnostics,
             _ => &[],
+        }
+    }
+
+    /// `error.code` of an `AuthorityError`.
+    pub fn code(&self) -> Option<&str> {
+        match self {
+            Self::Rejected { code, .. } => Some(code),
+            _ => None,
+        }
+    }
+
+    /// The fields of a `MechanicsRejected`.
+    pub fn mechanics(&self) -> Option<&MechanicsDetails> {
+        match self {
+            Self::Rejected { mechanics: Some(details), .. } => Some(details),
+            _ => None,
         }
     }
 
@@ -106,31 +297,32 @@ impl DomainError {
         match self {
             Self::Value(_) => "ValueError",
             Self::Type(_) => "TypeError",
-            Self::Diagnosed { error_type, .. } => error_type,
+            Self::Diagnosed { error_type, .. } | Self::Rejected { error_type, .. } => error_type,
         }
     }
 
-    /// Whether Python would have raised a `ValueError` (or a subclass).
+    /// Whether Python would have raised a `ValueError` (or a subclass). An `AuthorityError`
+    /// is a `RuntimeError`, not a `ValueError`.
     pub fn is_value_error(&self) -> bool {
-        !matches!(self, Self::Type(_))
+        matches!(self, Self::Value(_) | Self::Diagnosed { .. })
     }
 
     /// The owner reply for this error if it reaches the owner uncaught.
     ///
-    /// The Python owner catches `ValueError` and replies `command_rejected` with `str(error)` and
-    /// `[d.as_payload() for d in error.diagnostics]`; `error_type` is `type(error).__name__`. It does not catch `TypeError`: that becomes
-    /// its `internal_error` reply, which the owner lane writes, so this returns `None`.
+    /// The Python owner catches `ValueError` and `AuthorityError`, and replies with
+    /// `getattr(error, "code", "command_rejected")`, `str(error)` and the diagnostics payloads;
+    /// `error_type` is `type(error).__name__`. It does not catch `TypeError`: that becomes its
+    /// `internal_error` reply, which the owner lane writes, so this returns `None`.
     pub fn rejection(&self) -> Option<CodedError> {
-        match self {
-            Self::Type(_) => None,
-            other => Some(
-                CodedError::rejected(other.message())
-                    .with_diagnostics(
-                        other.diagnostics().iter().map(|d| Json::Object(d.as_payload())).collect(),
-                    )
-                    .with_error_type(other.python_class()),
-            ),
+        if let Self::Type(_) = self {
+            return None;
         }
+        let code = self.code().unwrap_or("command_rejected");
+        Some(
+            CodedError::new(code, self.message())
+                .with_diagnostics(self.diagnostics().iter().map(|d| Json::Object(d.as_payload())).collect())
+                .with_error_type(self.python_class()),
+        )
     }
 }
 

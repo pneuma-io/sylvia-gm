@@ -44,7 +44,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/reusable_participants.py` | 799 | `sylvia-app::reusable_participants` | pending | |
 | `src/sylvia_gm/application/reusable_plans.py` | 575 | `sylvia-app::reusable_plans` | pending | |
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |
-| `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-app::schema_admission` | pending | |
+| `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-domain::schema_admission` | ported | In `sylvia-domain`, not `sylvia-app`: package archive admission (this crate) and the engine, store and agent lanes call it |
 | `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | pending | |
 | `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | pending | |
 | `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | pending | |
@@ -90,7 +90,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain::content::catalog` | ported | `list_content_definitions`, `get_content_definition` |
 | `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain::content::validation` | ported | `validate_content_shape`, `ContentShapeError`; the engine (`content::schema`) also serves lanes 2 and 4 and `state/_schema.py`, with jsonschema 4.26 messages |
-| `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain::error` | in progress | `RulesetDiagnostic` done; the authority error classes follow |
+| `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain::error` | ported | `RulesetDiagnostic`, `MechanicsValidationIssue`; the `AuthorityError` classes are `DomainError::Rejected` with their codes |
 | `src/sylvia_gm/domain/interview_contribution.py` | 150 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain::inventory` | in progress | Shared schemas done (data, `generate_inventory_schema.py`); `validate_holdings`, `transfer_holding` and `player_inventory` follow |
 | `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain` | pending | |

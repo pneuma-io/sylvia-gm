@@ -59,7 +59,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/reusable_plans.py:310` | `save_reusable_rift_plan` | len() against a limit | `or len(title) > 160` | |
 | `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` | |
 | `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` | |
-| `application/schema_admission.py:86` | `validate_json_schema` | len() against a limit | `or not 1 <= len(branches) <= 256` | |
+| `application/schema_admission.py:86` | `validate_json_schema` | len() against a limit | `or not 1 <= len(branches) <= 256` | `sylvia-domain` schema_admission_vectors |
 | `application/setting_character_requirements.py:76` | `parse_setting_character_requirements` | len() against a limit | `if not encoded or len(encoded) > _BYTE_LIMIT:` | |
 | `application/setting_character_requirements.py:145` | `validate_setting_character_data` | len() against a limit | `if len(canonical_json_bytes(captured)) > _BYTE_LIMIT:` | |
 | `builder/_campaign_plan_materializer.py:54` | `_bounded_text` | len() against a limit | `if len(value) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
@@ -93,8 +93,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/campaign_sequel.py:67` | `review_payload` | len() against a limit | `if not isinstance(note, str) or not note.strip() or len(note) > 4000:` | |
 | `domain/content_validation.py:138` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
 | `domain/content_validation.py:140` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
-| `domain/errors.py:150` | `MechanicsRejected.__init__` | len() against a limit | `or len(reason) > 500 or any(ord(character) < 32 for character in reason)` | |
-| `domain/errors.py:163` | `RulesetPreconditionRejected.__init__` | len() against a limit | `or len(safe_reason) > 500` | |
+| `domain/errors.py:150` | `MechanicsRejected.__init__` | len() against a limit | `or len(reason) > 500 or any(ord(character) < 32 for character in reason)` | `sylvia-domain` schema_admission_vectors |
+| `domain/errors.py:163` | `RulesetPreconditionRejected.__init__` | len() against a limit | `or len(safe_reason) > 500` | `sylvia-domain` schema_admission_vectors |
 | `domain/interview_contribution.py:76` | `parse_interview_contribution_bytes` | len() against a limit | `if not value or len(value) > INTERVIEW_CONTRIBUTION_BYTE_LIMIT:` | |
 | `domain/inventory.py:125` | `validate_holdings` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | |
 | `domain/mechanics_choices.py:63` | `answers_from_payload` | len() against a limit | `if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or len(value) >= 64:` | |
