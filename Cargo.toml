@@ -44,10 +44,9 @@ thiserror = "2"
 sha2 = "0.10"
 hmac = "0.12"
 hex = "0.4"
-# Comparison tool only: reads finished databases, serves the stand-in model endpoint.
+# Comparison tool only: reads finished databases (the stand-in model endpoint is std::net).
 # The store's own SQLite binding is lane 3's decision and is added by that lane.
 rusqlite = { version = "0.32", features = ["bundled"] }
-tiny_http = "0.12"
 getrandom = "0.2"
 regex = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net"] }

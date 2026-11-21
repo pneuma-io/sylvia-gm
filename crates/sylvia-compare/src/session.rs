@@ -22,6 +22,10 @@ pub struct Session {
     /// `${standin_model}` to the steps.
     #[serde(default)]
     pub standin: bool,
+    /// What the stand-in narrates: `fixed` (default) or `journey`, which answers "The Game
+    /// Master answers: " and the player's message, as the Stop and resume fixtures do.
+    #[serde(default)]
+    pub standin_narration: standin::Narration,
     /// Seconds to wait for the owner to report ready. A first start installs the bundled
     /// packages, which takes the Python owner well over a minute.
     #[serde(default = "default_ready_timeout")]
@@ -46,7 +50,8 @@ fn default_step_timeout() -> u64 {
     300
 }
 
-/// One request, or a wait for an earlier background request.
+/// One request, a wait for an earlier background request, a stand-in control, or a fresh
+/// launch of the owner on the same data folder.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Step {
@@ -65,6 +70,15 @@ pub struct Step {
     /// Wait for the reply to the background step with this id.
     #[serde(default, rename = "await")]
     pub await_id: Option<String>,
+    /// Control the stand-in: `wait_held` blocks until it holds one more request than earlier
+    /// `wait_held` steps waited for (the owner is then inside that model stream); `release`
+    /// lets every `[late]` request being held answer.
+    #[serde(default)]
+    pub standin: Option<StandinControl>,
+    /// Start the owner again on the same data folder. Must follow a `shutdown` step. The
+    /// recording keeps the previous launch's exit code and the new launch's ready message.
+    #[serde(default)]
+    pub relaunch: bool,
     /// Values to keep from the reply: variable name to JSON pointer into the reply.
     #[serde(default)]
     pub save: HashMap<String, String>,
@@ -74,6 +88,16 @@ pub struct Step {
     /// Seconds to wait for the reply.
     #[serde(default = "default_step_timeout")]
     pub timeout_s: u64,
+}
+
+/// A stand-in control step.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StandinControl {
+    /// Wait until the stand-in holds a new request.
+    WaitHeld,
+    /// Let held `[late]` requests answer.
+    Release,
 }
 
 /// Load a session file.
@@ -122,7 +146,7 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
     }
     let command = &command;
 
-    let standin = if session.standin { Some(Standin::start()?) } else { None };
+    let standin = if session.standin { Some(Standin::start(session.standin_narration)?) } else { None };
     let mut variables: HashMap<String, Json> = HashMap::new();
     let plain_work = plain_path(&work);
     variables.insert("data_root".into(), plain_path(&data_root).into());
@@ -132,7 +156,7 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
         variables.insert("standin_model".into(), standin::MODEL.into());
     }
 
-    let outcome = run_steps(session, command, &database, &mut variables);
+    let outcome = run_steps(session, command, &database, &mut variables, standin.as_ref());
     let model_requests = standin.map(Standin::finish).unwrap_or_default();
     let (ready, steps, exit_code, stopped) = outcome?;
 
@@ -199,9 +223,10 @@ fn run_steps(
     command: &OwnerCommand,
     database: &Path,
     variables: &mut HashMap<String, Json>,
+    standin: Option<&Standin>,
 ) -> Result<StepsOutcome, String> {
-    let mut owner =
-        Owner::launch(command, database, "sylvia-compare", Duration::from_secs(session.ready_timeout_s))?;
+    let ready_timeout = Duration::from_secs(session.ready_timeout_s);
+    let mut owner = Owner::launch(command, database, "sylvia-compare", ready_timeout)?;
     let ready = owner.ready.clone();
     let mut recorded = Vec::new();
     let mut closed_by_shutdown = false;
@@ -209,6 +234,43 @@ fn run_steps(
     for (index, step) in session.steps.iter().enumerate() {
         let id = step.id.clone().unwrap_or_else(|| format!("s{index}"));
         let mut entry = JsonMap::new();
+        if step.relaunch {
+            if !closed_by_shutdown {
+                return Err(format!("step {index} relaunches the owner without a shutdown before it"));
+            }
+            let exit_code = owner.close(Duration::from_secs(60))?;
+            owner = Owner::launch(command, database, "sylvia-compare", ready_timeout)?;
+            closed_by_shutdown = false;
+            entry.insert("relaunch".into(), true.into());
+            entry.insert("exit_code".into(), exit_code.map_or(Json::Null, Json::from));
+            entry.insert("ready".into(), owner.ready.clone());
+            recorded.push(Json::Object(entry));
+            continue;
+        }
+        if let Some(control) = step.standin {
+            let standin =
+                standin.ok_or(format!("step {index} controls the stand-in, which is not started"))?;
+            let name = match control {
+                StandinControl::WaitHeld => "wait_held",
+                StandinControl::Release => "release",
+            };
+            entry.insert("standin".into(), name.into());
+            recorded.push(Json::Object(entry));
+            match control {
+                StandinControl::WaitHeld => {
+                    if let Err(reason) = standin.wait_held(Duration::from_secs(step.timeout_s)) {
+                        stopped = Json::String(format!(
+                            "step {index} (wait_held): {reason}; {} of {} steps ran",
+                            index + 1,
+                            session.steps.len()
+                        ));
+                        break;
+                    }
+                }
+                StandinControl::Release => standin.release(),
+            }
+            continue;
+        }
         let reply = if let Some(await_id) = &step.await_id {
             entry.insert("await".into(), await_id.clone().into());
             Some(owner.reply(await_id, Duration::from_secs(step.timeout_s))?)
@@ -259,7 +321,8 @@ fn run_steps(
             stopped = Json::String(format!("{reason}; {} of {} steps ran", index + 1, session.steps.len()));
             break;
         }
-        if closed_by_shutdown {
+        // After a shutdown only a relaunch may follow; anything else ends the session.
+        if closed_by_shutdown && !session.steps.get(index + 1).is_some_and(|next| next.relaunch) {
             break;
         }
     }

@@ -69,11 +69,19 @@ impl Rules {
                 "last_seen".into(),
             ],
             ignore_pointers: Vec::new(),
-            scrub: vec![Replace {
-                // ISO 8601 date-times, with or without fraction and zone.
-                pattern: r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?".into(),
-                with: "<time>".into(),
-            }],
+            scrub: vec![
+                Replace {
+                    // ISO 8601 date-times, with or without fraction and zone.
+                    pattern: r"\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:?\d{2})?".into(),
+                    with: "<time>".into(),
+                },
+                Replace {
+                    // The `Host` header of a model request: the stand-in's port is per run.
+                    // Anchored, so only a whole value that is exactly this is replaced.
+                    pattern: r"^127\.0\.0\.1:[0-9]{1,5}$".into(),
+                    with: "<standin_host>".into(),
+                },
+            ],
             // `uuid4().hex` identities of diagnostics records and of one owner run.
             alias: vec![Alias {
                 name: "diagnostic".into(),
@@ -372,6 +380,17 @@ mod tests {
         let normal = |value| normalise(value, &rules).unwrap();
         assert!(compare(&normal(&first), &normal(&second), 10).is_empty());
         assert!(!compare(&normal(&first), &normal(&third), 10).is_empty());
+    }
+
+    #[test]
+    fn only_the_stand_in_host_port_may_differ_in_headers() {
+        let rules = Rules::defaults();
+        let normal = |value: Json| normalise(&value, &rules).unwrap();
+        let first = json!({"headers": [["Host", "127.0.0.1:51296"], ["Content-Length", "37814"]]});
+        let second = json!({"headers": [["Host", "127.0.0.1:63279"], ["Content-Length", "37814"]]});
+        let longer = json!({"headers": [["Host", "127.0.0.1:63279"], ["Content-Length", "37815"]]});
+        assert!(compare(&normal(first.clone()), &normal(second), 10).is_empty());
+        assert_eq!(compare(&normal(first), &normal(longer), 10).len(), 1);
     }
 
     #[test]

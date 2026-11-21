@@ -4,8 +4,12 @@
 an outside observer can see:
 
 1. **Replies:** every reply on the owner's command protocol.
-2. **Model requests:** every request the owner sends to the model, whole, captured by a
-   stand-in model service built into the tool. No real model, key or network is used.
+2. **Model requests:** every request the owner sends to the model, captured by a stand-in
+   model service built into the tool: method, path, the headers in the order received (the
+   `Authorization` value left out; `authorised` says whether it was the stand-in key), the
+   body parsed, and `body_encoding`, the Python encoding that reproduces the body's bytes
+   exactly (`other` when none does, `none` for no body). No real model, key or network is
+   used.
 3. **Database:** every table of the SQLite database after the owner exits, plus schema and
    pragmas. Stored JSON is parsed, and the tool records which Python encoding reproduces the
    stored text exactly.
@@ -79,6 +83,17 @@ A session is a JSON file in `crates/sylvia-compare/sessions`:
 - `summarise_tables` records matching tables as a row count and one hash of their rows. Use
   it for bulk content another session already records in full. `startup` records the installed
   package tables in full; other sessions summarise them.
+- `standin_narration` (session): `fixed` (default) narrates as below; `journey` answers
+  "The Game Master answers: " and the player's message without its markers, as the Stop and
+  resume fixtures do, so a recording shows which message each reply answered.
+- `{"standin": "wait_held"}` waits until the stand-in holds one more request than earlier
+  `wait_held` steps waited for: the owner is then inside that model stream. Use it between a
+  background `[hold]` or `[late]` message and the Stop or read that needs it running, instead
+  of polling the owner.
+- `{"standin": "release"}` lets every `[late]` request being held answer.
+- `{"relaunch": true}` starts the owner again on the same data folder, for reopen. It must
+  follow a `shutdown` step. The step records the previous launch's exit code and the new
+  launch's ready message; the database and files are dumped once, after the last launch.
 - `timeout_s` (per step, default 300) and `ready_timeout_s` (default 600) bound the waits.
 - End with `shutdown`, so the database is closed cleanly before it is dumped.
 
@@ -88,8 +103,9 @@ derives campaign and session identities from them, so they come out the same on 
 ## What may differ
 
 Two runs of the same Python owner already differ in a few places. Those, and only those, are
-declared as rules. The built-in defaults cover wall-clock times, measured durations and the
-random identities of diagnostics records. A session adds its own under `rules`:
+declared as rules. The built-in defaults cover wall-clock times, measured durations, the
+random identities of diagnostics records and the stand-in's port in a model request's `Host`
+header. A session adds its own under `rules`:
 
 ```json
 "rules": {
@@ -126,20 +142,34 @@ model (`standin-narrator`), fixed narration, and an `update_campaign_file` tool 
 that tool is offered and the last message is not a tool result. That is enough for an opening
 turn and ordinary player turns.
 
-It does not yet script failures, held replies or tool-using mechanics turns. Sessions that
-need those (Stop, Retry, a rules check, an attack) need the stand-in extended first: reply
-scripts chosen by a marker in the latest player message, as `tests/stop_resume` does with
-`[hold]`, `[fail]` and `[late]`. That is lane 5's first comparison-tool task, with lane 4
-saying what the mechanics turns need.
+A marker in the latest player message (the newest user message without a `[host-seal ...]`
+prefix, as `latest_player_message` in `tests/gm_context_contract.py` finds it) scripts the
+reply, following `JourneyGM` in `tests/stop_resume_owner_fixture.py`:
+
+| Marker | The stand-in | The owner sees |
+| --- | --- | --- |
+| `[hold]` | streams the role chunk and "Partial narration that Stop must discard.", then holds the connection until the owner closes it | a reply in progress, until Stop |
+| `[fail]` | streams the same partial chunk and drops the connection mid-body, the first time it sees that player message; later requests with it are answered | a lost provider connection (`provider_error`), then a Retry that succeeds |
+| `[late]` | holds before answering until a `release` step, then answers | a slow reply |
+
+It is a small HTTP/1.1 server on `std::net`, because holding a stream open and dropping one
+mid-body need control of the socket. It does not yet script tool-using mechanics turns (a
+rules check, an attack); lane 4 says what those need.
 
 ## Sessions so far
 
 | Session | Covers | Python owner |
 | --- | --- | --- |
-| `startup` | First start on an empty folder, bundled package install, opening reads, an unknown method, error replies | recorded on Windows; reproduces on a second run |
-| `ruleless-turn` | Connect a model, No Ruleset campaign through the interview, GM opening, one player turn, reads | recorded on Windows; reproduces on a second run |
+| `startup` | First start on an empty folder, bundled package install, opening reads, an unknown method, error replies | recorded on Windows and Linux; reproduces on a second run |
+| `ruleless-turn` | Connect a model, No Ruleset campaign through the interview, GM opening, one player turn, reads | recorded on Windows and Linux; reproduces on a second run |
+| `stop-redirect` | Stop a held reply, the Retry offer and history, a redirecting message, a `[late]` reply read while running and then released | recorded on Windows and Linux; reproduces on a second run |
+| `fail-retry` | A reply lost mid-stream, the Retry offer, plain and redirecting input refused, Manual Retry and its replay | recorded on Windows and Linux; reproduces on a second run |
+| `reopen` | Stop and a failed reply, each followed by a restart on the same data folder; the offer survives, a redirect and a Manual Retry answer | recorded on Windows and Linux; reproduces on a second run |
 
-Wanted next, each by the lane that ports the behaviour: Linux recordings of both; an SRD Lite
-check and an attack (lane 2); Stop, Retry and reopen (lanes 4 and 5); a Builder draft edited
-and published (lanes 1 and 4); archive, restore, export and recover (lane 3); provider
-settings save, remove and switch (lane 4).
+The last three follow the Stop, Retry and reopen contract fixtures in
+`tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop
+sends camelCase ones.
+
+Wanted next, each by the lane that ports the behaviour: an SRD Lite check and an attack
+(lane 2); a Builder draft edited and published (lanes 1 and 4); archive, restore, export and
+recover (lane 3); provider settings save, remove and switch (lane 4).

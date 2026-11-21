@@ -16,7 +16,6 @@ sha2.workspace = true
 hmac.workspace = true
 hex.workspace = true
 rusqlite.workspace = true
-tiny_http.workspace = true
 getrandom.workspace = true
 regex.workspace = true
 
