@@ -23,7 +23,9 @@ mod pyvalue;
 pub mod resolver;
 pub mod user_settings;
 
-pub use loader::{load_config, provider_credentials, ProviderDef, Secret, SylviaGMConfig};
+pub use loader::{
+    default_config_path, load_config, provider_credentials, ProviderDef, Secret, SylviaGMConfig,
+};
 pub use pyvalue::{from_json as data_from_json, reply_json};
 pub use sylvia_base::pyyaml::Data;
 

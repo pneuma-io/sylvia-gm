@@ -18,7 +18,7 @@ use super::pyvalue::{from_json, json_dumps, type_name};
 use super::resolver::resolve_vars;
 use super::user_settings::read_user_settings;
 use super::ConfigFailure;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use sylvia_base::pyyaml::{self, data_key_eq, Data};
 
 /// `SecretStr`: text whose `Debug` form hides it.
@@ -329,6 +329,21 @@ fn assign(pairs: &mut Vec<(Data, Data)>, name: &str, value: Data) {
         Some(slot) => slot.1 = value,
         None => pairs.push((key, value)),
     }
+}
+
+/// `_DEFAULT_CONFIG_PATH`: the shipped defaults. A packaged app keeps them in
+/// `config/config.yaml` beside the executable (Python's bundle folder); a checkout has them at
+/// its root.
+pub fn default_config_path() -> PathBuf {
+    let packaged = std::env::current_exe()
+        .ok()
+        .and_then(|exe| Some(exe.parent()?.join("config").join("config.yaml")))
+        .filter(|path| path.is_file());
+    packaged.unwrap_or_else(|| {
+        let crate_folder = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let root = crate_folder.parent().and_then(Path::parent).unwrap_or(crate_folder);
+        root.join("config").join("config.yaml")
+    })
 }
 
 /// `load_config(user_config_path, load_dotenv_file=False, decrypt_credentials=False)`.

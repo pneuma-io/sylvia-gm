@@ -883,6 +883,8 @@ fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
         store_thread.join();
         return Err(LaunchFailure::Other);
     }
+    let providers: Arc<dyn crate::services::ProviderResolver> =
+        Arc::new(crate::providers::OwnerProviders::new(&storage_root));
     let context = DispatchContext {
         owner_id,
         storage_root,
@@ -890,7 +892,7 @@ fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
         method: String::new(),
         gm_system_prompt: None,
         store,
-        providers: None,
+        providers: Some(providers),
         session_loop: None,
         record_provider_warning: Arc::new(|_: &str| {}),
     };

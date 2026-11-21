@@ -18,7 +18,12 @@
 //! - [`hooks`] holds `provider/_hooks.py`'s context and manager.
 //! - [`httpx_url`] holds `httpx.URL`; `urllib.parse.urlsplit` is [`sylvia_base::pyurl`].
 //! - [`pyfmt`] holds Python's `:g` number formatting.
+//! - [`catalog`] holds `provider/_models.py` and `provider/_output_policy.py`.
+//! - [`reasoning`] and [`speed`] hold `provider/_reasoning.py` and `provider/_speed.py`.
+//! - [`request_metadata`] holds `provider/_request_metadata.py`.
+//! - [`registry`] holds `provider/_registry.py`'s `ProviderRegistry`.
 
+pub mod catalog;
 pub mod chat;
 pub mod config;
 pub mod context_capacity;
@@ -32,11 +37,15 @@ pub mod openai_compat;
 pub mod provider;
 pub mod pyfmt;
 pub mod pyobj;
+pub mod reasoning;
+pub mod registry;
+pub mod request_metadata;
 /// `urllib.parse`, now shared in `sylvia_base`.
 pub use sylvia_base::pyurl;
 pub mod reply;
 pub mod retry;
 pub mod routes;
+pub mod speed;
 pub mod sse;
 pub mod stream_health;
 pub mod tool_delta;

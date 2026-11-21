@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 25 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 27 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -72,8 +72,8 @@ Ported: 25 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `builder_ch
 | `package_candidate_text` | `packages.handle_package_candidate_text` | yes | no | |
 | `compare_package_candidates` | `packages.handle_compare_package_candidates` | yes | no | |
 | `campaign_party_options` | `campaigns.handle_campaign_party_options` | yes | no | |
-| `model_choices` | `providers.handle_model_choices` | yes | no | |
-| `provider_settings` | `providers.handle_provider_settings` | yes | no | |
+| `model_choices` | `providers.handle_model_choices` | yes | yes | `startup` |
+| `provider_settings` | `providers.handle_provider_settings` | yes | yes | `startup` |
 | `open_provider_setup` | `providers.handle_open_provider_setup` | yes | no | |
 | `chatgpt_connection` | `providers.handle_chatgpt_connection` | no | no | |
 | `claude_connection` | `providers.handle_claude_connection` | no | no | |
