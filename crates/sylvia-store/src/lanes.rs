@@ -158,13 +158,16 @@ impl LaneRegistry {
     }
 }
 
-/// The owner's two lane registries, which every clone of the store handle shares.
+/// The owner's two lane registries and its campaign work registry, which every clone of the
+/// store handle shares.
 #[derive(Debug, Clone, Default)]
 pub struct OwnerLanes {
     /// `AuthorityOwner._lanes`: campaign ids and `builder-chat:<session id>`.
     pub owner: LaneRegistry,
     /// `SessionApplication._lanes`: session ids.
     pub sessions: LaneRegistry,
+    /// `AuthorityOwner`'s campaign work counts and reservations ([`crate::work`]).
+    pub work: crate::work::CampaignWork,
 }
 
 /// `f"builder-chat:{session_id}"`: the owner lane of a standalone Builder chat.

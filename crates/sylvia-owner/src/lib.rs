@@ -13,6 +13,7 @@
 //! A command is ported by adding its handler under [`commands`] and flipping its status in
 //! `commands/table.rs`; `docs/rust-port/commands.md` is the burn-down.
 
+pub mod chat_start;
 pub mod commands;
 pub mod desktop_update;
 pub mod diagnostics;
