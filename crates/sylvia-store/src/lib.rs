@@ -27,6 +27,7 @@ pub mod sessions;
 pub mod sql;
 pub mod store;
 pub mod stored;
+mod stored_campaigns;
 pub mod stored_sessions;
 mod verify;
 

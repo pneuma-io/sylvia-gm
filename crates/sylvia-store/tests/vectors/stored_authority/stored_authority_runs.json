@@ -4,7 +4,9 @@
   {
    "name": "riichi_untouched",
    "base": "riichi",
-   "sql": [],
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
    "outcome": {
     "ok": null
    }
@@ -12,7 +14,9 @@
   {
    "name": "story_untouched",
    "base": "story",
-   "sql": [],
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
    "outcome": {
     "ok": null
    }
@@ -21,6 +25,7 @@
    "name": "unbound_campaign",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "INSERT INTO campaigns (campaign_id, display_name, lifecycle, writer, revision, lock_hash, current_lock_id) VALUES ('campaign-unbound', 'Unbound', 'active', 'dm', 0, 'unbound', NULL)"
    ],
    "outcome": {
@@ -33,6 +38,7 @@
    "name": "unbound_builder_without_interview",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "INSERT INTO campaigns (campaign_id, display_name, lifecycle, writer, revision, lock_hash, current_lock_id) VALUES ('campaign-unbound', 'Unbound', 'active', 'builder', 0, 'unbound', NULL)"
    ],
    "outcome": {
@@ -45,6 +51,7 @@
    "name": "activation_row",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "INSERT INTO package_activations (activation_id, campaign_id, candidate_id, old_lock_id, new_lock_id, migration_id, status, resulting_revision, payload_sha256, result_json) VALUES ('activation-x', 'campaign-x', 'candidate-install-1', 'lock-a', 'lock-b', 'none', 'committed', 1, 'p', '{}')"
    ],
    "outcome": {
@@ -57,6 +64,7 @@
    "name": "package_sha_uppercase",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE packages SET sha256 = upper(sha256) WHERE package_id = 'pneuma.riichi-mahjong'"
    ],
    "outcome": {
@@ -69,6 +77,7 @@
    "name": "package_capabilities_object",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE packages SET capabilities_json = '{\"a\":1}' WHERE package_id = 'pneuma.riichi-mahjong'"
    ],
    "outcome": {
@@ -81,6 +90,7 @@
    "name": "package_capabilities_numbers",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE packages SET capabilities_json = '[1]' WHERE package_id = 'pneuma.riichi-mahjong'"
    ],
    "outcome": {
@@ -93,6 +103,7 @@
    "name": "package_capabilities_not_json",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE packages SET capabilities_json = 'x' WHERE package_id = 'pneuma.riichi-mahjong'"
    ],
    "outcome": {
@@ -105,6 +116,7 @@
    "name": "dependency_order_gap",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE package_dependencies SET dependency_order = 5"
    ],
    "outcome": {
@@ -117,6 +129,7 @@
    "name": "dependency_kind_blank",
    "base": "riichi",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE package_dependencies SET dependency_kind = ' '"
    ],
    "outcome": {
@@ -129,6 +142,7 @@
    "name": "campaign_name_padded",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaigns SET display_name = ' Story' WHERE campaign_id = 'campaign-story'"
    ],
    "outcome": {
@@ -141,6 +155,7 @@
    "name": "campaign_lock_hash",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaigns SET lock_hash = '[]' WHERE campaign_id = 'campaign-story'"
    ],
    "outcome": {
@@ -153,6 +168,7 @@
    "name": "event_attempt_blank",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE canonical_events SET attempt_id = ' ' WHERE sequence = (SELECT MIN(sequence) FROM canonical_events WHERE attempt_id IS NOT NULL)"
    ],
    "outcome": {
@@ -165,6 +181,7 @@
    "name": "action_payload_hash_uppercase",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE actions SET payload_hash = upper(payload_hash)"
    ],
    "outcome": {
@@ -182,6 +199,7 @@
     "DROP TRIGGER campaign_state_owner_matches_current_lock",
     "DROP TRIGGER campaign_state_owner_required_insert",
     "DROP TRIGGER campaign_state_owner_required_update",
+    "PRAGMA ignore_check_constraints = ON",
     "DELETE FROM campaign_state_namespace_owners",
     "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
     "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
@@ -204,6 +222,7 @@
     "DROP TRIGGER campaign_state_owner_matches_current_lock",
     "DROP TRIGGER campaign_state_owner_required_insert",
     "DROP TRIGGER campaign_state_owner_required_update",
+    "PRAGMA ignore_check_constraints = ON",
     "INSERT INTO campaign_state_namespace_owners SELECT campaign_id, 'other.namespace', owner_package_id FROM campaign_state_namespace_owners LIMIT 1",
     "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
     "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
@@ -226,6 +245,7 @@
     "DROP TRIGGER campaign_state_owner_matches_current_lock",
     "DROP TRIGGER campaign_state_owner_required_insert",
     "DROP TRIGGER campaign_state_owner_required_update",
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_state_namespace_owners SET owner_package_id = 'other.package'",
     "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
     "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
@@ -243,6 +263,7 @@
    "name": "state_trigger_dropped",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "DROP TRIGGER campaign_state_owner_immutable"
    ],
    "outcome": {
@@ -255,6 +276,7 @@
    "name": "foreign_key_orphan",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "INSERT INTO turns (campaign_id, turn_id, status, created_revision) VALUES ('campaign-gone', 'turn-x', 'open', 0)"
    ],
    "outcome": {
@@ -266,7 +288,9 @@
   {
    "name": "children_untouched",
    "base": "children",
-   "sql": [],
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
    "outcome": {
     "ok": null
    }
@@ -275,6 +299,7 @@
    "name": "message_chronology_gap",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE agent_session_messages SET sequence = 70 WHERE session_id = 'dm-1' AND message_id = 'u-3'"
    ],
    "outcome": {
@@ -287,6 +312,7 @@
    "name": "reference_content_changed",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE agent_session_messages SET content_json = replace(content_json, 'The sea answers.', 'Silence.') WHERE message_id = 'canonical-1'"
    ],
    "outcome": {
@@ -299,6 +325,7 @@
    "name": "reference_event_missing",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE agent_session_messages SET canonical_sequence = 999 WHERE message_id = 'canonical-1'"
    ],
    "outcome": {
@@ -311,6 +338,7 @@
    "name": "plan_revision_gap",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_plans SET plan_revision = 2"
    ],
    "outcome": {
@@ -323,6 +351,7 @@
    "name": "plan_content_changed",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_plans SET content_json = replace(content_json, 'The Drowned Bell', 'The Dry Bell')"
    ],
    "outcome": {
@@ -335,6 +364,7 @@
    "name": "plan_provenance_missing",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_plans SET provenance_json = '[\"ev-missing\"]'"
    ],
    "outcome": {
@@ -347,6 +377,7 @@
    "name": "plan_payload_identity",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_plans SET payload_sha256 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
    ],
    "outcome": {
@@ -359,6 +390,7 @@
    "name": "plan_revision_row_missing",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_revisions SET plan_id = NULL WHERE plan_id = 'plan-1'"
    ],
    "outcome": {
@@ -371,6 +403,7 @@
    "name": "handoff_turn_open",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE turns SET status = 'open' WHERE turn_id = 'turn-build'"
    ],
    "outcome": {
@@ -383,6 +416,7 @@
    "name": "handoff_payload_identity",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE builder_dm_handoffs SET payload_sha256 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'"
    ],
    "outcome": {
@@ -395,6 +429,7 @@
    "name": "handoff_revision_row_missing",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE campaign_revisions SET handoff_id = NULL WHERE handoff_id = 'handoff-1'"
    ],
    "outcome": {
@@ -407,6 +442,7 @@
    "name": "child_return_authoritative",
    "base": "children",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE agent_session_messages SET content_json = replace(content_json, '\"authoritative\":false', '\"authoritative\":true') WHERE message_id = 'evidence-1'"
    ],
    "outcome": {
@@ -419,7 +455,1226 @@
    "name": "event_payload_not_object",
    "base": "story",
    "sql": [
+    "PRAGMA ignore_check_constraints = ON",
     "UPDATE canonical_events SET safe_payload_json = '[]' WHERE sequence = 1"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "writer_illegal_for_lifecycle",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaigns SET writer = 'none' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "lifecycle_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaigns SET lifecycle = 'paused' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "campaign_revision_short",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaigns SET revision = 7 WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "revision_gap",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_revisions SET revision = 9 WHERE campaign_id = 'campaign-story' AND revision = 8"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "revision_text",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_revisions SET revision = 'eight' WHERE campaign_id = 'campaign-story' AND revision = 8"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "revision_zero_with_authority",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_revisions SET continuity_operation_id = 'op-1' WHERE campaign_id = 'campaign-story' AND revision = 0"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "revision_two_authorities",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_revisions SET action_id = 'action-1' WHERE campaign_id = 'campaign-story' AND revision = 7"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "revision_authorities_swapped",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_revisions SET continuity_operation_id = CASE revision WHEN 7 THEN 'op-5' ELSE 'op-4' END WHERE campaign_id = 'campaign-story' AND revision IN (7, 8)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "revision_operation_missing",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "DELETE FROM campaign_operations WHERE operation_id = 'op-5'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "second_open_turn",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO turns (campaign_id, turn_id, status, created_revision) VALUES ('campaign-build', 'turn-c', 'open', 0)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "turn_status_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE turns SET status = 'paused' WHERE turn_id = 'turn-b'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "turn_from_the_future",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE turns SET created_revision = 1 WHERE turn_id = 'turn-b'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "turn_created_text",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE turns SET created_revision = 'zero' WHERE turn_id = 'turn-b'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "participant_foreign_package",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) SELECT campaign_id, 'hero', 'character', 'other.package', '1.0.0', '{}' FROM campaigns WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "state_value_private_channel",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_delete_requires_empty",
+    "DROP TRIGGER campaign_state_owner_immutable",
+    "DROP TRIGGER campaign_state_owner_matches_current_lock",
+    "DROP TRIGGER campaign_state_owner_required_insert",
+    "DROP TRIGGER campaign_state_owner_required_update",
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_state SET value_json = '{\"private_reasoning\":1}' WHERE campaign_id = 'campaign-story'",
+    "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
+    "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
+    "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "state_value_not_canonical",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_delete_requires_empty",
+    "DROP TRIGGER campaign_state_owner_immutable",
+    "DROP TRIGGER campaign_state_owner_matches_current_lock",
+    "DROP TRIGGER campaign_state_owner_required_insert",
+    "DROP TRIGGER campaign_state_owner_required_update",
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_state SET value_json = '{\"total\": 15}' WHERE campaign_id = 'campaign-story'",
+    "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
+    "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
+    "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "state_drifted_from_mutations",
+   "base": "story",
+   "sql": [
+    "DROP TRIGGER campaign_state_owner_delete_requires_empty",
+    "DROP TRIGGER campaign_state_owner_immutable",
+    "DROP TRIGGER campaign_state_owner_matches_current_lock",
+    "DROP TRIGGER campaign_state_owner_required_insert",
+    "DROP TRIGGER campaign_state_owner_required_update",
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_state SET value_json = '{\"total\":16}' WHERE campaign_id = 'campaign-story'",
+    "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND",
+    "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND",
+    "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND",
+    "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "event_sequence_gap",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET sequence = 9 WHERE campaign_id = 'campaign-story' AND sequence = 8"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "event_type_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET event_type = 'whisper' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "event_visibility_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET visibility = 'secret' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_as_think",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET event_type = 'think' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_with_action",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET action_id = 'action-1' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_internal",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET visibility = 'internal_safe' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_extra_member",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET safe_payload_json = '{\"text\":\"I dive.\",\"tone\":1}' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_empty_text",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET safe_payload_json = '{\"text\":\"\"}' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_response_blocks",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET safe_payload_json = '{\"response_blocks\":[{\"kind\":\"narration\",\"text\":\"I dive. The sea answers.\"}],\"text\":\"I dive. The sea answers.\"}' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_response_blocks_disagree",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET safe_payload_json = '{\"response_blocks\":[{\"kind\":\"narration\",\"text\":\"I swim. The sea answers.\"}],\"text\":\"I dive. The sea answers.\"}' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "talk_response_blocks_invalid",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET safe_payload_json = '{\"response_blocks\":[{\"kind\":\"aside\",\"text\":\"I dive. The sea answers.\"}],\"text\":\"I dive. The sea answers.\"}' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "think_response_blocks",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET event_type = 'think', safe_payload_json = '{\"response_blocks\":[{\"kind\":\"narration\",\"text\":\"I dive. The sea answers.\"}],\"text\":\"I dive. The sea answers.\"}' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "prose_ordinal_gap",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET attempt_ordinal = 1 WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "prose_ordinal_negative",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET attempt_ordinal = -1 WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "prose_ordinal_text",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET attempt_ordinal = 'first' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "prose_attempts_merged",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET attempt_id = 'att-1', attempt_ordinal = 1 WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "prose_turn_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET turn_id = 'turn-z' WHERE campaign_id = 'campaign-story' AND sequence = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_event_player_safe",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET visibility = 'player_safe' WHERE campaign_id = 'campaign-story' AND sequence = 3"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_event_with_attempt",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET attempt_id = 'att-9' WHERE campaign_id = 'campaign-story' AND sequence = 3"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_event_unknown_action",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET action_id = 'action-9' WHERE campaign_id = 'campaign-story' AND sequence = 3"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_events_reordered",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET event_type = CASE sequence WHEN 6 THEN 'consequence' ELSE 'state_mutation' END WHERE campaign_id = 'campaign-story' AND sequence IN (6, 7)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_event_other_turn",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE canonical_events SET turn_id = 'turn-build' WHERE campaign_id = 'campaign-story' AND sequence = 5"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_writer_builder",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET writer = 'builder'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_hash_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET payload_hash = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_unpinned",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET lock_id = NULL"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_pinned_elsewhere",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET package_sha256 = 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_revisions_disagree",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET expected_revision = 4"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_status_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET status = 'pending'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_failed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET status = 'failed'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_result_changed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET result_json = '{\"success\":true,\"total\":16}'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "action_result_float_total",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET result_json = '{\"success\":true,\"total\":15.0}'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "action_result_integer_success",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET result_json = '{\"success\":1,\"total\":15}'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "action_result_not_canonical",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET result_json = '{\"total\":15,\"success\":true}'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "action_parameters_not_object",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE actions SET payload_json = '[]'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "mutation_ordinal_gap",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE mutations SET ordinal = 1"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "mutation_before_changed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE mutations SET before_json = '{\"total\":1}'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "mutation_after_changed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE mutations SET after_json = '{\"total\":16}'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "mutation_key_changed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE mutations SET state_key = 'first'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "consequence_changed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"check_rolled\",\"total\":16}'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "consequence_kind_blank",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\" \",\"total\":15}'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\" \",\"total\":15}' WHERE campaign_id = 'campaign-story' AND sequence = 7"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "consequence_kind_number",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":5,\"total\":15}'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "consequence_ordinal_gap",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET ordinal = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "receipt_missing",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "DELETE FROM idempotency_records"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "receipt_status_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE idempotency_records SET status = 'failed'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "receipt_status_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE idempotency_records SET status = 'maybe'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "receipt_result_float_total",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE idempotency_records SET result_json = '{\"success\":true,\"total\":15.0}'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "receipt_result_changed",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE idempotency_records SET result_json = '{\"success\":false,\"total\":15}'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "receipt_revision_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE idempotency_records SET resulting_revision = 5"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "receipt_second_key",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO idempotency_records SELECT campaign_id, 'key-2', payload_hash, action_id, status, result_json, resulting_revision FROM idempotency_records"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "interruption_retryable",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', 'action-1', 'att-2', 'retryable', NULL, NULL)"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "interruption_other_turn_action",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-build', 'action-1', 'att-2', 'retryable', NULL, NULL)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "interruption_retryable_with_sequence",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', 'retryable', 'att-2', 2)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "interruption_resolved",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', 'resolved', 'att-2', 2)"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "interruption_resolved_without_sequence",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', 'resolved', 'att-2', NULL)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "interruption_resolved_on_other_attempt",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-2', 'resolved', 'att-2', 1)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "interruption_resolved_on_action_event",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', 'resolved', 'att-2', 3)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "interruption_resolved_without_retry_events",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', 'resolved', 'att-7', 2)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "interruption_status_unknown",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', 'parked', NULL, NULL)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "lifecycle_state_missing",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "DELETE FROM campaign_lifecycle_state WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "lifecycle_retained_writer_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_state SET retained_active_writer = 'builder' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "lifecycle_active_with_prior",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = 'active' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "handoff_basis_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE builder_dm_handoffs SET expected_revision = 0"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_untouched",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "trashed_untouched",
+   "base": "trashed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "archived_writer_dm",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaigns SET writer = 'dm' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_lifecycle_active",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaigns SET lifecycle = 'active', writer = 'dm' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_transition_from_other",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET from_lifecycle = 'archived'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_transition_basis_other",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET basis_revision = 3"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_transition_from_builder",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET from_writer = 'builder'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_transition_to_unknown",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET to_writer = 'ghost'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_transition_revision_text",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET basis_revision = 'eight'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_retained_writer_none",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_state SET retained_active_writer = 'none' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "trashed_prior_missing",
+   "base": "trashed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = NULL WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "trashed_prior_writer_missing",
+   "base": "trashed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_state SET tombstone_prior_writer = NULL WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "trashed_prior_other",
+   "base": "trashed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = 'tombstoned' WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "trashed_transitions_out_of_order",
+   "base": "trashed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET from_lifecycle = 'active' WHERE to_lifecycle = 'tombstoned'"
    ],
    "outcome": {
     "error": "SchemaIdentityError",

@@ -8,7 +8,7 @@ Run with the snapshot's own interpreter, from the repository root, after
 Each case copies a base profile (`riichi`: a new profile with the bundled Riichi closure;
 `story`: the session-page profile with a played DM campaign, an action, its state and its
 namespace owner), applies its SQL through a second connection with foreign keys off, as damage
-would arrive, and opens the profile with `_open_for_application_owner`, which runs the startup
+would arrive (CHECK constraints off), and opens the profile with `_open_for_application_owner`, which runs the startup
 verifiers. It writes `stored_authority/stored_authority_runs.json`; `tests/stored_authority.rs`
 replays every case on the Rust store. Reference tooling only.
 """
@@ -59,7 +59,48 @@ def children_base(folder: Path) -> bytes:
     connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
     connection.close()
     return path.read_bytes()
+
+
+def lifecycle_base(folder: Path, name: str, kinds: tuple[str, ...]) -> bytes:
+    """The story profile with the played campaign moved through `kinds` by Python's store
+    (written as `stored_authority/<name>.sqlite3.gz`)."""
+    import hashlib
+
+    from sylvia_gm.application.authority import _campaign_operation_payload
+    from sylvia_gm.domain.package_library import canonical_json_bytes
+
+    path = folder / name / "authority.sqlite3"
+    path.parent.mkdir()
+    path.write_bytes(gzip.decompress(BASES["story"].read_bytes()))
+    store = a._open_for_application_owner(path)
+    try:
+        revision = 8
+        for index, kind in enumerate(kinds):
+            values: dict[str, object] = {"campaign_id": "campaign-story"}
+            designated = "dm-1" if kind == "archive_campaign" else None
+            if kind in {"archive_campaign", "restore_campaign"}:
+                values["designated_session_id"] = designated
+            payload = _campaign_operation_payload(
+                operation_id=f"life-{index}", operation_kind=kind, values=values)
+            store.commit_lifecycle_operation(
+                operation_id=f"life-{index}", operation_kind=kind, semantic_payload=payload,
+                payload_sha256=hashlib.sha256(canonical_json_bytes(payload)).hexdigest(),
+                campaign_id="campaign-story", expected_revision=revision, designated_session_id=designated)
+            revision += 1
+    finally:
+        store.close()
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    connection.close()
+    return path.read_bytes()
+
+
+LIFECYCLE_BASES = {"archived": ("archive_campaign",), "trashed": ("archive_campaign", "trash_campaign")}
 PRIMARY = "pneuma.riichi-mahjong"
+# The story campaign's events: 1 and 2 are TALK prose (attempts att-1, att-2), 3 to 8 are action-1.
+STORY = "campaign_id = 'campaign-story'"
+CHECKS_OFF = "PRAGMA ignore_check_constraints = ON"
+BLOCKS = '{"response_blocks":[{"kind":"narration","text":"I dive. The sea answers."}],"text":"I dive. The sea answers."}'
 
 CASES: list[dict[str, object]] = [
     {"name": "riichi_untouched", "base": "riichi", "sql": []},
@@ -136,6 +177,199 @@ CASES: list[dict[str, object]] = [
         "'\"authoritative\":true') WHERE message_id = 'evidence-1'"]},
     {"name": "event_payload_not_object", "base": "story", "sql": [
         "UPDATE canonical_events SET safe_payload_json = '[]' WHERE sequence = 1"]},
+    # Part 3: `_verify_campaign_authority`. Writer and lifecycle.
+    {"name": "writer_illegal_for_lifecycle", "base": "story", "sql": [
+        f"UPDATE campaigns SET writer = 'none' WHERE {STORY}"]},
+    {"name": "lifecycle_unknown", "base": "story", "sql": [
+        f"UPDATE campaigns SET lifecycle = 'paused' WHERE {STORY}"]},
+    # Revisions and their authorities.
+    {"name": "campaign_revision_short", "base": "story", "sql": [
+        f"UPDATE campaigns SET revision = 7 WHERE {STORY}"]},
+    {"name": "revision_gap", "base": "story", "sql": [
+        f"UPDATE campaign_revisions SET revision = 9 WHERE {STORY} AND revision = 8"]},
+    {"name": "revision_text", "base": "story", "sql": [
+        f"UPDATE campaign_revisions SET revision = 'eight' WHERE {STORY} AND revision = 8"]},
+    {"name": "revision_zero_with_authority", "base": "story", "sql": [
+        f"UPDATE campaign_revisions SET continuity_operation_id = 'op-1' WHERE {STORY} AND revision = 0"]},
+    {"name": "revision_two_authorities", "base": "story", "sql": [
+        f"UPDATE campaign_revisions SET action_id = 'action-1' WHERE {STORY} AND revision = 7"]},
+    {"name": "revision_authorities_swapped", "base": "story", "sql": [
+        f"UPDATE campaign_revisions SET continuity_operation_id = CASE revision WHEN 7 THEN 'op-5' ELSE 'op-4' END "
+        f"WHERE {STORY} AND revision IN (7, 8)"]},
+    {"name": "revision_operation_missing", "base": "story", "sql": [
+        "DELETE FROM campaign_operations WHERE operation_id = 'op-5'"]},
+    # Turns, participants and state.
+    {"name": "second_open_turn", "base": "story", "sql": [
+        "INSERT INTO turns (campaign_id, turn_id, status, created_revision) VALUES ('campaign-build', 'turn-c', 'open', 0)"]},
+    {"name": "turn_status_unknown", "base": "story", "sql": [
+        "UPDATE turns SET status = 'paused' WHERE turn_id = 'turn-b'"]},
+    {"name": "turn_from_the_future", "base": "story", "sql": [
+        "UPDATE turns SET created_revision = 1 WHERE turn_id = 'turn-b'"]},
+    {"name": "turn_created_text", "base": "story", "sql": [
+        "UPDATE turns SET created_revision = 'zero' WHERE turn_id = 'turn-b'"]},
+    {"name": "participant_foreign_package", "base": "story", "sql": [
+        "INSERT INTO participants (campaign_id, participant_id, kind, package_id, package_version, data_json) "
+        "SELECT campaign_id, 'hero', 'character', 'other.package', '1.0.0', '{}' FROM campaigns WHERE " + STORY]},
+    {"name": "state_value_private_channel", "base": "story", "bypass_triggers": True, "sql": [
+        f"UPDATE campaign_state SET value_json = '{{\"private_reasoning\":1}}' WHERE {STORY}"]},
+    {"name": "state_value_not_canonical", "base": "story", "bypass_triggers": True, "sql": [
+        f"UPDATE campaign_state SET value_json = '{{\"total\": 15}}' WHERE {STORY}"]},
+    {"name": "state_drifted_from_mutations", "base": "story", "bypass_triggers": True, "sql": [
+        f"UPDATE campaign_state SET value_json = '{{\"total\":16}}' WHERE {STORY}"]},
+    # Canonical events and prose.
+    {"name": "event_sequence_gap", "base": "story", "sql": [
+        f"UPDATE canonical_events SET sequence = 9 WHERE {STORY} AND sequence = 8"]},
+    {"name": "event_type_unknown", "base": "story", "sql": [
+        f"UPDATE canonical_events SET event_type = 'whisper' WHERE {STORY} AND sequence = 2"]},
+    {"name": "event_visibility_unknown", "base": "story", "sql": [
+        f"UPDATE canonical_events SET visibility = 'secret' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_as_think", "base": "story", "sql": [
+        f"UPDATE canonical_events SET event_type = 'think' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_with_action", "base": "story", "sql": [
+        f"UPDATE canonical_events SET action_id = 'action-1' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_internal", "base": "story", "sql": [
+        f"UPDATE canonical_events SET visibility = 'internal_safe' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_extra_member", "base": "story", "sql": [
+        f"UPDATE canonical_events SET safe_payload_json = '{{\"text\":\"I dive.\",\"tone\":1}}' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_empty_text", "base": "story", "sql": [
+        f"UPDATE canonical_events SET safe_payload_json = '{{\"text\":\"\"}}' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_response_blocks", "base": "story", "sql": [
+        f"UPDATE canonical_events SET safe_payload_json = '{BLOCKS}' WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_response_blocks_disagree", "base": "story", "sql": [
+        f"UPDATE canonical_events SET safe_payload_json = '{BLOCKS.replace('I dive. The', 'I swim. The', 1)}' "
+        f"WHERE {STORY} AND sequence = 2"]},
+    {"name": "talk_response_blocks_invalid", "base": "story", "sql": [
+        f"UPDATE canonical_events SET safe_payload_json = '{BLOCKS.replace('narration', 'aside')}' "
+        f"WHERE {STORY} AND sequence = 2"]},
+    {"name": "think_response_blocks", "base": "story", "sql": [
+        f"UPDATE canonical_events SET event_type = 'think', safe_payload_json = '{BLOCKS}' "
+        f"WHERE {STORY} AND sequence = 2"]},
+    {"name": "prose_ordinal_gap", "base": "story", "sql": [
+        f"UPDATE canonical_events SET attempt_ordinal = 1 WHERE {STORY} AND sequence = 2"]},
+    {"name": "prose_ordinal_negative", "base": "story", "sql": [
+        f"UPDATE canonical_events SET attempt_ordinal = -1 WHERE {STORY} AND sequence = 2"]},
+    {"name": "prose_ordinal_text", "base": "story", "sql": [
+        f"UPDATE canonical_events SET attempt_ordinal = 'first' WHERE {STORY} AND sequence = 2"]},
+    {"name": "prose_attempts_merged", "base": "story", "sql": [
+        f"UPDATE canonical_events SET attempt_id = 'att-1', attempt_ordinal = 1 WHERE {STORY} AND sequence = 2"]},
+    {"name": "prose_turn_unknown", "base": "story", "sql": [
+        f"UPDATE canonical_events SET turn_id = 'turn-z' WHERE {STORY} AND sequence = 2"]},
+    {"name": "action_event_player_safe", "base": "story", "sql": [
+        f"UPDATE canonical_events SET visibility = 'player_safe' WHERE {STORY} AND sequence = 3"]},
+    {"name": "action_event_with_attempt", "base": "story", "sql": [
+        f"UPDATE canonical_events SET attempt_id = 'att-9' WHERE {STORY} AND sequence = 3"]},
+    {"name": "action_event_unknown_action", "base": "story", "sql": [
+        f"UPDATE canonical_events SET action_id = 'action-9' WHERE {STORY} AND sequence = 3"]},
+    {"name": "action_events_reordered", "base": "story", "sql": [
+        f"UPDATE canonical_events SET event_type = CASE sequence WHEN 6 THEN 'consequence' ELSE 'state_mutation' END "
+        f"WHERE {STORY} AND sequence IN (6, 7)"]},
+    {"name": "action_event_other_turn", "base": "story", "sql": [
+        f"UPDATE canonical_events SET turn_id = 'turn-build' WHERE {STORY} AND sequence = 5"]},
+    # Actions, their payloads, mutations, consequences and receipts.
+    {"name": "action_writer_builder", "base": "story", "sql": ["UPDATE actions SET writer = 'builder'"]},
+    {"name": "action_hash_other", "base": "story", "sql": ["UPDATE actions SET payload_hash = '" + "a" * 64 + "'"]},
+    {"name": "action_unpinned", "base": "story", "sql": ["UPDATE actions SET lock_id = NULL"]},
+    {"name": "action_pinned_elsewhere", "base": "story", "sql": [
+        "UPDATE actions SET package_sha256 = '" + "c" * 64 + "'"]},
+    {"name": "action_revisions_disagree", "base": "story", "sql": ["UPDATE actions SET expected_revision = 4"]},
+    {"name": "action_status_unknown", "base": "story", "sql": ["UPDATE actions SET status = 'pending'"]},
+    {"name": "action_failed", "base": "story", "sql": ["UPDATE actions SET status = 'failed'"]},
+    {"name": "action_result_changed", "base": "story", "sql": [
+        "UPDATE actions SET result_json = '{\"success\":true,\"total\":16}'"]},
+    {"name": "action_result_float_total", "base": "story", "sql": [
+        "UPDATE actions SET result_json = '{\"success\":true,\"total\":15.0}'"]},
+    {"name": "action_result_integer_success", "base": "story", "sql": [
+        "UPDATE actions SET result_json = '{\"success\":1,\"total\":15}'"]},
+    {"name": "action_result_not_canonical", "base": "story", "sql": [
+        "UPDATE actions SET result_json = '{\"total\":15,\"success\":true}'"]},
+    {"name": "action_parameters_not_object", "base": "story", "sql": ["UPDATE actions SET payload_json = '[]'"]},
+    {"name": "mutation_ordinal_gap", "base": "story", "sql": ["UPDATE mutations SET ordinal = 1"]},
+    {"name": "mutation_before_changed", "base": "story", "sql": [
+        "UPDATE mutations SET before_json = '{\"total\":1}'"]},
+    {"name": "mutation_after_changed", "base": "story", "sql": [
+        "UPDATE mutations SET after_json = '{\"total\":16}'"]},
+    {"name": "mutation_key_changed", "base": "story", "sql": ["UPDATE mutations SET state_key = 'first'"]},
+    {"name": "consequence_changed", "base": "story", "sql": [
+        "UPDATE consequences SET payload_json = '{\"kind\":\"check_rolled\",\"total\":16}'"]},
+    {"name": "consequence_kind_blank", "base": "story", "sql": [
+        "UPDATE consequences SET payload_json = '{\"kind\":\" \",\"total\":15}'",
+        f"UPDATE canonical_events SET safe_payload_json = '{{\"kind\":\" \",\"total\":15}}' WHERE {STORY} AND sequence = 7"]},
+    {"name": "consequence_kind_number", "base": "story", "sql": [
+        "UPDATE consequences SET payload_json = '{\"kind\":5,\"total\":15}'"]},
+    {"name": "consequence_ordinal_gap", "base": "story", "sql": ["UPDATE consequences SET ordinal = 2"]},
+    {"name": "receipt_missing", "base": "story", "sql": ["DELETE FROM idempotency_records"]},
+    {"name": "receipt_status_other", "base": "story", "sql": ["UPDATE idempotency_records SET status = 'failed'"]},
+    {"name": "receipt_status_unknown", "base": "story", "sql": [
+        "UPDATE idempotency_records SET status = 'maybe'"]},
+    {"name": "receipt_result_float_total", "base": "story", "sql": [
+        "UPDATE idempotency_records SET result_json = '{\"success\":true,\"total\":15.0}'"]},
+    {"name": "receipt_result_changed", "base": "story", "sql": [
+        "UPDATE idempotency_records SET result_json = '{\"success\":false,\"total\":15}'"]},
+    {"name": "receipt_revision_other", "base": "story", "sql": ["UPDATE idempotency_records SET resulting_revision = 5"]},
+    {"name": "receipt_second_key", "base": "story", "sql": [
+        "INSERT INTO idempotency_records SELECT campaign_id, 'key-2', payload_hash, action_id, status, result_json, "
+        "resulting_revision FROM idempotency_records"]},
+    # Narration interruptions.
+    {"name": "interruption_retryable", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', 'action-1', 'att-2', "
+        "'retryable', NULL, NULL)"]},
+    {"name": "interruption_other_turn_action", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-build', 'action-1', 'att-2', "
+        "'retryable', NULL, NULL)"]},
+    {"name": "interruption_retryable_with_sequence", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', "
+        "'retryable', 'att-2', 2)"]},
+    {"name": "interruption_resolved", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', "
+        "'resolved', 'att-2', 2)"]},
+    {"name": "interruption_resolved_without_sequence", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', "
+        "'resolved', 'att-2', NULL)"]},
+    {"name": "interruption_resolved_on_other_attempt", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-2', "
+        "'resolved', 'att-2', 1)"]},
+    {"name": "interruption_resolved_on_action_event", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', "
+        "'resolved', 'att-2', 3)"]},
+    {"name": "interruption_resolved_without_retry_events", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', "
+        "'resolved', 'att-7', 2)"]},
+    {"name": "interruption_status_unknown", "base": "story", "sql": [
+        "INSERT INTO narration_interruptions VALUES ('campaign-story', 'int-1', 'turn-2', NULL, 'att-1', "
+        "'parked', NULL, NULL)"]},
+    # Lifecycle state, transitions and the writer sequence.
+    {"name": "lifecycle_state_missing", "base": "story", "sql": [
+        f"DELETE FROM campaign_lifecycle_state WHERE {STORY}"]},
+    {"name": "lifecycle_retained_writer_other", "base": "story", "sql": [
+        f"UPDATE campaign_lifecycle_state SET retained_active_writer = 'builder' WHERE {STORY}"]},
+    {"name": "lifecycle_active_with_prior", "base": "story", "sql": [
+        f"UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = 'active' WHERE {STORY}"]},
+    {"name": "handoff_basis_other", "base": "story", "sql": ["UPDATE builder_dm_handoffs SET expected_revision = 0"]},
+    {"name": "archived_untouched", "base": "archived", "sql": []},
+    {"name": "trashed_untouched", "base": "trashed", "sql": []},
+    {"name": "archived_writer_dm", "base": "archived", "sql": [f"UPDATE campaigns SET writer = 'dm' WHERE {STORY}"]},
+    {"name": "archived_lifecycle_active", "base": "archived", "sql": [
+        f"UPDATE campaigns SET lifecycle = 'active', writer = 'dm' WHERE {STORY}"]},
+    {"name": "archived_transition_from_other", "base": "archived", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET from_lifecycle = 'archived'"]},
+    {"name": "archived_transition_basis_other", "base": "archived", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET basis_revision = 3"]},
+    {"name": "archived_transition_from_builder", "base": "archived", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET from_writer = 'builder'"]},
+    {"name": "archived_transition_to_unknown", "base": "archived", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET to_writer = 'ghost'"]},
+    {"name": "archived_transition_revision_text", "base": "archived", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET basis_revision = 'eight'"]},
+    {"name": "archived_retained_writer_none", "base": "archived", "sql": [
+        f"UPDATE campaign_lifecycle_state SET retained_active_writer = 'none' WHERE {STORY}"]},
+    {"name": "trashed_prior_missing", "base": "trashed", "sql": [
+        f"UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = NULL WHERE {STORY}"]},
+    {"name": "trashed_prior_writer_missing", "base": "trashed", "sql": [
+        f"UPDATE campaign_lifecycle_state SET tombstone_prior_writer = NULL WHERE {STORY}"]},
+    {"name": "trashed_prior_other", "base": "trashed", "sql": [
+        f"UPDATE campaign_lifecycle_state SET tombstone_prior_lifecycle = 'tombstoned' WHERE {STORY}"]},
+    {"name": "trashed_transitions_out_of_order", "base": "trashed", "sql": [
+        "UPDATE campaign_lifecycle_transitions SET from_lifecycle = 'active' WHERE to_lifecycle = 'tombstoned'"]},
 ]
 
 
@@ -157,6 +391,9 @@ def main() -> None:
         bases = {name: gzip.decompress(path.read_bytes()) for name, path in BASES.items()}
         bases["children"] = children_base(Path(scratch))
         (OUT / "children.sqlite3.gz").write_bytes(gzip.compress(bases["children"], mtime=0))
+        for name, kinds in LIFECYCLE_BASES.items():
+            bases[name] = lifecycle_base(Path(scratch), name, kinds)
+            (OUT / f"{name}.sqlite3.gz").write_bytes(gzip.compress(bases[name], mtime=0))
         for case in CASES:
             folder = Path(scratch) / str(case["name"])
             folder.mkdir()
@@ -165,7 +402,8 @@ def main() -> None:
             connection = sqlite3.connect(path, isolation_level=None)
             try:
                 connection.execute("PRAGMA foreign_keys = OFF")
-                statements = list(case["sql"])  # type: ignore[call-overload]
+                # Damage arrives past the tables' CHECK constraints too; the verifiers must see it.
+                statements = [CHECKS_OFF, *case["sql"]]  # type: ignore[misc]
                 if case.pop("bypass_triggers", False):
                     # Damage the ownership triggers forbid: drop them, then restore their exact SQL.
                     triggers = connection.execute(
