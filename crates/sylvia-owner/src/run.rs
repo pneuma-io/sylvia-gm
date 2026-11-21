@@ -12,23 +12,29 @@
 //! - the seven commands that can wait on a model run as their own tasks and answer whenever
 //!   they finish.
 //!
-//! Not ported yet (pull request 3 of lane 5): provider-work reservation for those seven, the
-//! update-startup and update-in-progress gates, the provider error sentences and the desktop
-//! update methods.
+//! A model-bound command reserves provider work for its session before it starts, as Python's
+//! `provider_request_work` does, and releases it before its reply is written.
+//!
+//! Not ported yet: the desktop update methods and the state behind the update gates (lane 5's
+//! desktop update assignment), `acquire_owner` and the internal handshake (lane 3), the bundled
+//! package installs and Builder migrations at launch (lanes 1 and 3), the provider resolver and
+//! session loop (lane 4).
 
 use crate::commands::RUN_LOOP_METHODS;
 use crate::desktop_update::drafts::DraftStore;
 use crate::diagnostics::{Fields, LocalDiagnostics};
 use crate::dispatch::{self, required_text, DispatchContext, DispatchResult, Failure, PORT_PENDING};
 use crate::display_reads::DisplayReads;
-use crate::handshake::derive_owner_response;
 use crate::protocol::{self, Frame};
+use crate::services::WorkGuard;
 use std::io::{BufRead, Write};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
-use sylvia_base::{Json, JsonMap};
+use sylvia_base::{pystr, Json, JsonMap};
+use sylvia_store::launch::{acquire_owner, derive_owner_response};
+use sylvia_store::StoreThread;
 use tokio::sync::mpsc;
 
 /// `_DISPLAY_READ_METHODS`.
@@ -45,6 +51,120 @@ const WORKER_METHODS: &[&str] = &[
     "customize_ready_campaign",
     "send_character_chat_message",
 ];
+
+/// The methods an unconfirmed updated application still answers (`update_startup` is set and
+/// `desktop_update_confirm_startup` has not succeeded).
+const UNCONFIRMED_STARTUP_METHODS: &[&str] = &[
+    "desktop_update_confirm_startup",
+    "desktop_update_state",
+    "shutdown",
+    "load_desktop_drafts",
+    "save_desktop_drafts",
+    "campaign_index",
+    "builder_chat_index",
+    "provider_settings",
+    "model_choices",
+    "display_snapshot",
+    "player_projection",
+    "player_projection_page",
+    "campaign_panels",
+    "cancel_display_load",
+    "record_local_fault",
+];
+
+/// The methods answered while update preparation has reserved the app.
+const UPDATE_RESERVED_METHODS: &[&str] = &[
+    "shutdown",
+    "desktop_update_state",
+    "desktop_update_abort",
+    "desktop_update_reserve",
+    "desktop_update_shutdown",
+    "desktop_update_prepare",
+    "desktop_update_defer",
+    "desktop_update_handoff",
+    "load_desktop_drafts",
+    "save_desktop_drafts",
+    "cancel_display_load",
+    "campaign_index",
+    "builder_chat_index",
+];
+
+/// The desktop update state the run loop's gates read. Until the desktop update is ported
+/// nothing sets it: no launch carries an update context the Rust owner understands, and no
+/// update is ever reserved, so both gates stay open, as they do in Python without an update.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct UpdateGates {
+    /// `update_startup is not None and not update_start_confirmed`.
+    pub startup_unconfirmed: bool,
+    /// `supervisor.desktop_update_operation()`.
+    pub reserved_operation: Option<String>,
+}
+
+impl UpdateGates {
+    /// The refusal Python writes before admitting `method`, if any. The startup gate is checked
+    /// first.
+    pub fn refusal(&self, request_id: &str, method: &str) -> Option<Json> {
+        if self.startup_unconfirmed && !UNCONFIRMED_STARTUP_METHODS.contains(&method) {
+            let error = protocol::plain_error(
+                "update_startup_unconfirmed",
+                "Wait for the updated application to confirm startup.",
+            );
+            return Some(protocol::error_reply(Some(request_id), error));
+        }
+        if self.reserved_operation.is_some() && !UPDATE_RESERVED_METHODS.contains(&method) {
+            let error = protocol::plain_error(
+                "update_in_progress",
+                "Update preparation has reserved this app. Finish or cancel it before changing saved work.",
+            );
+            return Some(protocol::error_reply(Some(request_id), error));
+        }
+        None
+    }
+}
+
+/// `_model_slash_command(user_text)`: the bounded `/model [reference] [--once|--global]`
+/// command, as `(reference, mode)`, or `None` when the text is not one.
+pub fn model_slash_command(user_text: &str) -> Result<Option<(Option<String>, &'static str)>, Failure> {
+    // `str.split()`: runs of Python whitespace, no empty parts.
+    let parts: Vec<&str> = user_text.split(pystr::is_space).filter(|part| !part.is_empty()).collect();
+    if parts.is_empty() || pystr::casefold(parts[0]) != "/model" {
+        return Ok(None);
+    }
+    if parts.len() > 3 {
+        return Err(Failure::protocol("Model command accepts one model and one optional mode"));
+    }
+    let flags: Vec<&str> = parts[1..].iter().copied().filter(|part| part.starts_with("--")).collect();
+    let references: Vec<&str> = parts[1..].iter().copied().filter(|part| !part.starts_with("--")).collect();
+    if flags.len() > 1 || references.len() > 1 {
+        return Err(Failure::protocol("Model command is ambiguous"));
+    }
+    let mode = match flags.first() {
+        None => "current",
+        Some(&"--once") => "once",
+        Some(&"--global") => "global",
+        Some(_) => return Err(Failure::protocol("Model command mode is unsupported")),
+    };
+    Ok(Some((references.first().map(|reference| (*reference).to_owned()), mode)))
+}
+
+/// `_generation_session(method, params)`: the session whose provider work a command reserves.
+/// `/model` is only a settings command.
+pub fn generation_session(method: &str, params: &JsonMap) -> Result<Option<String>, Failure> {
+    if !matches!(method, "submit_session_input" | "manual_retry_session" | "start_dm_session") {
+        return Ok(None);
+    }
+    if method == "submit_session_input" {
+        if let (Some(Json::String(user_text)), Some(Json::Null) | None) =
+            (params.get("user_text"), params.get("ooc_text"))
+        {
+            // Python reads `params.get("ooc_text") is None`: missing and null are the same.
+            if model_slash_command(user_text)?.is_some() {
+                return Ok(None);
+            }
+        }
+    }
+    required_text(params, "session_id").map(Some)
+}
 
 /// The fixed reply text of Python's `except Exception` branch.
 const INTERNAL_ERROR_MESSAGE: &str = "Sylvia encountered an internal error, not a confirmed provider failure. \
@@ -116,26 +236,37 @@ fn write_replies(mut output: impl Write, mut replies: mpsc::UnboundedReceiver<Js
 /// The owner's shared state while it serves: Python's closure variables in `run`.
 struct Owner {
     context: DispatchContext,
-    diagnostics: LocalDiagnostics,
+    diagnostics: Arc<LocalDiagnostics>,
     /// `desktop_drafts`, opened on first use.
     drafts: Mutex<Option<Arc<DraftStore>>>,
+}
+
+/// Run blocking store work (opening, closing) off the runtime's worker threads.
+async fn blocking<T: Send + 'static>(work: impl FnOnce() -> T + Send + 'static) -> Option<T> {
+    tokio::task::spawn_blocking(work).await.ok()
 }
 
 async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -> i32 {
     // Launch: the first message must be a valid launch envelope. Any failure here ends the
     // owner without a reply, as Python does ("Sylvia GM owner startup failed" on stderr).
-    let (context, response_hex) = match frames.recv().await {
-        Some(Frame::Message(envelope)) => match launch(&envelope) {
-            Ok(launched) => launched,
-            Err(()) => return startup_failed(),
+    let (context, response_hex, store_thread) = match frames.recv().await {
+        Some(Frame::Message(envelope)) => match blocking(move || launch(&envelope)).await {
+            Some(Ok(launched)) => launched,
+            _ => return startup_failed(),
         },
         _ => return startup_failed(),
     };
-    let owner = Arc::new(Owner {
-        diagnostics: LocalDiagnostics::new(&context.storage_root),
-        context,
-        drafts: Mutex::new(None),
-    });
+    let diagnostics = Arc::new(LocalDiagnostics::new(&context.storage_root));
+    let owner = Arc::new(Owner { diagnostics, context, drafts: Mutex::new(None) });
+    // Python's `application_owner.prepare_new_campaign_storage()`, after diagnostics opened.
+    if owner.context.store.call(|store| store.prepare_new_campaign_storage()).await.is_err() {
+        owner.diagnostics.record(
+            "owner_failed",
+            Fields { outcome: Some("error"), error_code: Some("internal_error"), ..Fields::default() },
+        );
+        close_owner(owner, store_thread).await;
+        return startup_failed();
+    }
     let mut ready = JsonMap::new();
     ready.insert("ok".into(), Json::Bool(true));
     ready.insert("type".into(), Json::String("ready".into()));
@@ -157,6 +288,7 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
         )
     };
     let mut workers = tokio::task::JoinSet::new();
+    let gates = UpdateGates::default();
 
     let code = loop {
         let frame = tokio::select! {
@@ -191,6 +323,10 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
             }
         };
 
+        if let Some(refusal) = gates.refusal(&id, &method) {
+            replies.send(refusal);
+            continue;
+        }
         if method == "shutdown" {
             let mut result = JsonMap::new();
             result.insert("status".into(), Json::String("closed".into()));
@@ -216,20 +352,41 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
             display_reads.submit(
                 id,
                 load_id,
-                Box::pin(async move { execute_request(&owner, &request_id, &method, &params).await }),
+                Box::pin(async move { execute_request(&owner, &request_id, &method, &params, None).await }),
             );
             continue;
         }
         if WORKER_METHODS.contains(&method.as_str()) {
+            let reservation = match reserve(&owner, &method, &params) {
+                Ok(reservation) => reservation,
+                Err(error) => {
+                    // Python records `request_rejected` and replies with code and message only.
+                    owner.diagnostics.record(
+                        "request_rejected",
+                        Fields {
+                            operation: Some(&method),
+                            outcome: Some("error"),
+                            error_code: Some("command_rejected"),
+                            error_type: Some(error.error_type.unwrap_or("CommandRejected")),
+                            ..Fields::default()
+                        },
+                    );
+                    replies.send(protocol::error_reply(
+                        Some(&id),
+                        protocol::plain_error(&error.code, &error.message),
+                    ));
+                    continue;
+                }
+            };
             let owner = Arc::clone(&owner);
             let replies = replies.clone();
             workers.spawn(async move {
-                let reply = execute_request(&owner, &id, &method, &params).await;
+                let reply = execute_request(&owner, &id, &method, &params, reservation).await;
                 replies.send(reply);
             });
             continue;
         }
-        let reply = execute_request(&owner, &id, &method, &params).await;
+        let reply = execute_request(&owner, &id, &method, &params, None).await;
         replies.send(reply);
     };
 
@@ -245,14 +402,53 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
             () = &mut deadline => break,
         }
     }
-    let diagnostics_owner = Arc::clone(&owner);
-    let _ = tokio::task::spawn_blocking(move || diagnostics_owner.diagnostics.close()).await;
+    // Workers still running after five seconds are abandoned, as Python's daemon threads are.
+    workers.abort_all();
+    while workers.join_next().await.is_some() {}
+    close_owner(owner, store_thread).await;
     code
+}
+
+/// Python's `finally`, after the loop: close the store (the supervisor and bus), then write
+/// diagnostics for the last time. The store thread ends once every handle is dropped; a
+/// handler task still holding one gets five seconds, as Python's workers do.
+async fn close_owner(owner: Arc<Owner>, store_thread: StoreThread) {
+    let diagnostics = Arc::clone(&owner.diagnostics);
+    drop(owner);
+    let joined = blocking(move || store_thread.join());
+    let _ = tokio::time::timeout(Duration::from_secs(5), joined).await;
+    let _ = blocking(move || diagnostics.close()).await;
+}
+
+/// The provider-work reservation of a model-bound command, taken before it runs as a task.
+fn reserve(
+    owner: &Owner,
+    method: &str,
+    params: &JsonMap,
+) -> Result<Option<WorkGuard>, sylvia_base::CodedError> {
+    let rejected = |failure: Failure| match failure {
+        Failure::Rejected(error) => error,
+        _ => sylvia_base::CodedError::rejected("Owner request could not be reserved"),
+    };
+    let Some(session_id) = generation_session(method, params).map_err(rejected)? else {
+        return Ok(None);
+    };
+    match &owner.context.session_loop {
+        Some(session_loop) => session_loop.provider_request_work(&session_id).map(Some),
+        // Lane 4's session loop is not in the owner yet, so there is nothing to reserve.
+        None => Ok(None),
+    }
 }
 
 /// `execute_request`: run one command and build its reply. Every reply is recorded in local
 /// diagnostics, and an error reply carries the record's identity as `diagnostic_id`.
-async fn execute_request(owner: &Arc<Owner>, request_id: &str, method: &str, params: &JsonMap) -> Json {
+async fn execute_request(
+    owner: &Arc<Owner>,
+    request_id: &str,
+    method: &str,
+    params: &JsonMap,
+    reservation: Option<WorkGuard>,
+) -> Json {
     let started = Instant::now();
     let outcome = match method {
         "load_desktop_drafts" | "save_desktop_drafts" => drafts(owner, method, params),
@@ -279,14 +475,28 @@ async fn execute_request(owner: &Arc<Owner>, request_id: &str, method: &str, par
         "save_local_report" => save_local_report(owner, params),
         _ => {
             // A task of its own, so a handler's panic is an internal error, not a dead owner.
-            let (context, method, params) = (owner.context.clone(), method.to_owned(), params.clone());
+            let mut context = owner.context.clone();
+            context.method = method.to_owned();
+            // `record_provider_warning`: a `provider_warning` record for this command.
+            let (warned, operation) = (Arc::clone(owner), method.to_owned());
+            context.record_provider_warning = Arc::new(move |code: &str| {
+                warned.diagnostics.record(
+                    "provider_warning",
+                    Fields { operation: Some(&operation), error_code: Some(code), ..Fields::default() },
+                );
+            });
+            let (method, params) = (method.to_owned(), params.clone());
             match tokio::spawn(async move { dispatch::dispatch(&context, &method, &params).await }).await {
                 Ok(outcome) => outcome,
                 Err(_) => Err(Failure::Internal { error_type: "RuntimeError" }),
             }
         }
     };
-    let (mut reply, error) = reply_for(request_id, outcome);
+    // Python closes the reservation in `finally`, before the reply is recorded and written.
+    drop(reservation);
+    let submitted =
+        (method == "submit_session_input").then(|| params.get("message_id").and_then(Json::as_str)).flatten();
+    let (mut reply, error) = reply_for(request_id, outcome, submitted);
     let duration_ms = started.elapsed().as_secs_f64() * 1000.0;
     let (error_code, error_type) = match &error {
         Some((code, error_type)) => (Some(code.as_str()), Some(*error_type)),
@@ -312,19 +522,36 @@ async fn execute_request(owner: &Arc<Owner>, request_id: &str, method: &str, par
 }
 
 /// The reply for an outcome, and for an error its diagnostics code and exception class.
-fn reply_for(request_id: &str, outcome: DispatchResult) -> (Json, Option<(String, &'static str)>) {
+fn reply_for(
+    request_id: &str,
+    outcome: DispatchResult,
+    submitted_message_id: Option<&str>,
+) -> (Json, Option<(String, &'static str)>) {
+    let internal = |error_type: &'static str| {
+        eprintln!("Sylvia GM owner command failed: internal_error");
+        let error = protocol::plain_error("internal_error", INTERNAL_ERROR_MESSAGE);
+        (protocol::error_reply(Some(request_id), error), Some(("internal_error".to_owned(), error_type)))
+    };
     match outcome {
+        Err(Failure::Provider(error)) => {
+            let reply = sylvia_provider::reply::provider_error_reply(&error, submitted_message_id);
+            if reply.code == "internal_error" {
+                // An internal error that escaped a provider is Python's `except Exception`.
+                return internal(error.kind.class_name());
+            }
+            let error_reply = sylvia_base::CodedError::new(reply.code, reply.message).to_reply_error();
+            (
+                protocol::error_reply(Some(request_id), error_reply),
+                Some((reply.code.to_owned(), error.kind.class_name())),
+            )
+        }
         Ok(result) => (protocol::ok_reply(request_id, result), None),
         Err(Failure::Rejected(error)) => {
             let code = error.code.clone();
             let error_type = error.error_type.unwrap_or("CommandRejected");
             (protocol::error_reply(Some(request_id), error.to_reply_error()), Some((code, error_type)))
         }
-        Err(Failure::Internal { error_type }) => {
-            eprintln!("Sylvia GM owner command failed: internal_error");
-            let error = protocol::plain_error("internal_error", INTERNAL_ERROR_MESSAGE);
-            (protocol::error_reply(Some(request_id), error), Some(("internal_error".into(), error_type)))
-        }
+        Err(Failure::Internal { error_type }) => internal(error_type),
     }
 }
 
@@ -367,23 +594,86 @@ fn startup_failed() -> i32 {
     EXIT_STARTUP_FAILED
 }
 
-/// `_launch`, as far as it is ported: validate the envelope and derive the handshake reply.
+/// `_launch`, as far as it is ported, in Python's order: validate the envelope, derive the
+/// external handshake reply, acquire the application owner (lane 3's `acquire_owner`: the store
+/// opens on its thread, taking the owner lock and running the migrations, then the internal
+/// handshake is issued) and complete the internal handshake. A failure after the store opened
+/// closes it again, as `supervisor.shutdown()` does.
 ///
-/// Not ported yet (lanes 3 and 5): update-startup validation, acquiring the application lock,
-/// opening and migrating the store, installing the bundled packages. Until those exist the
-/// Rust owner must not be given a database that matters.
-fn launch(envelope: &JsonMap) -> Result<(DispatchContext, String), ()> {
+/// Not ported yet: the update-startup check and its `before_migration` hook (the desktop
+/// update), so `before_migration` is `None`, as it is in Python without an update context.
+fn launch(envelope: &JsonMap) -> Result<(DispatchContext, String, StoreThread), ()> {
     if envelope.get("type").and_then(Json::as_str) != Some("launch") {
         return Err(());
     }
     let text = |key: &str| envelope.get(key).and_then(Json::as_str).filter(|value| !value.is_empty());
     let secret_hex = text("secret_hex").ok_or(())?;
-    let database_path = PathBuf::from(text("database_path").ok_or(())?);
+    let database_path = resolve_database_path(Path::new(text("database_path").ok_or(())?)).ok_or(())?;
     let owner_id = text("owner_id").ok_or(())?.to_owned();
-    let response_hex = derive_owner_response(secret_hex).map_err(|_| ())?;
     let storage_root = database_path.parent().map(Path::to_path_buf).ok_or(())?;
     std::fs::create_dir_all(&storage_root).map_err(|_| ())?;
-    Ok((DispatchContext { owner_id, storage_root, handshake_verified: true }, response_hex))
+    let response_hex = derive_owner_response(secret_hex).map_err(|_| ())?;
+    let acquired = acquire_owner(&database_path, None).map_err(|_| ())?;
+    let (store, store_thread, mut handshake) = (acquired.store, acquired.thread, acquired.handshake);
+    // `supervisor.complete_handshake(derive_owner_response(internal.secret_hex))`.
+    let verified = derive_owner_response(&acquired.credential.secret_hex)
+        .and_then(|internal| handshake.verify(&internal));
+    if verified.is_err() {
+        drop(store);
+        store_thread.join();
+        return Err(());
+    }
+    let context = DispatchContext {
+        owner_id,
+        storage_root,
+        handshake_verified: true,
+        method: String::new(),
+        gm_system_prompt: None,
+        store,
+        providers: None,
+        session_loop: None,
+        record_provider_warning: Arc::new(|_: &str| {}),
+    };
+    Ok((context, response_hex, store_thread))
+}
+
+/// `Path(text).expanduser().resolve()`: `~` becomes the home folder, then the path is made
+/// absolute with links resolved as far as it exists (Python's non-strict `resolve`).
+fn resolve_database_path(path: &Path) -> Option<PathBuf> {
+    let text = path.to_string_lossy();
+    let expanded = match text.strip_prefix('~') {
+        Some(rest) if rest.is_empty() || rest.starts_with(['/', '\\']) => {
+            let home = std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" })?;
+            PathBuf::from(home).join(rest.trim_start_matches(['/', '\\']))
+        }
+        _ => path.to_path_buf(),
+    };
+    let absolute =
+        if expanded.is_absolute() { expanded } else { std::env::current_dir().ok()?.join(expanded) };
+    // Resolve the longest existing ancestor, then append the rest unchanged.
+    let mut existing = absolute.as_path();
+    let mut rest = Vec::new();
+    loop {
+        if let Ok(resolved) = std::fs::canonicalize(existing) {
+            let mut resolved = PathBuf::from(plain(&resolved));
+            for part in rest.iter().rev() {
+                resolved.push(part);
+            }
+            return Some(resolved);
+        }
+        rest.push(existing.file_name()?.to_os_string());
+        existing = existing.parent()?;
+    }
+}
+
+/// A path without Windows' `\\?\` prefix, as Python prints it.
+fn plain(path: &Path) -> String {
+    let text = path.to_string_lossy().into_owned();
+    if let Some(rest) = text.strip_prefix(r"\\?\UNC\") {
+        format!(r"\\{rest}")
+    } else {
+        text.strip_prefix(r"\\?\").map(str::to_owned).unwrap_or(text)
+    }
 }
 
 /// A validated request: its id, method, parameters and display load identity.
@@ -425,4 +715,103 @@ fn validate(request: &JsonMap, id: Option<&str>) -> Result<Admitted, String> {
 fn send_invalid(replies: &Replies, id: Option<&str>, message: &str) {
     let error = protocol::plain_error("invalid_owner_request", message);
     replies.send(protocol::error_reply(id, error));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use sylvia_provider::error::{ErrorKind, ProviderError};
+
+    fn params(value: Json) -> JsonMap {
+        value.as_object().cloned().unwrap()
+    }
+
+    fn message(failure: Failure) -> String {
+        match failure {
+            Failure::Rejected(error) => error.message,
+            other => panic!("expected a rejection, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn model_commands_parse_like_python() {
+        assert_eq!(model_slash_command("/MODEL gpt --once").unwrap(), Some((Some("gpt".into()), "once")));
+        assert_eq!(model_slash_command("  /model\u{1c}").unwrap(), Some((None, "current")));
+        assert_eq!(model_slash_command("/models x").unwrap(), None);
+        assert_eq!(model_slash_command("I look around").unwrap(), None);
+        assert_eq!(
+            message(model_slash_command("/model a b c d").unwrap_err()),
+            "Model command accepts one model and one optional mode"
+        );
+        assert_eq!(message(model_slash_command("/model a b").unwrap_err()), "Model command is ambiguous");
+        assert_eq!(
+            message(model_slash_command("/model --soon").unwrap_err()),
+            "Model command mode is unsupported"
+        );
+    }
+
+    #[test]
+    fn only_model_bound_commands_reserve_their_session() {
+        let submit = params(json!({"session_id": "s", "user_text": "hello", "ooc_text": null}));
+        assert_eq!(generation_session("submit_session_input", &submit).unwrap(), Some("s".into()));
+        let slash = params(json!({"session_id": "s", "user_text": "/model x"}));
+        assert_eq!(generation_session("submit_session_input", &slash).unwrap(), None);
+        let slash_with_ooc = params(json!({"session_id": "s", "user_text": "/model x", "ooc_text": "aside"}));
+        assert_eq!(generation_session("submit_session_input", &slash_with_ooc).unwrap(), Some("s".into()));
+        assert_eq!(generation_session("ready_campaign_catalog", &JsonMap::new()).unwrap(), None);
+        assert_eq!(
+            message(generation_session("start_dm_session", &JsonMap::new()).unwrap_err()),
+            "session_id must be a nonempty string"
+        );
+    }
+
+    #[test]
+    fn update_gates_refuse_with_pythons_replies() {
+        assert_eq!(UpdateGates::default().refusal("r", "submit_session_input"), None);
+        let startup = UpdateGates { startup_unconfirmed: true, reserved_operation: None };
+        assert_eq!(startup.refusal("r", "campaign_index"), None);
+        assert_eq!(
+            startup.refusal("r", "submit_session_input").unwrap().to_string(),
+            r#"{"id":"r","ok":false,"error":{"code":"update_startup_unconfirmed","message":"Wait for the updated application to confirm startup."}}"#
+        );
+        let reserved = UpdateGates { startup_unconfirmed: false, reserved_operation: Some("op".into()) };
+        assert_eq!(reserved.refusal("r", "builder_chat_index"), None);
+        assert_eq!(reserved.refusal("r", "model_choices").unwrap()["error"]["code"], "update_in_progress");
+    }
+
+    #[test]
+    fn provider_errors_take_lane_4s_sentence_and_record_their_class() {
+        let error = ProviderError::connection("refused", None).with_accepted_message_id("m1");
+        let (reply, recorded) = reply_for("r", Err(Failure::Provider(error.clone())), Some("m1"));
+        assert_eq!(reply["error"]["code"], "provider_error");
+        assert!(reply["error"]["message"]
+            .as_str()
+            .unwrap()
+            .starts_with("Your message was saved. Sylvia could not connect"));
+        assert_eq!(reply["error"]["diagnostics"], json!([]));
+        assert_eq!(recorded, Some(("provider_error".to_owned(), "ProviderConnectionError")));
+        let (other, _) = reply_for("r", Err(Failure::Provider(error)), None);
+        assert!(other["error"]["message"].as_str().unwrap().starts_with("Sylvia could not connect"));
+        let compaction = ProviderError::new(ErrorKind::ContextCompaction, "Could not compact");
+        let (reply, recorded) = reply_for("r", Err(Failure::Provider(compaction)), None);
+        assert_eq!(reply["error"]["code"], "context_compaction_failed");
+        assert_eq!(reply["error"]["message"], "Could not compact");
+        assert_eq!(recorded.unwrap().0, "context_compaction_failed");
+    }
+
+    #[test]
+    fn an_internal_error_from_a_provider_is_pythons_except_exception() {
+        let escaped = ProviderError::new(ErrorKind::Internal, "unexpected keyword argument 'reasoning'");
+        let (reply, recorded) = reply_for("r", Err(Failure::Provider(escaped)), Some("m1"));
+        assert_eq!(reply["error"], json!({"code": "internal_error", "message": INTERNAL_ERROR_MESSAGE}));
+        assert_eq!(recorded, Some(("internal_error".to_owned(), "Exception")));
+    }
+
+    #[test]
+    fn an_internal_fault_has_the_fixed_reply_and_no_diagnostics_list() {
+        let (reply, recorded) = reply_for("r", Err(Failure::Internal { error_type: "KeyError" }), None);
+        assert_eq!(reply["error"], json!({"code": "internal_error", "message": INTERNAL_ERROR_MESSAGE}));
+        assert_eq!(recorded, Some(("internal_error".to_owned(), "KeyError")));
+    }
 }
