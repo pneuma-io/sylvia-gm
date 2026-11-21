@@ -304,3 +304,15 @@ async fn fake_provider_follows_python() {
     drop(fake.generate_stream(ProviderRequest::new(Vec::new())));
     assert_eq!(fake.calls().len(), 2);
 }
+
+#[test]
+fn internal_error_reply_matches_python() {
+    let vectors = vectors();
+    let expected = &vectors["errors"]["internal_reply"]["error"];
+    let reply =
+        provider_error_reply(&ProviderError::new(ErrorKind::Internal, "unexpected keyword"), Some("m-1"));
+    assert_eq!(reply.code, expected["code"].as_str().unwrap());
+    assert_eq!(reply.message, expected["message"].as_str().unwrap());
+    assert!(expected.get("diagnostics").is_none(), "Python's internal reply has no diagnostics member");
+    assert!(!ErrorKind::Internal.is_a(ErrorKind::Provider));
+}

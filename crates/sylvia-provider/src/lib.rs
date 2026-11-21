@@ -14,17 +14,25 @@
 //! - [`http`] holds the HTTP seam and the scripted transport for tests.
 //! - [`sse`] holds the OpenAI SDK's server-sent-event reading.
 //! - [`pyobj`] holds Python's view of provider JSON.
+//! - [`openai_compat`] holds `OpenAICompatProvider` over the HTTP seam.
+//! - [`hooks`] holds `provider/_hooks.py`'s context and manager.
+//! - [`pyurl`] and [`httpx_url`] hold `urllib.parse.urlsplit` and `httpx.URL`.
 //! - [`pyfmt`] holds Python's `:g` number formatting.
 
 pub mod chat;
 pub mod error;
+pub mod hooks;
 pub mod http;
+pub mod httpx_url;
 mod log;
+pub mod openai_compat;
 pub mod provider;
 pub mod pyfmt;
 pub mod pyobj;
+pub mod pyurl;
 pub mod reply;
 pub mod retry;
+pub mod routes;
 pub mod sse;
 pub mod stream_health;
 pub mod tool_delta;

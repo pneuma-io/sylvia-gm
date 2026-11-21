@@ -77,10 +77,14 @@ pub enum ErrorKind {
     Unavailable,
     /// `ModelCapacityError` (a `ProviderUnavailableError`).
     ModelCapacity,
+    /// Not a `ProviderError`: a plain Python exception that escapes the provider unconverted
+    /// (for example `TypeError` from an unknown request keyword in the streaming path). The owner
+    /// answers it with `internal_error`. It is outside the class tree: `is(Provider)` is false.
+    Internal,
 }
 
 impl ErrorKind {
-    /// Every class, for tests and vectors.
+    /// Every `ProviderError` class, for tests and vectors (not [`ErrorKind::Internal`]).
     pub const ALL: [ErrorKind; 20] = [
         Self::Provider,
         Self::Authentication,
@@ -127,13 +131,14 @@ impl ErrorKind {
             Self::ContinuationRequired => "ProviderContinuationRequiredError",
             Self::Unavailable => "ProviderUnavailableError",
             Self::ModelCapacity => "ModelCapacityError",
+            Self::Internal => "Exception",
         }
     }
 
     /// The Python base class, or `None` for `ProviderError`.
     pub fn parent(self) -> Option<ErrorKind> {
         match self {
-            Self::Provider => None,
+            Self::Provider | Self::Internal => None,
             Self::StaleConnection => Some(Self::Timeout),
             Self::Refusal
             | Self::Paused
@@ -163,7 +168,8 @@ impl ErrorKind {
     /// The class attribute `category`, inherited where a subclass does not set its own.
     pub fn category(self) -> ErrorCategory {
         match self {
-            Self::Provider | Self::Connection | Self::Unavailable | Self::ModelCapacity => {
+            // `Internal` has no category in Python; it never reaches retry or category checks.
+            Self::Provider | Self::Connection | Self::Unavailable | Self::ModelCapacity | Self::Internal => {
                 ErrorCategory::ProviderUnavailable
             }
             Self::Authentication => ErrorCategory::AuthFailure,

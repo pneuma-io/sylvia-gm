@@ -1,0 +1,1646 @@
+{
+ "python": "3.12.11",
+ "httpx": "0.28.1",
+ "urlsplit": [
+  {
+   "url": "http://127.0.0.1:1234/v1",
+   "parts": [
+    "http",
+    "127.0.0.1:1234",
+    "/v1",
+    "",
+    ""
+   ],
+   "hostname": "127.0.0.1",
+   "port": 1234,
+   "port_error": null,
+   "unsplit": "http://127.0.0.1:1234/v1"
+  },
+  {
+   "url": "https://openrouter.ai/api/v1",
+   "parts": [
+    "https",
+    "openrouter.ai",
+    "/api/v1",
+    "",
+    ""
+   ],
+   "hostname": "openrouter.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://openrouter.ai/api/v1"
+  },
+  {
+   "url": "https://OpenRouter.AI/api/v1/",
+   "parts": [
+    "https",
+    "OpenRouter.AI",
+    "/api/v1/",
+    "",
+    ""
+   ],
+   "hostname": "openrouter.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://OpenRouter.AI/api/v1/"
+  },
+  {
+   "url": "HTTPS://API.GROQ.COM/openai/v1",
+   "parts": [
+    "https",
+    "API.GROQ.COM",
+    "/openai/v1",
+    "",
+    ""
+   ],
+   "hostname": "api.groq.com",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://API.GROQ.COM/openai/v1"
+  },
+  {
+   "url": " \t https://api.x.ai/v1",
+   "parts": [
+    "https",
+    "api.x.ai",
+    "/v1",
+    "",
+    ""
+   ],
+   "hostname": "api.x.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://api.x.ai/v1"
+  },
+  {
+   "url": "https://api.openai.com/v1?x=1#f",
+   "parts": [
+    "https",
+    "api.openai.com",
+    "/v1",
+    "x=1",
+    "f"
+   ],
+   "hostname": "api.openai.com",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://api.openai.com/v1?x=1#f"
+  },
+  {
+   "url": "http://user:pw@Host.Example:8080/p",
+   "parts": [
+    "http",
+    "user:pw@Host.Example:8080",
+    "/p",
+    "",
+    ""
+   ],
+   "hostname": "host.example",
+   "port": 8080,
+   "port_error": null,
+   "unsplit": "http://user:pw@Host.Example:8080/p"
+  },
+  {
+   "url": "http://[::1]:11434/v1",
+   "parts": [
+    "http",
+    "[::1]:11434",
+    "/v1",
+    "",
+    ""
+   ],
+   "hostname": "::1",
+   "port": 11434,
+   "port_error": null,
+   "unsplit": "http://[::1]:11434/v1"
+  },
+  {
+   "url": "http://[fe80::1%25Eth0]:80/",
+   "parts": [
+    "http",
+    "[fe80::1%25Eth0]:80",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "fe80::1%25Eth0",
+   "port": 80,
+   "port_error": null,
+   "unsplit": "http://[fe80::1%25Eth0]:80/"
+  },
+  {
+   "url": "http://[::1/v1",
+   "error": "Invalid IPv6 URL"
+  },
+  {
+   "url": "http://::1]/v1",
+   "error": "Invalid IPv6 URL"
+  },
+  {
+   "url": "http://[1.2.3.4]/",
+   "error": "An IPv4 address cannot be in brackets"
+  },
+  {
+   "url": "http://[v1.fe]/",
+   "parts": [
+    "http",
+    "[v1.fe]",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "v1.fe",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://[v1.fe]/"
+  },
+  {
+   "url": "http://[vz.x]/",
+   "error": "IPvFuture address is invalid"
+  },
+  {
+   "url": "localhost:1234/v1",
+   "parts": [
+    "localhost",
+    "",
+    "1234/v1",
+    "",
+    ""
+   ],
+   "hostname": null,
+   "port": null,
+   "port_error": null,
+   "unsplit": "localhost:1234/v1"
+  },
+  {
+   "url": "//host/path",
+   "parts": [
+    "",
+    "host",
+    "/path",
+    "",
+    ""
+   ],
+   "hostname": "host",
+   "port": null,
+   "port_error": null,
+   "unsplit": "//host/path"
+  },
+  {
+   "url": "/relative/path",
+   "parts": [
+    "",
+    "",
+    "/relative/path",
+    "",
+    ""
+   ],
+   "hostname": null,
+   "port": null,
+   "port_error": null,
+   "unsplit": "/relative/path"
+  },
+  {
+   "url": "",
+   "parts": [
+    "",
+    "",
+    "",
+    "",
+    ""
+   ],
+   "hostname": null,
+   "port": null,
+   "port_error": null,
+   "unsplit": ""
+  },
+  {
+   "url": "http://host:notaport/",
+   "parts": [
+    "http",
+    "host:notaport",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "host",
+   "port": null,
+   "port_error": "Port could not be cast to integer value as 'notaport'",
+   "unsplit": "http://host:notaport/"
+  },
+  {
+   "url": "http://host:99999/",
+   "parts": [
+    "http",
+    "host:99999",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "host",
+   "port": null,
+   "port_error": "Port out of range 0-65535",
+   "unsplit": "http://host:99999/"
+  },
+  {
+   "url": "mailto:someone@example.com",
+   "parts": [
+    "mailto",
+    "",
+    "someone@example.com",
+    "",
+    ""
+   ],
+   "hostname": null,
+   "port": null,
+   "port_error": null,
+   "unsplit": "mailto:someone@example.com"
+  },
+  {
+   "url": "1http://x/",
+   "parts": [
+    "",
+    "",
+    "1http://x/",
+    "",
+    ""
+   ],
+   "hostname": null,
+   "port": null,
+   "port_error": null,
+   "unsplit": "1http://x/"
+  },
+  {
+   "url": "ht tp://x/",
+   "parts": [
+    "",
+    "",
+    "ht tp://x/",
+    "",
+    ""
+   ],
+   "hostname": null,
+   "port": null,
+   "port_error": null,
+   "unsplit": "ht tp://x/"
+  },
+  {
+   "url": "http://a\nb.com/x\ty",
+   "parts": [
+    "http",
+    "ab.com",
+    "/xy",
+    "",
+    ""
+   ],
+   "hostname": "ab.com",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://ab.com/xy"
+  },
+  {
+   "url": "http://h/a?b?c#d#e",
+   "parts": [
+    "http",
+    "h",
+    "/a",
+    "b?c",
+    "d#e"
+   ],
+   "hostname": "h",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://h/a?b?c#d#e"
+  },
+  {
+   "url": "https://opencode.ai/zen/v1",
+   "parts": [
+    "https",
+    "opencode.ai",
+    "/zen/v1",
+    "",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://opencode.ai/zen/v1"
+  },
+  {
+   "url": "https://opencode.ai/zen/go/v1/",
+   "parts": [
+    "https",
+    "opencode.ai",
+    "/zen/go/v1/",
+    "",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://opencode.ai/zen/go/v1/"
+  },
+  {
+   "url": "https://opencode.ai/inference/v1",
+   "parts": [
+    "https",
+    "opencode.ai",
+    "/inference/v1",
+    "",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://opencode.ai/inference/v1"
+  },
+  {
+   "url": "https://opencode.ai/inference/go/openai/v1",
+   "parts": [
+    "https",
+    "opencode.ai",
+    "/inference/go/openai/v1",
+    "",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://opencode.ai/inference/go/openai/v1"
+  },
+  {
+   "url": "https://opencode.ai/inference/anthropic/v1?k=1",
+   "parts": [
+    "https",
+    "opencode.ai",
+    "/inference/anthropic/v1",
+    "k=1",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://opencode.ai/inference/anthropic/v1?k=1"
+  },
+  {
+   "url": "http://opencode.ai/zen/v1",
+   "parts": [
+    "http",
+    "opencode.ai",
+    "/zen/v1",
+    "",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://opencode.ai/zen/v1"
+  },
+  {
+   "url": "https://opencode.ai/inference/unknown/v1",
+   "parts": [
+    "https",
+    "opencode.ai",
+    "/inference/unknown/v1",
+    "",
+    ""
+   ],
+   "hostname": "opencode.ai",
+   "port": null,
+   "port_error": null,
+   "unsplit": "https://opencode.ai/inference/unknown/v1"
+  },
+  {
+   "url": "http://[::1]x/",
+   "error": "Invalid IPv6 URL"
+  },
+  {
+   "url": "http://host:/",
+   "parts": [
+    "http",
+    "host:",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "host",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://host:/"
+  },
+  {
+   "url": "http://@host/",
+   "parts": [
+    "http",
+    "@host",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "host",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://@host/"
+  },
+  {
+   "url": "http://h%41st/",
+   "parts": [
+    "http",
+    "h%41st",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "h%41st",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://h%41st/"
+  },
+  {
+   "url": "http://HOST.%e9.com/",
+   "parts": [
+    "http",
+    "HOST.%e9.com",
+    "/",
+    "",
+    ""
+   ],
+   "hostname": "host.%e9.com",
+   "port": null,
+   "port_error": null,
+   "unsplit": "http://HOST.%e9.com/"
+  }
+ ],
+ "inference_base_url": [
+  [
+   "http://127.0.0.1:1234/v1",
+   "chat_completions",
+   false,
+   "http://127.0.0.1:1234/v1"
+  ],
+  [
+   "http://127.0.0.1:1234/v1",
+   "responses",
+   false,
+   "http://127.0.0.1:1234/v1"
+  ],
+  [
+   "http://127.0.0.1:1234/v1",
+   "anthropic_messages",
+   false,
+   "http://127.0.0.1:1234/v1"
+  ],
+  [
+   "http://127.0.0.1:1234/v1",
+   "gemini_generate_content",
+   false,
+   "http://127.0.0.1:1234/v1"
+  ],
+  [
+   "http://127.0.0.1:1234/v1",
+   "codex_app_server",
+   false,
+   "http://127.0.0.1:1234/v1"
+  ],
+  [
+   "http://127.0.0.1:1234/v1",
+   "claude_code",
+   false,
+   "http://127.0.0.1:1234/v1"
+  ],
+  [
+   "https://opencode.ai/zen/v1",
+   "chat_completions",
+   true,
+   "https://opencode.ai/inference/openai/v1"
+  ],
+  [
+   "https://opencode.ai/zen/v1",
+   "responses",
+   true,
+   "https://opencode.ai/inference/openai/v1"
+  ],
+  [
+   "https://opencode.ai/zen/v1",
+   "anthropic_messages",
+   true,
+   "https://opencode.ai/inference/anthropic/v1"
+  ],
+  [
+   "https://opencode.ai/zen/v1",
+   "gemini_generate_content",
+   true,
+   "https://opencode.ai/inference/google/v1beta"
+  ],
+  [
+   "https://opencode.ai/zen/v1",
+   "codex_app_server",
+   true,
+   "https://opencode.ai/zen/v1"
+  ],
+  [
+   "https://opencode.ai/zen/v1",
+   "claude_code",
+   true,
+   "https://opencode.ai/zen/v1"
+  ],
+  [
+   "https://opencode.ai/zen/go/v1/",
+   "chat_completions",
+   true,
+   "https://opencode.ai/inference/go/openai/v1"
+  ],
+  [
+   "https://opencode.ai/zen/go/v1/",
+   "responses",
+   true,
+   "https://opencode.ai/inference/go/openai/v1"
+  ],
+  [
+   "https://opencode.ai/zen/go/v1/",
+   "anthropic_messages",
+   true,
+   "https://opencode.ai/inference/go/anthropic/v1"
+  ],
+  [
+   "https://opencode.ai/zen/go/v1/",
+   "gemini_generate_content",
+   true,
+   "https://opencode.ai/inference/go/google/v1beta"
+  ],
+  [
+   "https://opencode.ai/zen/go/v1/",
+   "codex_app_server",
+   true,
+   "https://opencode.ai/zen/go/v1/"
+  ],
+  [
+   "https://opencode.ai/zen/go/v1/",
+   "claude_code",
+   true,
+   "https://opencode.ai/zen/go/v1/"
+  ],
+  [
+   "https://opencode.ai/inference/v1",
+   "chat_completions",
+   true,
+   "https://opencode.ai/inference/openai/v1"
+  ],
+  [
+   "https://opencode.ai/inference/v1",
+   "responses",
+   true,
+   "https://opencode.ai/inference/openai/v1"
+  ],
+  [
+   "https://opencode.ai/inference/v1",
+   "anthropic_messages",
+   true,
+   "https://opencode.ai/inference/anthropic/v1"
+  ],
+  [
+   "https://opencode.ai/inference/v1",
+   "gemini_generate_content",
+   true,
+   "https://opencode.ai/inference/google/v1beta"
+  ],
+  [
+   "https://opencode.ai/inference/v1",
+   "codex_app_server",
+   true,
+   "https://opencode.ai/inference/v1"
+  ],
+  [
+   "https://opencode.ai/inference/v1",
+   "claude_code",
+   true,
+   "https://opencode.ai/inference/v1"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "chat_completions",
+   true,
+   "https://opencode.ai/inference/go/openai/v1"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "responses",
+   true,
+   "https://opencode.ai/inference/go/openai/v1"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "anthropic_messages",
+   true,
+   "https://opencode.ai/inference/go/anthropic/v1"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "gemini_generate_content",
+   true,
+   "https://opencode.ai/inference/go/google/v1beta"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "codex_app_server",
+   true,
+   "https://opencode.ai/inference/go/openai/v1"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "claude_code",
+   true,
+   "https://opencode.ai/inference/go/openai/v1"
+  ],
+  [
+   "https://opencode.ai/inference/anthropic/v1?k=1",
+   "chat_completions",
+   true,
+   "https://opencode.ai/inference/openai/v1?k=1"
+  ],
+  [
+   "https://opencode.ai/inference/anthropic/v1?k=1",
+   "responses",
+   true,
+   "https://opencode.ai/inference/openai/v1?k=1"
+  ],
+  [
+   "https://opencode.ai/inference/anthropic/v1?k=1",
+   "anthropic_messages",
+   true,
+   "https://opencode.ai/inference/anthropic/v1?k=1"
+  ],
+  [
+   "https://opencode.ai/inference/anthropic/v1?k=1",
+   "gemini_generate_content",
+   true,
+   "https://opencode.ai/inference/google/v1beta?k=1"
+  ],
+  [
+   "https://opencode.ai/inference/anthropic/v1?k=1",
+   "codex_app_server",
+   true,
+   "https://opencode.ai/inference/anthropic/v1?k=1"
+  ],
+  [
+   "https://opencode.ai/inference/anthropic/v1?k=1",
+   "claude_code",
+   true,
+   "https://opencode.ai/inference/anthropic/v1?k=1"
+  ],
+  [
+   "http://opencode.ai/zen/v1",
+   "chat_completions",
+   false,
+   "http://opencode.ai/zen/v1"
+  ],
+  [
+   "http://opencode.ai/zen/v1",
+   "responses",
+   false,
+   "http://opencode.ai/zen/v1"
+  ],
+  [
+   "http://opencode.ai/zen/v1",
+   "anthropic_messages",
+   false,
+   "http://opencode.ai/zen/v1"
+  ],
+  [
+   "http://opencode.ai/zen/v1",
+   "gemini_generate_content",
+   false,
+   "http://opencode.ai/zen/v1"
+  ],
+  [
+   "http://opencode.ai/zen/v1",
+   "codex_app_server",
+   false,
+   "http://opencode.ai/zen/v1"
+  ],
+  [
+   "http://opencode.ai/zen/v1",
+   "claude_code",
+   false,
+   "http://opencode.ai/zen/v1"
+  ],
+  [
+   "https://opencode.ai/inference/unknown/v1",
+   "chat_completions",
+   true,
+   "https://opencode.ai/inference/unknown/v1"
+  ],
+  [
+   "https://opencode.ai/inference/unknown/v1",
+   "responses",
+   true,
+   "https://opencode.ai/inference/unknown/v1"
+  ],
+  [
+   "https://opencode.ai/inference/unknown/v1",
+   "anthropic_messages",
+   true,
+   "https://opencode.ai/inference/unknown/v1"
+  ],
+  [
+   "https://opencode.ai/inference/unknown/v1",
+   "gemini_generate_content",
+   true,
+   "https://opencode.ai/inference/unknown/v1"
+  ],
+  [
+   "https://opencode.ai/inference/unknown/v1",
+   "codex_app_server",
+   true,
+   "https://opencode.ai/inference/unknown/v1"
+  ],
+  [
+   "https://opencode.ai/inference/unknown/v1",
+   "claude_code",
+   true,
+   "https://opencode.ai/inference/unknown/v1"
+  ]
+ ],
+ "sdk_urls": [
+  [
+   "http://127.0.0.1:1234/v1",
+   "http://127.0.0.1:1234/v1/chat/completions"
+  ],
+  [
+   "http://127.0.0.1:1234/v1/",
+   "http://127.0.0.1:1234/v1/chat/completions"
+  ],
+  [
+   "https://openrouter.ai/api/v1",
+   "https://openrouter.ai/api/v1/chat/completions"
+  ],
+  [
+   "http://localhost:11434",
+   "http://localhost:11434/chat/completions"
+  ],
+  [
+   "http://localhost:11434/",
+   "http://localhost:11434/chat/completions"
+  ],
+  [
+   "https://api.example.com:443/v1",
+   "https://api.example.com/v1/chat/completions"
+  ],
+  [
+   "http://api.example.com:80/v1",
+   "http://api.example.com/v1/chat/completions"
+  ],
+  [
+   "https://Example.COM/V1",
+   "https://example.com/V1/chat/completions"
+  ],
+  [
+   "http://h/v1?key=1",
+   "http://h/v1?key=1/chat/completions"
+  ],
+  [
+   "http://h/a b/v1",
+   "http://h/a%20b/v1/chat/completions"
+  ],
+  [
+   "http://h/caf\u00e9/v1",
+   "http://h/caf%C3%A9/v1/chat/completions"
+  ],
+  [
+   "http://h/v1#frag",
+   "http://h/v1/chat/completions#frag"
+  ],
+  [
+   "http://h:8080",
+   "http://h:8080/chat/completions"
+  ],
+  [
+   "https://opencode.ai/inference/go/openai/v1",
+   "https://opencode.ai/inference/go/openai/v1/chat/completions"
+  ]
+ ],
+ "headers": [
+  {
+   "name": "plain",
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "no-key",
+   "api_key": "",
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer sylvia-gm-local"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "configured",
+   "headers": {
+    "HTTP-Referer": "https://example.test",
+    "X-Title": "Sylvia"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "HTTP-Referer",
+     "https://example.test"
+    ],
+    [
+     "X-Title",
+     "Sylvia"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "configured-overrides",
+   "headers": {
+    "Accept": "text/plain",
+    "User-Agent": "Custom/1",
+    "Authorization": "Bearer other"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer other"
+    ],
+    [
+     "Accept",
+     "text/plain"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "Custom/1"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "configured-case",
+   "headers": {
+    "content-type": "text/x",
+    "x-one": "1"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "content-type",
+     "text/x"
+    ],
+    [
+     "x-one",
+     "1"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "extra",
+   "extra_headers": {
+    "x-opencode-session": "sylvia_abc",
+    "x-opencode-client": "sylvia-gm",
+    "User-Agent": "Sylvia-GM/0.4.1"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "Sylvia-GM/0.4.1"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-opencode-session",
+     "sylvia_abc"
+    ],
+    [
+     "x-opencode-client",
+     "sylvia-gm"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "extra-lowercase-user-agent",
+   "extra_headers": {
+    "user-agent": "Sylvia-GM/0.4.1"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "user-agent",
+     "Sylvia-GM/0.4.1"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "configured-and-extra",
+   "headers": {
+    "X-Title": "Sylvia",
+    "x-two": "a"
+   },
+   "extra_headers": {
+    "X-Title": "Other",
+    "x-three": "b"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Title",
+     "Other"
+    ],
+    [
+     "x-two",
+     "a"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-three",
+     "b"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "organization",
+   "env": {
+    "OPENAI_ORG_ID": "org-1",
+    "OPENAI_PROJECT_ID": "proj-1"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "OpenAI-Organization",
+     "org-1"
+    ],
+    [
+     "OpenAI-Project",
+     "proj-1"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  },
+  {
+   "name": "organization-configured",
+   "env": {
+    "OPENAI_ORG_ID": "org-1"
+   },
+   "headers": {
+    "OpenAI-Organization": "org-2"
+   },
+   "sent_headers": [
+    [
+     "Host",
+     "127.0.0.1:1234"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, deflate"
+    ],
+    [
+     "Connection",
+     "keep-alive"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "AsyncOpenAI/Python 2.53.0"
+    ],
+    [
+     "X-Stainless-Lang",
+     "python"
+    ],
+    [
+     "X-Stainless-Package-Version",
+     "2.53.0"
+    ],
+    [
+     "X-Stainless-OS",
+     "Windows"
+    ],
+    [
+     "X-Stainless-Arch",
+     "other:amd64"
+    ],
+    [
+     "X-Stainless-Runtime",
+     "CPython"
+    ],
+    [
+     "X-Stainless-Runtime-Version",
+     "3.12.11"
+    ],
+    [
+     "OpenAI-Organization",
+     "org-2"
+    ],
+    [
+     "X-Stainless-Async",
+     "async:asyncio"
+    ],
+    [
+     "x-stainless-retry-count",
+     "0"
+    ],
+    [
+     "x-stainless-read-timeout",
+     "120.0"
+    ],
+    [
+     "Content-Length",
+     "111"
+    ]
+   ]
+  }
+ ]
+}

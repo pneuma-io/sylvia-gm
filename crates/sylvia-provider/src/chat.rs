@@ -853,12 +853,24 @@ impl ChatStreamState {
     /// `IncompleteProviderStreamError` without a finish reason or the sentinel; otherwise
     /// returns the private continuation chunk, if any.
     pub fn finish(&self, done_seen: bool) -> ChatResult<Option<ProviderStreamChunk>> {
+        self.check_terminal(done_seen)?;
+        self.final_metadata()
+    }
+
+    /// The terminal check Python runs inside the stream's `try` (so its error fires `on_error`).
+    pub fn check_terminal(&self, done_seen: bool) -> ChatResult<()> {
         if !self.terminal_seen || !done_seen {
             return Err(ChatError::Provider(ProviderError::new(
                 ErrorKind::IncompleteStream,
                 "Provider stream ended before its terminal event",
             )));
         }
+        Ok(())
+    }
+
+    /// The private continuation chunk Python yields after the stream's `try`, where a failure
+    /// escapes without `on_error`.
+    pub fn final_metadata(&self) -> ChatResult<Option<ProviderStreamChunk>> {
         Ok(self.metadata.payload()?.map(|metadata| ProviderStreamChunk {
             chat_completion_metadata: Some(metadata),
             ..ProviderStreamChunk::default()

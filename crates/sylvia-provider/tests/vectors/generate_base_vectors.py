@@ -49,6 +49,29 @@ def error_classes() -> list[type]:
     ]
 
 
+def owner_internal_reply() -> dict:
+    """Run the owner's `except Exception` handler (the one after the provider-error handler)."""
+    tree = ast.parse(inspect.getsource(owner_process))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Try):
+            names = [getattr(h.type, "id", None) for h in node.handlers]
+            if "Exception" in names and any(isinstance(h.type, ast.Tuple) for h in node.handlers):
+                handler = node.handlers[names.index("Exception")]
+                break
+    else:
+        raise SystemExit("owner internal-error handler not found")
+    body = [stmt for stmt in handler.body if not (isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call)
+                                                   and getattr(stmt.value.func, "id", None) == "print")]
+    function = ast.FunctionDef(
+        name="build_internal", args=ast.arguments(posonlyargs=[], args=[ast.arg("error"), ast.arg("request_id")],
+                                                  kwonlyargs=[], kw_defaults=[], defaults=[]),
+        body=body + [ast.Return(ast.Name("reply", ast.Load()))], decorator_list=[], returns=None, type_params=[],
+    )
+    namespace = dict(vars(owner_process))
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[function], type_ignores=[])), owner_process.__file__, "exec"), namespace)
+    return namespace["build_internal"](TypeError("unexpected keyword"), "r-1")
+
+
 def owner_error_reply_function():
     """Compile the owner's provider-error handler into a function of (error, method, params)."""
     tree = ast.parse(inspect.getsource(owner_process))
@@ -123,7 +146,8 @@ def error_vectors() -> dict:
             "accepted_message_id": None, "reply": reply,
         })
     rejection = exceptions.TokenLimitError.provider_rejection()
-    return {"hierarchy": hierarchy, "replies": replies, "token_limit_rejection": str(rejection)}
+    return {"hierarchy": hierarchy, "replies": replies, "token_limit_rejection": str(rejection),
+            "internal_reply": owner_internal_reply()}
 
 
 def _json_float(value):

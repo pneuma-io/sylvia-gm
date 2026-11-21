@@ -87,14 +87,14 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/provider/_exceptions.py` | 179 | `sylvia-provider` | ported | `error` (one type, `ErrorKind` walks the class tree for `isinstance`), owner sentences in `reply::provider_error_reply` from the owner's own handler. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_factory.py` | 98 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_gemini.py` | 418 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_hooks.py` | 642 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_hooks.py` | 642 | `sylvia-provider` | in progress | `hooks`: `HookContext`, `ProviderHook`, `HookManager` (registry order, failing hooks logged). Remaining with their consumers: the built-in hooks, task-scoped hooks (`scoped`, `late_usage_listeners`, used by the admin audit). A hook's error context holds the converted `ProviderError` where Python passes the raw exception (only the never-enabled `DumpHook` reads more) |
 | `src/sylvia_gm/provider/_lifecycle.py` | 75 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_model_facts.py` | 277 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_models.py` | 235 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_native_output.py` | 87 | `sylvia-provider` | in progress | `chat::split_chat_content` and `sse::DoneTracker` ported (vectors: `tests/chat_vectors.rs`); `native_output` and `responses_finish` come with the Responses transport |
-| `src/sylvia_gm/provider/_openai_compat.py` | 1,339 | `sylvia-provider` | in progress | Chat Completions pieces ported in `chat` (format_request, the SDK body and key order, chunk and completion parsing, `_InlineReasoningFilter` with Python's casefold-length slicing kept, usage and cache readers, status mapping, preserve flags) and `sse` (the SDK's SSE decoder). Remaining: `OpenAICompatProvider` over HTTP, `ResponsesTransport`. Admin audit note for later: Python stores `_plain(tool_call_delta)`, which for Chat Completions is the pydantic repr string of a `ChoiceDeltaToolCall` |
+| `src/sylvia_gm/provider/_openai_compat.py` | 1,339 | `sylvia-provider` | in progress | Chat Completions ported: the transport in `chat`, the SDK's SSE reading in `sse`, and `OpenAICompatProvider` in `openai_compat` over the `http` seam (URL via `httpx_url`, header order, retries, pool recycling, hooks, timeouts, which failures fire `on_error` or escape). Vectors: `tests/chat_vectors.rs`, `tests/provider_vectors.rs` (the real Python provider through an httpx mock). Remaining: `ResponsesTransport`, the network HTTP client. Admin audit note for later: Python stores `_plain(tool_call_delta)`, which for Chat Completions is the pydantic repr string of a `ChoiceDeltaToolCall` |
 | `src/sylvia_gm/provider/_output_policy.py` | 26 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_protocol_routes.py` | 63 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_protocol_routes.py` | 63 | `sylvia-provider` | in progress | `routes::{is_opencode_inference, inference_base_url}` with `pyurl::urlsplit`/`urlunsplit`. Vectors: `tests/provider_vectors.rs`. Remaining: `model_protocol` (needs `_model_facts.py`) |
 | `src/sylvia_gm/provider/_reasoning.py` | 379 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_registry.py` | 393 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_request_metadata.py` | 139 | `sylvia-provider` | pending | |
