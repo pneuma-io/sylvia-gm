@@ -20,6 +20,7 @@
 //! - [`pyfmt`] holds Python's `:g` number formatting.
 
 pub mod chat;
+pub mod config;
 pub mod error;
 pub mod hooks;
 pub mod http;

@@ -582,7 +582,7 @@ impl<'g> Constructor<'g> {
                 mark,
             ));
         }
-        a2b_base64(text.as_bytes()).map(Value::Bytes).map_err(|reason| {
+        crate::pybase64::a2b_base64(text.as_bytes(), false).map(Value::Bytes).map_err(|reason| {
             constructor_error(None, None, format!("failed to decode base64 data: {reason}"), mark)
         })
     }
@@ -774,60 +774,6 @@ fn int_with_base(text: &str, base: u32) -> ConstructResult<i128> {
             .ok_or_else(int_refusal)?;
     }
     Ok(if negative { -value } else { value })
-}
-
-/// `binascii.a2b_base64(data)` without strict mode, as `base64.decodebytes` calls it: characters
-/// outside the alphabet are skipped, and decoding stops at the padding.
-fn a2b_base64(data: &[u8]) -> Result<Vec<u8>, String> {
-    const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    let mut out = Vec::new();
-    let mut quad_pos = 0;
-    let mut left_char: u32 = 0;
-    let mut pads = 0;
-    let mut data_chars = 0usize;
-    for &byte in data {
-        if byte == b'=' {
-            if quad_pos >= 2 {
-                pads += 1;
-                if quad_pos + pads >= 4 {
-                    return Ok(out);
-                }
-            }
-            continue;
-        }
-        let Some(value) = ALPHABET.iter().position(|c| *c == byte) else { continue };
-        let value = value as u32;
-        pads = 0;
-        data_chars += 1;
-        match quad_pos {
-            0 => {
-                quad_pos = 1;
-                left_char = value;
-            }
-            1 => {
-                quad_pos = 2;
-                out.push(((left_char << 2) | (value >> 4)) as u8);
-                left_char = value & 0x0F;
-            }
-            2 => {
-                quad_pos = 3;
-                out.push(((left_char << 4) | (value >> 2)) as u8);
-                left_char = value & 0x03;
-            }
-            _ => {
-                quad_pos = 0;
-                out.push(((left_char << 6) | value) as u8);
-                left_char = 0;
-            }
-        }
-    }
-    match quad_pos {
-        0 => Ok(out),
-        1 => Err(format!(
-            "Invalid base64-encoded string: number of data characters ({data_chars}) cannot be 1 more than a multiple of 4"
-        )),
-        _ => Err("Incorrect padding".into()),
-    }
 }
 
 /// Construct a composed document with the given hooks.

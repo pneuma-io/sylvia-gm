@@ -856507,18 +856507,18 @@ true
 [
 [
 "str",
-"b"
+"a"
 ],
 [
 "str",
-"a"
+"b"
 ]
 ]
 ]
 ]
 ]
 ],
-"text": "s: !!set\n  b: null\n  a: null\n"
+"text": "s: !!set\n  a: null\n  b: null\n"
 },
 {
 "value": [
@@ -862503,6 +862503,809 @@ true
 ]
 ]
 ]
+]
+}
+}
+],
+"streams": [
+{
+"name": "valid",
+"content": "a: 1\nb: [x, y]\n",
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"int",
+"1"
+]
+],
+[
+[
+"str",
+"b"
+],
+[
+"list",
+1,
+[
+[
+"str",
+"x"
+],
+[
+"str",
+"y"
+]
+]
+]
+]
+]
+]
+},
+{
+"name": "crlf",
+"content": "a: 1\r\nb: |\r\n  x\r\n  y\r\n",
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"int",
+"1"
+]
+],
+[
+[
+"str",
+"b"
+],
+[
+"str",
+"x\ny\n"
+]
+]
+]
+]
+},
+{
+"name": "cr",
+"content": "a: 1\rb: 2\r",
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"int",
+"1"
+]
+],
+[
+[
+"str",
+"b"
+],
+[
+"int",
+"2"
+]
+]
+]
+]
+},
+{
+"name": "bom",
+"content": "\ufeffa: 1\n",
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"int",
+"1"
+]
+]
+]
+]
+},
+{
+"name": "empty",
+"content": "",
+"value": [
+"none"
+]
+},
+{
+"name": "early-reader-error",
+"content": "x: \u0007\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 3",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "syntax-then-late-reader-error",
+"content": "a: b: c\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nx: \u0007\n",
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"stream-case.yaml\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+}
+},
+{
+"name": "late-reader-error",
+"content": "k: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nx: \u0007\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 12003",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "syntax-error-late",
+"content": "k: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\nk: v\na: b: c\n",
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"stream-case.yaml\", line 2401, column 5",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+2400,
+4,
+12004
+]
+}
+},
+{
+"name": "quoted-across-pieces",
+"content": "a: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'\nb: 1\n",
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"a"
+],
+[
+"str",
+"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+]
+],
+[
+[
+"str",
+"b"
+],
+[
+"int",
+"1"
+]
+]
+]
+]
+},
+{
+"name": "config",
+"content": "# Sylvia GM \u2014 Default Configuration\n# Override: create config.yaml in Sylvia GM's owner data folder or set environment variables\n# (SYLVIA_GM_ prefix). The desktop settings surface writes the owner-local file.\n# Load order: default (this file) \u2192 user config \u2192 env vars (highest priority)\n\napp:\n  name: \"Sylvia GM\"\n  version: \"0.4.1\"\n  data_dir: \"data\"\n  campaigns_dir: \"campaigns\"\n\nlogging:\n  level: \"INFO\"\n  format: \"%(asctime)s [%(levelname)s] %(name)s: %(message)s\"\n  file: \"data/sylvia-gm.log\"\n\nproviders:\n  lm_studio:\n    enabled: false\n    mode: local\n    name: \"LM Studio\"\n    base_url: \"http://127.0.0.1:1234/v1\"\n    api_key: \"\"\n    models: []\n  opencode_go:\n    enabled: false\n    mode: byok\n    name: \"OpenCode Go\"\n    base_url: \"https://opencode.ai/zen/go/v1\"\n    api_key: \"\"\n    models: []\n  openai:\n    enabled: false\n    mode: byok\n    name: \"OpenAI API\"\n    base_url: \"https://api.openai.com/v1\"\n    api_key: \"\"\n    models: []\n\nruleset:\n  default: \"\"\n  path: \"rulesets\"\n\ntts:\n  provider: \"edge\"\n  enabled: false\n  voice: \"en-US-AriaNeural\"\n  voices:\n    dm: \"en-US-AriaNeural\"\n    npc_female: \"en-US-JennyNeural\"\n    npc_male: \"en-US-GuyNeural\"\n",
+"value": [
+"dict",
+0,
+[
+[
+[
+"str",
+"app"
+],
+[
+"dict",
+1,
+[
+[
+[
+"str",
+"name"
+],
+[
+"str",
+"Sylvia GM"
+]
+],
+[
+[
+"str",
+"version"
+],
+[
+"str",
+"0.4.1"
+]
+],
+[
+[
+"str",
+"data_dir"
+],
+[
+"str",
+"data"
+]
+],
+[
+[
+"str",
+"campaigns_dir"
+],
+[
+"str",
+"campaigns"
+]
+]
+]
+]
+],
+[
+[
+"str",
+"logging"
+],
+[
+"dict",
+2,
+[
+[
+[
+"str",
+"level"
+],
+[
+"str",
+"INFO"
+]
+],
+[
+[
+"str",
+"format"
+],
+[
+"str",
+"%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+]
+],
+[
+[
+"str",
+"file"
+],
+[
+"str",
+"data/sylvia-gm.log"
+]
+]
+]
+]
+],
+[
+[
+"str",
+"providers"
+],
+[
+"dict",
+3,
+[
+[
+[
+"str",
+"lm_studio"
+],
+[
+"dict",
+4,
+[
+[
+[
+"str",
+"enabled"
+],
+[
+"bool",
+false
+]
+],
+[
+[
+"str",
+"mode"
+],
+[
+"str",
+"local"
+]
+],
+[
+[
+"str",
+"name"
+],
+[
+"str",
+"LM Studio"
+]
+],
+[
+[
+"str",
+"base_url"
+],
+[
+"str",
+"http://127.0.0.1:1234/v1"
+]
+],
+[
+[
+"str",
+"api_key"
+],
+[
+"str",
+""
+]
+],
+[
+[
+"str",
+"models"
+],
+[
+"list",
+5,
+[]
+]
+]
+]
+]
+],
+[
+[
+"str",
+"opencode_go"
+],
+[
+"dict",
+6,
+[
+[
+[
+"str",
+"enabled"
+],
+[
+"bool",
+false
+]
+],
+[
+[
+"str",
+"mode"
+],
+[
+"str",
+"byok"
+]
+],
+[
+[
+"str",
+"name"
+],
+[
+"str",
+"OpenCode Go"
+]
+],
+[
+[
+"str",
+"base_url"
+],
+[
+"str",
+"https://opencode.ai/zen/go/v1"
+]
+],
+[
+[
+"str",
+"api_key"
+],
+[
+"str",
+""
+]
+],
+[
+[
+"str",
+"models"
+],
+[
+"list",
+7,
+[]
+]
+]
+]
+]
+],
+[
+[
+"str",
+"openai"
+],
+[
+"dict",
+8,
+[
+[
+[
+"str",
+"enabled"
+],
+[
+"bool",
+false
+]
+],
+[
+[
+"str",
+"mode"
+],
+[
+"str",
+"byok"
+]
+],
+[
+[
+"str",
+"name"
+],
+[
+"str",
+"OpenAI API"
+]
+],
+[
+[
+"str",
+"base_url"
+],
+[
+"str",
+"https://api.openai.com/v1"
+]
+],
+[
+[
+"str",
+"api_key"
+],
+[
+"str",
+""
+]
+],
+[
+[
+"str",
+"models"
+],
+[
+"list",
+9,
+[]
+]
+]
+]
+]
+]
+]
+]
+],
+[
+[
+"str",
+"ruleset"
+],
+[
+"dict",
+10,
+[
+[
+[
+"str",
+"default"
+],
+[
+"str",
+""
+]
+],
+[
+[
+"str",
+"path"
+],
+[
+"str",
+"rulesets"
+]
+]
+]
+]
+],
+[
+[
+"str",
+"tts"
+],
+[
+"dict",
+11,
+[
+[
+[
+"str",
+"provider"
+],
+[
+"str",
+"edge"
+]
+],
+[
+[
+"str",
+"enabled"
+],
+[
+"bool",
+false
+]
+],
+[
+[
+"str",
+"voice"
+],
+[
+"str",
+"en-US-AriaNeural"
+]
+],
+[
+[
+"str",
+"voices"
+],
+[
+"dict",
+12,
+[
+[
+[
+"str",
+"dm"
+],
+[
+"str",
+"en-US-AriaNeural"
+]
+],
+[
+[
+"str",
+"npc_female"
+],
+[
+"str",
+"en-US-JennyNeural"
+]
+],
+[
+[
+"str",
+"npc_male"
+],
+[
+"str",
+"en-US-GuyNeural"
+]
+]
+]
+]
+]
+]
+]
+]
+]
+]
+},
+{
+"name": "bad-at-4094",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 4094",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "bad-at-4095",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 4095",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "bad-at-4096",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 4096",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "bad-at-8190",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 8190",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "bad-at-8191",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ReaderError",
+"text": "unacceptable character #x0007: special characters are not allowed\n  in \"stream-case.yaml\", position 8191",
+"context": null,
+"problem": null,
+"note": null,
+"context_mark": null,
+"problem_mark": null
+}
+},
+{
+"name": "bad-at-8192",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"stream-case.yaml\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+}
+},
+{
+"name": "bad-at-8193",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"stream-case.yaml\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+}
+},
+{
+"name": "bad-at-12288",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"stream-case.yaml\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
+]
+}
+},
+{
+"name": "bad-at-12289",
+"content": "a: b: c\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\u0007\n",
+"error": {
+"class": "ScannerError",
+"text": "mapping values are not allowed here\n  in \"stream-case.yaml\", line 1, column 5",
+"context": null,
+"problem": "mapping values are not allowed here",
+"note": null,
+"context_mark": null,
+"problem_mark": [
+0,
+4,
+4
 ]
 }
 }

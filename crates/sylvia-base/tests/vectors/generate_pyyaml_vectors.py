@@ -431,6 +431,52 @@ def dump_values(loaded: list) -> list:
     return out
 
 
+def stream_documents() -> list[tuple[str, str]]:
+    """Files for `yaml.safe_load(open(path, encoding="utf-8"))`: PyYAML reads the stream 4,096
+    characters at a time and checks a piece only when the scan needs it."""
+    lines = "k: v\n" * 2400  # 12,000 characters
+    docs = [
+        ("valid", "a: 1\nb: [x, y]\n"),
+        ("crlf", "a: 1\r\nb: |\r\n  x\r\n  y\r\n"),
+        ("cr", "a: 1\rb: 2\r"),
+        ("bom", BOM + "a: 1\n"),
+        ("empty", ""),
+        ("early-reader-error", "x: \x07\n" + lines),
+        ("syntax-then-late-reader-error", "a: b: c\n" + lines + "x: \x07\n"),
+        ("late-reader-error", lines + "x: \x07\n"),
+        ("syntax-error-late", lines + "a: b: c\n"),
+        ("quoted-across-pieces", "a: '" + "x" * 5000 + "'\nb: 1\n"),
+        ("config", (ROOT / "config" / "config.yaml").read_text(encoding="utf-8")),
+    ]
+    for at in (4094, 4095, 4096, 8190, 8191, 8192, 8193, 12288, 12289):
+        # A syntax error first, then a refused character at index `at`.
+        body = "a: b: c\n" + "x" * (at - 9) + "\n"
+        docs.append((f"bad-at-{at}", body + "\x07\n"))
+    return docs
+
+
+def stream_vectors() -> list:
+    import os
+    import tempfile
+
+    out = []
+    with tempfile.TemporaryDirectory() as folder:
+        previous = os.getcwd()
+        os.chdir(folder)
+        try:
+            for name, content in stream_documents():
+                Path("stream-case.yaml").write_bytes(content.encode("utf-8"))
+                try:
+                    with open("stream-case.yaml", encoding="utf-8") as fh:
+                        record = {"value": value_record(yaml.safe_load(fh), {})}
+                except Exception as error:  # noqa: BLE001
+                    record = {"error": error_record(error)}
+                out.append({"name": name, "content": content, **record})
+        finally:
+            os.chdir(previous)
+    return out
+
+
 def sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -475,6 +521,7 @@ def main() -> int:
     document = {
         "python": sys.version.split()[0], "pyyaml": yaml.__version__, "libyaml": yaml.__with_libyaml__,
         "cases": cases, "shipped": shipped, "dumps": dump_values(loaded_values), "hooks": hook_vectors(),
+        "streams": stream_vectors(),
         # `yaml.load(bytes)` (campaign_rules_update.py): the same document, marks named "<byte string>".
         "byte_inputs": [
             {"text": text, **{name: load_record(text.encode("utf-8"), loader) for name, loader in LOADERS.items()}}

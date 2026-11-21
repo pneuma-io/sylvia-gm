@@ -17,6 +17,13 @@ tokio.workspace = true
 futures-util.workspace = true
 getrandom.workspace = true
 
+[target.'cfg(windows)'.dependencies]
+windows-sys.workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+rustix.workspace = true
+aes-gcm.workspace = true
+
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }
 futures-util.workspace = true

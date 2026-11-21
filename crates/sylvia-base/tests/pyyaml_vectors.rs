@@ -646,3 +646,54 @@ fn shipped_files_load_and_dump_as_python_does() {
         assert_eq!(sha256_hex(&dumped), entry["dump_sha256"].as_str().unwrap(), "{path} dump");
     }
 }
+
+/// `yaml.safe_load(open(path, encoding="utf-8"))`: the stream is read in 4,096-character
+/// pieces, the first two checked at once and the rest when the scan reaches them.
+#[test]
+fn a_text_file_stream_loads_as_python_reads_it() {
+    let vectors = vectors();
+    let streams = vectors["streams"].as_array().unwrap();
+    assert!(streams.len() >= 20);
+    for case in streams {
+        let text = pyyaml::read_text(case["content"].as_str().unwrap().as_bytes()).unwrap();
+        let actual = match pyyaml::safe_load_stream(&text, "stream-case.yaml") {
+            Ok(loaded) => json!({"value": value_record_root(&loaded)}),
+            Err(error) => json!({"error": error_record(&error)}),
+        };
+        let expected = case.as_object().unwrap();
+        let key = if expected.contains_key("value") { "value" } else { "error" };
+        assert_eq!(actual[key], expected[key], "{}", case["name"]);
+    }
+}
+
+/// `Data`, the owned tree the configuration code edits, holds every corpus value and dumps as
+/// PyYAML does wherever the value shares no container (a shared one becomes a copy).
+#[test]
+fn owned_trees_round_trip_every_dumped_value() {
+    let vectors = vectors();
+    let mut checked = 0;
+    for dump in vectors["dumps"].as_array().unwrap() {
+        if holds_wide_int(&dump["value"]) {
+            continue;
+        }
+        let text = dump["text"].as_str().unwrap();
+        let loaded = pyyaml::safe_load(text).unwrap();
+        match loaded.to_data() {
+            Ok(Some(data)) => {
+                let again = data.to_loaded();
+                if !text.contains("&id") {
+                    assert_eq!(value_record_root(&again), value_record_root(&loaded), "{text:?}");
+                    assert_eq!(
+                        pyyaml::safe_dump(&again).unwrap(),
+                        pyyaml::safe_dump(&loaded).unwrap(),
+                        "{text:?}"
+                    );
+                }
+                checked += 1;
+            }
+            Ok(None) => {}
+            Err(_) => assert!(text.contains("*id"), "only a recursive document is refused: {text:?}"),
+        }
+    }
+    assert!(checked > 500);
+}

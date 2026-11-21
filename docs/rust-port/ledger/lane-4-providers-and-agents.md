@@ -56,16 +56,16 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/agent/_tool_loader.py` | 464 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_working_context.py` | 766 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/application/character_chat.py` | 697 | `sylvia-app::character_chat` | pending | |
-| `src/sylvia_gm/config/__init__.py` | 23 | `sylvia-provider::config` | pending | |
-| `src/sylvia_gm/config/_credential_protection.py` | 291 | `sylvia-provider::config` | pending | |
-| `src/sylvia_gm/config/_env.py` | 101 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/__init__.py` | 23 | `sylvia-provider::config` | ported | `config` (module root and re-exports). |
+| `src/sylvia_gm/config/_credential_protection.py` | 291 | `sylvia-provider::config` | ported | `config::protection`: the envelope over a `Seal`; Windows DPAPI in `protection/windows.rs` (the approved FFI module), the Linux key file and AES-256-GCM in `protection/linux.rs`. Vectors: `tests/config_vectors.rs` (envelopes through a shared fake seal), AES-GCM bytes for fixed keys and nonces against Python's `AESGCM`; DPAPI opened both ways against Python with disposable values (`dpapi_envelopes_open_on_both_sides`, opt-in). |
+| `src/sylvia_gm/config/_env.py` | 101 | `sylvia-provider::config` | ported | `config::env` over an `Environment` snapshot (Windows names upper-cased and matched without case, as `os.environ`). Vectors: `tests/config_vectors.rs` |
 | `src/sylvia_gm/config/_host_browser.py` | 94 | `sylvia-provider::config` | pending | |
-| `src/sylvia_gm/config/_merge.py` | 29 | `sylvia-provider::config` | pending | |
-| `src/sylvia_gm/config/_resolver.py` | 68 | `sylvia-provider::config` | pending | |
-| `src/sylvia_gm/config/_user_settings.py` | 103 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/_merge.py` | 29 | `sylvia-provider::config` | ported | `config::merge::deep_merge`. Vectors: `tests/config_vectors.rs` |
+| `src/sylvia_gm/config/_resolver.py` | 68 | `sylvia-provider::config` | ported | `config::resolver`. Vectors: `tests/config_vectors.rs` |
+| `src/sylvia_gm/config/_user_settings.py` | 103 | `sylvia-provider::config` | ported | `config::user_settings`: read with migration, atomic write (mode 0600 temporary file, sync, rename), the reentrant `CONFIG_LOCK`. Vectors: `tests/config_vectors.rs` |
 | `src/sylvia_gm/config/chatgpt_settings.py` | 169 | `sylvia-provider::config` | pending | |
 | `src/sylvia_gm/config/claude_settings.py` | 293 | `sylvia-provider::config` | pending | |
-| `src/sylvia_gm/config/loader.py` | 293 | `sylvia-provider::config` | pending | |
+| `src/sylvia_gm/config/loader.py` | 293 | `sylvia-provider::config` | ported | `config::loader`: `load_config` as every caller runs it (no `.env`, credentials sealed; python-dotenv not ported, as nothing reaches it), pydantic's lax validation, `provider_credentials`. The shipped defaults' path is the caller's (`_DEFAULT_CONFIG_PATH`). Vectors: `tests/config_vectors.rs` (66 cases) |
 | `src/sylvia_gm/config/provider_settings.py` | 2,250 | `sylvia-provider::config` | pending | |
 | `src/sylvia_gm/provider/__init__.py` | 144 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_admin_audit.py` | 417 | `sylvia-provider` | pending | |

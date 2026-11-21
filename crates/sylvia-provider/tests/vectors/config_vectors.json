@@ -1,0 +1,6003 @@
+{
+ "python": "3.12.11",
+ "platform": "win32",
+ "cases": [
+  {
+   "name": "no-user-file",
+   "user": null,
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "empty-file",
+   "user": "",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": ""
+  },
+  {
+   "name": "null-file",
+   "user": "null\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "null\n"
+  },
+  {
+   "name": "list-file",
+   "user": "- 1\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "The local provider settings file must contain a mapping"
+   },
+   "file_after": "- 1\n"
+  },
+  {
+   "name": "broken-yaml",
+   "user": "a: [\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "The local provider settings file could not be read"
+   },
+   "file_after": "a: [\n"
+  },
+  {
+   "name": "constructor-value-error",
+   "user": "a: !!int x\n",
+   "env": {},
+   "error": {
+    "class": "ValueError",
+    "message": "invalid literal for int() with base 10: 'x'"
+   },
+   "file_after": "a: !!int x\n"
+  },
+  {
+   "name": "plain-key-migrates",
+   "user": "providers:\n  openai:\n    enabled: true\n    api_key: sk-disposable-2\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19eyA6InNyZWRhZWgiICwiMi1lbGJhc29wc2lkLWtzIiA6Inlla19pcGEiew==\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "sk-disposable-2",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    enabled: true\n    protected_credentials:\n      version: 1\n      protection: <PROTECTION>\n      data: RkFLRX19eyA6InNyZWRhZWgiICwiMi1lbGJhc29wc2lkLWtzIiA6Inlla19pcGEiew==\n"
+  },
+  {
+   "name": "plain-headers-migrate",
+   "user": "providers:\n  mine:\n    base_url: http://localhost:1/v1\n    headers: {X-A: one, X-B: two}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "mine",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "http://localhost:1/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19Im93dCIgOiJCLVgiICwiZW5vIiA6IkEtWCJ7IDoic3JlZGFlaCIgLCIiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "mine",
+     {
+      "key": "",
+      "headers": [
+       [
+        "X-A",
+        "one"
+       ],
+       [
+        "X-B",
+        "two"
+       ]
+      ]
+     }
+    ]
+   ],
+   "file_after": "providers:\n  mine:\n    base_url: http://localhost:1/v1\n    protected_credentials:\n      version: 1\n      protection: <PROTECTION>\n      data: RkFLRX19Im93dCIgOiJCLVgiICwiZW5vIiA6IkEtWCJ7IDoic3JlZGFlaCIgLCIiIDoieWVrX2lwYSJ7\n"
+  },
+  {
+   "name": "empty-key-stays",
+   "user": "providers:\n  openai:\n    api_key: ''\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    api_key: ''\n"
+  },
+  {
+   "name": "conflict",
+   "user": "providers:\n  x:\n    api_key: k\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Saved credential migration did not complete. The original settings are unchanged; <MIGRATION_RETRY>"
+   },
+   "file_after": "providers:\n  x:\n    api_key: k\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "non-text-key",
+   "user": "providers:\n  x:\n    api_key: 123\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Saved credential migration did not complete. The original settings are unchanged; <MIGRATION_RETRY>"
+   },
+   "file_after": "providers:\n  x:\n    api_key: 123\n"
+  },
+  {
+   "name": "non-text-header",
+   "user": "providers:\n  x:\n    headers: {X: 1}\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Saved credential migration did not complete. The original settings are unchanged; <MIGRATION_RETRY>"
+   },
+   "file_after": "providers:\n  x:\n    headers: {X: 1}\n"
+  },
+  {
+   "name": "sealed",
+   "user": "providers:\n  x:\n    enabled: true\n    base_url: http://h/v1\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "http://h/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "sk-disposable-1",
+      "headers": [
+       [
+        "X-Test",
+        "v1"
+       ]
+      ]
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    enabled: true\n    base_url: http://h/v1\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "sealed-with-env-key",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {
+    "SYLVIA_GM_PROVIDERS__X__API_KEY": "sk-from-env"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{\"api_key\": \"sk-from-env\"}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "sk-from-env",
+      "headers": [
+       [
+        "X-Test",
+        "v1"
+       ]
+      ]
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "sealed-with-env-headers",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {
+    "SYLVIA_GM_PROVIDERS__X__HEADERS": "{\"X-Env\": \"e\"}"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{\"headers\": {\"X-Env\": \"e\"}}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "sk-disposable-1",
+      "headers": [
+       [
+        "X-Env",
+        "e"
+       ]
+      ]
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "sealed-with-bad-env",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {
+    "SYLVIA_GM_PROVIDERS__X__API_KEY": "[1]"
+   },
+   "error": {
+    "class": "ConfigError",
+    "message": "Provider credential environment overrides must contain text values"
+   },
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjF2IiA6InRzZVQtWCJ7IDoic3JlZGFlaCIgLCIxLWVsYmFzb3BzaWQta3MiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "sealed-references",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19In1GRVJfVEVSQ0VTX1RTRVR7JCIgOiJmZVItWCJ7IDoic3JlZGFlaCIgLCJ9RkVSX1RFUkNFU19UU0VUeyQiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {
+    "TEST_SECRET_REF": "resolved"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19In1GRVJfVEVSQ0VTX1RTRVR7JCIgOiJmZVItWCJ7IDoic3JlZGFlaCIgLCJ9RkVSX1RFUkNFU19UU0VUeyQiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "resolved",
+      "headers": [
+       [
+        "X-Ref",
+        "resolved"
+       ]
+      ]
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19In1GRVJfVEVSQ0VTX1RTRVR7JCIgOiJmZVItWCJ7IDoic3JlZGFlaCIgLCJ9RkVSX1RFUkNFU19UU0VUeyQiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "sealed-reference-unset",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19In1GRVJfVEVSQ0VTX1RTRVR7JCIgOiJmZVItWCJ7IDoic3JlZGFlaCIgLCJ9RkVSX1RFUkNFU19UU0VUeyQiIDoieWVrX2lwYSJ7\"}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19In1GRVJfVEVSQ0VTX1RTRVR7JCIgOiJmZVItWCJ7IDoic3JlZGFlaCIgLCJ9RkVSX1RFUkNFU19UU0VUeyQiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "error": {
+       "class": "ConfigError",
+       "message": "<UNAVAILABLE>"
+      }
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19In1GRVJfVEVSQ0VTX1RTRVR7JCIgOiJmZVItWCJ7IDoic3JlZGFlaCIgLCJ9RkVSX1RFUkNFU19UU0VUeyQiIDoieWVrX2lwYSJ7\"}\n"
+  },
+  {
+   "name": "sealed-garbage",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: other, data: abc}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"other\", \"data\": \"abc\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "error": {
+       "class": "ConfigError",
+       "message": "<UNAVAILABLE>"
+      }
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: other, data: abc}\n"
+  },
+  {
+   "name": "sealed-not-json",
+   "user": "providers:\n  x:\n    protected_credentials: {when: 2026-01-01}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "null",
+       "credential_overrides": "{}",
+       "credential_error": "<UNAVAILABLE>",
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "error": {
+       "class": "ConfigError",
+       "message": "<UNAVAILABLE>"
+      }
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {when: 2026-01-01}\n"
+  },
+  {
+   "name": "sealed-bad-base64",
+   "user": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: 'not base64!'}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"not base64!\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "error": {
+       "class": "ConfigError",
+       "message": "<UNAVAILABLE>"
+      }
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: 'not base64!'}\n"
+  },
+  {
+   "name": "enabled-yes",
+   "user": "providers:\n  openai:\n    enabled: 'yes'\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    enabled: 'yes'\n"
+  },
+  {
+   "name": "enabled-one",
+   "user": "providers:\n  openai:\n    enabled: 1\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    enabled: 1\n"
+  },
+  {
+   "name": "enabled-float",
+   "user": "providers:\n  openai:\n    enabled: 1.0\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    enabled: 1.0\n"
+  },
+  {
+   "name": "enabled-two",
+   "user": "providers:\n  openai:\n    enabled: 2\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  openai:\n    enabled: 2\n"
+  },
+  {
+   "name": "enabled-maybe",
+   "user": "providers:\n  openai:\n    enabled: maybe\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  openai:\n    enabled: maybe\n"
+  },
+  {
+   "name": "enabled-off",
+   "user": "providers:\n  openai:\n    enabled: off\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    enabled: off\n"
+  },
+  {
+   "name": "name-number",
+   "user": "providers:\n  openai:\n    name: 5\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  openai:\n    name: 5\n"
+  },
+  {
+   "name": "name-binary",
+   "user": "providers:\n  openai:\n    name: !!binary T3BlbkFJ\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    name: !!binary T3BlbkFJ\n"
+  },
+  {
+   "name": "models",
+   "user": "providers:\n  x:\n    models:\n    - {id: m, name: M, context_window: 8192}\n    - {id: n, when: 2026-01-01}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": [
+        [
+         "dict",
+         [
+          [
+           [
+            "str",
+            "id"
+           ],
+           [
+            "str",
+            "m"
+           ]
+          ],
+          [
+           [
+            "str",
+            "name"
+           ],
+           [
+            "str",
+            "M"
+           ]
+          ],
+          [
+           [
+            "str",
+            "context_window"
+           ],
+           [
+            "int",
+            "8192"
+           ]
+          ]
+         ]
+        ],
+        [
+         "dict",
+         [
+          [
+           [
+            "str",
+            "id"
+           ],
+           [
+            "str",
+            "n"
+           ]
+          ],
+          [
+           [
+            "str",
+            "when"
+           ],
+           [
+            "date",
+            "2026-01-01"
+           ]
+          ]
+         ]
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    models:\n    - {id: m, name: M, context_window: 8192}\n    - {id: n, when: 2026-01-01}\n"
+  },
+  {
+   "name": "models-not-dicts",
+   "user": "providers:\n  x:\n    models: [1]\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  x:\n    models: [1]\n"
+  },
+  {
+   "name": "models-int-keys",
+   "user": "providers:\n  x:\n    models: [{1: 2}]\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  x:\n    models: [{1: 2}]\n"
+  },
+  {
+   "name": "models-not-list",
+   "user": "providers:\n  x:\n    models: {a: 1}\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  x:\n    models: {a: 1}\n"
+  },
+  {
+   "name": "headers-plain-text-values",
+   "user": "providers:\n  x:\n    headers: {X: 'a'}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": "{\"version\": 1, \"protection\": \"<PROTECTION>\", \"data\": \"RkFLRX19ImEiIDoiWCJ7IDoic3JlZGFlaCIgLCIiIDoieWVrX2lwYSJ7\"}",
+       "credential_overrides": "{}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "",
+      "headers": [
+       [
+        "X",
+        "a"
+       ]
+      ]
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    protected_credentials:\n      version: 1\n      protection: <PROTECTION>\n      data: RkFLRX19ImEiIDoiWCJ7IDoic3JlZGFlaCIgLCIiIDoieWVrX2lwYSJ7\n"
+  },
+  {
+   "name": "providers-not-mapping",
+   "user": "providers: x\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Provider settings must contain a mapping"
+   },
+   "file_after": "providers: x\n"
+  },
+  {
+   "name": "provider-not-mapping",
+   "user": "providers:\n  x: 5\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "providers:\n  x: 5\n"
+  },
+  {
+   "name": "non-text-top-key",
+   "user": "1: a\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "1: a\n"
+  },
+  {
+   "name": "app-null-keeps-default",
+   "user": "app: null\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.3.0-alpha.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "app: null\n"
+  },
+  {
+   "name": "app-override",
+   "user": "app: {name: Mine, extra: 1}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Mine",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "app: {name: Mine, extra: 1}\n"
+  },
+  {
+   "name": "unknown-top-level",
+   "user": "custom: {x: 1}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "custom: {x: 1}\n"
+  },
+  {
+   "name": "var-set",
+   "user": "app: {name: '${TEST_NAME_VAR}'}\n",
+   "env": {
+    "TEST_NAME_VAR": "Named"
+   },
+   "config": {
+    "app": {
+     "name": "Named",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "app: {name: '${TEST_NAME_VAR}'}\n"
+  },
+  {
+   "name": "var-unset",
+   "user": "app: {name: '${TEST_UNSET_VAR}'}\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Environment variable 'TEST_UNSET_VAR' referenced in config.app.name but not set. Set it in .env or your shell environment."
+   },
+   "file_after": "app: {name: '${TEST_UNSET_VAR}'}\n"
+  },
+  {
+   "name": "var-escaped",
+   "user": "app: {name: 'a $${TEST_NAME_VAR} b'}\n",
+   "env": {
+    "TEST_NAME_VAR": "Named"
+   },
+   "config": {
+    "app": {
+     "name": "a ${TEST_NAME_VAR} b",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "app: {name: 'a $${TEST_NAME_VAR} b'}\n"
+  },
+  {
+   "name": "var-in-list",
+   "user": "providers:\n  x:\n    models: [{id: '${TEST_NAME_VAR}'}]\n",
+   "env": {
+    "TEST_NAME_VAR": "m"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": [
+        [
+         "dict",
+         [
+          [
+           [
+            "str",
+            "id"
+           ],
+           [
+            "str",
+            "m"
+           ]
+          ]
+         ]
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    models: [{id: '${TEST_NAME_VAR}'}]\n"
+  },
+  {
+   "name": "var-unset-in-list",
+   "user": "providers:\n  x:\n    models: [{id: '${TEST_UNSET_VAR}'}]\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Environment variable 'TEST_UNSET_VAR' referenced in config.providers.x.models[0].id but not set. Set it in .env or your shell environment."
+   },
+   "file_after": "providers:\n  x:\n    models: [{id: '${TEST_UNSET_VAR}'}]\n"
+  },
+  {
+   "name": "var-bad-name",
+   "user": "app: {name: '${1X} ${ X} $X ${}'}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "${1X} ${ X} $X ${}",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "app: {name: '${1X} ${ X} $X ${}'}\n"
+  },
+  {
+   "name": "env-app-name",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_APP__NAME": "From env"
+   },
+   "config": {
+    "app": {
+     "name": "From env",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-bool",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_PROVIDERS__OPENAI__ENABLED": "TRUE"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-bool-other",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_PROVIDERS__OPENAI__ENABLED": "on"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-json-object",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_TTS__VOICES": "{\"dm\": \"x\"}"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "x"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-json-broken",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_TTS__VOICE": "[1,"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "[1,",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-json-list",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_PROVIDERS__OPENAI__MODELS": " [{\"id\": \"m\"}]"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": [
+        [
+         "dict",
+         [
+          [
+           [
+            "str",
+            "id"
+           ],
+           [
+            "str",
+            "m"
+           ]
+          ]
+         ]
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-int-bad",
+   "user": "extra: {count: 3}\n",
+   "env": {
+    "SYLVIA_GM_EXTRA__COUNT": "abc"
+   },
+   "error": {
+    "class": "ValueError",
+    "message": "invalid literal for int() with base 10: 'abc'"
+   },
+   "file_after": "extra: {count: 3}\n"
+  },
+  {
+   "name": "env-int-good",
+   "user": "extra: {count: 3}\n",
+   "env": {
+    "SYLVIA_GM_EXTRA__COUNT": " 7 "
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "extra: {count: 3}\n"
+  },
+  {
+   "name": "env-float",
+   "user": "extra: {ratio: 1.5}\n",
+   "env": {
+    "SYLVIA_GM_EXTRA__RATIO": "2.5e1"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "extra: {ratio: 1.5}\n"
+  },
+  {
+   "name": "env-new-path",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_PROVIDERS__NEWONE__BASE_URL": "http://new/v1"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "newone",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "http://new/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "newone",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-through-scalar",
+   "user": "extra: 5\n",
+   "env": {
+    "SYLVIA_GM_EXTRA__INNER": "x"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "extra: 5\n"
+  },
+  {
+   "name": "env-empty-path",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_": "x"
+   },
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "env-mixed-case",
+   "user": null,
+   "env": {
+    "SYLVIA_GM_App__Name": "Mixed"
+   },
+   "config": {
+    "app": {
+     "name": "Mixed",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": null
+  },
+  {
+   "name": "crlf-file",
+   "user": "providers:\r\n  openai:\r\n    enabled: true\r\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\r\n  openai:\r\n    enabled: true\r\n"
+  },
+  {
+   "name": "unicode",
+   "user": "app: {name: 'Sylvia \u00e9 \ud83c\udfb2'}\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia \u00e9 \ud83c\udfb2",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "app: {name: 'Sylvia \u00e9 \ud83c\udfb2'}\n"
+  },
+  {
+   "name": "deep-merge-lists-replace",
+   "user": "providers:\n  openai:\n    models: [{id: a}]\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": [
+        [
+         "dict",
+         [
+          [
+           [
+            "str",
+            "id"
+           ],
+           [
+            "str",
+            "a"
+           ]
+          ]
+         ]
+        ]
+       ]
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai:\n    models: [{id: a}]\n"
+  },
+  {
+   "name": "deep-merge-null-removes",
+   "user": "providers:\n  openai: null\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  openai: null\n"
+  },
+  {
+   "name": "tts-voices-bad",
+   "user": "tts: {voices: {dm: 1}}\n",
+   "env": {},
+   "error": {
+    "class": "ConfigError",
+    "message": "Invalid configuration; check provider and model settings"
+   },
+   "file_after": "tts: {voices: {dm: 1}}\n"
+  },
+  {
+   "name": "credential-error-field",
+   "user": "providers:\n  x:\n    credential_error: blocked\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": "blocked",
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "error": {
+       "class": "ConfigError",
+       "message": "<UNAVAILABLE>"
+      }
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    credential_error: blocked\n"
+  },
+  {
+   "name": "credential-overrides-plain",
+   "user": "providers:\n  x:\n    credential_overrides: '{\"api_key\": \"o\"}'\n",
+   "env": {},
+   "config": {
+    "app": {
+     "name": "Sylvia GM",
+     "version": "0.4.1",
+     "data_dir": "data",
+     "campaigns_dir": "campaigns"
+    },
+    "logging": {
+     "level": "INFO",
+     "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+     "file": "data/sylvia-gm.log"
+    },
+    "ruleset": {
+     "default": "",
+     "path": "rulesets"
+    },
+    "tts": {
+     "provider": "edge",
+     "enabled": false,
+     "voice": "en-US-AriaNeural",
+     "voices": [
+      [
+       "dm",
+       "en-US-AriaNeural"
+      ],
+      [
+       "npc_female",
+       "en-US-JennyNeural"
+      ],
+      [
+       "npc_male",
+       "en-US-GuyNeural"
+      ]
+     ]
+    },
+    "providers": [
+     [
+      "lm_studio",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "local",
+       "name": "LM Studio",
+       "base_url": "http://127.0.0.1:1234/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "opencode_go",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenCode Go",
+       "base_url": "https://opencode.ai/zen/go/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "openai",
+      {
+       "enabled": false,
+       "preset_id": "",
+       "mode": "byok",
+       "name": "OpenAI API",
+       "base_url": "https://api.openai.com/v1",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": null,
+       "credential_error": null,
+       "models": []
+      }
+     ],
+     [
+      "x",
+      {
+       "enabled": true,
+       "preset_id": "",
+       "mode": "",
+       "name": "",
+       "base_url": "",
+       "api_key": "",
+       "headers": [],
+       "protected_credentials": null,
+       "credential_overrides": "{\"api_key\": \"o\"}",
+       "credential_error": null,
+       "models": []
+      }
+     ]
+    ]
+   },
+   "credentials": [
+    [
+     "lm_studio",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "opencode_go",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "openai",
+     {
+      "key": "",
+      "headers": []
+     }
+    ],
+    [
+     "x",
+     {
+      "key": "",
+      "headers": []
+     }
+    ]
+   ],
+   "file_after": "providers:\n  x:\n    credential_overrides: '{\"api_key\": \"o\"}'\n"
+  }
+ ]
+}
