@@ -506,8 +506,11 @@ dependencies = [
 name = "sylvia-engine"
 version = "0.4.1"
 dependencies = [
+ "getrandom",
+ "hex",
  "serde",
  "serde_json",
+ "sha2",
  "sylvia-base",
  "sylvia-domain",
  "thiserror",

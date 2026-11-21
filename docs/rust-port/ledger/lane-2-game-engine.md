@@ -22,7 +22,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/shot_effects.py` | 376 | `sylvia-app::shot_effects` | pending | |
 | `src/sylvia_gm/application/spatial_preview.py` | 118 | `sylvia-app::spatial_preview` | pending | |
 | `src/sylvia_gm/application/tactical_grid.py` | 710 | `sylvia-app::tactical_grid` | pending | |
-| `src/sylvia_gm/dice.py` | 920 | `sylvia-engine::dice` | pending | |
+| `src/sylvia_gm/dice.py` | 920 | `sylvia-engine::dice` | in progress | The seeded stream it draws from (`random.Random`: MT19937, `init_by_array`, `getrandbits`, `_randbelow`, `randrange`/`randint`/`choice`/`shuffle`/`random`) and the tool seed derivation are `sylvia-engine::pyrandom`, proven by `tests/vectors/pyrandom_vectors.json`. |
 | `src/sylvia_gm/ruleset/__init__.py` | 5 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/ruleset/schema.py` | 273 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/ruleset/validator.py` | 195 | `sylvia-engine` | pending | |
@@ -39,7 +39,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_deferred_queue.py` | 186 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_distance_tracker.py` | 562 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_duration_tracker.py` | 189 | `sylvia-engine` | pending | |
-| `src/sylvia_gm/runtime/_effect_executor.py` | 2,351 | `sylvia-engine` | pending | |
+| `src/sylvia_gm/runtime/_effect_executor.py` | 2,351 | `sylvia-engine` | pending | `_handle_shuffle` draws from `secrets.SystemRandom` (OS entropy), not the seeded tool stream, so its order differs between any two runs, Python or Rust; it is ported as OS-random. Shipped tools that reach it: Riichi Mahjong `start_game` (through `_new_hand`, `shuffle indices(136)`) and every Riichi `take_action` that runs `refresh` (`shuffle indices(256)`). SRD Lite has none. Comparison sessions must avoid those tools or declare a rule for the shuffled values. |
 | `src/sylvia_gm/runtime/_exceptions.py` | 110 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_expression_parser.py` | 595 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_flag_store.py` | 97 | `sylvia-engine` | pending | |
