@@ -15,11 +15,14 @@ mkdir -p "$work"
 failed=0
 for name in "$@"; do
   same=0
+  module=sylvia_gm.interfaces.owner_process
+  # A WebUI host session runs the Python host, which starts its own owner.
+  if grep -q '"webui": true' "crates/sylvia-compare/sessions/$name.session.json"; then module=sylvia_gm.main; fi
   for run in $(seq 1 "$runs"); do
     out="$work/$name-$run"
     if "$compare" check --session "crates/sylvia-compare/sessions/$name.session.json" \
         --reference "crates/sylvia-compare/recordings/$platform/$name.recording.json" \
-        --work "$out" --limit 10 --owner "$python" --arg -B --arg -m --arg sylvia_gm.interfaces.owner_process \
+        --work "$out" --limit 10 --owner "$python" --arg -B --arg -m --arg "$module" \
         > "$out.log" 2>&1; then
       same=$((same + 1)); echo "$name run $run: same"
     else

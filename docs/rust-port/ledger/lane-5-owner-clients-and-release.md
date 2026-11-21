@@ -56,9 +56,9 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/interfaces/local_owner.py` | 1,444 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/owner_process.py` | 2,245 | `sylvia-owner::run` | in progress | run loop: execution model, local services, diagnostics on replies, update gates (state from the desktop update port), provider-work reservation, the provider error path (lane 4 `provider_error_reply`); launch opens and migrates the store (lane 3 `StoreHandle`). Pending: `acquire_owner` and internal handshake, bundled package installs, Builder migrations, desktop update methods |
 | `src/sylvia_gm/interfaces/ruleset_test_worker.py` | 96 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/webui.py` | 847 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/webui.py` | 847 | `sylvia-owner::webui` | in progress | Ported whole. `webui-guard` and `webui-remote` match the Python host on every response. Not yet proven by a session: an export with its download and a successful upload, which wait for the owner's export and install commands; `tests/stop_resume_owner_contract.cjs` against the Rust host waits for the turn commands |
 | `src/sylvia_gm/local_dictation.py` | 346 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/local_dictation_process.py` | 195 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/main.py` | 67 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/main.py` | 67 | `sylvia-owner` (`sylvia-gm` binary) | in progress | The CLI: `--version`, `--webui` and its options. It starts `sylvia-gm-owner` from its own folder; packaging decides the final layout |
 | `src/sylvia_gm/portable_artifact.py` | 219 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/release_artifact.py` | 826 | `sylvia-owner` | pending | |

@@ -68,9 +68,18 @@ fancy-regex = "0.14"
 # winapi-util also gives the store's safe-file checks handle identity on Windows (lane 3).
 windows-version = "0.1"
 winapi-util = "0.1"
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net", "signal"] }
 # Lane 4: provider streams are pull-based like Python async generators (Stream, StreamExt).
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
+# The WebUI host (lane 5): an HTTP/1.1 server with no framework. hyper is the server, hyper-util
+# runs it on tokio, http-body-util builds and reads bodies, multer parses multipart uploads as a
+# stream, and bytes is the buffer type all four share. Lane 4's reqwest client sits on the same
+# hyper and http types.
+hyper = { version = "1", features = ["server", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+http-body-util = "0.1"
+multer = "3"
+bytes = "1"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

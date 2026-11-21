@@ -147,6 +147,34 @@ times on each platform before calling it reproducible: a race that hits one run 
 Everything else is compared exactly, including the order of object keys and whether a number
 is an integer or a float.
 
+## WebUI host sessions
+
+A session with `"webui": true` tests the WebUI host instead of the owner. `--owner` names the host
+program (`target/debug/sylvia-gm`, or Python's `-m sylvia_gm.main`), which the tool starts with
+`--webui --data-root <data> --port 0`; the host starts its own owner. `"webui_remote": {"origin",
+"key"}` starts it in private HTTPS mode instead, with a key file and a fixed free port.
+
+Each step is an `http` request, sent on its own connection by a small HTTP/1.1 client, so a
+session can send what a browser never would:
+
+```json
+{"http": {"method": "POST", "path": "/api/command",
+          "headers": [["Origin", "${origin}"], ["X-Sylvia-WebUI", "1"], ["Cookie", "${cookie}"]],
+          "json": {"id": "a", "method": "application_info"}}}
+```
+
+- `headers` go out in order, after `Host` (unless named, or `no_host` is set). `Content-Length`
+  or chunked framing, and `Connection: close`, are added.
+- The body is one of `json`, `text`, `repeat` (that many `a` bytes) or `multipart` (parts with
+  `name`, `filename`, `headers`, `content` or `repeat`). `chunked: N` sends it in pieces of N bytes.
+- `${origin}` and `${authority}` are what the browser sends as Origin and Host; `${address}` is
+  where the host listens. `"save_cookie": true` keeps the cookies a response sets as `${cookie}`.
+
+A response is recorded as status, reason, headers (lowercased names, sorted; the hop-by-hop
+`Connection` and `Keep-Alive` are left out) and body: JSON parsed with the encoding that
+reproduces it, small text whole, anything else by size and SHA-256. The data folder and database
+are dumped once the host has exited after `/api/stop`.
+
 ## The stand-in model service
 
 It speaks the OpenAI-compatible chat API like `scripts/qa/standin_model_endpoint.py`: one
@@ -177,6 +205,8 @@ rules check, an attack); lane 4 says what those need.
 | `stop-redirect` | Stop a held reply, the Retry offer and history, a redirecting message, a `[late]` reply read while running and then released | recorded on Windows and Linux; reproduces on a second run |
 | `fail-retry` | A reply lost mid-stream, the Retry offer, plain and redirecting input refused, Manual Retry and its replay | recorded on Windows and Linux; reproduces on a second run |
 | `reopen` | Stop and a failed reply, each followed by a restart on the same data folder; the offer survives, a redirect and a Manual Retry answer | recorded on Windows and Linux; reproduces on a second run |
+| `webui-guard` | The local WebUI host's boundary, request by request: cookie, Host, Origin, Sec-Fetch, the same-origin header, command checks and idempotency, renamed arguments, asset path tricks, downloads, upload names and size limits, unknown routes, Stop | recorded on Windows and Linux; five reproductions on each |
+| `webui-remote` | Private HTTPS mode: the sign-in page, the remote Host only, access-key sign-in, the remote cookie, sign-out, the sign-in budget, Stop | recorded on Windows and Linux; five reproductions on each |
 
 The last three follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop

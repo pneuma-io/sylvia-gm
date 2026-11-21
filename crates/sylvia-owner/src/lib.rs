@@ -22,5 +22,6 @@ pub mod protocol;
 pub mod run;
 pub mod services;
 pub mod util;
+pub mod webui;
 
 pub use run::run;

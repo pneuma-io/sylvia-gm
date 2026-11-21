@@ -45,6 +45,16 @@ pub fn named_temporary(directory: &Path, prefix: &str, suffix: &str) -> std::io:
     Err(last.unwrap_or_else(|| std::io::Error::other("no temporary name was free")))
 }
 
+/// A path without Windows' `\\?\` prefix, as Python prints it.
+pub fn plain_path(path: &Path) -> String {
+    let text = path.to_string_lossy().into_owned();
+    if let Some(rest) = text.strip_prefix(r"\\?\UNC\") {
+        format!(r"\\{rest}")
+    } else {
+        text.strip_prefix(r"\\?\").map(str::to_owned).unwrap_or(text)
+    }
+}
+
 /// `Path(text).name`: the last component of the path as pathlib reports it. `..` is a name;
 /// a drive or root alone has none.
 pub fn path_name(path: &Path) -> String {
