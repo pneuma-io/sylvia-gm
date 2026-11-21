@@ -35,6 +35,8 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-owner/src/desktop_update/windows.rs` (`disk_free`, `dirname_wide`) | CPython's `os__getdiskusage_impl` and `_dirnameW` (`Modules/posixmodule.c`), as `shutil.disk_usage` calls them | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 | `sylvia-base/src/winreg.rs` (`sz_units`, `dword`, `Key::query_raw`) | CPython's `winreg.QueryValueEx` and `Reg2Py` for `REG_SZ` (`PC/winreg.c`): the size query, the doubling read and the cut at the first NUL | CPython 3.12 (source read from the 3.12 branch; vectors from 3.12.11) | PSF License Version 2 | lane 5 |
 | `sylvia-owner/src/desktop_update/installed.rs` (`list2cmdline`) | CPython's `subprocess.list2cmdline` (`Lib/subprocess.py`) | CPython 3.12.11 | PSF License Version 2 | lane 5 |
+| `sylvia-owner/src/webui/file_response.rs` (`prepare`, `etags`, `etag_match`, `http_range`) | aiohttp's `FileResponse.prepare`, `_make_response`, `_prepare_open_file` and `_etag_match` (`web_fileresponse.py`), the request's `if_match`, `_etag_values` and `http_range` (`web_request.py`) and `LIST_QUOTED_ETAG_RE` (`helpers.py`) | aiohttp 3.14.3 | Apache License 2.0 | lane 5 |
+| `sylvia-owner/src/webui/file_response.rs` (`parsedate`) | CPython's `email._parseaddr._parsedate_tz` (`Lib/email/_parseaddr.py`), as `email.utils.parsedate` and aiohttp's `parse_http_date` call it | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.

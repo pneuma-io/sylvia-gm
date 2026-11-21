@@ -1,0 +1,4670 @@
+{
+ "python": "3.12.11",
+ "pinned_ns": 1800000000123456700,
+ "boundary": "sylvia-vector-boundary",
+ "steps": [
+  {
+   "name": "bootstrap",
+   "method": "GET",
+   "path": "/app.html",
+   "headers": [],
+   "save_cookie": true
+  },
+  {
+   "name": "export a campaign",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x1",
+    "method": "export_campaign_file",
+    "params": {
+     "exportId": "e1",
+     "campaignId": "c1"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "download",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "download again",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "head",
+   "method": "HEAD",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "first ten bytes",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=0-9"
+    ]
+   ]
+  },
+  {
+   "name": "last sixteen bytes",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=-16"
+    ]
+   ]
+  },
+  {
+   "name": "a tail longer than the file",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=-5000"
+    ]
+   ]
+  },
+  {
+   "name": "from byte 990",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=990-"
+    ]
+   ]
+  },
+  {
+   "name": "an end past the file",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=995-2000"
+    ]
+   ]
+  },
+  {
+   "name": "a start past the file",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=5000-"
+    ]
+   ]
+  },
+  {
+   "name": "a start at the end",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=1000-1001"
+    ]
+   ]
+  },
+  {
+   "name": "an end before the start",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=9-3"
+    ]
+   ]
+  },
+  {
+   "name": "two ranges",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=0-1,4-5"
+    ]
+   ]
+  },
+  {
+   "name": "another unit",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "items=0-1"
+    ]
+   ]
+  },
+  {
+   "name": "an empty range",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=-"
+    ]
+   ]
+  },
+  {
+   "name": "head of a range",
+   "method": "HEAD",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=0-9"
+    ]
+   ]
+  },
+  {
+   "name": "if-none-match the etag",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-None-Match",
+     "${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-none-match any",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-None-Match",
+     "*"
+    ]
+   ]
+  },
+  {
+   "name": "if-none-match the weak etag",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-None-Match",
+     "W/${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-none-match in a list",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-None-Match",
+     "\"other\", ${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-none-match another",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-None-Match",
+     "\"other\""
+    ]
+   ]
+  },
+  {
+   "name": "if-none-match garbage first",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-None-Match",
+     "garbage, ${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-match another",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Match",
+     "\"other\""
+    ]
+   ]
+  },
+  {
+   "name": "if-match the etag",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Match",
+     "${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-match the weak etag",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Match",
+     "W/${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-match any",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Match",
+     "*"
+    ]
+   ]
+  },
+  {
+   "name": "if-match empty",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Match",
+     ""
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since the future",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Fri, 01 Jan 2100 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since the past",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Mon, 01 Jan 2024 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since the same second",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Fri, 15 Jan 2027 08:00:01 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since nonsense",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "yesterday"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since with an offset",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Fri, 01 Jan 2100 00:00:00 +0500"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since two-digit year",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Friday, 01-Jan-99 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since asctime",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Fri Jan  1 00:00:00 2100"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since an impossible day",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Sat, 31 Feb 2100 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-modified-since but none-match differs",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Modified-Since",
+     "Fri, 01 Jan 2100 00:00:00 GMT"
+    ],
+    [
+     "If-None-Match",
+     "\"other\""
+    ]
+   ]
+  },
+  {
+   "name": "if-unmodified-since the past",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Unmodified-Since",
+     "Mon, 01 Jan 2024 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-unmodified-since the future",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Unmodified-Since",
+     "Fri, 01 Jan 2100 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-unmodified-since past with if-match",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "If-Unmodified-Since",
+     "Mon, 01 Jan 2024 00:00:00 GMT"
+    ],
+    [
+     "If-Match",
+     "${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "if-range in the past",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=0-9"
+    ],
+    [
+     "If-Range",
+     "Mon, 01 Jan 2024 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-range in the future",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=0-9"
+    ],
+    [
+     "If-Range",
+     "Fri, 01 Jan 2100 00:00:00 GMT"
+    ]
+   ]
+  },
+  {
+   "name": "if-range an etag",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Range",
+     "bytes=0-9"
+    ],
+    [
+     "If-Range",
+     "${etag}"
+    ]
+   ]
+  },
+  {
+   "name": "accepting compression",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip, br"
+    ]
+   ]
+  },
+  {
+   "name": "an unknown handle",
+   "method": "GET",
+   "path": "/api/download/unknown",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "back up the database",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x2",
+    "method": "backup_authority",
+    "params": {
+     "backupId": "b1"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "download the backup",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "export a plan",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x3",
+    "method": "export_campaign_plan_file",
+    "params": {
+     "exportId": "p1",
+     "campaignId": "c1"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "download the plan",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "export a package",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x4",
+    "method": "export_package_candidate_file",
+    "params": {
+     "exportId": "k1",
+     "packageId": "pkg"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "download the package",
+   "method": "GET",
+   "path": "${download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "export the campaign again",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x5",
+    "method": "export_campaign_file",
+    "params": {
+     "exportId": "e1",
+     "campaignId": "c1"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "the first download still works",
+   "method": "GET",
+   "path": "${first_download}",
+   "headers": [
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "an export the owner refuses",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x6",
+    "method": "export_campaign_file",
+    "params": {
+     "exportId": "rejected"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "an export that leaves no file",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x7",
+    "method": "export_campaign_file",
+    "params": {
+     "exportId": "missing"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "an export without an identity",
+   "method": "POST",
+   "path": "/api/command",
+   "json": {
+    "id": "x8",
+    "method": "export_campaign_file",
+    "params": {
+     "campaignId": "c1"
+    }
+   },
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "upload a package",
+   "method": "POST",
+   "path": "/api/upload/package",
+   "multipart": [
+    {
+     "name": "params",
+     "b64": "eyJzb3VyY2VLaW5kIjogImZpbGUifQ=="
+    },
+    {
+     "name": "file",
+     "filename": "Rift.sylvia-gm-package",
+     "b64": "UEsDBCBzdGFuZC1pbiBwYWNrYWdlIGJ5dGVz"
+    }
+   ],
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "upload a package needing repair",
+   "method": "POST",
+   "path": "/api/upload/package",
+   "multipart": [
+    {
+     "name": "file",
+     "filename": "repair-me.sylvia-gm-package",
+     "b64": "UEsDBCBzdGFuZC1pbiBwYWNrYWdlIGJ5dGVz"
+    }
+   ],
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "upload a recovery",
+   "method": "POST",
+   "path": "/api/upload/recovery",
+   "multipart": [
+    {
+     "name": "file",
+     "filename": "old.sylvia-gm-campaign",
+     "b64": "Y2FtcGFpZ24gYnl0ZXM="
+    },
+    {
+     "name": "params",
+     "b64": "eyJjYW1wYWlnbk5hbWUiOiAiUmlmdCJ9"
+    }
+   ],
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "upload a character card",
+   "method": "POST",
+   "path": "/api/upload/character",
+   "multipart": [
+    {
+     "name": "file",
+     "filename": "card.png",
+     "headers": [
+      [
+       "Content-Type",
+       "image/png"
+      ]
+     ],
+     "b64": "iVBORyBjYXJk"
+    }
+   ],
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "upload builder sources",
+   "method": "POST",
+   "path": "/api/upload/builder",
+   "multipart": [
+    {
+     "name": "params",
+     "b64": "eyJzZXNzaW9uSWQiOiAiczEiLCAiaW5nZXN0aW9uSWQiOiAiaTEifQ=="
+    },
+    {
+     "name": "file",
+     "filename": "notes.md",
+     "b64": "IyBOb3Rlcwo="
+    },
+    {
+     "name": "file",
+     "filename": "map.txt",
+     "b64": "YSBtYXA="
+    }
+   ],
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "an upload the owner refuses",
+   "method": "POST",
+   "path": "/api/upload/character",
+   "multipart": [
+    {
+     "name": "params",
+     "b64": "eyJtZXRob2QiOiAibm90aGluZyJ9"
+    },
+    {
+     "name": "file",
+     "filename": "card.json",
+     "b64": "e30="
+    }
+   ],
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  },
+  {
+   "name": "stop",
+   "method": "POST",
+   "path": "/api/stop",
+   "json": null,
+   "headers": [
+    [
+     "Origin",
+     "${origin}"
+    ],
+    [
+     "X-Sylvia-WebUI",
+     "1"
+    ],
+    [
+     "Cookie",
+     "${cookie}"
+    ]
+   ]
+  }
+ ],
+ "recorded": {
+  "steps": [
+   {
+    "name": "bootstrap",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "101335"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "text/html; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "set-cookie",
+       "sylvia_webui_<port>=<cookie>; HttpOnly; Path=/; SameSite=Strict"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 101335,
+      "sha256": "f05dd0a9346313e41235f5117bc86349f418326f9f66d35339a503ad55f848ee",
+      "start": "<!DOCTYPE html>\n<html la"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "export a campaign",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "249"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "exported",
+        "download": "/api/download/<token:1>",
+        "filename": "sylvia.sylvia-gm-campaign",
+        "file_name": "sylvia.sylvia-gm-campaign",
+        "export": {
+         "id": "e1",
+         "method": "export_campaign_file"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "export_campaign_file",
+      "params": {
+       "export_id": "e1",
+       "campaign_id": "c1"
+      }
+     }
+    ]
+   },
+   {
+    "name": "download",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "download again",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "head",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "first ten bytes",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "10"
+      ],
+      [
+       "content-range",
+       "bytes 0-9/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 10,
+      "sha256": "9f57900735d6547fa1e930148c2b42345c1afd92d1d501fe9c3b6d9033a627d2",
+      "start": "export_cam"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "last sixteen bytes",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "16"
+      ],
+      [
+       "content-range",
+       "bytes 984-999/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 16,
+      "sha256": "d112d941dda2d37697b989b6e447cc93e78bbd6455b552ca80f9651b7cb9b79b",
+      "start": "export_campaign_"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "a tail longer than the file",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-range",
+       "bytes 0-999/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "from byte 990",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "10"
+      ],
+      [
+       "content-range",
+       "bytes 990-999/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 10,
+      "sha256": "e82dd3d264499ad61f86fd43c8c04f7681c8a201cade2efc65f19a2f9af82da3",
+      "start": "_campaign_"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "an end past the file",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "5"
+      ],
+      [
+       "content-range",
+       "bytes 995-999/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 5,
+      "sha256": "01fe9dd9576fef512eaa7b08807c194eedafa148ed316652398afec98e2d6a76",
+      "start": "aign_"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "a start past the file",
+    "response": {
+     "status": 416,
+     "reason": "Requested Range Not Satisfiable",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-range",
+       "bytes */1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "transfer-encoding",
+       "chunked"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "a start at the end",
+    "response": {
+     "status": 416,
+     "reason": "Requested Range Not Satisfiable",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-range",
+       "bytes */1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "transfer-encoding",
+       "chunked"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "an end before the start",
+    "response": {
+     "status": 416,
+     "reason": "Requested Range Not Satisfiable",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-range",
+       "bytes */1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "transfer-encoding",
+       "chunked"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "two ranges",
+    "response": {
+     "status": 416,
+     "reason": "Requested Range Not Satisfiable",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-range",
+       "bytes */1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "transfer-encoding",
+       "chunked"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "another unit",
+    "response": {
+     "status": 416,
+     "reason": "Requested Range Not Satisfiable",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-range",
+       "bytes */1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "transfer-encoding",
+       "chunked"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "an empty range",
+    "response": {
+     "status": 416,
+     "reason": "Requested Range Not Satisfiable",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-range",
+       "bytes */1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "transfer-encoding",
+       "chunked"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "head of a range",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "10"
+      ],
+      [
+       "content-range",
+       "bytes 0-9/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-none-match the etag",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-none-match any",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-none-match the weak etag",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-none-match in a list",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-none-match another",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-none-match garbage first",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-match another",
+    "response": {
+     "status": 412,
+     "reason": "Precondition Failed",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "0"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-match the etag",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-match the weak etag",
+    "response": {
+     "status": 412,
+     "reason": "Precondition Failed",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "0"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-match any",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-match empty",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since the future",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since the past",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since the same second",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since nonsense",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since with an offset",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since two-digit year",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since asctime",
+    "response": {
+     "status": 304,
+     "reason": "Not Modified",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since an impossible day",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-modified-since but none-match differs",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-unmodified-since the past",
+    "response": {
+     "status": 412,
+     "reason": "Precondition Failed",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "0"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "start": ""
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-unmodified-since the future",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-unmodified-since past with if-match",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-range in the past",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-range in the future",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "10"
+      ],
+      [
+       "content-range",
+       "bytes 0-9/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 10,
+      "sha256": "9f57900735d6547fa1e930148c2b42345c1afd92d1d501fe9c3b6d9033a627d2",
+      "start": "export_cam"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "if-range an etag",
+    "response": {
+     "status": 206,
+     "reason": "Partial Content",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "10"
+      ],
+      [
+       "content-range",
+       "bytes 0-9/1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 10,
+      "sha256": "9f57900735d6547fa1e930148c2b42345c1afd92d1d501fe9c3b6d9033a627d2",
+      "start": "export_cam"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "accepting compression",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "an unknown handle",
+    "response": {
+     "status": 404,
+     "reason": "Not Found",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "14"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "text/plain; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "text": "404: Not Found"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "back up the database",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "222"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "exported",
+        "download": "/api/download/<token:2>",
+        "filename": "sylvia.sqlite3",
+        "file_name": "sylvia.sqlite3",
+        "export": {
+         "id": "b1",
+         "method": "backup_database"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "backup_database",
+      "params": {
+       "backup_id": "b1"
+      }
+     }
+    ]
+   },
+   {
+    "name": "download the backup",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sqlite3\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "bbbf35fbda7eb248c1d1a64650f568453c3404c1311a13fa0e353ac903bf0850",
+      "start": "backup_database:b1:backu"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "export a plan",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "246"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "exported",
+        "download": "/api/download/<token:3>",
+        "filename": "sylvia.sylvia-gm-plan",
+        "file_name": "sylvia.sylvia-gm-plan",
+        "export": {
+         "id": "p1",
+         "method": "export_campaign_plan_file"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "export_campaign_plan_file",
+      "params": {
+       "export_id": "p1",
+       "campaign_id": "c1"
+      }
+     }
+    ]
+   },
+   {
+    "name": "download the plan",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-plan\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "c433f24bc7088a189a82ad1ffdd54858e63c712a16e4d2c56cabccd9dbb13c47",
+      "start": "export_campaign_plan_fil"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "export a package",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "256"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "exported",
+        "download": "/api/download/<token:4>",
+        "filename": "sylvia.sylvia-gm-package",
+        "file_name": "sylvia.sylvia-gm-package",
+        "export": {
+         "id": "k1",
+         "method": "export_package_candidate_file"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "export_package_candidate_file",
+      "params": {
+       "export_id": "k1",
+       "package_id": "pkg"
+      }
+     }
+    ]
+   },
+   {
+    "name": "download the package",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-package\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "22450d859bb0c317c201a9760eae5a9f8427c6e3af6f66f99e45c080fbc8b203",
+      "start": "export_package_candidate"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "export the campaign again",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "249"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "exported",
+        "download": "/api/download/<token:5>",
+        "filename": "sylvia.sylvia-gm-campaign",
+        "file_name": "sylvia.sylvia-gm-campaign",
+        "export": {
+         "id": "e1",
+         "method": "export_campaign_file"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "export_campaign_file",
+      "params": {
+       "export_id": "e1",
+       "campaign_id": "c1"
+      }
+     }
+    ]
+   },
+   {
+    "name": "the first download still works",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "accept-ranges",
+       "bytes"
+      ],
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-disposition",
+       "attachment; filename=\"sylvia.sylvia-gm-campaign\""
+      ],
+      [
+       "content-length",
+       "1000"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/octet-stream"
+      ],
+      [
+       "etag",
+       "\"18fae2769b0fccbc-3e8\""
+      ],
+      [
+       "last-modified",
+       "Fri, 15 Jan 2027 08:00:01 GMT"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "size": 1000,
+      "sha256": "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130",
+      "start": "export_campaign_file:e1:"
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "an export the owner refuses",
+    "response": {
+     "status": 400,
+     "reason": "Bad Request",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "100"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": false,
+       "error": {
+        "code": "command_rejected",
+        "message": "The stand-in refused this export."
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "export_campaign_file",
+      "params": {
+       "export_id": "rejected"
+      }
+     }
+    ]
+   },
+   {
+    "name": "an export that leaves no file",
+    "response": {
+     "status": 500,
+     "reason": "Internal Server Error",
+     "headers": [
+      [
+       "content-length",
+       "55"
+      ],
+      [
+       "content-type",
+       "text/plain; charset=utf-8"
+      ]
+     ],
+     "body": {
+      "text": "500 Internal Server Error\n\nServer got itself in trouble"
+     }
+    },
+    "owner": [
+     {
+      "method": "export_campaign_file",
+      "params": {
+       "export_id": "missing"
+      }
+     }
+    ]
+   },
+   {
+    "name": "an export without an identity",
+    "response": {
+     "status": 400,
+     "reason": "Bad Request",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "97"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": false,
+       "error": {
+        "code": "invalid_request",
+        "message": "Choose a valid export identity."
+       }
+      }
+     }
+    },
+    "owner": []
+   },
+   {
+    "name": "upload a package",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "157"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "installed",
+        "file_name": "Rift.sylvia-gm-package",
+        "candidate": {
+         "status": "ready",
+         "package": "Rift.sylvia-gm-package"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "install_package_file",
+      "params": {
+       "source_kind": "file",
+       "source_path": "<upload>/0/Rift.sylvia-gm-package"
+      },
+      "file": {
+       "name": "Rift.sylvia-gm-package",
+       "size": 27,
+       "sha256": "38854988a325ca8898ff5c0a4b41186024239116bbb51732c9eb8268642f600f"
+      }
+     }
+    ]
+   },
+   {
+    "name": "upload a package needing repair",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "70"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "repairable",
+        "reason": "stand-in"
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "install_package_file",
+      "params": {
+       "source_path": "<upload>/0/repair-me.sylvia-gm-package"
+      },
+      "file": {
+       "name": "repair-me.sylvia-gm-package",
+       "size": 27,
+       "sha256": "38854988a325ca8898ff5c0a4b41186024239116bbb51732c9eb8268642f600f"
+      }
+     }
+    ]
+   },
+   {
+    "name": "upload a recovery",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "130"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "recovered",
+        "file_name": "old.sylvia-gm-campaign",
+        "recovery": {
+         "campaign_id": "recovered-1"
+        }
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "recover_campaign_file",
+      "params": {
+       "campaign_name": "Rift",
+       "source_path": "<upload>/0/old.sylvia-gm-campaign"
+      },
+      "file": {
+       "name": "old.sylvia-gm-campaign",
+       "size": 14,
+       "sha256": "b8e6cbb2a68a79c3dfc23566349b06bc85cb3493031defb1fa35de4726e3e535"
+      }
+     }
+    ]
+   },
+   {
+    "name": "upload a character card",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "54"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "name": "Stand-in Character"
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "preview_character_card_file",
+      "params": {
+       "source_path": "<upload>/0/card.png"
+      },
+      "file": {
+       "name": "card.png",
+       "size": 9,
+       "sha256": "9bd78b2dda3d59a672b3fab533c8b9235ccbdda488dcffd26d46f208928d937f"
+      }
+     }
+    ]
+   },
+   {
+    "name": "upload builder sources",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "39"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "accepted": 2
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "ingest_builder_sources",
+      "params": {
+       "session_id": "s1",
+       "ingestion_id": "i1",
+       "source_paths": [
+        "<upload>/0/notes.md",
+        "<upload>/1/map.txt"
+       ]
+      },
+      "files": [
+       "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee",
+       "23e1765cd96692fcbaafc1b70970e2dd0f25f9454193be4ab4f10ab8248adbe4"
+      ]
+     }
+    ]
+   },
+   {
+    "name": "an upload the owner refuses",
+    "response": {
+     "status": 400,
+     "reason": "Bad Request",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "95"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": false,
+       "error": {
+        "code": "invalid_card",
+        "message": "The stand-in refuses JSON cards."
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "preview_character_card_file",
+      "params": {
+       "method": "nothing",
+       "source_path": "<upload>/0/card.json"
+      },
+      "file": {
+       "name": "card.json",
+       "size": 2,
+       "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      }
+     }
+    ]
+   },
+   {
+    "name": "stop",
+    "response": {
+     "status": 200,
+     "reason": "OK",
+     "headers": [
+      [
+       "cache-control",
+       "no-store"
+      ],
+      [
+       "content-length",
+       "44"
+      ],
+      [
+       "content-security-policy",
+       "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+      ],
+      [
+       "content-type",
+       "application/json; charset=utf-8"
+      ],
+      [
+       "referrer-policy",
+       "no-referrer"
+      ],
+      [
+       "x-content-type-options",
+       "nosniff"
+      ],
+      [
+       "x-frame-options",
+       "DENY"
+      ]
+     ],
+     "body": {
+      "json": {
+       "ok": true,
+       "result": {
+        "status": "closed"
+       }
+      }
+     }
+    },
+    "owner": [
+     {
+      "method": "shutdown",
+      "params": {}
+     }
+    ]
+   }
+  ],
+  "files_before_cleanup": [
+   [
+    "<downloads>",
+    "dir"
+   ],
+   [
+    "<downloads>/<token:1>.sylvia-gm-campaign",
+    "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130"
+   ],
+   [
+    "<downloads>/<token:2>.sqlite3",
+    "bbbf35fbda7eb248c1d1a64650f568453c3404c1311a13fa0e353ac903bf0850"
+   ],
+   [
+    "<downloads>/<token:3>.sylvia-gm-plan",
+    "c433f24bc7088a189a82ad1ffdd54858e63c712a16e4d2c56cabccd9dbb13c47"
+   ],
+   [
+    "<downloads>/<token:4>.sylvia-gm-package",
+    "22450d859bb0c317c201a9760eae5a9f8427c6e3af6f66f99e45c080fbc8b203"
+   ],
+   [
+    "<downloads>/<token:5>.sylvia-gm-campaign",
+    "9850cd18b6687b2e04ea637c3fee57a5746b1fd9f87c4e26d256112b6273e130"
+   ],
+   [
+    "backups",
+    "dir"
+   ],
+   [
+    "backups/b1.sqlite3",
+    "bbbf35fbda7eb248c1d1a64650f568453c3404c1311a13fa0e353ac903bf0850"
+   ],
+   [
+    "exports",
+    "dir"
+   ]
+  ],
+  "files_after_cleanup": [
+   [
+    "backups",
+    "dir"
+   ],
+   [
+    "backups/b1.sqlite3",
+    "bbbf35fbda7eb248c1d1a64650f568453c3404c1311a13fa0e353ac903bf0850"
+   ],
+   [
+    "exports",
+    "dir"
+   ]
+  ]
+ }
+}

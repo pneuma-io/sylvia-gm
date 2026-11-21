@@ -22,6 +22,12 @@ path = "src/bin/sylvia-gm.rs"
 name = "nsis_command_line"
 harness = false
 
+# Runs the real WebUI host with itself as the stand-in owner, which must answer before a test
+# harness reads its arguments.
+[[test]]
+name = "webui_files"
+harness = false
+
 [dependencies]
 sylvia-base.workspace = true
 serde_json.workspace = true
