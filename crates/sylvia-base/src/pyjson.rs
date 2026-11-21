@@ -11,12 +11,18 @@
 //!
 //! Reference vectors generated from the frozen Python snapshot are in `tests/vectors`.
 //!
+//! [`loads`] refuses text Python refuses with Python's `JSONDecodeError` text, located as
+//! CPython's scanner locates it (`decode_error`).
+//!
 //! Known, declared limits (see `docs/rust-port/differences.md`):
 //! - integers outside `i64`/`u64` are rejected by [`loads`]; Python accepts arbitrary size;
 //! - lone UTF-16 surrogates cannot exist in a Rust `String`; Python strings can hold them;
-//! - the `NaN`/`Infinity` literals Python accepts on input are rejected.
+//! - the `NaN`/`Infinity` literals Python accepts on input are rejected, and so is a number
+//!   beyond the float range, which Python reads as infinity.
 //! - JSON nested 128 or more arrays or objects deep is rejected by [`loads`] (`serde_json`'s
 //!   recursion limit; 127 levels read); Python reads roughly a thousand, its interpreter stack.
+
+mod decode_error;
 
 use crate::{CodedError, Json};
 use std::fmt::Write as _;
@@ -106,11 +112,20 @@ pub fn canonical_bytes(value: &Json) -> Vec<u8> {
 
 /// `json.loads(text)` for the inputs Sylvia accepts.
 ///
-/// Stricter than Python in the three declared ways listed in the module documentation, so a
-/// value never silently changes between the two implementations.
+/// Stricter than Python in the declared ways listed in the module documentation, so a value
+/// never silently changes between the two implementations. Text Python refuses gets Python's
+/// `JSONDecodeError` and its exact message (`"Expecting value: line 1 column 1 (char 0)"`);
+/// only text Python reads and this refuses gets this module's own "Invalid JSON" message.
 pub fn loads(text: &str) -> Result<Json, CodedError> {
-    let text = python_integers(text)?;
-    serde_json::from_str(&text).map_err(|error| CodedError::rejected(format!("Invalid JSON: {error}")))
+    let parsed = python_integers(text).and_then(|rewritten| {
+        serde_json::from_str(&rewritten)
+            .map_err(|error| CodedError::rejected(format!("Invalid JSON: {error}")))
+    });
+    parsed.map_err(|error| match decode_error::first_error(text) {
+        Some((message, position)) => CodedError::rejected(decode_error::message(text, message, position))
+            .with_error_type("JSONDecodeError"),
+        None => error,
+    })
 }
 
 /// `repr(value)` for a Python float, which is also how `json.dumps` writes it.

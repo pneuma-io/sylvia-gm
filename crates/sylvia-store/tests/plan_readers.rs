@@ -102,12 +102,15 @@ fn check(label: &str, connection: &Connection, got: StoreResult<Json>, want: &Js
                 error.rejection().unwrap_or_else(|| panic!("{label}: Rust fault {error:?}, Python {want}"));
             assert_eq!((coded.error_type, coded.message.as_str()), (Some("ValueError"), message), "{label}");
         }
-        // `json.JSONDecodeError` is a `ValueError`. `sylvia_base::pyjson::loads` reports its own
-        // text, not CPython's decoder message (a declared difference, in the lane 3 ledger).
+        // `json.JSONDecodeError`, a `ValueError`, with CPython's text (`sylvia_base::pyjson`).
         "JSONDecodeError" => {
             let coded =
                 error.rejection().unwrap_or_else(|| panic!("{label}: Rust fault {error:?}, Python {want}"));
-            assert_eq!(coded.error_type, Some("ValueError"), "{label}");
+            assert_eq!(
+                (coded.error_type, coded.message.as_str()),
+                (Some("JSONDecodeError"), message),
+                "{label}"
+            );
         }
         _ => {
             assert!(error.rejection().is_none(), "{label}: Rust rejection {error:?}, Python {want}");
