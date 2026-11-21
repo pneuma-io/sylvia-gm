@@ -348,9 +348,9 @@ fn completions_match_python() {
                 let usage = &response.usage;
                 assert_eq!(
                     serde_json::json!([
-                        usage.prompt_tokens,
-                        usage.completion_tokens,
-                        usage.total_tokens,
+                        usage.prompt_tokens.to_json(),
+                        usage.completion_tokens.to_json(),
+                        usage.total_tokens.to_json(),
                         usage.reasoning_tokens
                     ]),
                     want["usage"],
@@ -394,7 +394,7 @@ fn usage_sums_outside_64_bits_are_refused() {
     // A JSON object is the SDK's usage model, which declares total_tokens: a missing total reads
     // as None and becomes 0, as in Python, so the prompt + completion sum is never computed.
     let missing_total = serde_json::json!({"prompt_tokens": i64::MAX, "completion_tokens": 1});
-    assert_eq!(stream_usage(&missing_total).unwrap().0.total_tokens, 0);
+    assert_eq!(stream_usage(&missing_total).unwrap().0.total_tokens, PyValue::int(0));
     let negative_prompt =
         serde_json::json!({"prompt_tokens": i64::MIN, "cached_tokens": 5, "total_tokens": 1});
     assert_eq!(stream_usage(&negative_prompt).unwrap_err().0, COUNT_OVERFLOW);

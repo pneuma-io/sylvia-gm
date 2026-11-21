@@ -219,10 +219,14 @@ def retry_after_vectors() -> list[list]:
         "Sat, 21 Nov 2026 1_3:00:00 GMT", "Sat, 21 Nov 2026 +13:00:00 GMT", "Sat 21 Nov 2026 13:00:00 GMT",
         "Wed, 01 Jan 1986 00:00:00 GMT", "21 Nov 2026 13:00:00 z", "Sat, 21 nov 2026 13:00:60 GMT",
         "21 Nov 2026 12:30:15 GMT",
+        # Unicode decimal digits: Python's float() and int() accept them (httpx decodes UTF-8).
+        chr(0x665), chr(0x661) + chr(0x660), chr(0xFF11) + chr(0xFF12), chr(0x966) + "." + chr(0x967),
+        "Sat, " + chr(0x662) + chr(0x661) + " Nov 2026 13:00:00 GMT", "21 Nov 2026 1" + chr(0x663) + ":00:00 GMT",
+        chr(0xB2), "1" * 30, "21 Nov 2026 13:00:00 +" + "9" * 25, "Sat, 21 Nov " + "9" * 25 + " 13:00:00 GMT",
     ]
     out = []
     for value in values:
-        headers = {} if value is None else {"retry-after": value.encode("latin-1")}
+        headers = {} if value is None else {"retry-after": value.encode("utf-8")}
         error = type("E", (), {"response": httpx.Response(429, headers=headers)})()
         out.append([value, _json_float(retry_after.retry_after_seconds(error))])
     return out

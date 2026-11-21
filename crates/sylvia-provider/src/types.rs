@@ -8,12 +8,37 @@ use std::collections::BTreeSet;
 use sylvia_base::{Json, JsonMap};
 
 /// `TokenUsage`: token counts for one request.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+///
+/// The three counts hold Python's value. A stream's usage is always an integer (Python coerces
+/// it with `int(...)`), but a complete response keeps what the SDK held: `None` when missing,
+/// or `3.9`, `"12"` from a malformed reply. Code that does arithmetic or comparisons on a count
+/// must go through the helper Python's code uses there ([`PyValue::int_or_zero`] for
+/// `int(x or 0)`, [`PyValue::as_int`] for an exact `int`), so it fails where Python fails.
+#[derive(Debug, Clone, PartialEq)]
 pub struct TokenUsage {
-    pub prompt_tokens: i64,
-    pub completion_tokens: i64,
-    pub total_tokens: i64,
+    pub prompt_tokens: PyValue,
+    pub completion_tokens: PyValue,
+    pub total_tokens: PyValue,
     pub reasoning_tokens: Option<i64>,
+}
+
+impl Default for TokenUsage {
+    /// `TokenUsage()`: zero counts, no reasoning count.
+    fn default() -> Self {
+        Self::from_ints(0, 0, 0, None)
+    }
+}
+
+impl TokenUsage {
+    /// Integer counts, as the streaming path and most providers produce them.
+    pub fn from_ints(prompt: i64, completion: i64, total: i64, reasoning: Option<i64>) -> Self {
+        Self {
+            prompt_tokens: PyValue::int(prompt),
+            completion_tokens: PyValue::int(completion),
+            total_tokens: PyValue::int(total),
+            reasoning_tokens: reasoning,
+        }
+    }
 }
 
 /// A field Python keeps as whatever the provider sent. Normally text; a malformed reply (common
@@ -45,6 +70,25 @@ impl PyValue {
     /// Python's `None`.
     pub fn none() -> Self {
         Self::Other(Json::Null)
+    }
+
+    /// A Python `int`.
+    pub fn int(value: i64) -> Self {
+        Self::Other(Json::from(value))
+    }
+
+    /// The value when it is a Python `int` (not a `bool`, `float` or text), else `None`.
+    pub fn as_int(&self) -> Option<i64> {
+        match self {
+            Self::Other(Json::Number(number)) if !number.is_f64() => number.as_i64(),
+            _ => None,
+        }
+    }
+
+    /// `int(value or 0)`, with Python's failures as `Incidental` (and the integer-overflow
+    /// refusal for values beyond `i64`).
+    pub fn int_or_zero(&self) -> Result<i64, crate::pyobj::Incidental> {
+        crate::pyobj::int_or_zero(&self.to_json())
     }
 
     /// The text, when it is a `str`.
