@@ -613,3 +613,36 @@ fn errors_graphs_and_values_are_send_and_sync() {
     send_sync::<pyyaml::Composed>();
     send_sync::<Loaded>();
 }
+
+/// The repository's shipped YAML, read from the checkout as Python's `read_text` reads it
+/// (universal newlines). Python's records are kept as digests of their compact JSON.
+#[test]
+fn shipped_files_load_and_dump_as_python_does() {
+    use sylvia_base::hash::sha256_hex;
+    use sylvia_base::pyjson::{dumps, Dump};
+    let vectors = vectors();
+    let shipped = vectors["shipped"].as_array().unwrap();
+    assert!(shipped.len() >= 7);
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    for entry in shipped {
+        let path = entry["path"].as_str().unwrap();
+        let raw = std::fs::read_to_string(root.join(path)).unwrap();
+        let text = raw.replace("\r\n", "\n").replace('\r', "\n");
+        assert_eq!(
+            sha256_hex(&text),
+            entry["text_sha256"].as_str().unwrap(),
+            "{path} changed since the vectors were written"
+        );
+        for (name, loader) in [("pure", Loader::Pure), ("c", Loader::C)] {
+            let record = load_record(&text, loader);
+            assert_eq!(
+                sha256_hex(dumps(&record, Dump::WIRE)),
+                entry[format!("{name}_sha256")].as_str().unwrap(),
+                "{path} [{name}]"
+            );
+        }
+        let loaded = pyyaml::safe_load(&text).unwrap();
+        let dumped = pyyaml::safe_dump(&loaded).unwrap();
+        assert_eq!(sha256_hex(&dumped), entry["dump_sha256"].as_str().unwrap(), "{path} dump");
+    }
+}

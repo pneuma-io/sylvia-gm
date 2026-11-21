@@ -16,6 +16,7 @@ crafted values. Reference tooling only; retired with the Python source.
 from __future__ import annotations
 
 import datetime
+import hashlib
 import json
 import math
 import random
@@ -27,7 +28,7 @@ import yaml
 from yaml import nodes
 
 HERE = Path(__file__).parent
-ROOT = HERE.parents[2]
+ROOT = HERE.parents[3]
 OUTPUT = HERE / "pyyaml_vectors.json"
 LOADERS = {"pure": yaml.SafeLoader, "c": yaml.CSafeLoader}
 
@@ -430,9 +431,17 @@ def dump_values(loaded: list) -> list:
     return out
 
 
+def sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def compact(record) -> str:
+    """The text the Rust test hashes: `pyjson::Dump::WIRE`."""
+    return json.dumps(record, ensure_ascii=True, separators=(",", ":"))
+
+
 def main() -> int:
-    named = ([("shipped:" + name, text) for name, text in shipped_documents()]
-             + [("config:" + name, text) for name, text in recorded_configs()])
+    named = [("config:" + name, text) for name, text in recorded_configs()]
     texts = [(f"scalar:{i}", t) for i, t in enumerate(scalar_documents())]
     texts += [(f"structure:{i}", t) for i, t in enumerate(STRUCTURES)]
     texts += [(f"libyaml:{i}", t) for i, t in enumerate(libyaml_documents())]
@@ -450,13 +459,26 @@ def main() -> int:
             continue
         if not name.startswith("fuzz") or len(loaded_values) < 600:
             loaded_values.append(value)
+    # The shipped files are read from the checkout, and their records kept as digests: the
+    # runtime Ruleset alone would add hundreds of megabytes of events.
+    shipped = []
+    for name, text in shipped_documents():
+        entry = {"path": name, "text_sha256": sha256(text)}
+        for loader_name, loader in LOADERS.items():
+            entry[loader_name + "_sha256"] = sha256(compact(load_record(text, loader)))
+        try:
+            dumped = yaml.safe_dump(yaml.load(text, Loader=yaml.SafeLoader), sort_keys=False, allow_unicode=True)
+            entry["dump_sha256"] = sha256(dumped)
+        except Exception as error:  # noqa: BLE001
+            entry["dump_error"] = error_record(error)
+        shipped.append(entry)
     document = {
         "python": sys.version.split()[0], "pyyaml": yaml.__version__, "libyaml": yaml.__with_libyaml__,
-        "cases": cases, "dumps": dump_values(loaded_values), "hooks": hook_vectors(),
+        "cases": cases, "shipped": shipped, "dumps": dump_values(loaded_values), "hooks": hook_vectors(),
         # `yaml.load(bytes)` (campaign_rules_update.py): the same document, marks named "<byte string>".
         "byte_inputs": [
             {"text": text, **{name: load_record(text.encode("utf-8"), loader) for name, loader in LOADERS.items()}}
-            for text in ("a: 1\n", "a: b: c\n", "a: 'x", "a: \x07\n", "﻿a: [1,\n", "k: é\nx: *y\n")
+            for text in ("a: 1\n", "a: b: c\n", "a: 'x", "a: \x07\n", BOM + "a: [1,\n", "k: é\nx: *y\n")
         ],
         # differences.md: a date reached twice is one object in Python, so safe_dump anchors it.
         "date_alias": [
