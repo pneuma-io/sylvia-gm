@@ -14,6 +14,12 @@ sylvia-domain.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+# Python seeds a str or bytes seed with SHA-512; an unseeded stream reads 16 OS bytes.
+sha2.workspace = true
+getrandom.workspace = true
+
+[dev-dependencies]
+hex.workspace = true
 
 [lints]
 workspace = true
