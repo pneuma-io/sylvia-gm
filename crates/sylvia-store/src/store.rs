@@ -287,6 +287,8 @@ impl AuthorityStore {
         // the authority's invariants; each arrives with the transaction family that owns its
         // tables (see the lane 3 ledger).
         if version == CAMPAIGN_SCHEMA_VERSION {
+            // `verify_f5_campaign_authority` runs before this in Python; it is still to come.
+            crate::continuity::verify_authority(connection)?;
             // Exclusive owner startup cannot inherit a live provider attempt.
             connection.execute(
                 "UPDATE provider_private_records SET status = 'interrupted' WHERE status = 'partial'",

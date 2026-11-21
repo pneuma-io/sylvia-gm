@@ -144,7 +144,7 @@ fn read_messages(connection: &Connection, session_id: &str) -> StoreResult<Vec<S
 }
 
 /// Python's `==` between two JSON values: `1 == 1.0` and `True == 1`, dict order ignored.
-fn py_eq(left: &Json, right: &Json) -> bool {
+pub(crate) fn py_eq(left: &Json, right: &Json) -> bool {
     fn number(value: &Json) -> Option<f64> {
         match value {
             Json::Bool(flag) => Some(f64::from(u8::from(*flag))),
