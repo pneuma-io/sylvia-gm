@@ -1929,9 +1929,9 @@ def run(
                     )
                 elif isinstance(error, ProviderConnectionError):
                     message = (
-                        "Sylvia could not connect to the provider. Check the connection address, "
-                        "network, and whether your local model server is running, then retry. "
-                        "Saved work is kept."
+                        "Sylvia could not connect to the provider. Check your network and this "
+                        "connection's address (for a local model, that its server is running), "
+                        "then retry. Saved work is kept."
                     )
                 elif isinstance(error, InvalidRequestError):
                     message = (

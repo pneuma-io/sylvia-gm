@@ -2283,10 +2283,15 @@ test('campaign opening continues in its GM session after navigation to Builder',
   assert.equal(h.node('player-input').value, 'My draft');
   assert.equal(h.state.sessionActivities.get('gm').phase, 'completed');
   // The next interview reuses the warning controls after the first handoff leaves it.
-  h.state.bridge.model_guidance = async () => ({ warning_required: true, status: 'unrated' });
+  h.state.bridge.model_guidance = async () => ({
+    warning_required: true, status: 'unrated', minimum_tier_id: 'sylvia.capability.t06' });
   await h.openCampaign('campaign', 'interview');
   await h.finalizeSelectedConstruction();
   assert.equal(h.node('model-guidance-warning').hidden, false);
+  // The notice is in player words: no tier id or internal wording (#258).
+  const notice = h.node('model-guidance-warning-text').textContent;
+  assert.match(notice, /hasn’t been tested with this model on these rules/);
+  assert.doesNotMatch(notice, /sylvia\.capability|empirical|placement/);
   assert.equal(h.node('continue-model-guidance-btn').disabled, false);
   assert.equal(h.node('dismiss-model-guidance-btn').disabled, false);
 });

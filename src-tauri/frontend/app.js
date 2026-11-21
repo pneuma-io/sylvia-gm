@@ -4373,15 +4373,14 @@ const SylviaGMFrontend = (() => {
     $('model-guidance-warning').hidden = true;
   }
 
+  // Player wording only: the tier ids stay in the saved guidance, never in the text (#258).
   function guidanceWarningText(guidance) {
     if (guidance.status === 'below') {
-      return `This exact model is placed at ${guidance.placement_tier_id}, below this ` +
-        `ruleset's minimum ${guidance.minimum_tier_id}. You can continue explicitly, ` +
-        'but Sylvia may be less reliable with this ruleset.';
+      return 'Sylvia’s tests rate this model below what these rules need, so the Game ' +
+        'Master may make more mistakes with them. You can still continue with it.';
     }
-    return `This exact model has no empirical Sylvia GM capability placement for this ` +
-      `ruleset's minimum ${guidance.minimum_tier_id}. You can continue explicitly, ` +
-      'but the model is currently unrated.';
+    return 'Sylvia hasn’t been tested with this model on these rules yet, so it may be ' +
+      'less reliable. You can still continue with it.';
   }
 
   function showModelGuidanceWarning(guidance, selected) {
@@ -4392,8 +4391,8 @@ const SylviaGMFrontend = (() => {
       guidance,
     };
     $('model-guidance-warning-title').textContent = guidance.status === 'below'
-      ? 'Selected model is below the ruleset minimum'
-      : 'Selected model is not yet rated';
+      ? 'This model is rated below these rules’ needs'
+      : 'This model isn’t rated for these rules yet';
     $('model-guidance-warning-text').textContent = guidanceWarningText(guidance);
     $('model-guidance-warning').hidden = false;
   }
@@ -4411,13 +4410,12 @@ const SylviaGMFrontend = (() => {
       badge.textContent = 'Model guidance: not applicable (no ruleset)';
       badge.title = 'No ruleset minimum applies to this campaign.';
     } else if (guidance.status === 'meets') {
-      badge.textContent = `Model guidance: ${guidance.placement_tier_id} meets ` +
-        `${guidance.minimum_tier_id}`;
-      badge.title = 'This placement is backed by the recorded empirical evidence identity.';
+      badge.textContent = 'Model guidance: rated for these rules';
+      badge.title = 'Sylvia’s tests rate this model as meeting what these rules need.';
     } else {
-      const placement = guidance.placement_tier_id || 'unrated';
-      badge.textContent = `Model guidance override recorded: ${placement} / minimum ` +
-        `${guidance.minimum_tier_id}`;
+      badge.textContent = guidance.status === 'below'
+        ? 'Model guidance: continued with a model rated below these rules’ needs'
+        : 'Model guidance: continued with a model not yet rated for these rules';
       badge.title = guidanceWarningText(guidance);
     }
     badge.hidden = false;

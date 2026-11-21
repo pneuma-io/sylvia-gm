@@ -139,6 +139,8 @@ test('composer and sidebar controls remain usable in the shipped shell', { timeo
       { provider_id: 'test', model_id: 'sol' }));
     assert.equal(await page.locator('#model-guidance-warning').isVisible(), true,
       'model guidance must remain visible independently of hidden lifecycle controls and collapsed sidebars');
+    // The notice never shows the tier id it was given (#258).
+    assert.doesNotMatch(await page.locator('#model-guidance-warning').innerText(), /synthetic-minimum/);
     assert.equal(await page.locator('#continue-model-guidance-btn').isEnabled(), true);
     await page.locator('#dismiss-model-guidance-btn').click();
     assert.equal(await page.locator('#model-guidance-warning').isVisible(), false);

@@ -14,8 +14,8 @@
 const HOLD = '[hold]', FAIL = '[fail]', LATE = '[late]';
 const PROVIDER = 'test.transport', MODEL = 'test.transport/model0';
 const FAILURE = 'provider_error: Your message was saved. Sylvia could not connect to the provider. ' +
-  'Check the connection address, network, and whether your local model server is running, then ' +
-  'retry. Saved work is kept.';
+  'Check your network and this connection\'s address (for a local model, that its server is ' +
+  'running), then retry. Saved work is kept.';
 
 const reply = text => 'The Game Master answers: ' + text.replace(/\[(hold|fail|late)\]/g, '').trim();
 const slug = text => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
