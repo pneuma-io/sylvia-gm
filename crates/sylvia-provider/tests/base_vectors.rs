@@ -3,7 +3,8 @@
 //! Regenerate with `tests/vectors/generate_base_vectors.py` (needs the snapshot's Python).
 
 use serde_json::Value;
-use sylvia_provider::error::{casefold, is_context_rejection, ErrorKind, ProviderError};
+use sylvia_base::pystr::casefold;
+use sylvia_provider::error::{is_context_rejection, ErrorKind, ProviderError};
 use sylvia_provider::pyfmt::format_g;
 use sylvia_provider::reply::provider_error_reply;
 use sylvia_provider::retry::{build_delay_with, retry_after_seconds_at};

@@ -573,7 +573,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sylvia-base",
- "sylvia-domain",
  "thiserror",
  "tokio",
 ]

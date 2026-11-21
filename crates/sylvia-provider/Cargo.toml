@@ -10,7 +10,6 @@ publish.workspace = true
 
 [dependencies]
 sylvia-base.workspace = true
-sylvia-domain.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
