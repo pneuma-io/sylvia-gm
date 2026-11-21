@@ -19,6 +19,7 @@ pub mod diagnostics;
 pub mod dispatch;
 pub mod display_reads;
 pub mod protocol;
+pub mod providers;
 pub mod run;
 pub mod services;
 pub mod util;

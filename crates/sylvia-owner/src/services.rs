@@ -12,17 +12,15 @@ use futures_util::future::BoxFuture;
 use std::sync::Arc;
 use sylvia_base::{CodedResult, Json};
 use sylvia_domain::session::SessionRecord;
-use sylvia_provider::error::ProviderError;
 use sylvia_provider::provider::Provider;
 
 /// The owner's provider resolver (lane 4): Python's `provider_resolver`, `model_choices` and
 /// `reload_provider_resolver` closures in `owner_process.run`.
 pub trait ProviderResolver: Send + Sync {
-    /// `provider_resolver(session)`: the provider that answers this session.
-    fn resolve<'a>(
-        &'a self,
-        session: &'a SessionRecord,
-    ) -> BoxFuture<'a, Result<Arc<dyn Provider>, ProviderError>>;
+    /// `provider_resolver(session)`: the provider that answers this session. Python raises
+    /// `CommandRejected` (and `ValueError` or `ConfigError`) here, not `ProviderError`, so the
+    /// failure is the owner's coded reply.
+    fn resolve<'a>(&'a self, session: &'a SessionRecord) -> BoxFuture<'a, CodedResult<Arc<dyn Provider>>>;
 
     /// `list_model_choices()`.
     fn model_choices(&self) -> BoxFuture<'_, CodedResult<Vec<Json>>>;
