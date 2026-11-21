@@ -18,6 +18,7 @@
 
 pub mod bundled_packages;
 pub mod campaign_starting_world;
+pub mod character_rules;
 pub mod network_graph;
 pub mod package_materialization;
 pub mod path_guardrail;
