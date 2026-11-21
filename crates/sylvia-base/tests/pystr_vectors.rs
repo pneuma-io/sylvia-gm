@@ -36,3 +36,16 @@ fn strip_and_isspace_match_python() {
         assert_eq!(pystr::isspace(text), case["isspace"].as_bool().unwrap(), "isspace {text:?}");
     }
 }
+
+#[test]
+fn casefold_upper_and_len_match_python() {
+    let vectors = vectors();
+    let cases = vectors["cased"].as_array().unwrap();
+    assert!(cases.len() > 1500);
+    for case in cases {
+        let text = case["text"].as_str().unwrap();
+        assert_eq!(pystr::casefold(text), case["casefold"].as_str().unwrap(), "casefold {text:?}");
+        assert_eq!(pystr::upper(text), case["upper"].as_str().unwrap(), "upper {text:?}");
+        assert_eq!(pystr::len(text) as u64, case["len"].as_u64().unwrap(), "len {text:?}");
+    }
+}

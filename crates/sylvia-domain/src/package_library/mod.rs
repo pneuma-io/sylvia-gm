@@ -14,7 +14,6 @@ pub use strict_json::{
 
 use crate::authority::{str_enum, validate_authority_identity, PackageLock};
 use crate::error::{DomainError, DomainResult};
-use crate::pytext;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{pyjson, pystr, Json, JsonMap};
 
@@ -249,7 +248,7 @@ const WINDOWS_RESERVED_NAMES: &[&str] = &[
 fn windows_reserved_piece(piece: &str) -> bool {
     let name = piece.split('.').next().unwrap_or_default();
     let name = name.split(':').next().unwrap_or_default().trim_end_matches(' ');
-    WINDOWS_RESERVED_NAMES.contains(&pytext::upper(name).as_str())
+    WINDOWS_RESERVED_NAMES.contains(&pystr::upper(name).as_str())
 }
 
 /// `validate_portable_path(path)`: ordinary relative file names, also on Windows.
