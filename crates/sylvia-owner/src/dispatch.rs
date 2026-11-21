@@ -144,6 +144,12 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,
         "provider_settings" => commands::providers::handle_provider_settings(context, params).await,
+        "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
+        "remove_provider_settings" => {
+            commands::providers::handle_remove_provider_settings(context, params).await
+        }
+        "set_default_model" => commands::providers::handle_set_default_model(context, params).await,
+        "set_chat_defaults" => commands::providers::handle_set_chat_defaults(context, params).await,
         // A command marked Ported must have an arm above this one.
         _ => Err(CodedError::new("internal_error", format!("{method} is marked ported but has no handler."))),
     };

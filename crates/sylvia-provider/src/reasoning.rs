@@ -29,6 +29,28 @@ pub enum Advertised<'a> {
     Other,
 }
 
+impl<'a> Advertised<'a> {
+    /// A configuration value as `reasoning_values` sees it (`None` for a missing key).
+    pub fn from_data(value: Option<&'a sylvia_base::pyyaml::Data>) -> Self {
+        use sylvia_base::pyyaml::Data;
+        match value {
+            None | Some(Data::None) => Self::Missing,
+            Some(Data::List(items) | Data::Tuple(items)) => {
+                Self::List(items.iter().map(Data::as_str).collect())
+            }
+            Some(_) => Self::Other,
+        }
+    }
+}
+
+/// The `suggested` argument from a configuration value: `None` for a missing key or `None`.
+pub fn suggested_from_data(value: Option<&sylvia_base::pyyaml::Data>) -> Option<Option<&str>> {
+    match value {
+        None | Some(sylvia_base::pyyaml::Data::None) => None,
+        Some(value) => Some(value.as_str()),
+    }
+}
+
 /// `reasoning_values(values, suggested)`: validated native names without inventing a universal
 /// option list. `suggested` is `None` for Python's `None` and `Some(None)` for a non-text value.
 pub fn reasoning_values(

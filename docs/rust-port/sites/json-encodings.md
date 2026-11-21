@@ -19,7 +19,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/builder_references.py:404` | `reader_for_references` | Dump::INDENT2.ascii(false) | `plan_files[example["path"]] = json.dumps( json.loads(canonical_json_bytes(example["draft"])), indent=2, ensure_ascii=False, ) + "\n"` | |
 | `application/builder_references.py:410` | `reader_for_references` | Dump::INDENT2.ascii(false) | `plan_files["character-profile/profile.json"] = json.dumps( dict(profile.profile), ensure_ascii=False, indent=2, )` | |
 | `application/builder_references.py:415` | `reader_for_references` | Dump::INDENT2.ascii(false) | `"campaign-plan/plan.json": json.dumps( json.loads(canonical_json_bytes(plan["payload"])), indent=2, ensure_ascii=False ),` | |
-| `application/bundled_packages.py:488` | `read_bundled_rift_source` | Dump::CANONICAL | `return json.dumps( { "binding": authority.ruleset.as_payload(), "campaign_setting": authority.setting.as_payload(), "package_closure_sha256": autho...` | |
+| `application/bundled_packages.py:488` | `read_bundled_rift_source` | Dump::CANONICAL | `return json.dumps( { "binding": authority.ruleset.as_payload(), "campaign_setting": authority.setting.as_payload(), "package_closure_sha256": autho...` |  `sylvia-app` bundled_vectors |
 | `builder/_interview_extractor.py:197` | `InterviewExtractor._build_extraction_prompt` | Dump::INDENT2 | `lines.append(json.dumps(raw_answers, indent=2))` | |
 | `campaign/_folder.py:466` | `_write_status_atomic` | Dump::INDENT2 | `tmp_path.write_text(json.dumps(data, indent=2), encoding="utf-8")` | |
 | `campaign/_folder.py:502` | `_update_status` | Dump::INDENT2 | `tmp_path.write_text(json.dumps(data, indent=2), encoding="utf-8")` | |
@@ -181,8 +181,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/desktop_update/helper.py:260` | `_write` | Dump::WIRE | `stream.write(json.dumps(value, separators=(",", ":")) + "\n")` | |
-| `application/desktop_update/identity.py:34` | `main` | Dump::WIRE | `print(json.dumps(runtime_identity(), separators=(",", ":")))` | |
+| `application/desktop_update/helper.py:260` | `_write` | Dump::WIRE | `stream.write(json.dumps(value, separators=(",", ":")) + "\n")` | `helper_vectors` (`main`'s replies) |
+| `application/desktop_update/identity.py:34` | `main` | Dump::WIRE | `print(json.dumps(runtime_identity(), separators=(",", ":")))` | `owner_update_modes` |
 | `application/desktop_update/manifest.py:140` | `canonical_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False ).encode("utf-8")` | `local-services`, `sylvia-owner` diagnostics tests |
 | `application/desktop_update/recovery_service.py:138` | `_write` | Dump::WIRE | `stream.write(json.dumps(row, separators=(",", ":")) + "\n")` | |
 | `build_workspace.py:29` | `BuildWorkspace.create` | Dump::DEFAULT | `(path / ".invocation.json").write_text(json.dumps({"token": token, "pid": os.getpid()}))` | |

@@ -10,13 +10,13 @@ file; a row moves to another lane only through the manager.
 | Python file | Lines | Rust target | Status | Notes |
 | --- | ---: | --- | --- | --- |
 | `src/sylvia_gm/application/__init__.py` | 1 | `sylvia-app::__init__` | pending | |
-| `src/sylvia_gm/application/_srd_lite_character_legacy.py` | 315 | `sylvia-app::_srd_lite_character_legacy` | pending | |
+| `src/sylvia_gm/application/_srd_lite_character_legacy.py` | 315 | `sylvia-app::srd_lite_character_compatibility` | ported | Data only: the compressed Lite 0.2 contract is exported as `sylvia-app/src/srd_lite_legacy_character_contract.json` by `generate_srd_lite_legacy_contract.py`; read by `srd_lite_character_compatibility` |
 | `src/sylvia_gm/application/_yaml_bounds.py` | 71 | `sylvia-domain::yaml_bounds` | ported | In `sylvia-domain`, not `sylvia-app`: lane 2's `package_runtime` and the Builder's Ruleset source both run it from a `construct_document` hook. `yaml_bounds_vectors` |
 | `src/sylvia_gm/application/builder_references.py` | 435 | `sylvia-app::builder_references` | pending | |
 | `src/sylvia_gm/application/builder_session_migration.py` | 136 | `sylvia-app::builder_session_migration` | pending | |
 | `src/sylvia_gm/application/builder_source_selection.py` | 123 | `sylvia-app::builder_source_selection` | pending | |
 | `src/sylvia_gm/application/bundled_campaign_plans.py` | 271 | `sylvia-app::bundled_campaign_plans` | pending | |
-| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | pending | |
+| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`). `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` wait on `plan_snapshot.py`, `bundled_campaign_content_catalog` on `bundled_campaign_plans.py` |
 | `src/sylvia_gm/application/bundled_starter_characters.py` | 150 | `sylvia-app::bundled_starter_characters` | pending | |
 | `src/sylvia_gm/application/campaign_library_selection.py` | 668 | `sylvia-app::campaign_library_selection` | pending | |
 | `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | pending | |
@@ -32,12 +32,12 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/library_sources.py` | 223 | `sylvia-app::library_sources` | pending | |
 | `src/sylvia_gm/application/network_graph.py` | 433 | `sylvia-app::network_graph` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | pending | |
-| `src/sylvia_gm/application/package_materialization.py` | 260 | `sylvia-app::package_materialization` | pending | |
+| `src/sylvia_gm/application/package_materialization.py` | 260 | `sylvia-app::package_materialization` | ported | `bundled_vectors` (every bundled archive byte for byte, synthetic drafts); ZIP bytes through `package_archive::zipfile_write` |
 | `src/sylvia_gm/application/plan_bundle.py` | 164 | `sylvia-app::plan_bundle` | pending | |
 | `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | pending | |
 | `src/sylvia_gm/application/plan_snapshot.py` | 113 | `sylvia-app::plan_snapshot` | pending | |
 | `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | pending | |
-| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | pending | |
+| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads; the rest of `plan_spatial_admission.py` waits on lane 2's `tactical_grid` and `spatial` |
 | `src/sylvia_gm/application/ready_campaigns.py` | 504 | `sylvia-app::ready_campaigns` | pending | |
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
 | `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | pending | |
@@ -46,13 +46,13 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |
 | `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-domain::schema_admission` | ported | In `sylvia-domain`, not `sylvia-app`: package archive admission (this crate) and the engine, store and agent lanes call it |
 | `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | ported | `app_leaves_vectors` |
-| `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | pending | |
+| `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | ported | `srd_lite_compat_vectors` (the bundled player declaration stands in for the lost 0.3.0 one) |
 | `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/builder/__init__.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_interview_extractor.py` | 347 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_interview_manifest.py` | 57 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::path_guardrail` | ported | `guardrail_vectors`, one file per platform (`Path.resolve` differs); Windows and Linux vectors both checked |
+| `src/sylvia_gm/builder/_interview_extractor.py` | 347 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/builder/_interview_manifest.py` | 57 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_package_snapshots.py` | 222 | `sylvia-app::builder` | pending | |
@@ -63,7 +63,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_setting_draft_check.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_setting_materializer.py` | 150 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_workspace_files.py` | 114 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_workspace_files.py` | 114 | `sylvia-app::workspace_files` | ported | Unit test: stale versions, unique and overlapping literals, atomic replace with no leftover temporary file |
 | `src/sylvia_gm/campaign/__init__.py` | 10 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/campaign/_folder.py` | 600 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/campaign/rift.py` | 543 | `sylvia-domain` | pending | |
@@ -135,3 +135,7 @@ read only by `session/_reveal_guard.py`, whose `RevealGuard` is never constructe
 asserts it is not). Lane 4 drops the type-only references when it ports those files. The
 Builder prompt text that names `create_campaign_folder` (`builder/_prompts.py`) is model-read
 and stays byte for byte. `campaign/rift.py` is live and is ported.
+`builder/_interview_extractor.py` and `builder/_interview_manifest.py` are retired the same way (agreed
+21 Nov 2026): they reference only each other and `builder/__init__.py`'s re-export, and nothing in
+`src/`, `scripts/`, `tests/`, SylviaBench or Trigger Discipline uses `InterviewExtractor`,
+`InterviewManifest` or `ExtractionError`. The `builder/__init__.py` port drops the two re-exports.

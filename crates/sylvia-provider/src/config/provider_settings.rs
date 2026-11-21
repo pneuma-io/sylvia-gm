@@ -27,11 +27,11 @@ pub struct ConfigSources<'a> {
     pub env: &'a Environment,
 }
 
-fn text(value: &str) -> Data {
+pub(super) fn text(value: &str) -> Data {
     Data::Str(value.to_owned())
 }
 
-fn dict(pairs: Vec<(&str, Data)>) -> Data {
+pub(super) fn dict(pairs: Vec<(&str, Data)>) -> Data {
     Data::Dict(pairs.into_iter().map(|(key, value)| (text(key), value)).collect())
 }
 
@@ -44,12 +44,12 @@ fn opt_int(value: Option<i64>) -> Data {
 }
 
 /// `mapping.get(key)` when the value is a mapping, `None` otherwise.
-fn mapping_get<'a>(mapping: Option<&'a Data>, key: &str) -> Option<&'a Data> {
+pub(super) fn mapping_get<'a>(mapping: Option<&'a Data>, key: &str) -> Option<&'a Data> {
     mapping.filter(|value| value.as_dict().is_some()).and_then(|value| value.get_str(key))
 }
 
 /// `_PROFILE_ID.fullmatch(value)`: `[a-z][a-z0-9_]{0,63}`.
-fn is_profile_id(value: &str) -> bool {
+pub(super) fn is_profile_id(value: &str) -> bool {
     let mut chars = value.chars();
     matches!(chars.next(), Some('a'..='z'))
         && value.len() <= 64
@@ -65,7 +65,7 @@ fn is_native_setting(value: &str) -> bool {
 }
 
 /// `_native_setting(value)`: a saved native option name, or `None`.
-fn native_setting(value: Option<&Data>) -> Data {
+pub(super) fn native_setting(value: Option<&Data>) -> Data {
     match value {
         Some(Data::Str(name)) if is_native_setting(name) => text(name),
         _ => Data::None,
@@ -73,7 +73,7 @@ fn native_setting(value: Option<&Data>) -> Data {
 }
 
 /// `_provider_preset_id(provider_id, raw)`.
-fn provider_preset_id(provider_id: &str, raw: Option<&Data>) -> &'static str {
+pub(super) fn provider_preset_id(provider_id: &str, raw: Option<&Data>) -> &'static str {
     if let Some(Data::Str(declared)) = mapping_get(raw, "preset_id") {
         if let Some(found) = preset(declared) {
             return found.id;
@@ -88,7 +88,7 @@ pub fn canonical_model_id(provider_id: &str, upstream_model_id: &str) -> String 
 }
 
 /// `_configured_model_exists(document, provider_id, canonical_model_id)`.
-fn configured_model_exists(document: &Data, provider_id: &str, canonical: &str) -> bool {
+pub(super) fn configured_model_exists(document: &Data, provider_id: &str, canonical: &str) -> bool {
     let provider = mapping_get(document.get_str("providers"), provider_id);
     let Some(Data::List(models)) = mapping_get(provider, "models") else { return false };
     models.iter().any(|model| match model.as_dict().and_then(|_| model.get_str("id")) {
@@ -127,7 +127,12 @@ pub fn require_configured_model(
 }
 
 /// `_model_integer(value, field, minimum, maximum)`.
-fn model_integer(value: &Data, field: &str, minimum: i64, maximum: i64) -> Result<i64, ConfigFailure> {
+pub(super) fn model_integer(
+    value: &Data,
+    field: &str,
+    minimum: i64,
+    maximum: i64,
+) -> Result<i64, ConfigFailure> {
     let Data::Int(number) = value else {
         return Err(ConfigFailure::config(format!("Provider model {field} must be an integer")));
     };
@@ -147,7 +152,7 @@ fn optional_model_integer(value: Option<&Data>, field: &str) -> Result<Option<i6
 }
 
 /// `_capacity_source(value, fallback=...)`.
-fn capacity_source<'a>(value: Option<&'a Data>, fallback: &'a str) -> &'a str {
+pub(super) fn capacity_source<'a>(value: Option<&'a Data>, fallback: &'a str) -> &'a str {
     match value {
         Some(Data::Str(name)) if CONTEXT_CAPACITY_SOURCES.contains(&name.as_str()) => name,
         _ => fallback,
@@ -155,7 +160,7 @@ fn capacity_source<'a>(value: Option<&'a Data>, fallback: &'a str) -> &'a str {
 }
 
 /// `_capacity_timestamp(value)`: one owner-recorded timestamp, never invented.
-fn capacity_timestamp(value: Option<&Data>) -> Option<&str> {
+pub(super) fn capacity_timestamp(value: Option<&Data>) -> Option<&str> {
     match value {
         Some(Data::Str(stamp)) if !stamp.is_empty() => Some(stamp),
         _ => None,
@@ -208,7 +213,7 @@ pub(crate) fn capacity_from_model_row(
     }))
 }
 
-fn capacity_pairs(capacity: &ResolvedContextCapacity) -> Vec<(&'static str, Data)> {
+pub(super) fn capacity_pairs(capacity: &ResolvedContextCapacity) -> Vec<(&'static str, Data)> {
     capacity
         .projection()
         .into_iter()
@@ -265,7 +270,7 @@ fn project_configured_model(
 }
 
 /// `_chat_defaults(document)`: the saved new-chat effort and speed; `None` where unset.
-fn chat_defaults(document: &Data) -> Data {
+pub(super) fn chat_defaults(document: &Data) -> Data {
     let raw = document.get_str("chat_defaults").filter(|value| value.as_dict().is_some());
     dict(vec![
         ("reasoning_effort", native_setting(mapping_get(raw, "reasoning_effort"))),

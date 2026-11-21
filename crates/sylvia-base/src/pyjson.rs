@@ -14,6 +14,10 @@
 //! [`loads`] refuses text Python refuses with Python's `JSONDecodeError` text, located as
 //! CPython's scanner locates it (`decode_error`).
 //!
+//! [`loads_hooked`] reads as `json.loads(text, object_pairs_hook=..., parse_constant=...)` with
+//! hooks that refuse duplicate keys and the `NaN`/`Infinity` literals, reporting the first failure
+//! in CPython's scan order ([`HookFailure`]).
+//!
 //! Known, declared limits (see `docs/rust-port/differences.md`):
 //! - integers outside `i64`/`u64` are rejected by [`loads`]; Python accepts arbitrary size;
 //! - lone UTF-16 surrogates cannot exist in a Rust `String`; Python strings can hold them;
@@ -23,6 +27,8 @@
 //!   recursion limit; 127 levels read); Python reads roughly a thousand, its interpreter stack.
 
 mod decode_error;
+
+pub use decode_error::{loads_hooked, HookFailure, HookPolicy, Hooked, JsonDecodeError};
 
 use crate::{CodedError, Json};
 use std::fmt::Write as _;

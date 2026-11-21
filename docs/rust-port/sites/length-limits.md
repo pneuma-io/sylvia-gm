@@ -44,7 +44,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/plan_bundle.py:84` | `_read_bundle` | len() against a limit | `if len(data) > PLAN_BUNDLE_BYTE_LIMIT:` | |
 | `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` | |
 | `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` | |
-| `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` | |
+| `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` |  `sylvia-app` plan_state_vectors |
 | `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
 | `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
 | `application/reusable_participants.py:264` | `parse_setting_character` | len() against a limit | `or len(source.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
@@ -347,9 +347,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/drafts.py:29` | `validate_drafts` | len() against a limit | `or len(value["sessions"]) > MAX_SESSIONS` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/drafts.py:57` | `validate_drafts` | len() against a limit | `or len(row["questions"]) > MAX_QUESTIONS` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/drafts.py:75` | `validate_drafts` | len() against a limit | `if len(canonical_bytes(value)) > MANIFEST_LIMIT:` | `local-services`, `sylvia-owner` tests |
-| `application/desktop_update/helper.py:335` | `main` | len() against a limit | `or not 0 < len(row[name]) <= 4096` | |
-| `application/desktop_update/installed.py:78` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
-| `application/desktop_update/installed.py:85` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
+| `application/desktop_update/helper.py:335` | `main` | len() against a limit | `or not 0 < len(row[name]) <= 4096` | `helper_vectors` (`main: refusals before any native access`) |
+| `application/desktop_update/installed.py:78` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | `helper_vectors` (registry: too long, a surrogate pair), `installed::tests::the_real_registry_reads_like_python` |
+| `application/desktop_update/installed.py:85` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | `helper_vectors` (registry), `installed::tests::the_real_registry_reads_like_python` |
 | `application/desktop_update/launch.py:49` | `Installation._from_launch` | len() against a limit | `or not 0 < len(value[name]) <= 4096` | `controller_vectors` |
 | `application/desktop_update/manifest.py:61` | `Version.parse` | len() against a limit | `if not isinstance(value, str) or len(value) > 128:` | `update_vectors` |
 | `application/desktop_update/manifest.py:191` | `release_url` | len() against a limit | `or len(value) > 2048` | `update_vectors` |

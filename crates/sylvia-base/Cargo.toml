@@ -17,5 +17,9 @@ hex.workspace = true
 regex.workspace = true
 unicode-normalization.workspace = true
 
+# `winreg`'s registry calls (rule 9).
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true, features = ["Win32_System_Registry"] }
+
 [lints]
 workspace = true

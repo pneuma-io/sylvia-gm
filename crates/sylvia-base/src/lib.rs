@@ -13,6 +13,8 @@
 //! - [`pyurl`]: `urllib.parse`'s `urlsplit`, `urlunsplit` and strict `unquote`, CPython 3.12.
 //! - [`pyyaml`]: YAML loaded and dumped exactly as PyYAML 6.0.3 does (`SafeLoader`,
 //!   `CSafeLoader`, `safe_dump`).
+//! - [`winreg`]: `winreg.QueryValueEx` as CPython 3.12 reads the current user's registry
+//!   (read-only; the rule 9 module for the registry).
 
 pub mod error;
 pub mod hash;
@@ -21,6 +23,7 @@ pub mod pyjson;
 pub mod pystr;
 pub mod pyurl;
 pub mod pyyaml;
+pub mod winreg;
 
 pub use error::{CodedError, CodedResult};
 

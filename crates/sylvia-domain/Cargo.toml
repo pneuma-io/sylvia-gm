@@ -16,6 +16,8 @@ thiserror.workspace = true
 fancy-regex.workspace = true
 unicode-normalization.workspace = true
 flate2.workspace = true
+# Enables libz-sys's `static` build, so flate2's zlib backend is madler zlib from source.
+libz-sys.workspace = true
 sha2.workspace = true
 hex.workspace = true
 

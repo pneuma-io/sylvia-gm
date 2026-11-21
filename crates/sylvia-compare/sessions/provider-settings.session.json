@@ -1,0 +1,55 @@
+{
+  "name": "provider-settings",
+  "description": "Save, refuse, read, default, choose chat defaults for and remove provider connections on an empty data folder, with the resolver reloading after each change, then shut down.",
+  "summarise_tables": ["^package_", "^packages$"],
+  "steps": [
+    {"method": "save_provider_settings", "expect_ok": true, "params": {
+      "preset_id": "custom", "display_name": "Example Service", "base_url": "https://example.test/v1/",
+      "credential": "sk-session-disposable", "model_id": "example-large", "model_name": "Example Large",
+      "context_window": 65536, "max_output_tokens": 4096, "transport": "chat_completions",
+      "headers": {"X-Example": "disposable"}
+    }, "save": {"custom_id": "/result/provider_id", "custom_model": "/result/canonical_model_id"}},
+    {"method": "save_provider_settings", "expect_ok": true, "params": {
+      "provider_id": "lm_studio", "preset_id": "lm_studio", "model_id": "qwen-local",
+      "declared_context_window": 32768, "configured_context_window": 16384,
+      "configured_context_observed_at": "2026-11-21T08:00:00+00:00", "builder_output_tokens": 2048
+    }},
+    {"method": "save_provider_settings", "params": {
+      "provider_id": "openai", "preset_id": "openai", "credential": "sk-session-disposable",
+      "model_id": "gpt-6-sol", "transport": "chat_completions"
+    }},
+    {"method": "save_provider_settings", "params": {
+      "preset_id": "custom", "base_url": "https://example.test", "credential": "k", "model_id": "m",
+      "headers": {"Bad Name": "1"}
+    }},
+    {"method": "save_provider_settings", "params": {"preset_id": "nope", "model_id": "m"}},
+    {"method": "provider_settings"},
+    {"method": "model_choices"},
+    {"method": "set_default_model", "params": {"provider_id": "lm_studio", "model_id": "lm-studio/qwen-local"}},
+    {"method": "set_default_model", "params": {"provider_id": "lm_studio", "model_id": "lm-studio/absent"}},
+    {"method": "set_chat_defaults", "params": {"provider_id": "${custom_id}", "model_id": "${custom_model}"}},
+    {"method": "set_chat_defaults", "params": {
+      "provider_id": "${custom_id}", "model_id": "${custom_model}", "reasoning_effort": "mode_default", "speed": "standard"
+    }},
+    {"method": "set_chat_defaults", "params": {
+      "provider_id": "${custom_id}", "model_id": "${custom_model}", "reasoning_effort": "high"
+    }},
+    {"method": "set_chat_defaults", "params": {
+      "provider_id": "${custom_id}", "model_id": "${custom_model}", "speed": "fast"
+    }},
+    {"method": "set_chat_defaults", "params": {"provider_id": "lm_studio", "model_id": "lm-studio/absent"}},
+    {"method": "provider_settings"},
+    {"method": "remove_provider_settings", "expect_ok": true, "params": {"provider_id": "lm_studio"}},
+    {"method": "remove_provider_settings", "params": {"provider_id": "Not Valid"}},
+    {"method": "provider_settings"},
+    {"method": "model_choices"},
+    {"method": "shutdown"}
+  ],
+  "rules": {
+    "ignore_keys": ["diagnostic_id"],
+    "scrub": [
+      {"pattern": "data: [A-Za-z0-9+/=]{40,}", "with": "data: <protected credential>"}
+    ],
+    "volatile_files": ["^diagnostics/"]
+  }
+}

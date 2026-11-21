@@ -213,11 +213,12 @@ rules check, an attack); lane 4 says what those need.
 | `builder-chat-edit` | Renaming and deleting Builder chats before any exists: missing parameters, display names, identities, the exact deletion confirmation, an unknown chat | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update` | The desktop updater as 0.4.1 ships it (no trusted key): the unavailable state, every refusal, the request and host checks, the reservation, abort and shutdown rules, both update gates, and the startup check with seeded receipts and launch fields | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update-recovery` | The recovery-only owner: an update interrupted mid-apply met by the desktop's update context, its bounded recovery pipe, the refused methods and shutdown, and launches without a reply or with the ordinary refusal | recorded on Windows and Linux; five reproductions on each |
+| `provider-settings` | Provider connections on an empty folder: saving a custom service (identity, headers, sealed key) and a local runtime, the refusals for a mismatched transport, a bad header and an unknown preset, the default model, new-chat defaults with their effort and speed checks, removal, and the resolver reloading after each change | recorded on Windows and Linux; reproduces on a second run |
 
-The last three follow the Stop, Retry and reopen contract fixtures in
+`stop-redirect`, `fail-retry` and `reopen` follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop
 sends camelCase ones.
 
 Wanted next, each by the lane that ports the behaviour: an SRD Lite check and an attack
 (lane 2); a Builder draft edited and published (lanes 1 and 4); archive, restore, export and
-recover (lane 3); provider settings save, remove and switch (lane 4).
+recover (lane 3); a chat's model switch (lane 4).

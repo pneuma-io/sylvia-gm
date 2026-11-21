@@ -1,12 +1,12 @@
 //! `application/desktop_update/preparation.py`: one verified download, an immutable copy of
 //! the application and a coherent data checkpoint, bound to one preparation attempt.
 //!
-//! A portable copy is complete. An installed copy is read and checked up to its replacement
-//! (its manifests and both retained installers); the replacement itself (`installed.py`)
-//! needs the registry and the installer, which come with the update helper, and answers
-//! [`super::service::PREPARATION_PENDING`] until then.
+//! Both distributions are complete: a portable copy replaces its files itself
+//! (`replacement.py`), an installed copy runs its retained, verified NSIS installers
+//! (`installed.py`).
 
 use super::checkpoint::{acquire_update_data_lock, DataCheckpoint, STORAGE_COMPATIBILITY};
+use super::installed::{run_nsis, InstalledReplacement, Installer, Registration, WindowsRegistration};
 use super::manifest::{
     bounded_json, parse_current_recovery_manifest, parse_manifest, Context, KeyRing, Manifest, PayloadFile,
     Version, MANIFEST_LIMIT,
@@ -21,7 +21,8 @@ use super::storage::{
 use super::update_error;
 use crate::util::uuid4_hex;
 use std::path::{Path, PathBuf};
-use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use std::sync::Arc;
+use sylvia_base::{CodedResult, Json, JsonMap};
 
 /// The phases in which a prepared attempt is still the selected one.
 const SELECTED_PHASES: [&str; 10] = [
@@ -47,25 +48,41 @@ pub fn new_attempt() -> String {
 #[derive(Debug, Clone)]
 pub enum Replacement {
     Portable(Box<PortableReplacement>),
+    Installed(Box<InstalledReplacement>),
 }
 
-fn installed_pending() -> CodedError {
-    CodedError::new(
-        super::service::PREPARATION_PENDING,
-        "The Rust owner does not replace installed copies yet.",
-    )
+/// The registration an installed copy is checked against and the installer it runs:
+/// `registration=` and `run_installer=` in Python, the real ones unless a test gives others.
+#[derive(Clone)]
+pub struct InstalledHooks {
+    pub registration: Arc<dyn Registration>,
+    pub run: Installer,
+}
+
+impl Default for InstalledHooks {
+    fn default() -> Self {
+        Self { registration: Arc::new(WindowsRegistration), run: Arc::new(run_nsis) }
+    }
+}
+
+impl std::fmt::Debug for InstalledHooks {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("InstalledHooks")
+    }
 }
 
 impl Replacement {
     pub fn prepare(&mut self) -> CodedResult<()> {
         match self {
             Self::Portable(replacement) => replacement.prepare(),
+            Self::Installed(replacement) => replacement.prepare(),
         }
     }
 
     pub fn apply(&mut self, processes_exited: &dyn Fn() -> CodedResult<bool>) -> CodedResult<()> {
         match self {
             Self::Portable(replacement) => replacement.apply(processes_exited),
+            Self::Installed(replacement) => replacement.apply(processes_exited),
         }
     }
 
@@ -76,24 +93,28 @@ impl Replacement {
     ) -> CodedResult<()> {
         match self {
             Self::Portable(replacement) => replacement.rollback(processes_exited, compatibility),
+            Self::Installed(replacement) => replacement.rollback(processes_exited, compatibility),
         }
     }
 
     pub fn confirm(&mut self) -> CodedResult<()> {
         match self {
             Self::Portable(replacement) => replacement.confirm(),
+            Self::Installed(replacement) => replacement.confirm(),
         }
     }
 
     pub fn verify_rollback(&mut self) -> CodedResult<()> {
         match self {
             Self::Portable(replacement) => replacement.verify_rollback(),
+            Self::Installed(replacement) => replacement.verify_rollback(),
         }
     }
 
     pub fn helper_payload(&mut self) -> CodedResult<(PathBuf, PayloadFile)> {
         match self {
             Self::Portable(replacement) => replacement.helper_payload(),
+            Self::Installed(replacement) => replacement.helper_payload(),
         }
     }
 }
@@ -115,6 +136,7 @@ pub struct PreparedUpdate {
     pub previous: Option<Manifest>,
     root_identity: Identity,
     live_identity: Identity,
+    installed: InstalledHooks,
     replacement: Option<Replacement>,
 }
 
@@ -182,8 +204,16 @@ impl PreparedUpdate {
             previous,
             root_identity,
             live_identity,
+            installed: InstalledHooks::default(),
             replacement: None,
         })
+    }
+
+    /// The registration and installer an installed copy uses instead of the real ones.
+    pub fn with_installed(mut self, installed: InstalledHooks) -> Self {
+        self.installed = installed;
+        self.replacement = None;
+        self
     }
 
     /// `_check()`.
@@ -203,11 +233,23 @@ impl PreparedUpdate {
     pub fn replacement(&mut self) -> CodedResult<&mut Replacement> {
         self.check()?;
         if self.replacement.is_none() {
-            if self.previous.is_some() {
-                return Err(installed_pending());
-            }
-            let replacement = PortableReplacement::new(&self.live, &self.stage, &self.manifest)?;
-            self.replacement = Some(Replacement::Portable(Box::new(replacement)));
+            let replacement = match &self.previous {
+                None => Replacement::Portable(Box::new(PortableReplacement::new(
+                    &self.live,
+                    &self.stage,
+                    &self.manifest,
+                )?)),
+                Some(previous) => Replacement::Installed(Box::new(InstalledReplacement::new(
+                    &self.live,
+                    &self.stage,
+                    &self.manifest,
+                    previous,
+                    self.installed.registration.clone(),
+                    self.installed.run.clone(),
+                    Some(&self.base),
+                )?)),
+            };
+            self.replacement = Some(replacement);
         }
         Ok(self.replacement.as_mut().expect("made above"))
     }

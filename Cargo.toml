@@ -49,8 +49,15 @@ hex = "0.4"
 # assert it so a later bump cannot move it silently. `backup` is the online copy the store
 # makes before schema migrations. The comparison tool's stand-in model endpoint is std::net.
 rusqlite = { version = "0.34", features = ["bundled", "backup"] }
-# Store tests only: the Python-made fixture databases are kept gzip-compressed.
-flate2 = "1"
+# DEFLATE through madler zlib, built from source by libz-sys's `static` feature (a C build, like
+# the bundled SQLite): package archives are hashed, so `zipfile`'s DEFLATE output must be zlib's
+# byte for byte, which miniz_oxide, zlib-ng and zlib-rs do not give. Also reads package archives
+# and the store tests' gzip-compressed Python fixture databases.
+flate2 = { version = "1", default-features = false, features = ["zlib"] }
+# Pinned: 1.1.24 is the last libz-sys that bundles zlib 1.3.1, the zlib of the Windows reference
+# CPython, so `zipfile`'s DEFLATE bytes match (1.1.25 bundles 1.3.2, 1.1.33 bundles 1.4). Package
+# archive hashes depend on these bytes: do not bump it without re-running zip_write_vectors.
+libz-sys = { version = "=1.1.24", default-features = false, features = ["static"] }
 # Store safe-file primitives (`infrastructure/safe_file.py`). Linux: safe openat/statat/
 # unlinkat/renameat/fsync on descriptors. Windows: handle identity without unsafe code, and the
 # three kernel32 calls with no safe binding (GetDriveTypeW, the delete disposition, MoveFileExW).
