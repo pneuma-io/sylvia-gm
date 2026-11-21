@@ -10,6 +10,7 @@
 //! - [`pystr`]: Python `str` behaviour Rust lacks (whitespace, case folding, `upper`, code-point
 //!   `len`), on Unicode 15.0.
 //! - [`pybase64`]: CPython's `binascii` base64 and the `base64` calls Sylvia makes.
+//! - [`pyurl`]: `urllib.parse`'s `urlsplit`, `urlunsplit` and strict `unquote`, CPython 3.12.
 //! - [`pyyaml`]: YAML loaded and dumped exactly as PyYAML 6.0.3 does (`SafeLoader`,
 //!   `CSafeLoader`, `safe_dump`).
 
@@ -18,6 +19,7 @@ pub mod hash;
 pub mod pybase64;
 pub mod pyjson;
 pub mod pystr;
+pub mod pyurl;
 pub mod pyyaml;
 
 pub use error::{CodedError, CodedResult};

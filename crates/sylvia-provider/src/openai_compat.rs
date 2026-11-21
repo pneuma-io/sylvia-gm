@@ -112,7 +112,7 @@ impl OpenAICompatProvider {
         let model_info =
             model_info.unwrap_or_else(|| ModelInfo::new("unknown", "Unknown", "BYOK", "byok", "byok"));
         let hostname =
-            crate::pyurl::urlsplit(base_url).map_err(|error| BuildError::Value(error.0.into()))?.hostname();
+            crate::pyurl::urlsplit(base_url).map_err(|error| BuildError::Value(error.0))?.hostname();
         let (preserve_reasoning, preserve_content) =
             chat::preserve_flags(hostname.as_deref(), &model_info.provider_key);
         let path = if model_info.transport == crate::types::transport::RESPONSES {
