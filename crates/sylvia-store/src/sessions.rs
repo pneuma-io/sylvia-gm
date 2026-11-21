@@ -104,14 +104,14 @@ fn read_builder_chat(connection: &Connection, session_id: &str) -> StoreResult<B
 }
 
 /// `sqlite_session.read_builder_chats`: newest first.
-fn read_builder_chats(connection: &Connection) -> StoreResult<Vec<BuilderChatRecord>> {
+pub(crate) fn read_builder_chats(connection: &Connection) -> StoreResult<Vec<BuilderChatRecord>> {
     let (columns, rows) =
         named_rows(connection, "SELECT * FROM standalone_builder_chats ORDER BY created_ordinal DESC", &[])?;
     rows.into_iter().map(|values| builder_chat_from_row(&Named { columns: &columns, values })).collect()
 }
 
 /// `sqlite_session.message_from_row`.
-fn message_from_row(row: &Named<'_>) -> StoreResult<SessionMessage> {
+pub(crate) fn message_from_row(row: &Named<'_>) -> StoreResult<SessionMessage> {
     let canonical_sequence = match row.get("canonical_sequence")? {
         Value::Null => None,
         _ => Some(row.int("canonical_sequence")?),

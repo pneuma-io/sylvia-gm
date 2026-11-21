@@ -262,6 +262,170 @@
     "code": "schema_identity_mismatch",
     "message": "Saved campaign records failed an integrity check"
    }
+  },
+  {
+   "name": "children_untouched",
+   "base": "children",
+   "sql": [],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "message_chronology_gap",
+   "base": "story",
+   "sql": [
+    "UPDATE agent_session_messages SET sequence = 70 WHERE session_id = 'dm-1' AND message_id = 'u-3'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "reference_content_changed",
+   "base": "story",
+   "sql": [
+    "UPDATE agent_session_messages SET content_json = replace(content_json, 'The sea answers.', 'Silence.') WHERE message_id = 'canonical-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "reference_event_missing",
+   "base": "story",
+   "sql": [
+    "UPDATE agent_session_messages SET canonical_sequence = 999 WHERE message_id = 'canonical-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "plan_revision_gap",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET plan_revision = 2"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "plan_content_changed",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = replace(content_json, 'The Drowned Bell', 'The Dry Bell')"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "plan_provenance_missing",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET provenance_json = '[\"ev-missing\"]'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "plan_payload_identity",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET payload_sha256 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "plan_revision_row_missing",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_revisions SET plan_id = NULL WHERE plan_id = 'plan-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "handoff_turn_open",
+   "base": "story",
+   "sql": [
+    "UPDATE turns SET status = 'open' WHERE turn_id = 'turn-build'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "handoff_payload_identity",
+   "base": "story",
+   "sql": [
+    "UPDATE builder_dm_handoffs SET payload_sha256 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "handoff_revision_row_missing",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_revisions SET handoff_id = NULL WHERE handoff_id = 'handoff-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "child_return_authoritative",
+   "base": "children",
+   "sql": [
+    "UPDATE agent_session_messages SET content_json = replace(content_json, '\"authoritative\":false', '\"authoritative\":true') WHERE message_id = 'evidence-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "event_payload_not_object",
+   "base": "story",
+   "sql": [
+    "UPDATE canonical_events SET safe_payload_json = '[]' WHERE sequence = 1"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
   }
  ]
 }

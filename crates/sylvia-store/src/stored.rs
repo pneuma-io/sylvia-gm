@@ -5,10 +5,10 @@
 //! `_lock_representation`, `_read_lock` and `sqlite_state_ownership.verify_authority`
 //! (`_historical_writers`).
 //!
-//! Part 1. In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`, the
-//! stored identities, the state-ownership verifier (from schema 6), the `packages` rows, and
+//! Parts 1 and 2. In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`,
+//! the stored identities, the session graph (`crate::stored_sessions`), the state-ownership verifier (from schema 6), the `packages` rows, and
 //! each campaign's lock binding. Still to come, each only making this less strict until it
-//! lands: `_verify_session_identities` (part 2), `sqlite_recovery.verify_recovery_receipts` (with
+//! lands: `sqlite_recovery.verify_recovery_receipts` (with
 //! the archive family, which owns `campaign_archive.py`), and `_verify_campaign_authority` and
 //! `_verify_construction_authority` (part 3).
 //!
@@ -361,8 +361,9 @@ pub fn verify_stored_authority(connection: &Connection) -> StoreResult<()> {
     // Its refusals are its own; a SQLite error escapes, as Python catches only `KeyError`,
     // `TypeError` and `ValueError` there.
     verify_stored_identities(connection)?;
-    // `_verify_session_identities` and `sqlite_recovery.verify_recovery_receipts` run here in
-    // Python; both are still to come (see the module documentation).
+    crate::stored_sessions::verify_session_identities(connection)?;
+    // `sqlite_recovery.verify_recovery_receipts` runs here in Python; it comes with the archive
+    // family (see the module documentation).
     let version: i64 = connection.query_row("PRAGMA user_version", [], |row| row.get(0))?;
     if matches!(version, 6 | 10 | 11 | 12) {
         verify_state_ownership(connection)?;
