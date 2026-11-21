@@ -240,7 +240,8 @@ fn read_request(reader: &mut impl BufRead) -> Option<Request> {
                 while !read_line(reader)?.is_empty() {}
                 break;
             }
-            if request.body.len() + size > MAX_REQUEST_BYTES {
+            // The size comes from the request: an overflowing sum is refused, never wrapped.
+            if request.body.len().checked_add(size).is_none_or(|total| total > MAX_REQUEST_BYTES) {
                 return None;
             }
             let mut chunk = vec![0; size];
