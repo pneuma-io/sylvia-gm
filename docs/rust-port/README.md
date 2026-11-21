@@ -187,5 +187,6 @@ No GitHub Actions run for this branch. State in the pull request what you ran an
 | `commands.md` | The 137 owner commands and which the Rust owner answers |
 | `comparison-tool.md` | How to record and check sessions, and how to write one |
 | `differences.md` | Every agreed difference between the Python and Rust behaviour |
+| `third-party-ports.md` | Third-party code the port translates, with its licence; add a row when you translate one |
 | `sites/*.md` | Hash, JSON encoding, regex, Unicode, length-limit and YAML call sites by lane |
 | `tools/*.py` | Reference tooling that reads the Python snapshot; retired with it |
