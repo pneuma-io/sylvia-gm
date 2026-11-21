@@ -51,8 +51,8 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/__init__.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_interview_extractor.py` | 347 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_interview_manifest.py` | 57 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_interview_extractor.py` | 347 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/builder/_interview_manifest.py` | 57 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_package_snapshots.py` | 222 | `sylvia-app::builder` | pending | |
@@ -135,3 +135,7 @@ read only by `session/_reveal_guard.py`, whose `RevealGuard` is never constructe
 asserts it is not). Lane 4 drops the type-only references when it ports those files. The
 Builder prompt text that names `create_campaign_folder` (`builder/_prompts.py`) is model-read
 and stays byte for byte. `campaign/rift.py` is live and is ported.
+`builder/_interview_extractor.py` and `builder/_interview_manifest.py` are retired the same way (agreed
+21 Nov 2026): they reference only each other and `builder/__init__.py`'s re-export, and nothing in
+`src/`, `scripts/`, `tests/`, SylviaBench or Trigger Discipline uses `InterviewExtractor`,
+`InterviewManifest` or `ExtractionError`. The `builder/__init__.py` port drops the two re-exports.
