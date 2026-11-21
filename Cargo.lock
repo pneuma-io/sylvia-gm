@@ -934,6 +934,7 @@ dependencies = [
  "sha2",
  "thiserror",
  "unicode-normalization",
+ "windows-sys",
 ]
 
 [[package]]

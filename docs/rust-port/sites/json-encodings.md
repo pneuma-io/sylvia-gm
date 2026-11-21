@@ -181,8 +181,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/desktop_update/helper.py:260` | `_write` | Dump::WIRE | `stream.write(json.dumps(value, separators=(",", ":")) + "\n")` | |
-| `application/desktop_update/identity.py:34` | `main` | Dump::WIRE | `print(json.dumps(runtime_identity(), separators=(",", ":")))` | |
+| `application/desktop_update/helper.py:260` | `_write` | Dump::WIRE | `stream.write(json.dumps(value, separators=(",", ":")) + "\n")` | `helper_vectors` (`main`'s replies) |
+| `application/desktop_update/identity.py:34` | `main` | Dump::WIRE | `print(json.dumps(runtime_identity(), separators=(",", ":")))` | `owner_update_modes` |
 | `application/desktop_update/manifest.py:140` | `canonical_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False ).encode("utf-8")` | `local-services`, `sylvia-owner` diagnostics tests |
 | `application/desktop_update/recovery_service.py:138` | `_write` | Dump::WIRE | `stream.write(json.dumps(row, separators=(",", ":")) + "\n")` | |
 | `build_workspace.py:29` | `BuildWorkspace.create` | Dump::DEFAULT | `(path / ".invocation.json").write_text(json.dumps({"token": token, "pid": os.getpid()}))` | |

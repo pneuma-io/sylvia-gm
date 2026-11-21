@@ -1,12 +1,15 @@
-//! Test helpers shared by the desktop update vector tests: the generators' scripted transport
-//! and a temporary folder that is removed afterwards.
+//! Test helpers shared by the desktop update vector tests: the generators' scripted transport,
+//! a temporary folder that is removed afterwards, and the scenario record (outcomes, file
+//! listings and their normalization) the preparation and helper generators share.
 
 #![allow(dead_code)]
 
-use serde_json::Value as J;
+use serde_json::{json, Value as J};
+use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Mutex;
 use sylvia_base::CodedResult;
+use sylvia_owner::desktop_update::storage::is_update_error;
 use sylvia_owner::desktop_update::transport::{Cancel, Response, Transport};
 
 /// `ScriptedTransport` and `ScriptedResponse` of the generator.
@@ -135,4 +138,114 @@ pub fn temporary_folder(name: &str) -> Folder {
     let resolved = std::fs::canonicalize(&base).unwrap();
     let text = resolved.to_string_lossy().to_string();
     Folder(PathBuf::from(text.strip_prefix(r"\\?\").unwrap_or(&text)))
+}
+
+/// Python's `outcome(call)`: an `UpdateError` by code and message, any other exception by class.
+pub fn outcome(result: CodedResult<J>) -> J {
+    match result {
+        Ok(value) => json!({"ok": value}),
+        Err(error) if is_update_error(&error) => json!({"error": [error.code, error.message]}),
+        Err(error) => json!({"other": error.error_type.unwrap_or("Exception")}),
+    }
+}
+
+pub fn listing(root: &Path) -> J {
+    use sha2::Digest;
+    // Each restored file gets its own random temporary folder; its name is folded as the
+    // generator folds it.
+    let temp = regex::Regex::new("((?:^|/)(?:restoring|restore-payload)/)[0-9a-f]{32}").unwrap();
+    let mut rows = Vec::new();
+    let mut pending = vec![root.to_path_buf()];
+    while let Some(folder) = pending.pop() {
+        for entry in std::fs::read_dir(&folder).unwrap() {
+            let path = entry.unwrap().path();
+            let relative = path.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/");
+            let relative = temp.replace_all(&relative, "${1}<temp>").to_string();
+            if path.is_dir() {
+                rows.push(json!([relative, "dir"]));
+                pending.push(path);
+                continue;
+            }
+            let raw = std::fs::read(&path).unwrap();
+            let parsed = (relative.ends_with(".json") && relative.contains(".application-updates/"))
+                .then(|| serde_json::from_slice::<J>(&raw).ok())
+                .flatten();
+            rows.push(json!([
+                relative,
+                parsed.unwrap_or_else(|| json!(hex::encode(sha2::Sha256::digest(&raw))))
+            ]));
+        }
+    }
+    // Sorted by the relative path text before aliasing, as the generator does.
+    rows.sort_by(|left, right| left[0].as_str().cmp(&right[0].as_str()));
+    J::Array(rows)
+}
+
+pub fn normalize(value: &J) -> J {
+    match value {
+        J::Object(map) => J::Object(
+            map.iter()
+                .map(|(key, item)| {
+                    let item = if key == "data_identity" || key == "app_identity" {
+                        json!("<identity>")
+                    } else {
+                        normalize(item)
+                    };
+                    (key.clone(), item)
+                })
+                .collect(),
+        ),
+        J::Array(items) => J::Array(items.iter().map(normalize).collect()),
+        other => other.clone(),
+    }
+}
+
+pub fn alias(value: &J) -> J {
+    let text = String::from_utf8(sylvia_base::pyjson::canonical_bytes(value)).unwrap();
+    let pattern = regex::Regex::new("[0-9a-f]+").unwrap();
+    let mut seen: Vec<String> = Vec::new();
+    let replaced = pattern.replace_all(&text, |found: &regex::Captures<'_>| {
+        let found = found[0].to_string();
+        if found.len() != 32 {
+            return found;
+        }
+        let index = seen.iter().position(|known| *known == found).unwrap_or_else(|| {
+            seen.push(found);
+            seen.len() - 1
+        });
+        format!("<id:{}>", index + 1)
+    });
+    serde_json::from_str(&replaced).unwrap()
+}
+
+pub fn record(results: Vec<J>, files: J) -> J {
+    let mut aliased = alias(&json!([normalize(&J::Array(results)), normalize(&files)]));
+    let mut files = aliased[1].take();
+    if let Some(rows) = files.as_array_mut() {
+        rows.sort_by(|left, right| left[0].as_str().cmp(&right[0].as_str()));
+    }
+    json!({"results": aliased[0].take(), "files": files})
+}
+
+/// Where two values first differ, as a JSON pointer with both values.
+pub fn first_difference(got: &J, expected: &J, path: &str) -> String {
+    match (got, expected) {
+        (J::Object(left), J::Object(right)) => {
+            for key in left.keys().chain(right.keys()) {
+                let (a, b) = (left.get(key).unwrap_or(&J::Null), right.get(key).unwrap_or(&J::Null));
+                if a != b {
+                    return first_difference(a, b, &format!("{path}/{key}"));
+                }
+            }
+        }
+        (J::Array(left), J::Array(right)) if left.len() == right.len() => {
+            for (index, (a, b)) in left.iter().zip(right).enumerate() {
+                if a != b {
+                    return first_difference(a, b, &format!("{path}/{index}"));
+                }
+            }
+        }
+        _ => {}
+    }
+    format!("{path}: got {got}, expected {expected}")
 }

@@ -16,6 +16,12 @@ path = "src/main.rs"
 name = "sylvia-gm"
 path = "src/bin/sylvia-gm.rs"
 
+# Starts a copy of itself as a stand-in installer, which must answer before a test harness
+# reads its arguments.
+[[test]]
+name = "nsis_command_line"
+harness = false
+
 [dependencies]
 sylvia-base.workspace = true
 serde_json.workspace = true
@@ -42,7 +48,8 @@ rusqlite.workspace = true
 [target.'cfg(windows)'.dependencies]
 windows-version.workspace = true
 winapi-util.workspace = true
-windows-sys.workspace = true
+# The desktop update helper's direct Windows calls (`desktop_update/windows.rs`).
+windows-sys = { workspace = true, features = ["Win32_System_Threading", "Win32_System_LibraryLoader", "Win32_UI_Controls"] }
 
 [target.'cfg(not(windows))'.dependencies]
 rustix.workspace = true
