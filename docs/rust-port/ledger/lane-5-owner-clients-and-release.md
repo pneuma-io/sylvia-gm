@@ -14,14 +14,14 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/desktop_update/__init__.py` | 1 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/checkpoint.py` | 418 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/controller.py` | 383 | `sylvia-owner::desktop_update` | pending | |
-| `src/sylvia_gm/application/desktop_update/discovery.py` | 113 | `sylvia-owner::desktop_update` | pending | |
+| `src/sylvia_gm/application/desktop_update/discovery.py` | 113 | `sylvia-owner::desktop_update::discovery` | ported | `update_vectors` (release index selection and the retained current manifest, over a scripted transport) |
 | `src/sylvia_gm/application/desktop_update/drafts.py` | 102 | `sylvia-owner::desktop_update::drafts` | ported | `local-services` |
 | `src/sylvia_gm/application/desktop_update/helper.py` | 433 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/identity.py` | 39 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/installed.py` | 410 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/launch.py` | 71 | `sylvia-owner::desktop_update` | pending | |
-| `src/sylvia_gm/application/desktop_update/manifest.py` | 458 | `sylvia-owner::desktop_update::manifest` | in progress | `bounded_json`, `canonical_bytes`, `MANIFEST_LIMIT` only |
-| `src/sylvia_gm/application/desktop_update/payload.py` | 139 | `sylvia-owner::desktop_update` | pending | |
+| `src/sylvia_gm/application/desktop_update/manifest.py` | 458 | `sylvia-owner::desktop_update::manifest` | ported | `update_vectors` (SemVer and its order, strict base64, Ed25519 as OpenSSL 3.0 verifies it, release locations through `desktop_update::url`, payload paths, every manifest refusal), `local-services` |
+| `src/sylvia_gm/application/desktop_update/payload.py` | 139 | `sylvia-owner::desktop_update::payload` | in progress | `verify_artifact` (`update_vectors`); `extract_portable` comes with preparation |
 | `src/sylvia_gm/application/desktop_update/preparation.py` | 337 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/processes.py` | 171 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/progress.py` | 313 | `sylvia-owner::desktop_update` | pending | |
@@ -32,8 +32,8 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/desktop_update/runtime.py` | 63 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/service.py` | 334 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/startup.py` | 221 | `sylvia-owner::desktop_update` | pending | |
-| `src/sylvia_gm/application/desktop_update/storage.py` | 404 | `sylvia-owner::desktop_update::storage` | in progress | `operation_id`, `directory_identity`, `checked_file`, `atomic_receipt` only |
-| `src/sylvia_gm/application/desktop_update/transport.py` | 374 | `sylvia-owner::desktop_update` | pending | |
+| `src/sylvia_gm/application/desktop_update/storage.py` | 404 | `sylvia-owner::desktop_update::storage` | in progress | `operation_id`, `directory_identity`, `checked_file`, `atomic_receipt`, and the stage and stable-digest checks `transport` and `payload` use |
+| `src/sylvia_gm/application/desktop_update/transport.py` | 374 | `sylvia-owner::desktop_update::transport` | in progress | `update_vectors`: `official_request`, the redirect and final-location rules, `content_length`, `metadata_bytes`, `download_artifact` over a `Transport` trait. Pending: `HttpsTransport` (the client, its cancellation and error mapping), with the controller |
 | `src/sylvia_gm/application/launch_compatibility.py` | 31 | `sylvia-app::launch_compatibility` | pending | |
 | `src/sylvia_gm/build_workspace.py` | 67 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/core/__init__.py` | 1 | `sylvia-owner` | pending | |

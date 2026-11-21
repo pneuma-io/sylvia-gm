@@ -1,12 +1,18 @@
 //! Desktop update: `application/desktop_update` in Python.
 //!
-//! Only what the desktop drafts store needs is ported so far: the bounded JSON reader and
-//! canonical encoding of `manifest.py`, the folder and file checks and atomic receipt of
-//! `storage.py`, and all of `drafts.py`. The updater itself is a later lane 5 assignment.
+//! Ported so far: the signed manifest and its checks (`manifest.py`), release discovery
+//! (`discovery.py`), the official request rules and download staging of `transport.py` over
+//! a caller's transport, `payload.verify_artifact`, the folder and file checks and atomic
+//! receipt of `storage.py`, and all of `drafts.py`. `url` holds the parts of Python's
+//! `urllib.parse` and `ipaddress` the location checks depend on.
 
+pub mod discovery;
 pub mod drafts;
 pub mod manifest;
+pub mod payload;
 pub mod storage;
+pub mod transport;
+pub mod url;
 
 use sylvia_base::CodedError;
 

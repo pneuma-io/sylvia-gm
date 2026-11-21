@@ -177,6 +177,55 @@ fn read_checked(path: &Path, maximum: usize) -> std::io::Result<Option<Vec<u8>>>
     Ok(Some(raw))
 }
 
+/// The identity a download stage is checked by (`download_artifact`'s `checked_stage`): the
+/// folder resolves to itself and is not itself a reparse point. Unlike
+/// [`directory_identity`], Python checks no ancestor and does not require a directory here.
+pub fn stage_identity(path: &Path) -> std::io::Result<Option<Identity>> {
+    if comparable(&resolve_strict(path)?) != comparable(&absolute(path)?) || is_reparse_point(path)? {
+        return Ok(None);
+    }
+    Ok(Some(identity_of_path(path)?.0))
+}
+
+/// The SHA-256 of a regular, unaliased file whose size must be `size`, read in 256 KiB
+/// chunks with Python's checks: a single link, no reparse point, the same file opened as
+/// was inspected, no growth while it is read, and the same identity, size and modification
+/// time afterwards. `None` where any check fails; the digest is the caller's to compare.
+pub fn stable_digest(path: &Path, size: u64) -> std::io::Result<Option<String>> {
+    use sha2::Digest;
+    let (metadata, before) = lstat(path)?;
+    let links = identity_of_path(path)?.1;
+    if !metadata.file_type().is_file() || links != 1 || is_reparse_point(path)? || before.size != size {
+        return Ok(None);
+    }
+    let mut file = std::fs::File::open(path)?;
+    if identity_of_file(&file)? != before.identity {
+        return Ok(None);
+    }
+    let mut digest = sha2::Sha256::new();
+    let mut count = 0u64;
+    let mut chunk = vec![0u8; 256 * 1024];
+    loop {
+        let read = file.read(&mut chunk)?;
+        if read == 0 {
+            break;
+        }
+        count += read as u64;
+        if count > size {
+            return Ok(None);
+        }
+        digest.update(&chunk[..read]);
+    }
+    drop(file);
+    let (_, after) = lstat(path)?;
+    if count != size
+        || (after.identity, after.size, after.modified) != (before.identity, before.size, before.modified)
+    {
+        return Ok(None);
+    }
+    Ok(Some(hex::encode(digest.finalize())))
+}
+
 /// `checked_file(path, maximum=)`: the whole file, refused if it is a link, has other names,
 /// is empty or too large, or changes while it is read.
 pub fn checked_file(path: &Path, maximum: usize) -> CodedResult<Vec<u8>> {

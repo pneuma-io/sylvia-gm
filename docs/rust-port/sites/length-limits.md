@@ -342,8 +342,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | --- | --- | --- | --- | --- |
 | `application/desktop_update/checkpoint.py:133` | `schema_identity` | len() against a limit | `if len(schema) > 5000:` | |
 | `application/desktop_update/checkpoint.py:138` | `schema_identity` | len() against a limit | `if len(raw) > MANIFEST_LIMIT:` | |
-| `application/desktop_update/discovery.py:59` | `discover` | len() against a limit | `if not isinstance(releases, list) or len(releases) > 30:` | |
-| `application/desktop_update/discovery.py:96` | `discover` | len() against a limit | `if not isinstance(assets, list) or len(assets) > 128:` | |
+| `application/desktop_update/discovery.py:59` | `discover` | len() against a limit | `if not isinstance(releases, list) or len(releases) > 30:` | `update_vectors` |
+| `application/desktop_update/discovery.py:96` | `discover` | len() against a limit | `if not isinstance(assets, list) or len(assets) > 128:` | `update_vectors` |
 | `application/desktop_update/drafts.py:29` | `validate_drafts` | len() against a limit | `or len(value["sessions"]) > MAX_SESSIONS` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/drafts.py:57` | `validate_drafts` | len() against a limit | `or len(row["questions"]) > MAX_QUESTIONS` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/drafts.py:75` | `validate_drafts` | len() against a limit | `if len(canonical_bytes(value)) > MANIFEST_LIMIT:` | `local-services`, `sylvia-owner` tests |
@@ -351,19 +351,19 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/installed.py:78` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
 | `application/desktop_update/installed.py:85` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
 | `application/desktop_update/launch.py:49` | `Installation._from_launch` | len() against a limit | `or not 0 < len(value[name]) <= 4096` | |
-| `application/desktop_update/manifest.py:61` | `Version.parse` | len() against a limit | `if not isinstance(value, str) or len(value) > 128:` | |
-| `application/desktop_update/manifest.py:191` | `release_url` | len() against a limit | `or len(value) > 2048` | |
-| `application/desktop_update/manifest.py:228` | `payload_path` | len() against a limit | `if not isinstance(value, str) or not 0 < len(value) <= 240 or not value.isascii():` | |
-| `application/desktop_update/manifest.py:348` | `_parse_manifest` | len() against a limit | `or len(encoded) > 100` | |
-| `application/desktop_update/manifest.py:411` | `_parse_manifest` | len() against a limit | `if not isinstance(rows, list) or not 3 <= len(rows) <= 4096:` | |
+| `application/desktop_update/manifest.py:61` | `Version.parse` | len() against a limit | `if not isinstance(value, str) or len(value) > 128:` | `update_vectors` |
+| `application/desktop_update/manifest.py:191` | `release_url` | len() against a limit | `or len(value) > 2048` | `update_vectors` |
+| `application/desktop_update/manifest.py:228` | `payload_path` | len() against a limit | `if not isinstance(value, str) or not 0 < len(value) <= 240 or not value.isascii():` | `update_vectors` |
+| `application/desktop_update/manifest.py:348` | `_parse_manifest` | len() against a limit | `or len(encoded) > 100` | `update_vectors` |
+| `application/desktop_update/manifest.py:411` | `_parse_manifest` | len() against a limit | `if not isinstance(rows, list) or not 3 <= len(rows) <= 4096:` | `update_vectors` |
 | `application/desktop_update/recovery_service.py:129` | `_read` | len() against a limit | `if not raw.endswith("\n") or len(raw.encode()) > 65536:` | |
 | `application/desktop_update/recovery_service.py:170` | `run_recovery` | len() against a limit | `not isinstance(identity, str) or not 0 < len(identity) <= 128` | |
 | `application/desktop_update/replacement.py:129` | `_inventory` | len() against a limit | `if not isinstance(entries, dict) or not 3 <= len(entries) <= 4096:` | |
 | `application/desktop_update/replacement.py:253` | `PortableReplacement._restore_receipt` | len() against a limit | `or not 3 <= len(row["old"]) <= 4097` | |
 | `application/desktop_update/service.py:109` | `DesktopUpdateService.handle` | len() against a limit | `or len(host["target"]) > 64` | |
 | `application/desktop_update/storage.py:278` | `atomic_receipt` | len() against a limit | `if len(raw) > MANIFEST_LIMIT:` | `local-services`, `sylvia-owner` tests |
-| `application/desktop_update/transport.py:239` | `content_length` | len() against a limit | `or len(length) > 20` | |
-| `application/desktop_update/transport.py:278` | `metadata_bytes` | len() against a limit | `if len(result) > MANIFEST_LIMIT:` | |
+| `application/desktop_update/transport.py:239` | `content_length` | len() against a limit | `or len(length) > 20` | `update_vectors` |
+| `application/desktop_update/transport.py:278` | `metadata_bytes` | len() against a limit | `if len(result) > MANIFEST_LIMIT:` | `update_vectors` |
 | `interfaces/_display_reads.py:46` | `DisplayReads.cancel` | len() against a limit | `while len(self._cancelled) > 128:` | `local-services`, `sylvia-owner` tests |
 | `interfaces/_local_diagnostics.py:182` | `LocalDiagnostics._load` | len() against a limit | `if len(data) > MAX_SNAPSHOT_BYTES:` | `local-services`, `sylvia-owner` tests |
 | `interfaces/_local_diagnostics.py:298` | `LocalDiagnostics.record` | len() against a limit | `while len(self._records) > MAX_RECORDS:` | `local-services`, `sylvia-owner` tests |

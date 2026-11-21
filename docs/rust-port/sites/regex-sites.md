@@ -220,15 +220,15 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | --- | --- | --- | --- | --- |
 | `application/desktop_update/helper.py:277` | `_failure_code` | re.fullmatch; plain | `if not isinstance(code, str) or re.fullmatch(r"[a-z_]{1,64}", code) is None:` | |
 | `application/desktop_update/helper.py:323` | `main` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{32}", row["restart_nonce"]) is None` | |
-| `application/desktop_update/manifest.py:22` | `<module>` | re.compile; plain | `_HASH = re.compile(r"[0-9a-f]{64}\Z")` | |
-| `application/desktop_update/manifest.py:23` | `<module>` | re.compile; plain | `_VERSION = re.compile( r"(0\|[1-9][0-9]{0,8})\.(0\|[1-9][0-9]{0,8})\.(0\|[1-9][0-9]{0,8})" r"(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?" r"(?:\+([0-...` | |
-| `application/desktop_update/manifest.py:209` | `release_url` | re.search; NEEDS fancy-regex: lookahead | `or re.search(r"%(?![0-9A-Fa-f]{2})", parsed.path)` | |
-| `application/desktop_update/manifest.py:237` | `payload_path` | re.fullmatch; plain | `re.fullmatch(r"[A-Za-z0-9_. -]+", part) is None or part.endswith((".", " "))` | |
-| `application/desktop_update/manifest.py:346` | `_parse_manifest` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", key_id) is None` | |
+| `application/desktop_update/manifest.py:22` | `<module>` | re.compile; plain | `_HASH = re.compile(r"[0-9a-f]{64}\Z")` | `update_vectors` |
+| `application/desktop_update/manifest.py:23` | `<module>` | re.compile; plain | `_VERSION = re.compile( r"(0\|[1-9][0-9]{0,8})\.(0\|[1-9][0-9]{0,8})\.(0\|[1-9][0-9]{0,8})" r"(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?" r"(?:\+([0-...` | `update_vectors` |
+| `application/desktop_update/manifest.py:209` | `release_url` | re.search; NEEDS fancy-regex: lookahead | `or re.search(r"%(?![0-9A-Fa-f]{2})", parsed.path)` | `update_vectors` |
+| `application/desktop_update/manifest.py:237` | `payload_path` | re.fullmatch; plain | `re.fullmatch(r"[A-Za-z0-9_. -]+", part) is None or part.endswith((".", " "))` | `update_vectors` |
+| `application/desktop_update/manifest.py:346` | `_parse_manifest` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", key_id) is None` | `update_vectors` |
 | `application/desktop_update/storage.py:204` | `operation_id` | re.fullmatch; plain | `if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{32}", value) is None:` | `local-services`, `sylvia-owner` storage tests |
 | `application/desktop_update/storage.py:343` | `UpdateStore._move_update` | re.fullmatch; plain | `error_code is not None and re.fullmatch(r"[a-z_]{1,64}", error_code) is None` | |
 | `application/desktop_update/storage.py:375` | `UpdateStore.load` | re.fullmatch; plain | `or re.fullmatch(r"[a-z_]{1,64}", row["error_code"]) is None` | |
-| `application/desktop_update/transport.py:44` | `official_request` | re.search; NEEDS fancy-regex: lookahead | `or re.search(r"%(?![0-9A-Fa-f]{2})", parsed.path)` | |
+| `application/desktop_update/transport.py:44` | `official_request` | re.search; NEEDS fancy-regex: lookahead | `or re.search(r"%(?![0-9A-Fa-f]{2})", parsed.path)` | `update_vectors` |
 | `interfaces/owner_process.py:301` | `<module>` | re.compile; plain | `_SEMANTIC_VERSION = re.compile( r"^(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$" )` | |
 | `interfaces/owner_process.py:954` | `_required_artifact_id` | re.fullmatch; plain | `if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", value) is None:` | |
 | `interfaces/webui.py:80` | `RemoteAccess.from_file` | re.fullmatch; plain | `if not re.fullmatch( r"https://(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.){2,}ts\.net" r"(?::[1-9][0-9]{0,4})?", origin, ):` | |

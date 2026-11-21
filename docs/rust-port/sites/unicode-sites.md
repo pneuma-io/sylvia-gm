@@ -99,19 +99,19 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/desktop_update/manifest.py:67` | `Version.parse` | .isdigit() | `if any(part.isdigit() and len(part) > 1 and part.startswith("0") for part in pre):` | |
-| `application/desktop_update/manifest.py:92` | `Version.__lt__` | .isdigit() | `if left.isdigit() and right.isdigit():` | |
-| `application/desktop_update/manifest.py:94` | `Version.__lt__` | .isdigit() | `if left.isdigit() != right.isdigit():` | |
-| `application/desktop_update/manifest.py:95` | `Version.__lt__` | .isdigit() | `return left.isdigit()` | |
-| `application/desktop_update/manifest.py:253` | `payload_path` | .casefold() | `or value.casefold() in {"authority.sqlite3", "config.yaml"}` | |
-| `application/desktop_update/manifest.py:419` | `_parse_manifest` | .casefold() | `if name.casefold() in names:` | |
-| `application/desktop_update/manifest.py:421` | `_parse_manifest` | .casefold() | `names.add(name.casefold())` | |
-| `application/desktop_update/manifest.py:422` | `_parse_manifest` | .casefold() | `maximum = 128 if name.casefold() == "sylvia-portable.json" else ARTIFACT_LIMIT` | |
-| `application/desktop_update/manifest.py:440` | `_parse_manifest` | .casefold() | `if not {name.casefold() for name in required} <= names:` | |
+| `application/desktop_update/manifest.py:67` | `Version.parse` | .isdigit() | `if any(part.isdigit() and len(part) > 1 and part.startswith("0") for part in pre):` | `update_vectors` |
+| `application/desktop_update/manifest.py:92` | `Version.__lt__` | .isdigit() | `if left.isdigit() and right.isdigit():` | `update_vectors` |
+| `application/desktop_update/manifest.py:94` | `Version.__lt__` | .isdigit() | `if left.isdigit() != right.isdigit():` | `update_vectors` |
+| `application/desktop_update/manifest.py:95` | `Version.__lt__` | .isdigit() | `return left.isdigit()` | `update_vectors` |
+| `application/desktop_update/manifest.py:253` | `payload_path` | .casefold() | `or value.casefold() in {"authority.sqlite3", "config.yaml"}` | `update_vectors` |
+| `application/desktop_update/manifest.py:419` | `_parse_manifest` | .casefold() | `if name.casefold() in names:` | `update_vectors` |
+| `application/desktop_update/manifest.py:421` | `_parse_manifest` | .casefold() | `names.add(name.casefold())` | `update_vectors` |
+| `application/desktop_update/manifest.py:422` | `_parse_manifest` | .casefold() | `maximum = 128 if name.casefold() == "sylvia-portable.json" else ARTIFACT_LIMIT` | `update_vectors` |
+| `application/desktop_update/manifest.py:440` | `_parse_manifest` | .casefold() | `if not {name.casefold() for name in required} <= names:` | `update_vectors` |
 | `application/desktop_update/replacement.py:139` | `_inventory` | .casefold() | `name.casefold() in names` | |
 | `application/desktop_update/replacement.py:152` | `_inventory` | .casefold() | `names.add(name.casefold())` | |
 | `application/desktop_update/replacement.py:273` | `PortableReplacement._restore_receipt` | .casefold() | `if len({entry.path.casefold() for entry in files}) != len(files):` | |
-| `application/desktop_update/transport.py:238` | `content_length` | .isdigit() | `or not length.isdigit()` | |
+| `application/desktop_update/transport.py:238` | `content_length` | .isdigit() | `or not length.isdigit()` | `update_vectors` |
 | `interfaces/owner_process.py:313` | `_package_version_priority` | .casefold() | `return (0, 0, 0, 0, 0, (), version.casefold())` | |
 | `interfaces/owner_process.py:316` | `_package_version_priority` | .casefold() | `(0, f"{int(part):020d}") if part.isdigit() else (1, part.casefold())` | |
 | `interfaces/owner_process.py:316` | `_package_version_priority` | .isdigit() | `(0, f"{int(part):020d}") if part.isdigit() else (1, part.casefold())` | |
