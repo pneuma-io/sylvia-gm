@@ -10,9 +10,9 @@
 //! startup words it as `_migrate` does. Each step keeps Python's evaluation order, so the same
 //! damage fails the same way.
 //!
-//! Not yet ported, so less strict until it lands: a failed action's consequence is checked with
-//! `player_actions.valid_player_action_consequence` in Python, which belongs to lane 2's
-//! application layer. Here it is accepted.
+//! A failed action's one consequence must be the owner's player-action marker
+//! (`player_actions.valid_player_action_consequence`, lane 2's
+//! `sylvia_domain::player_actions`).
 
 use crate::actions::{dump, load_json, load_payload};
 use crate::campaigns::{named_rows, parse, read_lock_record, Named};
@@ -29,6 +29,7 @@ use sylvia_domain::authority::{
     WriterRole,
 };
 use sylvia_domain::package_library::PackageLockRecord;
+use sylvia_domain::player_actions::valid_player_action_consequence;
 use sylvia_domain::pyops::py_eq;
 
 const INVALID: &str = "Saved campaign records failed an integrity check";
@@ -787,10 +788,10 @@ pub(crate) fn verify_campaign_authority(
                     validate_authority_identity_value(kind, "Stored consequence kind", false)?;
                 }
             }
-            // `valid_player_action_consequence` for a failed action is lane 2's (see the module
-            // documentation).
             if !canonical_payload_is_safe(&Json::Object(consequence_payload.clone()))
-                || !py_eq(&payloads[consequence_offset + ordinal], &Json::Object(consequence_payload))
+                || !py_eq(&payloads[consequence_offset + ordinal], &Json::Object(consequence_payload.clone()))
+                || (status == ActionStatus::Failed
+                    && !valid_player_action_consequence(&consequence_payload, expected_revision))
             {
                 return Err(invalid());
             }
