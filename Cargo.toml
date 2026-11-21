@@ -91,6 +91,9 @@ hyper-util = { version = "0.1", features = ["tokio"] }
 http-body-util = "0.1"
 multer = "3"
 bytes = "1"
+# Desktop update (lane 5): verifying the Ed25519 signature on a release manifest, as Python does
+# with `cryptography`. Verification only; no signing or key generation in the product.
+ed25519-dalek = "2"
 
 [workspace.lints.rust]
 unsafe_code = "deny"
