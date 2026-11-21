@@ -60,7 +60,10 @@ rustix = { version = "1", features = ["fs", "process"] }
 # Lane 4 adds `Win32_Security_Cryptography` and `Win32_Foundation` for current-user DPAPI
 # (`CryptProtectData`, `CryptUnprotectData`, `LocalFree`), the saved-credential protection of
 # `config/_credential_protection.py` on Windows.
-windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem", "Win32_Security_Cryptography", "Win32_Foundation"] }
+# and `Win32_UI_Shell` (with `Win32_UI_WindowsAndMessaging`, for its show-window type) for
+# `ShellExecuteW`, the call `os.startfile` makes to open a setup page or sign-in address in the
+# browser (`config/_host_browser.py`).
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem", "Win32_Security_Cryptography", "Win32_Foundation", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
 getrandom = "0.2"
 # AES-256-GCM for the Linux saved-credential key file (`config/_credential_protection.py`,
 # Python's `cryptography` AESGCM). RustCrypto, pure Rust.

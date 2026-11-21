@@ -7,10 +7,13 @@
 //!   AES-256-GCM key file on Linux.
 //! - [`user_settings`]: `_user_settings.py`, the owner-local `config.yaml`.
 //! - [`loader`]: `loader.py`, `load_config` and the configuration model.
+//! - [`host_browser`]: `_host_browser.py`, opening an address in the person's browser.
+//! - [`presets`] and [`provider_settings`]: the read-only part of `provider_settings.py`.
 //!
 //! Documents are [`Data`] trees, the values `yaml.safe_load` returns.
 
 pub mod env;
+pub mod host_browser;
 pub mod loader;
 pub mod merge;
 pub mod presets;

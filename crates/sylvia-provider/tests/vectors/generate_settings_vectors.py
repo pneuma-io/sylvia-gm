@@ -22,6 +22,7 @@ from pathlib import Path
 
 from sylvia_gm.config import _credential_protection as protection
 from sylvia_gm.config import provider_settings as settings
+from sylvia_gm.config._host_browser import host_environment
 from sylvia_gm.config._resolver import ConfigError
 from sylvia_gm.interfaces.owner_process import _json_value
 from sylvia_gm.provider._context_capacity import resolve_context_capacity
@@ -147,6 +148,24 @@ CAPACITY_CASES = [
     {"configured_context_window": 10, "configured_observed_at": "c"},
 ]
 
+HOST_ENVIRONMENTS = [
+    {"PATH": "/usr/bin:/bin"},
+    {"APPDIR": "/tmp/.mount_x", "PATH": "/tmp/.mount_x/usr/bin:/usr/bin", "LD_LIBRARY_PATH": "/tmp/.mount_x/usr/lib",
+     "XDG_DATA_DIRS": "/tmp/.mount_x/usr/share:/usr/share", "HOME": "/home/u"},
+    {"APPDIR": "/tmp/.mount_x/", "PYTHONPATH": "/tmp/.mount_x//lib/./py:/tmp/.mount_xy/lib", "GTK_PATH": "/tmp/.mount_x"},
+    {"APPDIR": "/a/b", "MIXED": "/a/b/c::/d:", "ONLY_EMPTY": ":", "DOTS": "/a/x/../b/z:/a/bb", "REL": "a/b:/a/b"},
+    {"APPDIR": "", "PATH": "/x"},
+    {"APPDIR": "//net/app", "P": "//net/app/bin:/net/app/bin:///net/app/bin"},
+    {"APPDIR": "/", "PATH": "/usr/bin:relative"},
+]
+
+# differences.md row 12: httpx IDNA-encodes a non-ASCII host; the port refuses it.
+IDNA_URLS = [
+    "http://bücher.example/v1", "http://BÜCHER.example", "http://xn--bcher-kva.example/",
+    "http://例え.テスト/", "http://straße.de/", "http://a‍b.de/", "http://é",
+    "https://éx.example:8443/v1?q=1", "http://plain.example/",
+]
+
 REQUIRE_CASES = [
     ("openai", "openai/gpt-5"), ("openai", "openai/gpt-4"), ("Openai", "openai/gpt-5"), ("openai", " openai/gpt-5"),
     ("openai", ""), ("openai", "x" * 513), (5, "openai/gpt-5"), ("openai", None), ("a" * 65, "m"), ("lm_studio", "lm-studio/q"),
@@ -207,10 +226,21 @@ def main() -> int:
     for preset_id in DISCOVERY_PRESETS:
         for row in DISCOVERY_ROWS:
             discovery.append({"preset_id": preset_id, "row": row, **reply(lambda r=row, p=preset_id: settings._discovery_model(r, preset_id=p))})
+    import httpx
+
+    idna = []
+    for url in IDNA_URLS:
+        try:
+            idna.append({"url": url, "value": str(httpx.URL(url))})
+        except Exception as error:  # noqa: BLE001
+            idna.append({"url": url, "error": {"class": type(error).__name__, "message": str(error)}})
+    environments = []
+    for environ in HOST_ENVIRONMENTS:
+        environments.append({"environ": list(environ.items()), "result": list(host_environment(environ, packed_folder=None).items())})
     capacity = [{"inputs": case, **reply(lambda c=case: resolve_context_capacity(**c).projection())} for case in CAPACITY_CASES]
     document = {
         "python": sys.version.split()[0], "platform": sys.platform, "now": FIXED_NOW,
-        "documents": documents, "require": require, "sessions": sessions, "discovery": discovery, "capacity": capacity,
+        "documents": documents, "require": require, "sessions": sessions, "discovery": discovery, "capacity": capacity, "host_environments": environments, "idna": idna,
     }
     (HERE / "settings_vectors.json").write_bytes((json.dumps(document, ensure_ascii=True, indent=0) + "\n").encode("ascii"))
     print(f"{len(documents)} documents, {len(discovery)} discovery rows -> {HERE}")

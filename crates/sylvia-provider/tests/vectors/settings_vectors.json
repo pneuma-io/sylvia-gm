@@ -34708,5 +34708,222 @@
 "context_window_source": "user_configured"
 }
 }
+],
+"host_environments": [
+{
+"environ": [
+[
+"PATH",
+"/usr/bin:/bin"
+]
+],
+"result": [
+[
+"PATH",
+"/usr/bin:/bin"
+]
+]
+},
+{
+"environ": [
+[
+"APPDIR",
+"/tmp/.mount_x"
+],
+[
+"PATH",
+"/tmp/.mount_x/usr/bin:/usr/bin"
+],
+[
+"LD_LIBRARY_PATH",
+"/tmp/.mount_x/usr/lib"
+],
+[
+"XDG_DATA_DIRS",
+"/tmp/.mount_x/usr/share:/usr/share"
+],
+[
+"HOME",
+"/home/u"
+]
+],
+"result": [
+[
+"PATH",
+"/usr/bin"
+],
+[
+"XDG_DATA_DIRS",
+"/usr/share"
+],
+[
+"HOME",
+"/home/u"
+]
+]
+},
+{
+"environ": [
+[
+"APPDIR",
+"/tmp/.mount_x/"
+],
+[
+"PYTHONPATH",
+"/tmp/.mount_x//lib/./py:/tmp/.mount_xy/lib"
+],
+[
+"GTK_PATH",
+"/tmp/.mount_x"
+]
+],
+"result": [
+[
+"PYTHONPATH",
+"/tmp/.mount_xy/lib"
+]
+]
+},
+{
+"environ": [
+[
+"APPDIR",
+"/a/b"
+],
+[
+"MIXED",
+"/a/b/c::/d:"
+],
+[
+"ONLY_EMPTY",
+":"
+],
+[
+"DOTS",
+"/a/x/../b/z:/a/bb"
+],
+[
+"REL",
+"a/b:/a/b"
+]
+],
+"result": [
+[
+"MIXED",
+":/d:"
+],
+[
+"ONLY_EMPTY",
+":"
+],
+[
+"DOTS",
+"/a/bb"
+],
+[
+"REL",
+"a/b"
+]
+]
+},
+{
+"environ": [
+[
+"APPDIR",
+""
+],
+[
+"PATH",
+"/x"
+]
+],
+"result": [
+[
+"APPDIR",
+""
+],
+[
+"PATH",
+"/x"
+]
+]
+},
+{
+"environ": [
+[
+"APPDIR",
+"//net/app"
+],
+[
+"P",
+"//net/app/bin:/net/app/bin:///net/app/bin"
+]
+],
+"result": [
+[
+"P",
+"/net/app/bin:///net/app/bin"
+]
+]
+},
+{
+"environ": [
+[
+"APPDIR",
+"/"
+],
+[
+"PATH",
+"/usr/bin:relative"
+]
+],
+"result": [
+[
+"PATH",
+"/usr/bin:relative"
+]
+]
+}
+],
+"idna": [
+{
+"url": "http://b\u00fccher.example/v1",
+"value": "http://xn--bcher-kva.example/v1"
+},
+{
+"url": "http://B\u00dcCHER.example",
+"value": "http://xn--bcher-kva.example"
+},
+{
+"url": "http://xn--bcher-kva.example/",
+"value": "http://xn--bcher-kva.example/"
+},
+{
+"url": "http://\u4f8b\u3048.\u30c6\u30b9\u30c8/",
+"value": "http://xn--r8jz45g.xn--zckzah/"
+},
+{
+"url": "http://stra\u00dfe.de/",
+"value": "http://xn--strae-oqa.de/"
+},
+{
+"url": "http://a\u200db.de/",
+"error": {
+"class": "InvalidURL",
+"message": "Invalid IDNA hostname: 'a\\u200db.de'"
+}
+},
+{
+"url": "http://\u00e9",
+"value": "http://xn--9ca"
+},
+{
+"url": "https://\u00e9x.example:8443/v1?q=1",
+"value": "https://xn--x-9fa.example:8443/v1?q=1"
+},
+{
+"url": "http://plain.example/",
+"value": "http://plain.example/"
+}
 ]
 }

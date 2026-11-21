@@ -202,3 +202,57 @@ fn now_is_an_aware_utc_isoformat() {
     let now = settings::now_isoformat();
     assert!(now.ends_with("+00:00") && now.len() >= 25 && now.as_bytes()[10] == b'T', "{now}");
 }
+
+#[test]
+fn host_environment_matches_python() {
+    use sylvia_provider::config::host_browser::host_environment;
+    let vectors = vectors();
+    let pairs = |value: &J| -> Vec<(Vec<u8>, Vec<u8>)> {
+        value
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|pair| {
+                (pair[0].as_str().unwrap().as_bytes().to_vec(), pair[1].as_str().unwrap().as_bytes().to_vec())
+            })
+            .collect()
+    };
+    for case in vectors["host_environments"].as_array().unwrap() {
+        assert_eq!(host_environment(&pairs(&case["environ"])), pairs(&case["result"]), "{}", case["environ"]);
+    }
+}
+
+/// Refusals only: a real preset would open the person's browser.
+#[test]
+fn open_provider_setup_refuses_like_python() {
+    let refuse = |value: Data| settings::open_provider_setup(&value).unwrap_err().to_string();
+    assert_eq!(refuse(Data::Str("nope".into())), "Provider preset is unsupported");
+    assert_eq!(refuse(Data::Int(1)), "Provider preset is unsupported");
+    assert_eq!(refuse(Data::Str("custom".into())), "Ask your custom service for its connection instructions");
+}
+
+/// differences.md row 12: httpx IDNA-encodes a non-ASCII host name (`http://bücher.example` is
+/// sent to `xn--bcher-kva.example`); the port refuses such a host with httpx's own message for
+/// an invalid IDNA name. ASCII hosts, and the names httpx itself refuses, match exactly.
+#[test]
+fn non_ascii_hosts_are_refused_where_httpx_would_encode_them() {
+    use sylvia_provider::httpx_url::HttpxUrl;
+    let vectors = vectors();
+    for case in vectors["idna"].as_array().unwrap() {
+        let url = case["url"].as_str().unwrap();
+        let parsed = HttpxUrl::parse(url);
+        match (case.get("value"), case.get("error")) {
+            (Some(value), _) if url.is_ascii() => {
+                assert_eq!(parsed.unwrap().to_string(), value.as_str().unwrap())
+            }
+            (Some(_), _) => {
+                let message = parsed.unwrap_err().0;
+                assert!(message.starts_with("Invalid IDNA hostname: '"), "{url}: {message}");
+            }
+            (None, Some(error)) => {
+                assert_eq!(parsed.unwrap_err().0, error["message"].as_str().unwrap(), "{url}")
+            }
+            (None, None) => unreachable!(),
+        }
+    }
+}

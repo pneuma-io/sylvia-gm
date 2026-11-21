@@ -550,3 +550,16 @@ pub fn session_model_once_settings(
         Err(other) => Err(other),
     }
 }
+
+/// `open_provider_setup(preset_id)`: open only a shipped service's setup page, never an address
+/// the renderer supplies.
+pub fn open_provider_setup(preset_id: &Data) -> Result<Data, ConfigFailure> {
+    let unsupported = || ConfigFailure::config("Provider preset is unsupported");
+    let Data::Str(preset_id) = preset_id else { return Err(unsupported()) };
+    let found = preset(preset_id).ok_or_else(unsupported)?;
+    let Some(url) = found.setup_url else {
+        return Err(ConfigFailure::config("Ask your custom service for its connection instructions"));
+    };
+    let opened = super::host_browser::open_in_browser(url)?;
+    Ok(dict(vec![("opened", Data::Bool(opened)), ("url", text(url))]))
+}

@@ -226,29 +226,10 @@ pub fn py_eq(a: &Json, b: &Json) -> bool {
     }
 }
 
-/// `repr(text)` for a `str`, with Python's quote choice and escapes for the ASCII control
-/// characters, backslash and the quote. Non-ASCII characters are kept as they are (Python escapes
-/// the non-printable ones); the result here only feeds phrase matching and a replaced message.
+/// `repr(text)` for a `str` (`sylvia_base::pystr::repr`: Python's quote choice and escapes,
+/// non-printable characters included).
 pub fn py_repr_str(text: &str) -> String {
-    let quote = if text.contains('\'') && !text.contains('"') { '"' } else { '\'' };
-    let mut out = String::with_capacity(text.len() + 2);
-    out.push(quote);
-    for character in text.chars() {
-        match character {
-            '\\' => out.push_str("\\\\"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\t' => out.push_str("\\t"),
-            c if c == quote => {
-                out.push('\\');
-                out.push(c);
-            }
-            c if (c as u32) < 0x20 || c as u32 == 0x7f => out.push_str(&format!("\\x{:02x}", c as u32)),
-            c => out.push(c),
-        }
-    }
-    out.push(quote);
-    out
+    sylvia_base::pystr::repr(text)
 }
 
 /// `str(value)` of a parsed JSON value: a `str` as itself, containers as their `repr`.

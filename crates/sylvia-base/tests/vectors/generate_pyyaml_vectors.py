@@ -11,6 +11,10 @@ package runtimes). For each document and loader: the events, the composed node t
 constructed value with Python's types, or the error's class, pieces and full text. For dumping:
 `yaml.safe_dump(value, sort_keys=False, allow_unicode=True)` of every value that loaded, plus
 crafted values. Reference tooling only; retired with the Python source.
+
+The output is byte-for-byte reproducible: a `set` iterates in an order that follows string
+hashing, so the generator runs under `PYTHONHASHSEED=0`, re-running itself when it was started
+with randomisation (or with `-I`, which ignores the variable).
 """
 
 from __future__ import annotations
@@ -19,6 +23,7 @@ import datetime
 import hashlib
 import json
 import math
+import os
 import random
 import subprocess
 import sys
@@ -487,6 +492,9 @@ def compact(record) -> str:
 
 
 def main() -> int:
+    if sys.flags.hash_randomization:
+        environment = dict(os.environ, PYTHONHASHSEED="0")
+        return subprocess.run([sys.executable, str(Path(__file__).resolve())], env=environment, check=False).returncode
     named = [("config:" + name, text) for name, text in recorded_configs()]
     texts = [(f"scalar:{i}", t) for i, t in enumerate(scalar_documents())]
     texts += [(f"structure:{i}", t) for i, t in enumerate(STRUCTURES)]
