@@ -20,6 +20,28 @@ pub enum Frame {
     /// `OwnerFramingError` or a decoding failure: the stream itself can no longer be trusted.
     /// Python lets this end the owner.
     Fatal(&'static str),
+    /// A raw line for the recovery-only owner, which reads its own bounded requests
+    /// (`recovery_service._read`): the line, the end of input, or a stream that is not strict
+    /// UTF-8.
+    Raw(crate::desktop_update::recovery_service::RecoveryLine),
+}
+
+/// `stream.readline(65537)` on the recovery-only owner's text input: up to and including the
+/// next newline, decoded as strict UTF-8. Python stops at 65,537 characters; a line that long
+/// is refused afterwards either way, so reading stops at the newline or at four bytes per
+/// character past that bound.
+pub fn read_raw_line(input: &mut impl BufRead) -> crate::desktop_update::recovery_service::RecoveryLine {
+    use crate::desktop_update::recovery_service::RecoveryLine;
+    let mut line = Vec::new();
+    let mut limited = input.take(65_537 * 4 + 1);
+    match limited.read_until(b'\n', &mut line) {
+        Ok(0) => RecoveryLine::End,
+        Ok(_) => match String::from_utf8(line) {
+            Ok(text) => RecoveryLine::Line(text),
+            Err(_) => RecoveryLine::Broken,
+        },
+        Err(_) => RecoveryLine::Broken,
+    }
 }
 
 /// Read one message. Mirrors `_read_message`, including its limits.

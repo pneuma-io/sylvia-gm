@@ -1,0 +1,252 @@
+{
+ "session": "desktop-update-recovery",
+ "ready": {
+  "ok": true,
+  "type": "ready",
+  "response_hex": "<verified>",
+  "recovery_only": true
+ },
+ "steps": [
+  {
+   "id": "s0",
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   },
+   "reply": {
+    "id": "s0",
+    "ok": false,
+    "error": {
+     "code": "trust_not_configured",
+     "message": "Updates are not configured in this build. A manual bootstrap upgrade is required."
+    }
+   }
+  },
+  {
+   "id": "s1",
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "portable"
+    }
+   },
+   "reply": {
+    "id": "s1",
+    "ok": false,
+    "error": {
+     "code": "invalid_update_request",
+     "message": "The native recovery context changed."
+    }
+   }
+  },
+  {
+   "id": "s2",
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    },
+    "extra": 1
+   },
+   "reply": {
+    "id": "s2",
+    "ok": false,
+    "error": {
+     "code": "invalid_update_request",
+     "message": "The native recovery context changed."
+    }
+   }
+  },
+  {
+   "id": "s3",
+   "method": "desktop_update_recovery_handoff",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    },
+    "operation_id": "0123456789abcdef0123456789abcdef",
+    "choice": "keep",
+    "restart_nonce": null
+   },
+   "reply": {
+    "id": "s3",
+    "ok": false,
+    "error": {
+     "code": "trust_not_configured",
+     "message": "Updates are not configured in this build. A manual bootstrap upgrade is required."
+    }
+   }
+  },
+  {
+   "id": "s4",
+   "method": "desktop_update_recovery_handoff",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   },
+   "reply": {
+    "id": "s4",
+    "ok": false,
+    "error": {
+     "code": "invalid_update_request",
+     "message": "The native recovery context changed."
+    }
+   }
+  },
+  {
+   "id": "s5",
+   "method": "campaign_index",
+   "params": {},
+   "reply": {
+    "id": "s5",
+    "ok": false,
+    "error": {
+     "code": "recovery_only",
+     "message": "Only update recovery is available in this window."
+    }
+   }
+  },
+  {
+   "id": "s6",
+   "method": "desktop_update_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   },
+   "reply": {
+    "id": "s6",
+    "ok": false,
+    "error": {
+     "code": "recovery_only",
+     "message": "Only update recovery is available in this window."
+    }
+   }
+  },
+  {
+   "id": "s7",
+   "method": "shutdown",
+   "params": {
+    "unexpected": true
+   },
+   "reply": {
+    "id": "s7",
+    "ok": false,
+    "error": {
+     "code": "recovery_only",
+     "message": "Only update recovery is available in this window."
+    }
+   }
+  },
+  {
+   "id": "s8",
+   "method": "shutdown",
+   "params": {},
+   "reply": {
+    "id": "s8",
+    "ok": true,
+    "result": {
+     "status": "closed"
+    }
+   }
+  },
+  {
+   "relaunch": true,
+   "exit_code": 0,
+   "ready": null
+  },
+  {
+   "relaunch": true,
+   "exit_code": 2,
+   "ready": {
+    "ok": false,
+    "type": "update_recovery_required",
+    "error": {
+     "code": "update_recovery_required",
+     "message": "The interrupted update must be reconciled before opening saved data."
+    }
+   }
+  },
+  {
+   "relaunch": true,
+   "exit_code": 2,
+   "ready": {
+    "ok": true,
+    "type": "ready",
+    "response_hex": "<verified>",
+    "recovery_only": true
+   }
+  },
+  {
+   "id": "s12",
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   },
+   "reply": {
+    "id": "s12",
+    "ok": false,
+    "error": {
+     "code": "trust_not_configured",
+     "message": "Updates are not configured in this build. A manual bootstrap upgrade is required."
+    }
+   }
+  },
+  {
+   "id": "s13",
+   "method": "shutdown",
+   "params": {},
+   "reply": {
+    "id": "s13",
+    "ok": true,
+    "result": {
+     "status": "closed"
+    }
+   }
+  }
+ ],
+ "exit_code": 0,
+ "model_requests": [],
+ "database": null,
+ "files": [
+  {
+   "path": ".application-updates/0123456789abcdef0123456789abcdef/attempts/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/prepared-update.json",
+   "bytes": 64,
+   "text": "{\"current_version\":\"0.4.1\",\"format_version\":2,\"version\":\"0.4.2\"}"
+  },
+  {
+   "path": ".application-updates/0123456789abcdef0123456789abcdef/manifest.json",
+   "bytes": 156,
+   "text": "{\"key_id\":\"release-key\",\"signature\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw==\",\"signed\":{\"version\":\"0.4.2\"}}"
+  },
+  {
+   "path": ".application-updates/0123456789abcdef0123456789abcdef/selected-attempt.json",
+   "bytes": 65,
+   "text": "{\"attempt\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"format_version\":1}"
+  },
+  {
+   "path": ".application-updates/current.json",
+   "bytes": 125,
+   "text": "{\"error_code\":null,\"format_version\":1,\"operation_id\":\"0123456789abcdef0123456789abcdef\",\"phase\":\"applying\",\"version\":\"0.4.2\"}"
+  }
+ ]
+}

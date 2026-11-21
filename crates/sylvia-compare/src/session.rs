@@ -410,14 +410,17 @@ fn run_steps(
             entry.insert("method".into(), method.into());
             entry.insert("params".into(), params.clone());
             owner.request(&id, method, &params)?;
-            if method == "shutdown" {
-                closed_by_shutdown = true;
-            }
             if step.background {
+                // A background shutdown is taken as closing; its reply is collected later.
+                closed_by_shutdown |= method == "shutdown";
                 entry.insert("background".into(), true.into());
                 None
             } else {
-                Some(owner.reply(&id, Duration::from_secs(step.timeout_s))?)
+                let reply = owner.reply(&id, Duration::from_secs(step.timeout_s))?;
+                // Only a shutdown the owner accepted closes it; a refused one (the recovery-only
+                // owner refuses one with parameters) leaves it running.
+                closed_by_shutdown |= method == "shutdown" && reply.get("ok") == Some(&Json::Bool(true));
+                Some(reply)
             }
         };
         // A step the session depends on that goes wrong stops the session. What was recorded

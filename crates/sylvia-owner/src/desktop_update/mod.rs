@@ -8,10 +8,11 @@
 //! `replacement.py` and `restart.py`. The location checks use the shared `sylvia_base::pyurl`
 //! (CPython's `urllib.parse`); `windows` holds the approved direct Windows calls.
 //!
-//! Not ported yet: recovery (`recovery.py`, `recovery_service.py`), the installed copy
-//! (`installed.py`) and the helper (`helper.py`, `processes.py`, `progress.py`). Where the
-//! owner reaches one of them it answers `rust_port_pending`; in the shipped build (no trusted
-//! key) it never does.
+//! Recovery is ported too: `recovery.py`, `recovery_service.py` and the recovery-only owner.
+//!
+//! Not ported yet: the installed copy (`installed.py`) and the helper (`helper.py`,
+//! `processes.py`, `progress.py`). Where the owner reaches one of them it answers
+//! `rust_port_pending`; in the shipped build (no trusted key) it never does.
 
 pub mod checkpoint;
 pub mod controller;
@@ -21,6 +22,8 @@ pub mod launch;
 pub mod manifest;
 pub mod payload;
 pub mod preparation;
+pub mod recovery;
+pub mod recovery_service;
 pub mod replacement;
 pub mod restart;
 pub mod runtime;

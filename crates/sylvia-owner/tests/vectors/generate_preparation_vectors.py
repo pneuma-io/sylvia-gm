@@ -53,6 +53,8 @@ from sylvia_gm.application.desktop_update.restart import RestartHandshake  # noq
 from sylvia_gm.application.desktop_update.storage import UpdateStore  # noqa: E402
 from sylvia_gm.application.desktop_update.launch import Installation  # noqa: E402
 from sylvia_gm.application.desktop_update.startup import authorize_startup  # noqa: E402
+from sylvia_gm.application.desktop_update.recovery import RecoveryOperation  # noqa: E402
+from sylvia_gm.application.desktop_update.recovery_service import RecoveryService  # noqa: E402
 from sylvia_gm.portable_artifact import ENTRY_MANIFEST, REQUIRED_PAYLOADS  # noqa: E402
 
 OUTPUT = HERE / "preparation_vectors.json"
@@ -62,6 +64,7 @@ ATTEMPT = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 NEW = "0.4.2"
 TARGET = "windows-x86_64"
 HEX_RUN = re.compile(r"[0-9a-f]+")
+TEMP_NAME = re.compile(r"((?:^|/)(?:restoring|restore-payload)/)[0-9a-f]{32}")
 
 
 def test_key() -> Ed25519PrivateKey:
@@ -149,6 +152,25 @@ def database_bytes() -> bytes:
 DATABASE = database_bytes()
 
 
+def newer_database_bytes() -> bytes:
+    """The data after the update ran: one more table, so its schema no longer matches."""
+    folder = Path(tempfile.mkdtemp(prefix="sylvia-prep-db-"))
+    try:
+        path = folder / "authority.sqlite3"
+        path.write_bytes(DATABASE)
+        connection = sqlite3.connect(path)
+        connection.execute("CREATE TABLE notes (note_id TEXT PRIMARY KEY)")
+        connection.execute("INSERT INTO campaigns VALUES ('c2', 'Later')")
+        connection.commit()
+        connection.close()
+        return path.read_bytes()
+    finally:
+        shutil.rmtree(folder)
+
+
+NEWER_DATABASE = newer_database_bytes()
+
+
 def base_tree(*, live_extra=(), new_extra=("licenses/NEW-NOTICE.md",), new_drop=(), artifact=None, inventory=None,
               phase="verified", config=True):
     """The running copy at `app`, its data at `app/isolated-data`, and the retained download."""
@@ -180,7 +202,9 @@ def outcome(call):
 def listing(root: Path) -> list:
     rows = []
     for path in sorted(root.rglob("*")):
-        relative = path.relative_to(root).as_posix()
+        # Each restored file gets its own random temporary folder; fold those names so the
+        # listing's order does not depend on them.
+        relative = TEMP_NAME.sub(r"\1<temp>", path.relative_to(root).as_posix())
         if path.is_dir():
             rows.append([relative, "dir"])
         elif path.suffix == ".json" and ".application-updates/" in relative:
@@ -302,6 +326,64 @@ def run(scenario):
                 result = outcome(authorize)
             elif name == "startup_confirm":
                 result = outcome(lambda: state["startup"].confirm())
+            elif name == "recovery_new":
+                def recover():
+                    state["recovery"] = RecoveryOperation(state["prepared"])
+                    return None
+                result = outcome(recover)
+            elif name == "recovery_inspect":
+                result = outcome(lambda: state["recovery"].inspect())
+            elif name == "recovery_rollback":
+                exited = op.get("exited", True)
+                result = outcome(lambda: state["recovery"].rollback(op["choice"], lambda: exited))
+            elif name == "recovery_create_restart":
+                def recovery_restart():
+                    handshake = state["recovery"].create_restart(op["identity"])
+                    state["nonce"] = handshake._load()["nonce"]
+                    return state["nonce"]
+                result = outcome(recovery_restart)
+            elif name == "recovery_retry":
+                exited = op.get("exited", True)
+                def retry():
+                    handshake = state["recovery"].retry_restart(op.get("nonce", state["nonce"]), op["identity"],
+                                                                lambda: exited)
+                    state["nonce"] = handshake._load()["nonce"]
+                    return state["nonce"]
+                result = outcome(retry)
+            elif name == "recovery_launch":
+                result = outcome(lambda: list(state["recovery"].handshake.launch_once(lambda arguments: list(arguments))))
+            elif name == "recovery_confirm_handshake":
+                result = outcome(lambda: state["recovery"].handshake.confirm(
+                    nonce=state["nonce"], live=live, desktop_version=__version__, owner_version=__version__,
+                    target=TARGET, distribution="portable", storage_compatibility=1))
+            elif name == "recovery_confirmed":
+                result = outcome(lambda: state["recovery"].handshake.confirmed())
+            elif name == "recovery_confirm":
+                result = outcome(lambda: state["recovery"].confirm())
+            elif name in ("service_state", "service_handoff"):
+                def serve():
+                    installation = Installation.for_recovery(
+                        {"live": str(live), "data_root": str(data), "version": op.get("native", __version__),
+                         "target": TARGET, "distribution": "portable"}, data)
+                    service = RecoveryService(installation, current=Version.parse(op.get("current", __version__)),
+                                              verify=RING.verify, native_version=op.get("native", __version__))
+                    host = {"version": op.get("native", __version__), "target": TARGET, "distribution": "portable"}
+                    if name == "service_state":
+                        return service.handle("state", {"host": host})
+                    return service.handle("handoff", {"host": host, "operation_id": OP, "choice": op.get("choice", "keep"),
+                                                      "restart_nonce": None})
+                result = outcome(serve)
+            elif name == "authorize_recovery_startup":
+                def authorize_recovery():
+                    installation = Installation.from_launch(
+                        {"live": str(live), "data_root": str(data), "version": __version__, "target": TARGET,
+                         "distribution": "portable"}, data)
+                    request = {"operation_id": OP, "attempt": ATTEMPT, "nonce": state["nonce"], "recovery": True}
+                    state["startup"] = authorize_startup(
+                        data, installation, request, running=Version.parse(__version__), desktop_version=__version__,
+                        storage_compatibility=1, verify=RING.verify)
+                    return None
+                result = outcome(authorize_recovery)
             elif name == "extract":
                 def extract():
                     base = data / ".application-updates" / OP
@@ -351,6 +433,39 @@ def scenarios():
                    {"op": "authorize_startup", "nonce": "d" * 32}, {"op": "authorize_startup"},
                    {"op": "startup_confirm"}, {"op": "startup_confirm"}, {"op": "confirm"}, {"op": "startup_confirm"},
                    {"op": "startup_confirm"}]}
+    old_identity = {**IDENTITY, "version": __version__}
+    live_db = "app/isolated-data/authority.sqlite3"
+    recovered = [{"op": "new"}, {"op": "prepare"}, {"op": "apply"}, {"op": "recovery_new"}]
+    yield {"name": "recovery keeps current data", "tree": encoded(base_tree()),
+           "ops": [*recovered, {"op": "recovery_inspect"}, {"op": "service_state"}, {"op": "service_handoff"},
+                   {"op": "recovery_rollback", "choice": "Keep current data", "exited": False},
+                   {"op": "recovery_rollback", "choice": "keep"},
+                   {"op": "recovery_rollback", "choice": "Keep current data"}, {"op": "recovery_inspect"},
+                   {"op": "recovery_rollback", "choice": "Keep current data"},
+                   {"op": "recovery_create_restart", "identity": IDENTITY},
+                   {"op": "recovery_create_restart", "identity": old_identity},
+                   {"op": "recovery_create_restart", "identity": old_identity}, {"op": "recovery_inspect"},
+                   {"op": "recovery_confirmed"}, {"op": "recovery_launch"}, {"op": "authorize_recovery_startup"}, {"op": "startup_confirm"},
+                   {"op": "recovery_confirm"}, {"op": "recovery_confirm_handshake"}, {"op": "startup_confirm"}, {"op": "recovery_confirm"}, {"op": "startup_confirm"},
+                   {"op": "recovery_inspect"}, {"op": "service_state"}]}
+    yield {"name": "recovery restores pre-update data", "tree": encoded(base_tree()),
+           "ops": [*recovered, {"op": "write", "path": live_db, "b64": b64(NEWER_DATABASE)}, {"op": "recovery_inspect"},
+                   {"op": "recovery_rollback", "choice": "Keep current data"},
+                   {"op": "recovery_rollback", "choice": "Restore pre-update data"}, {"op": "recovery_inspect"},
+                   {"op": "recovery_rollback", "choice": "Restore pre-update data"},
+                   {"op": "recovery_create_restart", "identity": old_identity}]}
+    yield {"name": "recovery before apply", "tree": encoded(base_tree()),
+           "ops": [{"op": "new"}, {"op": "prepare"}, {"op": "recovery_new"}, {"op": "recovery_inspect"},
+                   {"op": "recovery_rollback", "choice": "Keep current data"}, {"op": "recovery_inspect"}]}
+    yield {"name": "recovery restart retried", "tree": encoded(base_tree()),
+           "ops": [*recovered, {"op": "recovery_rollback", "choice": "Keep current data"},
+                   {"op": "recovery_create_restart", "identity": old_identity}, {"op": "recovery_launch"},
+                   {"op": "recovery_retry", "identity": old_identity, "nonce": "e" * 32},
+                   {"op": "recovery_retry", "identity": old_identity, "exited": False},
+                   {"op": "recovery_retry", "identity": old_identity}, {"op": "recovery_inspect"},
+                   {"op": "recovery_launch"}, {"op": "recovery_confirm_handshake"}, {"op": "recovery_confirm"}]}
+    yield {"name": "recovery service for another app version", "tree": encoded(base_tree()),
+           "ops": [*recovered, {"op": "service_state", "native": "0.4.0", "current": "0.4.0"}]}
     yield {"name": "without settings", "tree": encoded(base_tree(config=False)),
            "ops": [{"op": "new"}, {"op": "prepare"}, {"op": "require_selected"}]}
     yield {"name": "deferred download prepares too", "tree": encoded(base_tree(phase="deferred")),

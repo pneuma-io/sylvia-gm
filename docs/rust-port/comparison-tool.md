@@ -97,7 +97,7 @@ A session is a JSON file in `crates/sylvia-compare/sessions`:
 - `timeout_s` (per step, default 300) and `ready_timeout_s` (default 600) bound the waits.
 - `seed_files` (session): files or folders written under the work folder before the first launch (`{"path": "data/...", "text"|"json"|"directory": ...}`; `json` is written in Python's canonical encoding). `${work}`, `${data_root}` and `${app_root}` (an empty `app` folder beside the data folder) may be used.
 - `launch` (session): extra launch-envelope fields, such as the desktop's `desktop_update_context`. A `relaunch` step may give its own `launch` and its own `seed`, written before the owner starts again.
-- A launch the owner refuses (its first reply is not `ok`) is recorded with that reply and the owner's exit code; only a `relaunch` may follow it.
+- A launch the owner refuses (its first reply is not `ok`, or it exits without one) is recorded with that reply (or `null`) and the owner's exit code; only a `relaunch` may follow it. A `shutdown` the owner refuses does not close the session.
 - End with `shutdown`, so the database is closed cleanly before it is dumped.
 
 Use identities the session chooses (`operation_id`, `message_id`, `attempt_id`): Sylvia
@@ -212,6 +212,7 @@ rules check, an attack); lane 4 says what those need.
 | `webui-remote` | Private HTTPS mode: the sign-in page, the remote Host only, access-key sign-in, the remote cookie, sign-out, the sign-in budget, Stop | recorded on Windows and Linux; five reproductions on each |
 | `builder-chat-edit` | Renaming and deleting Builder chats before any exists: missing parameters, display names, identities, the exact deletion confirmation, an unknown chat | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update` | The desktop updater as 0.4.1 ships it (no trusted key): the unavailable state, every refusal, the request and host checks, the reservation, abort and shutdown rules, both update gates, and the startup check with seeded receipts and launch fields | recorded on Windows and Linux; five reproductions on each |
+| `desktop-update-recovery` | The recovery-only owner: an update interrupted mid-apply met by the desktop's update context, its bounded recovery pipe, the refused methods and shutdown, and launches without a reply or with the ordinary refusal | recorded on Windows and Linux; five reproductions on each |
 
 The last three follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop
