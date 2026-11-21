@@ -584,6 +584,23 @@ impl LocalDiagnostics {
             let _ = finished.recv_timeout(Duration::from_secs(1));
         }
     }
+
+    /// For tests: what a killed owner leaves behind. The writer finishes the write it is in
+    /// and stops, nothing more is recorded (no `owner_stopped`), and the call returns only
+    /// once the writer has ended, so no stale writer runs beside the next owner.
+    #[cfg(test)]
+    fn kill(&self) {
+        {
+            let mut inner = self.lock();
+            inner.closed = true;
+            inner.stop = true;
+            inner.wake = true;
+        }
+        self.shared.woken.notify_all();
+        if let Some(finished) = self.finished.lock().expect("diagnostics lock").take() {
+            finished.recv_timeout(Duration::from_secs(60)).expect("the killed writer ends");
+        }
+    }
 }
 
 /// The optional fields of [`LocalDiagnostics::record`], Python's keyword arguments.
@@ -789,33 +806,65 @@ mod tests {
         let second = diagnostics.record("command_completed", fields);
         assert_eq!(first, second, "one minute of matching outcomes is one record");
         assert_eq!(first.len(), 32);
+        // `close` waits at most a second for its final write (Python's bound); under load the
+        // write can land later, so wait for it.
         diagnostics.close();
-        let text = std::fs::read_to_string(root.join("diagnostics/runtime.jsonl")).unwrap();
-        let events: Vec<String> = text
-            .lines()
-            .map(|line| serde_json::from_str::<Json>(line).unwrap()["event"].as_str().unwrap().to_owned())
-            .collect();
-        assert_eq!(events, ["owner_started", "command_completed", "owner_stopped"]);
+        let text = written(&root, "owner_stopped");
+        assert_eq!(events_in(&text), ["owner_started", "command_completed", "owner_stopped"]);
         assert!(text.contains("\"count\":2"));
 
         // A run that did not stop cleanly is reported as interrupted by the next one.
         let again = LocalDiagnostics::with_clock(&root, fixed_clock(1_800_000_100.0));
         again.record("command_completed", fields);
-        // Not closed: wait for the writer's own snapshot, as a killed owner leaves it.
-        let deadline = std::time::Instant::now() + Duration::from_secs(10);
-        while !std::fs::read_to_string(root.join("diagnostics/runtime.jsonl"))
-            .unwrap_or_default()
-            .contains("1800000100")
-        {
-            assert!(std::time::Instant::now() < deadline, "the writer did not write within 10 s");
-            std::thread::sleep(Duration::from_millis(20));
-        }
-        drop(again);
+        // Not closed: wait for the writer's own snapshot, as a killed owner leaves it, then
+        // stop its writer as the killed process's would be gone.
+        written(&root, "1800000100");
+        again.kill();
         let resumed = LocalDiagnostics::with_clock(&root, fixed_clock(1_800_000_200.0));
         resumed.close();
-        let text = std::fs::read_to_string(root.join("diagnostics/runtime.jsonl")).unwrap();
-        assert!(text.contains("owner_interrupted"), "{text}");
+        // The resumed owner's final write: every session's rows, the killed one reported.
+        let text = written_when(&root, |text| events_in(text).len() == 8);
+        assert_eq!(
+            events_in(&text),
+            [
+                "owner_started",
+                "command_completed",
+                "owner_stopped",
+                "owner_started",
+                "command_completed",
+                "owner_interrupted",
+                "owner_started",
+                "owner_stopped",
+            ],
+            "{text}"
+        );
         let _ = std::fs::remove_dir_all(root);
+    }
+
+    /// The `event` of each snapshot row, in order.
+    fn events_in(text: &str) -> Vec<String> {
+        text.lines()
+            .filter_map(|line| serde_json::from_str::<Json>(line).ok())
+            .filter_map(|row| row["event"].as_str().map(str::to_owned))
+            .collect()
+    }
+
+    /// The diagnostics snapshot once it contains `needle`, waiting up to 30 s for the writer.
+    fn written(root: &Path, needle: &str) -> String {
+        written_when(root, |text| text.contains(needle))
+    }
+
+    /// The diagnostics snapshot once `ready` accepts it, waiting up to 30 s for the writer.
+    fn written_when(root: &Path, ready: impl Fn(&str) -> bool) -> String {
+        let deadline = std::time::Instant::now() + Duration::from_secs(30);
+        loop {
+            let text = std::fs::read_to_string(root.join("diagnostics/runtime.jsonl")).unwrap_or_default();
+            if ready(&text) {
+                return text;
+            }
+            assert!(std::time::Instant::now() < deadline, "the writer did not write within 30 s: {text}");
+            std::thread::sleep(Duration::from_millis(20));
+        }
     }
 
     #[test]
