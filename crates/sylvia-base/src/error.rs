@@ -18,6 +18,11 @@ pub struct CodedError {
     pub message: String,
     /// Structured diagnostics (`diagnostic.as_payload()` in Python). Usually empty.
     pub diagnostics: Vec<Json>,
+    /// The Python exception class this error stands for (`type(error).__name__`), for example
+    /// `CommandRejected`, `StaleRevision` or `ConfigError`. Local diagnostics and saved reports
+    /// record it, so set it wherever the Python code raised a specific class. `None` means the
+    /// error has no Python counterpart class yet; the owner then records `CommandRejected`.
+    pub error_type: Option<&'static str>,
 }
 
 /// Result alias used across the port.
@@ -26,7 +31,7 @@ pub type CodedResult<T> = Result<T, CodedError>;
 impl CodedError {
     /// A rejection with an explicit code.
     pub fn new(code: impl Into<String>, message: impl Into<String>) -> Self {
-        Self { code: code.into(), message: message.into(), diagnostics: Vec::new() }
+        Self { code: code.into(), message: message.into(), diagnostics: Vec::new(), error_type: None }
     }
 
     /// The default code Python uses when an exception carries none.
@@ -38,6 +43,13 @@ impl CodedError {
     #[must_use]
     pub fn with_diagnostics(mut self, diagnostics: Vec<Json>) -> Self {
         self.diagnostics = diagnostics;
+        self
+    }
+
+    /// Name the Python exception class this error stands for.
+    #[must_use]
+    pub fn with_error_type(mut self, class_name: &'static str) -> Self {
+        self.error_type = Some(class_name);
         self
     }
 
