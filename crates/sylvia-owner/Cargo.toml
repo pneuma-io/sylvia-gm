@@ -36,10 +36,15 @@ sylvia-store.workspace = true
 sylvia-provider.workspace = true
 ed25519-dalek.workspace = true
 unicode-normalization.workspace = true
+rusqlite.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-version.workspace = true
 winapi-util.workspace = true
+windows-sys.workspace = true
+
+[target.'cfg(not(windows))'.dependencies]
+rustix.workspace = true
 
 [dev-dependencies]
 flate2.workspace = true

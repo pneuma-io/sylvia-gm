@@ -108,8 +108,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/manifest.py:421` | `_parse_manifest` | .casefold() | `names.add(name.casefold())` | `update_vectors` |
 | `application/desktop_update/manifest.py:422` | `_parse_manifest` | .casefold() | `maximum = 128 if name.casefold() == "sylvia-portable.json" else ARTIFACT_LIMIT` | `update_vectors` |
 | `application/desktop_update/manifest.py:440` | `_parse_manifest` | .casefold() | `if not {name.casefold() for name in required} <= names:` | `update_vectors` |
-| `application/desktop_update/replacement.py:139` | `_inventory` | .casefold() | `name.casefold() in names` | |
-| `application/desktop_update/replacement.py:152` | `_inventory` | .casefold() | `names.add(name.casefold())` | |
+| `application/desktop_update/replacement.py:139` | `_inventory` | .casefold() | `name.casefold() in names` | `preparation_vectors` |
+| `application/desktop_update/replacement.py:152` | `_inventory` | .casefold() | `names.add(name.casefold())` | `preparation_vectors` |
 | `application/desktop_update/replacement.py:273` | `PortableReplacement._restore_receipt` | .casefold() | `if len({entry.path.casefold() for entry in files}) != len(files):` | |
 | `application/desktop_update/transport.py:238` | `content_length` | .isdigit() | `or not length.isdigit()` | `update_vectors` |
 | `interfaces/owner_process.py:313` | `_package_version_priority` | .casefold() | `return (0, 0, 0, 0, 0, (), version.casefold())` | |

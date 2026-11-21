@@ -29,6 +29,7 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-store/src/sessions.rs` (`is_reserved_windows_name`) | CPython's `PureWindowsPath.is_reserved` and `_WIN_RESERVED_NAMES` (`Lib/pathlib.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 | `sylvia-owner/src/desktop_update/url.rs` | CPython's `urllib.parse.urlsplit` with `_check_bracketed_netloc`, `_check_bracketed_host` and `_checknetloc`, `unquote` and `_unquote_impl` (`Lib/urllib/parse.py`), and `ipaddress`'s IPv4 and IPv6 text parsing (`Lib/ipaddress.py`) | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 | `sylvia-owner/src/desktop_update/manifest.rs` (`b64decode_strict`) | CPython's `binascii.a2b_base64` in strict mode, as `base64.b64decode(..., validate=True)` calls it (`Modules/binascii.c`) | CPython 3.12.11 | PSF License Version 2 | lane 5 |
+| `sylvia-owner/src/desktop_update/windows.rs` (`disk_free`, `dirname_wide`) | CPython's `os__getdiskusage_impl` and `_dirnameW` (`Modules/posixmodule.c`), as `shutil.disk_usage` calls them | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.

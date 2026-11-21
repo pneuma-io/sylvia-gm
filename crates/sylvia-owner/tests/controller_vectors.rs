@@ -215,7 +215,8 @@ async fn run_service(scenario: &J, index: usize) -> J {
         Ok(())
     });
     let keys = if scenario.get("keys") == Some(&json!(false)) { BTreeMap::new() } else { keys() };
-    let service = DesktopUpdateService::with_trust(&root, None, Some(reserved), Some(release), keys, factory);
+    let service =
+        DesktopUpdateService::with_trust(&root, None, None, Some(reserved), Some(release), keys, factory);
     let mut results = Vec::new();
     for op in scenario["ops"].as_array().unwrap() {
         let name = op["op"].as_str().unwrap();

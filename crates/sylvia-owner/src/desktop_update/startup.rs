@@ -1,18 +1,22 @@
 //! `application/desktop_update/startup.py`: an update restart is authorized before migration,
 //! from update-owned bytes only. No owner acquisition, SQL migration, apply or launch here.
 //!
-//! Ported: the launch-envelope reading (`owner_startup_context`) and every refusal of
-//! `authorize_startup` that comes before update preparation. An ordinary start (no restart
-//! request) is complete: it refuses when a retained update was interrupted mid-apply. A
-//! restart request that reaches the retained preparation needs `preparation.py` and answers
-//! [`super::service::PREPARATION_PENDING`] until it is ported.
+//! All of it is ported: the launch-envelope reading (`owner_startup_context`), the ordinary
+//! start (refused when a retained update was interrupted mid-apply), and an update or
+//! recovery restart, authorized against its retained preparation and restart intent and
+//! later confirmed (`AuthorizedStartup.confirm`).
 
+use super::checkpoint::STORAGE_COMPATIBILITY;
 use super::launch::Installation;
-use super::manifest::{Version, APP_VERSION};
-use super::storage::{phase, present, same_path, UpdateStore};
+use super::manifest::{bounded_json, KeyRing, Version, APP_VERSION, MANIFEST_LIMIT};
+use super::preparation::PreparedUpdate;
+use super::replacement::file_matches;
+use super::restart::{RestartContext, RestartHandshake};
+use super::service::public_keys;
+use super::storage::{checked_file, phase, present, same_path, UpdateStore};
 use super::update_error;
 use std::path::{Path, PathBuf};
-use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_base::{CodedResult, Json, JsonMap};
 
 /// `_UNSAFE_ORDINARY_START`: phases in which saved data must not be opened normally.
 pub const UNSAFE_ORDINARY_START: [&str; 7] = [
@@ -25,13 +29,65 @@ pub const UNSAFE_ORDINARY_START: [&str; 7] = [
     phase::ROLLBACK_AWAITING_RESTART,
 ];
 
-/// `AuthorizedStartup`: an update restart this owner was started to confirm. Its
-/// confirmation needs update preparation, which is not ported yet, so no value of this type
-/// is made yet.
-#[derive(Debug, Clone, PartialEq)]
+/// `AuthorizedStartup`: the update (or recovery) restart this owner was started to confirm.
+#[derive(Debug, Clone)]
 pub struct AuthorizedStartup {
-    pub version: String,
+    pub prepared: PreparedUpdate,
+    pub handshake: RestartHandshake,
+    pub nonce: String,
     pub installation: Installation,
+    pub version: String,
+    pub desktop_version: String,
+    pub compatibility: i64,
+    pub retained_compatibility: i64,
+    pub recovery: bool,
+    pub completed: bool,
+}
+
+impl AuthorizedStartup {
+    /// `_context()`.
+    fn context(&self) -> RestartContext<'_> {
+        RestartContext {
+            nonce: &self.nonce,
+            live: &self.installation.live,
+            desktop_version: &self.desktop_version,
+            owner_version: &self.version,
+            target: &self.installation.target,
+            distribution: &self.installation.distribution,
+            storage_compatibility: self.compatibility,
+        }
+    }
+
+    /// `confirm()`: the real new owner calls this only once the native app reports a usable
+    /// start. Only the helper finalizes the operation; until it does, admission stays closed,
+    /// so a late helper write cannot overtake the player's next check.
+    pub fn confirm(&mut self) -> CodedResult<bool> {
+        self.installation.check(&self.installation.target, &self.installation.distribution)?;
+        if self.completed {
+            return Ok(true);
+        }
+        self.prepared.require_selected(Some(self.retained_compatibility))?;
+        let context = self.context();
+        self.handshake.confirm(&context)?;
+        let row = self.prepared.store.load()?;
+        let Some(row) = row.filter(|row| row.operation_id == self.prepared.identity) else {
+            return Err(update_error("changed_restart", "The startup operation changed before completion."));
+        };
+        let finished = if self.recovery { phase::ROLLED_BACK } else { phase::CONFIRMED };
+        if row.phase == finished {
+            self.completed = true;
+            return Ok(true);
+        }
+        let error = self.handshake.error_receipt()?;
+        if present(&error) {
+            checked_file(&error, 4096)?;
+            return Err(update_error(
+                "update_completion_failed",
+                "The update helper could not finish. Use recovery.",
+            ));
+        }
+        Ok(false)
+    }
 }
 
 /// `authorize_startup(data, installation, request, running=, desktop_version=, ...)`.
@@ -41,6 +97,8 @@ pub fn authorize_startup(
     request: Option<&Json>,
     running: &Version,
     desktop_version: &str,
+    storage_compatibility: i64,
+    keyring: &KeyRing,
 ) -> CodedResult<Option<AuthorizedStartup>> {
     let update_root = data.join(".application-updates");
     let journal = update_root.join("current.json");
@@ -93,10 +151,67 @@ pub fn authorize_startup(
         return Err(update_error("wrong_restart", "The selected app and update operation do not match."));
     }
     installation.check(&installation.target, &installation.distribution)?;
-    Err(CodedError::new(
-        super::service::PREPARATION_PENDING,
-        "The Rust owner does not confirm update restarts yet.",
-    ))
+    let (identity, attempt, nonce) = (&identities[0], &identities[1], &identities[2]);
+    let stage = update_root.join(identity).join("attempts").join(attempt);
+    let binding = bounded_json(&checked_file(&stage.join("prepared-update.json"), 8192)?, MANIFEST_LIMIT)?;
+    let Some(checkpoint) =
+        binding.as_object().and_then(|binding| binding.get("checkpoint")).and_then(Json::as_object)
+    else {
+        return Err(update_error("invalid_restart", "The retained restart preparation is incomplete."));
+    };
+    let old = Version::parse(binding.get("current_version").unwrap_or(&Json::Null))?;
+    let old_compatibility = checkpoint
+        .get("storage_compatibility")
+        .filter(|value| value.is_number())
+        .and_then(Json::as_i64)
+        .filter(|value| 0 < *value && *value < 1 << 31);
+    let Some(old_compatibility) = old_compatibility else {
+        return Err(update_error("invalid_checkpoint", "The retained storage contract is invalid."));
+    };
+    let mut prepared = PreparedUpdate::new(
+        data,
+        &installation.live,
+        identity,
+        attempt,
+        &old,
+        &installation.target,
+        &installation.distribution,
+        keyring,
+    )?;
+    prepared.require_selected(Some(old_compatibility))?;
+    let expected_version = if recovery { old.text.clone() } else { prepared.manifest.version.text.clone() };
+    if expected_version != running.text
+        || row.version.as_deref() != Some(prepared.manifest.version.text.as_str())
+    {
+        return Err(update_error("wrong_restart", "The running owner is not the signed update version."));
+    }
+    if recovery {
+        prepared.replacement()?.verify_rollback()?;
+        if storage_compatibility != old_compatibility {
+            return Err(update_error("wrong_restart", "The restored owner's data contract is inconsistent."));
+        }
+    } else {
+        for payload in &prepared.manifest.files {
+            if !file_matches(&installation.live.join(&payload.path), payload)? {
+                return Err(update_error("application_changed", "The updated application is incomplete."));
+            }
+        }
+    }
+    let handshake = RestartHandshake::new(data, identity, attempt, recovery)?;
+    let result = AuthorizedStartup {
+        prepared,
+        handshake,
+        nonce: nonce.clone(),
+        installation: installation.clone(),
+        version: running.text.clone(),
+        desktop_version: desktop_version.to_string(),
+        compatibility: storage_compatibility,
+        retained_compatibility: old_compatibility,
+        recovery,
+        completed: false,
+    };
+    result.handshake.authorize(&result.context())?;
+    Ok(Some(result))
 }
 
 /// What the launch envelope says about updates: the installation context, when the native
@@ -126,6 +241,8 @@ pub fn owner_startup_context(
         launch.get("desktop_update_start"),
         &running,
         APP_VERSION,
+        STORAGE_COMPATIBILITY,
+        &KeyRing::new(public_keys()),
     )?;
     Ok((installation, start))
 }

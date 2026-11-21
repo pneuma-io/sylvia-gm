@@ -144,6 +144,23 @@ pub fn is_update_error(error: &CodedError) -> bool {
     error.error_type == Some("UpdateError")
 }
 
+/// `shutil.disk_usage(path).free`: on Windows the volume's total free bytes
+/// (`nt._getdiskusage`), on Linux `f_bavail * f_frsize` from `statvfs`.
+pub fn disk_free(path: &Path) -> std::io::Result<u64> {
+    #[cfg(windows)]
+    {
+        super::windows::disk_free(path)
+    }
+    #[cfg(not(windows))]
+    {
+        let stats = rustix::fs::statvfs(path)?;
+        stats
+            .f_bavail
+            .checked_mul(stats.f_frsize)
+            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::InvalidData, "free space exceeds 64 bits"))
+    }
+}
+
 /// `path.exists() or path.is_symlink()`.
 pub fn present(path: &Path) -> bool {
     std::fs::symlink_metadata(path).is_ok()
@@ -377,6 +394,16 @@ fn identity_of_file(file: &std::fs::File) -> std::io::Result<Identity> {
     Ok((metadata.dev(), metadata.ino()))
 }
 
+/// A path's `(st_dev, st_ino)`.
+pub fn file_identity(path: &Path) -> std::io::Result<Identity> {
+    Ok(identity_of_path(path)?.0)
+}
+
+/// An open file's `(st_dev, st_ino)` (`os.fstat`).
+pub fn open_identity(file: &std::fs::File) -> std::io::Result<Identity> {
+    identity_of_file(file)
+}
+
 /// `_is_reparse_point(path)`: a symbolic link, or on Windows any reparse point (junctions).
 fn is_reparse_point(path: &Path) -> std::io::Result<bool> {
     let metadata = std::fs::symlink_metadata(path)?;
@@ -394,6 +421,12 @@ fn is_reparse_point(path: &Path) -> std::io::Result<bool> {
 /// `left == right` for two `pathlib` paths: the same components, case-insensitively on Windows.
 pub fn same_path(left: &Path, right: &Path) -> bool {
     comparable(left) == comparable(right)
+}
+
+/// `path.is_relative_to(other)` for `pathlib` paths: `other`'s components begin `path`'s
+/// (equal paths included). Nothing is resolved.
+pub fn is_relative_to(path: &Path, other: &Path) -> bool {
+    comparable(path).starts_with(&comparable(other))
 }
 
 fn comparable(path: &Path) -> Vec<String> {

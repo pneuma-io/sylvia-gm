@@ -28,7 +28,7 @@ use crate::desktop_update::service::DesktopUpdateService;
 use crate::desktop_update::startup::{owner_startup_context, AuthorizedStartup};
 use crate::desktop_update::storage::operation_id;
 use crate::diagnostics::{Fields, LocalDiagnostics};
-use crate::dispatch::{self, required_text, DispatchContext, DispatchResult, Failure, PORT_PENDING};
+use crate::dispatch::{self, required_text, DispatchContext, DispatchResult, Failure};
 use crate::display_reads::DisplayReads;
 use crate::protocol::{self, Frame};
 use crate::services::WorkGuard;
@@ -247,7 +247,7 @@ struct Owner {
     /// `update_installation`: the native update context, when the launch gave a valid one.
     update_installation: Option<Installation>,
     /// `update_startup`: the update restart this owner was started to confirm.
-    update_startup: Option<AuthorizedStartup>,
+    update_startup: Mutex<Option<AuthorizedStartup>>,
     /// `update_start_confirmed`.
     update_start_confirmed: AtomicBool,
     /// `supervisor._desktop_update_operation`: the update that has reserved this owner.
@@ -260,7 +260,7 @@ impl Owner {
     /// The gates' view of the update state.
     fn gates(&self) -> UpdateGates {
         UpdateGates {
-            startup_unconfirmed: self.update_startup.is_some()
+            startup_unconfirmed: self.update_startup.lock().expect("update startup lock").is_some()
                 && !self.update_start_confirmed.load(Ordering::SeqCst),
             reserved_operation: self.update_operation.lock().expect("update reservation lock").clone(),
         }
@@ -280,9 +280,19 @@ impl Owner {
         let operation = Arc::clone(&self.update_operation);
         let release: crate::desktop_update::service::Release =
             Arc::new(move |identity: &str| abort_desktop_update(&operation, identity));
+        // `bus.backup_database`: the store's coherent online backup, called from the update
+        // controller's blocking worker.
+        let store = self.context.store.clone();
+        let backup: crate::desktop_update::service::Backup = Arc::new(move |target: &Path| {
+            let target = target.to_path_buf();
+            store
+                .call_blocking(move |store| store.backup_database(&target))
+                .map_err(crate::commands::campaigns::store_error)
+        });
         let service = Arc::new(DesktopUpdateService::new(
             &self.context.storage_root,
             self.update_installation.clone(),
+            Some(backup),
             Some(reserved),
             Some(release),
         ));
@@ -373,7 +383,7 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
         drafts: Mutex::new(None),
         updates: Mutex::new(None),
         update_installation: installation,
-        update_startup: startup,
+        update_startup: Mutex::new(startup),
         update_start_confirmed: AtomicBool::new(false),
         update_operation: Arc::new(Mutex::new(None)),
         closing: Arc::clone(&replies.closing),
@@ -608,15 +618,34 @@ fn update_lifecycle(
 }
 
 /// `desktop_update_confirm_startup`: only an owner started to confirm an update restart
-/// answers it, and confirming one needs update preparation (not ported yet).
-fn confirm_update_startup(owner: &Owner, params: &JsonMap) -> DispatchResult {
-    if params.len() != 1 || !params.contains_key("host") || owner.update_startup.is_none() {
-        return Err(Failure::protocol("No update startup is awaiting confirmation"));
+/// answers it. The native host must name the same version, target and distribution. The
+/// first confirmation discards the updater's boot-time recovery projection.
+async fn confirm_update_startup(owner: &Owner, params: &JsonMap) -> DispatchResult {
+    let confirmed = {
+        let mut startup = owner.update_startup.lock().expect("update startup lock");
+        let Some(startup) = startup.as_mut().filter(|_| params.len() == 1 && params.contains_key("host"))
+        else {
+            return Err(Failure::protocol("No update startup is awaiting confirmation"));
+        };
+        let mut expected = JsonMap::new();
+        expected.insert("version".into(), startup.version.clone().into());
+        expected.insert("target".into(), startup.installation.target.clone().into());
+        expected.insert("distribution".into(), startup.installation.distribution.clone().into());
+        if params["host"] != Json::Object(expected) {
+            return Err(Failure::protocol("The native startup context changed"));
+        }
+        startup.confirm().map_err(Failure::from)?
+    };
+    let already = owner.update_start_confirmed.swap(confirmed, Ordering::SeqCst);
+    if confirmed && !already {
+        let updates = owner.updates.lock().expect("updates lock").clone();
+        if let Some(updates) = updates {
+            updates.startup_completed().await;
+        }
     }
-    Err(Failure::Rejected(sylvia_base::CodedError::new(
-        PORT_PENDING,
-        "The Rust owner does not confirm update restarts yet.",
-    )))
+    let mut result = JsonMap::new();
+    result.insert("status".into(), if confirmed { "confirmed" } else { "waiting_for_helper" }.into());
+    Ok(Json::Object(result))
 }
 
 /// The provider-work reservation of a model-bound command, taken before it runs as a task.
@@ -650,7 +679,7 @@ async fn execute_request(
 ) -> Json {
     let started = Instant::now();
     let outcome = match method {
-        "desktop_update_confirm_startup" => confirm_update_startup(owner, params),
+        "desktop_update_confirm_startup" => confirm_update_startup(owner, params).await,
         "desktop_update_state"
         | "desktop_update_check"
         | "desktop_update_download"
