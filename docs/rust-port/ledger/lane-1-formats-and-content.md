@@ -22,7 +22,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | pending | |
 | `src/sylvia_gm/application/campaign_starting_world.py` | 97 | `sylvia-app::campaign_starting_world` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/character_card_import.py` | 628 | `sylvia-app::character_card_import` | pending | |
-| `src/sylvia_gm/application/character_profiles.py` | 391 | `sylvia-app::character_profiles` | pending | |
+| `src/sylvia_gm/application/character_profiles.py` | 391 | `sylvia-app::character_profiles` | ported | `character_profile_vectors` (one file for Windows and Linux); reads through `pyjson::loads_hooked`; differences rows 1, 3 and 4 |
 | `src/sylvia_gm/application/character_rules.py` | 145 | `sylvia-app::character_rules` | pending | |
 | `src/sylvia_gm/application/compatible_character_copy.py` | 171 | `sylvia-app::compatible_character_copy` | pending | |
 | `src/sylvia_gm/application/import_repair.py` | 621 | `sylvia-app::import_repair` | pending | |
@@ -40,7 +40,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads; the rest of `plan_spatial_admission.py` waits on lane 2's `tactical_grid` and `spatial` |
 | `src/sylvia_gm/application/ready_campaigns.py` | 504 | `sylvia-app::ready_campaigns` | pending | |
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
-| `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | pending | |
+| `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | ported | `character_profile_vectors` (storage scripts: links, tampering, delete and retry) |
 | `src/sylvia_gm/application/reusable_participants.py` | 799 | `sylvia-app::reusable_participants` | pending | |
 | `src/sylvia_gm/application/reusable_plans.py` | 575 | `sylvia-app::reusable_plans` | pending | |
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |

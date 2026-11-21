@@ -26,11 +26,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_card_import.py:461` | `load_import_original` | len() against a limit | `or len(source) > MAX_CARD_BYTES` | |
 | `application/character_card_import.py:524` | `_read_pending_preview` | len() against a limit | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
 | `application/character_card_import.py:590` | `stage_card_preview` | len() against a limit | `if len(tuple(root.iterdir())) >= MAX_PENDING_PREVIEWS:` | |
-| `application/character_profiles.py:70` | `_parse` | len() against a limit | `if not data or len(data) > MAX_PROFILE_BYTES:` | |
-| `application/character_profiles.py:170` | `validate_character_profile` | len() against a limit | `if len(canonical_json_bytes(value)) > MAX_PROFILE_BYTES:` | |
-| `application/character_profiles.py:254` | `validate_source_profile` | len() against a limit | `or len(name) > 160` | |
-| `application/character_profiles.py:344` | `save_character_profile` | len() against a limit | `if len(tuple(root.iterdir())) >= 256:` | |
-| `application/character_profiles.py:383` | `character_profile_catalog` | len() against a limit | `if len(paths) > 256:` | |
+| `application/character_profiles.py:70` | `_parse` | len() against a limit | `if not data or len(data) > MAX_PROFILE_BYTES:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:170` | `validate_character_profile` | len() against a limit | `if len(canonical_json_bytes(value)) > MAX_PROFILE_BYTES:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:254` | `validate_source_profile` | len() against a limit | `or len(name) > 160` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:344` | `save_character_profile` | len() against a limit | `if len(tuple(root.iterdir())) >= 256:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:383` | `character_profile_catalog` | len() against a limit | `if len(paths) > 256:` |  `sylvia-app` character_profile_vectors |
 | `application/character_rules.py:42` | `validate_character_rules` | len() against a limit | `if (not isinstance(value["description"], str) or not 1 <= len(value["description"]) <= 2000` | |
 | `application/import_repair.py:119` | `_read_selected_source` | len() against a limit | `if len(value) > _SOURCE_BYTE_LIMIT:` | |
 | `application/import_repair.py:148` | `_read_safe_zip` | len() against a limit | `if not infos or len(infos) > _MEMBER_COUNT_LIMIT:` | |
