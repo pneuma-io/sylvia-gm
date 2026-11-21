@@ -8,7 +8,13 @@
 use crate::error::{ErrorKind, ProviderError};
 use crate::pyfmt::format_g;
 
-/// The `code` and `message` of the owner's error reply for a provider error.
+/// The owner's sentence for an internal fault (any exception that is not a provider error).
+pub const INTERNAL_ERROR_MESSAGE: &str = "Sylvia encountered an internal error, not a confirmed provider \
+     failure. Previously saved work is kept. Try the action again; \
+     if it repeats, report this error with the action you were taking.";
+
+/// The `code` and `message` of the owner's error reply for a provider error. For
+/// `internal_error` the owner's reply has no `diagnostics` member.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProviderErrorReply {
     /// `provider_error`, or `context_compaction_failed` for a `ContextCompactionError`.
@@ -23,6 +29,10 @@ pub struct ProviderErrorReply {
 /// `submit_session_input`, and `None` for every other command. When it equals the error's
 /// `accepted_message_id`, the message starts with "Your message was saved. ".
 pub fn provider_error_reply(error: &ProviderError, submitted_message_id: Option<&str>) -> ProviderErrorReply {
+    if error.kind == ErrorKind::Internal {
+        // The owner's `except Exception` branch: no prefix, and its reply has no `diagnostics`.
+        return ProviderErrorReply { code: "internal_error", message: INTERNAL_ERROR_MESSAGE.into() };
+    }
     let is = |kind| error.is(kind);
     let mut code = "provider_error";
     let mut message: String = if is(ErrorKind::ContextCompaction) {

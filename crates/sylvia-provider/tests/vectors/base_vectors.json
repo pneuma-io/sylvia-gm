@@ -3140,7 +3140,15 @@
     }
    }
   ],
-  "token_limit_rejection": "The provider rejected this request because of a context or token limit. Previously saved work is kept. Compact context, use a smaller step, or choose a model with more context capacity before retrying."
+  "token_limit_rejection": "The provider rejected this request because of a context or token limit. Previously saved work is kept. Compact context, use a smaller step, or choose a model with more context capacity before retrying.",
+  "internal_reply": {
+   "id": "r-1",
+   "ok": false,
+   "error": {
+    "code": "internal_error",
+    "message": "Sylvia encountered an internal error, not a confirmed provider failure. Previously saved work is kept. Try the action again; if it repeats, report this error with the action you were taking."
+   }
+  }
  },
  "format_g": [
   [

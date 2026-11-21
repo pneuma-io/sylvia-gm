@@ -75,6 +75,17 @@ impl std::fmt::Debug for HttpResponse {
 pub trait HttpTransport: Send + Sync {
     /// Send `request` and return once the status and headers have arrived.
     fn send(&self, request: HttpRequest) -> BoxFuture<'_, Result<HttpResponse, TransportError>>;
+
+    /// Drop pooled connections and start a fresh pool (Python closes the SDK client and builds a
+    /// new one after repeated connection errors). Default: nothing to recycle.
+    fn recycle(&self) -> BoxFuture<'_, ()> {
+        Box::pin(async {})
+    }
+
+    /// Release every connection. Default: nothing to release.
+    fn close(&self) -> BoxFuture<'_, ()> {
+        Box::pin(async {})
+    }
 }
 
 /// One step of a scripted response body.
@@ -139,6 +150,8 @@ struct ScriptState {
     replies: VecDeque<ScriptedReply>,
     last: Option<ScriptedReply>,
     requests: Vec<HttpRequest>,
+    recycles: usize,
+    closes: usize,
 }
 
 /// Replays scripted replies in order, recording every request. When the script runs out, the
@@ -159,9 +172,25 @@ impl ScriptedTransport {
     pub fn requests(&self) -> Vec<HttpRequest> {
         self.state.lock().expect("script lock").requests.clone()
     }
+
+    /// How often the pool was recycled and the transport closed.
+    pub fn recycles_and_closes(&self) -> (usize, usize) {
+        let state = self.state.lock().expect("script lock");
+        (state.recycles, state.closes)
+    }
 }
 
 impl HttpTransport for ScriptedTransport {
+    fn recycle(&self) -> BoxFuture<'_, ()> {
+        self.state.lock().expect("script lock").recycles += 1;
+        Box::pin(async {})
+    }
+
+    fn close(&self) -> BoxFuture<'_, ()> {
+        self.state.lock().expect("script lock").closes += 1;
+        Box::pin(async {})
+    }
+
     fn send(&self, request: HttpRequest) -> BoxFuture<'_, Result<HttpResponse, TransportError>> {
         let reply = {
             let mut state = self.state.lock().expect("script lock");

@@ -314,7 +314,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude_runtime.py:379` | `ClaudeConnection._read` | len() against a limit | `if len(line.encode("utf-8")) > MAX_FRAME_BYTES or not line.endswith("\n"):` | |
 | `provider/_lifecycle.py:38` | `LifecycleTiming.record` | len() against a limit | `if len(self._spans) < 24:` | |
 | `provider/_openai_compat.py:644` | `_responses_service_tier` | len() against a limit | `if isinstance(value, str) and 0 < len(value) <= 32 and value.isascii():` | |
-| `provider/_openai_compat.py:855` | `OpenAICompatProvider._response_continuation_options` | len() against a limit | `and len(context_id) <= 256):` | |
+| `provider/_openai_compat.py:855` | `OpenAICompatProvider._response_continuation_options` | len() against a limit | `and len(context_id) <= 256):` || yes |
 | `provider/_reasoning.py:41` | `reasoning_values` | len() against a limit | `or len(values) > 16` | |
 | `provider/_retry_after.py:13` | `retry_after_seconds` | len() against a limit | `if not isinstance(value, str) or len(value) > 128:` | yes |
 | `provider/_speed.py:53` | `speed_options` | len() against a limit | `if not isinstance(values, (list, tuple)) or len(values) > 8:` | |
