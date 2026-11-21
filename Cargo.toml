@@ -62,6 +62,10 @@ regex = "1"
 # Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate
 # rejects (content schema patterns, docs/rust-port/sites/regex-sites.md). Added by lane 1.
 fancy-regex = "0.14"
+# NFC checks of package archive member names (`unicodedata.normalize("NFC", name)`). Pinned to
+# the release on Unicode 15.0.0, the tables of the CPython 3.12 reference; a test asserts it.
+# Added by lane 1.
+unicode-normalization = "=0.1.22"
 # Owner (lane 5), Windows only: the numeric OS version local diagnostics records
 # (`sys.getwindowsversion()`), and file identity and link counts for the desktop update's
 # folder checks (`os.stat` st_dev, st_ino and st_nlink), without unsafe code in the owner.

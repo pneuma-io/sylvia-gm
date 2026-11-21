@@ -104,6 +104,69 @@ fn int_float(int: i128, float: f64) -> std::cmp::Ordering {
     }
 }
 
+/// `data.decode("utf-8")`: the text, or the `str(UnicodeDecodeError)` Python gives.
+pub fn py_utf8_decode(data: &[u8]) -> Result<String, String> {
+    match std::str::from_utf8(data) {
+        Ok(text) => Ok(text.to_owned()),
+        Err(error) => {
+            let start = error.valid_up_to();
+            let (end, reason) = match error.error_len() {
+                None => (data.len(), "unexpected end of data"),
+                Some(1) if matches!(data[start], 0x80..=0xC1 | 0xF5..=0xFF) => {
+                    (start + 1, "invalid start byte")
+                }
+                Some(length) => (start + length, "invalid continuation byte"),
+            };
+            Err(if end - start == 1 {
+                format!("'utf-8' codec can't decode byte 0x{:02x} in position {start}: {reason}", data[start])
+            } else {
+                format!("'utf-8' codec can't decode bytes in position {start}-{}: {reason}", end - 1)
+            })
+        }
+    }
+}
+
+/// `repr(data)` for Python `bytes`.
+pub fn py_bytes_repr(data: &[u8]) -> String {
+    let quote = if data.contains(&b'\'') && !data.contains(&b'"') { '"' } else { '\'' };
+    let mut out = String::from("b");
+    out.push(quote);
+    for &byte in data {
+        match byte {
+            b'\\' => out.push_str("\\\\"),
+            b'\t' => out.push_str("\\t"),
+            b'\n' => out.push_str("\\n"),
+            b'\r' => out.push_str("\\r"),
+            byte if byte == quote as u8 => {
+                out.push('\\');
+                out.push(quote);
+            }
+            0x20..=0x7E => out.push(byte as char),
+            byte => out.push_str(&format!("\\x{byte:02x}")),
+        }
+    }
+    out.push(quote);
+    out
+}
+
+/// `type(value).__name__` of the object a JSON value parses to.
+pub fn py_type_name(value: &Json) -> &'static str {
+    match value {
+        Json::Null => "NoneType",
+        Json::Bool(_) => "bool",
+        Json::Number(n) if n.is_i64() || n.is_u64() => "int",
+        Json::Number(_) => "float",
+        Json::String(_) => "str",
+        Json::Array(_) => "list",
+        Json::Object(_) => "dict",
+    }
+}
+
+/// The `TypeError` Python raises when hashing `value` (for `set()` or a set membership test).
+pub fn py_unhashable(value: &Json) -> crate::error::DomainError {
+    crate::error::DomainError::type_error(format!("unhashable type: '{}'", py_type_name(value)))
+}
+
 /// `bool(value)`.
 pub fn py_truthy(value: &Json) -> bool {
     match value {

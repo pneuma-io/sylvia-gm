@@ -58,8 +58,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/builder_source_ingestion.py:143` | `_extract_source` | .casefold() | `extension = path.suffix.casefold()` | |
 | `infrastructure/campaign_archive.py:2587` | `validate_campaign_archive` | .casefold() | `casefold_aliases = [name.casefold() for name in names]` | |
 | `infrastructure/campaign_archive.py:2588` | `validate_campaign_archive` | unicodedata.normalize | `nfc_aliases = [unicodedata.normalize("NFC", name).casefold() for name in names]` | |
-| `infrastructure/package_archive.py:146` | `_normalized_name` | unicodedata.normalize | `normalized = unicodedata.normalize("NFC", name)` | |
-| `infrastructure/package_archive.py:149` | `_normalized_name` | .casefold() | `return normalized.casefold()` | |
+| `infrastructure/package_archive.py:146` | `_normalized_name` | unicodedata.normalize | `normalized = unicodedata.normalize("NFC", name)` | `sylvia-domain` archive_vectors |
+| `infrastructure/package_archive.py:149` | `_normalized_name` | .casefold() | `return normalized.casefold()` | `sylvia-domain` archive_vectors |
 
 ## Lane 4: Providers and agents
 
