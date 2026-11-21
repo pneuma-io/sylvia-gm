@@ -324,7 +324,7 @@ pub(crate) fn python_type(value: &Json) -> &'static str {
 }
 
 /// `sqlite_session.handoff_from_row`.
-fn handoff_from_row(row: &Named<'_>) -> StoreResult<BuilderDMHandoff> {
+pub(crate) fn handoff_from_row(row: &Named<'_>) -> StoreResult<BuilderDMHandoff> {
     let safe_payload = session_payload(&row.text("safe_payload_json")?)?;
     let mut expected = JsonMap::new();
     expected.insert("campaign_id".into(), row.text("campaign_id")?.into());
