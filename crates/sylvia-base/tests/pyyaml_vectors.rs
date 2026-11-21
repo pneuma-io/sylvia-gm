@@ -604,3 +604,12 @@ fn byte_input_marks_carry_the_byte_string_name() {
         }
     }
 }
+
+/// Callers wrap these in their own errors and move graphs and values between tasks.
+#[test]
+fn errors_graphs_and_values_are_send_and_sync() {
+    fn send_sync<T: Send + Sync>() {}
+    send_sync::<YamlError>();
+    send_sync::<pyyaml::Composed>();
+    send_sync::<Loaded>();
+}

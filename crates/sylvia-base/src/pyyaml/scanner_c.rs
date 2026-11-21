@@ -11,7 +11,7 @@
 
 use super::error::{Mark, MarkedError, MarkedKind, YamlError};
 use std::collections::VecDeque;
-use std::rc::Rc;
+use std::sync::Arc;
 
 /// `YAML_RAW_BUFFER_SIZE`.
 const RAW_BUFFER_SIZE: usize = 16384;
@@ -97,7 +97,7 @@ fn c_string(mut bytes: Vec<u8>) -> Vec<u8> {
 }
 
 pub(crate) struct CScanner {
-    name: Rc<str>,
+    name: Arc<str>,
     chars: Vec<char>,
     /// Byte length of each character in UTF-8.
     widths: Vec<usize>,
@@ -130,7 +130,7 @@ impl CScanner {
         let chars: Vec<char> = text.chars().collect();
         let widths: Vec<usize> = chars.iter().map(|c| c.len_utf8()).collect();
         Self {
-            name: Rc::from(stream_name.unwrap_or("<unicode string>")),
+            name: Arc::from(stream_name.unwrap_or("<unicode string>")),
             total_bytes: text.len(),
             chars,
             widths,
@@ -159,7 +159,7 @@ impl CScanner {
     /// A libyaml mark as `_yaml.pyx` turns it into a `yaml.Mark` (no snippet).
     pub(crate) fn py_mark(&self, mark: CMark) -> Mark {
         Mark {
-            name: Rc::clone(&self.name),
+            name: Arc::clone(&self.name),
             index: mark.index,
             line: mark.line,
             column: mark.column,
@@ -225,7 +225,7 @@ impl CScanner {
                 let value = self.chars[index];
                 if !printable(value) {
                     return Err(YamlError::Reader {
-                        name: Rc::clone(&self.name),
+                        name: Arc::clone(&self.name),
                         position: self.raw_pos,
                         character: u32::from(value),
                         reason: "control characters are not allowed",

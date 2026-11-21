@@ -1,20 +1,20 @@
 //! PyYAML's marks and errors (`yaml/error.py`, `yaml/reader.py`), with their exact text.
 
 use crate::pystr::repr;
-use std::rc::Rc;
+use std::sync::Arc;
 
 /// A position in the input (`yaml.error.Mark`). `line` and `column` count from 0; `index` counts
 /// characters from the start of the stream.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Mark {
     /// `"<unicode string>"` for text, or the file name for a file stream.
-    pub name: Rc<str>,
+    pub name: Arc<str>,
     pub index: usize,
     pub line: usize,
     pub column: usize,
     /// The input, for the source snippet a pure-Python mark shows. `None` for file streams and
     /// for the C loader's marks, which show no snippet.
-    pub(crate) buffer: Option<Rc<[char]>>,
+    pub(crate) buffer: Option<Arc<[char]>>,
 }
 
 impl Mark {
@@ -141,7 +141,7 @@ impl std::fmt::Display for MarkedError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum YamlError {
     /// `ReaderError`: a character YAML does not allow.
-    Reader { name: Rc<str>, position: usize, character: u32, reason: &'static str },
+    Reader { name: Arc<str>, position: usize, character: u32, reason: &'static str },
     /// `ScannerError`, `ParserError`, `ComposerError`, `ConstructorError`.
     Marked(MarkedError),
     /// `RepresenterError` and `EmitterError` while dumping.

@@ -1,14 +1,14 @@
 //! `yaml/reader.py` and `yaml/scanner.py`: characters to tokens, ported method for method.
 
 use super::error::{char_repr, Mark, MarkedError, MarkedKind, YamlError};
-use std::rc::Rc;
+use std::sync::Arc;
 
 // ── Reader ────────────────────────────────────────────────────────────────────────────────
 
 /// `Reader` for text input: the characters with a trailing NUL, and the position.
 pub(crate) struct Reader {
-    buffer: Rc<[char]>,
-    name: Rc<str>,
+    buffer: Arc<[char]>,
+    name: Arc<str>,
     /// Text input keeps its buffer for snippets; a file stream's marks have none.
     snippets: bool,
     pointer: usize,
@@ -29,7 +29,7 @@ impl Reader {
     /// `"<unicode string>"`). It checks every character before scanning starts, and its marks
     /// keep the input for snippets.
     pub(crate) fn new(text: &str, stream_name: Option<&str>) -> Result<Self, YamlError> {
-        let name: Rc<str> = Rc::from(stream_name.unwrap_or("<unicode string>"));
+        let name: Arc<str> = Arc::from(stream_name.unwrap_or("<unicode string>"));
         let mut buffer: Vec<char> = text.chars().collect();
         if let Some(position) = buffer.iter().position(|c| !printable(*c)) {
             let character = u32::from(buffer[position]);
@@ -72,11 +72,11 @@ impl Reader {
 
     pub(crate) fn get_mark(&self) -> Mark {
         Mark {
-            name: Rc::clone(&self.name),
+            name: Arc::clone(&self.name),
             index: self.index,
             line: self.line,
             column: self.column,
-            buffer: self.snippets.then(|| Rc::clone(&self.buffer)),
+            buffer: self.snippets.then(|| Arc::clone(&self.buffer)),
         }
     }
 }
