@@ -83,6 +83,69 @@ fn record_json(record: &CampaignIndexRecord) -> Json {
     })
 }
 
+fn entry_json(entry: &sylvia_store::authority::CampaignIndexEntry) -> Json {
+    json!({
+        "campaign_id": entry.campaign_id,
+        "display_name": entry.display_name,
+        "lifecycle": entry.lifecycle,
+        "writer": entry.writer,
+        "revision": entry.revision,
+        "ruleset_summary": entry.ruleset_summary,
+        "package_summary": entry.package_summary,
+        "package_count": entry.package_count,
+        "playable": entry.playable,
+        "availability": entry.availability,
+        "ruleset_id": entry.ruleset_id,
+        "ruleset_label": entry.ruleset_label,
+        "campaign_setting_id": entry.campaign_setting_id,
+        "campaign_setting_label": entry.campaign_setting_label,
+        "session_activity_ordinal": entry.session_activity_ordinal,
+        "turn_id": entry.turn_id,
+        "turn_status": entry.turn_status,
+        "session_id": entry.session_id,
+        "session_status": entry.session_status,
+        "provider_id": entry.provider_id,
+        "model_id": entry.model_id,
+        "sessions": entry.sessions.iter().map(|session| json!({
+            "session_id": session.session_id,
+            "role": session.role,
+            "status": session.status,
+            "provider_id": session.provider_id,
+            "model_id": session.model_id,
+            "selected_skill": session.selected_skill,
+            "model_guidance": session.model_guidance.as_ref().map(|guidance| Json::Object(model_guidance_payload(guidance))),
+        })).collect::<Vec<_>>(),
+    })
+}
+
+fn open_seed(name: &str) -> (AuthorityStore, std::path::PathBuf) {
+    let folder = common::work_folder(name);
+    let database = folder.join("authority.sqlite3");
+    let seed = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/campaigns/seed.sqlite3.gz");
+    let mut bytes = Vec::new();
+    GzDecoder::new(std::fs::File::open(seed).unwrap()).read_to_end(&mut bytes).unwrap();
+    std::fs::write(&database, bytes).unwrap();
+    (AuthorityStore::open_for_application_owner(&database, None).unwrap(), database)
+}
+
+#[test]
+fn campaign_index_entries_match_the_python_owner() {
+    let expected = common::read_json("tests/vectors/campaigns/campaign_index.json");
+    let (mut store, _) = open_seed("campaign-index-entries");
+    let entries = store.campaign_index_entries().unwrap();
+    store.close();
+    let want = expected["campaign_index_entries"].as_array().unwrap();
+    assert_eq!(entries.len(), want.len(), "entry count");
+    for (got, want) in entries.iter().map(entry_json).zip(want) {
+        // Every key, in Python's declaration order.
+        let got_keys: Vec<&String> = got.as_object().unwrap().keys().collect();
+        let want_keys: Vec<&String> = want.as_object().unwrap().keys().collect();
+        assert_eq!(got_keys, want_keys, "field order");
+        assert_eq!(&got, want, "entry {}", want["campaign_id"]);
+    }
+    assert!(store.campaign_index_entries().is_err(), "a closed owner refuses the read");
+}
+
 #[test]
 fn campaign_index_matches_python() {
     let expected = common::read_json("tests/vectors/campaigns/campaign_index.json");

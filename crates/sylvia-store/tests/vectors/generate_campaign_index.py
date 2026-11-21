@@ -11,7 +11,8 @@ It writes, under `campaigns/`:
   DM session); a DM campaign on one small synthetic package with session messages; a
   default-titled interview campaign whose interview state names an accepted answer; and
   campaigns whose names differ only in case;
-- `campaign_index.json`: every `CampaignIndexRecord` the Python store returns for it.
+- `campaign_index.json`: every `CampaignIndexRecord` the Python store returns for it, and
+  every `CampaignIndexEntry` `AuthorityOwner.campaign_index()` projects from them.
 
 `tests/campaigns.rs` reads the same database with the Rust store and must return the same
 records. Reference tooling only.
@@ -29,6 +30,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+# The owner draws campaign identities from uuid.uuid4 (some modules bind it at import), and the
+# session and handoff identities derive from them. Seed it before anything imports it, so a
+# re-run writes byte-identical files.
+import random  # noqa: E402
+import uuid  # noqa: E402
+
+_IDENTITIES = random.Random(20261121)
+uuid.uuid4 = lambda: uuid.UUID(int=_IDENTITIES.getrandbits(128), version=4)  # type: ignore[assignment]
 
 from generate_action_runs import synthetic_archive  # noqa: E402
 
@@ -202,6 +212,32 @@ def record_json(record: a.CampaignIndexRecord) -> dict[str, object]:
     }
 
 
+def entry_json(entry: object) -> dict[str, object]:
+    """`CampaignIndexEntry` field by field, in declaration order."""
+    values = dict(vars(entry)) if hasattr(entry, "__dict__") else {
+        name: getattr(entry, name) for name in entry.__dataclass_fields__  # type: ignore[attr-defined]
+    }
+    out: dict[str, object] = {}
+    for name in entry.__dataclass_fields__:  # type: ignore[attr-defined]
+        value = values[name]
+        if name == "sessions":
+            value = [
+                {
+                    **{
+                        key: getattr(session, key)
+                        for key in session.__dataclass_fields__
+                        if key != "model_guidance"
+                    },
+                    "model_guidance": None
+                    if session.model_guidance is None
+                    else json.loads(a._dump(model_guidance_payload(session.model_guidance))),
+                }
+                for session in value
+            ]
+        out[name] = value
+    return out
+
+
 def main() -> None:
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -213,12 +249,23 @@ def main() -> None:
         checkpoint.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         checkpoint.close()
         (OUT / "seed.sqlite3.gz").write_bytes(gzip.compress(database.read_bytes(), mtime=0))
+        seed_bytes = database.read_bytes()
         store = a._open_for_application_owner(database)
         try:
             records = [record_json(record) for record in store.campaign_index()]
         finally:
             store.close()
-    record = {"python": sys.version.split()[0], "campaign_index": records}
+        # The owner-level projection, read from its own copy of the same seed.
+        owner_copy = Path(scratch) / "owner" / "authority.sqlite3"
+        owner_copy.parent.mkdir()
+        owner_copy.write_bytes(seed_bytes)
+        with AuthorityOwner.open(owner_copy, "campaign-index-entries") as owner:
+            entries = [entry_json(entry) for entry in owner.campaign_index()]
+    record = {
+        "python": sys.version.split()[0],
+        "campaign_index": records,
+        "campaign_index_entries": entries,
+    }
     text = json.dumps(record, indent=1, ensure_ascii=True) + "\n"
     (OUT / "campaign_index.json").write_bytes(text.encode("utf-8"))
 

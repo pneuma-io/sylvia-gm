@@ -118,7 +118,7 @@
   },
   {
    "campaign": {
-    "campaign_id": "06f8873c-85cc-40f9-b6ee-6f4410b643d0",
+    "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
     "display_name": "New campaign interview",
     "lifecycle": "active",
     "writer": "builder",
@@ -136,7 +136,7 @@
    "top_level_sessions": [
     {
      "session_id": "builder-interview",
-     "campaign_id": "06f8873c-85cc-40f9-b6ee-6f4410b643d0",
+     "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
      "role": "builder",
      "provider_id": "synthetic.provider",
      "model_id": "synthetic.provider/model",
@@ -153,7 +153,7 @@
   },
   {
    "campaign": {
-    "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+    "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
     "display_name": "Ruleless Road",
     "lifecycle": "active",
     "writer": "dm",
@@ -171,7 +171,7 @@
    "top_level_sessions": [
     {
      "session_id": "builder-ruleless",
-     "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+     "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
      "role": "builder",
      "provider_id": "synthetic.provider",
      "model_id": "synthetic.provider/model",
@@ -183,8 +183,8 @@
      "reasoning_effort_once": null
     },
     {
-     "session_id": "session-dm-db362d269262fb8b779fd4dc",
-     "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+     "session_id": "session-dm-4a4b97133864fe33934ec185",
+     "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
      "role": "dm",
      "provider_id": "synthetic.provider",
      "model_id": "synthetic.provider/model",
@@ -198,13 +198,13 @@
    ],
    "handoffs": [
     {
-     "handoff_id": "builder-dm-handoff-db362d269262fb8b779fd4dc",
-     "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+     "handoff_id": "builder-dm-handoff-4a4b97133864fe33934ec185",
+     "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
      "builder_session_id": "builder-ruleless",
-     "dm_session_id": "session-dm-db362d269262fb8b779fd4dc",
-     "package_lock_id": "lock-58ef0adb8f4392a4f8a4e5d41e95d45686d44343",
+     "dm_session_id": "session-dm-4a4b97133864fe33934ec185",
+     "package_lock_id": "lock-e7ef7d0f209c19051874bfe071e4c818372187cb",
      "package_candidate_id": null,
-     "plan_id": "campaign-plan-db362d269262fb8b779fd4dc",
+     "plan_id": "campaign-plan-4a4b97133864fe33934ec185",
      "plan_revision": 1,
      "plan_content_sha256": "42246c5ec114705fc40e3e3a44dc7c5b1c246bfe5d68d55b3fc03e810274f7e9",
      "expected_revision": 3,
@@ -221,10 +221,204 @@
       "status": "not_applicable",
       "warning_code": null
      },
-     "payload_sha256": "eb5b73ec12dab96e5684e8aa230991d7b9b2764a416def41ef4eb05dc113d46f"
+     "payload_sha256": "b8b8a5e259b1363aba80390c5bf16f719748e80b3fbed6b772f7dd0670152c46"
     }
    ],
    "interview_name": null
+  }
+ ],
+ "campaign_index_entries": [
+  {
+   "campaign_id": "campaign-a2",
+   "display_name": "Alpha",
+   "lifecycle": "active",
+   "writer": "dm",
+   "revision": 0,
+   "ruleset_summary": "No rules",
+   "package_summary": "No packages",
+   "package_count": 0,
+   "playable": true,
+   "availability": "available",
+   "ruleset_id": null,
+   "ruleset_label": "No rules",
+   "campaign_setting_id": null,
+   "campaign_setting_label": "No campaign setting",
+   "session_activity_ordinal": 0,
+   "turn_id": "turn-campaign-a2",
+   "turn_status": "open",
+   "session_id": null,
+   "session_status": null,
+   "provider_id": null,
+   "model_id": null,
+   "sessions": []
+  },
+  {
+   "campaign_id": "campaign-a1",
+   "display_name": "alpha",
+   "lifecycle": "active",
+   "writer": "dm",
+   "revision": 0,
+   "ruleset_summary": "No rules",
+   "package_summary": "No packages",
+   "package_count": 0,
+   "playable": true,
+   "availability": "available",
+   "ruleset_id": null,
+   "ruleset_label": "No rules",
+   "campaign_setting_id": null,
+   "campaign_setting_label": "No campaign setting",
+   "session_activity_ordinal": 0,
+   "turn_id": "turn-campaign-a1",
+   "turn_status": "open",
+   "session_id": null,
+   "session_status": null,
+   "provider_id": null,
+   "model_id": null,
+   "sessions": []
+  },
+  {
+   "campaign_id": "campaign-b",
+   "display_name": "beta",
+   "lifecycle": "active",
+   "writer": "dm",
+   "revision": 0,
+   "ruleset_summary": "No rules",
+   "package_summary": "No packages",
+   "package_count": 0,
+   "playable": true,
+   "availability": "available",
+   "ruleset_id": null,
+   "ruleset_label": "No rules",
+   "campaign_setting_id": null,
+   "campaign_setting_label": "No campaign setting",
+   "session_activity_ordinal": 0,
+   "turn_id": "turn-campaign-b",
+   "turn_status": "open",
+   "session_id": null,
+   "session_status": null,
+   "provider_id": null,
+   "model_id": null,
+   "sessions": []
+  },
+  {
+   "campaign_id": "campaign-clockwork",
+   "display_name": "clockwork Vale",
+   "lifecycle": "active",
+   "writer": "dm",
+   "revision": 0,
+   "ruleset_summary": "Package-defined rules",
+   "package_summary": "1 packages",
+   "package_count": 1,
+   "playable": true,
+   "availability": "available",
+   "ruleset_id": "synthetic.actions",
+   "ruleset_label": "Synthetic action runs",
+   "campaign_setting_id": null,
+   "campaign_setting_label": "No campaign setting",
+   "session_activity_ordinal": 4,
+   "turn_id": "turn-clockwork",
+   "turn_status": "open",
+   "session_id": "dm-clockwork",
+   "session_status": "active",
+   "provider_id": "synthetic.provider",
+   "model_id": "synthetic.provider/model",
+   "sessions": [
+    {
+     "session_id": "dm-clockwork",
+     "role": "dm",
+     "status": "active",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "selected_skill": null,
+     "model_guidance": null
+    }
+   ]
+  },
+  {
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "display_name": "Moonlit Keep \u00b7 Interview",
+   "lifecycle": "active",
+   "writer": "builder",
+   "revision": 0,
+   "ruleset_summary": "No rules",
+   "package_summary": "No packages",
+   "package_count": 0,
+   "playable": false,
+   "availability": "draft",
+   "ruleset_id": null,
+   "ruleset_label": "No rules",
+   "campaign_setting_id": null,
+   "campaign_setting_label": "No campaign setting",
+   "session_activity_ordinal": 6,
+   "turn_id": "turn-interview",
+   "turn_status": "open",
+   "session_id": "builder-interview",
+   "session_status": "active",
+   "provider_id": "synthetic.provider",
+   "model_id": "synthetic.provider/model",
+   "sessions": [
+    {
+     "session_id": "builder-interview",
+     "role": "builder",
+     "status": "active",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "selected_skill": "BUILD CAMPAIGN PLAN",
+     "model_guidance": null
+    }
+   ]
+  },
+  {
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "display_name": "Ruleless Road",
+   "lifecycle": "active",
+   "writer": "dm",
+   "revision": 4,
+   "ruleset_summary": "No rules",
+   "package_summary": "No packages",
+   "package_count": 0,
+   "playable": false,
+   "availability": "unavailable",
+   "ruleset_id": null,
+   "ruleset_label": "No rules",
+   "campaign_setting_id": null,
+   "campaign_setting_label": "No campaign setting",
+   "session_activity_ordinal": 1,
+   "turn_id": "turn-ruleless-builder",
+   "turn_status": "completed",
+   "session_id": "session-dm-4a4b97133864fe33934ec185",
+   "session_status": "active",
+   "provider_id": "synthetic.provider",
+   "model_id": "synthetic.provider/model",
+   "sessions": [
+    {
+     "session_id": "builder-ruleless",
+     "role": "builder",
+     "status": "active",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "selected_skill": "BUILD CAMPAIGN PLAN",
+     "model_guidance": null
+    },
+    {
+     "session_id": "session-dm-4a4b97133864fe33934ec185",
+     "role": "dm",
+     "status": "active",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "selected_skill": null,
+     "model_guidance": {
+      "minimum_tier_id": null,
+      "model_id": "synthetic.provider/model",
+      "override_accepted": false,
+      "placement_evidence_sha256": null,
+      "placement_tier_id": null,
+      "registry_version": "sylvia.capability.registry.v1",
+      "status": "not_applicable",
+      "warning_code": null
+     }
+    }
+   ]
   }
  ]
 }

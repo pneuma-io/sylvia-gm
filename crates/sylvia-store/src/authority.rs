@@ -1,0 +1,191 @@
+//! `application/authority.py` operations on top of the store, one by one.
+//!
+//! So far: `AuthorityOwner.campaign_index` with `_campaign_index_entry`, and the
+//! `CampaignIndexEntry` and `CampaignSessionIndexEntry` it returns. The owner's reply field order
+//! (`_json_value`) is lane 5's handler.
+
+use crate::campaigns::CampaignIndexRecord;
+use crate::error::StoreResult;
+use crate::store::AuthorityStore;
+use sylvia_domain::authority::{LifecycleState, PackageRole, TurnStatus, WriterRole};
+use sylvia_domain::model_capability::ModelGuidanceDecision;
+use sylvia_domain::package_library::campaign_setting_entries;
+use sylvia_domain::session::SessionStatus;
+
+/// One persistent top-level agent chat shown within a campaign (`CampaignSessionIndexEntry`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CampaignSessionIndexEntry {
+    pub session_id: String,
+    pub role: String,
+    pub status: String,
+    pub provider_id: String,
+    pub model_id: String,
+    pub selected_skill: Option<String>,
+    pub model_guidance: Option<ModelGuidanceDecision>,
+}
+
+/// The product-safe campaign rail projection (`CampaignIndexEntry`), in Python's field order.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CampaignIndexEntry {
+    pub campaign_id: String,
+    pub display_name: String,
+    pub lifecycle: String,
+    pub writer: String,
+    pub revision: i64,
+    pub ruleset_summary: String,
+    pub package_summary: String,
+    pub package_count: i64,
+    pub playable: bool,
+    pub availability: String,
+    pub ruleset_id: Option<String>,
+    pub ruleset_label: String,
+    pub campaign_setting_id: Option<String>,
+    pub campaign_setting_label: String,
+    pub session_activity_ordinal: i64,
+    pub turn_id: Option<String>,
+    pub turn_status: Option<String>,
+    pub session_id: Option<String>,
+    pub session_status: Option<String>,
+    pub provider_id: Option<String>,
+    pub model_id: Option<String>,
+    pub sessions: Vec<CampaignSessionIndexEntry>,
+}
+
+impl AuthorityStore {
+    /// `AuthorityOwner.campaign_index`: the store's index projected through
+    /// `_campaign_index_entry`. `_operation()` only refuses work once the owner is closed, which
+    /// the store's own closed check gives here.
+    pub fn campaign_index_entries(&self) -> StoreResult<Vec<CampaignIndexEntry>> {
+        Ok(self.campaign_index()?.iter().map(campaign_index_entry).collect())
+    }
+}
+
+/// `AuthorityOwner._campaign_index_entry`.
+pub fn campaign_index_entry(record: &CampaignIndexRecord) -> CampaignIndexEntry {
+    let campaign = &record.campaign;
+    let package_count = record.package_lock.as_ref().map_or(0, |lock| lock.entries().len());
+    let label_of = |package_id: &str| {
+        // `dict(record.package_labels)`: the last label given for an identity wins.
+        record
+            .package_labels
+            .iter()
+            .rev()
+            .find(|(id, _)| id == package_id)
+            .map_or_else(|| package_id.to_owned(), |(_, label)| label.clone())
+    };
+    let mut ruleset_id = None;
+    let mut ruleset_label = "No rules".to_owned();
+    let mut campaign_setting_id = None;
+    let mut campaign_setting_label = "No campaign setting".to_owned();
+    let mut turn: Option<(String, TurnStatus)> = None;
+    let mut session_fields: Option<(String, SessionStatus, String, String)> = None;
+    let open_turns: Vec<&(String, TurnStatus)> =
+        record.turns.iter().filter(|(_, status)| *status == TurnStatus::Open).collect();
+    let mut supported = campaign.lifecycle == LifecycleState::Active
+        && campaign.writer == WriterRole::Dm
+        && record.package_lock.is_some()
+        && open_turns.len() == 1;
+    if open_turns.len() == 1 {
+        turn = Some(open_turns[0].clone());
+    } else if let Some(last) = record.turns.last() {
+        turn = Some(last.clone());
+    }
+    let writer_sessions: Vec<_> =
+        record.top_level_sessions.iter().filter(|session| session.role() == campaign.writer).collect();
+    if writer_sessions.len() == 1 {
+        let session = writer_sessions[0].fields();
+        session_fields = Some((
+            session.session_id.clone(),
+            session.status,
+            session.provider_id.clone(),
+            session.model_id.clone(),
+        ));
+        supported = supported
+            && session.campaign_id.as_deref() == Some(campaign.campaign_id.as_str())
+            && session.role == WriterRole::Dm
+            && !session.provider_id.is_empty()
+            && !session.model_id.is_empty()
+            && session.status == SessionStatus::Active
+            && session.parent_session_id.is_none()
+            && session.selected_skill.is_none();
+    }
+    let (ruleset_summary, package_summary) = match &record.package_lock {
+        None => {
+            ruleset_label = "Not selected".to_owned();
+            campaign_setting_label = "Not selected".to_owned();
+            ("Not selected".to_owned(), "Draft Campaign".to_owned())
+        }
+        Some(_) if package_count == 0 => ("No rules".to_owned(), "No packages".to_owned()),
+        Some(lock) => {
+            if let Some(primary) = lock.entries().iter().find(|entry| entry.role() == PackageRole::Primary) {
+                ruleset_id = Some(primary.package_id().to_owned());
+                ruleset_label = label_of(primary.package_id());
+                if let Some(setting) = campaign_setting_entries(lock).first() {
+                    campaign_setting_id = Some(setting.package_id().to_owned());
+                    campaign_setting_label = label_of(setting.package_id());
+                }
+            }
+            ("Package-defined rules".to_owned(), format!("{package_count} packages"))
+        }
+    };
+    let sessions = record
+        .top_level_sessions
+        .iter()
+        .map(|session| {
+            let fields = session.fields();
+            CampaignSessionIndexEntry {
+                session_id: fields.session_id.clone(),
+                role: fields.role.as_str().to_owned(),
+                status: fields.status.as_str().to_owned(),
+                provider_id: fields.provider_id.clone(),
+                model_id: fields.model_id.clone(),
+                selected_skill: fields.selected_skill.clone(),
+                model_guidance: record
+                    .handoffs
+                    .iter()
+                    .find(|handoff| handoff.fields().dm_session_id == fields.session_id)
+                    .map(|handoff| handoff.fields().model_guidance.clone()),
+            }
+        })
+        .collect();
+    let availability = if supported {
+        "available"
+    } else if campaign.lifecycle == LifecycleState::Active && campaign.writer == WriterRole::Builder {
+        "draft"
+    } else {
+        "unavailable"
+    };
+    let (session_id, session_status, provider_id, model_id) = match session_fields {
+        Some((id, status, provider, model)) => {
+            (Some(id), Some(status.as_str().to_owned()), Some(provider), Some(model))
+        }
+        None => (None, None, None, None),
+    };
+    CampaignIndexEntry {
+        campaign_id: campaign.campaign_id.clone(),
+        display_name: match record.interview_name.as_deref() {
+            Some(name) if !name.is_empty() => format!("{name} \u{b7} Interview"),
+            _ => campaign.display_name.clone(),
+        },
+        lifecycle: campaign.lifecycle.as_str().to_owned(),
+        writer: campaign.writer.as_str().to_owned(),
+        revision: campaign.revision,
+        ruleset_summary,
+        package_summary,
+        package_count: i64::try_from(package_count).unwrap_or(i64::MAX),
+        playable: supported,
+        availability: availability.to_owned(),
+        ruleset_id,
+        ruleset_label,
+        campaign_setting_id,
+        campaign_setting_label,
+        session_activity_ordinal: record.session_activity_ordinal,
+        turn_id: turn.as_ref().map(|(id, _)| id.clone()),
+        turn_status: turn.as_ref().map(|(_, status)| status.as_str().to_owned()),
+        session_id,
+        session_status,
+        provider_id,
+        model_id,
+        sessions,
+    }
+}
