@@ -68,7 +68,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/provider/__init__.py` | 144 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_admin_audit.py` | 417 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_anthropic.py` | 1,145 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_base.py` | 519 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_base.py` | 519 | `sylvia-provider` | ported | `types`, `provider` (trait, `FakeProvider`). `closing_provider_stream` and `release_provider_idle` become dropping the stream and the trait's default `release_idle`. `TimeoutConfig.to_httpx_timeout` lands with the HTTP client. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_chat_metadata.py` | 93 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_chatgpt.py` | 1,522 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_chatgpt_account.py` | 177 | `sylvia-provider` | pending | |
@@ -82,7 +82,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/provider/_context_capacity.py` | 150 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_context_fit.py` | 408 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_diagnostics.py` | 135 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_exceptions.py` | 179 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_exceptions.py` | 179 | `sylvia-provider` | ported | `error` (one type, `ErrorKind` walks the class tree for `isinstance`), owner sentences in `reply::provider_error_reply` from the owner's own handler. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_factory.py` | 98 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_gemini.py` | 418 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_hooks.py` | 642 | `sylvia-provider` | pending | |
@@ -96,12 +96,12 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/provider/_reasoning.py` | 379 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_registry.py` | 393 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_request_metadata.py` | 139 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_retry.py` | 113 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_retry_after.py` | 25 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_retry.py` | 113 | `sylvia-provider` | ported | `retry::{build_delay, retry_with_backoff}`; jitter is random in both. Warnings go to stderr as Python's `logging.lastResort` prints them. Vectors: `tests/base_vectors.rs` |
+| `src/sylvia_gm/provider/_retry_after.py` | 25 | `sylvia-provider` | ported | `retry::retry_after_seconds` with `email.utils.parsedate_to_datetime` ported. Non-ASCII digits, which Python's `float()`/`int()` accept, are refused. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_speed.py` | 178 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_stream_health.py` | 76 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_stream_health.py` | 76 | `sylvia-provider` | ported | `stream_health::StreamHealthMonitor`. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_token_estimate.py` | 52 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_tool_delta.py` | 32 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_tool_delta.py` | 32 | `sylvia-provider` | ported | `tool_delta::parse_tool_call_delta` over ordered JSON fragments (SDK objects and dicts read the same; checked in the generator). Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_usage_tracker.py` | 171 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/session/__init__.py` | 57 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/session/_context.py` | 302 | `sylvia-agent` | pending | |
