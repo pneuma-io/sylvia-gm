@@ -21,7 +21,7 @@ exclude = ["src-tauri"]
 [workspace.package]
 version = "0.4.1"
 edition = "2021"
-rust-version = "1.85"
+rust-version = "1.89"
 authors = ["Daniel Young"]
 publish = false
 
@@ -44,10 +44,14 @@ thiserror = "2"
 sha2 = "0.10"
 hmac = "0.12"
 hex = "0.4"
-# Comparison tool only: reads finished databases, serves the stand-in model endpoint.
-# The store's own SQLite binding is lane 3's decision and is added by that lane.
-rusqlite = { version = "0.32", features = ["bundled"] }
+# SQLite for the store and the comparison tool. 0.34 bundles SQLite 3.49.1, the library the
+# Python reference environment ships (sqlite3.sqlite_version); sylvia-store's vector tests
+# assert it so a later bump cannot move it silently. `backup` is the online copy the store
+# makes before schema migrations.
+rusqlite = { version = "0.34", features = ["bundled", "backup"] }
 tiny_http = "0.12"
+# Store tests only: the Python-made fixture databases are kept gzip-compressed.
+flate2 = "1"
 getrandom = "0.2"
 regex = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net"] }

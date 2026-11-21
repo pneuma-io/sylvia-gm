@@ -1,0 +1,311 @@
+{
+ "python": "3.12.11",
+ "sqlite_version": "3.49.1",
+ "migrations": [
+  [
+   1,
+   "f1_neutral_authority",
+   "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+  ],
+  [
+   2,
+   "f2_provisional_event_protocol",
+   "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+  ],
+  [
+   3,
+   "f3_sqlite_package_library",
+   "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+  ],
+  [
+   4,
+   "f4_builder_dm_sessions",
+   "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+  ],
+  [
+   5,
+   "f5_campaign_lifecycle_recovery",
+   "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+  ],
+  [
+   6,
+   "f7_relational_state_namespace_ownership",
+   "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+  ],
+  [
+   7,
+   "mechanics_choice_reservations",
+   "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+  ],
+  [
+   8,
+   "standalone_builder_chats",
+   "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+  ],
+  [
+   9,
+   "campaign_state_continuity",
+   "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+  ],
+  [
+   10,
+   "unbound_draft_lifecycle",
+   "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+  ],
+  [
+   11,
+   "private_provider_records",
+   "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+  ],
+  [
+   12,
+   "session_reasoning_preferences",
+   "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+  ]
+ ],
+ "predecessor_migration_5_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802",
+ "extensions": {
+  "campaign_identity": [
+   "f5_probe_01_stable_campaign_identity",
+   "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+  ],
+  "lifecycle": [
+   "f5_reversible_lifecycle_v3",
+   "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+  ],
+  "recovery": [
+   "f5_portable_campaign_recovery_v1",
+   "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61"
+  ],
+  "purge": [
+   "f5_campaign_purge_v1",
+   "1de84ac0fe9870ee106630aad69f12281322121cbc549f5f396192f0a384cd3b"
+  ]
+ },
+ "extension_rows": {
+  "recovery=False,purge=False": [
+   [
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+    "f5_campaign_lifecycle_recovery",
+    "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+   ],
+   [
+    "f5_reversible_lifecycle_v3",
+    "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+   ]
+  ],
+  "recovery=False,purge=True": [
+   [
+    "f5_campaign_purge_v1",
+    "1de84ac0fe9870ee106630aad69f12281322121cbc549f5f396192f0a384cd3b",
+    "f5_portable_campaign_recovery_v1",
+    "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61"
+   ],
+   [
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+    "f5_campaign_lifecycle_recovery",
+    "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+   ],
+   [
+    "f5_reversible_lifecycle_v3",
+    "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+   ]
+  ],
+  "recovery=True,purge=False": [
+   [
+    "f5_portable_campaign_recovery_v1",
+    "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+    "f5_reversible_lifecycle_v3",
+    "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+   ],
+   [
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+    "f5_campaign_lifecycle_recovery",
+    "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+   ],
+   [
+    "f5_reversible_lifecycle_v3",
+    "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+   ]
+  ],
+  "recovery=True,purge=True": [
+   [
+    "f5_campaign_purge_v1",
+    "1de84ac0fe9870ee106630aad69f12281322121cbc549f5f396192f0a384cd3b",
+    "f5_portable_campaign_recovery_v1",
+    "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61"
+   ],
+   [
+    "f5_portable_campaign_recovery_v1",
+    "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+    "f5_reversible_lifecycle_v3",
+    "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+   ],
+   [
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+    "f5_campaign_lifecycle_recovery",
+    "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+   ],
+   [
+    "f5_reversible_lifecycle_v3",
+    "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+    "f5_probe_01_stable_campaign_identity",
+    "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+   ]
+  ]
+ },
+ "schema_identities": {
+  "builder_chat": {
+   "tables": 52,
+   "sha256": "828ba5129168724ac28d747ae6b8e9a757cf912c22bf5f9d6ddc5306b6fcaae7"
+  },
+  "campaign": {
+   "tables": 45,
+   "sha256": "6c4a24b122d245d6dff1e7941a1cf32e18aeb763562e79c5e5ad500d94fe6f21"
+  },
+  "continuity": {
+   "tables": 53,
+   "sha256": "cd91629ef9bf8359c37b0797c1339846532bbec18e378bc3ce6affa46ca3e8ad"
+  },
+  "draft_lifecycle": {
+   "tables": 53,
+   "sha256": "c6266cdfcaf8a513c59f37344021b43eb324033dd0b35bc0a87bea37760e82cb"
+  },
+  "effort": {
+   "tables": 54,
+   "sha256": "459ec44fd04f243cf269b11ab4aaf874ad40c14e90a91aee6a96365a3d02b710"
+  },
+  "mechanics_choice": {
+   "tables": 50,
+   "sha256": "e4dbba57a02dd2e43e52297ddfb9871d21e8608e877495ebad87c15cd34b1f33"
+  },
+  "predecessor_campaign": {
+   "tables": 40,
+   "sha256": "4fb75c8043605023fcee6a5907c9418abe213406e246be2f4c0aaffd06763f9a"
+  },
+  "probe01_campaign": {
+   "tables": 43,
+   "sha256": "6c60b01bc9c50ef46cd0933bd97db356cdf772542259a08f6aded38ff871037c"
+  },
+  "purge_builder_chat": {
+   "tables": 52,
+   "sha256": "8d31e1c54b02d74051601f82d6eac840baaa5640b7f195e11f771feba3ac2a27"
+  },
+  "purge_campaign": {
+   "tables": 46,
+   "sha256": "91d10f3300d86be30bf05506f5eed9c44bf99915b7779cd9f051aef6b5979390"
+  },
+  "purge_continuity": {
+   "tables": 53,
+   "sha256": "d5a62afe7dabb02b660d55107ba396224229502119396eec326a2790ceffb991"
+  },
+  "purge_mechanics_choice": {
+   "tables": 50,
+   "sha256": "199b53f12c41ae11c81a0b352299cecf2375d68ebecd2d0a0a438e0ff1c1983a"
+  },
+  "purge_state_ownership": {
+   "tables": 47,
+   "sha256": "5f49f9992591b34daf831274a7a347a9907c6ab223b9614c82baa182b7155624"
+  },
+  "reasoning": {
+   "tables": 54,
+   "sha256": "fe48a1fd62e8d21227d6ce09f86406f34f5e3f1f4db7695359f5d852a8c97706"
+  },
+  "base": {
+   "tables": 33,
+   "sha256": "b788040f1174fe49b69dd1087a5ccdebdc34605a665af501b2e31a352e567f8f"
+  },
+  "session": {
+   "tables": 37,
+   "sha256": "80302f0ed4ac427d93dfa8a8e0061501caea3123a36d50812fd254d28c76f110"
+  },
+  "state_ownership": {
+   "tables": 47,
+   "sha256": "25a08715dfad7fbeb1e4b4b954771b1804fef1adb0c7009d64a9604682b8fd7b"
+  },
+  "w12_campaign": {
+   "tables": 46,
+   "sha256": "ec9b5a7ac20826f70eb0a82ad5e927565ed375f46da4aed941a8ca03e798878e"
+  }
+ },
+ "trigger_identity": [
+  [
+   "campaign_state_owner_delete_requires_empty",
+   "create trigger campaign_state_owner_delete_requires_empty before delete on campaign_state_namespace_owners when exists ( select 1 from campaign_state as state where state.campaign_id = old.campaign_id and state.namespace = old.namespace ) begin select raise(abort, 'campaign state namespace owner still has state'); end"
+  ],
+  [
+   "campaign_state_owner_immutable",
+   "create trigger campaign_state_owner_immutable before update on campaign_state_namespace_owners begin select raise(abort, 'campaign state namespace owner is immutable'); end"
+  ],
+  [
+   "campaign_state_owner_matches_current_lock",
+   "create trigger campaign_state_owner_matches_current_lock before insert on campaign_state_namespace_owners begin select case when ( new.owner_package_id is null and exists ( select 1 from campaigns as campaign join campaign_lock_memberships as membership on membership.lock_id = campaign.current_lock_id where campaign.campaign_id = new.campaign_id ) ) or ( new.owner_package_id is not null and not exists ( select 1 from campaigns as campaign join campaign_lock_memberships as membership on membership.lock_id = campaign.current_lock_id where campaign.campaign_id = new.campaign_id and membership.package_id = new.owner_package_id ) ) or exists ( select 1 from campaigns as campaign join campaign_lock_memberships as membership on membership.lock_id = campaign.current_lock_id where campaign.campaign_id = new.campaign_id and new.namespace like membership.package_id || '.%' and membership.package_id <> new.owner_package_id ) then raise(abort, 'campaign state namespace owner conflicts with current lock') end; end"
+  ],
+  [
+   "campaign_state_owner_required_insert",
+   "create trigger campaign_state_owner_required_insert before insert on campaign_state begin select case when not exists ( select 1 from campaign_state_namespace_owners as owner where owner.campaign_id = new.campaign_id and owner.namespace = new.namespace ) then raise(abort, 'campaign state namespace owner is required') end; end"
+  ],
+  [
+   "campaign_state_owner_required_update",
+   "create trigger campaign_state_owner_required_update before update of campaign_id, namespace on campaign_state begin select case when not exists ( select 1 from campaign_state_namespace_owners as owner where owner.campaign_id = new.campaign_id and owner.namespace = new.namespace ) then raise(abort, 'campaign state namespace owner is required') end; end"
+  ],
+  [
+   "mutation_requires_matching_namespace_owner",
+   "create trigger mutation_requires_matching_namespace_owner before insert on mutations begin select case when not exists ( select 1 from actions as action join campaign_state_namespace_owners as owner on owner.campaign_id = new.campaign_id and owner.namespace = new.namespace where action.campaign_id = new.campaign_id and action.action_id = new.action_id and owner.owner_package_id is not null and owner.owner_package_id = action.package_id ) then raise(abort, 'mutation package does not own state namespace') end; end"
+  ]
+ ],
+ "python_whitespace": [
+  9,
+  10,
+  11,
+  12,
+  13,
+  28,
+  29,
+  30,
+  31,
+  32,
+  133,
+  160,
+  5760,
+  8192,
+  8193,
+  8194,
+  8195,
+  8196,
+  8197,
+  8198,
+  8199,
+  8200,
+  8201,
+  8202,
+  8232,
+  8233,
+  8239,
+  8287,
+  12288
+ ],
+ "casefold_to_ascii": {
+  "00DF": "ss",
+  "017F": "s",
+  "1E9E": "ss",
+  "212A": "k",
+  "FB00": "ff",
+  "FB01": "fi",
+  "FB02": "fl",
+  "FB03": "ffi",
+  "FB04": "ffl",
+  "FB05": "st",
+  "FB06": "st"
+ }
+}

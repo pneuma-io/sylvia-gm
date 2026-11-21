@@ -192,7 +192,7 @@ fn shortest_digits(value: f64) -> (String, i32) {
         return (digits, exponent);
     }
     let lower = &exact[..count];
-    let last_is_even = (lower.as_bytes()[count - 1] - b'0') % 2 == 0;
+    let last_is_even = (lower.as_bytes()[count - 1] - b'0').is_multiple_of(2);
     let reads_back = format!("{}.{}e{exact_exponent}", &lower[..1], &lower[1..])
         .parse::<f64>()
         .is_ok_and(|parsed| parsed == value);
