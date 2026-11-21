@@ -603,6 +603,7 @@ dependencies = [
 name = "sylvia-owner"
 version = "0.4.1"
 dependencies = [
+ "flate2",
  "futures-util",
  "getrandom",
  "hex",

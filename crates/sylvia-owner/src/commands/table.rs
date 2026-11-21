@@ -40,7 +40,7 @@ const fn ported(name: &'static str, topic: &'static str, webui: bool, diagnostic
 /// Every command in `COMMAND_REGISTRY`, in Python's declaration order.
 pub const REGISTRY: &[Command] = &[
     ported("handshake_status", "campaigns", false, true),
-    pending("campaign_index", "campaigns", true, true),
+    ported("campaign_index", "campaigns", true, true),
     pending("campaign_creation_catalog", "campaigns", true, true),
     pending("ready_campaign_catalog", "campaigns", true, false),
     pending("customize_ready_campaign", "campaigns", true, false),

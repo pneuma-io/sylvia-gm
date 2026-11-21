@@ -85,12 +85,11 @@ impl From<StoreError> for Failure {
     /// other exception is an internal fault (Python's `except Exception`); a store path not
     /// ported yet is an internal fault too, never a Python outcome.
     fn from(error: StoreError) -> Self {
-        match error {
-            StoreError::Coded(error) => Failure::from(error),
-            // `_BackupFailure` is a `CommandRejected` with its own code and diagnostics.
-            StoreError::Backup(failure) => Failure::from(failure.to_coded()),
-            StoreError::Sqlite(_) => Self::Internal { error_type: "Error" },
-            StoreError::Other(_) | StoreError::NotPorted(_) => Self::Internal { error_type: "RuntimeError" },
+        // Lane 3's `rejection()` is the one place that decides which store failures Python's
+        // owner catches.
+        match error.rejection() {
+            Some(error) => Failure::from(error),
+            None => Self::Internal { error_type: "RuntimeError" },
         }
     }
 }
@@ -139,6 +138,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     }
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
+        "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
         // A command marked Ported must have an arm above this one.
         _ => Err(CodedError::new("internal_error", format!("{method} is marked ported but has no handler."))),
     };
