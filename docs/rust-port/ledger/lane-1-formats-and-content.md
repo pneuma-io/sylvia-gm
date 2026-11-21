@@ -85,7 +85,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/_content_schema_ui.py` | 209 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/_runtime_executable_reference.py` | 225 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/authority.py` | 1,128 | `sylvia-domain::authority` | ported | Validated types keep private fields behind `new`; `Mechanic` and `NarrationStream` (callables) left to lanes 2 and 4 |
-| `src/sylvia_gm/domain/campaign_ending.py` | 99 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/campaign_ending.py` | 99 | `sylvia-domain::campaign_ending` | ported | `plan_reading_vectors` (every shipped Campaign Plan) |
 | `src/sylvia_gm/domain/campaign_plan.py` | 759 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain::content::catalog` | ported | `list_content_definitions`, `get_content_definition` |
@@ -95,7 +95,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain::inventory` | in progress | Shared schemas done (data, `generate_inventory_schema.py`); `validate_holdings`, `transfer_holding` and `player_inventory` follow |
 | `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/model_capability.py` | 333 | `sylvia-domain::model_capability` | ported | Tiers, placements, registry, guidance decisions and payloads |
-| `src/sylvia_gm/domain/no_ruleset_plan.py` | 124 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/no_ruleset_plan.py` | 124 | `sylvia-domain::no_ruleset_plan` | ported | `plan_reading_vectors` (synthetic No Ruleset worlds on shipped Plans) |
 | `src/sylvia_gm/domain/package_library.py` | 2,211 | `sylvia-domain::package_library` | ported | Manifests, declarations, gameplay support, setting knowledge and closures; Python operator quirks via `pyops` |
 | `src/sylvia_gm/domain/panel_layout.py` | 105 | `sylvia-domain::panel_layout` | ported | `panel_layout_vectors` (synthetic layouts: the only shipped ones are private) and `archive_vectors` |
 | `src/sylvia_gm/domain/provider_records.py` | 17 | `sylvia-domain` | pending | |

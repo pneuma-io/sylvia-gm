@@ -98,7 +98,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/interview_contribution.py:76` | `parse_interview_contribution_bytes` | len() against a limit | `if not value or len(value) > INTERVIEW_CONTRIBUTION_BYTE_LIMIT:` | |
 | `domain/inventory.py:125` | `validate_holdings` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | |
 | `domain/mechanics_choices.py:63` | `answers_from_payload` | len() against a limit | `if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or len(value) >= 64:` | |
-| `domain/no_ruleset_plan.py:79` | `validate_no_ruleset_world` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | |
+| `domain/no_ruleset_plan.py:79` | `validate_no_ruleset_world` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | `sylvia-domain` plan_reading_vectors |
 | `domain/package_library.py:114` | `_validate_mechanical_inventory_declaration` | len() against a limit | `if not 1 <= len(names) <= 32:` | `sylvia-domain` manifest_vectors |
 | `domain/package_library.py:803` | `_safe_small_label` | len() against a limit | `if len(value.encode("utf-8")) > 256 or "/" in value or "\\" in value or ":" in value:` | `sylvia-domain` manifest_vectors |
 | `domain/package_library.py:818` | `_sorted_unique_identities` | len() against a limit | `if len(item.encode("utf-8")) > 512:` | `sylvia-domain` manifest_vectors |

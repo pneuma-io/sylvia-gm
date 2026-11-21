@@ -167,6 +167,87 @@ pub fn py_unhashable(value: &Json) -> crate::error::DomainError {
     crate::error::DomainError::type_error(format!("unhashable type: '{}'", py_type_name(value)))
 }
 
+/// `str(value)`: text as itself, anything else as its `repr`.
+pub fn py_str(value: &Json) -> String {
+    match value {
+        Json::String(text) => text.clone(),
+        other => sylvia_base::pystr::repr_json(other),
+    }
+}
+
+/// `isinstance(value, Sequence)`: a `list` or a `str` (a `dict` is not a sequence).
+pub fn py_is_sequence(value: &Json) -> bool {
+    matches!(value, Json::Array(_) | Json::String(_))
+}
+
+/// `iter(value)`: a list's items, a string's characters or a dict's keys, else `TypeError`.
+pub fn py_iter(value: &Json) -> crate::error::DomainResult<Vec<Json>> {
+    match value {
+        Json::Array(items) => Ok(items.clone()),
+        Json::String(text) => Ok(text.chars().map(|c| Json::String(c.to_string())).collect()),
+        Json::Object(map) => Ok(map.keys().map(|key| Json::String(key.clone())).collect()),
+        other => Err(crate::error::DomainError::type_error(format!(
+            "'{}' object is not iterable",
+            py_type_name(other)
+        ))),
+    }
+}
+
+/// `value.get(key)`, with Python's `AttributeError` for a value that is not a `dict`.
+pub fn py_get_attr<'a>(value: &'a Json, key: &str) -> crate::error::DomainResult<Option<&'a Json>> {
+    match value {
+        Json::Object(map) => Ok(map.get(key)),
+        other => Err(crate::error::DomainError::uncaught(
+            "AttributeError",
+            format!("'{}' object has no attribute 'get'", py_type_name(other)),
+        )),
+    }
+}
+
+/// `value[key]` with a `str` key, with Python's `KeyError` or `TypeError` and its text.
+pub fn py_item<'a>(value: &'a Json, key: &str) -> crate::error::DomainResult<&'a Json> {
+    use crate::error::DomainError;
+    match value {
+        Json::Object(map) => {
+            map.get(key).ok_or_else(|| DomainError::uncaught("KeyError", sylvia_base::pystr::repr(key)))
+        }
+        Json::Array(_) => Err(DomainError::type_error("list indices must be integers or slices, not str")),
+        Json::String(_) => Err(DomainError::type_error("string indices must be integers, not 'str'")),
+        other => {
+            Err(DomainError::type_error(format!("'{}' object is not subscriptable", py_type_name(other))))
+        }
+    }
+}
+
+/// `value[-1]`, with Python's `IndexError`, `KeyError` or `TypeError` and its text.
+pub fn py_last(value: &Json) -> crate::error::DomainResult<Json> {
+    use crate::error::DomainError;
+    match value {
+        Json::Array(items) => items
+            .last()
+            .cloned()
+            .ok_or_else(|| DomainError::uncaught("IndexError", "list index out of range")),
+        Json::String(text) => text
+            .chars()
+            .last()
+            .map(|c| Json::String(c.to_string()))
+            .ok_or_else(|| DomainError::uncaught("IndexError", "string index out of range")),
+        Json::Object(_) => Err(DomainError::uncaught("KeyError", "-1")),
+        other => {
+            Err(DomainError::type_error(format!("'{}' object is not subscriptable", py_type_name(other))))
+        }
+    }
+}
+
+/// Hash `value` as a `set` or `dict` operation would: `TypeError` for a `list` or `dict`.
+pub fn py_require_hashable(value: &Json) -> crate::error::DomainResult<()> {
+    if py_hashable(value) {
+        Ok(())
+    } else {
+        Err(py_unhashable(value))
+    }
+}
+
 /// `bool(value)`.
 pub fn py_truthy(value: &Json) -> bool {
     match value {
@@ -310,5 +391,40 @@ mod tests {
         assert_eq!(py_set_equals(&json!(3), &["a"]), Err(PyFault::Type));
         assert_eq!(py_set(&json!([true, 1, 1.0])).unwrap().len(), 1);
         assert!(!py_truthy(&json!(0.0)) && py_truthy(&json!(" ")) && !py_truthy(&json!({})));
+    }
+
+    fn raised<T>(result: crate::error::DomainResult<T>) -> (&'static str, String) {
+        let error = result.err().expect("an exception");
+        (error.python_class(), error.message().to_owned())
+    }
+
+    #[test]
+    fn operations_raise_pythons_exceptions() {
+        assert_eq!(py_str(&json!("x")), "x");
+        assert_eq!(py_str(&json!([1, true, null, 1.5, {"a": "b"}])), "[1, True, None, 1.5, {'a': 'b'}]");
+        assert_eq!(py_iter(&json!("ab")).unwrap(), vec![json!("a"), json!("b")]);
+        assert_eq!(py_iter(&json!({"k": 1})).unwrap(), vec![json!("k")]);
+        assert_eq!(raised(py_iter(&json!(1))), ("TypeError", "'int' object is not iterable".into()));
+        assert_eq!(
+            raised(py_get_attr(&json!([]), "id")),
+            ("AttributeError", "'list' object has no attribute 'get'".into())
+        );
+        assert_eq!(raised(py_item(&json!({}), "id")), ("KeyError", "'id'".into()));
+        assert_eq!(
+            raised(py_item(&json!([]), "id")),
+            ("TypeError", "list indices must be integers or slices, not str".into())
+        );
+        assert_eq!(
+            raised(py_item(&json!("x"), "id")),
+            ("TypeError", "string indices must be integers, not 'str'".into())
+        );
+        assert_eq!(
+            raised(py_item(&json!(null), "id")),
+            ("TypeError", "'NoneType' object is not subscriptable".into())
+        );
+        assert_eq!(py_last(&json!("ab")).unwrap(), json!("b"));
+        assert_eq!(raised(py_last(&json!([]))), ("IndexError", "list index out of range".into()));
+        assert_eq!(raised(py_last(&json!({}))), ("KeyError", "-1".into()));
+        assert_eq!(raised(py_require_hashable(&json!({}))), ("TypeError", "unhashable type: 'dict'".into()));
     }
 }

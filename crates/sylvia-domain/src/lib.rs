@@ -20,12 +20,15 @@
 //!   `zipfile` read path; [`panel_layout`]: `domain/panel_layout.py`.
 //! - [`schema_admission`]: `application/schema_admission.py`, the admitted JSON-schema subset.
 //! - [`pyops`]: Python `==`, `in`, `set()` and subscripting on JSON values, for untrusted records.
+//! - [`campaign_ending`], [`no_ruleset_plan`]: Campaign Plan endings and No Ruleset worlds.
 
 pub mod authority;
+pub mod campaign_ending;
 pub mod content;
 pub mod error;
 pub mod inventory;
 pub mod model_capability;
+pub mod no_ruleset_plan;
 pub mod package_archive;
 pub mod package_library;
 pub mod panel_layout;
