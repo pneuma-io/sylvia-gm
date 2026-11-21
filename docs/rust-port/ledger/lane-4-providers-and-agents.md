@@ -7,6 +7,8 @@ One row per Python file this lane retires. Status is `pending`, `in progress`,
 (no Rust replacement needed; say why in Notes). Only this lane's worker edits this
 file; a row moves to another lane only through the manager.
 
+Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a complete response's counts as the SDK held them, `None` included). Every consumer that computes with or compares a count must call the helper Python's code applies there (`PyValue::int_or_zero` for `int(x or 0)`, `PyValue::as_int`), so it fails where Python fails.
+
 | Python file | Lines | Rust target | Status | Notes |
 | --- | ---: | --- | --- | --- |
 | `src/sylvia_gm/agent/__init__.py` | 49 | `sylvia-agent` | pending | |
@@ -97,7 +99,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/provider/_registry.py` | 393 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_request_metadata.py` | 139 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_retry.py` | 113 | `sylvia-provider` | ported | `retry::{build_delay, retry_with_backoff}`; jitter is random in both. Warnings go to stderr as Python's `logging.lastResort` prints them. Vectors: `tests/base_vectors.rs` |
-| `src/sylvia_gm/provider/_retry_after.py` | 25 | `sylvia-provider` | ported | `retry::retry_after_seconds` with `email.utils.parsedate_to_datetime` ported. Non-ASCII digits, which Python's `float()`/`int()` accept, are refused. Vectors: `tests/base_vectors.rs` |
+| `src/sylvia_gm/provider/_retry_after.py` | 25 | `sylvia-provider` | ported | `retry::retry_after_seconds` with `email.utils.parsedate_to_datetime` ported; numbers through `sylvia_base::pystr::parse_float`/`parse_int` (Unicode digits included). Not ported: a date token starting with a non-decimal digit that `str.isdigit` accepts (superscripts), which fails as a date in both. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_speed.py` | 178 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_stream_health.py` | 76 | `sylvia-provider` | ported | `stream_health::StreamHealthMonitor`. Vectors: `tests/base_vectors.rs` |
 | `src/sylvia_gm/provider/_token_estimate.py` | 52 | `sylvia-provider` | pending | |

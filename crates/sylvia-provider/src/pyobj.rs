@@ -178,23 +178,13 @@ pub(crate) fn parse_python_int(text: &str) -> Option<i64> {
     }
 }
 
-/// `int(text)` for ASCII input: whitespace, a sign, digits and single underscores between digits.
+/// `int(text)` (`sylvia_base::pystr::parse_int`, Python's string rules).
 pub fn python_int_text(text: &str) -> IntText {
-    let trimmed =
-        text.trim_matches(|c: char| sylvia_base::pystr::is_space(c) && !('\u{1c}'..='\u{1f}').contains(&c));
-    let (negative, digits) = match trimmed.strip_prefix('-') {
-        Some(rest) => (true, rest),
-        None => (false, trimmed.strip_prefix('+').unwrap_or(trimmed)),
-    };
-    if digits.is_empty() || digits.starts_with('_') || digits.ends_with('_') || digits.contains("__") {
-        return IntText::Invalid;
+    match sylvia_base::pystr::parse_int(text) {
+        Ok(value) => IntText::Value(value),
+        Err(sylvia_base::pystr::IntParseError::OutOfRange { .. }) => IntText::Overflow,
+        Err(_) => IntText::Invalid,
     }
-    if !digits.chars().all(|c| c.is_ascii_digit() || c == '_') {
-        return IntText::Invalid;
-    }
-    let plain: String = digits.chars().filter(|c| *c != '_').collect();
-    let signed = if negative { format!("-{plain}") } else { plain };
-    signed.parse::<i64>().map_or(IntText::Overflow, IntText::Value)
 }
 
 /// `type(value) is int and value >= 0` (a `bool` is not an `int` here).

@@ -686,12 +686,7 @@ pub fn stream_usage(raw_usage: &Json) -> Result<(TokenUsage, CacheUsage), Incide
         };
         Some(int_or_zero(value)?)
     };
-    let usage = TokenUsage {
-        prompt_tokens: prompt,
-        completion_tokens: completion,
-        total_tokens: total,
-        reasoning_tokens: reasoning,
-    };
+    let usage = TokenUsage::from_ints(prompt, completion, total, reasoning);
     Ok((usage, reported_cache_usage(raw_usage, prompt)?))
 }
 
@@ -873,19 +868,6 @@ impl ChatStreamState {
 
 // ── Complete responses ────────────────────────────────────────────────────────────────────
 
-/// A usage count of a complete response. Python's `TokenUsage` keeps it exactly as the SDK held
-/// it (`None`, `3.9`, `"12"`); `TokenUsage` here holds integers, so a missing or non-integer
-/// value is read the way `int(x or 0)` reads it, and a malformed one as 0. This is an open
-/// question for the manager (pull request 249), not an agreed difference. A value outside the
-/// 64-bit range is refused, never clamped.
-fn loose_count(value: &Json) -> Result<i64, Incidental> {
-    match int_or_zero(value) {
-        Ok(count) => Ok(count),
-        Err(Incidental(message)) if message == crate::pyobj::COUNT_OVERFLOW => Err(Incidental(message)),
-        Err(_) => Ok(0),
-    }
-}
-
 /// `_parse_completion(completion, model_id, ...)`: a non-streaming chat completion.
 pub fn parse_completion(
     completion: &Json,
@@ -951,10 +933,15 @@ pub fn parse_completion(
             };
             Some(int_or_zero(value)?)
         };
+        // TokenUsage(prompt_tokens=getattr(usage_raw, "prompt_tokens", 0), ...): kept as the SDK
+        // held it, None included; consumers coerce the way Python's code does.
+        let count = |name: &str| {
+            PyValue::from_json(attr(usage_raw, models::USAGE, name).cloned().unwrap_or_else(|| Json::from(0)))
+        };
         let usage = TokenUsage {
-            prompt_tokens: loose_count(get("prompt_tokens"))?,
-            completion_tokens: loose_count(get("completion_tokens"))?,
-            total_tokens: loose_count(get("total_tokens"))?,
+            prompt_tokens: count("prompt_tokens"),
+            completion_tokens: count("completion_tokens"),
+            total_tokens: count("total_tokens"),
             reasoning_tokens,
         };
         let (_, cache) = stream_usage(usage_raw)?;

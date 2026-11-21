@@ -348,6 +348,9 @@ def completion_scenarios() -> list[dict]:
             "prompt_tokens_details": {"cached_tokens": 6, "cache_write_tokens": 1}})},
         {"name": "openrouter-details", "provider_key": "openrouter", "body": completion({
             "content": "A", "reasoning": "R", "reasoning_details": [{"type": "reasoning.encrypted", "data": "xyz", "id": "r1"}]})},
+        {"name": "usage-malformed", "body": completion({"content": "A"}, usage={
+            "prompt_tokens": None, "completion_tokens": "12", "total_tokens": 3.9})},
+        {"name": "usage-partial", "body": completion({"content": "A"}, usage={"completion_tokens": 2})},
         {"name": "http-400-context", "status": 400, "body": b'{"error":{"message":"prompt is too long"}}'},
         {"name": "http-403", "status": 403, "body": b'{"error":{"message":"forbidden"}}'},
         {"name": "http-429-retry", "status": 429, "headers": {"retry-after": "2"}, "body": b"{}", "retries": 2},

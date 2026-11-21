@@ -13811,6 +13811,476 @@
    ]
   },
   {
+   "name": "usage-malformed",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "body": "eyJpZCI6ICJ4IiwgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLCAiY3JlYXRlZCI6IDEsICJtb2RlbCI6ICJtIiwgImNob2ljZXMiOiBbeyJpbmRleCI6IDAsICJmaW5pc2hfcmVhc29uIjogInN0b3AiLCAibWVzc2FnZSI6IHsiY29udGVudCI6ICJBIn19XSwgInVzYWdlIjogeyJwcm9tcHRfdG9rZW5zIjogbnVsbCwgImNvbXBsZXRpb25fdG9rZW5zIjogIjEyIiwgInRvdGFsX3Rva2VucyI6IDMuOX19",
+   "retries": 0,
+   "provider_key": "byok",
+   "response": {
+    "content": "A",
+    "reasoning_content": null,
+    "tool_calls": [],
+    "usage": [
+     null,
+     "12",
+     3.9,
+     null
+    ],
+    "usage_reported": true,
+    "finish_reason": "stop",
+    "cache": [
+     null,
+     null,
+     null,
+     0
+    ],
+    "chat_completion_metadata": null,
+    "reported_effort": null,
+    "reported_tier": null
+   },
+   "error": null,
+   "hooks": [
+    {
+     "hook": "on_request",
+     "context": {
+      "provider_key": "byok",
+      "model_id": "test/model-a",
+      "message_count": 2,
+      "tool_count": 1,
+      "request_json": {
+       "model": "model-a",
+       "messages": [
+        {
+         "role": "system",
+         "content": "You are the GM."
+        },
+        {
+         "role": "user",
+         "content": "I open the door. \u00c9tienne waits \ud83c\udfb2."
+        }
+       ],
+       "stream": false,
+       "max_tokens": 256,
+       "tools": [
+        {
+         "type": "function",
+         "function": {
+          "name": "roll",
+          "description": "Roll dice.",
+          "parameters": {
+           "type": "object",
+           "properties": {
+            "n": {
+             "type": "integer"
+            }
+           },
+           "required": [
+            "n"
+           ]
+          }
+         }
+        }
+       ]
+      },
+      "stream": false,
+      "retry_attempt": 0,
+      "http_status": null,
+      "response_headers": {},
+      "error_type": null,
+      "error": null,
+      "response": null
+     }
+    },
+    {
+     "hook": "on_response",
+     "context": {
+      "provider_key": "byok",
+      "model_id": "test/model-a",
+      "message_count": 2,
+      "tool_count": 1,
+      "request_json": {
+       "model": "model-a",
+       "messages": [
+        {
+         "role": "system",
+         "content": "You are the GM."
+        },
+        {
+         "role": "user",
+         "content": "I open the door. \u00c9tienne waits \ud83c\udfb2."
+        }
+       ],
+       "stream": false,
+       "max_tokens": 256,
+       "tools": [
+        {
+         "type": "function",
+         "function": {
+          "name": "roll",
+          "description": "Roll dice.",
+          "parameters": {
+           "type": "object",
+           "properties": {
+            "n": {
+             "type": "integer"
+            }
+           },
+           "required": [
+            "n"
+           ]
+          }
+         }
+        }
+       ]
+      },
+      "stream": false,
+      "retry_attempt": 0,
+      "http_status": 200,
+      "response_headers": {},
+      "error_type": null,
+      "error": null,
+      "response": {
+       "content": "A",
+       "reasoning_content": null,
+       "tool_calls": [],
+       "usage": [
+        null,
+        "12",
+        3.9,
+        null
+       ],
+       "usage_reported": true,
+       "finish_reason": "stop",
+       "cache": [
+        null,
+        null,
+        null,
+        0
+       ],
+       "chat_completion_metadata": null,
+       "reported_effort": null,
+       "reported_tier": null
+      }
+     }
+    }
+   ],
+   "requests": [
+    {
+     "method": "POST",
+     "url": "http://standin.test/v1/chat/completions",
+     "headers": [
+      [
+       "Host",
+       "standin.test"
+      ],
+      [
+       "Accept-Encoding",
+       "gzip, deflate"
+      ],
+      [
+       "Connection",
+       "keep-alive"
+      ],
+      [
+       "Authorization",
+       "Bearer test-key-not-a-secret"
+      ],
+      [
+       "Accept",
+       "application/json"
+      ],
+      [
+       "Content-Type",
+       "application/json"
+      ],
+      [
+       "User-Agent",
+       "AsyncOpenAI/Python 2.53.0"
+      ],
+      [
+       "X-Stainless-Lang",
+       "python"
+      ],
+      [
+       "X-Stainless-Package-Version",
+       "2.53.0"
+      ],
+      [
+       "X-Stainless-OS",
+       "Windows"
+      ],
+      [
+       "X-Stainless-Arch",
+       "other:amd64"
+      ],
+      [
+       "X-Stainless-Runtime",
+       "CPython"
+      ],
+      [
+       "X-Stainless-Runtime-Version",
+       "3.12.11"
+      ],
+      [
+       "X-Stainless-Async",
+       "async:asyncio"
+      ],
+      [
+       "x-stainless-retry-count",
+       "0"
+      ],
+      [
+       "x-stainless-read-timeout",
+       "120.0"
+      ],
+      [
+       "Content-Length",
+       "346"
+      ]
+     ],
+     "body": "{\"messages\":[{\"role\":\"system\",\"content\":\"You are the GM.\"},{\"role\":\"user\",\"content\":\"I open the door. \u00c9tienne waits \ud83c\udfb2.\"}],\"model\":\"model-a\",\"max_tokens\":256,\"stream\":false,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"roll\",\"description\":\"Roll dice.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"integer\"}},\"required\":[\"n\"]}}}]}"
+    }
+   ]
+  },
+  {
+   "name": "usage-partial",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "body": "eyJpZCI6ICJ4IiwgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLCAiY3JlYXRlZCI6IDEsICJtb2RlbCI6ICJtIiwgImNob2ljZXMiOiBbeyJpbmRleCI6IDAsICJmaW5pc2hfcmVhc29uIjogInN0b3AiLCAibWVzc2FnZSI6IHsiY29udGVudCI6ICJBIn19XSwgInVzYWdlIjogeyJjb21wbGV0aW9uX3Rva2VucyI6IDJ9fQ==",
+   "retries": 0,
+   "provider_key": "byok",
+   "response": {
+    "content": "A",
+    "reasoning_content": null,
+    "tool_calls": [],
+    "usage": [
+     null,
+     2,
+     null,
+     null
+    ],
+    "usage_reported": true,
+    "finish_reason": "stop",
+    "cache": [
+     null,
+     null,
+     null,
+     0
+    ],
+    "chat_completion_metadata": null,
+    "reported_effort": null,
+    "reported_tier": null
+   },
+   "error": null,
+   "hooks": [
+    {
+     "hook": "on_request",
+     "context": {
+      "provider_key": "byok",
+      "model_id": "test/model-a",
+      "message_count": 2,
+      "tool_count": 1,
+      "request_json": {
+       "model": "model-a",
+       "messages": [
+        {
+         "role": "system",
+         "content": "You are the GM."
+        },
+        {
+         "role": "user",
+         "content": "I open the door. \u00c9tienne waits \ud83c\udfb2."
+        }
+       ],
+       "stream": false,
+       "max_tokens": 256,
+       "tools": [
+        {
+         "type": "function",
+         "function": {
+          "name": "roll",
+          "description": "Roll dice.",
+          "parameters": {
+           "type": "object",
+           "properties": {
+            "n": {
+             "type": "integer"
+            }
+           },
+           "required": [
+            "n"
+           ]
+          }
+         }
+        }
+       ]
+      },
+      "stream": false,
+      "retry_attempt": 0,
+      "http_status": null,
+      "response_headers": {},
+      "error_type": null,
+      "error": null,
+      "response": null
+     }
+    },
+    {
+     "hook": "on_response",
+     "context": {
+      "provider_key": "byok",
+      "model_id": "test/model-a",
+      "message_count": 2,
+      "tool_count": 1,
+      "request_json": {
+       "model": "model-a",
+       "messages": [
+        {
+         "role": "system",
+         "content": "You are the GM."
+        },
+        {
+         "role": "user",
+         "content": "I open the door. \u00c9tienne waits \ud83c\udfb2."
+        }
+       ],
+       "stream": false,
+       "max_tokens": 256,
+       "tools": [
+        {
+         "type": "function",
+         "function": {
+          "name": "roll",
+          "description": "Roll dice.",
+          "parameters": {
+           "type": "object",
+           "properties": {
+            "n": {
+             "type": "integer"
+            }
+           },
+           "required": [
+            "n"
+           ]
+          }
+         }
+        }
+       ]
+      },
+      "stream": false,
+      "retry_attempt": 0,
+      "http_status": 200,
+      "response_headers": {},
+      "error_type": null,
+      "error": null,
+      "response": {
+       "content": "A",
+       "reasoning_content": null,
+       "tool_calls": [],
+       "usage": [
+        null,
+        2,
+        null,
+        null
+       ],
+       "usage_reported": true,
+       "finish_reason": "stop",
+       "cache": [
+        null,
+        null,
+        null,
+        0
+       ],
+       "chat_completion_metadata": null,
+       "reported_effort": null,
+       "reported_tier": null
+      }
+     }
+    }
+   ],
+   "requests": [
+    {
+     "method": "POST",
+     "url": "http://standin.test/v1/chat/completions",
+     "headers": [
+      [
+       "Host",
+       "standin.test"
+      ],
+      [
+       "Accept-Encoding",
+       "gzip, deflate"
+      ],
+      [
+       "Connection",
+       "keep-alive"
+      ],
+      [
+       "Authorization",
+       "Bearer test-key-not-a-secret"
+      ],
+      [
+       "Accept",
+       "application/json"
+      ],
+      [
+       "Content-Type",
+       "application/json"
+      ],
+      [
+       "User-Agent",
+       "AsyncOpenAI/Python 2.53.0"
+      ],
+      [
+       "X-Stainless-Lang",
+       "python"
+      ],
+      [
+       "X-Stainless-Package-Version",
+       "2.53.0"
+      ],
+      [
+       "X-Stainless-OS",
+       "Windows"
+      ],
+      [
+       "X-Stainless-Arch",
+       "other:amd64"
+      ],
+      [
+       "X-Stainless-Runtime",
+       "CPython"
+      ],
+      [
+       "X-Stainless-Runtime-Version",
+       "3.12.11"
+      ],
+      [
+       "X-Stainless-Async",
+       "async:asyncio"
+      ],
+      [
+       "x-stainless-retry-count",
+       "0"
+      ],
+      [
+       "x-stainless-read-timeout",
+       "120.0"
+      ],
+      [
+       "Content-Length",
+       "346"
+      ]
+     ],
+     "body": "{\"messages\":[{\"role\":\"system\",\"content\":\"You are the GM.\"},{\"role\":\"user\",\"content\":\"I open the door. \u00c9tienne waits \ud83c\udfb2.\"}],\"model\":\"model-a\",\"max_tokens\":256,\"stream\":false,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"roll\",\"description\":\"Roll dice.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"integer\"}},\"required\":[\"n\"]}}}]}"
+    }
+   ]
+  },
+  {
    "name": "http-400-context",
    "status": 400,
    "response_headers": {
