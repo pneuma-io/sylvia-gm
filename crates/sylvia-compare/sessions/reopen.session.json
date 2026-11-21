@@ -337,7 +337,8 @@
  "rules": {
   "ignore_keys": [
    "elapsed_ms",
-   "quiet_ms"
+   "quiet_ms",
+   "activity_timing/revision"
   ],
   "alias": [
    {

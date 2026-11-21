@@ -118,6 +118,9 @@ header. A session adds its own under `rules`:
 ```
 
 - `ignore_keys`: the value under these keys is not compared; the key must still be present.
+  `parent/key` limits it to a `key` directly inside an object stored under `parent`, so
+  `activity_timing/revision` ignores a stopped turn's progress counter without hiding
+  campaign revisions.
 - `alias`: a run-specific identifier. Each distinct match becomes `<name:1>`, `<name:2>` in
   order of first appearance, so both runs must still agree on which identifier appears where.
   Always give `keys`, so an alias cannot hide a wrong hash stored under another key.
@@ -130,7 +133,9 @@ header. A session adds its own under `rules`:
 **How to find the rules for a new session:** record it from Python twice and `diff` the two
 recordings. Whatever differs between two Python runs is what a rule may cover. Add the
 narrowest rule that makes Python agree with itself, and nothing more. Never add a rule to make
-the Rust owner pass.
+the Rust owner pass. Then `check` the reference against the Python owner at least five more
+times on each platform before calling it reproducible: a race that hits one run in three
+(how far a stopped reply got) is easily missed by two.
 
 Everything else is compared exactly, including the order of object keys and whether a number
 is an integer or a float.

@@ -2,7 +2,8 @@
 //!
 //! Three kinds of allowance, all declared in data (the built-in defaults plus a session's own
 //! `rules`), never decided in code:
-//! - `ignore_keys`: object keys whose values are dropped wherever they appear (durations);
+//! - `ignore_keys`: object keys whose values are dropped wherever they appear (durations), or
+//!   with `parent/key` only where `key` sits directly in an object stored under `parent`;
 //! - `scrub`: regular expressions replaced by a fixed word (timestamps);
 //! - `alias`: regular expressions for run-specific identifiers. Each distinct match becomes
 //!   `<name:1>`, `<name:2>` in order of first appearance, so two runs still have to agree on
@@ -21,7 +22,8 @@ use sylvia_base::Json;
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Rules {
-    /// Keys dropped wherever they appear.
+    /// Keys dropped wherever they appear. `parent/key` drops `key` only directly inside an
+    /// object that is itself the value of `parent` (or an item of an array under `parent`).
     pub ignore_keys: Vec<String>,
     /// JSON pointers dropped (exact pointers into the recording).
     pub ignore_pointers: Vec<String>,
@@ -182,10 +184,14 @@ fn walk(
                 .collect(),
         ),
         Json::Object(map) => {
+            let parent = key;
             let mut out = sylvia_base::JsonMap::new();
             for (key, item) in map {
                 let child = format!("{pointer}/{}", key.replace('~', "~0").replace('/', "~1"));
-                if rules.ignore_keys.contains(key) || rules.ignore_pointers.contains(&child) {
+                let scoped = parent.is_some_and(|parent| {
+                    rules.ignore_keys.iter().any(|rule| rule.split_once('/') == Some((parent, key.as_str())))
+                });
+                if rules.ignore_keys.contains(key) || scoped || rules.ignore_pointers.contains(&child) {
                     out.insert(key.clone(), Json::String("<ignored>".into()));
                     continue;
                 }
@@ -391,6 +397,29 @@ mod tests {
         let longer = json!({"headers": [["Host", "127.0.0.1:63279"], ["Content-Length", "37815"]]});
         assert!(compare(&normal(first.clone()), &normal(second), 10).is_empty());
         assert_eq!(compare(&normal(first), &normal(longer), 10).len(), 1);
+    }
+
+    #[test]
+    fn a_scoped_key_is_ignored_only_under_its_parent() {
+        let rules = Rules { ignore_keys: vec!["activity_timing/revision".into()], ..Rules::default() };
+        let normal = |value: Json| normalise(&value, &rules).unwrap();
+        let first = json!({"revision": 4, "content": {"activity_timing": {"phase": "working", "revision": 4}},
+                           "rows": [{"$json": {"activity_timing": {"revision": 4}}}]});
+        let second = json!({"revision": 4, "content": {"activity_timing": {"phase": "working", "revision": 3}},
+                            "rows": [{"$json": {"activity_timing": {"revision": 3}}}]});
+        assert!(compare(&normal(first.clone()), &normal(second), 10).is_empty());
+        // A campaign revision elsewhere is still compared, and so is a missing key.
+        let other = json!({"revision": 5, "content": {"activity_timing": {"phase": "working", "revision": 4}},
+                           "rows": [{"$json": {"activity_timing": {"revision": 4}}}]});
+        let differences = compare(&normal(first.clone()), &normal(other), 10);
+        assert_eq!(differences.len(), 1);
+        assert_eq!(differences[0].pointer, "/revision");
+        let missing = json!({"revision": 4, "content": {"activity_timing": {"phase": "working"}},
+                             "rows": [{"$json": {"activity_timing": {"revision": 4}}}]});
+        assert_eq!(compare(&normal(first), &normal(missing), 10).len(), 1);
+        // Nested deeper than directly inside `activity_timing`, it is compared.
+        let deep = |value: u64| json!({"activity_timing": {"inner": {"revision": value}}});
+        assert_eq!(compare(&normal(deep(1)), &normal(deep(2)), 10).len(), 1);
     }
 
     #[test]
