@@ -1,70 +1,20 @@
 //! The few Python text and value conversions the store's checks depend on.
+//!
+//! Python's whitespace set, `strip` and `casefold` are the shared ones in `sylvia_base::pystr`;
+//! only the conversions of values read from SQLite (`str(value)`, `int(value)`) live here.
 
 use rusqlite::types::Value;
-
-/// The code points Python's `str.isspace()` accepts (CPython 3.12, Unicode 15.0), which is
-/// what `str.split()` and `str.strip()` without arguments use. Rust's `char::is_whitespace`
-/// differs: it leaves out U+001C to U+001F. Checked against `sql/schema_vectors.json`.
-pub const PY_WHITESPACE: [char; 29] = [
-    '\u{9}', '\u{a}', '\u{b}', '\u{c}', '\u{d}', '\u{1c}', '\u{1d}', '\u{1e}', '\u{1f}', '\u{20}', '\u{85}',
-    '\u{a0}', '\u{1680}', '\u{2000}', '\u{2001}', '\u{2002}', '\u{2003}', '\u{2004}', '\u{2005}', '\u{2006}',
-    '\u{2007}', '\u{2008}', '\u{2009}', '\u{200a}', '\u{2028}', '\u{2029}', '\u{202f}', '\u{205f}',
-    '\u{3000}',
-];
-
-/// Python's `str.isspace()` for one character.
-pub fn is_py_whitespace(c: char) -> bool {
-    PY_WHITESPACE.contains(&c)
-}
+use sylvia_base::pystr;
 
 /// Python's `str.strip()` with no arguments.
 pub fn py_strip(text: &str) -> &str {
-    text.trim_matches(is_py_whitespace)
+    pystr::strip(text)
 }
 
-/// Non-ASCII characters whose `str.casefold()` is entirely ASCII (CPython 3.12). Every other
-/// non-ASCII character folds to something non-ASCII. Checked against `sql/schema_vectors.json`.
-const CASEFOLD_TO_ASCII: [(char, &str); 11] = [
-    ('\u{df}', "ss"),
-    ('\u{17f}', "s"),
-    ('\u{1e9e}', "ss"),
-    ('\u{212a}', "k"),
-    ('\u{fb00}', "ff"),
-    ('\u{fb01}', "fi"),
-    ('\u{fb02}', "fl"),
-    ('\u{fb03}', "ffi"),
-    ('\u{fb04}', "ffl"),
-    ('\u{fb05}', "st"),
-    ('\u{fb06}', "st"),
-];
-
-/// The ASCII text a non-ASCII character casefolds to, when it folds to ASCII at all.
-pub fn casefold_to_ascii(c: char) -> Option<&'static str> {
-    CASEFOLD_TO_ASCII.iter().find(|(from, _)| *from == c).map(|(_, to)| *to)
-}
-
-/// `" ".join(text.split()).casefold()`, exact wherever the result is compared with ASCII text.
-///
-/// The store only ever compares this against identities built from its own ASCII SQL, so a
-/// non-ASCII character matters only when it folds to ASCII; those are folded exactly and any
-/// other non-ASCII character is kept, which can never equal ASCII text.
+/// `" ".join(text.split()).casefold()`.
 pub fn normalized_casefold(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    for word in text.split(is_py_whitespace).filter(|word| !word.is_empty()) {
-        if !out.is_empty() {
-            out.push(' ');
-        }
-        for c in word.chars() {
-            if c.is_ascii() {
-                out.push(c.to_ascii_lowercase());
-            } else if let Some(folded) = casefold_to_ascii(c) {
-                out.push_str(folded);
-            } else {
-                out.push(c);
-            }
-        }
-    }
-    out
+    let words: Vec<&str> = text.split(pystr::is_space).filter(|word| !word.is_empty()).collect();
+    pystr::casefold(&words.join(" "))
 }
 
 /// Python's `str(value)` of a value read from SQLite, exact wherever it is compared with
@@ -132,7 +82,7 @@ mod tests {
         assert_eq!(py_strip("\u{1c} x \u{85}"), "x");
         assert_eq!(normalized_casefold("CREATE\u{1f}TABLE  T (\n A )"), "create table t ( a )");
         assert_eq!(normalized_casefold("Stra\u{df}e \u{212a}"), "strasse k");
-        assert_eq!(normalized_casefold("\u{e9}"), "\u{e9}");
+        assert_eq!(normalized_casefold("\u{c9}"), "\u{e9}");
     }
 
     #[test]
