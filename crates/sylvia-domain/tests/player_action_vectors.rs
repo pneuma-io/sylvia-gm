@@ -1,13 +1,13 @@
-//! Compare sylvia_app::player_actions with the frozen Python.
+//! Compare sylvia_domain::player_actions with the frozen Python.
 //!
 //! Regenerate with `tests/vectors/generate_player_action_vectors.py` (needs the snapshot's Python).
 
 use serde_json::json;
-use sylvia_app::player_actions::{
-    player_control_origin, valid_player_action_consequence, PLAYER_ACTION_ORIGIN,
-};
 use sylvia_base::pyjson;
 use sylvia_base::Json;
+use sylvia_domain::player_actions::{
+    player_control_origin, valid_player_action_consequence, PLAYER_ACTION_ORIGIN,
+};
 
 fn vectors() -> Json {
     pyjson::loads(include_str!("vectors/player_action_vectors.json")).expect("vector file is valid JSON")

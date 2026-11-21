@@ -1,18 +1,17 @@
-//! `application/player_actions.py`, first part: the owner's marker for a direct player action.
+//! `application/player_actions.py`, the owner's marker for a direct player action.
 //!
 //! [`player_control_origin`] identifies the declared UI control a player used (a panel action, a
 //! saved result-card button or a mechanics choice), and [`valid_player_action_consequence`]
 //! recognises the marker that may survive a failed, fully rolled-back mechanic. The stored
-//! authority verifier uses the second to refuse a damaged profile, so both are ported ahead of
-//! the rest of the file (`parse_player_controls` and the action helpers follow).
+//! authority verifier uses the second to refuse a damaged profile. Both are pure JSON rules over
+//! domain types, so they live here, below the store; the rest of `player_actions.py` lands in
+//! `sylvia-app`.
 
+use crate::authority::{owned_payload, validate_authority_identity, validate_authority_identity_value};
+use crate::error::{DomainError, DomainResult};
+use crate::pyops::py_eq;
 use serde_json::json;
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::authority::{
-    owned_payload, validate_authority_identity, validate_authority_identity_value,
-};
-use sylvia_domain::error::{DomainError, DomainResult};
-use sylvia_domain::pyops::py_eq;
 
 /// `PLAYER_ACTION_ORIGIN`: the consequence kind of a player action's owner marker.
 pub const PLAYER_ACTION_ORIGIN: &str = "sylvia_player_action";

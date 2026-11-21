@@ -1,8 +1,8 @@
-"""Generate player-action marker vectors for sylvia_app::player_actions from the frozen Python.
+"""Generate player-action marker vectors for sylvia_domain::player_actions from the frozen Python.
 
 Run with the snapshot's own interpreter, from the repository root:
 
-    .venv/Scripts/python.exe -I crates/sylvia-app/tests/vectors/generate_player_action_vectors.py
+    .venv/Scripts/python.exe -I crates/sylvia-domain/tests/vectors/generate_player_action_vectors.py
 
 (`.venv/bin/python` on Linux.) Deterministic and checked in. Reference tooling for the port,
 retired with the Python source.
