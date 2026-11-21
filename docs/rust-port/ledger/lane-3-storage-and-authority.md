@@ -9,13 +9,13 @@ file; a row moves to another lane only through the manager.
 
 | Python file | Lines | Rust target | Status | Notes |
 | --- | ---: | --- | --- | --- |
-| `src/sylvia_gm/application/authority.py` | 9,922 | `sylvia-store::authority` | in progress | `campaign_index` (`_campaign_index_entry`, `CampaignIndexEntry`, `CampaignSessionIndexEntry`; `_operation()` refuses a closed owner), proven against `AuthorityOwner.campaign_index()` in `tests/vectors/campaigns`. |
+| `src/sylvia_gm/application/authority.py` | 9,922 | `sylvia-store::authority` | in progress | `campaign_index` (`_campaign_index_entry`, `CampaignIndexEntry`, `CampaignSessionIndexEntry`; `_operation()` refuses a closed owner), proven against `AuthorityOwner.campaign_index()` in `tests/vectors/campaigns`. Lanes PR: `_lane` and `_lanes` as `sylvia-store::lanes` (`LaneRegistry`, shared through `StoreHandle::lanes()`; nested acquisitions are listed in the module documentation and are handled by passing the held guard down), `rename_builder_chat` and `delete_builder_chat` (`StoreHandle` operations), proven against `AuthorityOwner` in `tests/vectors/builder_chat_owner`, with concurrency tests. |
 | `src/sylvia_gm/application/campaign_inventory.py` | 231 | `sylvia-app::campaign_inventory` | pending | |
 | `src/sylvia_gm/application/campaign_rules_update.py` | 816 | `sylvia-app::campaign_rules_update` | pending | |
 | `src/sylvia_gm/application/campaign_sequels.py` | 274 | `sylvia-app::campaign_sequels` | pending | |
 | `src/sylvia_gm/application/knowledge_search.py` | 227 | `sylvia-app::knowledge_search` | pending | |
 | `src/sylvia_gm/application/ruleless_play.py` | 238 | `sylvia-app::ruleless_play` | pending | |
-| `src/sylvia_gm/application/session.py` | 256 | `sylvia-app::session` | pending | |
+| `src/sylvia_gm/application/session.py` | 256 | `sylvia-app::session` | in progress | Lanes PR: `_lane` and `_lanes` as `sylvia-store::lanes` (`OwnerLanes::sessions`), and `rename_builder_chat` / `delete_builder_chat` under that lane inside the `StoreHandle` operations. The other methods take the same lane when their callers are ported. |
 | `src/sylvia_gm/infrastructure/__init__.py` | 1 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/builder_source_ingestion.py` | 571 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/builder_workspace_migration.py` | 130 | `sylvia-store` | in progress | Sessions PR 1: `_is_link_or_reparse`, `_builder_workspace_path` (with `PureWindowsPath.is_reserved`), `remove_builder_workspace`. Still to come: `retain_legacy_workspace` and the rest, with Builder sessions. |

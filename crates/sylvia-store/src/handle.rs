@@ -4,6 +4,7 @@
 //! tokio and awaits replies.
 
 use crate::error::{StoreError, StoreResult};
+use crate::lanes::OwnerLanes;
 use crate::store::AuthorityStore;
 use std::sync::mpsc;
 use std::thread::JoinHandle;
@@ -13,10 +14,12 @@ type Job = Box<dyn FnOnce(&mut AuthorityStore) + Send>;
 /// The store thread is gone (it panicked or was shut down).
 pub const STORE_STOPPED: &str = "SQLite authority store thread has stopped";
 
-/// A cloneable handle to the store thread. The owner's dispatch context holds one.
+/// A cloneable handle to the store thread. The owner's dispatch context holds one. Its clones
+/// share the owner's lanes ([`OwnerLanes`]), as Python's one `AuthorityOwner` does.
 #[derive(Debug, Clone)]
 pub struct StoreHandle {
     jobs: mpsc::Sender<Job>,
+    lanes: OwnerLanes,
 }
 
 /// Joins the store thread; returned once by [`StoreHandle::spawn`].
@@ -54,7 +57,9 @@ impl StoreHandle {
             })
             .map_err(StoreError::from)?;
         match opened_receiver.recv() {
-            Ok(Ok(())) => Ok((Self { jobs }, StoreThread { thread: Some(thread) })),
+            Ok(Ok(())) => {
+                Ok((Self { jobs, lanes: OwnerLanes::default() }, StoreThread { thread: Some(thread) }))
+            }
             Ok(Err(error)) => {
                 let _ = thread.join();
                 Err(error)
@@ -64,6 +69,11 @@ impl StoreHandle {
                 Err(StoreError::Other(STORE_STOPPED.into()))
             }
         }
+    }
+
+    /// The owner's lane registries: `AuthorityOwner._lanes` and `SessionApplication._lanes`.
+    pub fn lanes(&self) -> &OwnerLanes {
+        &self.lanes
     }
 
     /// Run `operation` on the store thread and await its result.

@@ -1,0 +1,514 @@
+{
+ "python": "3.12.11",
+ "operations": [
+  {
+   "op": "delete_builder_chat",
+   "session_id": "",
+   "busy": false,
+   "confirmation": "permanently delete "
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "   ",
+   "busy": false,
+   "confirmation": "permanently delete    "
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": " chat-a",
+   "busy": false,
+   "confirmation": "permanently delete  chat-a"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a ",
+   "busy": false,
+   "confirmation": "permanently delete chat-a "
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": ".",
+   "busy": false,
+   "confirmation": "permanently delete ."
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "..",
+   "busy": false,
+   "confirmation": "permanently delete .."
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "a/b",
+   "busy": false,
+   "confirmation": "permanently delete a/b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "a\\b",
+   "busy": false,
+   "confirmation": "permanently delete a\\b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "a:b",
+   "busy": false,
+   "confirmation": "permanently delete a:b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "../chat-a",
+   "busy": false,
+   "confirmation": "permanently delete ../chat-a"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "C:chat",
+   "busy": false,
+   "confirmation": "permanently delete C:chat"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": ".",
+   "busy": false,
+   "confirmation": "wrong"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "a/b",
+   "busy": false,
+   "confirmation": ""
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": false,
+   "confirmation": ""
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": false,
+   "confirmation": "permanently delete chat-a "
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": false,
+   "confirmation": "Permanently delete chat-a"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": false,
+   "confirmation": "permanently delete  chat-a"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": false,
+   "confirmation": "permanently delete chat-b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": true,
+   "confirmation": "permanently delete chat-a"
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-a",
+   "display_name": "Renamed while busy",
+   "automatic": false,
+   "busy": true
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-a",
+   "busy": true,
+   "confirmation": "wrong"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-missing",
+   "busy": false,
+   "confirmation": "permanently delete chat-missing"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "..chat",
+   "busy": false,
+   "confirmation": "permanently delete ..chat"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "a\u0000b",
+   "busy": false,
+   "confirmation": "permanently delete a\u0000b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "CON",
+   "busy": false,
+   "confirmation": "permanently delete CON"
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-a",
+   "display_name": "Map notes",
+   "automatic": false,
+   "busy": false
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-a",
+   "display_name": "Automatic title",
+   "automatic": true,
+   "busy": false
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-c",
+   "display_name": "Automatic title",
+   "automatic": true,
+   "busy": false
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-missing",
+   "display_name": "Name",
+   "automatic": false,
+   "busy": false
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": " chat-a",
+   "display_name": "Name",
+   "automatic": false,
+   "busy": false
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-a",
+   "display_name": "   ",
+   "automatic": false,
+   "busy": false
+  },
+  {
+   "op": "make_workspace",
+   "session_id": "chat-b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-b",
+   "busy": false,
+   "confirmation": "permanently delete chat-b"
+  },
+  {
+   "op": "workspace_exists",
+   "session_id": "chat-b"
+  },
+  {
+   "op": "delete_builder_chat",
+   "session_id": "chat-b",
+   "busy": false,
+   "confirmation": "permanently delete chat-b"
+  },
+  {
+   "op": "rename_builder_chat",
+   "session_id": "chat-b",
+   "display_name": "Gone",
+   "automatic": false,
+   "busy": false
+  },
+  {
+   "op": "builder_chat_index"
+  }
+ ],
+ "outcomes": [
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Builder chat identity is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_delete_confirmation_inexact",
+   "message": "Builder chat deletion confirmation is not exact"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_delete_confirmation_inexact",
+   "message": "Builder chat deletion confirmation is not exact"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_delete_confirmation_inexact",
+   "message": "Builder chat deletion confirmation is not exact"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_delete_confirmation_inexact",
+   "message": "Builder chat deletion confirmation is not exact"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_delete_confirmation_inexact",
+   "message": "Builder chat deletion confirmation is not exact"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_work_in_progress",
+   "message": "Builder chat has active work; deletion is not queued"
+  },
+  {
+   "ok": {
+    "session": {
+     "session_id": "chat-a",
+     "campaign_id": null,
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    },
+    "display_name": "Renamed while busy",
+    "created_ordinal": 1
+   }
+  },
+  {
+   "error": "CommandRejected",
+   "code": "builder_chat_delete_confirmation_inexact",
+   "message": "Builder chat deletion confirmation is not exact"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "ok": {
+    "session": {
+     "session_id": "chat-a",
+     "campaign_id": null,
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    },
+    "display_name": "Map notes",
+    "created_ordinal": 1
+   }
+  },
+  {
+   "ok": {
+    "session": {
+     "session_id": "chat-a",
+     "campaign_id": null,
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    },
+    "display_name": "Map notes",
+    "created_ordinal": 1
+   }
+  },
+  {
+   "ok": {
+    "session": {
+     "session_id": "chat-c",
+     "campaign_id": null,
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    },
+    "display_name": "Automatic title",
+    "created_ordinal": 3
+   }
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "error": "ValueError",
+   "code": null,
+   "message": "Builder chat display name must be trimmed and nonempty"
+  },
+  {
+   "ok": null
+  },
+  {
+   "ok": {
+    "session": {
+     "session_id": "chat-b",
+     "campaign_id": null,
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    },
+    "display_name": "New chat",
+    "created_ordinal": 2
+   }
+  },
+  {
+   "ok": false
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Builder chat is unavailable"
+  },
+  {
+   "ok": [
+    {
+     "session": {
+      "session_id": "chat-c",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     },
+     "display_name": "Automatic title",
+     "created_ordinal": 3
+    },
+    {
+     "session": {
+      "session_id": "chat-a",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     },
+     "display_name": "Map notes",
+     "created_ordinal": 1
+    }
+   ]
+  }
+ ]
+}
