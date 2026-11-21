@@ -109,9 +109,10 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    and `sylvia-provider/src/config/host_browser/windows.rs` (`ShellExecuteW` with no verb,
    parameters or folder, `SW_SHOWNORMAL`), mirroring `os.startfile` as `webbrowser` calls it. It
    only ever receives a shipped preset's setup address.
-   Approved, not yet merged: `sylvia-owner/src/desktop_update/windows.rs` (process-barrier
-   handles, the two installed-copy registry keys, the progress `TaskDialogIndirect`, and
-   `GetDiskFreeSpaceExW`), to be listed in full when lane 5's helper PR merges.
+   `sylvia-owner/src/desktop_update/windows.rs` holds `GetDiskFreeSpaceExW` (merged, for
+   `shutil.disk_usage`). Approved for it but not yet merged: the process-barrier handles, the
+   two installed-copy registry keys and the progress `TaskDialogIndirect`, listed here when
+   lane 5's helper PR merges.
 
 ## Concurrency
 
