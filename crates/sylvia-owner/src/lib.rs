@@ -6,7 +6,7 @@
 //! `src/sylvia_gm/interfaces/owner_process.py` and is started in the real desktop through the
 //! existing `SYLVIA_GM_OWNER_EXECUTABLE` override.
 //!
-//! What exists today: launch handshake, line protocol, request validation, the command table,
+//! What exists today: line protocol, launch through lane 3's `acquire_owner`, request validation, the command table,
 //! Python's execution model (inline commands, display reads, model-bound tasks), local
 //! diagnostics, desktop drafts, display-load cancellation and `handshake_status`. Every
 //! other command still answers `rust_port_pending`.
@@ -18,9 +18,9 @@ pub mod desktop_update;
 pub mod diagnostics;
 pub mod dispatch;
 pub mod display_reads;
-pub mod handshake;
 pub mod protocol;
 pub mod run;
+pub mod services;
 pub mod util;
 
 pub use run::run;

@@ -54,7 +54,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/interfaces/commands/sessions.py` | 1,416 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/local_api.py` | 820 | `sylvia-owner` | in progress | `handshake_status` only |
 | `src/sylvia_gm/interfaces/local_owner.py` | 1,444 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/owner_process.py` | 2,245 | `sylvia-owner::run` | in progress | run loop: execution model, local services, diagnostics on replies; gates, reservation and provider errors next |
+| `src/sylvia_gm/interfaces/owner_process.py` | 2,245 | `sylvia-owner::run` | in progress | run loop: execution model, local services, diagnostics on replies, update gates (state from the desktop update port), provider-work reservation, the provider error path (lane 4 `provider_error_reply`); launch opens and migrates the store (lane 3 `StoreHandle`). Pending: `acquire_owner` and internal handshake, bundled package installs, Builder migrations, desktop update methods |
 | `src/sylvia_gm/interfaces/ruleset_test_worker.py` | 96 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/webui.py` | 847 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/local_dictation.py` | 346 | `sylvia-owner` | pending | |

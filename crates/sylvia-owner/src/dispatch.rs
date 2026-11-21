@@ -6,22 +6,55 @@
 //! so a comparison run shows exactly which commands are still missing.
 
 use crate::commands::{self, Status};
+use crate::services::{ProviderResolver, SessionLoop};
+use std::path::PathBuf;
+use std::sync::Arc;
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_provider::error::ProviderError;
+use sylvia_store::{StoreError, StoreHandle};
 
 /// The code a known but unported command answers with.
 pub const PORT_PENDING: &str = "rust_port_pending";
 
-/// What handlers get. Lanes add the owner's shared services here (store handle, provider
-/// resolver, session loop) as they are ported; it mirrors Python's `DispatchContext`.
-#[derive(Debug, Clone)]
+/// What handlers get: Python's `DispatchContext`, one handle per service.
+///
+/// Cloned per request with `method` set. A field is `None` until the lane that owns the service
+/// lands it: the provider resolver and session loop (lane 4).
+#[derive(Clone)]
 pub struct DispatchContext {
     /// `owner_id` from the launch envelope.
     pub owner_id: String,
     /// The folder holding the database: Python's `storage_root`.
-    pub storage_root: std::path::PathBuf,
+    pub storage_root: PathBuf,
     /// The launch handshake was verified (the supervisor's `handshake_verified`). The run loop
     /// only starts after it is, so this is true whenever a command runs.
     pub handshake_verified: bool,
+    /// The command being answered: `ctx.method`.
+    pub method: String,
+    /// `gm_system_prompt`: a replacement GM system prompt, `None` in the product.
+    pub gm_system_prompt: Option<Arc<str>>,
+    /// The application owner's store (lane 3): Python's `application_owner` and the bus reads
+    /// that go through it.
+    pub store: StoreHandle,
+    /// `provider_resolver`, `model_choices` and `reload_provider_resolver` (lane 4).
+    pub providers: Option<Arc<dyn ProviderResolver>>,
+    /// `session_loop` (lane 4).
+    pub session_loop: Option<Arc<dyn SessionLoop>>,
+    /// `record_provider_warning(code)`: a `provider_warning` record in local diagnostics.
+    pub record_provider_warning: Arc<dyn Fn(&str) + Send + Sync>,
+}
+
+impl std::fmt::Debug for DispatchContext {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("DispatchContext")
+            .field("owner_id", &self.owner_id)
+            .field("storage_root", &self.storage_root)
+            .field("method", &self.method)
+            .field("providers", &self.providers.is_some())
+            .field("session_loop", &self.session_loop.is_some())
+            .finish_non_exhaustive()
+    }
 }
 
 /// Why a command failed, as the run loop needs it.
@@ -31,11 +64,35 @@ pub enum Failure {
     /// the reply carries the error's code and message. Local diagnostics records the error's
     /// `error_type`, or `CommandRejected` when it names none.
     Rejected(CodedError),
+    /// Python's `ProviderError` branch: the reply's code and player-facing sentence come from
+    /// `sylvia_provider::reply::provider_error_reply`, and diagnostics records the class.
+    Provider(ProviderError),
     /// Any other exception: the reply is the fixed `internal_error` text.
     Internal {
         /// The exception class name Python would record.
         error_type: &'static str,
     },
+}
+
+impl From<ProviderError> for Failure {
+    fn from(error: ProviderError) -> Self {
+        Self::Provider(error)
+    }
+}
+
+impl From<StoreError> for Failure {
+    /// A store failure as Python's owner sees it: a coded error is a rejection; a SQLite or
+    /// other exception is an internal fault (Python's `except Exception`); a store path not
+    /// ported yet is an internal fault too, never a Python outcome.
+    fn from(error: StoreError) -> Self {
+        match error {
+            StoreError::Coded(error) => Failure::from(error),
+            // `_BackupFailure` is a `CommandRejected` with its own code and diagnostics.
+            StoreError::Backup(failure) => Failure::from(failure.to_coded()),
+            StoreError::Sqlite(_) => Self::Internal { error_type: "Error" },
+            StoreError::Other(_) | StoreError::NotPorted(_) => Self::Internal { error_type: "RuntimeError" },
+        }
+    }
 }
 
 impl Failure {
