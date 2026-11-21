@@ -68,29 +68,29 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/campaign/_folder.py` | 600 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/campaign/rift.py` | 543 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/__init__.py` | 1 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_campaign_export.py` | 276 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_character.py` | 175 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_character_profile.py` | 43 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_character_profile_v2.py` | 252 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_declarations.py` | 288 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_map_card.py` | 803 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_package.py` | 404 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_package_subformats.py` | 258 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_panel.py` | 294 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_plan.py` | 841 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_ruleset.py` | 445 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_ruleset_tests.py` | 188 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_runtime.py` | 320 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_setting.py` | 62 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/_content_schema_ui.py` | 209 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/_content_schema_campaign_export.py` | 276 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_character.py` | 175 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_character_profile.py` | 43 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_character_profile_v2.py` | 252 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_declarations.py` | 288 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_map_card.py` | 803 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_package.py` | 404 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_package_subformats.py` | 258 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_panel.py` | 294 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_plan.py` | 841 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_ruleset.py` | 445 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_ruleset_tests.py` | 188 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py`; `RULESET_TESTS_PATH` is `content::RULESET_TESTS_PATH` |
+| `src/sylvia_gm/domain/_content_schema_runtime.py` | 320 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_setting.py` | 62 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
+| `src/sylvia_gm/domain/_content_schema_ui.py` | 209 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/_runtime_executable_reference.py` | 225 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/authority.py` | 1,128 | `sylvia-domain::authority` | ported | Validated types keep private fields behind `new`; `Mechanic` and `NarrationStream` (callables) left to lanes 2 and 4 |
 | `src/sylvia_gm/domain/campaign_ending.py` | 99 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/campaign_plan.py` | 759 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain::content::catalog` | ported | `list_content_definitions`, `get_content_definition` |
+| `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain::content::validation` | ported | `validate_content_shape`, `ContentShapeError`; the engine (`content::schema`) also serves lanes 2 and 4 and `state/_schema.py`, with jsonschema 4.26 messages |
+| `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain::error` | in progress | `RulesetDiagnostic` done; the authority error classes follow |
 | `src/sylvia_gm/domain/interview_contribution.py` | 150 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain` | pending | |

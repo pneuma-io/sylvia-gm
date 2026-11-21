@@ -1,0 +1,201 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pneuma.io/sylvia-gm/gameplay-support-v1.schema.json",
+  "title": "Sylvia GM gameplay support declarations",
+  "type": "object",
+  "required": [
+   "format_id",
+   "format_version",
+   "records"
+  ],
+  "properties": {
+   "format_id": {
+    "const": "sylvia-gm-gameplay-support"
+   },
+   "format_version": {
+    "type": "integer",
+    "const": 1
+   },
+   "records": {
+    "type": "array",
+    "maxItems": 10000,
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "reference_availability",
+      "gameplay_resolution",
+      "mechanic_family",
+      "deterministic_part",
+      "gm_part"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1
+      },
+      "reference_availability": {
+       "enum": [
+        "included",
+        "excluded"
+       ]
+      },
+      "gameplay_resolution": {
+       "enum": [
+        "not_applicable",
+        "engine_family",
+        "engine_specialized",
+        "hybrid",
+        "gm_adjudicated",
+        "unsupported"
+       ]
+      },
+      "mechanic_family": {
+       "oneOf": [
+        {
+         "type": "null"
+        },
+        {
+         "type": "string",
+         "minLength": 1
+        }
+       ]
+      },
+      "deterministic_part": {
+       "oneOf": [
+        {
+         "type": "null"
+        },
+        {
+         "type": "string",
+         "minLength": 1,
+         "pattern": ".*\\S.*"
+        }
+       ]
+      },
+      "gm_part": {
+       "oneOf": [
+        {
+         "type": "null"
+        },
+        {
+         "type": "string",
+         "minLength": 1,
+         "pattern": ".*\\S.*"
+        }
+       ]
+      }
+     },
+     "additionalProperties": false,
+     "allOf": [
+      {
+       "if": {
+        "properties": {
+         "gameplay_resolution": {
+          "enum": [
+           "engine_family",
+           "hybrid",
+           "gm_adjudicated"
+          ]
+         }
+        },
+        "required": [
+         "gameplay_resolution"
+        ]
+       },
+       "then": {
+        "properties": {
+         "mechanic_family": {
+          "type": "string",
+          "minLength": 1
+         }
+        }
+       }
+      },
+      {
+       "if": {
+        "properties": {
+         "gameplay_resolution": {
+          "const": "hybrid"
+         }
+        },
+        "required": [
+         "gameplay_resolution"
+        ]
+       },
+       "then": {
+        "properties": {
+         "deterministic_part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": ".*\\S.*"
+         },
+         "gm_part": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": ".*\\S.*"
+         }
+        }
+       },
+       "else": {
+        "properties": {
+         "deterministic_part": {
+          "type": "null"
+         },
+         "gm_part": {
+          "type": "null"
+         }
+        }
+       }
+      },
+      {
+       "if": {
+        "properties": {
+         "reference_availability": {
+          "const": "excluded"
+         }
+        },
+        "required": [
+         "reference_availability"
+        ]
+       },
+       "then": {
+        "properties": {
+         "gameplay_resolution": {
+          "enum": [
+           "not_applicable",
+           "unsupported"
+          ]
+         }
+        }
+       }
+      }
+     ]
+    }
+   }
+  },
+  "additionalProperties": false
+ },
+ "example": {
+  "format_id": "sylvia-gm-gameplay-support",
+  "format_version": 1,
+  "records": [
+   {
+    "id": "negotiation-outcome",
+    "reference_availability": "included",
+    "gameplay_resolution": "hybrid",
+    "mechanic_family": "social-resolution",
+    "deterministic_part": "The engine records the declared stakes and check result.",
+    "gm_part": "The GM applies the authored person's motives and decides the response."
+   }
+  ]
+ },
+ "notes": [
+  "The canonical UTF-8 JSON file is limited to 2 MiB; records must be sorted and unique by id.",
+  "Identity fields use authority identity validation. Optional ownership text must be nonblank when present.",
+  "engine_family, hybrid, and gm_adjudicated require mechanic_family; hybrid alone requires both ownership descriptions.",
+  "Excluded reference content may declare only not_applicable or unsupported resolution."
+ ],
+ "file": "support/gameplay-resolution.json"
+}

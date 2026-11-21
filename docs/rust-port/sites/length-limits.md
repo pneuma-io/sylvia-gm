@@ -91,8 +91,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/campaign_plan.py:749` | `validate_campaign_plan` | len() against a limit | `if len(encoded) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
 | `domain/campaign_sequel.py:45` | `prepare_story` | len() against a limit | `if any(len(item) > 160 for item in mapping.values()):` | |
 | `domain/campaign_sequel.py:67` | `review_payload` | len() against a limit | `if not isinstance(note, str) or not note.strip() or len(note) > 4000:` | |
-| `domain/content_validation.py:138` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | |
-| `domain/content_validation.py:140` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | |
+| `domain/content_validation.py:138` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
+| `domain/content_validation.py:140` | `validate_content_shape` | len() against a limit | `if len(corrections) >= 16:` | `sylvia-domain` content_vectors |
 | `domain/errors.py:150` | `MechanicsRejected.__init__` | len() against a limit | `or len(reason) > 500 or any(ord(character) < 32 for character in reason)` | |
 | `domain/errors.py:163` | `RulesetPreconditionRejected.__init__` | len() against a limit | `or len(safe_reason) > 500` | |
 | `domain/interview_contribution.py:76` | `parse_interview_contribution_bytes` | len() against a limit | `if not value or len(value) > INTERVIEW_CONTRIBUTION_BYTE_LIMIT:` | |

@@ -1,0 +1,1291 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pneuma.io/sylvia-gm/package-archive-manifest.schema.json",
+  "title": "Sylvia GM package archive manifest",
+  "type": "object",
+  "required": [
+   "format",
+   "packages"
+  ],
+  "properties": {
+   "format": {
+    "type": "integer",
+    "enum": [
+     1,
+     2,
+     3,
+     4
+    ]
+   },
+   "packages": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$schema": "https://json-schema.org/draft/2020-12/schema",
+     "$id": "https://pneuma.io/sylvia-gm/package-record.schema.json",
+     "title": "Sylvia GM package record (archive formats 1-4)",
+     "type": "object",
+     "required": [
+      "id",
+      "version",
+      "role",
+      "metadata",
+      "provenance",
+      "compatibility",
+      "minimum_model_capability_tier",
+      "dependencies",
+      "capabilities",
+      "tools",
+      "prompt_fragments",
+      "ui_surfaces",
+      "files",
+      "content_sha256"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "minLength": 1
+      },
+      "version": {
+       "type": "string",
+       "minLength": 1
+      },
+      "role": {
+       "enum": [
+        "primary",
+        "dependency"
+       ]
+      },
+      "content_kind": {
+       "enum": [
+        "ruleset",
+        "campaign_setting",
+        "support"
+       ]
+      },
+      "metadata": {
+       "type": "object",
+       "required": [
+        "label"
+       ],
+       "properties": {
+        "label": {
+         "type": "string",
+         "minLength": 1
+        }
+       },
+       "additionalProperties": false
+      },
+      "provenance": {
+       "type": "object",
+       "required": [
+        "publisher",
+        "source_sha256"
+       ],
+       "properties": {
+        "publisher": {
+         "type": "string",
+         "minLength": 1
+        },
+        "source_sha256": {
+         "type": "string",
+         "pattern": "^[0-9a-f]{64}$"
+        }
+       },
+       "additionalProperties": false
+      },
+      "compatibility": {
+       "type": "object",
+       "required": [
+        "host_contract",
+        "runtime_format",
+        "requires"
+       ],
+       "properties": {
+        "host_contract": {
+         "const": 1
+        },
+        "runtime_format": {
+         "const": 1
+        },
+        "requires": {
+         "type": "array",
+         "items": {
+          "type": "string",
+          "minLength": 1
+         },
+         "uniqueItems": true
+        }
+       },
+       "additionalProperties": false
+      },
+      "minimum_model_capability_tier": {
+       "type": "string",
+       "minLength": 1
+      },
+      "dependencies": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "namespace",
+         "kind",
+         "id",
+         "version",
+         "content_sha256"
+        ],
+        "properties": {
+         "namespace": {
+          "type": "string",
+          "minLength": 1
+         },
+         "kind": {
+          "type": "string",
+          "minLength": 1
+         },
+         "id": {
+          "type": "string",
+          "minLength": 1
+         },
+         "version": {
+          "type": "string",
+          "minLength": 1
+         },
+         "content_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+         }
+        },
+        "additionalProperties": false
+       }
+      },
+      "capabilities": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "minLength": 1
+       },
+       "uniqueItems": true
+      },
+      "tools": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "name",
+         "capability",
+         "input_schema",
+         "state_predicates",
+         "turn_statuses",
+         "writers"
+        ],
+        "properties": {
+         "name": {
+          "type": "string",
+          "minLength": 1
+         },
+         "capability": {
+          "type": "string",
+          "minLength": 1
+         },
+         "input_schema": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "state_predicates": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "required": [
+            "namespace",
+            "key",
+            "equals"
+           ],
+           "properties": {
+            "namespace": {
+             "type": "string",
+             "minLength": 1
+            },
+            "key": {
+             "type": "string",
+             "minLength": 1
+            },
+            "equals": {},
+            "negated": {
+             "type": "boolean"
+            }
+           },
+           "additionalProperties": false
+          }
+         },
+         "turn_statuses": {
+          "type": "array",
+          "items": {
+           "enum": [
+            "open",
+            "completed"
+           ]
+          }
+         },
+         "writers": {
+          "type": "array",
+          "items": {
+           "enum": [
+            "builder",
+            "dm"
+           ]
+          }
+         }
+        },
+        "additionalProperties": false
+       }
+      },
+      "prompt_fragments": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "id",
+         "capability"
+        ],
+        "properties": {
+         "id": {
+          "type": "string",
+          "minLength": 1
+         },
+         "capability": {
+          "type": "string",
+          "minLength": 1
+         }
+        },
+        "additionalProperties": false
+       }
+      },
+      "ui_surfaces": {
+       "type": "array",
+       "items": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "urn:sylvia-gm:content:packaged-panel:1",
+        "title": "Materialized Ruleset panel declaration",
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+         "id",
+         "capability",
+         "renderer",
+         "source",
+         "title",
+         "icon",
+         "group",
+         "order",
+         "default_size",
+         "minimum_size",
+         "default_placement",
+         "allowed_placements",
+         "actions"
+        ],
+        "properties": {
+         "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])",
+          "description": "Unique panel identity within the package."
+         },
+         "capability": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])",
+          "description": "A capability declared by the same package."
+         },
+         "renderer": {
+          "enum": [
+           "party",
+           "encounter",
+           "inventory",
+           "objectives",
+           "unit_list",
+           "key_value",
+           "text",
+           "tactical_grid",
+           "coordinate_map",
+           "network_graph",
+           "piece_table"
+          ]
+         },
+         "source": {
+          "$ref": "#/$defs/source"
+         },
+         "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "description": "Defaults to id in compact source."
+         },
+         "icon": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "default": "\u25c7"
+         },
+         "group": {
+          "oneOf": [
+           {
+            "type": "null"
+           },
+           {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+           }
+          ],
+          "default": null
+         },
+         "order": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000,
+          "description": "Defaults to the surface's zero-based source-list position."
+         },
+         "default_size": {
+          "type": "integer",
+          "minimum": 96,
+          "maximum": 2000,
+          "default": 180
+         },
+         "minimum_size": {
+          "type": "integer",
+          "minimum": 96,
+          "maximum": 2000,
+          "default": 96
+         },
+         "default_placement": {
+          "enum": [
+           "docked",
+           "floating",
+           "window"
+          ],
+          "default": "docked"
+         },
+         "allowed_placements": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+           "enum": [
+            "docked",
+            "floating",
+            "window"
+           ]
+          },
+          "default": [
+           "docked",
+           "window"
+          ]
+         },
+         "actions": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+           "$ref": "#/$defs/action"
+          },
+          "default": []
+         }
+        },
+        "$defs": {
+         "source": {
+          "oneOf": [
+           {
+            "$ref": "#/$defs/state_source"
+           },
+           {
+            "$ref": "#/$defs/literal_source"
+           },
+           {
+            "$ref": "#/$defs/participant_source"
+           },
+           {
+            "$ref": "#/$defs/campaign_plan_source"
+           },
+           {
+            "$ref": "#/$defs/object_source"
+           },
+           {
+            "$ref": "#/$defs/keyed_values_source"
+           }
+          ]
+         },
+         "literal_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "kind",
+           "value"
+          ],
+          "properties": {
+           "kind": {
+            "const": "literal"
+           },
+           "value": {
+            "type": "object"
+           }
+          }
+         },
+         "state_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "kind",
+           "namespace",
+           "key"
+          ],
+          "properties": {
+           "kind": {
+            "const": "state"
+           },
+           "namespace": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+           },
+           "key": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+           }
+          }
+         },
+         "participant_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "kind",
+           "kinds"
+          ],
+          "properties": {
+           "kind": {
+            "const": "participants"
+           },
+           "kinds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "uniqueItems": true,
+            "items": {
+             "type": "string",
+             "minLength": 1,
+             "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+            }
+           }
+          }
+         },
+         "campaign_plan_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "kind",
+           "path"
+          ],
+          "properties": {
+           "kind": {
+            "const": "campaign_plan"
+           },
+           "path": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+             "type": "string",
+             "minLength": 1,
+             "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+            }
+           }
+          }
+         },
+         "keyed_values_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "kind",
+           "entries"
+          ],
+          "description": "Map resolved string keys to values; omit empty keys and null values.",
+          "properties": {
+           "kind": {
+            "const": "keyed_values"
+           },
+           "entries": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+             "type": "object",
+             "additionalProperties": false,
+             "required": [
+              "key",
+              "value"
+             ],
+             "properties": {
+              "key": {
+               "$ref": "#/$defs/source"
+              },
+              "value": {
+               "$ref": "#/$defs/source"
+              }
+             }
+            }
+           }
+          }
+         },
+         "object_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "kind",
+           "fields"
+          ],
+          "properties": {
+           "kind": {
+            "const": "object"
+           },
+           "fields": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 16,
+            "propertyNames": {
+             "type": "string",
+             "minLength": 1,
+             "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+            },
+            "additionalProperties": {
+             "$ref": "#/$defs/source"
+            }
+           }
+          }
+         },
+         "action": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+           "id",
+           "label",
+           "intent",
+           "params"
+          ],
+          "properties": {
+           "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+           },
+           "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+           },
+           "intent": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])",
+            "description": "An exact public tool name in this package."
+           },
+           "params": {
+            "type": "object",
+            "description": "Open fixed Ruleset parameter data.",
+            "additionalProperties": true
+           },
+           "bindings": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 16,
+            "propertyNames": {
+             "type": "string",
+             "minLength": 1,
+             "pattern": "^\\S(?:[\\s\\S]*\\S)?$(?![\\s\\S])"
+            },
+            "additionalProperties": {
+             "enum": [
+              "actor",
+              "aim_point",
+              "area",
+              "declared_action",
+              "destination",
+              "device",
+              "link",
+              "node",
+              "orientation",
+              "path",
+              "piece",
+              "remote_function",
+              "route_step",
+              "target",
+              "zone"
+             ]
+            }
+           },
+           "spatial_preview": {
+            "enum": [
+             "segment"
+            ]
+           },
+           "target_reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Coordinate target binding uses the map's admitted mechanical reference."
+           },
+           "actor_reference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+            "description": "Coordinate map actor binding reads this entity metadata field."
+           }
+          }
+         }
+        },
+        "allOf": [
+         {
+          "if": {
+           "properties": {
+            "renderer": {
+             "const": "piece_table"
+            }
+           }
+          },
+          "then": {
+           "properties": {
+            "actions": {
+             "items": {
+              "properties": {
+               "bindings": {
+                "additionalProperties": {
+                 "enum": [
+                  "piece"
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         {
+          "if": {
+           "properties": {
+            "renderer": {
+             "const": "coordinate_map"
+            }
+           }
+          },
+          "then": {
+           "properties": {
+            "actions": {
+             "items": {
+              "properties": {
+               "bindings": {
+                "additionalProperties": {
+                 "enum": [
+                  "actor",
+                  "target",
+                  "aim_point",
+                  "declared_action"
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         {
+          "if": {
+           "properties": {
+            "renderer": {
+             "enum": [
+              "party",
+              "unit_list"
+             ]
+            }
+           }
+          },
+          "then": {
+           "properties": {
+            "actions": {
+             "items": {
+              "properties": {
+               "bindings": {
+                "additionalProperties": {
+                 "enum": [
+                  "actor"
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         {
+          "if": {
+           "properties": {
+            "renderer": {
+             "const": "tactical_grid"
+            }
+           }
+          },
+          "then": {
+           "properties": {
+            "actions": {
+             "items": {
+              "properties": {
+               "bindings": {
+                "additionalProperties": {
+                 "enum": [
+                  "actor",
+                  "zone",
+                  "device",
+                  "destination",
+                  "path",
+                  "target",
+                  "aim_point",
+                  "area",
+                  "orientation",
+                  "declared_action"
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         {
+          "if": {
+           "properties": {
+            "renderer": {
+             "const": "network_graph"
+            }
+           }
+          },
+          "then": {
+           "properties": {
+            "actions": {
+             "items": {
+              "properties": {
+               "bindings": {
+                "additionalProperties": {
+                 "enum": [
+                  "actor",
+                  "node",
+                  "link",
+                  "route_step",
+                  "remote_function",
+                  "declared_action"
+                 ]
+                }
+               }
+              }
+             }
+            }
+           }
+          }
+         },
+         {
+          "if": {
+           "properties": {
+            "renderer": {
+             "not": {
+              "enum": [
+               "party",
+               "unit_list",
+               "inventory",
+               "tactical_grid",
+               "coordinate_map",
+               "network_graph",
+               "piece_table"
+              ]
+             }
+            }
+           }
+          },
+          "then": {
+           "properties": {
+            "actions": {
+             "items": {
+              "not": {
+               "required": [
+                "bindings"
+               ]
+              }
+             }
+            }
+           }
+          }
+         }
+        ]
+       }
+      },
+      "participant_artifacts": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "kind",
+         "schema_id",
+         "schema_sha256",
+         "schema"
+        ],
+        "properties": {
+         "kind": {
+          "type": "string",
+          "minLength": 1
+         },
+         "schema_id": {
+          "type": "string",
+          "minLength": 1
+         },
+         "schema_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+         },
+         "schema": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "entity_state_schema": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "initial_state_validation": {
+          "type": "object",
+          "required": [
+           "description",
+           "definitions",
+           "effects"
+          ],
+          "properties": {
+           "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+           },
+           "definitions": {
+            "type": "object"
+           },
+           "effects": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1024,
+            "items": {
+             "type": "object"
+            }
+           }
+          },
+          "additionalProperties": false
+         },
+         "initial_state_calculations": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+           "type": "object",
+           "required": [
+            "set"
+           ],
+           "properties": {
+            "condition": {
+             "type": "string",
+             "minLength": 1,
+             "maxLength": 500
+            },
+            "set": {
+             "type": "object",
+             "required": [
+              "field",
+              "value"
+             ],
+             "properties": {
+              "field": {
+               "type": "string",
+               "minLength": 1
+              },
+              "value": {
+               "type": "string",
+               "minLength": 1,
+               "maxLength": 500
+              }
+             },
+             "additionalProperties": false
+            }
+           },
+           "additionalProperties": false
+          }
+         }
+        },
+        "additionalProperties": false,
+        "dependentRequired": {
+         "entity_state_schema": [
+          "initial_state_calculations"
+         ],
+         "initial_state_calculations": [
+          "entity_state_schema"
+         ],
+         "initial_state_validation": [
+          "entity_state_schema",
+          "initial_state_calculations"
+         ]
+        }
+       }
+      },
+      "state_schemas": {
+       "type": "array",
+       "minItems": 1,
+       "maxItems": 32,
+       "items": {
+        "type": "object",
+        "required": [
+         "key",
+         "schema",
+         "references"
+        ],
+        "properties": {
+         "key": {
+          "type": "string",
+          "minLength": 1
+         },
+         "visibility": {
+          "enum": [
+           "public",
+           "engine"
+          ],
+          "default": "public"
+         },
+         "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require this key before a Plan can be published or played. Descendants retain this obligation."
+         },
+         "schema": {
+          "type": "object",
+          "additionalProperties": true
+         },
+         "references": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+           "type": "object",
+           "required": [
+            "source",
+            "target_key",
+            "target"
+           ],
+           "properties": {
+            "source": {
+             "type": "array",
+             "minItems": 1,
+             "maxItems": 16,
+             "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+             }
+            },
+            "target_key": {
+             "type": "string",
+             "minLength": 1
+            },
+            "target": {
+             "type": "array",
+             "minItems": 1,
+             "maxItems": 16,
+             "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+             }
+            }
+           },
+           "additionalProperties": false
+          }
+         }
+        },
+        "additionalProperties": false
+       }
+      },
+      "content_declarations": {
+       "type": "string",
+       "minLength": 1
+      },
+      "files": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "path",
+         "bytes",
+         "sha256"
+        ],
+        "properties": {
+         "path": {
+          "type": "string",
+          "minLength": 1
+         },
+         "bytes": {
+          "type": "integer",
+          "minimum": 0
+         },
+         "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+         }
+        },
+        "additionalProperties": false
+       }
+      },
+      "content_sha256": {
+       "type": "string",
+       "pattern": "^[0-9a-f]{64}$"
+      }
+     },
+     "additionalProperties": false,
+     "allOf": [
+      {
+       "if": {
+        "properties": {
+         "role": {
+          "const": "primary"
+         }
+        },
+        "required": [
+         "role",
+         "content_kind"
+        ]
+       },
+       "then": {
+        "properties": {
+         "content_kind": {
+          "const": "ruleset"
+         }
+        }
+       },
+       "else": {
+        "if": {
+         "required": [
+          "content_kind"
+         ]
+        },
+        "then": {
+         "properties": {
+          "content_kind": {
+           "enum": [
+            "campaign_setting",
+            "support"
+           ]
+          }
+         }
+        }
+       }
+      }
+     ]
+    }
+   }
+  },
+  "additionalProperties": false,
+  "allOf": [
+   {
+    "if": {
+     "properties": {
+      "format": {
+       "const": 1
+      }
+     },
+     "required": [
+      "format"
+     ]
+    },
+    "then": {
+     "properties": {
+      "packages": {
+       "items": {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "participant_artifacts"
+           ]
+          },
+          {
+           "required": [
+            "content_declarations"
+           ]
+          },
+          {
+           "required": [
+            "content_kind"
+           ]
+          },
+          {
+           "required": [
+            "state_schemas"
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   {
+    "if": {
+     "properties": {
+      "format": {
+       "const": 2
+      }
+     },
+     "required": [
+      "format"
+     ]
+    },
+    "then": {
+     "properties": {
+      "packages": {
+       "items": {
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "content_declarations"
+           ]
+          },
+          {
+           "required": [
+            "content_kind"
+           ]
+          },
+          {
+           "required": [
+            "state_schemas"
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   {
+    "if": {
+     "properties": {
+      "format": {
+       "const": 3
+      }
+     },
+     "required": [
+      "format"
+     ]
+    },
+    "then": {
+     "properties": {
+      "packages": {
+       "items": {
+        "required": [
+         "participant_artifacts",
+         "content_declarations"
+        ],
+        "not": {
+         "anyOf": [
+          {
+           "required": [
+            "content_kind"
+           ]
+          },
+          {
+           "required": [
+            "state_schemas"
+           ]
+          }
+         ]
+        }
+       }
+      }
+     }
+    }
+   },
+   {
+    "if": {
+     "properties": {
+      "format": {
+       "const": 4
+      }
+     },
+     "required": [
+      "format"
+     ]
+    },
+    "then": {
+     "properties": {
+      "packages": {
+       "items": {
+        "required": [
+         "participant_artifacts",
+         "content_declarations",
+         "content_kind"
+        ]
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "example": {
+  "format": 4,
+  "packages": [
+   {
+    "id": "example.coin-rules",
+    "version": "1.0.0",
+    "role": "primary",
+    "content_kind": "ruleset",
+    "metadata": {
+     "label": "Coin Rules"
+    },
+    "provenance": {
+     "publisher": "Example author",
+     "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "compatibility": {
+     "host_contract": 1,
+     "runtime_format": 1,
+     "requires": []
+    },
+    "minimum_model_capability_tier": "sylvia.capability.t01",
+    "dependencies": [],
+    "capabilities": [],
+    "tools": [],
+    "prompt_fragments": [],
+    "ui_surfaces": [],
+    "participant_artifacts": [],
+    "content_declarations": "content/content-declarations.json",
+    "files": [],
+    "content_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+   }
+  ]
+ },
+ "notes": [
+  "Portable package labels are limited to 256 UTF-8 bytes; identity lists to 512 UTF-8 bytes per entry. Preserve the admitted identity/path grammar. These byte limits differ from JSON Schema character counts.",
+  "The outer ZIP contains canonical manifest.json and only packages/<package-id>/<indexed-path> members.",
+  "The manifest format selects package-record versions 1-4; format 4 adds content_kind and requires content declarations.",
+  "Records inside manifest.json include derived files and content_sha256 fields; materializers derive these rather than asking authors to calculate them.",
+  "Admission rejects directories, symlinks, Unicode/case aliases, undeclared members, absent indexed files, and byte-count or SHA-256 mismatches.",
+  "The parser owns identity, ordering, reference, closure, schema-subset, runtime, and content-declaration link checks beyond this structural schema."
+ ],
+ "file": "manifest.json in .sylvia-gm-package"
+}

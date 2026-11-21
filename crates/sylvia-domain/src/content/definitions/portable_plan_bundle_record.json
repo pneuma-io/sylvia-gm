@@ -1,0 +1,92 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pneuma.io/sylvia-gm/portable-plan-bundle-record-v3.schema.json",
+  "title": "Sylvia GM portable Campaign Plan bundle record",
+  "type": "object",
+  "required": [
+   "format_id",
+   "format_version",
+   "artifact_id",
+   "content_sha256",
+   "plan_content_sha256",
+   "title",
+   "summary",
+   "source_plan_content_sha256",
+   "setup_id",
+   "package_snapshot",
+   "package_snapshot_sha256"
+  ],
+  "properties": {
+   "format_id": {
+    "const": "sylvia-gm-reusable-campaign-plan"
+   },
+   "format_version": {
+    "type": "integer",
+    "const": 3
+   },
+   "artifact_id": {
+    "type": "string",
+    "pattern": "^campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}$"
+   },
+   "content_sha256": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+   },
+   "plan_content_sha256": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+   },
+   "title": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "source_plan_content_sha256": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+   },
+   "setup_id": {
+    "oneOf": [
+     {
+      "type": "null"
+     },
+     {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\u0000]+$"
+     }
+    ]
+   },
+   "package_snapshot": {
+    "const": "setting.sylvia-gm-package"
+   },
+   "package_snapshot_sha256": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+   }
+  },
+  "additionalProperties": false
+ },
+ "example": {
+  "format_id": "sylvia-gm-reusable-campaign-plan",
+  "format_version": 3,
+  "artifact_id": "campaign-plan-reusable-000000000000000000000000-0000000000000000",
+  "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "plan_content_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "title": "The Silent Relay",
+  "summary": "Find the lost signal.",
+  "source_plan_content_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+  "setup_id": null,
+  "package_snapshot": "setting.sylvia-gm-package",
+  "package_snapshot_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+ },
+ "notes": [
+  "This is record.json inside an exported .sylvia-gm-plan bundle. Portable bundles require version 3; local legacy records use versions 1 and 2 and are not portable bundle authoring formats.",
+  "record.json is limited to 64 KiB and must be canonical JSON. The ZIP has a closed, bounded regular-file member set and requires record.json, plan.json, plan.md, setting.sylvia-gm-package; interview-contribution.json is optional.",
+  "The loader validates plan.json and plan.md against the retained package snapshot, checks catalog title/summary, and recomputes plan, snapshot, contribution, and aggregate hashes.",
+  "setup_id is either null or the one supported built-in setup identity; that identity also requires its exact Ruleset and Setting bindings."
+ ],
+ "file": "record.json in .sylvia-gm-plan"
+}

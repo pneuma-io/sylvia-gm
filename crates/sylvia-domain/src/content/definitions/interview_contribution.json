@@ -1,0 +1,227 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sylvia-gm:content:interview-contribution:1",
+  "title": "Interview Contribution, version 1",
+  "description": "Optional data-only questions owned by a Ruleset, Setting or Plan.",
+  "type": "object",
+  "properties": {
+   "format_id": {
+    "const": "sylvia-gm-interview-contribution"
+   },
+   "format_version": {
+    "type": "integer",
+    "const": 1
+   },
+   "owner_kind": {
+    "enum": [
+     "ruleset",
+     "campaign_setting",
+     "campaign_plan"
+    ]
+   },
+   "id": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 96,
+    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"
+   },
+   "title": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 160,
+    "pattern": "^\\S(?:[^\\u0000]*\\S)?$(?![\\s\\S])",
+    "not": {
+     "pattern": "\\u0000"
+    }
+   },
+   "questions": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 32,
+    "items": {
+     "$ref": "#/$defs/question"
+    },
+    "description": "Ordered questions with unique IDs. Conditions refer to earlier IDs."
+   }
+  },
+  "required": [
+   "format_id",
+   "format_version",
+   "owner_kind",
+   "id",
+   "title",
+   "questions"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+   "option": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"
+     },
+     "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^\\S(?:[^\\u0000]*\\S)?$(?![\\s\\S])",
+      "not": {
+       "pattern": "\\u0000"
+      }
+     }
+    },
+    "required": [
+     "id",
+     "label"
+    ],
+    "additionalProperties": false
+   },
+   "condition": {
+    "type": "object",
+    "properties": {
+     "question_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"
+     },
+     "equals": {
+      "type": [
+       "string",
+       "boolean",
+       "integer"
+      ]
+     }
+    },
+    "required": [
+     "question_id",
+     "equals"
+    ],
+    "additionalProperties": false
+   },
+   "question": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$(?![\\s\\S])"
+     },
+     "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^\\S(?:[^\\u0000]*\\S)?$(?![\\s\\S])",
+      "not": {
+       "pattern": "\\u0000"
+      }
+     },
+     "type": {
+      "enum": [
+       "choice",
+       "free_text"
+      ]
+     },
+     "required": {
+      "type": "boolean"
+     },
+     "adaptive": {
+      "type": "boolean",
+      "description": "Whether interpreting the answer needs Builder assistance."
+     },
+     "options": {
+      "type": "array",
+      "items": {
+       "$ref": "#/$defs/option"
+      }
+     },
+     "condition": {
+      "anyOf": [
+       {
+        "type": "null"
+       },
+       {
+        "$ref": "#/$defs/condition"
+       }
+      ]
+     }
+    },
+    "required": [
+     "id",
+     "prompt",
+     "type",
+     "required",
+     "adaptive",
+     "options",
+     "condition"
+    ],
+    "additionalProperties": false,
+    "allOf": [
+     {
+      "if": {
+       "properties": {
+        "type": {
+         "const": "choice"
+        }
+       }
+      },
+      "then": {
+       "properties": {
+        "options": {
+         "minItems": 2,
+         "maxItems": 16
+        }
+       }
+      },
+      "else": {
+       "properties": {
+        "options": {
+         "maxItems": 0
+        }
+       }
+      }
+     }
+    ]
+   }
+  }
+ },
+ "example": {
+  "format_id": "sylvia-gm-interview-contribution",
+  "format_version": 1,
+  "owner_kind": "campaign_setting",
+  "id": "journey-tone",
+  "title": "Your journey",
+  "questions": [
+   {
+    "id": "mood",
+    "prompt": "What mood would you like?",
+    "type": "choice",
+    "required": true,
+    "adaptive": false,
+    "options": [
+     {
+      "id": "hopeful",
+      "label": "Hopeful"
+     },
+     {
+      "id": "tense",
+      "label": "Tense"
+     }
+    ],
+    "condition": null
+   }
+  ]
+ },
+ "notes": [
+  "Save as interview-contribution.json in its owning package or Plan. Maximum UTF-8 size: 32 KiB.",
+  "The declared owner_kind must match the actual owner. IDs are unique within their group.",
+  "A condition references only an earlier question. Free-text questions have an empty options list.",
+  "Content supplies questions, not executable code, tools, system policy or cross-artifact writes."
+ ],
+ "file": "interview-contribution.json"
+}

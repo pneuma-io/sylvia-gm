@@ -10,9 +10,11 @@
 //! - [`authority`]: `domain/authority.py`, identities, roles, package locks and campaign records.
 //! - [`package_library`]: `domain/package_library.py`, canonical bytes, closure and content
 //!   hashes, package files, portable paths and the strict JSON readers.
-//! - [`error`]: the `ValueError` / `TypeError` pair the domain raises.
+//! - [`content`]: content definitions and `validate_content_shape` (JSON Schema Draft 2020-12).
+//! - [`error`]: the `ValueError` / `TypeError` the domain raises, and `RulesetDiagnostic`.
 
 pub mod authority;
+pub mod content;
 pub mod error;
 pub mod package_library;
 

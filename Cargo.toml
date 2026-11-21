@@ -53,6 +53,9 @@ rusqlite = { version = "0.34", features = ["bundled", "backup"] }
 flate2 = "1"
 getrandom = "0.2"
 regex = "1"
+# Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate
+# rejects (content schema patterns, docs/rust-port/sites/regex-sites.md). Added by lane 1.
+fancy-regex = "0.14"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net"] }
 # Lane 4: provider streams are pull-based like Python async generators (Stream, StreamExt).
 futures-util = { version = "0.3", default-features = false, features = ["std"] }

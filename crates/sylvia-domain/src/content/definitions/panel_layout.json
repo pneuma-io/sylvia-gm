@@ -1,0 +1,187 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sylvia-gm:content:panel-layout:1",
+  "title": "Ruleset starting panel layout, version 1",
+  "description": "The package's starting arrangement; user-saved view preferences are separate.",
+  "type": "object",
+  "properties": {
+   "version": {
+    "type": "integer",
+    "const": 1
+   },
+   "sidebar": {
+    "anyOf": [
+     {
+      "type": "null"
+     },
+     {
+      "$ref": "#/$defs/tree"
+     }
+    ]
+   },
+   "windows": {
+    "type": "array",
+    "maxItems": 64,
+    "items": {
+     "$ref": "#/$defs/window"
+    }
+   },
+   "hidden": {
+    "type": "array",
+    "maxItems": 64,
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "minLength": 1,
+     "description": "An exact declared panel ID."
+    }
+   }
+  },
+  "required": [
+   "version",
+   "sidebar",
+   "windows",
+   "hidden"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+   "tree": {
+    "oneOf": [
+     {
+      "$ref": "#/$defs/tabs"
+     },
+     {
+      "$ref": "#/$defs/split"
+     }
+    ]
+   },
+   "tabs": {
+    "type": "object",
+    "properties": {
+     "kind": {
+      "const": "tabs"
+     },
+     "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,96}$(?![\\s\\S])"
+     },
+     "panels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+       "type": "string",
+       "minLength": 1,
+       "description": "An exact declared panel ID."
+      }
+     },
+     "active": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One member of this group's panels list."
+     }
+    },
+    "required": [
+     "kind",
+     "id",
+     "panels",
+     "active"
+    ],
+    "additionalProperties": false
+   },
+   "split": {
+    "type": "object",
+    "properties": {
+     "kind": {
+      "const": "split"
+     },
+     "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,96}$(?![\\s\\S])"
+     },
+     "axis": {
+      "enum": [
+       "row",
+       "column"
+      ]
+     },
+     "ratio": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 0.9
+     },
+     "first": {
+      "$ref": "#/$defs/tree"
+     },
+     "second": {
+      "$ref": "#/$defs/tree"
+     }
+    },
+    "required": [
+     "kind",
+     "id",
+     "axis",
+     "ratio",
+     "first",
+     "second"
+    ],
+    "additionalProperties": false
+   },
+   "window": {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,96}$(?![\\s\\S])",
+      "not": {
+       "const": "sidebar"
+      }
+     },
+     "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^\\S(?:[^\\u0000]*\\S)?$(?![\\s\\S])",
+      "not": {
+       "pattern": "\\u0000"
+      },
+      "description": "Trimmed text, at most 256 UTF-8 bytes."
+     },
+     "tree": {
+      "$ref": "#/$defs/tree"
+     }
+    },
+    "required": [
+     "id",
+     "title",
+     "tree"
+    ],
+    "additionalProperties": false
+   }
+  }
+ },
+ "example": {
+  "version": 1,
+  "sidebar": {
+   "kind": "tabs",
+   "id": "main",
+   "panels": [
+    "party"
+   ],
+   "active": "party"
+  },
+  "windows": [],
+  "hidden": []
+ },
+ "notes": [
+  "Save as ui/panel-layout.json. Maximum UTF-8 size: 64 KiB; at most 256 tree nodes and depth 16.",
+  "Every referenced panel must be declared by this Ruleset and appear at most once in the layout.",
+  "Group IDs are unique across all trees; window IDs are unique and cannot be sidebar.",
+  "A sidebar panel must permit docked placement; an extra-window panel must permit window placement.",
+  "The active panel belongs to its group. Split children and window trees cannot be null.",
+  "The example needs a panel named party. Omitted declared panels appear in the sidebar."
+ ],
+ "file": "ui/panel-layout.json"
+}

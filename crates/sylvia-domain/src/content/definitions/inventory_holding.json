@@ -1,0 +1,98 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sylvia-gm/inventory-holding/v1",
+  "title": "Inventory holding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+   "holder_id",
+   "holding_id",
+   "item_id",
+   "kind",
+   "known_by",
+   "name",
+   "owner_id",
+   "quantity",
+   "stackable",
+   "visibility"
+  ],
+  "properties": {
+   "holding_id": {
+    "type": "string",
+    "minLength": 1
+   },
+   "item_id": {
+    "type": "string",
+    "minLength": 1
+   },
+   "owner_id": {
+    "type": "string",
+    "minLength": 1
+   },
+   "holder_id": {
+    "type": "string",
+    "minLength": 1
+   },
+   "name": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 300
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "item",
+     "currency"
+    ]
+   },
+   "stackable": {
+    "type": "boolean"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 9007199254740991
+   },
+   "visibility": {
+    "type": "string",
+    "enum": [
+     "player_known",
+     "gm_private"
+    ],
+    "description": "Release boundary for the entire holding. Use player_known only when all included details are established for the player; otherwise use gm_private."
+   },
+   "known_by": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "minLength": 1
+    },
+    "uniqueItems": true,
+    "description": "Exact character identities that know this holding in the fiction. This does not override visibility or reveal private information to the player."
+   }
+  }
+ },
+ "example": {
+  "holding_id": "mira-arrows",
+  "item_id": "ordinary-arrow",
+  "name": "Arrow",
+  "kind": "item",
+  "stackable": true,
+  "quantity": 2,
+  "owner_id": "waystation",
+  "holder_id": "mira",
+  "visibility": "player_known",
+  "known_by": [
+   "player"
+  ]
+ },
+ "notes": [
+  "Owner and holder/location reference persistent campaign entities or participants.",
+  "Quantities are whole units. Currency has a stable named identity; no exchange rate is inferred.",
+  "Distinct objects have at most one unit across all holdings of their item_id.",
+  "For a Ruleset holdings projection, use this schema as the inventory array items after removing only the $schema, $id and title documentation headers.",
+  "Ruleset inventory selection requires x-sylvia-gm-inventory. Shared bookkeeping uses format string_list or holdings; mechanic-owned equipment uses format mechanics with its own state {namespace, key}, declared surface_id and tool names. The latter must not also declare character bookkeeping. A panel name alone selects nothing."
+ ],
+ "file": "Campaign State inventory holdings; Ruleset inventory field items"
+}

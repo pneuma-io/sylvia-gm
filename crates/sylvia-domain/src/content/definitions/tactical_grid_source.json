@@ -1,0 +1,436 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sylvia-gm:content:tactical-grid-source:1",
+  "title": "Sylvia GM tactical-grid surface source v1",
+  "description": "Ruleset-owned source object resolved by a tactical_grid or coordinate_map panel. Coordinate maps use continuous aim_point input rather than destination cells. scene uses the spatial scene definition; the other fields are optional player presentation and selection state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+   "scene"
+  ],
+  "properties": {
+   "scene": {
+    "type": "object",
+    "description": "A complete value satisfying the spatial_scene content definition."
+   },
+   "enabled": {
+    "type": [
+     "boolean",
+     "null"
+    ],
+    "description": "A coordinate_map with this field present is shown only when true."
+   },
+   "objectives": {
+    "type": [
+     "array",
+     "null"
+    ],
+    "maxItems": 256,
+    "items": {
+     "$ref": "#/$defs/objective"
+    }
+   },
+   "selection": {
+    "oneOf": [
+     {
+      "$ref": "#/$defs/selection"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   },
+   "preview": {
+    "oneOf": [
+     {
+      "$ref": "#/$defs/preview"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
+  "$defs": {
+   "finiteNumber": {
+    "type": "number"
+   },
+   "coordinate2": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 2,
+    "items": {
+     "$ref": "#/$defs/finiteNumber"
+    }
+   },
+   "coordinate3": {
+    "type": "array",
+    "minItems": 3,
+    "maxItems": 3,
+    "items": {
+     "$ref": "#/$defs/finiteNumber"
+    }
+   },
+   "cell": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 2,
+    "items": {
+     "type": "integer",
+     "minimum": 0
+    }
+   },
+   "path": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 256,
+    "items": {
+     "$ref": "#/$defs/cell"
+    }
+   },
+   "area": {
+    "oneOf": [
+     {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "kind",
+       "min",
+       "max"
+      ],
+      "properties": {
+       "kind": {
+        "const": "box"
+       },
+       "min": {
+        "$ref": "#/$defs/coordinate3"
+       },
+       "max": {
+        "$ref": "#/$defs/coordinate3"
+       }
+      }
+     },
+     {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "kind",
+       "center",
+       "radius",
+       "height"
+      ],
+      "properties": {
+       "kind": {
+        "const": "cylinder"
+       },
+       "center": {
+        "$ref": "#/$defs/coordinate3"
+       },
+       "radius": {
+        "type": "number",
+        "exclusiveMinimum": 0
+       },
+       "height": {
+        "type": "number",
+        "exclusiveMinimum": 0
+       }
+      }
+     }
+    ]
+   },
+   "objective": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "id",
+     "label",
+     "status",
+     "position",
+     "visible"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "minLength": 1
+     },
+     "label": {
+      "type": "string",
+      "minLength": 1
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "active",
+       "complete",
+       "failed"
+      ]
+     },
+     "position": {
+      "$ref": "#/$defs/coordinate3"
+     },
+     "visible": {
+      "type": "boolean"
+     }
+    }
+   },
+   "selection": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+     "actor": {
+      "type": "string"
+     },
+     "destination": {
+      "$ref": "#/$defs/cell"
+     },
+     "path": {
+      "$ref": "#/$defs/path"
+     },
+     "target": {
+      "type": "string"
+     },
+     "aim_point": {
+      "$ref": "#/$defs/coordinate3"
+     },
+     "area": {
+      "$ref": "#/$defs/area"
+     },
+     "orientation": {
+      "$ref": "#/$defs/coordinate2"
+     },
+     "declared_action": {
+      "type": "string"
+     }
+    }
+   },
+   "preview": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "map_revision"
+    ],
+    "properties": {
+     "map_revision": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "path_cost": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "minimum": 0
+     },
+     "los": {
+      "type": [
+       "boolean",
+       "null"
+      ]
+     },
+     "exposure": {
+      "type": [
+       "number",
+       "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+     },
+     "crossed_zones": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "playerDisplay": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+     "label",
+     "kind"
+    ],
+    "properties": {
+     "label": {
+      "$ref": "#/$defs/playerText"
+     },
+     "kind": {
+      "type": "string",
+      "minLength": 1
+     },
+     "state": {
+      "$ref": "#/$defs/playerText"
+     },
+     "stance": {
+      "$ref": "#/$defs/playerText"
+     },
+     "side": {
+      "$ref": "#/$defs/playerText"
+     },
+     "color": {
+      "$ref": "#/$defs/playerText"
+     },
+     "icon": {
+      "$ref": "#/$defs/playerText"
+     },
+     "interactive": {
+      "type": "boolean"
+     },
+     "height_label": {
+      "$ref": "#/$defs/playerText"
+     }
+    }
+   },
+   "playerText": {
+    "type": "string",
+    "minLength": 1,
+    "pattern": "^(?=\\S(?:[\\s\\S]*\\S)?$)(?![\\s\\S]*\\x00)[\\s\\S]+$"
+   }
+  }
+ },
+ "example": {
+  "scene": {
+   "format": 1,
+   "map": {
+    "id": "relay-floor",
+    "revision": 1,
+    "bounds": {
+     "min": [
+      0,
+      0,
+      0
+     ],
+     "max": [
+      8,
+      6,
+      3
+     ]
+    },
+    "grid": {
+     "cell_size": 1,
+     "unit": "m",
+     "origin": [
+      0,
+      0
+     ]
+    },
+    "layers": [
+     {
+      "id": "floor",
+      "min_elevation": 0,
+      "max_elevation": 3
+     }
+    ]
+   },
+   "geometry": [
+    {
+     "id": "bulkhead",
+     "map_id": "relay-floor",
+     "volume": {
+      "kind": "box",
+      "min": [
+       3,
+       2,
+       0
+      ],
+      "max": [
+       3.25,
+       4,
+       2.5
+      ]
+     },
+     "active": true,
+     "movement": "blocking",
+     "occupies_cells": true,
+     "visibility": "opaque",
+     "metadata": {
+      "player": {
+       "label": "Bulkhead",
+       "kind": "door"
+      }
+     },
+     "destroyed": {
+      "active": false,
+      "movement": "passable",
+      "visibility": "clear"
+     }
+    }
+   ],
+   "entities": [
+    {
+     "id": "keeper",
+     "map_id": "relay-floor",
+     "position": [
+      1.5,
+      2.5,
+      0
+     ],
+     "footprint": {
+      "kind": "circle",
+      "radius": 0.4
+     },
+     "height": 1.8,
+     "facing": [
+      1,
+      0
+     ],
+     "active": true,
+     "movement": "blocking",
+     "visibility": "opaque",
+     "metadata": {
+      "player": {
+       "label": "Keeper",
+       "kind": "unit"
+      }
+     }
+    }
+   ],
+   "zones": [],
+   "terrain": [
+    {
+     "cell": [
+      2,
+      2
+     ],
+     "layer_id": "floor",
+     "cost": 2
+    }
+   ]
+  },
+  "objectives": [
+   {
+    "id": "reach-console",
+    "label": "Reach the relay console",
+    "status": "active",
+    "position": [
+     7,
+     5,
+     0
+    ],
+    "visible": true
+   }
+  ],
+  "selection": {
+   "actor": "keeper",
+   "target": "bulkhead"
+  },
+  "preview": {
+   "map_revision": 1,
+   "path_cost": 3,
+   "los": true,
+   "exposure": 0.25,
+   "crossed_zones": []
+  }
+ },
+ "notes": [
+  "scene must separately satisfy the complete spatial_scene definition. Every scene object's metadata.player, when present, must satisfy playerDisplay: label and kind are required; state, stance, side, color, icon, interactive and height_label are optional.",
+  "Player display strings are unpadded and nonempty. label and the optional text fields are limited to 256 UTF-8 bytes; kind is limited to 64 UTF-8 bytes. Invalid player metadata hides that scene object from the player projection.",
+  "Only objectives with visible true are projected. Objective IDs must be unique among projected objectives; labels are limited to 256 UTF-8 bytes. Position values and all preview numbers must be finite.",
+  "Selection fields are inert presentation state until a declared panel action binds them. At action time actor and target must name visible entities, cells and points must fit the current map, orientation must be nonzero, declared_action must equal the action ID, and area extents must be valid.",
+  "preview is advisory. Its map_revision must match the scene revision; stale or malformed values fall back to an empty non-authoritative preview. crossed_zones are deduplicated in their first-seen order.",
+  "Runtime projection filters malformed objectives, selection, preview and metadata.player. The authoring definition describes their accepted structure. Contextual checks and the player-safe runtime fallback remain with the projection owner."
+ ],
+ "file": "Ruleset tactical-grid panel source"
+}

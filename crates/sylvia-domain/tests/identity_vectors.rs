@@ -34,9 +34,10 @@ fn text(value: &Json) -> String {
 }
 
 fn kind(error: &DomainError) -> &'static str {
-    match error {
-        DomainError::Value(_) => "ValueError",
-        DomainError::Type(_) => "TypeError",
+    if error.is_value_error() {
+        "ValueError"
+    } else {
+        "TypeError"
     }
 }
 

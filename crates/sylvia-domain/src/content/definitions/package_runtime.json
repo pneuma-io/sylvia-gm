@@ -1,0 +1,1091 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pneuma.io/sylvia-gm/package-runtime-v1.schema.json",
+  "title": "Sylvia GM package runtime YAML, format 1",
+  "$defs": {
+   "AbilityConfig": {
+    "description": "Configuration for a single ability score.\n\nFree-form keys \u2014 no fixed ability superset. Each ruleset declares its own\nability keys using native naming. The parser is a pure conduit.",
+    "properties": {
+     "active": {
+      "default": true,
+      "title": "Active",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Description"
+     },
+     "default_min": {
+      "anyOf": [
+       {
+        "minimum": 1,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Default Min"
+     },
+     "default_max": {
+      "anyOf": [
+       {
+        "maximum": 100,
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Default Max"
+     },
+     "generation": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Generation"
+     },
+     "modifier_formula": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Modifier Formula"
+     },
+     "used_for": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Used For",
+      "type": "array"
+     },
+     "save_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Save Label"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "AbilityConfig",
+    "type": "object"
+   },
+   "Actor": {
+    "description": "Who can act during a turn and when.",
+    "properties": {
+     "entity": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Entity"
+     },
+     "timing": {
+      "title": "Timing",
+      "type": "string"
+     },
+     "resources": {
+      "additionalProperties": {
+       "$ref": "#/$defs/ResourcePool"
+      },
+      "title": "Resources",
+      "type": "object"
+     }
+    },
+    "required": [
+     "timing"
+    ],
+    "title": "Actor",
+    "type": "object"
+   },
+   "Condition": {
+    "properties": {
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "description": {
+      "title": "Description",
+      "type": "string"
+     },
+     "mechanical_effect": {
+      "title": "Mechanical Effect",
+      "type": "string"
+     },
+     "stackable": {
+      "default": false,
+      "title": "Stackable",
+      "type": "boolean"
+     },
+     "max_stacks": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Max Stacks"
+     },
+     "levels": {
+      "items": {
+       "$ref": "#/$defs/ConditionLevel"
+      },
+      "title": "Levels",
+      "type": "array"
+     },
+     "cleared_by": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Cleared By",
+      "type": "array"
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "mechanical_effect"
+    ],
+    "title": "Condition",
+    "type": "object"
+   },
+   "ConditionLevel": {
+    "properties": {
+     "level": {
+      "minimum": 1,
+      "title": "Level",
+      "type": "integer"
+     },
+     "effect": {
+      "title": "Effect",
+      "type": "string"
+     }
+    },
+    "required": [
+     "level",
+     "effect"
+    ],
+    "title": "ConditionLevel",
+    "type": "object"
+   },
+   "Features": {
+    "additionalProperties": true,
+    "description": "Legacy D&D/Cairn compatibility toggles.\n\nRulesets do not need this object. Unknown explicit compatibility metadata is\npreserved rather than silently discarded, but package-owned capabilities\nremain the neutral extension contract.",
+    "properties": {
+     "death_saves_enabled": {
+      "default": false,
+      "title": "Death Saves Enabled",
+      "type": "boolean"
+     },
+     "spell_slots_enabled": {
+      "default": false,
+      "title": "Spell Slots Enabled",
+      "type": "boolean"
+     },
+     "concentration_enabled": {
+      "default": false,
+      "title": "Concentration Enabled",
+      "type": "boolean"
+     },
+     "proficiency_bonus_enabled": {
+      "default": false,
+      "title": "Proficiency Bonus Enabled",
+      "type": "boolean"
+     },
+     "hit_dice_enabled": {
+      "default": false,
+      "title": "Hit Dice Enabled",
+      "type": "boolean"
+     },
+     "initiative_enabled": {
+      "default": true,
+      "title": "Initiative Enabled",
+      "type": "boolean"
+     },
+     "critical_hits_enabled": {
+      "default": false,
+      "title": "Critical Hits Enabled",
+      "type": "boolean"
+     },
+     "critical_misses_enabled": {
+      "default": false,
+      "title": "Critical Misses Enabled",
+      "type": "boolean"
+     },
+     "advantage_disadvantage_enabled": {
+      "default": false,
+      "title": "Advantage Disadvantage Enabled",
+      "type": "boolean"
+     },
+     "multi_attack_enabled": {
+      "default": false,
+      "title": "Multi Attack Enabled",
+      "type": "boolean"
+     },
+     "reactions_enabled": {
+      "default": false,
+      "title": "Reactions Enabled",
+      "type": "boolean"
+     },
+     "bonus_actions_enabled": {
+      "default": false,
+      "title": "Bonus Actions Enabled",
+      "type": "boolean"
+     },
+     "skills_enabled": {
+      "default": false,
+      "title": "Skills Enabled",
+      "type": "boolean"
+     },
+     "backgrounds_enabled": {
+      "default": true,
+      "title": "Backgrounds Enabled",
+      "type": "boolean"
+     },
+     "species_enabled": {
+      "default": false,
+      "title": "Species Enabled",
+      "type": "boolean"
+     },
+     "classes_enabled": {
+      "default": false,
+      "title": "Classes Enabled",
+      "type": "boolean"
+     },
+     "feats_enabled": {
+      "default": false,
+      "title": "Feats Enabled",
+      "type": "boolean"
+     },
+     "multiclassing_enabled": {
+      "default": false,
+      "title": "Multiclassing Enabled",
+      "type": "boolean"
+     }
+    },
+    "title": "Features",
+    "type": "object"
+   },
+   "Meta": {
+    "description": "Ruleset metadata \u2014 id is the canonical identifier (C3 fix).",
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "version": {
+      "title": "Version",
+      "type": "string"
+     },
+     "author": {
+      "title": "Author",
+      "type": "string"
+     },
+     "license": {
+      "title": "License",
+      "type": "string"
+     },
+     "license_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "License Url"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Description"
+     },
+     "source_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Source Url"
+     },
+     "attribution": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Attribution"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "version",
+     "author",
+     "license"
+    ],
+    "title": "Meta",
+    "type": "object"
+   },
+   "ModeConfig": {
+    "additionalProperties": true,
+    "description": "A game mode declaration (combat, out-of-combat, day, drive, etc.).",
+    "properties": {
+     "turn_system": {
+      "$ref": "#/$defs/TurnSystemConfig"
+     }
+    },
+    "required": [
+     "turn_system"
+    ],
+    "title": "ModeConfig",
+    "type": "object"
+   },
+   "ResourcePool": {
+    "description": "A typed resource that depletes during a turn (action, movement, etc.).",
+    "properties": {
+     "count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Count"
+     },
+     "refresh": {
+      "title": "Refresh",
+      "type": "string"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Unit"
+     },
+     "condition": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Condition"
+     },
+     "source": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Source"
+     }
+    },
+    "required": [
+     "refresh"
+    ],
+    "title": "ResourcePool",
+    "type": "object"
+   },
+   "SkillDef": {
+    "description": "A single skill definition.",
+    "properties": {
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "ability": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Ability"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Description"
+     },
+     "trained_only": {
+      "default": false,
+      "title": "Trained Only",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "SkillDef",
+    "type": "object"
+   },
+   "TurnSystemConfig": {
+    "description": "Turn structure for a mode.",
+    "properties": {
+     "type": {
+      "title": "Type",
+      "type": "string"
+     },
+     "label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Label"
+     },
+     "actors": {
+      "items": {
+       "$ref": "#/$defs/Actor"
+      },
+      "title": "Actors",
+      "type": "array"
+     },
+     "order": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Order"
+     },
+     "resolution": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Resolution"
+     },
+     "exit_condition": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": null,
+      "title": "Exit Condition"
+     }
+    },
+    "required": [
+     "type"
+    ],
+    "title": "TurnSystemConfig",
+    "type": "object"
+   }
+  },
+  "type": "object",
+  "required": [
+   "sylvia_gm_runtime"
+  ],
+  "properties": {
+   "features": {
+    "anyOf": [
+     {
+      "$ref": "#/$defs/Features"
+     },
+     {
+      "type": "null"
+     }
+    ],
+    "default": null
+   },
+   "abilities": {
+    "additionalProperties": {
+     "$ref": "#/$defs/AbilityConfig"
+    },
+    "title": "Abilities",
+    "type": "object"
+   },
+   "skills": {
+    "items": {
+     "$ref": "#/$defs/SkillDef"
+    },
+    "title": "Skills",
+    "type": "array"
+   },
+   "modes": {
+    "additionalProperties": {
+     "$ref": "#/$defs/ModeConfig"
+    },
+    "title": "Modes",
+    "type": "object"
+   },
+   "magic": {
+    "additionalProperties": true,
+    "title": "Magic",
+    "type": "object"
+   },
+   "equipment": {
+    "additionalProperties": true,
+    "title": "Equipment",
+    "type": "object"
+   },
+   "character_creation": {
+    "additionalProperties": true,
+    "title": "Character Creation",
+    "type": "object"
+   },
+   "progression": {
+    "additionalProperties": true,
+    "title": "Progression",
+    "type": "object"
+   },
+   "conditions": {
+    "items": {
+     "$ref": "#/$defs/Condition"
+    },
+    "title": "Conditions",
+    "type": "array"
+   },
+   "sylvia_gm_runtime": {
+    "type": "object",
+    "required": [
+     "format",
+     "state_namespace"
+    ],
+    "properties": {
+     "format": {
+      "type": "integer",
+      "const": 1
+     },
+     "state_namespace": {
+      "type": "string",
+      "minLength": 1
+     }
+    },
+    "additionalProperties": false
+   },
+   "tools": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "object",
+     "properties": {
+      "description": {
+       "type": "string"
+      },
+      "parameters": {
+       "type": "array",
+       "items": {
+        "oneOf": [
+         {
+          "type": "object",
+          "required": [
+           "name"
+          ],
+          "properties": {
+           "name": {
+            "type": "string",
+            "minLength": 1
+           },
+           "type": {
+            "enum": [
+             "array",
+             "boolean",
+             "entity_id",
+             "entity_id_list",
+             "enum",
+             "integer",
+             "number",
+             "object",
+             "string"
+            ]
+           },
+           "description": {
+            "type": "string"
+           },
+           "required": {
+            "type": "boolean"
+           },
+           "enum_values": {
+            "type": "array"
+           },
+           "minimum": {
+            "type": "number"
+           },
+           "maximum": {
+            "type": "number"
+           },
+           "items": {
+            "type": "object",
+            "additionalProperties": true
+           },
+           "from_state": {
+            "type": "string"
+           },
+           "default": {},
+           "resolve": {
+            "enum": [
+             "entity",
+             "participant",
+             "entity_list"
+            ]
+           },
+           "model_derive": {
+            "oneOf": [
+             {
+              "type": "boolean"
+             },
+             {
+              "type": "object",
+              "properties": {
+               "kind": {
+                "type": "string"
+               },
+               "source": {
+                "type": "string"
+               },
+               "field": {
+                "type": "string"
+               },
+               "participant": {
+                "type": "string"
+               },
+               "mapping": {
+                "type": "object",
+                "additionalProperties": true
+               },
+               "present": {},
+               "absent": {},
+               "value": {}
+              },
+              "required": [
+               "kind"
+              ],
+              "additionalProperties": false
+             }
+            ]
+           },
+           "model_hidden": {
+            "type": "boolean"
+           },
+           "model_required": {
+            "type": "boolean"
+           },
+           "min_items": {
+            "type": "integer",
+            "minimum": 0
+           },
+           "max_items": {
+            "type": "integer",
+            "minimum": 0
+           },
+           "unique_items": {
+            "type": "boolean"
+           }
+          },
+          "additionalProperties": false
+         },
+         {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+         }
+        ]
+       }
+      },
+      "pre_conditions": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "condition"
+        ],
+        "properties": {
+         "condition": {
+          "type": "string"
+         },
+         "error": {
+          "type": "string"
+         }
+        },
+        "additionalProperties": false
+       }
+      },
+      "effects": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "minProperties": 1
+       }
+      },
+      "metadata": {
+       "type": "object",
+       "additionalProperties": true,
+       "description": "Metadata extension area; known consumers validate their own keys.",
+       "properties": {
+        "activity_label": {
+         "oneOf": [
+          {
+           "type": "string",
+           "minLength": 1,
+           "maxLength": 80
+          },
+          {
+           "type": "object",
+           "required": [
+            "path"
+           ],
+           "additionalProperties": false,
+           "properties": {
+            "path": {
+             "type": "string",
+             "minLength": 1,
+             "maxLength": 256
+            }
+           }
+          }
+         ],
+         "description": "Neutral routine label, saved with the result. A public path may resolve to null when an outcome needs its own result card. Maximum 80 characters."
+        }
+       }
+      },
+      "narrative": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "range": {
+       "type": "object",
+       "required": [
+        "type",
+        "value"
+       ],
+       "properties": {
+        "type": {
+         "enum": [
+          "band",
+          "grid"
+         ]
+        },
+        "value": {
+         "oneOf": [
+          {
+           "type": "string",
+           "minLength": 1
+          },
+          {
+           "type": "number"
+          }
+         ]
+        }
+       },
+       "additionalProperties": false
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "parameter_declarations": {
+    "type": "object",
+    "propertyNames": {
+     "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "additionalProperties": {
+     "type": "object",
+     "required": [
+      "name"
+     ],
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1
+      },
+      "type": {
+       "enum": [
+        "array",
+        "boolean",
+        "entity_id",
+        "entity_id_list",
+        "enum",
+        "integer",
+        "number",
+        "object",
+        "string"
+       ]
+      },
+      "description": {
+       "type": "string"
+      },
+      "required": {
+       "type": "boolean"
+      },
+      "enum_values": {
+       "type": "array"
+      },
+      "minimum": {
+       "type": "number"
+      },
+      "maximum": {
+       "type": "number"
+      },
+      "items": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "from_state": {
+       "type": "string"
+      },
+      "default": {},
+      "resolve": {
+       "enum": [
+        "entity",
+        "participant",
+        "entity_list"
+       ]
+      },
+      "model_derive": {
+       "oneOf": [
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "object",
+         "properties": {
+          "kind": {
+           "type": "string"
+          },
+          "source": {
+           "type": "string"
+          },
+          "field": {
+           "type": "string"
+          },
+          "participant": {
+           "type": "string"
+          },
+          "mapping": {
+           "type": "object",
+           "additionalProperties": true
+          },
+          "present": {},
+          "absent": {},
+          "value": {}
+         },
+         "required": [
+          "kind"
+         ],
+         "additionalProperties": false
+        }
+       ]
+      },
+      "model_hidden": {
+       "type": "boolean"
+      },
+      "model_required": {
+       "type": "boolean"
+      },
+      "min_items": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "max_items": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "unique_items": {
+       "type": "boolean"
+      }
+     },
+     "additionalProperties": false
+    },
+    "description": "Package-local complete literal descriptors referenced by ID only in tool parameter lists."
+   },
+   "procedures": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "object",
+     "required": [
+      "trigger"
+     ],
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "pattern": "^on_[a-z][a-z0-9_]*$"
+      },
+      "description": {
+       "type": "string"
+      },
+      "condition": {
+       "type": "string"
+      },
+      "steps": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "minProperties": 1
+       }
+      },
+      "narrative": {
+       "type": "object",
+       "additionalProperties": true
+      }
+     },
+     "additionalProperties": false
+    }
+   },
+   "definitions": {
+    "oneOf": [
+     {
+      "type": "null"
+     },
+     {
+      "type": "object",
+      "additionalProperties": true
+     }
+    ]
+   },
+   "definition_row_schemas": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "narrative": {
+    "oneOf": [
+     {
+      "type": "null"
+     },
+     {
+      "type": "object",
+      "additionalProperties": true
+     }
+    ]
+   },
+   "model_decision_boundary": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Actor control may declare preparation {queue_field,intent,actor_parameter,prompt}; queued character events precede play and use the ordinary mechanics/choice path."
+   },
+   "model_decision_scope": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  },
+  "additionalProperties": false
+ },
+ "example": {
+  "sylvia_gm_runtime": {
+   "format": 1,
+   "state_namespace": "example.coin-rules"
+  },
+  "tools": {},
+  "procedures": {},
+  "definition_row_schemas": {},
+  "definitions": {},
+  "narrative": {}
+ },
+ "notes": [
+  "Expressions allow at most 500 characters, with string literals of at most 200 characters. Player-choice prompts allow at most 4096 UTF-8 bytes and option labels at most 1024 UTF-8 bytes, including after interpolation.",
+  "runtime/ruleset.yaml is compiler output. Authors normally edit ruleset-source.yaml and let the existing materializer expand mechanic families and derive the runtime.",
+  "The structural schema identifies the accepted sections; the procedural definition names every live validator that owns the executable grammar. Final admission must call validate_package_runtime.",
+  "Tools and procedures are mappings keyed by authored identities. Their bodies are not generic extensions: _schema_validator checks supported fields, effects, expressions, references, metadata, procedures and calls.",
+  "Configuration maps explicitly preserve compatibility-specific extensions only where RulesetFile declares them. Runtime admission rejects unknown root and known-record fields.",
+  "This definition grants no mechanics sandbox or arbitrary code execution. Only the listed effects and expression functions are available; it supplies no ruleset-specific defaults."
+ ],
+ "file": "runtime/ruleset.yaml"
+}

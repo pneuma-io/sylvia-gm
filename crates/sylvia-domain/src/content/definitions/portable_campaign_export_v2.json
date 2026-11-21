@@ -1,0 +1,583 @@
+{
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pneuma.io/sylvia-gm/portable-campaign-export-v2.schema.json",
+  "title": "Sylvia GM Portable Campaign Export manifest v2 with saved thinking",
+  "type": "object",
+  "required": [
+   "format_id",
+   "format_version",
+   "product_id",
+   "product_generation",
+   "source_authority_schema_version",
+   "source_authority_schema_identity_sha256",
+   "migration_provenance",
+   "campaign_id",
+   "captured_revision",
+   "authority_record_count",
+   "table_row_counts",
+   "blob_count",
+   "closure_index",
+   "non_manifest_members"
+  ],
+  "properties": {
+   "format_id": {
+    "const": "sylvia-gm-campaign-export"
+   },
+   "format_version": {
+    "const": 2
+   },
+   "product_id": {
+    "const": "sylvia-gm"
+   },
+   "product_generation": {
+    "const": "alpha"
+   },
+   "source_authority_schema_version": {
+    "enum": [
+     9,
+     10,
+     11,
+     12
+    ]
+   },
+   "source_authority_schema_identity_sha256": {
+    "type": "string",
+    "pattern": "^[0-9a-f]{64}$"
+   },
+   "migration_provenance": {
+    "type": "object",
+    "required": [
+     "schema_migrations",
+     "schema_extensions"
+    ],
+    "properties": {
+     "schema_migrations": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "version",
+        "applied_name",
+        "sql_sha256"
+       ],
+       "properties": {
+        "version": {
+         "type": "integer",
+         "minimum": 1
+        },
+        "applied_name": {
+         "type": "string",
+         "minLength": 1
+        },
+        "sql_sha256": {
+         "type": "string",
+         "pattern": "^[0-9a-f]{64}$"
+        }
+       },
+       "additionalProperties": false
+      }
+     },
+     "schema_extensions": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "extension_name",
+        "extension_sha256",
+        "predecessor_migration_name",
+        "predecessor_sql_sha256"
+       ],
+       "properties": {
+        "extension_name": {
+         "type": "string",
+         "minLength": 1
+        },
+        "extension_sha256": {
+         "type": "string",
+         "pattern": "^[0-9a-f]{64}$"
+        },
+        "predecessor_migration_name": {
+         "type": "string",
+         "minLength": 1
+        },
+        "predecessor_sql_sha256": {
+         "type": "string",
+         "pattern": "^[0-9a-f]{64}$"
+        }
+       },
+       "additionalProperties": false
+      }
+     }
+    },
+    "additionalProperties": false
+   },
+   "campaign_id": {
+    "type": "string",
+    "minLength": 1
+   },
+   "captured_revision": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "authority_record_count": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "table_row_counts": {
+    "type": "object",
+    "required": [
+     "campaigns",
+     "campaign_lifecycle_state",
+     "campaign_lifecycle_transitions",
+     "campaign_operations",
+     "campaign_constructions",
+     "campaign_continuity_records",
+     "campaign_revisions",
+     "campaign_package_memberships",
+     "participants",
+     "participant_quarantines",
+     "campaign_state_namespace_owners",
+     "campaign_state",
+     "turns",
+     "actions",
+     "idempotency_records",
+     "canonical_events",
+     "narration_interruptions",
+     "mutations",
+     "consequences",
+     "campaign_locks",
+     "campaign_lock_memberships",
+     "package_activations",
+     "campaign_plans",
+     "builder_dm_handoffs",
+     "agent_sessions",
+     "pending_mechanics_actions",
+     "pending_mechanics_action_aliases",
+     "mechanics_choice_resolutions",
+     "agent_session_messages",
+     "package_candidates",
+     "package_candidate_memberships",
+     "package_staging",
+     "packages",
+     "package_dependencies",
+     "package_manifests",
+     "package_manifest_files",
+     "package_exact_dependencies",
+     "package_capabilities",
+     "package_tools",
+     "package_prompt_fragments",
+     "package_ui_surfaces",
+     "package_participant_artifacts",
+     "package_blobs"
+    ],
+    "properties": {
+     "campaigns": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_lifecycle_state": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_lifecycle_transitions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_operations": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_constructions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_continuity_records": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_revisions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_package_memberships": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "participants": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "participant_quarantines": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_state_namespace_owners": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_state": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "turns": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "actions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "idempotency_records": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "canonical_events": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "narration_interruptions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "mutations": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "consequences": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_locks": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_lock_memberships": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_activations": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "campaign_plans": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "builder_dm_handoffs": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "agent_sessions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "pending_mechanics_actions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "pending_mechanics_action_aliases": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "mechanics_choice_resolutions": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "agent_session_messages": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_candidates": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_candidate_memberships": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_staging": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "packages": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_dependencies": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_manifests": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_manifest_files": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_exact_dependencies": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_capabilities": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_tools": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_prompt_fragments": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_ui_surfaces": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_participant_artifacts": {
+      "type": "integer",
+      "minimum": 0
+     },
+     "package_blobs": {
+      "type": "integer",
+      "minimum": 0
+     }
+    },
+    "additionalProperties": false
+   },
+   "blob_count": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "closure_index": {
+    "type": "object",
+    "required": [
+     "lock_ids",
+     "action_ids",
+     "candidate_ids",
+     "package_identities",
+     "blob_sha256s",
+     "plan_ids",
+     "handoff_ids",
+     "session_ids"
+    ],
+    "properties": {
+     "lock_ids": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     },
+     "action_ids": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     },
+     "candidate_ids": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     },
+     "package_identities": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "package_id",
+        "version",
+        "content_sha256"
+       ],
+       "properties": {
+        "package_id": {
+         "type": "string",
+         "minLength": 1
+        },
+        "version": {
+         "type": "string",
+         "minLength": 1
+        },
+        "content_sha256": {
+         "type": "string",
+         "pattern": "^[0-9a-f]{64}$"
+        }
+       },
+       "additionalProperties": false
+      }
+     },
+     "blob_sha256s": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "pattern": "^[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+     },
+     "plan_ids": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     },
+     "handoff_ids": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     },
+     "session_ids": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     }
+    },
+    "additionalProperties": false
+   },
+   "non_manifest_members": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "byte_count",
+      "sha256"
+     ],
+     "properties": {
+      "name": {
+       "type": "string",
+       "minLength": 1
+      },
+      "byte_count": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "sha256": {
+       "type": "string",
+       "pattern": "^[0-9a-f]{64}$"
+      }
+     },
+     "additionalProperties": false
+    },
+    "contains": {
+     "properties": {
+      "name": {
+       "const": "provider-private.jsonl"
+      }
+     },
+     "required": [
+      "name"
+     ]
+    }
+   }
+  },
+  "additionalProperties": false
+ },
+ "example": {
+  "format_id": "sylvia-gm-campaign-export",
+  "format_version": 2,
+  "product_id": "sylvia-gm",
+  "product_generation": "alpha",
+  "source_authority_schema_version": 12,
+  "source_authority_schema_identity_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "migration_provenance": {
+   "schema_migrations": [],
+   "schema_extensions": []
+  },
+  "campaign_id": "example-campaign",
+  "captured_revision": 0,
+  "authority_record_count": 0,
+  "table_row_counts": {
+   "campaigns": 0,
+   "campaign_lifecycle_state": 0,
+   "campaign_lifecycle_transitions": 0,
+   "campaign_operations": 0,
+   "campaign_constructions": 0,
+   "campaign_continuity_records": 0,
+   "campaign_revisions": 0,
+   "campaign_package_memberships": 0,
+   "participants": 0,
+   "participant_quarantines": 0,
+   "campaign_state_namespace_owners": 0,
+   "campaign_state": 0,
+   "turns": 0,
+   "actions": 0,
+   "idempotency_records": 0,
+   "canonical_events": 0,
+   "narration_interruptions": 0,
+   "mutations": 0,
+   "consequences": 0,
+   "campaign_locks": 0,
+   "campaign_lock_memberships": 0,
+   "package_activations": 0,
+   "campaign_plans": 0,
+   "builder_dm_handoffs": 0,
+   "agent_sessions": 0,
+   "pending_mechanics_actions": 0,
+   "pending_mechanics_action_aliases": 0,
+   "mechanics_choice_resolutions": 0,
+   "agent_session_messages": 0,
+   "package_candidates": 0,
+   "package_candidate_memberships": 0,
+   "package_staging": 0,
+   "packages": 0,
+   "package_dependencies": 0,
+   "package_manifests": 0,
+   "package_manifest_files": 0,
+   "package_exact_dependencies": 0,
+   "package_capabilities": 0,
+   "package_tools": 0,
+   "package_prompt_fragments": 0,
+   "package_ui_surfaces": 0,
+   "package_participant_artifacts": 0,
+   "package_blobs": 0
+  },
+  "blob_count": 0,
+  "closure_index": {
+   "lock_ids": [],
+   "action_ids": [],
+   "candidate_ids": [],
+   "package_identities": [],
+   "blob_sha256s": [],
+   "plan_ids": [],
+   "handoff_ids": [],
+   "session_ids": []
+  },
+  "non_manifest_members": [
+   {
+    "name": "authority.jsonl",
+    "byte_count": 0,
+    "sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+   },
+   {
+    "name": "provider-private.jsonl",
+    "byte_count": 0,
+    "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+   }
+  ]
+ },
+ "notes": [
+  "This is the existing .sylvia-gm-campaign ZIP contract: authority.jsonl, blobs/<sha256>, then canonical manifest.json in exact member order.",
+  "The manifest schema is structural. The codec remains authoritative for exact product/schema generations, migration provenance, table names and row schemas, canonical bytes, ordering, limits, hashes, counts, and closure indexes.",
+  "Every non-manifest member is declared by exact name, size, and SHA-256; every retained package blob must agree with authority rows and package-file byte counts.",
+  "Exports contain the selected campaign aggregate and exact package closure. They exclude Full Audit, credentials, independent Builder chats, unrelated campaigns, and workspace scratch.",
+  "Recovery verifies into staging before the sole authority writer commits it; retrieving this definition does not export, recover, or inspect campaign data.",
+  "This is the already-supported format 2, selected only when saved thinking is explicitly included. The provider-private.jsonl member is required and checked by the existing private-record codec; it is excluded from ordinary history. Format 1 excludes this member. No credentials or Full Audit are included in either format."
+ ],
+ "file": "manifest.json in .sylvia-gm-campaign with provider-private.jsonl"
+}
