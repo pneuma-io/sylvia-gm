@@ -20,6 +20,8 @@
 //!   `zipfile` read path; [`panel_layout`]: `domain/panel_layout.py`.
 //! - [`schema_admission`]: `application/schema_admission.py`, the admitted JSON-schema subset.
 //! - [`pyops`]: Python `==`, `in`, `set()` and subscripting on JSON values, for untrusted records.
+//! - [`yaml_bounds`]: `application/_yaml_bounds.py`, the composed-YAML size check the bounded
+//!   loaders run before construction.
 //! - [`campaign_plan`]: `domain/campaign_plan.py`, the structured Campaign Plan validator.
 //! - [`campaign_ending`], [`no_ruleset_plan`]: Campaign Plan endings and No Ruleset worlds.
 //! - [`interview_contribution`]: artifact-owned Campaign Interview questions.
@@ -47,5 +49,6 @@ pub mod schema_admission;
 pub mod session;
 pub mod starting_state;
 pub mod state_ownership;
+pub mod yaml_bounds;
 
 pub use error::{DomainError, DomainResult};
