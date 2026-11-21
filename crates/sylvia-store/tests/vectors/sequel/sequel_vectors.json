@@ -1,0 +1,7064 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "name": "valid",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "previous_plan_id",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-0",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "campaign",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-other",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "package_lock",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-ffffffffffffffffffffffffffffffffffffffff",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_previous_sha",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_previous_id",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-0",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_expected_revision",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 4,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "request_expected_revision",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 4,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "request_source",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:other",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "metadata_source",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:other",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "request_session",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-2"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_session",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-2",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_campaign",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-other",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_number",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 3
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_number_text",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": "2"
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "basis_number_float",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2.0
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "plan_revision",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 3,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "preview_sha",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "source_plan",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "Another",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "markdown",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# Changed",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  },
+  {
+   "name": "operation",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-2",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel request identity is invalid"
+   }
+  },
+  {
+   "name": "prepared_plan",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "Edited"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel changed its reviewed preparation or identity mapping"
+   }
+  },
+  {
+   "name": "identity_mapping",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel changed its reviewed preparation or identity mapping"
+   }
+  },
+  {
+   "name": "identity_mapping_list",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": [],
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel changed its reviewed preparation or identity mapping"
+   }
+  },
+  {
+   "name": "missing_request",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "KeyError",
+    "message": "'request'"
+   }
+  },
+  {
+   "name": "missing_review",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "KeyError",
+    "message": "'review'"
+   }
+  },
+  {
+   "name": "review_unconfirmed",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": false
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Confirm the reviewed timeline and preserved campaign facts"
+   }
+  },
+  {
+   "name": "missing_markdown",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "KeyError",
+    "message": "'campaign_plan_markdown'"
+   }
+  },
+  {
+   "name": "sequel_not_object",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": "plan-1"
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black"
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign adventure metadata must be an object"
+   }
+  },
+  {
+   "name": "previous_without_plan",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {},
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "KeyError",
+    "message": "'campaign_plan'"
+   }
+  },
+  {
+   "name": "previous_boundaries_unhashable",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": [
+       [
+        "x"
+       ]
+      ],
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "TypeError",
+    "message": "unhashable type: 'FrozenJsonList'"
+   }
+  },
+  {
+   "name": "previous_boundaries_text",
+   "plan": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "previous": {
+    "plan_id": "plan-1",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "builder-1",
+    "content_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+    "content": {
+     "campaign_plan": {
+      "title": "The Drowned Bell",
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "boundaries": "ab",
+      "structure": [
+       {
+        "id": "act-1",
+        "objectives": []
+       }
+      ]
+     }
+    },
+    "provenance_evidence_ids": [
+     "ev"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 1,
+    "resulting_campaign_revision": 1,
+    "payload_sha256": "a688471f53157df808e055c407b544da41769cbbcf8edd87065e4bfc4ebfb62b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel changed its reviewed preparation or identity mapping"
+   }
+  },
+  {
+   "name": "third_adventure",
+   "plan": {
+    "plan_id": "campaign-sequel-9279a7954e6c7c4b720acf6262388729",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "437a8fbf9206db09e3e3c20ea23865dc06c4704e2b6c21fc0afb5d49250725c4",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-3-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-3-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-3-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-3-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-3-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-3-3c551846:act-a",
+        "objectives": [
+         "adventure-3-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-3-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-3-3c551846:act-a",
+       "act-b": "adventure-3-3c551846:act-b",
+       "obj-a": "adventure-3-3c551846:obj-a",
+       "secret-a": "adventure-3-3c551846:secret-a",
+       "end-a": "adventure-3-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+       "previous_plan_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 3
+      },
+      "request": {
+       "operation_id": "op-3",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "555f73fffe8b7f623521bbc8614f72f3292978078a9264f7a67a19d093e4f794",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-9279a7954e6c7c4b720acf6262388729-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 3,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "cbb781ad2a575ecd509d3a3969986f6c6eb1695d04c88cb0da59ca83c3d0999f"
+   },
+   "previous": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "third_adventure_wrong_number",
+   "plan": {
+    "plan_id": "campaign-sequel-9279a7954e6c7c4b720acf6262388729",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e7a2af51ef97c6682b7b7e8f57c4100948ef619cd31ab166f0be5b3e63fe3ad4",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+       "previous_plan_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-3",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "386d6b01fb3fbb638301a008d49894c053ef06621125bf3ca6d766c0bc6e09d2",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-9279a7954e6c7c4b720acf6262388729-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 3,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "66f003ed11233a2390eb913c22547d999fff9e7863721430e828afede80c9f19"
+   },
+   "previous": {
+    "plan_id": "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f",
+    "campaign_id": "campaign-story",
+    "package_lock_id": "lock-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "source_session_id": "dm-1",
+    "content_sha256": "e78c5b8617f58bbcfb369467067645486ec8b1e87548bcc53d8d019c3406d88b",
+    "content": {
+     "campaign_plan": {
+      "bindings": {
+       "campaign_setting": null,
+       "ruleset": null
+      },
+      "boundaries": [
+       "no gore",
+       "fade to black",
+       "no spiders"
+      ],
+      "ending": {
+       "mode": "finite",
+       "outcomes": [
+        {
+         "after_story": null,
+         "id": "adventure-2-3c551846:end-a",
+         "open_world": true
+        }
+       ]
+      },
+      "objectives": [
+       {
+        "id": "adventure-2-3c551846:obj-a",
+        "text": "Find the bell."
+       }
+      ],
+      "secrets": [
+       {
+        "id": "adventure-2-3c551846:secret-a",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-b"
+        }
+       },
+       {
+        "id": "kept",
+        "reveal": {
+         "from_act": "adventure-2-3c551846:act-a"
+        },
+        "setting_fact_id": "fact-1"
+       }
+      ],
+      "structure": [
+       {
+        "id": "adventure-2-3c551846:act-a",
+        "objectives": [
+         "adventure-2-3c551846:obj-a"
+        ]
+       },
+       {
+        "id": "adventure-2-3c551846:act-b",
+        "objectives": []
+       }
+      ],
+      "title": "The Second Tide"
+     },
+     "campaign_plan_markdown": "# The Second Tide\n\nA reviewed sequel.",
+     "sequel": {
+      "previous_plan_id": "plan-1",
+      "source_id": "library:second-tide",
+      "source_plan": {
+       "title": "The Second Tide",
+       "bindings": {
+        "ruleset": null,
+        "campaign_setting": null
+       },
+       "boundaries": [
+        "fade to black",
+        "no spiders"
+       ],
+       "structure": [
+        {
+         "id": "act-a",
+         "objectives": [
+          "obj-a"
+         ]
+        },
+        {
+         "id": "act-b",
+         "objectives": []
+        }
+       ],
+       "objectives": [
+        {
+         "id": "obj-a",
+         "text": "Find the bell."
+        }
+       ],
+       "secrets": [
+        {
+         "id": "secret-a",
+         "reveal": {
+          "from_act": "act-b"
+         }
+        },
+        {
+         "id": "kept",
+         "setting_fact_id": "fact-1",
+         "reveal": {
+          "from_act": "act-a"
+         }
+        }
+       ],
+       "ending": {
+        "mode": "finite",
+        "outcomes": [
+         {
+          "id": "end-a",
+          "open_world": true,
+          "after_story": null
+         }
+        ]
+       }
+      },
+      "identity_mapping": {
+       "act-a": "adventure-2-3c551846:act-a",
+       "act-b": "adventure-2-3c551846:act-b",
+       "obj-a": "adventure-2-3c551846:obj-a",
+       "secret-a": "adventure-2-3c551846:secret-a",
+       "end-a": "adventure-2-3c551846:end-a"
+      },
+      "preview": {
+       "campaign_id": "campaign-story",
+       "session_id": "dm-1",
+       "expected_revision": 5,
+       "latest_message_sequence": 9,
+       "previous_plan_id": "plan-1",
+       "previous_plan_sha256": "3437dba17eb5086c3d67c563370f348e866a7f001833dcf4fcb652755f704243",
+       "source_id": "library:second-tide",
+       "source_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+       "source_plan_sha256": "3c551846e09baf8352716367ffac5243c5afdbc0bda8c7e3a1a10378e6bf8496",
+       "source_markdown_sha256": "5b78207dfae270699ea817c15f6bfc5b2bdbfb9180a959a3a520eb9a5f3adbb0",
+       "number": 2
+      },
+      "request": {
+       "operation_id": "op-1",
+       "source_id": "library:second-tide",
+       "expected_revision": 5,
+       "preview_sha256": "c2adc577c825011ae7a5f853b1e8c6865865025b93928fae9ee78ef196e7bc6f",
+       "review": {
+        "connection": "The bell rings again.",
+        "timeline": "after",
+        "reviewed": true
+       },
+       "session_id": "dm-1"
+      }
+     }
+    },
+    "provenance_evidence_ids": [
+     "campaign-sequel-0de5530fbc55aa4874dc81f8f89e880f-review"
+    ],
+    "validation_outcome": "valid",
+    "acceptance_status": "accepted",
+    "plan_revision": 2,
+    "resulting_campaign_revision": 6,
+    "payload_sha256": "fd3c460294b20e23f0f987d79c3a7df395af338b3b0a2f40af7d11adaa6aae4b"
+   },
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign sequel source or review identity is invalid"
+   }
+  }
+ ]
+}

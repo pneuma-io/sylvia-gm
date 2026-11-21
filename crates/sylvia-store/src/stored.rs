@@ -5,12 +5,12 @@
 //! `_lock_representation`, `_read_lock` and `sqlite_state_ownership.verify_authority`
 //! (`_historical_writers`).
 //!
-//! Parts 1 and 2. In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`,
-//! the stored identities, the session graph (`crate::stored_sessions`), the state-ownership verifier (from schema 6), the `packages` rows, and
-//! each campaign's lock binding. Still to come, each only making this less strict until it
-//! lands: `sqlite_recovery.verify_recovery_receipts` (with
-//! the archive family, which owns `campaign_archive.py`), and `_verify_campaign_authority` and
-//! `_verify_construction_authority` (part 3).
+//! Parts 1 to 3. In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`,
+//! the stored identities, the session graph (`crate::stored_sessions`), the state-ownership
+//! verifier (from schema 6), the `packages` rows, and each campaign's lock binding and
+//! `_verify_campaign_authority` (`crate::stored_campaigns`). Still to come, each only making this
+//! less strict until it lands: `sqlite_recovery.verify_recovery_receipts` (with the archive
+//! family, which owns `campaign_archive.py`) and `_verify_construction_authority` (part 4).
 //!
 //! Only the failures Python raises itself become its `SchemaIdentityError`; anything else
 //! escapes as it does in Python, and startup words it as `_migrate` does
@@ -471,9 +471,17 @@ pub fn verify_stored_authority(connection: &Connection) -> StoreResult<()> {
                 return Err(invalid());
             }
         }
-        // `_verify_campaign_authority` runs here in Python (part 3).
+        crate::stored_campaigns::verify_campaign_authority(
+            connection,
+            &crate::stored_campaigns::CampaignAuthority {
+                campaign_id: &campaign_id,
+                current_lifecycle: &campaign.text("lifecycle")?,
+                current_revision: int(campaign.get("revision")?)?,
+                current_writer: &campaign.text("writer")?,
+            },
+        )?;
     }
     // `_verify_construction_authority` runs here in Python when `campaign_operations` exists
-    // (part 3).
+    // (part 4).
     Ok(())
 }
