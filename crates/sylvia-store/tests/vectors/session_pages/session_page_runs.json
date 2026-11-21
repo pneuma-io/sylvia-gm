@@ -1,0 +1,2439 @@
+{
+ "python": "3.12.11",
+ "runs": {
+  "pages": {
+   "operations": [
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": null,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": null,
+     "limit": 3
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": 6,
+     "limit": 2
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": 1,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": 10000,
+     "limit": 200
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": null,
+     "limit": 0
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": null,
+     "limit": 201
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": 0,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "dm-1",
+     "before_sequence": -3,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "session-missing",
+     "before_sequence": null,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "builder-1",
+     "before_sequence": null,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "builder-2",
+     "before_sequence": null,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "builder-2",
+     "before_sequence": null,
+     "limit": 1
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "chat-1",
+     "before_sequence": null,
+     "limit": 50
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "chat-1",
+     "before_sequence": null,
+     "limit": 2
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-story",
+       "role": "dm",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "dm-1",
+        "sequence": 1,
+        "message_id": "u-1",
+        "kind": "user",
+        "content": {
+         "text": "I ring the bell."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 2,
+        "message_id": "canonical-1",
+        "kind": "canonical_reference",
+        "content": {
+         "event_type": "talk",
+         "safe_payload": {
+          "text": "I ring the bell. The sea answers."
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 1
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 3,
+        "message_id": "u-2",
+        "kind": "user",
+        "content": {
+         "text": "I dive."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 4,
+        "message_id": "canonical-2",
+        "kind": "canonical_reference",
+        "content": {
+         "event_type": "talk",
+         "safe_payload": {
+          "text": "I dive. The sea answers."
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 2
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 5,
+        "message_id": "canonical-5",
+        "kind": "canonical_reference",
+        "content": {
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "event_type": "tool_result",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 5
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 6,
+        "message_id": "activity-1",
+        "kind": "evidence",
+        "content": {
+         "action_id": "action-1",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "kind": "mechanics_activity"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 7,
+        "message_id": "u-3",
+        "kind": "user",
+        "content": {
+         "campaign_ending_choice": {
+          "choice": "epilogue",
+          "ending_id": "end-quiet"
+         },
+         "text": "Let it end."
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": null,
+      "latest_sequence": 7,
+      "latest_user_sequence": 7,
+      "launch_messages": [],
+      "latest_canonical_sequence": 5,
+      "act_markers": [
+       {
+        "act_number": 1,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-1-complete",
+        "status": "complete"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-2-begins",
+        "status": "begins"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "marker_id": "act-2-complete",
+        "status": "complete"
+       }
+      ],
+      "campaign_ending": {
+       "act_number": 2,
+       "after_message_id": "canonical-2",
+       "choice": "epilogue",
+       "ending_id": "end-quiet",
+       "has_after_story": false,
+       "open_world": false,
+       "plan_title": "The Drowned Bell"
+      },
+      "campaign_endings": [
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "choice": "epilogue",
+        "ending_id": "end-quiet",
+        "has_after_story": false,
+        "open_world": false,
+        "plan_title": "The Drowned Bell"
+       }
+      ],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-story",
+       "role": "dm",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "dm-1",
+        "sequence": 5,
+        "message_id": "canonical-5",
+        "kind": "canonical_reference",
+        "content": {
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "event_type": "tool_result",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 5
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 6,
+        "message_id": "activity-1",
+        "kind": "evidence",
+        "content": {
+         "action_id": "action-1",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "kind": "mechanics_activity"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 7,
+        "message_id": "u-3",
+        "kind": "user",
+        "content": {
+         "campaign_ending_choice": {
+          "choice": "epilogue",
+          "ending_id": "end-quiet"
+         },
+         "text": "Let it end."
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": 5,
+      "latest_sequence": 7,
+      "latest_user_sequence": 7,
+      "launch_messages": [],
+      "latest_canonical_sequence": 5,
+      "act_markers": [
+       {
+        "act_number": 1,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-1-complete",
+        "status": "complete"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-2-begins",
+        "status": "begins"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "marker_id": "act-2-complete",
+        "status": "complete"
+       }
+      ],
+      "campaign_ending": {
+       "act_number": 2,
+       "after_message_id": "canonical-2",
+       "choice": "epilogue",
+       "ending_id": "end-quiet",
+       "has_after_story": false,
+       "open_world": false,
+       "plan_title": "The Drowned Bell"
+      },
+      "campaign_endings": [
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "choice": "epilogue",
+        "ending_id": "end-quiet",
+        "has_after_story": false,
+        "open_world": false,
+        "plan_title": "The Drowned Bell"
+       }
+      ],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-story",
+       "role": "dm",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "dm-1",
+        "sequence": 4,
+        "message_id": "canonical-2",
+        "kind": "canonical_reference",
+        "content": {
+         "event_type": "talk",
+         "safe_payload": {
+          "text": "I dive. The sea answers."
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 2
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 5,
+        "message_id": "canonical-5",
+        "kind": "canonical_reference",
+        "content": {
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "event_type": "tool_result",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 5
+       }
+      ],
+      "next_before_sequence": 4,
+      "latest_sequence": 7,
+      "latest_user_sequence": 7,
+      "launch_messages": [],
+      "latest_canonical_sequence": 5,
+      "act_markers": [
+       {
+        "act_number": 1,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-1-complete",
+        "status": "complete"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-2-begins",
+        "status": "begins"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "marker_id": "act-2-complete",
+        "status": "complete"
+       }
+      ],
+      "campaign_ending": {
+       "act_number": 2,
+       "after_message_id": "canonical-2",
+       "choice": "epilogue",
+       "ending_id": "end-quiet",
+       "has_after_story": false,
+       "open_world": false,
+       "plan_title": "The Drowned Bell"
+      },
+      "campaign_endings": [
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "choice": "epilogue",
+        "ending_id": "end-quiet",
+        "has_after_story": false,
+        "open_world": false,
+        "plan_title": "The Drowned Bell"
+       }
+      ],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-story",
+       "role": "dm",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [],
+      "next_before_sequence": null,
+      "latest_sequence": 7,
+      "latest_user_sequence": 7,
+      "launch_messages": [],
+      "latest_canonical_sequence": 5,
+      "act_markers": [
+       {
+        "act_number": 1,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-1-complete",
+        "status": "complete"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-2-begins",
+        "status": "begins"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "marker_id": "act-2-complete",
+        "status": "complete"
+       }
+      ],
+      "campaign_ending": {
+       "act_number": 2,
+       "after_message_id": "canonical-2",
+       "choice": "epilogue",
+       "ending_id": "end-quiet",
+       "has_after_story": false,
+       "open_world": false,
+       "plan_title": "The Drowned Bell"
+      },
+      "campaign_endings": [
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "choice": "epilogue",
+        "ending_id": "end-quiet",
+        "has_after_story": false,
+        "open_world": false,
+        "plan_title": "The Drowned Bell"
+       }
+      ],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-story",
+       "role": "dm",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "dm-1",
+        "sequence": 1,
+        "message_id": "u-1",
+        "kind": "user",
+        "content": {
+         "text": "I ring the bell."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 2,
+        "message_id": "canonical-1",
+        "kind": "canonical_reference",
+        "content": {
+         "event_type": "talk",
+         "safe_payload": {
+          "text": "I ring the bell. The sea answers."
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 1
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 3,
+        "message_id": "u-2",
+        "kind": "user",
+        "content": {
+         "text": "I dive."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 4,
+        "message_id": "canonical-2",
+        "kind": "canonical_reference",
+        "content": {
+         "event_type": "talk",
+         "safe_payload": {
+          "text": "I dive. The sea answers."
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 2
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 5,
+        "message_id": "canonical-5",
+        "kind": "canonical_reference",
+        "content": {
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "event_type": "tool_result",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe"
+        },
+        "canonical_sequence": 5
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 6,
+        "message_id": "activity-1",
+        "kind": "evidence",
+        "content": {
+         "action_id": "action-1",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         },
+         "kind": "mechanics_activity"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "dm-1",
+        "sequence": 7,
+        "message_id": "u-3",
+        "kind": "user",
+        "content": {
+         "campaign_ending_choice": {
+          "choice": "epilogue",
+          "ending_id": "end-quiet"
+         },
+         "text": "Let it end."
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": null,
+      "latest_sequence": 7,
+      "latest_user_sequence": 7,
+      "launch_messages": [],
+      "latest_canonical_sequence": 5,
+      "act_markers": [
+       {
+        "act_number": 1,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-1-complete",
+        "status": "complete"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-1",
+        "marker_id": "act-2-begins",
+        "status": "begins"
+       },
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "marker_id": "act-2-complete",
+        "status": "complete"
+       }
+      ],
+      "campaign_ending": {
+       "act_number": 2,
+       "after_message_id": "canonical-2",
+       "choice": "epilogue",
+       "ending_id": "end-quiet",
+       "has_after_story": false,
+       "open_world": false,
+       "plan_title": "The Drowned Bell"
+      },
+      "campaign_endings": [
+       {
+        "act_number": 2,
+        "after_message_id": "canonical-2",
+        "choice": "epilogue",
+        "ending_id": "end-quiet",
+        "has_after_story": false,
+        "open_world": false,
+        "plan_title": "The Drowned Bell"
+       }
+      ],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "History page limit must be an integer from 1 to 200"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "History page limit must be an integer from 1 to 200"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "History cursor must be a positive integer"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "History cursor must be a positive integer"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable"
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-1",
+       "campaign_id": "campaign-story",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "builder-1",
+        "sequence": 1,
+        "message_id": "ev-plan",
+        "kind": "evidence",
+        "content": {
+         "kind": "plan_draft"
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": null,
+      "latest_sequence": 1,
+      "latest_user_sequence": null,
+      "launch_messages": [],
+      "latest_canonical_sequence": null,
+      "act_markers": [],
+      "campaign_ending": null,
+      "campaign_endings": [],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-2",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "builder-2",
+        "sequence": 1,
+        "message_id": "b-user-1",
+        "kind": "user",
+        "content": {
+         "attempt_id": "a-1",
+         "text": "Make a coast."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 2,
+        "message_id": "b-question-old",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_tool_result",
+         "q": 1,
+         "tool_name": "ask_question"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 3,
+        "message_id": "b-terminal-1",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "a-1",
+         "kind": "builder_attempt_terminal",
+         "status": "completed"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 4,
+        "message_id": "b-user-2",
+        "kind": "user",
+        "content": {
+         "attempt_id": "a-2",
+         "text": "Now a tower."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 5,
+        "message_id": "b-question",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_tool_result",
+         "q": 2,
+         "tool_name": "ask_question"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 6,
+        "message_id": "b-other-tool",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_tool_result",
+         "tool_name": "search"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 7,
+        "message_id": "b-compact",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "c-1",
+         "kind": "context_compaction_requested"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 8,
+        "message_id": "b-compact-end",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "c-1",
+         "kind": "context_compaction_terminal",
+         "status": "completed"
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": null,
+      "latest_sequence": 8,
+      "latest_user_sequence": 4,
+      "launch_messages": [],
+      "latest_canonical_sequence": null,
+      "act_markers": [],
+      "campaign_ending": null,
+      "campaign_endings": [],
+      "builder_question_messages": [
+       {
+        "session_id": "builder-2",
+        "sequence": 5,
+        "message_id": "b-question",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_tool_result",
+         "q": 2,
+         "tool_name": "ask_question"
+        },
+        "canonical_sequence": null
+       }
+      ]
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-2",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "builder-2",
+        "sequence": 8,
+        "message_id": "b-compact-end",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "c-1",
+         "kind": "context_compaction_terminal",
+         "status": "completed"
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": 8,
+      "latest_sequence": 8,
+      "latest_user_sequence": 4,
+      "launch_messages": [],
+      "latest_canonical_sequence": null,
+      "act_markers": [],
+      "campaign_ending": null,
+      "campaign_endings": [],
+      "builder_question_messages": [
+       {
+        "session_id": "builder-2",
+        "sequence": 5,
+        "message_id": "b-question",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_tool_result",
+         "q": 2,
+         "tool_name": "ask_question"
+        },
+        "canonical_sequence": null
+       }
+      ]
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "chat-1",
+        "sequence": 1,
+        "message_id": "c-launch",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_launch_context",
+         "source": "library"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 2,
+        "message_id": "c-start",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "s-1",
+         "kind": "builder_start"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 3,
+        "message_id": "c-link-1",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 1
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 4,
+        "message_id": "c-link-2",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 2
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 5,
+        "message_id": "c-user",
+        "kind": "user",
+        "content": {
+         "attempt_id": 7,
+         "text": "Hello."
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": null,
+      "latest_sequence": 5,
+      "latest_user_sequence": 5,
+      "launch_messages": [
+       {
+        "session_id": "chat-1",
+        "sequence": 4,
+        "message_id": "c-link-2",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 2
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 3,
+        "message_id": "c-link-1",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 1
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "latest_canonical_sequence": null,
+      "act_markers": [],
+      "campaign_ending": null,
+      "campaign_endings": [],
+      "builder_question_messages": []
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "chat-1",
+        "sequence": 4,
+        "message_id": "c-link-2",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 2
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 5,
+        "message_id": "c-user",
+        "kind": "user",
+        "content": {
+         "attempt_id": 7,
+         "text": "Hello."
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": 4,
+      "latest_sequence": 5,
+      "latest_user_sequence": 5,
+      "launch_messages": [
+       {
+        "session_id": "chat-1",
+        "sequence": 4,
+        "message_id": "c-link-2",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 2
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "chat-1",
+        "sequence": 3,
+        "message_id": "c-link-1",
+        "kind": "evidence",
+        "content": {
+         "kind": "creation_subflow_link",
+         "n": 1
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "latest_canonical_sequence": null,
+      "act_markers": [],
+      "campaign_ending": null,
+      "campaign_endings": [],
+      "builder_question_messages": []
+     }
+    }
+   ]
+  },
+  "activity": {
+   "operations": [
+    {
+     "op": "session_activity_basis",
+     "session_id": "chat-1",
+     "attempt_id": null
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "chat-1",
+     "attempt_id": "s-1"
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "chat-1",
+     "attempt_id": "missing"
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "builder-2",
+     "attempt_id": null
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "builder-2",
+     "attempt_id": "a-1"
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "builder-2",
+     "attempt_id": "c-1"
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "dm-1",
+     "attempt_id": null
+    },
+    {
+     "op": "session_activity_basis",
+     "session_id": "session-missing",
+     "attempt_id": null
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "chat-1",
+       "sequence": 2,
+       "message_id": "c-start",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "s-1",
+        "kind": "builder_start"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "chat-1",
+       "sequence": 2,
+       "message_id": "c-start",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "s-1",
+        "kind": "builder_start"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "chat-1",
+       "campaign_id": null,
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": null,
+      "terminal": null,
+      "has_compaction": false
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-2",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "builder-2",
+       "sequence": 7,
+       "message_id": "b-compact",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "c-1",
+        "kind": "context_compaction_requested"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": {
+       "session_id": "builder-2",
+       "sequence": 8,
+       "message_id": "b-compact-end",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "c-1",
+        "kind": "context_compaction_terminal",
+        "status": "completed"
+       },
+       "canonical_sequence": null
+      },
+      "has_compaction": true
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-2",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "builder-2",
+       "sequence": 1,
+       "message_id": "b-user-1",
+       "kind": "user",
+       "content": {
+        "attempt_id": "a-1",
+        "text": "Make a coast."
+       },
+       "canonical_sequence": null
+      },
+      "terminal": {
+       "session_id": "builder-2",
+       "sequence": 3,
+       "message_id": "b-terminal-1",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "a-1",
+        "kind": "builder_attempt_terminal",
+        "status": "completed"
+       },
+       "canonical_sequence": null
+      },
+      "has_compaction": true
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-2",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "builder-2",
+       "sequence": 7,
+       "message_id": "b-compact",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "c-1",
+        "kind": "context_compaction_requested"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": {
+       "session_id": "builder-2",
+       "sequence": 8,
+       "message_id": "b-compact-end",
+       "kind": "evidence",
+       "content": {
+        "attempt_id": "c-1",
+        "kind": "context_compaction_terminal",
+        "status": "completed"
+       },
+       "canonical_sequence": null
+      },
+      "has_compaction": true
+     }
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "dm-1",
+       "campaign_id": "campaign-story",
+       "role": "dm",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": null,
+      "terminal": null,
+      "has_compaction": false
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable"
+    }
+   ]
+  },
+  "plans": {
+   "operations": [
+    {
+     "op": "campaign_plan_hit",
+     "plan_id": "plan-1"
+    },
+    {
+     "op": "campaign_plan_hit",
+     "plan_id": "plan-missing"
+    },
+    {
+     "op": "accepted_campaign_plan",
+     "campaign_id": "campaign-story"
+    },
+    {
+     "op": "accepted_campaign_plan",
+     "campaign_id": "campaign-build"
+    },
+    {
+     "op": "campaign_adventures",
+     "campaign_id": "campaign-story"
+    },
+    {
+     "op": "campaign_adventures",
+     "campaign_id": "campaign-build"
+    },
+    {
+     "op": "handoff_hit",
+     "handoff_id": "handoff-1"
+    },
+    {
+     "op": "handoff_hit",
+     "handoff_id": "handoff-missing"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "plan_id": "plan-1",
+      "campaign_id": "campaign-story",
+      "package_lock_id": "lock-e55968e3b7c797ba058c415ead34301de2916b88",
+      "source_session_id": "builder-1",
+      "content_sha256": "c51bd2de9ebce50cf716b1a017d0df203f269e9e18303d60799893b80831904b",
+      "plan_revision": 1,
+      "resulting_campaign_revision": 1,
+      "payload_sha256": "567057aff30352cc77b8bf473a6d52bcf8f3acea4ccff426fa00939a6b9d7de6",
+      "content": {
+       "campaign_plan": {
+        "bindings": {
+         "campaign_setting": null,
+         "ruleset": null
+        },
+        "ending": {
+         "mode": "finite",
+         "outcomes": [
+          {
+           "after_story": null,
+           "id": "end-quiet",
+           "open_world": false,
+           "requires_all_acts": true
+          },
+          {
+           "after_story": "The town remembers.",
+           "id": "end-loud",
+           "open_world": true,
+           "requires_all_acts": false
+          }
+         ]
+        },
+        "initial_state": {
+         "entities": [
+          {
+           "id": "keeper",
+           "kind": "npc",
+           "source_ref": {
+            "id": "keeper",
+            "path": "entities/keeper"
+           },
+           "state": {
+            "mood": "wary",
+            "name": "The Keeper",
+            "visibility": "player_known"
+           }
+          }
+         ],
+         "facts": [
+          "The bell rang at dawn.",
+          {
+           "fact": "The tide is wrong.",
+           "id": "fact-tide",
+           "known_by": [
+            "gm"
+           ]
+          },
+          {
+           "fact": "Gulls avoid the tower.",
+           "known_by": "player"
+          },
+          7
+         ]
+        },
+        "starting_location": {
+         "id": "harbour",
+         "name": "The harbour"
+        },
+        "structure": [
+         {
+          "id": "act-1",
+          "objectives": [
+           "obj-1"
+          ]
+         },
+         {
+          "id": "act-2"
+         }
+        ],
+        "title": "The Drowned Bell"
+       }
+      },
+      "provenance_evidence_ids": [
+       "ev-plan"
+      ],
+      "validation_outcome": "valid",
+      "acceptance_status": "accepted"
+     }
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": {
+      "plan_id": "plan-1",
+      "campaign_id": "campaign-story",
+      "package_lock_id": "lock-e55968e3b7c797ba058c415ead34301de2916b88",
+      "source_session_id": "builder-1",
+      "content_sha256": "c51bd2de9ebce50cf716b1a017d0df203f269e9e18303d60799893b80831904b",
+      "plan_revision": 1,
+      "resulting_campaign_revision": 1,
+      "payload_sha256": "567057aff30352cc77b8bf473a6d52bcf8f3acea4ccff426fa00939a6b9d7de6",
+      "content": {
+       "campaign_plan": {
+        "bindings": {
+         "campaign_setting": null,
+         "ruleset": null
+        },
+        "ending": {
+         "mode": "finite",
+         "outcomes": [
+          {
+           "after_story": null,
+           "id": "end-quiet",
+           "open_world": false,
+           "requires_all_acts": true
+          },
+          {
+           "after_story": "The town remembers.",
+           "id": "end-loud",
+           "open_world": true,
+           "requires_all_acts": false
+          }
+         ]
+        },
+        "initial_state": {
+         "entities": [
+          {
+           "id": "keeper",
+           "kind": "npc",
+           "source_ref": {
+            "id": "keeper",
+            "path": "entities/keeper"
+           },
+           "state": {
+            "mood": "wary",
+            "name": "The Keeper",
+            "visibility": "player_known"
+           }
+          }
+         ],
+         "facts": [
+          "The bell rang at dawn.",
+          {
+           "fact": "The tide is wrong.",
+           "id": "fact-tide",
+           "known_by": [
+            "gm"
+           ]
+          },
+          {
+           "fact": "Gulls avoid the tower.",
+           "known_by": "player"
+          },
+          7
+         ]
+        },
+        "starting_location": {
+         "id": "harbour",
+         "name": "The harbour"
+        },
+        "structure": [
+         {
+          "id": "act-1",
+          "objectives": [
+           "obj-1"
+          ]
+         },
+         {
+          "id": "act-2"
+         }
+        ],
+        "title": "The Drowned Bell"
+       }
+      },
+      "provenance_evidence_ids": [
+       "ev-plan"
+      ],
+      "validation_outcome": "valid",
+      "acceptance_status": "accepted"
+     }
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": [
+      {
+       "plan_id": "plan-1",
+       "campaign_id": "campaign-story",
+       "package_lock_id": "lock-e55968e3b7c797ba058c415ead34301de2916b88",
+       "source_session_id": "builder-1",
+       "content_sha256": "c51bd2de9ebce50cf716b1a017d0df203f269e9e18303d60799893b80831904b",
+       "plan_revision": 1,
+       "resulting_campaign_revision": 1,
+       "payload_sha256": "567057aff30352cc77b8bf473a6d52bcf8f3acea4ccff426fa00939a6b9d7de6",
+       "content": {
+        "campaign_plan": {
+         "bindings": {
+          "campaign_setting": null,
+          "ruleset": null
+         },
+         "ending": {
+          "mode": "finite",
+          "outcomes": [
+           {
+            "after_story": null,
+            "id": "end-quiet",
+            "open_world": false,
+            "requires_all_acts": true
+           },
+           {
+            "after_story": "The town remembers.",
+            "id": "end-loud",
+            "open_world": true,
+            "requires_all_acts": false
+           }
+          ]
+         },
+         "initial_state": {
+          "entities": [
+           {
+            "id": "keeper",
+            "kind": "npc",
+            "source_ref": {
+             "id": "keeper",
+             "path": "entities/keeper"
+            },
+            "state": {
+             "mood": "wary",
+             "name": "The Keeper",
+             "visibility": "player_known"
+            }
+           }
+          ],
+          "facts": [
+           "The bell rang at dawn.",
+           {
+            "fact": "The tide is wrong.",
+            "id": "fact-tide",
+            "known_by": [
+             "gm"
+            ]
+           },
+           {
+            "fact": "Gulls avoid the tower.",
+            "known_by": "player"
+           },
+           7
+          ]
+         },
+         "starting_location": {
+          "id": "harbour",
+          "name": "The harbour"
+         },
+         "structure": [
+          {
+           "id": "act-1",
+           "objectives": [
+            "obj-1"
+           ]
+          },
+          {
+           "id": "act-2"
+          }
+         ],
+         "title": "The Drowned Bell"
+        }
+       },
+       "provenance_evidence_ids": [
+        "ev-plan"
+       ],
+       "validation_outcome": "valid",
+       "acceptance_status": "accepted"
+      }
+     ]
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": {
+      "handoff_id": "handoff-1",
+      "campaign_id": "campaign-story",
+      "builder_session_id": "builder-1",
+      "dm_session_id": "dm-1",
+      "package_lock_id": "lock-e55968e3b7c797ba058c415ead34301de2916b88",
+      "package_candidate_id": "candidate-install-pages",
+      "plan_id": "plan-1",
+      "plan_revision": 1,
+      "plan_content_sha256": "c51bd2de9ebce50cf716b1a017d0df203f269e9e18303d60799893b80831904b",
+      "expected_revision": 1,
+      "resulting_campaign_revision": 2,
+      "chronology_ordinal": 1,
+      "completed_turn_id": "turn-build",
+      "payload_sha256": "1d893c947d1e8b51ba857acf0f0c60bf70ccee93f49d19784318e612ebd68ad4",
+      "model_guidance": {
+       "minimum_tier_id": "sylvia.capability.t00",
+       "model_id": "synthetic.provider/model",
+       "override_accepted": true,
+       "placement_evidence_sha256": null,
+       "placement_tier_id": null,
+       "registry_version": "sylvia.capability.registry.v1",
+       "status": "unrated",
+       "warning_code": "model_capability_unrated"
+      }
+     }
+    },
+    {
+     "ok": null
+    }
+   ]
+  },
+  "children_and_review": {
+   "operations": [
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-1",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-1",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-1",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/other",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-2",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-3",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-4",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-nested",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "child-1",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-dm",
+      "campaign_id": "campaign-story",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "dm-1",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-none",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": null,
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-of-missing",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "session-missing",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "return_builder_child_evidence",
+     "evidence": {
+      "evidence_id": "evidence-1",
+      "child_session_id": "child-1",
+      "parent_session_id": "builder-2",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "safe_summary": "Rules drafted.",
+      "claims": [
+       "rules-ready"
+      ]
+     }
+    },
+    {
+     "op": "return_builder_child_evidence",
+     "evidence": {
+      "evidence_id": "evidence-1",
+      "child_session_id": "child-1",
+      "parent_session_id": "builder-2",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "safe_summary": "Rules drafted.",
+      "claims": [
+       "rules-ready"
+      ]
+     }
+    },
+    {
+     "op": "return_builder_child_evidence",
+     "evidence": {
+      "evidence_id": "evidence-2",
+      "child_session_id": "child-2",
+      "parent_session_id": "builder-1",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "safe_summary": "Rules drafted.",
+      "claims": [
+       "rules-ready"
+      ]
+     }
+    },
+    {
+     "op": "return_builder_child_evidence",
+     "evidence": {
+      "evidence_id": "evidence-3",
+      "child_session_id": "dm-1",
+      "parent_session_id": "builder-2",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "safe_summary": "Rules drafted.",
+      "claims": [
+       "rules-ready"
+      ]
+     }
+    },
+    {
+     "op": "return_builder_child_evidence",
+     "evidence": {
+      "evidence_id": "evidence-4",
+      "child_session_id": "child-missing",
+      "parent_session_id": "builder-2",
+      "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "safe_summary": "Rules drafted.",
+      "claims": [
+       "rules-ready"
+      ]
+     }
+    },
+    {
+     "op": "require_agent_human_review",
+     "session_id": "dm-1",
+     "review_id": "review-dm",
+     "content": {
+      "outcome": "human_review_required",
+      "unsupported_capabilities": [
+       "maps"
+      ],
+      "contradictions": []
+     }
+    },
+    {
+     "op": "require_agent_human_review",
+     "session_id": "builder-1",
+     "review_id": "review-closed",
+     "content": {
+      "outcome": "human_review_required",
+      "unsupported_capabilities": [
+       "maps"
+      ],
+      "contradictions": []
+     }
+    },
+    {
+     "op": "require_agent_human_review",
+     "session_id": "builder-2",
+     "review_id": "review-1",
+     "content": {
+      "outcome": "human_review_required",
+      "unsupported_capabilities": [
+       "maps"
+      ],
+      "contradictions": []
+     }
+    },
+    {
+     "op": "require_agent_human_review",
+     "session_id": "builder-2",
+     "review_id": "review-2",
+     "content": {
+      "outcome": "human_review_required",
+      "unsupported_capabilities": [
+       "maps"
+      ],
+      "contradictions": []
+     }
+    },
+    {
+     "op": "require_agent_human_review",
+     "session_id": "builder-2",
+     "review_id": "review-1",
+     "content": {
+      "outcome": "human_review_required",
+      "unsupported_capabilities": [
+       "maps"
+      ],
+      "contradictions": []
+     }
+    },
+    {
+     "op": "require_agent_human_review",
+     "session_id": "chat-1",
+     "review_id": "review-chat",
+     "content": {
+      "outcome": "human_review_required",
+      "unsupported_capabilities": [
+       "maps"
+      ],
+      "contradictions": []
+     }
+    },
+    {
+     "op": "create_builder_child_session",
+     "record": {
+      "session_id": "child-after-review",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "op": "session_history_page",
+     "session_id": "builder-2",
+     "before_sequence": null,
+     "limit": 3
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": {
+      "session_id": "child-1",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "child-1",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "IdempotencyConflict",
+     "code": "idempotency_conflict",
+     "message": "Agent session identity payload does not match"
+    },
+    {
+     "ok": {
+      "session_id": "child-2",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "child-3",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "active",
+      "parent_session_id": "builder-2",
+      "selected_skill": "BUILD RULESET",
+      "scope": [
+       "rules"
+      ],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Builder child sessions are bounded at three"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Builder child sessions cannot create nested children"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Builder parent session is not active"
+    },
+    {
+     "error": "ValueError",
+     "code": null,
+     "message": "Only child sessions carry isolated scope"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable"
+    },
+    {
+     "ok": [
+      {
+       "authoritative": false,
+       "child_session_id": "child-1",
+       "claims": [
+        "rules-ready"
+       ],
+       "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "evidence_id": "evidence-1",
+       "safe_summary": "Rules drafted."
+      },
+      {
+       "session_id": "child-1",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "completed",
+       "parent_session_id": "builder-2",
+       "selected_skill": "BUILD RULESET",
+       "scope": [
+        "rules"
+       ],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      }
+     ]
+    },
+    {
+     "ok": [
+      {
+       "authoritative": false,
+       "child_session_id": "child-1",
+       "claims": [
+        "rules-ready"
+       ],
+       "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "evidence_id": "evidence-1",
+       "safe_summary": "Rules drafted."
+      },
+      {
+       "session_id": "child-1",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "completed",
+       "parent_session_id": "builder-2",
+       "selected_skill": "BUILD RULESET",
+       "scope": [
+        "rules"
+       ],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      }
+     ]
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Child evidence parent identity does not match"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Child evidence parent identity does not match"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable"
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Only Builder sessions can require construction review"
+    },
+    {
+     "ok": {
+      "session_id": "builder-1",
+      "campaign_id": "campaign-story",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "review_required",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "builder-2",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "review_required",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Agent session is not active"
+    },
+    {
+     "ok": {
+      "session_id": "builder-2",
+      "campaign_id": "campaign-build",
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "review_required",
+      "parent_session_id": null,
+      "selected_skill": "BUILD CAMPAIGN PLAN",
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "ok": {
+      "session_id": "chat-1",
+      "campaign_id": null,
+      "role": "builder",
+      "provider_id": "synthetic.provider",
+      "model_id": "synthetic.provider/model",
+      "status": "review_required",
+      "parent_session_id": null,
+      "selected_skill": null,
+      "scope": [],
+      "reasoning_effort": null,
+      "reasoning_effort_once": null
+     }
+    },
+    {
+     "error": "CommandRejected",
+     "code": "command_rejected",
+     "message": "Builder parent session is not active"
+    },
+    {
+     "ok": {
+      "session": {
+       "session_id": "builder-2",
+       "campaign_id": "campaign-build",
+       "role": "builder",
+       "provider_id": "synthetic.provider",
+       "model_id": "synthetic.provider/model",
+       "status": "review_required",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "messages": [
+       {
+        "session_id": "builder-2",
+        "sequence": 8,
+        "message_id": "b-compact-end",
+        "kind": "evidence",
+        "content": {
+         "attempt_id": "c-1",
+         "kind": "context_compaction_terminal",
+         "status": "completed"
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 9,
+        "message_id": "evidence-1",
+        "kind": "evidence",
+        "content": {
+         "authoritative": false,
+         "child_session_id": "child-1",
+         "claims": [
+          "rules-ready"
+         ],
+         "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+         "evidence_id": "evidence-1",
+         "safe_summary": "Rules drafted."
+        },
+        "canonical_sequence": null
+       },
+       {
+        "session_id": "builder-2",
+        "sequence": 10,
+        "message_id": "review-1",
+        "kind": "human_review",
+        "content": {
+         "contradictions": [],
+         "outcome": "human_review_required",
+         "unsupported_capabilities": [
+          "maps"
+         ]
+        },
+        "canonical_sequence": null
+       }
+      ],
+      "next_before_sequence": 8,
+      "latest_sequence": 10,
+      "latest_user_sequence": 4,
+      "launch_messages": [],
+      "latest_canonical_sequence": null,
+      "act_markers": [],
+      "campaign_ending": null,
+      "campaign_endings": [],
+      "builder_question_messages": [
+       {
+        "session_id": "builder-2",
+        "sequence": 5,
+        "message_id": "b-question",
+        "kind": "evidence",
+        "content": {
+         "kind": "builder_tool_result",
+         "q": 2,
+         "tool_name": "ask_question"
+        },
+        "canonical_sequence": null
+       }
+      ]
+     }
+    }
+   ]
+  }
+ }
+}

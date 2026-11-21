@@ -7,25 +7,32 @@
 //! receipt helpers it uses (`_campaign_operation_hit`, `_insert_campaign_operation`, the
 //! continuity branch of `_campaign_operation_result`).
 //!
-//! Still to come, with sessions part 2: `read_act_markers`, `read_campaign_ending(s)` and
-//! `seed_initial_state`. They read accepted Campaign Plans, and the last two use lane 1's pending
-//! `domain/campaign_ending.py` and `domain/no_ruleset_plan.py`.
+//! Sessions part 2 adds what reads accepted Campaign Plans: `read_act_markers` (with
+//! `_act_marker_anchor`), `read_campaign_ending(s)`, `seed_initial_state` (with
+//! `_initial_entry_id`) and the seeding step of `apply_migration`, on lane 1's
+//! `campaign_ending` and `no_ruleset_plan`.
 
 use crate::actions::{dump, load_payload, rejected};
 use crate::campaigns::{named_rows, Named};
 use crate::error::{schema_identity, value_error, StoreError, StoreResult};
 use crate::pytext::{py_int, py_str};
+use crate::sequel::{adventure_rows, bind_json, json_loads, PlanRow};
 use crate::store::AuthorityStore;
 use rusqlite::types::Value;
 use rusqlite::{params, Connection, OptionalExtension};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
     canonical_payload_is_safe, owned_payload, validate_authority_identity, CampaignContinuityCommand,
     CampaignContinuityReceipt, CampaignContinuityRecord, CampaignContinuityView, LifecycleState, WriterRole,
 };
+use sylvia_domain::campaign_ending::{
+    ending_progress_id, intended_endings, required_ending_items, required_story_items, resolved_progress,
+};
+use sylvia_domain::no_ruleset_plan::{is_no_ruleset_plan, no_ruleset_world_records};
 use sylvia_domain::package_library::canonical_json_bytes;
+use sylvia_domain::pyops::{py_eq, py_get_attr, py_item, py_iter, py_type_name};
 use sylvia_domain::session::SessionStatus;
 
 /// `_load_mapping`: plain `json.loads`, `None` for anything that is not a JSON object.
@@ -605,4 +612,447 @@ fn first_row(
 ) -> StoreResult<Option<(Vec<String>, Vec<Value>)>> {
     let (columns, mut rows) = named_rows(connection, query, &[&key])?;
     Ok(if rows.is_empty() { None } else { Some((columns, rows.swap_remove(0))) })
+}
+
+// ---- Plan-derived continuity: chapter markers, endings and the accepted initial state ----
+
+/// `len(value)`, with Python's `TypeError` for a value that has no length.
+fn py_len(value: &Json) -> StoreResult<i64> {
+    let length = match value {
+        Json::Array(items) => items.len(),
+        Json::String(text) => sylvia_base::pystr::len(text),
+        Json::Object(map) => map.len(),
+        other => {
+            return Err(StoreError::Other(format!("object of type '{}' has no len()", py_type_name(other))))
+        }
+    };
+    i64::try_from(length)
+        .map_err(|_| StoreError::Other("cannot fit 'int' into an index-sized integer".into()))
+}
+
+/// `json.loads(row['content_json']).get('campaign_plan', {}).get('structure', ())`.
+fn plan_structure(row: &PlanRow) -> StoreResult<Json> {
+    let content = row.content()?;
+    let empty = Json::Object(JsonMap::new());
+    let plan = py_get_attr(&content, "campaign_plan")?.unwrap_or(&empty);
+    Ok(py_get_attr(plan, "structure")?.cloned().unwrap_or_else(|| Json::Array(Vec::new())))
+}
+
+/// The text of a SQLite value, the only kind that can equal a `str` key in Python.
+fn text_of(value: &Value) -> Option<&str> {
+    match value {
+        Value::Text(text) => Some(text),
+        _ => None,
+    }
+}
+
+/// A SQLite result value as the JSON value Python's `sqlite3` gives it.
+fn sql_json(value: &Value) -> StoreResult<Json> {
+    Ok(match value {
+        Value::Null => Json::Null,
+        Value::Integer(number) => Json::from(*number),
+        Value::Real(number) => Json::from(*number),
+        Value::Text(text) => Json::String(text.clone()),
+        Value::Blob(_) => {
+            return Err(StoreError::Other("Safe payload values must be JSON compatible".into()))
+        }
+    })
+}
+
+/// `_act_marker_anchor`: the saved narration after a committed response basis, if any.
+fn act_marker_anchor(
+    connection: &Connection,
+    session_id: &str,
+    basis_json: &str,
+) -> StoreResult<Option<String>> {
+    let basis: Value = connection.query_row(
+        "SELECT MAX(sequence) FROM agent_session_messages WHERE session_id = ? \
+         AND message_id IN (SELECT value FROM json_each(?))",
+        params![session_id, basis_json],
+        |row| row.get(0),
+    )?;
+    if basis == Value::Null {
+        return Ok(None);
+    }
+    let next_input: Value = connection.query_row(
+        "SELECT MIN(sequence) FROM agent_session_messages WHERE session_id = ? \
+         AND sequence > ? AND (kind = 'user' OR json_extract(content_json, '$.kind') \
+         IN ('campaign_start', 'player_action_response'))",
+        params![session_id, &basis],
+        |row| row.get(0),
+    )?;
+    let anchor: Option<Value> = connection
+        .query_row(
+            "SELECT message_id FROM agent_session_messages WHERE session_id = ? \
+             AND sequence >= ? AND (? IS NULL OR sequence < ?) \
+             AND kind = 'canonical_reference' \
+             AND json_extract(content_json, '$.event_type') = 'talk' \
+             ORDER BY sequence DESC LIMIT 1",
+            params![session_id, &basis, &next_input, &next_input],
+            |row| row.get(0),
+        )
+        .optional()?;
+    Ok(anchor.map(|value| py_str(&value)))
+}
+
+/// `read_act_markers`: saved chapter boundaries as ordinals, never private Plan titles or
+/// summaries. Completion needs an explicit resolved act; beginning needs a saved scene in it.
+pub fn read_act_markers(
+    connection: &Connection,
+    session_id: &str,
+    campaign_id: &str,
+) -> StoreResult<Vec<JsonMap>> {
+    let mut structure = Vec::new();
+    for row in adventure_rows(connection, campaign_id)? {
+        structure.extend(py_iter(&plan_structure(&row)?)?);
+    }
+    // A dict comprehension: a repeated act id keeps its last ordinal.
+    let mut ordinals: HashMap<String, i64> = HashMap::new();
+    for (index, act) in structure.iter().enumerate() {
+        if let Json::Object(map) = act {
+            if let Some(Json::String(id)) = map.get("id") {
+                let ordinal = i64::try_from(index).ok().and_then(|index| index.checked_add(1));
+                ordinals.insert(
+                    id.clone(),
+                    ordinal.ok_or_else(|| StoreError::Other("act ordinal overflow".into()))?,
+                );
+            }
+        }
+    }
+    if ordinals.is_empty() {
+        return Ok(Vec::new());
+    }
+    let (columns, rows) = named_rows(
+        connection,
+        "SELECT kind, record_id, operation_id, basis_message_ids_json, \
+         json_extract(payload_json, '$.act_id') AS act_id \
+         FROM campaign_continuity_records WHERE campaign_id = ? AND status = 'active' \
+         AND (kind = 'scene' OR (kind = 'plan_progress' \
+         AND json_extract(payload_json, '$.status') = 'resolved')) ORDER BY sequence",
+        &[&campaign_id],
+    )?;
+    let mut begun: HashSet<String> = HashSet::new();
+    let mut completed: HashSet<String> = HashSet::new();
+    let mut anchors: HashMap<String, Option<String>> = HashMap::new();
+    let mut markers = Vec::new();
+    for values in rows {
+        let row = Named { columns: &columns, values };
+        let is_scene = text_of(row.get("kind")?) == Some("scene");
+        let act_id = row.get(if is_scene { "act_id" } else { "record_id" })?;
+        let Some(act_id) = text_of(act_id).map(str::to_owned) else { continue };
+        let Some(&ordinal) = ordinals.get(&act_id) else { continue };
+        let seen = if is_scene { &mut begun } else { &mut completed };
+        if seen.contains(&act_id) {
+            continue;
+        }
+        // The initial seeded scene establishes the first act without an announcement.
+        if row.get("operation_id")? == &Value::Null {
+            if is_scene {
+                seen.insert(act_id);
+            }
+            continue;
+        }
+        let basis_json = py_str(row.get("basis_message_ids_json")?);
+        if !anchors.contains_key(&basis_json) {
+            let anchor = act_marker_anchor(connection, session_id, &basis_json)?;
+            anchors.insert(basis_json.clone(), anchor);
+        }
+        let Some(anchor) = anchors[&basis_json].clone() else { continue };
+        seen.insert(act_id);
+        let status = if is_scene { "begins" } else { "complete" };
+        let mut marker = JsonMap::new();
+        marker.insert("marker_id".into(), format!("act-{ordinal}-{status}").into());
+        marker.insert("after_message_id".into(), anchor.into());
+        marker.insert("act_number".into(), ordinal.into());
+        marker.insert("status".into(), status.into());
+        markers.push(marker);
+    }
+    Ok(markers)
+}
+
+/// `read_campaign_ending` for one adventure (`plan_row`, `act_offset`): the earned ending and
+/// the player's choice, without private ending prose.
+fn campaign_ending(
+    connection: &Connection,
+    session_id: &str,
+    campaign_id: &str,
+    plan_row: &PlanRow,
+    act_offset: i64,
+) -> StoreResult<Option<JsonMap>> {
+    let content = plan_row.content()?;
+    let Some(Json::Object(plan)) = py_get_attr(&content, "campaign_plan")? else { return Ok(None) };
+    let plan_json = Json::Object(plan.clone());
+    // A dict comprehension: a repeated progress id keeps its first position and last ending.
+    let mut endings: Vec<(String, JsonMap)> = Vec::new();
+    for item in intended_endings(plan) {
+        let key = ending_progress_id(item)?;
+        match endings.iter_mut().find(|(existing, _)| *existing == key) {
+            Some(entry) => entry.1 = item.clone(),
+            None => endings.push((key, item.clone())),
+        }
+    }
+    if endings.is_empty() {
+        return Ok(None);
+    }
+    let (columns, rows) = named_rows(
+        connection,
+        "SELECT record_id, payload_json, basis_message_ids_json FROM campaign_continuity_records \
+         WHERE campaign_id = ? AND kind = 'plan_progress' AND status = 'active' ORDER BY sequence",
+        &[&campaign_id],
+    )?;
+    let rows: Vec<Named<'_>> = rows.into_iter().map(|values| Named { columns: &columns, values }).collect();
+    let progress = rows
+        .iter()
+        .map(|row| json_loads(&py_str(row.get("payload_json")?)))
+        .collect::<StoreResult<Vec<_>>>()?;
+    let resolved = resolved_progress(progress.iter())?;
+    let ending_of = |id: &str| endings.iter().find(|(key, _)| key == id).map(|(_, ending)| ending);
+    let mut reached = None;
+    for row in rows.iter().rev() {
+        if let Some(id) = text_of(row.get("record_id")?) {
+            if ending_of(id).is_some() && resolved.contains(id) {
+                reached = Some(id.to_owned());
+                break;
+            }
+        }
+    }
+    let Some(reached) = reached else { return Ok(None) };
+    let ending = ending_of(&reached).cloned().expect("the reached ending is declared");
+    if !required_ending_items(plan, &ending)?.is_subset(&resolved) {
+        return Ok(None);
+    }
+    let mut first = None;
+    for row in &rows {
+        if text_of(row.get("record_id")?) == Some(reached.as_str()) {
+            let payload = json_loads(&py_str(row.get("payload_json")?))?;
+            if py_get_attr(&payload, "status")?.is_some_and(|status| py_eq(status, &Json::from("resolved"))) {
+                first = Some(row);
+                break;
+            }
+        }
+    }
+    // `next()` over an exhausted generator raises a bare `StopIteration`.
+    let Some(first) = first else { return Err(StoreError::Other(String::new())) };
+    let Some(anchor) =
+        act_marker_anchor(connection, session_id, &py_str(first.get("basis_message_ids_json")?))?
+    else {
+        return Ok(None);
+    };
+    let ending_json = Json::Object(ending);
+    let ending_id = py_item(&ending_json, "id")?.clone();
+    let choice: Option<Value> = connection
+        .query_row(
+            "SELECT json_extract(content_json, '$.campaign_ending_choice.choice') \
+             FROM agent_session_messages WHERE session_id = ? AND kind = 'user' \
+             AND json_extract(content_json, '$.campaign_ending_choice.ending_id') = ? \
+             ORDER BY sequence DESC LIMIT 1",
+            params![session_id, bind_json(&ending_id)?],
+            |row| row.get(0),
+        )
+        .optional()?;
+    let act_number = if required_story_items(plan)?.is_subset(&resolved) {
+        let length = py_len(py_item(&plan_json, "structure")?)?;
+        Json::from(
+            act_offset.checked_add(length).ok_or_else(|| StoreError::Other("act number overflow".into()))?,
+        )
+    } else {
+        Json::Null
+    };
+    let mut result = JsonMap::new();
+    result.insert("ending_id".into(), ending_id);
+    result.insert("after_message_id".into(), anchor.into());
+    result.insert("act_number".into(), act_number);
+    result.insert("plan_title".into(), py_item(&plan_json, "title")?.clone());
+    result.insert("open_world".into(), py_item(&ending_json, "open_world")?.clone());
+    result.insert("has_after_story".into(), Json::Bool(!py_item(&ending_json, "after_story")?.is_null()));
+    result.insert(
+        "choice".into(),
+        match choice {
+            Some(value) => sql_json(&value)?,
+            None => Json::Null,
+        },
+    );
+    Ok(Some(owned_payload(&Json::Object(result))?))
+}
+
+/// `read_campaign_ending`: the current adventure's ending, its acts numbered after the earlier
+/// adventures'.
+pub fn read_campaign_ending(
+    connection: &Connection,
+    session_id: &str,
+    campaign_id: &str,
+) -> StoreResult<Option<JsonMap>> {
+    let adventures = adventure_rows(connection, campaign_id)?;
+    let Some((current, earlier)) = adventures.split_last() else { return Ok(None) };
+    let mut offset: i64 = 0;
+    for row in earlier {
+        offset = offset
+            .checked_add(py_len(&plan_structure(row)?)?)
+            .ok_or_else(|| StoreError::Other("act offset overflow".into()))?;
+    }
+    campaign_ending(connection, session_id, campaign_id, current, offset)
+}
+
+/// `read_campaign_endings`: earlier adventures' completion cards (marked `historical`) and the
+/// current one's.
+pub fn read_campaign_endings(
+    connection: &Connection,
+    session_id: &str,
+    campaign_id: &str,
+) -> StoreResult<Vec<JsonMap>> {
+    let adventures = adventure_rows(connection, campaign_id)?;
+    let mut result = Vec::new();
+    let mut offset: i64 = 0;
+    for (index, row) in adventures.iter().enumerate() {
+        if let Some(mut ending) = campaign_ending(connection, session_id, campaign_id, row, offset)? {
+            if index + 1 < adventures.len() {
+                ending.insert("historical".into(), Json::Bool(true));
+            }
+            result.push(owned_payload(&Json::Object(ending))?);
+        }
+        offset = offset
+            .checked_add(py_len(&plan_structure(row)?)?)
+            .ok_or_else(|| StoreError::Other("act offset overflow".into()))?;
+    }
+    Ok(result)
+}
+
+/// `_initial_entry_id`.
+fn initial_entry_id(campaign_id: &str, record_id: &str, kind: &str) -> String {
+    let digest = sha256_hex(format!("{campaign_id}\0{kind}\0{record_id}").as_bytes());
+    format!("initial-{}", &digest[..32])
+}
+
+fn append_initial(
+    connection: &Connection,
+    campaign_id: &str,
+    record_id: &str,
+    kind: &str,
+    payload: &JsonMap,
+    admitted_revision: i64,
+) -> StoreResult<()> {
+    append_record(
+        connection,
+        &ContinuityAppend {
+            campaign_id,
+            entry_id: &initial_entry_id(campaign_id, record_id, kind),
+            record_id,
+            kind,
+            status: "active",
+            payload,
+            basis_message_ids: &[],
+            operation_id: None,
+            admitted_revision,
+        },
+    )
+}
+
+/// `seed_initial_state`: materialise the accepted Plan's initial facts without promoting future
+/// preparation. A campaign that already has continuity is left as it is.
+pub fn seed_initial_state(
+    connection: &Connection,
+    campaign_id: &str,
+    plan: &JsonMap,
+    admitted_revision: i64,
+) -> StoreResult<()> {
+    if connection
+        .query_row(
+            "SELECT 1 FROM campaign_continuity_records WHERE campaign_id = ? LIMIT 1",
+            [campaign_id],
+            |_| Ok(()),
+        )
+        .optional()?
+        .is_some()
+    {
+        return Ok(());
+    }
+    let mut first_act_id = Json::Null;
+    if let Some(Json::Array(items)) = plan.get("structure") {
+        if let Some(Json::Object(first)) = items.iter().find(|item| item.is_object()) {
+            if let Some(Json::String(id)) = first.get("id") {
+                first_act_id = Json::String(id.clone());
+            }
+        }
+    }
+    if let Some(Json::Object(start)) = plan.get("starting_location") {
+        let mut payload = JsonMap::new();
+        payload.insert("act_id".into(), first_act_id);
+        payload.insert("location_id".into(), start.get("id").cloned().unwrap_or(Json::Null));
+        payload.insert("starting_location".into(), Json::Object(start.clone()));
+        payload.insert("summary".into(), Json::Null);
+        payload.insert("origin".into(), "accepted_initial_state".into());
+        append_initial(connection, campaign_id, "current_scene", "scene", &payload, admitted_revision)?;
+    }
+    if is_no_ruleset_plan(plan) {
+        for (record_id, payload) in no_ruleset_world_records(plan)? {
+            append_initial(connection, campaign_id, &record_id, "entity", &payload, admitted_revision)?;
+        }
+    }
+    let facts = match plan.get("initial_state") {
+        Some(Json::Object(state)) => state.get("facts"),
+        _ => None,
+    };
+    let Some(Json::Array(facts)) = facts else { return Ok(()) };
+    for (index, raw) in facts.iter().enumerate() {
+        let fallback = || format!("initial-fact-{index}");
+        let (text, known_by, record_id) = match raw {
+            Json::String(text) => (text.clone(), vec!["player".to_owned()], fallback()),
+            Json::Object(fact) => match fact.get("fact") {
+                Some(Json::String(text)) => {
+                    let known_by = match fact.get("known_by") {
+                        Some(Json::Array(items)) => {
+                            items.iter().filter_map(|item| item.as_str().map(str::to_owned)).collect()
+                        }
+                        _ => Vec::new(),
+                    };
+                    let record_id = match fact.get("id") {
+                        Some(Json::String(id)) => id.clone(),
+                        _ => fallback(),
+                    };
+                    (text.clone(), known_by, record_id)
+                }
+                _ => continue,
+            },
+            _ => continue,
+        };
+        let visibility =
+            if known_by.iter().any(|item| item == "player") { "player_known" } else { "gm_private" };
+        let mut payload = JsonMap::new();
+        payload.insert("category".into(), "continuity".into());
+        payload.insert("text".into(), text.into());
+        payload.insert("visibility".into(), visibility.into());
+        payload.insert("known_by".into(), Json::Array(known_by.into_iter().map(Json::String).collect()));
+        payload.insert("subjects".into(), Json::Array(Vec::new()));
+        payload.insert("origin".into(), "accepted_initial_state".into());
+        append_initial(connection, campaign_id, &record_id, "fact", &payload, admitted_revision)?;
+    }
+    Ok(())
+}
+
+/// The seeding step of `apply_migration`: each campaign's latest accepted Plan, if its content
+/// holds a structured `campaign_plan`.
+pub(crate) fn seed_accepted_plans(connection: &Connection) -> StoreResult<()> {
+    let (columns, rows) = named_rows(
+        connection,
+        "SELECT plan.campaign_id, plan.content_json, plan.resulting_campaign_revision \
+         FROM campaign_plans AS plan JOIN (\
+         SELECT campaign_id, MAX(plan_revision) AS plan_revision FROM campaign_plans \
+         WHERE acceptance_status = 'accepted' GROUP BY campaign_id\
+         ) AS accepted ON accepted.campaign_id = plan.campaign_id \
+         AND accepted.plan_revision = plan.plan_revision ORDER BY plan.campaign_id",
+        &[],
+    )?;
+    for values in rows {
+        let row = Named { columns: &columns, values };
+        let Some(content) = load_mapping(&py_str(row.get("content_json")?)) else { continue };
+        if let Some(Json::Object(plan)) = content.get("campaign_plan") {
+            seed_initial_state(
+                connection,
+                &row.text("campaign_id")?,
+                plan,
+                row.int("resulting_campaign_revision")?,
+            )?;
+        }
+    }
+    Ok(())
 }

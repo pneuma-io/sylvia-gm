@@ -1,0 +1,3473 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "name": "story",
+   "base": "story",
+   "sql": [],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    },
+    {
+     "fn": "adventure_rows",
+     "campaign_id": "campaign-build"
+    },
+    {
+     "fn": "adventure_rows",
+     "campaign_id": "campaign-missing"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "ok": {
+      "ending_id": "end-quiet",
+      "after_message_id": "canonical-2",
+      "act_number": 2,
+      "plan_title": "The Drowned Bell",
+      "open_world": false,
+      "has_after_story": false,
+      "choice": "epilogue"
+     }
+    },
+    {
+     "ok": [
+      {
+       "ending_id": "end-quiet",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
+       "open_world": false,
+       "has_after_story": false,
+       "choice": "epilogue"
+      }
+     ]
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": []
+    }
+   ]
+  },
+  {
+   "name": "sequel",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":\"The sea keeps its bell.\",\"id\":\"end-open\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":[{\"id\":\"act-3\"},{\"id\":\"act-4\"}],\"title\":\"The Second Tide\"},\"sequel\":{\"previous_plan_id\":\"plan-1\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO agent_session_messages VALUES ('dm-1', 8, 'u-4', 'user', '{\"text\":\"I follow the second tide.\"}', NULL)",
+    "INSERT INTO agent_session_messages VALUES ('dm-1', 9, 'canonical-99', 'canonical_reference', '{\"event_type\":\"talk\",\"safe_payload\":{\"text\":\"On.\"},\"visibility\":\"player\"}', 99)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 20, 'entry-20', 'current_scene', 'scene', 'active', '{\"act_id\":\"act-3\"}', '[\"u-4\"]', 'op-6', 50)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 21, 'entry-21', 'ending:end-open', 'plan_progress', 'active', '{\"plan_item_id\":\"ending:end-open\",\"status\":\"resolved\"}', '[\"u-4\"]', 'op-7', 50)"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-3-begins",
+       "after_message_id": "canonical-99",
+       "act_number": 3,
+       "status": "begins"
+      }
+     ]
+    },
+    {
+     "ok": {
+      "ending_id": "end-open",
+      "after_message_id": "canonical-99",
+      "act_number": null,
+      "plan_title": "The Second Tide",
+      "open_world": true,
+      "has_after_story": true,
+      "choice": null
+     }
+    },
+    {
+     "ok": [
+      {
+       "ending_id": "end-quiet",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
+       "open_world": false,
+       "has_after_story": false,
+       "choice": "epilogue",
+       "historical": true
+      },
+      {
+       "ending_id": "end-open",
+       "after_message_id": "canonical-99",
+       "act_number": null,
+       "plan_title": "The Second Tide",
+       "open_world": true,
+       "has_after_story": true,
+       "choice": null
+      }
+     ]
+    },
+    {
+     "ok": [
+      "plan-1",
+      "plan-2"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "sequel_choice",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":\"The sea keeps its bell.\",\"id\":\"end-open\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":[{\"id\":\"act-3\"},{\"id\":\"act-4\"}],\"title\":\"The Second Tide\"},\"sequel\":{\"previous_plan_id\":\"plan-1\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO agent_session_messages VALUES ('dm-1', 8, 'u-4', 'user', '{\"text\":\"I follow the second tide.\"}', NULL)",
+    "INSERT INTO agent_session_messages VALUES ('dm-1', 9, 'canonical-99', 'canonical_reference', '{\"event_type\":\"talk\",\"safe_payload\":{\"text\":\"On.\"},\"visibility\":\"player\"}', 99)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 20, 'entry-20', 'current_scene', 'scene', 'active', '{\"act_id\":\"act-3\"}', '[\"u-4\"]', 'op-6', 50)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 21, 'entry-21', 'ending:end-open', 'plan_progress', 'active', '{\"plan_item_id\":\"ending:end-open\",\"status\":\"resolved\"}', '[\"u-4\"]', 'op-7', 50)",
+    "INSERT INTO agent_session_messages VALUES ('dm-1', 10, 'u-5', 'user', '{\"campaign_ending_choice\":{\"choice\":3,\"ending_id\":\"end-open\"}}', NULL)"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-3-begins",
+       "after_message_id": "canonical-99",
+       "act_number": 3,
+       "status": "begins"
+      }
+     ]
+    },
+    {
+     "ok": {
+      "ending_id": "end-open",
+      "after_message_id": "canonical-99",
+      "act_number": null,
+      "plan_title": "The Second Tide",
+      "open_world": true,
+      "has_after_story": true,
+      "choice": 3
+     }
+    },
+    {
+     "ok": [
+      {
+       "ending_id": "end-quiet",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
+       "open_world": false,
+       "has_after_story": false,
+       "choice": "epilogue",
+       "historical": true
+      },
+      {
+       "ending_id": "end-open",
+       "after_message_id": "canonical-99",
+       "act_number": null,
+       "plan_title": "The Second Tide",
+       "open_world": true,
+       "has_after_story": true,
+       "choice": 3
+      }
+     ]
+    },
+    {
+     "ok": [
+      "plan-1",
+      "plan-2"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lineage_self",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{},\"sequel\":{\"previous_plan_id\":\"plan-2\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "ValueError",
+     "message": "Campaign adventure predecessor is unavailable"
+    },
+    {
+     "error": "ValueError",
+     "message": "Campaign adventure predecessor is unavailable"
+    },
+    {
+     "error": "ValueError",
+     "message": "Campaign adventure predecessor is unavailable"
+    },
+    {
+     "error": "ValueError",
+     "message": "Campaign adventure predecessor is unavailable"
+    }
+   ]
+  },
+  {
+   "name": "lineage_reordered",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{},\"sequel\":{\"previous_plan_id\":\"plan-2\"}}' WHERE plan_id = 'plan-1'",
+    "UPDATE campaign_plans SET plan_revision = 3 WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      "plan-2",
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lineage_missing_key",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{},\"sequel\":{}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')"
+   ],
+   "calls": [
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "KeyError",
+     "message": "'previous_plan_id'"
+    }
+   ]
+  },
+  {
+   "name": "lineage_list_identity",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{},\"sequel\":{\"previous_plan_id\":[\"plan-1\"]}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')"
+   ],
+   "calls": [
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "ProgrammingError",
+     "message": "Error binding parameter 1: type 'list' is not supported"
+    }
+   ]
+  },
+  {
+   "name": "lineage_number_identity",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{},\"sequel\":{\"previous_plan_id\":1}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')"
+   ],
+   "calls": [
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "ValueError",
+     "message": "Campaign adventure predecessor is unavailable"
+    }
+   ]
+  },
+  {
+   "name": "lineage_at_bound",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x2\"}]},\"sequel\":{\"previous_plan_id\":\"plan-1\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-3', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x3\"}]},\"sequel\":{\"previous_plan_id\":\"plan-2\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 3, 103, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-4', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x4\"}]},\"sequel\":{\"previous_plan_id\":\"plan-3\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 4, 104, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-5', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x5\"}]},\"sequel\":{\"previous_plan_id\":\"plan-4\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 5, 105, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-6', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x6\"}]},\"sequel\":{\"previous_plan_id\":\"plan-5\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 6, 106, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-7', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x7\"}]},\"sequel\":{\"previous_plan_id\":\"plan-6\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 7, 107, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-8', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x8\"}]},\"sequel\":{\"previous_plan_id\":\"plan-7\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 8, 108, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-9', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x9\"}]},\"sequel\":{\"previous_plan_id\":\"plan-8\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 9, 109, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-10', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x10\"}]},\"sequel\":{\"previous_plan_id\":\"plan-9\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 10, 110, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-11', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x11\"}]},\"sequel\":{\"previous_plan_id\":\"plan-10\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 11, 111, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-12', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x12\"}]},\"sequel\":{\"previous_plan_id\":\"plan-11\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 12, 112, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-13', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x13\"}]},\"sequel\":{\"previous_plan_id\":\"plan-12\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 13, 113, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-14', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x14\"}]},\"sequel\":{\"previous_plan_id\":\"plan-13\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 14, 114, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-15', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x15\"}]},\"sequel\":{\"previous_plan_id\":\"plan-14\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 15, 115, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-16', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x16\"}]},\"sequel\":{\"previous_plan_id\":\"plan-15\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 16, 116, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-17', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x17\"}]},\"sequel\":{\"previous_plan_id\":\"plan-16\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 17, 117, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-18', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x18\"}]},\"sequel\":{\"previous_plan_id\":\"plan-17\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 18, 118, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-19', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x19\"}]},\"sequel\":{\"previous_plan_id\":\"plan-18\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 19, 119, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-20', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x20\"}]},\"sequel\":{\"previous_plan_id\":\"plan-19\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 20, 120, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-21', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x21\"}]},\"sequel\":{\"previous_plan_id\":\"plan-20\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 21, 121, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-22', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x22\"}]},\"sequel\":{\"previous_plan_id\":\"plan-21\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 22, 122, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-23', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x23\"}]},\"sequel\":{\"previous_plan_id\":\"plan-22\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 23, 123, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-24', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x24\"}]},\"sequel\":{\"previous_plan_id\":\"plan-23\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 24, 124, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-25', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x25\"}]},\"sequel\":{\"previous_plan_id\":\"plan-24\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 25, 125, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-26', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x26\"}]},\"sequel\":{\"previous_plan_id\":\"plan-25\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 26, 126, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-27', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x27\"}]},\"sequel\":{\"previous_plan_id\":\"plan-26\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 27, 127, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-28', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x28\"}]},\"sequel\":{\"previous_plan_id\":\"plan-27\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 28, 128, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-29', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x29\"}]},\"sequel\":{\"previous_plan_id\":\"plan-28\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 29, 129, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-30', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x30\"}]},\"sequel\":{\"previous_plan_id\":\"plan-29\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 30, 130, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-31', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x31\"}]},\"sequel\":{\"previous_plan_id\":\"plan-30\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 31, 131, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-32', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x32\"}]},\"sequel\":{\"previous_plan_id\":\"plan-31\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 32, 132, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": [
+      {
+       "ending_id": "end-quiet",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
+       "open_world": false,
+       "has_after_story": false,
+       "choice": "epilogue",
+       "historical": true
+      }
+     ]
+    },
+    {
+     "ok": [
+      "plan-1",
+      "plan-2",
+      "plan-3",
+      "plan-4",
+      "plan-5",
+      "plan-6",
+      "plan-7",
+      "plan-8",
+      "plan-9",
+      "plan-10",
+      "plan-11",
+      "plan-12",
+      "plan-13",
+      "plan-14",
+      "plan-15",
+      "plan-16",
+      "plan-17",
+      "plan-18",
+      "plan-19",
+      "plan-20",
+      "plan-21",
+      "plan-22",
+      "plan-23",
+      "plan-24",
+      "plan-25",
+      "plan-26",
+      "plan-27",
+      "plan-28",
+      "plan-29",
+      "plan-30",
+      "plan-31",
+      "plan-32"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lineage_over_bound",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('plan-2', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x2\"}]},\"sequel\":{\"previous_plan_id\":\"plan-1\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 2, 102, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-3', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x3\"}]},\"sequel\":{\"previous_plan_id\":\"plan-2\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 3, 103, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-4', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x4\"}]},\"sequel\":{\"previous_plan_id\":\"plan-3\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 4, 104, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-5', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x5\"}]},\"sequel\":{\"previous_plan_id\":\"plan-4\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 5, 105, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-6', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x6\"}]},\"sequel\":{\"previous_plan_id\":\"plan-5\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 6, 106, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-7', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x7\"}]},\"sequel\":{\"previous_plan_id\":\"plan-6\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 7, 107, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-8', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x8\"}]},\"sequel\":{\"previous_plan_id\":\"plan-7\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 8, 108, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-9', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x9\"}]},\"sequel\":{\"previous_plan_id\":\"plan-8\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 9, 109, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-10', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x10\"}]},\"sequel\":{\"previous_plan_id\":\"plan-9\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 10, 110, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-11', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x11\"}]},\"sequel\":{\"previous_plan_id\":\"plan-10\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 11, 111, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-12', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x12\"}]},\"sequel\":{\"previous_plan_id\":\"plan-11\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 12, 112, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-13', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x13\"}]},\"sequel\":{\"previous_plan_id\":\"plan-12\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 13, 113, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-14', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x14\"}]},\"sequel\":{\"previous_plan_id\":\"plan-13\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 14, 114, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-15', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x15\"}]},\"sequel\":{\"previous_plan_id\":\"plan-14\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 15, 115, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-16', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x16\"}]},\"sequel\":{\"previous_plan_id\":\"plan-15\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 16, 116, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-17', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x17\"}]},\"sequel\":{\"previous_plan_id\":\"plan-16\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 17, 117, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-18', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x18\"}]},\"sequel\":{\"previous_plan_id\":\"plan-17\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 18, 118, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-19', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x19\"}]},\"sequel\":{\"previous_plan_id\":\"plan-18\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 19, 119, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-20', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x20\"}]},\"sequel\":{\"previous_plan_id\":\"plan-19\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 20, 120, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-21', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x21\"}]},\"sequel\":{\"previous_plan_id\":\"plan-20\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 21, 121, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-22', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x22\"}]},\"sequel\":{\"previous_plan_id\":\"plan-21\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 22, 122, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-23', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x23\"}]},\"sequel\":{\"previous_plan_id\":\"plan-22\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 23, 123, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-24', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x24\"}]},\"sequel\":{\"previous_plan_id\":\"plan-23\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 24, 124, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-25', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x25\"}]},\"sequel\":{\"previous_plan_id\":\"plan-24\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 25, 125, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-26', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x26\"}]},\"sequel\":{\"previous_plan_id\":\"plan-25\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 26, 126, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-27', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x27\"}]},\"sequel\":{\"previous_plan_id\":\"plan-26\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 27, 127, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-28', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x28\"}]},\"sequel\":{\"previous_plan_id\":\"plan-27\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 28, 128, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-29', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x29\"}]},\"sequel\":{\"previous_plan_id\":\"plan-28\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 29, 129, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-30', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x30\"}]},\"sequel\":{\"previous_plan_id\":\"plan-29\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 30, 130, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-31', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x31\"}]},\"sequel\":{\"previous_plan_id\":\"plan-30\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 31, 131, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-32', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x32\"}]},\"sequel\":{\"previous_plan_id\":\"plan-31\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 32, 132, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')",
+    "INSERT INTO campaign_plans VALUES ('plan-33', 'campaign-story', (SELECT package_lock_id FROM campaign_plans WHERE plan_id = 'plan-1'), 'builder-1', 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', '{\"campaign_plan\":{\"structure\":[{\"id\":\"act-x33\"}]},\"sequel\":{\"previous_plan_id\":\"plan-32\"}}', '[\"ev-plan\"]', 'valid', 'accepted', 33, 133, 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd')"
+   ],
+   "calls": [
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "ValueError",
+     "message": "Campaign adventure lineage is invalid or exceeds its bound"
+    }
+   ]
+  },
+  {
+   "name": "content_not_object",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '[1,2]' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "AttributeError",
+     "message": "'list' object has no attribute 'get'"
+    },
+    {
+     "error": "AttributeError",
+     "message": "'list' object has no attribute 'get'"
+    },
+    {
+     "error": "AttributeError",
+     "message": "'list' object has no attribute 'get'"
+    },
+    {
+     "error": "AttributeError",
+     "message": "'list' object has no attribute 'get'"
+    }
+   ]
+  },
+  {
+   "name": "content_invalid_json",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\": ' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "JSONDecodeError",
+     "message": "Expecting value: line 1 column 19 (char 18)"
+    },
+    {
+     "error": "JSONDecodeError",
+     "message": "Expecting value: line 1 column 19 (char 18)"
+    },
+    {
+     "error": "JSONDecodeError",
+     "message": "Expecting value: line 1 column 19 (char 18)"
+    },
+    {
+     "error": "JSONDecodeError",
+     "message": "Expecting value: line 1 column 19 (char 18)"
+    }
+   ]
+  },
+  {
+   "name": "plan_not_object",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":\"a story\"}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "AttributeError",
+     "message": "'str' object has no attribute 'get'"
+    },
+    {
+     "ok": null
+    },
+    {
+     "error": "AttributeError",
+     "message": "'str' object has no attribute 'get'"
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "structure_string",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"id\":\"end-quiet\",\"open_world\":false,\"requires_all_acts\":true},{\"after_story\":\"The town remembers.\",\"id\":\"end-loud\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":\"act\",\"title\":\"The Drowned Bell\"}}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": []
+    },
+    {
+     "ok": {
+      "ending_id": "end-quiet",
+      "after_message_id": "canonical-2",
+      "act_number": 3,
+      "plan_title": "The Drowned Bell",
+      "open_world": false,
+      "has_after_story": false,
+      "choice": "epilogue"
+     }
+    },
+    {
+     "ok": [
+      {
+       "ending_id": "end-quiet",
+       "after_message_id": "canonical-2",
+       "act_number": 3,
+       "plan_title": "The Drowned Bell",
+       "open_world": false,
+       "has_after_story": false,
+       "choice": "epilogue"
+      }
+     ]
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "structure_object",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"id\":\"end-quiet\",\"open_world\":false,\"requires_all_acts\":true},{\"after_story\":\"The town remembers.\",\"id\":\"end-loud\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":{\"act-1\":1,\"act-2\":2},\"title\":\"The Drowned Bell\"}}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": []
+    },
+    {
+     "ok": {
+      "ending_id": "end-quiet",
+      "after_message_id": "canonical-2",
+      "act_number": 2,
+      "plan_title": "The Drowned Bell",
+      "open_world": false,
+      "has_after_story": false,
+      "choice": "epilogue"
+     }
+    },
+    {
+     "ok": [
+      {
+       "ending_id": "end-quiet",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
+       "open_world": false,
+       "has_after_story": false,
+       "choice": "epilogue"
+      }
+     ]
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "structure_number",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"id\":\"end-quiet\",\"open_world\":false,\"requires_all_acts\":true},{\"after_story\":\"The town remembers.\",\"id\":\"end-loud\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":5,\"title\":\"The Drowned Bell\"}}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "TypeError",
+     "message": "'int' object is not iterable"
+    },
+    {
+     "error": "TypeError",
+     "message": "object of type 'int' has no len()"
+    },
+    {
+     "error": "TypeError",
+     "message": "object of type 'int' has no len()"
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "structure_duplicates",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"id\":\"end-quiet\",\"open_world\":false,\"requires_all_acts\":true},{\"after_story\":\"The town remembers.\",\"id\":\"end-loud\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":[{\"id\":\"act-1\"},{\"id\":\"act-1\"},\"x\",{\"id\":\"act-2\"},{\"id\":4}],\"title\":\"The Drowned Bell\"}}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-4-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 4,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-4-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 4,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ending_missing_title",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"id\":\"end-quiet\",\"open_world\":false,\"requires_all_acts\":true},{\"after_story\":\"The town remembers.\",\"id\":\"end-loud\",\"open_world\":true,\"requires_all_acts\":false}]},\"structure\":[{\"id\":\"act-1\",\"objectives\":[\"obj-1\"]},{\"id\":\"act-2\"}]}}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "error": "KeyError",
+     "message": "'title'"
+    },
+    {
+     "error": "KeyError",
+     "message": "'title'"
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ending_ongoing",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_plans SET content_json = '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"ending\":{\"mode\":\"ongoing\"},\"structure\":[{\"id\":\"act-1\",\"objectives\":[\"obj-1\"]},{\"id\":\"act-2\"}],\"title\":\"The Drowned Bell\"}}' WHERE plan_id = 'plan-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ending_no_anchor",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_continuity_records SET basis_message_ids_json = '[\"nope\"]' WHERE record_id = 'ending:end-quiet'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ending_progress_elsewhere",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 30, 'entry-30', 'other', 'plan_progress', 'active', '{\"plan_item_id\":\"ending:end-loud\",\"status\":\"resolved\"}', '[\"u-2\"]', 'op-a', 50)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 31, 'entry-31', 'ending:end-loud', 'plan_progress', 'active', '{\"plan_item_id\":\"zzz\",\"status\":\"open\"}', '[\"u-2\"]', 'op-b', 50)"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "error": "StopIteration",
+     "message": ""
+    },
+    {
+     "error": "StopIteration",
+     "message": ""
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "ending_unmet_requirements",
+   "base": "story",
+   "sql": [
+    "UPDATE campaign_continuity_records SET status = 'retired' WHERE record_id = 'obj-1'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    },
+    {
+     "fn": "read_campaign_ending"
+    },
+    {
+     "fn": "read_campaign_endings"
+    },
+    {
+     "fn": "adventure_rows"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    },
+    {
+     "ok": null
+    },
+    {
+     "ok": []
+    },
+    {
+     "ok": [
+      "plan-1"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "markers_odd_rows",
+   "base": "story",
+   "sql": [
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 40, 'entry-40', 'current_scene', 'scene', 'active', '{\"act_id\":2}', '[\"u-2\"]', 'op-c', 50)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 41, 'entry-41', 'act-9', 'plan_progress', 'active', '{\"plan_item_id\":\"act-9\",\"status\":\"resolved\"}', '[\"u-2\"]', 'op-d', 50)",
+    "INSERT INTO campaign_continuity_records VALUES ('campaign-story', 42, 'entry-42', 'current_scene', 'scene', 'active', '{\"act_id\":\"act-2\"}', '[not json', 'op-e', 50)"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      {
+       "marker_id": "act-1-complete",
+       "after_message_id": "canonical-1",
+       "act_number": 1,
+       "status": "complete"
+      },
+      {
+       "marker_id": "act-2-begins",
+       "after_message_id": "canonical-1",
+       "act_number": 2,
+       "status": "begins"
+      },
+      {
+       "marker_id": "act-2-complete",
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "status": "complete"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "markers_bad_basis",
+   "base": "story",
+   "sql": [
+    "DELETE FROM campaign_continuity_records WHERE kind = 'plan_progress'",
+    "UPDATE campaign_continuity_records SET basis_message_ids_json = '[not json' WHERE operation_id = 'op-3'"
+   ],
+   "calls": [
+    {
+     "fn": "read_act_markers"
+    }
+   ],
+   "outcomes": [
+    {
+     "error": "OperationalError",
+     "message": "malformed JSON"
+    }
+   ]
+  },
+  {
+   "name": "seeding",
+   "base": "story",
+   "sql": [],
+   "calls": [
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-full",
+     "plan": {
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "structure": [
+       "note",
+       {
+        "title": "no id"
+       },
+       {
+        "id": "act-1"
+       }
+      ],
+      "starting_location": {
+       "id": "harbour",
+       "name": "The harbour"
+      },
+      "initial_state": {
+       "entities": [
+        {
+         "id": "keeper",
+         "kind": "npc",
+         "source_ref": {
+          "id": "keeper",
+          "path": "entities/keeper"
+         },
+         "state": {
+          "name": "The Keeper",
+          "known_by": [
+           "player"
+          ],
+          "mood": "wary"
+         }
+        }
+       ],
+       "facts": [
+        "The bell rang.",
+        {
+         "fact": "Known two ways.",
+         "known_by": [
+          "player",
+          "gm",
+          3
+         ]
+        },
+        {
+         "fact": "Odd knowledge.",
+         "known_by": "player",
+         "id": 5
+        },
+        {
+         "nofact": 1
+        },
+        4,
+        {
+         "fact": "GM only.",
+         "id": "fact-gm",
+         "known_by": [
+          "gm"
+         ]
+        }
+       ]
+      }
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-full",
+     "plan": {
+      "starting_location": {
+       "id": "elsewhere"
+      }
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-empty",
+     "plan": {},
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-string-structure",
+     "plan": {
+      "structure": "act",
+      "starting_location": {
+       "name": "No id"
+      }
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-facts-string",
+     "plan": {
+      "initial_state": {
+       "facts": "abc"
+      },
+      "starting_location": {}
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-state-list",
+     "plan": {
+      "initial_state": [
+       "facts"
+      ]
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-duplicate-ids",
+     "plan": {
+      "initial_state": {
+       "facts": [
+        {
+         "fact": "a",
+         "id": "same"
+        },
+        {
+         "fact": "b",
+         "id": "same"
+        }
+       ]
+      }
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-entity-no-kind",
+     "plan": {
+      "bindings": {
+       "ruleset": null,
+       "campaign_setting": null
+      },
+      "initial_state": {
+       "entities": [
+        {
+         "id": "x",
+         "state": {
+          "name": "X"
+         }
+        }
+       ],
+       "facts": [
+        "after"
+       ]
+      }
+     },
+     "admitted_revision": 7
+    },
+    {
+     "fn": "seed_initial_state",
+     "campaign_id": "seed-bindings-partial",
+     "plan": {
+      "bindings": {
+       "ruleset": null
+      },
+      "initial_state": {
+       "entities": [
+        {
+         "id": "x",
+         "kind": "npc",
+         "state": {
+          "name": "X"
+         }
+        }
+       ]
+      }
+     },
+     "admitted_revision": 7
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-string-structure",
+       1,
+       "initial-29f7b53e34e871e650894ac684f13e7b",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{\"name\":\"No id\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-facts-string",
+       1,
+       "initial-22901759de5f160473cc98f581dcbc0e",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-string-structure",
+       1,
+       "initial-29f7b53e34e871e650894ac684f13e7b",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{\"name\":\"No id\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-facts-string",
+       1,
+       "initial-22901759de5f160473cc98f581dcbc0e",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-string-structure",
+       1,
+       "initial-29f7b53e34e871e650894ac684f13e7b",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{\"name\":\"No id\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "error": "IntegrityError",
+     "message": "UNIQUE constraint failed: campaign_continuity_records.campaign_id, campaign_continuity_records.entry_id",
+     "records": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-duplicate-ids",
+       1,
+       "initial-962bd19f7e50daccf47e49ca8a01a292",
+       "same",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"a\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-facts-string",
+       1,
+       "initial-22901759de5f160473cc98f581dcbc0e",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-string-structure",
+       1,
+       "initial-29f7b53e34e871e650894ac684f13e7b",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{\"name\":\"No id\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "error": "KeyError",
+     "message": "'kind'",
+     "records": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-duplicate-ids",
+       1,
+       "initial-962bd19f7e50daccf47e49ca8a01a292",
+       "same",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"a\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-facts-string",
+       1,
+       "initial-22901759de5f160473cc98f581dcbc0e",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-string-structure",
+       1,
+       "initial-29f7b53e34e871e650894ac684f13e7b",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{\"name\":\"No id\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    },
+    {
+     "ok": [
+      [
+       "campaign-story",
+       1,
+       "initial-6e52359a4f4dee0513fc265900125b7d",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-1\",\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       2,
+       "initial-098b66dc2506afe212ac36d744e234ae",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       3,
+       "initial-fe95bc3fa5851564f09c2140353655fe",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang at dawn.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       4,
+       "initial-5260e175422685a8bc2e25353d6724d3",
+       "fact-tide",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The tide is wrong.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       5,
+       "initial-76d74a66d6c472c2e7bfa30494617894",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Gulls avoid the tower.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "campaign-story",
+       6,
+       "op-1",
+       "act-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-1",
+       3
+      ],
+      [
+       "campaign-story",
+       7,
+       "op-2",
+       "obj-1",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"obj-1\",\"status\":\"resolved\"}",
+       "[\"u-1\"]",
+       "op-2",
+       4
+      ],
+      [
+       "campaign-story",
+       8,
+       "op-3",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":\"act-2\",\"summary\":\"Below.\"}",
+       "[\"u-1\"]",
+       "op-3",
+       5
+      ],
+      [
+       "campaign-story",
+       9,
+       "op-4",
+       "act-2",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"act-2\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-4",
+       7
+      ],
+      [
+       "campaign-story",
+       10,
+       "op-5",
+       "ending:end-quiet",
+       "plan_progress",
+       "active",
+       "{\"plan_item_id\":\"ending:end-quiet\",\"status\":\"resolved\"}",
+       "[\"u-2\"]",
+       "op-5",
+       8
+      ],
+      [
+       "seed-duplicate-ids",
+       1,
+       "initial-962bd19f7e50daccf47e49ca8a01a292",
+       "same",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"a\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-facts-string",
+       1,
+       "initial-22901759de5f160473cc98f581dcbc0e",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       1,
+       "initial-4fd8c7f23c7c629514acc410496df77f",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       2,
+       "initial-42ba82ea10c496fb68e5ed53b66d358d",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       3,
+       "initial-e91f1b3e061ee75b203058f6953568c0",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       4,
+       "initial-e88f169d9405c6b5461d41ea93c77e8e",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       5,
+       "initial-49efaead16168e8ad929fed5ca132015",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-full",
+       6,
+       "initial-478e4d78e3f203d5cfc1b511eef9da88",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       7
+      ],
+      [
+       "seed-string-structure",
+       1,
+       "initial-29f7b53e34e871e650894ac684f13e7b",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":null,\"origin\":\"accepted_initial_state\",\"starting_location\":{\"name\":\"No id\"},\"summary\":null}",
+       "[]",
+       null,
+       7
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "name": "migration",
+   "base": "v8",
+   "sql": [
+    "INSERT INTO campaign_plans VALUES ('m-a1', 'm-a', 'lock', 'builder', 'c', '{\"note\":1}', '[]', 'valid', 'accepted', 1, 1, 'd')",
+    "INSERT INTO campaign_plans VALUES ('m-a2', 'm-a', 'lock', 'builder', 'c', '{\"campaign_plan\":{\"bindings\":{\"campaign_setting\":null,\"ruleset\":null},\"initial_state\":{\"entities\":[{\"id\":\"keeper\",\"kind\":\"npc\",\"source_ref\":{\"id\":\"keeper\",\"path\":\"entities/keeper\"},\"state\":{\"known_by\":[\"player\"],\"mood\":\"wary\",\"name\":\"The Keeper\"}}],\"facts\":[\"The bell rang.\",{\"fact\":\"Known two ways.\",\"known_by\":[\"player\",\"gm\",3]},{\"fact\":\"Odd knowledge.\",\"id\":5,\"known_by\":\"player\"},{\"nofact\":1},4,{\"fact\":\"GM only.\",\"id\":\"fact-gm\",\"known_by\":[\"gm\"]}]},\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"structure\":[\"note\",{\"title\":\"no id\"},{\"id\":\"act-1\"}]}}', '[]', 'valid', 'accepted', 2, 2, 'd')",
+    "INSERT INTO campaign_plans VALUES ('m-b1', 'm-b', 'lock', 'builder', 'c', '{\"campaign_plan\":\"text\"}', '[]', 'valid', 'accepted', 1, 4, 'd')",
+    "INSERT INTO campaign_plans VALUES ('m-c1', 'm-c', 'lock', 'builder', 'c', '{\"campaign_plan\":', '[]', 'valid', 'accepted', 1, 5, 'd')",
+    "INSERT INTO campaign_plans VALUES ('m-d2', 'm-d', 'lock', 'builder', 'c', '{\"campaign_plan\":{\"initial_state\":{\"facts\":[\"d2\"]}}}', '[]', 'valid', 'accepted', 2, 9, 'd')",
+    "INSERT INTO campaign_plans VALUES ('m-d1', 'm-d', 'lock', 'builder', 'c', '{\"campaign_plan\":{\"initial_state\":{\"facts\":[\"d1\"]}}}', '[]', 'valid', 'accepted', 1, 8, 'd')"
+   ],
+   "calls": [
+    {
+     "fn": "apply_migration"
+    }
+   ],
+   "outcomes": [
+    {
+     "ok": [
+      [
+       "m-a",
+       1,
+       "initial-fb2bea3bc2a0380f321088d787d7d225",
+       "current_scene",
+       "scene",
+       "active",
+       "{\"act_id\":null,\"location_id\":\"harbour\",\"origin\":\"accepted_initial_state\",\"starting_location\":{\"id\":\"harbour\",\"name\":\"The harbour\"},\"summary\":null}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "m-a",
+       2,
+       "initial-ea146360cd051c43d5a3890e62b3880f",
+       "keeper",
+       "entity",
+       "active",
+       "{\"attributes\":{\"mood\":\"wary\"},\"entity_kind\":\"npc\",\"known_by\":[\"player\"],\"name\":\"The Keeper\",\"origin\":\"accepted_initial_state\",\"source_ref\":\"keeper\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "m-a",
+       3,
+       "initial-1ab737392992b006af0e177bac1993fc",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"The bell rang.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "m-a",
+       4,
+       "initial-f05bc5a0da8c45386d2bf79c8e504e4f",
+       "initial-fact-1",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\",\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Known two ways.\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "m-a",
+       5,
+       "initial-d6da2921e9bdf3b90c0813d38b4e1809",
+       "initial-fact-2",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"Odd knowledge.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "m-a",
+       6,
+       "initial-3425b14a0971b8a3e24fe28123c823a6",
+       "fact-gm",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"gm\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"GM only.\",\"visibility\":\"gm_private\"}",
+       "[]",
+       null,
+       2
+      ],
+      [
+       "m-d",
+       1,
+       "initial-52052c7e50384d68bb6dd5d9c03c30b8",
+       "initial-fact-0",
+       "fact",
+       "active",
+       "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"accepted_initial_state\",\"subjects\":[],\"text\":\"d2\",\"visibility\":\"player_known\"}",
+       "[]",
+       null,
+       9
+      ]
+     ]
+    }
+   ]
+  }
+ ]
+}

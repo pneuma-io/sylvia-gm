@@ -8,8 +8,9 @@
 //! `sqlite_effort.update_preferences`, `builder_workspace_migration.remove_builder_workspace`
 //! and the session operations of `SQLiteAuthorityStore`.
 //!
-//! The history page, activity basis, child sessions and human review come later: the page reads
-//! campaign continuity and mechanics activity, which are not ported yet.
+//! Part 2 adds `_with_mechanics_activity`, `read_activity_basis`, `read_history_page`,
+//! `plan_from_row`, `read_plan`, `read_handoff`, `require_human_review`, `insert_child_session` and
+//! `return_child_evidence`, with their store operations.
 
 use crate::actions::{dump, rejected, require_active_campaign};
 use crate::campaigns::{named_rows, parse, session_from_row, session_payload, Named};
@@ -20,10 +21,12 @@ use rusqlite::{params, Connection, OptionalExtension};
 use std::path::{Path, PathBuf};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{pystr, Json, JsonMap};
-use sylvia_domain::authority::{LifecycleState, WriterRole};
+use sylvia_domain::authority::{owned_payload, LifecycleState, WriterRole};
 use sylvia_domain::session::{
-    agent_session_payload_sha256, builder_chat_payload_sha256, BuilderChatRecord, SessionContext,
-    SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
+    agent_session_payload_sha256, builder_chat_payload_sha256, BuilderChatRecord, BuilderDMHandoff,
+    CampaignPlan, CampaignPlanFields, ChildEvidence, PlanAcceptanceStatus, PlanValidationOutcome,
+    SessionActivityBasis, SessionContext, SessionHistoryPage, SessionMessage, SessionMessageKind,
+    SessionRecord, SessionRecordFields, SessionStatus,
 };
 
 fn authority(kind: &'static str, message: &str) -> StoreError {
@@ -856,5 +859,476 @@ impl AuthorityStore {
         self.in_immediate(|connection| {
             append_message(connection, session_id, message_id, kind, content, canonical_sequence)
         })
+    }
+}
+
+// ---- Sessions part 2: display pages, activity bases, plans, review and child sessions ----
+
+/// `_with_mechanics_activity`: attach the saved execution link to each `tool_result` row, even
+/// when its evidence is on an older page.
+fn with_mechanics_activity(
+    connection: &Connection,
+    session: &SessionRecord,
+    messages: Vec<SessionMessage>,
+) -> StoreResult<Vec<SessionMessage>> {
+    let sequences: Vec<i64> = messages
+        .iter()
+        .filter(|message| {
+            message.kind() == SessionMessageKind::CanonicalReference
+                && message.content().get("event_type") == Some(&Json::from("tool_result"))
+        })
+        .filter_map(SessionMessage::canonical_sequence)
+        .collect();
+    let Some(campaign_id) = session.campaign_id() else { return Ok(messages) };
+    if sequences.is_empty() {
+        return Ok(messages);
+    }
+    let placeholders = vec!["?"; sequences.len()].join(",");
+    let session_id = &session.fields().session_id;
+    let mut values: Vec<&dyn rusqlite::ToSql> = vec![session_id, &campaign_id];
+    values.extend(sequences.iter().map(|sequence| sequence as &dyn rusqlite::ToSql));
+    let (columns, rows) = named_rows(
+        connection,
+        &format!(
+            "SELECT event.sequence, (SELECT json_extract(message.content_json, '$.activity') \
+             FROM agent_session_messages AS message WHERE message.session_id = ? \
+             AND message.kind = 'evidence' \
+             AND json_extract(message.content_json, '$.kind') = 'mechanics_activity' \
+             AND json_extract(message.content_json, '$.action_id') = event.action_id \
+             ORDER BY message.sequence LIMIT 1) AS activity \
+             FROM canonical_events AS event WHERE event.campaign_id = ? \
+             AND event.sequence IN ({placeholders}) AND event.event_type = 'tool_result'"
+        ),
+        &values,
+    )?;
+    let mut activity: Vec<(i64, JsonMap)> = Vec::new();
+    for values in rows {
+        let row = Named { columns: &columns, values };
+        if row.get("activity")? != &Value::Null {
+            activity.push((row.int("sequence")?, session_payload(&row.text("activity")?)?));
+        }
+    }
+    messages
+        .into_iter()
+        .map(|message| {
+            let found = message
+                .canonical_sequence()
+                .and_then(|sequence| activity.iter().rev().find(|(key, _)| *key == sequence));
+            let Some((_, saved)) = found else { return Ok(message) };
+            let mut content = message.content().clone();
+            content.insert("activity".into(), Json::Object(saved.clone()));
+            Ok(SessionMessage::new(
+                message.session_id().to_owned(),
+                message.sequence(),
+                message.message_id().to_owned(),
+                message.kind(),
+                &Json::Object(owned_payload(&Json::Object(content))?),
+                message.canonical_sequence(),
+            )?)
+        })
+        .collect()
+}
+
+fn messages_of(
+    connection: &Connection,
+    query: &str,
+    values: &[&dyn rusqlite::ToSql],
+) -> StoreResult<Vec<SessionMessage>> {
+    let (columns, rows) = named_rows(connection, query, values)?;
+    rows.into_iter().map(|values| message_from_row(&Named { columns: &columns, values })).collect()
+}
+
+fn optional_int(
+    connection: &Connection,
+    query: &str,
+    values: &[&dyn rusqlite::ToSql],
+) -> StoreResult<Option<i64>> {
+    let value: Value = connection.query_row(query, values, |row| row.get(0))?;
+    Ok(crate::pytext::py_int(&value))
+}
+
+/// `sqlite_session.read_activity_basis`: only the selected accepted input and its terminal
+/// outcome.
+fn read_activity_basis(
+    connection: &Connection,
+    session_id: &str,
+    attempt_id: Option<&str>,
+) -> StoreResult<SessionActivityBasis> {
+    let session = read_session(connection, session_id)?;
+    let table = message_table(&session);
+    let compaction = "json_extract(content_json, '$.kind') = 'context_compaction_requested'";
+    let has_compaction = first(
+        connection,
+        &format!("SELECT 1 FROM {table} WHERE session_id = ? AND {compaction} LIMIT 1"),
+        &[&session_id],
+    )?
+    .is_some();
+    let inputs = if session.role() == WriterRole::Builder {
+        format!("({compaction} OR kind = 'user' OR json_extract(content_json, '$.kind') = 'builder_start')")
+    } else {
+        compaction.to_owned()
+    };
+    let matching =
+        if attempt_id.is_some() { " AND json_extract(content_json, '$.attempt_id') = ?" } else { "" };
+    let query = format!(
+        "SELECT * FROM {table} WHERE session_id = ? AND {inputs} \
+         AND json_type(content_json, '$.attempt_id') = 'text'{matching} ORDER BY sequence DESC LIMIT 1"
+    );
+    let accepted = match attempt_id {
+        None => messages_of(connection, &query, &[&session_id])?,
+        Some(attempt) => messages_of(connection, &query, &[&session_id, &attempt])?,
+    }
+    .into_iter()
+    .next();
+    let selected = match (attempt_id, &accepted) {
+        (Some(attempt), _) => Some(attempt.to_owned()),
+        (None, Some(message)) => Some(sylvia_domain::pyops::py_str(sylvia_domain::pyops::py_item(
+            &Json::Object(message.content().clone()),
+            "attempt_id",
+        )?)),
+        (None, None) => None,
+    };
+    let terminal = match &selected {
+        None => None,
+        Some(attempt) => messages_of(
+            connection,
+            &format!(
+                "SELECT * FROM {table} WHERE session_id = ? AND kind = 'evidence' \
+                 AND json_extract(content_json, '$.kind') IN \
+                 ('builder_attempt_terminal', 'context_compaction_terminal') \
+                 AND json_extract(content_json, '$.attempt_id') = ? ORDER BY sequence DESC LIMIT 1"
+            ),
+            &[&session_id, attempt],
+        )?
+        .into_iter()
+        .next(),
+    };
+    Ok(SessionActivityBasis { session, accepted, terminal, has_compaction })
+}
+
+/// `sqlite_session.read_history_page`: the newest rows before a stable cursor, without decoding
+/// the rest of history.
+fn read_history_page(
+    connection: &Connection,
+    session_id: &str,
+    before_sequence: Option<i64>,
+    limit: i64,
+) -> StoreResult<SessionHistoryPage> {
+    if !(1..=200).contains(&limit) {
+        return Err(value_error("History page limit must be an integer from 1 to 200"));
+    }
+    if before_sequence.is_some_and(|cursor| cursor <= 0) {
+        return Err(value_error("History cursor must be a positive integer"));
+    }
+    let session = read_session(connection, session_id)?;
+    let table = message_table(&session);
+    let fetch = limit + 1;
+    let rows = match before_sequence {
+        None => messages_of(
+            connection,
+            &format!("SELECT * FROM {table} WHERE session_id = ? ORDER BY sequence DESC LIMIT ?"),
+            &[&session_id, &fetch],
+        )?,
+        Some(cursor) => messages_of(
+            connection,
+            &format!(
+                "SELECT * FROM {table} WHERE session_id = ? AND sequence < ? ORDER BY sequence DESC LIMIT ?"
+            ),
+            &[&session_id, &cursor, &fetch],
+        )?,
+    };
+    let more = i64::try_from(rows.len()).unwrap_or(i64::MAX) > limit;
+    let mut page: Vec<SessionMessage> =
+        rows.into_iter().take(usize::try_from(limit).unwrap_or(usize::MAX)).collect();
+    page.reverse();
+    let messages = with_mechanics_activity(connection, &session, page)?;
+    let latest = optional_int(
+        connection,
+        &format!("SELECT MAX(sequence) FROM {table} WHERE session_id = ?"),
+        &[&session_id],
+    )?;
+    let latest_user = optional_int(
+        connection,
+        &format!("SELECT MAX(sequence) FROM {table} WHERE session_id = ? AND kind = ?"),
+        &[&session_id, &SessionMessageKind::User.as_str()],
+    )?;
+    // A display cursor must not truncate the current form: decode only its tool evidence.
+    let builder_question_messages = if session.role() == WriterRole::Builder {
+        messages_of(
+            connection,
+            &format!(
+                "SELECT * FROM {table} WHERE session_id = ? AND sequence > ? \
+                 AND kind = 'evidence' \
+                 AND json_extract(content_json, '$.kind') = 'builder_tool_result' \
+                 AND json_extract(content_json, '$.tool_name') = 'ask_question' ORDER BY sequence"
+            ),
+            &[&session_id, &latest_user.unwrap_or(0)],
+        )?
+    } else {
+        Vec::new()
+    };
+    let launch_messages = messages_of(
+        connection,
+        &format!(
+            "SELECT * FROM {table} WHERE session_id = ? AND kind = 'evidence' \
+             AND json_extract(content_json, '$.kind') IN \
+             ('creation_subflow_link', 'builder_launch_context') ORDER BY sequence DESC LIMIT 2"
+        ),
+        &[&session_id],
+    )?;
+    let latest_canonical = optional_int(
+        connection,
+        &format!("SELECT MAX(canonical_sequence) FROM {table} WHERE session_id = ?"),
+        &[&session_id],
+    )?;
+    let story = match session.campaign_id() {
+        Some(campaign_id) if session.role() == WriterRole::Dm => Some(campaign_id.to_owned()),
+        _ => None,
+    };
+    let (act_markers, campaign_ending, campaign_endings) = match &story {
+        Some(campaign_id) => (
+            crate::continuity::read_act_markers(connection, session_id, campaign_id)?,
+            crate::continuity::read_campaign_ending(connection, session_id, campaign_id)?,
+            crate::continuity::read_campaign_endings(connection, session_id, campaign_id)?,
+        ),
+        None => (Vec::new(), None, Vec::new()),
+    };
+    Ok(SessionHistoryPage {
+        next_before_sequence: if more { messages.first().map(SessionMessage::sequence) } else { None },
+        session,
+        messages,
+        latest_sequence: latest,
+        latest_user_sequence: latest_user,
+        launch_messages,
+        latest_canonical_sequence: latest_canonical,
+        act_markers,
+        campaign_ending,
+        campaign_endings,
+        builder_question_messages,
+    })
+}
+
+/// `sqlite_session.plan_from_row`.
+pub(crate) fn plan_from_row(row: &Named<'_>) -> StoreResult<CampaignPlan> {
+    let provenance_text = row.text("provenance_json")?;
+    let provenance = match crate::sequel::json_loads(&provenance_text)? {
+        parsed if crate::actions::dump(&parsed) != provenance_text => {
+            return Err(value_error("Stored session JSON is not canonical"))
+        }
+        Json::Array(items) => items.iter().map(crate::campaigns::json_str).collect(),
+        _ => return Err(value_error("Stored Campaign Plan provenance is not an array")),
+    };
+    Ok(CampaignPlan::new(CampaignPlanFields {
+        plan_id: row.text("plan_id")?,
+        campaign_id: row.text("campaign_id")?,
+        package_lock_id: row.text("package_lock_id")?,
+        source_session_id: row.text("source_session_id")?,
+        content_sha256: row.text("content_sha256")?,
+        content: Json::Object(session_payload(&row.text("content_json")?)?),
+        provenance_evidence_ids: provenance,
+        validation_outcome: parse(
+            &row.text("validation_outcome")?,
+            PlanValidationOutcome::parse,
+            "PlanValidationOutcome",
+        )?,
+        acceptance_status: parse(
+            &row.text("acceptance_status")?,
+            PlanAcceptanceStatus::parse,
+            "PlanAcceptanceStatus",
+        )?,
+        plan_revision: row.int("plan_revision")?,
+        resulting_campaign_revision: row.int("resulting_campaign_revision")?,
+        payload_sha256: row.text("payload_sha256")?,
+    })?)
+}
+
+/// `sqlite_session.read_plan`.
+fn read_plan(connection: &Connection, plan_id: &str) -> StoreResult<Option<CampaignPlan>> {
+    match first(connection, "SELECT * FROM campaign_plans WHERE plan_id = ?", &[&plan_id])? {
+        Some((columns, values)) => plan_from_row(&Named { columns: &columns, values }).map(Some),
+        None => Ok(None),
+    }
+}
+
+/// `sqlite_session.read_handoff`.
+fn read_handoff(connection: &Connection, handoff_id: &str) -> StoreResult<Option<BuilderDMHandoff>> {
+    match first(connection, "SELECT * FROM builder_dm_handoffs WHERE handoff_id = ?", &[&handoff_id])? {
+        Some((columns, values)) => {
+            crate::campaigns::handoff_from_row(&Named { columns: &columns, values }).map(Some)
+        }
+        None => Ok(None),
+    }
+}
+
+/// `sqlite_session.require_human_review`.
+fn require_human_review(
+    connection: &Connection,
+    session_id: &str,
+    review_id: &str,
+    content: &JsonMap,
+) -> StoreResult<SessionRecord> {
+    let current = read_session(connection, session_id)?;
+    if current.role() != WriterRole::Builder {
+        return Err(rejected("Only Builder sessions can require construction review", "command_rejected"));
+    }
+    if !matches!(current.fields().status, SessionStatus::Active | SessionStatus::ReviewRequired) {
+        return Err(rejected("Builder session is not review-admissible", "command_rejected"));
+    }
+    append_message(connection, session_id, review_id, SessionMessageKind::HumanReview, content, None)?;
+    update_session_status(connection, session_id, SessionStatus::ReviewRequired)
+}
+
+/// `sqlite_session.insert_child_session`, with Python's bound of three children.
+fn insert_child_session(connection: &Connection, record: &SessionRecord) -> StoreResult<SessionRecord> {
+    const MAXIMUM_CHILDREN: i64 = 3;
+    let fields = record.fields();
+    if let Some((columns, values)) =
+        first(connection, "SELECT * FROM agent_sessions WHERE session_id = ?", &[&fields.session_id])?
+    {
+        let captured = session_from_row(&Named { columns: &columns, values })?;
+        if &captured != record {
+            return Err(authority("IdempotencyConflict", "Agent session identity payload does not match"));
+        }
+        return Ok(captured);
+    }
+    let Some(parent_id) = fields.parent_session_id.as_deref() else {
+        return Err(value_error("Child session requires a parent_session_id"));
+    };
+    let parent = read_session(connection, parent_id)?;
+    if parent.fields().parent_session_id.is_some() {
+        return Err(rejected("Builder child sessions cannot create nested children", "command_rejected"));
+    }
+    if parent.role() != WriterRole::Builder || parent.fields().status != SessionStatus::Active {
+        return Err(rejected("Builder parent session is not active", "command_rejected"));
+    }
+    let children = optional_int(
+        connection,
+        "SELECT COUNT(*) FROM agent_sessions WHERE parent_session_id = ?",
+        &[&parent.fields().session_id],
+    )?
+    .unwrap_or(0);
+    if children >= MAXIMUM_CHILDREN {
+        return Err(rejected("Builder child sessions are bounded at three", "command_rejected"));
+    }
+    insert_session(connection, record)
+}
+
+/// `sqlite_session.return_child_evidence`.
+fn return_child_evidence(
+    connection: &Connection,
+    evidence: &ChildEvidence,
+) -> StoreResult<(ChildEvidence, SessionRecord)> {
+    let child = read_session(connection, &evidence.child_session_id)?;
+    if child.fields().parent_session_id.as_deref() != Some(evidence.parent_session_id.as_str()) {
+        return Err(rejected("Child evidence parent identity does not match", "command_rejected"));
+    }
+    if child.role() != WriterRole::Builder {
+        return Err(rejected("Only Builder children return construction evidence", "command_rejected"));
+    }
+    if !matches!(child.fields().status, SessionStatus::Active | SessionStatus::Completed) {
+        return Err(rejected("Builder child session cannot return evidence", "command_rejected"));
+    }
+    append_message(
+        connection,
+        &evidence.parent_session_id,
+        &evidence.evidence_id,
+        SessionMessageKind::Evidence,
+        &evidence.payload(),
+        None,
+    )?;
+    let completed = update_session_status(connection, &evidence.child_session_id, SessionStatus::Completed)?;
+    Ok((evidence.clone(), completed))
+}
+
+impl AuthorityStore {
+    /// `session_activity_basis`: attempt recovery facts from one consistent saved state.
+    pub fn session_activity_basis(
+        &self,
+        session_id: &str,
+        attempt_id: Option<&str>,
+    ) -> StoreResult<SessionActivityBasis> {
+        self.ensure_session_schema()?;
+        let connection = self.connect()?;
+        connection.execute_batch("BEGIN")?;
+        let result = read_activity_basis(&connection, session_id, attempt_id);
+        let _ = connection.execute_batch(if result.is_ok() { "COMMIT" } else { "ROLLBACK" });
+        result
+    }
+
+    /// `session_history_page`: page rows and current sequence metadata in one read transaction.
+    pub fn session_history_page(
+        &self,
+        session_id: &str,
+        before_sequence: Option<i64>,
+        limit: i64,
+    ) -> StoreResult<SessionHistoryPage> {
+        self.ensure_session_schema()?;
+        let connection = self.connect()?;
+        connection.execute_batch("BEGIN")?;
+        let result = read_history_page(&connection, session_id, before_sequence, limit);
+        let _ = connection.execute_batch(if result.is_ok() { "COMMIT" } else { "ROLLBACK" });
+        result
+    }
+
+    /// `require_agent_human_review`.
+    pub fn require_agent_human_review(
+        &self,
+        session_id: &str,
+        review_id: &str,
+        content: &JsonMap,
+    ) -> StoreResult<SessionRecord> {
+        self.ensure_session_schema()?;
+        self.in_immediate(|connection| require_human_review(connection, session_id, review_id, content))
+    }
+
+    /// `create_builder_child_session`.
+    pub fn create_builder_child_session(&self, record: &SessionRecord) -> StoreResult<SessionRecord> {
+        self.ensure_session_schema()?;
+        self.in_immediate(|connection| insert_child_session(connection, record))
+    }
+
+    /// `return_builder_child_evidence`: the evidence on the parent, and the completed child.
+    pub fn return_builder_child_evidence(
+        &self,
+        evidence: &ChildEvidence,
+    ) -> StoreResult<(ChildEvidence, SessionRecord)> {
+        self.ensure_session_schema()?;
+        self.in_immediate(|connection| return_child_evidence(connection, evidence))
+    }
+
+    /// `campaign_plan_hit`.
+    pub fn campaign_plan_hit(&self, plan_id: &str) -> StoreResult<Option<CampaignPlan>> {
+        self.ensure_session_schema()?;
+        read_plan(&self.connect()?, plan_id)
+    }
+
+    /// `handoff_hit`.
+    pub fn handoff_hit(&self, handoff_id: &str) -> StoreResult<Option<BuilderDMHandoff>> {
+        self.ensure_session_schema()?;
+        read_handoff(&self.connect()?, handoff_id)
+    }
+
+    /// `accepted_campaign_plan`: the latest accepted revision.
+    pub fn accepted_campaign_plan(&self, campaign_id: &str) -> StoreResult<Option<CampaignPlan>> {
+        self.ensure_session_schema()?;
+        let connection = self.connect()?;
+        match first(
+            &connection,
+            "SELECT * FROM campaign_plans WHERE campaign_id = ? \
+             AND acceptance_status = 'accepted' ORDER BY plan_revision DESC LIMIT 1",
+            &[&campaign_id],
+        )? {
+            Some((columns, values)) => plan_from_row(&Named { columns: &columns, values }).map(Some),
+            None => Ok(None),
+        }
+    }
+
+    /// `campaign_adventures`: the accepted adventure lineage, oldest first.
+    pub fn campaign_adventures(&self, campaign_id: &str) -> StoreResult<Vec<CampaignPlan>> {
+        let connection = self.connect_read_only()?;
+        crate::sequel::adventure_rows(&connection, campaign_id)?
+            .iter()
+            .map(|row| plan_from_row(&row.named()))
+            .collect()
     }
 }
