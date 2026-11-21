@@ -5,9 +5,10 @@ from the repository root:
 
     .venv/Scripts/python.exe -I crates/sylvia-owner/tests/vectors/generate_update_vectors.py
 
-Every run makes a fresh Ed25519 signing key in memory. Only its public key and the envelopes
-it signed are written; the private key is never stored, so regenerating changes the file.
-The Rust tests that need to sign make their own keys.
+The two signing keys are derived from fixed, test-only seeds (`test_key` below). Ed25519
+signing is deterministic, so regenerating reproduces the file byte for byte. Only their public
+keys and the envelopes they signed are written. The Rust tests that need to sign make their
+own keys.
 
 Covered: SemVer parsing and order, strict base64, URL splitting and unquoting, release and
 payload paths, the official request and redirect rules, Ed25519 verification edge cases,
@@ -51,6 +52,16 @@ from sylvia_gm.portable_artifact import LEGAL_FILES, REQUIRED_PAYLOADS  # noqa: 
 OUTPUT = Path(__file__).with_name("update_vectors.json")
 KEY_ID = "test-key"
 ED25519_L = 2**252 + 27742317777372353535851937790883648493
+
+
+def test_key(name: str) -> Ed25519PrivateKey:
+    """A TEST-ONLY signing key from a fixed, public seed, so the vectors reproduce exactly.
+
+    Anyone can derive it from this file. Its public key must never be added to any production
+    KeyRing or to `PUBLIC_KEYS`; a release signed with it must never be trusted.
+    """
+    seed = hashlib.sha256(f"sylvia-update-vectors test key {name}".encode()).digest()
+    return Ed25519PrivateKey.from_private_bytes(seed)
 
 
 def outcome(call):
@@ -710,7 +721,7 @@ def download_vectors(key):
 
 
 def main() -> None:
-    key, other = Ed25519PrivateKey.generate(), Ed25519PrivateKey.generate()
+    key, other = test_key("A"), test_key("B")
     versions, order = version_vectors()
     splits, unquotes, releases, officials, redirects, finals = url_vectors()
     vectors = {
