@@ -14,12 +14,19 @@
 //! - [`error`]: the `ValueError` / `TypeError` the domain raises, and `RulesetDiagnostic`.
 //! - [`model_capability`]: `domain/model_capability.py`, capability tiers and model guidance.
 //! - [`session`]: `domain/session.py`, Builder and DM session, handoff and plan records.
+//! - [`starting_state`], [`inventory`]: package-declared starting state and the shared holding schema.
+//! - [`state_ownership`]: `domain/state_ownership.py`, state namespace ownership under a lock.
+//! - [`pyops`]: Python `==`, `in`, `set()` and subscripting on JSON values, for untrusted records.
 
 pub mod authority;
 pub mod content;
 pub mod error;
+pub mod inventory;
 pub mod model_capability;
 pub mod package_library;
+pub mod pyops;
 pub mod session;
+pub mod starting_state;
+pub mod state_ownership;
 
 pub use error::{DomainError, DomainResult};
