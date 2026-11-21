@@ -39,10 +39,10 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/core/__init__.py` | 1 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/covered_source_delivery.py` | 116 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/__init__.py` | 22 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/_chat_start.py` | 143 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/_chat_start.py` | 143 | `sylvia-owner` | pending | `explicit_effort` and `explicit_speed` ported by lane 4 in C4 (at the manager's request, with `set_chat_defaults`): `sylvia-owner/src/commands/providers.rs`. Vectors: `sylvia-owner/tests/chat_start_vectors.rs`. The rest of the file is lane 5's. |
 | `src/sylvia_gm/interfaces/_display_reads.py` | 61 | `sylvia-owner::display_reads` | ported | `local-services` |
 | `src/sylvia_gm/interfaces/_local_diagnostics.py` | 438 | `sylvia-owner::diagnostics` | ported | `local-services` (replies and report content; `runtime.jsonl` itself is volatile, covered by unit tests); Python quirk kept: `record()` returns the owner session id, not a record id, once closed |
-| `src/sylvia_gm/interfaces/_session_reasoning.py` | 177 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/_session_reasoning.py` | 177 | `sylvia-owner` | pending | `catalog_model_info` ported by lane 4 in C4 (at the manager's request, with `set_chat_defaults`): `sylvia-owner/src/commands/providers.rs`. Vectors: `sylvia-owner/tests/chat_start_vectors.rs`. The rest of the file is lane 5's. |
 | `src/sylvia_gm/interfaces/commands/__init__.py` | 31 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/actions.py` | 157 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/builder.py` | 169 | `sylvia-owner::commands::builder` | in progress | `handle_builder_chat_index`, `handle_rename_builder_chat`, `handle_delete_builder_chat` (on lane 3's `StoreHandle` operations and lanes). A rename and a delete of an existing chat wait for `create_builder_chat` in the owner |

@@ -27,12 +27,14 @@ use sylvia_provider::config::{
 use sylvia_provider::context_capacity::{resolve_context_capacity, CapacityInputs, CONTEXT_CAPACITY_SOURCES};
 use sylvia_provider::provider::Provider;
 use sylvia_provider::pyurl::UrlError;
-use sylvia_provider::reasoning::{configure_reasoning, mode_reasoning_default, reasoning_values, Advertised};
+use sylvia_provider::reasoning::{
+    configure_reasoning, mode_reasoning_default, reasoning_values, suggested_from_data, Advertised,
+};
 use sylvia_provider::registry::{ProviderFactory, ProviderRegistry, RegistryError};
 use sylvia_provider::request_metadata::{
     opencode_request_headers, without_opencode_protocol_headers, SessionBoundRequestMetadataProvider,
 };
-use sylvia_provider::speed::{configure_speed, speed_options, AdvertisedTier, AdvertisedTiers};
+use sylvia_provider::speed::{configure_speed, speed_options, AdvertisedTiers};
 use sylvia_provider::types::{transport, ModelInfo};
 
 const LOCAL_PROVIDER_MODES: [&str; 2] = ["local", "ollama"];
@@ -259,39 +261,6 @@ fn not_runtime_managed(row: &Data) -> bool {
     )
 }
 
-/// `value` for `reasoning_values` / `speed_options`.
-fn advertised(value: Option<&Data>) -> Advertised<'_> {
-    match value {
-        None | Some(Data::None) => Advertised::Missing,
-        Some(Data::List(items) | Data::Tuple(items)) => {
-            Advertised::List(items.iter().map(Data::as_str).collect())
-        }
-        Some(_) => Advertised::Other,
-    }
-}
-
-fn advertised_tiers(value: Option<&Data>) -> AdvertisedTiers<'_> {
-    match value {
-        None | Some(Data::None) => AdvertisedTiers::Missing,
-        Some(Data::List(items) | Data::Tuple(items)) => AdvertisedTiers::List(
-            items
-                .iter()
-                .map(|item| {
-                    item.as_dict().map(|_| AdvertisedTier {
-                        id: item.get_str("id").and_then(Data::as_str),
-                        name: item.get_str("name").and_then(Data::as_str),
-                        description: match item.get_str("description") {
-                            None => Some(""),
-                            Some(value) => value.as_str(),
-                        },
-                    })
-                })
-                .collect(),
-        ),
-        Some(_) => AdvertisedTiers::Other,
-    }
-}
-
 /// An optional `bool`: `Err` for any other non-`None` value.
 fn optional_bool(value: Option<&Data>, default: Option<bool>) -> Result<Option<bool>, ()> {
     match value {
@@ -486,14 +455,13 @@ pub fn configured_provider_models(
         model.supports_streaming = supports_streaming;
         model.supports_tools = supports_tools;
         let mut model = model.post_init();
-        let suggested = match field(row, "default_reasoning_effort") {
-            None | Some(Data::None) => None,
-            Some(value) => Some(value.as_str()),
-        };
-        let (supported, suggested) =
-            reasoning_values(&advertised(field(row, "supported_reasoning_efforts")), suggested)
-                .map_err(config_error)?;
-        let speeds = speed_options(&advertised_tiers(field(row, "service_tiers"))).map_err(config_error)?;
+        let (supported, suggested) = reasoning_values(
+            &Advertised::from_data(field(row, "supported_reasoning_efforts")),
+            suggested_from_data(field(row, "default_reasoning_effort")),
+        )
+        .map_err(config_error)?;
+        let speeds =
+            speed_options(&AdvertisedTiers::from_data(field(row, "service_tiers"))).map_err(config_error)?;
         model.supported_reasoning_efforts = supported;
         model.default_reasoning_effort = suggested;
         model.speed_options = speeds;
