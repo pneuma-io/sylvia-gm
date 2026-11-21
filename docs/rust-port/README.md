@@ -93,6 +93,15 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
 8. **Python is reference tooling only.** A generator script that reads the snapshot to write
    vectors may be Python and lives beside its output. Nothing the product or its tests need at
    run time may call Python.
+9. **`unsafe` only where Python itself calls the operating system directly**, and only with the
+   manager's approval for that module. The code goes in one named module per platform with
+   `#![allow(unsafe_code)]` scoped to it. Each foreign call is wrapped in a small safe function
+   with a `SAFETY:` comment, and has a test on the platform it runs on. Everything else stays
+   under the workspace's `unsafe_code = "deny"`. Windows calls use `windows-sys` 0.61 (the
+   desktop shell's version); Linux calls use `rustix`. Approved so far:
+   `sylvia-store/src/safe_file/windows.rs` (`GetDriveTypeW`, `SetFileInformationByHandle`
+   with `FileDispositionInfo`, and `MoveFileExW` with `MOVEFILE_REPLACE_EXISTING |
+   MOVEFILE_WRITE_THROUGH`), mirroring `infrastructure/safe_file.py`'s ctypes calls.
 
 ## Concurrency
 
