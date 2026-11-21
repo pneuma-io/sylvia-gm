@@ -88,6 +88,8 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    comparison session (see `comparison-tool.md`). A port without one of the two is not done.
 6. **Every pull request says** which ledger rows it retires, which commands it ticks in
    `commands.md`, which rows it ticks in `sites/`, and which vectors or sessions now pass.
+   Once it is open, do not rebase it or push to it unless the manager sends it back. The
+   manager resolves conflicts with the moving branch at merge time.
 7. **New dependencies go in the workspace `Cargo.toml`** in the pull request that needs them,
    with one line on why. One library per job across the workspace.
 8. **Python is reference tooling only.** A generator script that reads the snapshot to write
