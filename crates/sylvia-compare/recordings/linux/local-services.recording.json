@@ -1,0 +1,2697 @@
+{
+ "session": "local-services",
+ "ready": {
+  "ok": true,
+  "type": "ready",
+  "response_hex": "<verified>"
+ },
+ "steps": [
+  {
+   "id": "s0",
+   "method": "handshake_status",
+   "params": {},
+   "reply": {
+    "id": "s0",
+    "ok": true,
+    "result": {
+     "verified": true,
+     "role": "owner",
+     "reason": "launch handshake verified"
+    }
+   }
+  },
+  {
+   "id": "s1",
+   "method": "record_local_fault",
+   "params": {
+    "category": "renderer_error",
+    "delta": 2
+   },
+   "reply": {
+    "id": "s1",
+    "ok": true,
+    "result": {
+     "diagnostic_id": "03ec9cea878d4015b1ffc9e3df7f1216"
+    }
+   }
+  },
+  {
+   "id": "s2",
+   "method": "record_local_fault",
+   "params": {
+    "category": "renderer_crash",
+    "delta": 1
+   },
+   "reply": {
+    "id": "s2",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Unknown app failure category.",
+     "diagnostics": [],
+     "diagnostic_id": "c85befb718984c73ac8337f3a3fa4633"
+    }
+   }
+  },
+  {
+   "id": "s3",
+   "method": "load_desktop_drafts",
+   "params": {
+    "unexpected": true
+   },
+   "reply": {
+    "id": "s3",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Unsupported draft storage request",
+     "diagnostics": [],
+     "diagnostic_id": "7e60410d3ec74fdb8bbd97ca034d0956"
+    }
+   }
+  },
+  {
+   "id": "s4",
+   "method": "save_desktop_drafts",
+   "params": {
+    "drafts": {
+     "format_version": 2,
+     "sessions": []
+    }
+   },
+   "reply": {
+    "id": "s4",
+    "ok": false,
+    "error": {
+     "code": "invalid_drafts",
+     "message": "Unsent drafts could not be saved safely.",
+     "diagnostics": [],
+     "diagnostic_id": "68bb401b390c450a852a199cbfe192db"
+    }
+   }
+  },
+  {
+   "id": "s5",
+   "method": "renderer",
+   "params": {},
+   "reply": {
+    "id": "s5",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Unsupported owner method: renderer",
+     "diagnostics": [],
+     "diagnostic_id": "75080c5ead50427fbf34b31c7f33f196"
+    }
+   }
+  },
+  {
+   "id": "s6",
+   "method": "cancel_local_report",
+   "params": {},
+   "reply": {
+    "id": "s6",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "preview_id must be a nonempty string",
+     "diagnostics": [],
+     "diagnostic_id": "ee3cf37b8eaa42cc9fbcc6b7ce988dfa"
+    }
+   }
+  },
+  {
+   "id": "s7",
+   "method": "preview_local_report",
+   "params": {
+    "kind": "app_problem",
+    "reproduction": "Open the app, then close it é",
+    "feedback": "Fine"
+   },
+   "reply": {
+    "id": "s7",
+    "ok": true,
+    "result": {
+     "preview_id": "1444f5c669434b83ac8816e5b0caec9d",
+     "content": "{\n  \"format\": \"sylvia-local-report-v1\",\n  \"application\": {\n    \"version\": \"0.4.1\",\n    \"build_version\": \"0.4.1\",\n    \"runtime\": \"source\",\n    \"platform\": {\n      \"os\": \"linux\"\n    }\n  },\n  \"retention\": {\n    \"max_storage_bytes\": 1048576,\n    \"max_age_days\": 7\n  },\n  \"storage_status\": \"available\",\n  \"report_kind\": \"app_problem\",\n  \"player_entered\": {\n    \"reproduction_steps\": \"Open the app, then close it \\u00e9\",\n    \"feedback\": \"Fine\"\n  },\n  \"diagnostics\": [\n    {\n      \"format\": 1,\n      \"event\": \"owner_started\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"0d5d4d35462a4603b0724728755fa220\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"handshake_status\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"2fd84677b69c479192485d1cccb2ecb9\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"renderer_error\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"internal_error\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"03ec9cea878d4015b1ffc9e3df7f1216\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 2\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"24b763bde4034b7e89e74993ba981e74\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"c85befb718984c73ac8337f3a3fa4633\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"7e60410d3ec74fdb8bbd97ca034d0956\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"other_rejection\",\n      \"error_type\": \"OtherError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"68bb401b390c450a852a199cbfe192db\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"75080c5ead50427fbf34b31c7f33f196\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"ee3cf37b8eaa42cc9fbcc6b7ce988dfa\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    }\n  ]\n}\n",
+     "bytes": 5767
+    }
+   }
+  },
+  {
+   "id": "s8",
+   "method": "cancel_local_report",
+   "params": {
+    "preview_id": "1444f5c669434b83ac8816e5b0caec9d"
+   },
+   "reply": {
+    "id": "s8",
+    "ok": true,
+    "result": {
+     "status": "cancelled"
+    }
+   }
+  },
+  {
+   "id": "s9",
+   "method": "save_local_report",
+   "params": {
+    "preview_id": "1444f5c669434b83ac8816e5b0caec9d",
+    "destination_path": "<work>/data/../saved-report.json"
+   },
+   "reply": {
+    "id": "s9",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Preview this report again before saving.",
+     "diagnostics": [],
+     "diagnostic_id": "9c590b3c92634bc39a7662988d255c65"
+    }
+   }
+  },
+  {
+   "id": "s10",
+   "method": "preview_local_report",
+   "params": {
+    "kind": "model_feedback"
+   },
+   "reply": {
+    "id": "s10",
+    "ok": true,
+    "result": {
+     "preview_id": "2a5d492c45774630a5b17c6eb137ba95",
+     "content": "{\n  \"format\": \"sylvia-local-report-v1\",\n  \"application\": {\n    \"version\": \"0.4.1\",\n    \"build_version\": \"0.4.1\",\n    \"runtime\": \"source\",\n    \"platform\": {\n      \"os\": \"linux\"\n    }\n  },\n  \"retention\": {\n    \"max_storage_bytes\": 1048576,\n    \"max_age_days\": 7\n  },\n  \"storage_status\": \"available\",\n  \"report_kind\": \"model_feedback\",\n  \"player_entered\": {\n    \"reproduction_steps\": \"\",\n    \"feedback\": \"\"\n  },\n  \"diagnostics\": [\n    {\n      \"format\": 1,\n      \"event\": \"owner_started\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"0d5d4d35462a4603b0724728755fa220\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"handshake_status\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"2fd84677b69c479192485d1cccb2ecb9\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"renderer_error\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"internal_error\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"03ec9cea878d4015b1ffc9e3df7f1216\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 2\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"24b763bde4034b7e89e74993ba981e74\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"c85befb718984c73ac8337f3a3fa4633\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"7e60410d3ec74fdb8bbd97ca034d0956\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"other_rejection\",\n      \"error_type\": \"OtherError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"68bb401b390c450a852a199cbfe192db\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"75080c5ead50427fbf34b31c7f33f196\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"ee3cf37b8eaa42cc9fbcc6b7ce988dfa\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"preview_local_report\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"1fe44509b03743b3bd426f8bd82bdf77\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"186e3ac2685c40629e499004f0fce39e\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"linux\"\n      },\n      \"operation\": \"save_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"9c590b3c92634bc39a7662988d255c65\",\n      \"session\": \"38c88dd4d1ba465ebbb1f574fc44a2bb\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    }\n  ]\n}\n",
+     "bytes": 7485
+    }
+   }
+  },
+  {
+   "id": "s11",
+   "method": "save_local_report",
+   "params": {
+    "preview_id": "2a5d492c45774630a5b17c6eb137ba95",
+    "destination_path": "saved-report.json"
+   },
+   "reply": {
+    "id": "s11",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Choose a local report file.",
+     "diagnostics": [],
+     "diagnostic_id": "feb39420067e403a8fd2069534da2dc5"
+    }
+   }
+  },
+  {
+   "id": "s12",
+   "method": "save_local_report",
+   "params": {
+    "preview_id": "2a5d492c45774630a5b17c6eb137ba95",
+    "destination_path": "<work>/data/../saved-report.json"
+   },
+   "reply": {
+    "id": "s12",
+    "ok": true,
+    "result": {
+     "status": "saved",
+     "bytes": 7485
+    }
+   }
+  },
+  {
+   "id": "s13",
+   "method": "save_local_report",
+   "params": {
+    "preview_id": "2a5d492c45774630a5b17c6eb137ba95",
+    "destination_path": "<work>/data/../saved-report.json"
+   },
+   "reply": {
+    "id": "s13",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Preview this report again before saving.",
+     "diagnostics": [],
+     "diagnostic_id": "9c590b3c92634bc39a7662988d255c65"
+    }
+   }
+  },
+  {
+   "id": "s14",
+   "method": "preview_local_report",
+   "params": {
+    "kind": "bug"
+   },
+   "reply": {
+    "id": "s14",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Choose an app problem or model feedback.",
+     "diagnostics": [],
+     "diagnostic_id": "6d1889d86f154cb485ac1d0fc0d034d0"
+    }
+   }
+  },
+  {
+   "id": "s15",
+   "method": "preview_local_report",
+   "params": {
+    "kind": "app_problem",
+    "reproduction": null
+   },
+   "reply": {
+    "id": "s15",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Report fields must each contain at most 4,000 characters.",
+     "diagnostics": [],
+     "diagnostic_id": "6d1889d86f154cb485ac1d0fc0d034d0"
+    }
+   }
+  },
+  {
+   "id": "s16",
+   "method": "record_local_fault",
+   "params": {
+    "category": "renderer_rejection",
+    "delta": 65536
+   },
+   "reply": {
+    "id": "s16",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "App failure count must be an integer from 1 to 65535.",
+     "diagnostics": [],
+     "diagnostic_id": "c85befb718984c73ac8337f3a3fa4633"
+    }
+   }
+  },
+  {
+   "id": "s17",
+   "method": "record_local_fault",
+   "params": {
+    "category": "renderer_rejection",
+    "delta": true
+   },
+   "reply": {
+    "id": "s17",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "App failure count must be an integer from 1 to 65535.",
+     "diagnostics": [],
+     "diagnostic_id": "c85befb718984c73ac8337f3a3fa4633"
+    }
+   }
+  },
+  {
+   "id": "s18",
+   "method": "load_desktop_drafts",
+   "params": {},
+   "reply": {
+    "id": "s18",
+    "ok": true,
+    "result": {
+     "format_version": 1,
+     "sessions": []
+    }
+   }
+  },
+  {
+   "id": "s19",
+   "method": "save_desktop_drafts",
+   "params": {
+    "drafts": {
+     "format_version": 1,
+     "sessions": [
+      {
+       "session_id": "session-a",
+       "text": "Half-written plan — été",
+       "ooc_text": "",
+       "ooc_open": false,
+       "questions": [
+        {
+         "question_key": "q1",
+         "text": "Maybe",
+         "selection": "b"
+        }
+       ]
+      }
+     ],
+     "update_view": {
+      "operation_id": "0123456789abcdef0123456789abcdef",
+      "kind": "session",
+      "campaign_id": "campaign-a",
+      "session_id": "session-a"
+     }
+    }
+   },
+   "reply": {
+    "id": "s19",
+    "ok": true,
+    "result": {
+     "status": "saved"
+    }
+   }
+  },
+  {
+   "id": "s20",
+   "method": "load_desktop_drafts",
+   "params": {},
+   "reply": {
+    "id": "s20",
+    "ok": true,
+    "result": {
+     "format_version": 1,
+     "sessions": [
+      {
+       "ooc_open": false,
+       "ooc_text": "",
+       "questions": [
+        {
+         "question_key": "q1",
+         "selection": "b",
+         "text": "Maybe"
+        }
+       ],
+       "session_id": "session-a",
+       "text": "Half-written plan — été"
+      }
+     ],
+     "update_view": {
+      "campaign_id": "campaign-a",
+      "kind": "session",
+      "operation_id": "0123456789abcdef0123456789abcdef",
+      "session_id": "session-a"
+     }
+    }
+   }
+  },
+  {
+   "id": "s21",
+   "method": "save_desktop_drafts",
+   "params": {
+    "drafts": {
+     "format_version": 1,
+     "sessions": [],
+     "update_view": {
+      "operation_id": "not-hex",
+      "kind": "home",
+      "campaign_id": null,
+      "session_id": null
+     }
+    }
+   },
+   "reply": {
+    "id": "s21",
+    "ok": false,
+    "error": {
+     "code": "invalid_operation",
+     "message": "The update operation is no longer available.",
+     "diagnostics": [],
+     "diagnostic_id": "68bb401b390c450a852a199cbfe192db"
+    }
+   }
+  },
+  {
+   "id": "s22",
+   "method": "save_desktop_drafts",
+   "params": {
+    "drafts": {
+     "format_version": 1,
+     "sessions": [
+      {
+       "session_id": "s",
+       "text": "",
+       "ooc_text": "",
+       "ooc_open": false,
+       "questions": [
+        {
+         "question_key": "q",
+         "custom": 3
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "reply": {
+    "id": "s22",
+    "ok": false,
+    "error": {
+     "code": "invalid_drafts",
+     "message": "Unsent question fields could not be saved.",
+     "diagnostics": [],
+     "diagnostic_id": "68bb401b390c450a852a199cbfe192db"
+    }
+   }
+  },
+  {
+   "id": "s23",
+   "method": "save_desktop_drafts",
+   "params": {},
+   "reply": {
+    "id": "s23",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Unsupported draft storage request",
+     "diagnostics": [],
+     "diagnostic_id": "7e60410d3ec74fdb8bbd97ca034d0956"
+    }
+   }
+  },
+  {
+   "id": "s24",
+   "method": "cancel_display_load",
+   "params": {
+    "load_id": "load-gone"
+   },
+   "reply": {
+    "id": "s24",
+    "ok": true,
+    "result": {
+     "status": "cancelled"
+    }
+   }
+  },
+  {
+   "id": "s25",
+   "method": "display_snapshot",
+   "params": {
+    "campaign_id": "campaign-that-does-not-exist",
+    "load_id": "load-gone"
+   },
+   "reply": {
+    "id": "s25",
+    "ok": false,
+    "error": {
+     "code": "display_load_cancelled",
+     "message": "This display load is no longer selected"
+    }
+   }
+  },
+  {
+   "id": "s26",
+   "method": "cancel_display_load",
+   "params": {},
+   "reply": {
+    "id": "s26",
+    "ok": false,
+    "error": {
+     "code": "invalid_owner_request",
+     "message": "load_id must be a nonempty string"
+    }
+   }
+  },
+  {
+   "id": "s27",
+   "method": "cancel_display_load",
+   "params": {
+    "load_id": 7
+   },
+   "reply": {
+    "id": "s27",
+    "ok": false,
+    "error": {
+     "code": "invalid_owner_request",
+     "message": "load_id must be a nonempty string"
+    }
+   }
+  },
+  {
+   "id": "s28",
+   "method": "player_projection_page",
+   "params": {
+    "campaign_id": "x",
+    "after_sequence": 0,
+    "load_id": "load-gone"
+   },
+   "reply": {
+    "id": "s28",
+    "ok": false,
+    "error": {
+     "code": "display_load_cancelled",
+     "message": "This display load is no longer selected"
+    }
+   }
+  },
+  {
+   "id": "s29",
+   "method": "display_snapshot",
+   "params": {
+    "campaign_id": "x",
+    "load_id": "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL"
+   },
+   "reply": {
+    "id": "s29",
+    "ok": false,
+    "error": {
+     "code": "invalid_owner_request",
+     "message": "Display load identity must be a bounded string"
+    }
+   }
+  },
+  {
+   "id": "s30",
+   "method": "no_such_method",
+   "params": {
+    "anything": 1
+   },
+   "reply": {
+    "id": "s30",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Unsupported owner method: no_such_method",
+     "diagnostics": [],
+     "diagnostic_id": "7e60410d3ec74fdb8bbd97ca034d0956"
+    }
+   }
+  },
+  {
+   "id": "s31",
+   "method": "handshake_status",
+   "params": {
+    "ignored": true
+   },
+   "reply": {
+    "id": "s31",
+    "ok": true,
+    "result": {
+     "verified": true,
+     "role": "owner",
+     "reason": "launch handshake verified"
+    }
+   }
+  },
+  {
+   "id": "s32",
+   "method": "shutdown",
+   "params": {},
+   "reply": {
+    "id": "s32",
+    "ok": true,
+    "result": {
+     "status": "closed"
+    }
+   }
+  }
+ ],
+ "exit_code": 0,
+ "model_requests": [],
+ "database": {
+  "pragmas": {
+   "user_version": 12,
+   "application_id": 0,
+   "journal_mode": "wal",
+   "page_size": 4096,
+   "auto_vacuum": 0,
+   "encoding": "UTF-8"
+  },
+  "schema": [
+   {
+    "type": "index",
+    "name": "campaign_continuity_record_lookup",
+    "table": "campaign_continuity_records",
+    "sql": "CREATE INDEX campaign_continuity_record_lookup\nON campaign_continuity_records(campaign_id, kind, record_id, sequence)"
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_actions_1",
+    "table": "actions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_agent_session_messages_1",
+    "table": "agent_session_messages",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_agent_session_messages_2",
+    "table": "agent_session_messages",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_agent_sessions_1",
+    "table": "agent_sessions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_authority_schema_extensions_1",
+    "table": "authority_schema_extensions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_builder_dm_handoffs_1",
+    "table": "builder_dm_handoffs",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_builder_dm_handoffs_2",
+    "table": "builder_dm_handoffs",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_builder_dm_handoffs_3",
+    "table": "builder_dm_handoffs",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_constructions_1",
+    "table": "campaign_constructions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_constructions_2",
+    "table": "campaign_constructions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_constructions_3",
+    "table": "campaign_constructions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_constructions_4",
+    "table": "campaign_constructions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_continuity_records_1",
+    "table": "campaign_continuity_records",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_continuity_records_2",
+    "table": "campaign_continuity_records",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_continuity_records_3",
+    "table": "campaign_continuity_records",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_lifecycle_state_1",
+    "table": "campaign_lifecycle_state",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_lifecycle_transitions_1",
+    "table": "campaign_lifecycle_transitions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_lifecycle_transitions_2",
+    "table": "campaign_lifecycle_transitions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_lock_memberships_1",
+    "table": "campaign_lock_memberships",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_lock_memberships_2",
+    "table": "campaign_lock_memberships",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_locks_1",
+    "table": "campaign_locks",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_operations_1",
+    "table": "campaign_operations",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_package_memberships_1",
+    "table": "campaign_package_memberships",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_package_memberships_2",
+    "table": "campaign_package_memberships",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_plans_1",
+    "table": "campaign_plans",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_plans_2",
+    "table": "campaign_plans",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_plans_3",
+    "table": "campaign_plans",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_recovery_receipts_1",
+    "table": "campaign_recovery_receipts",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_recovery_receipts_2",
+    "table": "campaign_recovery_receipts",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_revisions_1",
+    "table": "campaign_revisions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_state_1",
+    "table": "campaign_state",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaign_state_namespace_owners_1",
+    "table": "campaign_state_namespace_owners",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_campaigns_1",
+    "table": "campaigns",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_canonical_events_1",
+    "table": "canonical_events",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_canonical_events_2",
+    "table": "canonical_events",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_consequences_1",
+    "table": "consequences",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_idempotency_records_1",
+    "table": "idempotency_records",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_mechanics_choice_resolutions_1",
+    "table": "mechanics_choice_resolutions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_mechanics_choice_resolutions_2",
+    "table": "mechanics_choice_resolutions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_mutations_1",
+    "table": "mutations",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_narration_interruptions_1",
+    "table": "narration_interruptions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_narration_interruptions_2",
+    "table": "narration_interruptions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_narration_interruptions_3",
+    "table": "narration_interruptions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_activations_1",
+    "table": "package_activations",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_blob_chunks_1",
+    "table": "package_blob_chunks",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_blobs_1",
+    "table": "package_blobs",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_candidate_memberships_1",
+    "table": "package_candidate_memberships",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_candidate_memberships_2",
+    "table": "package_candidate_memberships",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_candidates_1",
+    "table": "package_candidates",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_candidates_2",
+    "table": "package_candidates",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_capabilities_1",
+    "table": "package_capabilities",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_capabilities_2",
+    "table": "package_capabilities",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_dependencies_1",
+    "table": "package_dependencies",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_dependencies_2",
+    "table": "package_dependencies",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_exact_dependencies_1",
+    "table": "package_exact_dependencies",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_exact_dependencies_2",
+    "table": "package_exact_dependencies",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_manifest_files_1",
+    "table": "package_manifest_files",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_manifest_files_2",
+    "table": "package_manifest_files",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_manifests_1",
+    "table": "package_manifests",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_participant_artifacts_1",
+    "table": "package_participant_artifacts",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_participant_artifacts_2",
+    "table": "package_participant_artifacts",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_prompt_fragments_1",
+    "table": "package_prompt_fragments",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_prompt_fragments_2",
+    "table": "package_prompt_fragments",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_read_leases_1",
+    "table": "package_read_leases",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_recovery_roots_1",
+    "table": "package_recovery_roots",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_staging_1",
+    "table": "package_staging",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_staging_chunks_1",
+    "table": "package_staging_chunks",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_tools_1",
+    "table": "package_tools",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_tools_2",
+    "table": "package_tools",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_ui_surfaces_1",
+    "table": "package_ui_surfaces",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_package_ui_surfaces_2",
+    "table": "package_ui_surfaces",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_packages_1",
+    "table": "packages",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_participant_adaptations_1",
+    "table": "participant_adaptations",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_participant_quarantines_1",
+    "table": "participant_quarantines",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_participants_1",
+    "table": "participants",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_pending_mechanics_action_aliases_1",
+    "table": "pending_mechanics_action_aliases",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_pending_mechanics_actions_1",
+    "table": "pending_mechanics_actions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_pending_mechanics_actions_2",
+    "table": "pending_mechanics_actions",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_provider_private_records_1",
+    "table": "provider_private_records",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_schema_migrations_1",
+    "table": "schema_migrations",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_standalone_builder_chat_messages_1",
+    "table": "standalone_builder_chat_messages",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_standalone_builder_chat_messages_2",
+    "table": "standalone_builder_chat_messages",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_standalone_builder_chats_1",
+    "table": "standalone_builder_chats",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_standalone_builder_chats_2",
+    "table": "standalone_builder_chats",
+    "sql": null
+   },
+   {
+    "type": "index",
+    "name": "sqlite_autoindex_turns_1",
+    "table": "turns",
+    "sql": null
+   },
+   {
+    "type": "table",
+    "name": "actions",
+    "table": "actions",
+    "sql": "CREATE TABLE actions (\n    campaign_id TEXT NOT NULL,\n    action_id TEXT NOT NULL,\n    turn_id TEXT NOT NULL,\n    expected_revision INTEGER NOT NULL,\n    resulting_revision INTEGER NOT NULL,\n    writer TEXT NOT NULL,\n    package_id TEXT NOT NULL,\n    package_version TEXT NOT NULL,\n    package_sha256 TEXT NOT NULL,\n    tool_name TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('committed', 'failed')),\n    payload_json TEXT NOT NULL,\n    payload_hash TEXT NOT NULL,\n    result_json TEXT NOT NULL, lock_id TEXT,\n    PRIMARY KEY (campaign_id, action_id),\n    FOREIGN KEY (campaign_id, turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (package_id, package_version, package_sha256)\n        REFERENCES packages(package_id, version, sha256),\n    FOREIGN KEY (campaign_id, package_id, package_version, package_sha256)\n        REFERENCES campaign_package_memberships(campaign_id, package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "agent_session_messages",
+    "table": "agent_session_messages",
+    "sql": "CREATE TABLE agent_session_messages (\n    session_id TEXT NOT NULL,\n    sequence INTEGER NOT NULL CHECK (sequence > 0),\n    message_id TEXT NOT NULL,\n    kind TEXT NOT NULL CHECK (kind IN (\n        'user', 'safe_think', 'talk', 'steering', 'evidence',\n        'canonical_reference', 'human_review'\n    )),\n    content_json TEXT NOT NULL,\n    canonical_sequence INTEGER,\n    PRIMARY KEY (session_id, sequence),\n    UNIQUE (session_id, message_id),\n    FOREIGN KEY (session_id) REFERENCES agent_sessions(session_id) ON DELETE CASCADE,\n    CHECK (\n        (kind = 'canonical_reference' AND canonical_sequence IS NOT NULL)\n        OR (kind != 'canonical_reference' AND canonical_sequence IS NULL)\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "agent_sessions",
+    "table": "agent_sessions",
+    "sql": "CREATE TABLE agent_sessions (\n    session_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL,\n    role TEXT NOT NULL CHECK (role IN ('builder', 'dm')),\n    provider_id TEXT NOT NULL,\n    model_id TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN (\n        'active', 'stopped', 'completed', 'review_required', 'handoff_closed'\n    )),\n    parent_session_id TEXT,\n    selected_skill TEXT CHECK (selected_skill IN (\n        'BUILD RULESET', 'BUILD CAMPAIGN SETTING', 'BUILD CAMPAIGN PLAN'\n    )),\n    scope_json TEXT NOT NULL,\n    payload_sha256 TEXT NOT NULL, reasoning_effort TEXT, reasoning_effort_once TEXT,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (parent_session_id) REFERENCES agent_sessions(session_id),\n    CHECK (\n        (role = 'builder' AND selected_skill IS NOT NULL)\n        OR (role = 'dm' AND selected_skill IS NULL)\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "authority_schema_extensions",
+    "table": "authority_schema_extensions",
+    "sql": "CREATE TABLE authority_schema_extensions (\n    extension_name TEXT PRIMARY KEY,\n    extension_sha256 TEXT NOT NULL,\n    predecessor_migration_name TEXT NOT NULL,\n    predecessor_sql_sha256 TEXT NOT NULL\n)"
+   },
+   {
+    "type": "table",
+    "name": "builder_dm_handoffs",
+    "table": "builder_dm_handoffs",
+    "sql": "CREATE TABLE builder_dm_handoffs (\n    handoff_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL UNIQUE,\n    payload_sha256 TEXT NOT NULL,\n    builder_session_id TEXT NOT NULL,\n    dm_session_id TEXT NOT NULL UNIQUE,\n    package_lock_id TEXT NOT NULL,\n    package_candidate_id TEXT,\n    plan_id TEXT NOT NULL,\n    plan_revision INTEGER NOT NULL CHECK (plan_revision > 0),\n    plan_content_sha256 TEXT NOT NULL,\n    expected_revision INTEGER NOT NULL CHECK (expected_revision >= 0),\n    resulting_campaign_revision INTEGER NOT NULL CHECK (\n        resulting_campaign_revision = expected_revision + 1\n    ),\n    chronology_ordinal INTEGER NOT NULL CHECK (chronology_ordinal = 1),\n    completed_turn_id TEXT NOT NULL,\n    safe_payload_json TEXT NOT NULL,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (builder_session_id) REFERENCES agent_sessions(session_id),\n    FOREIGN KEY (dm_session_id) REFERENCES agent_sessions(session_id),\n    FOREIGN KEY (package_lock_id) REFERENCES campaign_locks(lock_id),\n    FOREIGN KEY (package_candidate_id) REFERENCES package_candidates(candidate_id),\n    FOREIGN KEY (plan_id) REFERENCES campaign_plans(plan_id),\n    FOREIGN KEY (campaign_id, completed_turn_id) REFERENCES turns(campaign_id, turn_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_constructions",
+    "table": "campaign_constructions",
+    "sql": "CREATE TABLE campaign_constructions (\n    campaign_id TEXT PRIMARY KEY,\n    confirmation_operation_id TEXT NOT NULL UNIQUE,\n    authority_turn_id TEXT NOT NULL,\n    authority_lock_id TEXT NOT NULL,\n    confirmation_revision INTEGER NOT NULL CHECK (confirmation_revision >= 0),\n    lane TEXT CHECK (lane IN ('quick_start', 'customize')),\n    canonical_input_json TEXT,\n    begin_operation_id TEXT UNIQUE,\n    begin_revision INTEGER CHECK (begin_revision > 0),\n    canonical_plan_json TEXT,\n    completion_operation_id TEXT UNIQUE,\n    completion_revision INTEGER CHECK (completion_revision > 0),\n    canonical_representation_sha256 TEXT,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (confirmation_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (begin_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (completion_operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (campaign_id, authority_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (authority_lock_id) REFERENCES campaign_locks(lock_id),\n    CHECK (\n        (lane IS NULL AND canonical_input_json IS NULL AND begin_operation_id IS NULL\n            AND begin_revision IS NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NULL\n            AND completion_operation_id IS NULL AND completion_revision IS NULL\n            AND canonical_representation_sha256 IS NULL)\n        OR\n        (lane IS NOT NULL AND canonical_input_json IS NOT NULL AND begin_operation_id IS NOT NULL\n            AND begin_revision IS NOT NULL AND canonical_plan_json IS NOT NULL\n            AND completion_operation_id IS NOT NULL AND completion_revision IS NOT NULL\n            AND canonical_representation_sha256 IS NOT NULL)\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_continuity_records",
+    "table": "campaign_continuity_records",
+    "sql": "CREATE TABLE campaign_continuity_records (\n    campaign_id TEXT NOT NULL,\n    sequence INTEGER NOT NULL CHECK (sequence > 0),\n    entry_id TEXT NOT NULL,\n    record_id TEXT NOT NULL,\n    kind TEXT NOT NULL CHECK (kind IN ('scene', 'fact', 'entity', 'reveal', 'plan_progress')),\n    status TEXT NOT NULL CHECK (status IN ('active', 'retired')),\n    payload_json TEXT NOT NULL,\n    basis_message_ids_json TEXT NOT NULL,\n    operation_id TEXT,\n    admitted_revision INTEGER NOT NULL CHECK (admitted_revision >= 0),\n    PRIMARY KEY (campaign_id, sequence),\n    UNIQUE (campaign_id, entry_id),\n    UNIQUE (operation_id),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (operation_id) REFERENCES campaign_operations(operation_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_lifecycle_state",
+    "table": "campaign_lifecycle_state",
+    "sql": "CREATE TABLE campaign_lifecycle_state (\n    campaign_id TEXT PRIMARY KEY,\n    retained_active_writer TEXT,\n    designated_session_id TEXT,\n    tombstone_prior_lifecycle TEXT,\n    tombstone_prior_writer TEXT,\n    tombstone_prior_session_id TEXT,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (designated_session_id) REFERENCES agent_sessions(session_id),\n    FOREIGN KEY (tombstone_prior_session_id) REFERENCES agent_sessions(session_id),\n    CHECK (retained_active_writer IS NULL OR retained_active_writer IN ('builder', 'dm')),\n    CHECK (\n        tombstone_prior_lifecycle IS NULL\n        OR tombstone_prior_lifecycle IN ('active', 'archived')\n    ),\n    CHECK (tombstone_prior_writer IS NULL OR tombstone_prior_writer IN ('none', 'builder', 'dm'))\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_lifecycle_transitions",
+    "table": "campaign_lifecycle_transitions",
+    "sql": "CREATE TABLE campaign_lifecycle_transitions (\n    operation_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL,\n    operation_kind TEXT NOT NULL,\n    basis_revision INTEGER NOT NULL,\n    resulting_revision INTEGER NOT NULL,\n    from_lifecycle TEXT NOT NULL,\n    to_lifecycle TEXT NOT NULL,\n    from_writer TEXT NOT NULL,\n    to_writer TEXT NOT NULL,\n    designated_session_id TEXT,\n    FOREIGN KEY (operation_id) REFERENCES campaign_operations(operation_id),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (designated_session_id) REFERENCES agent_sessions(session_id),\n    UNIQUE (campaign_id, resulting_revision),\n    CHECK (\n        operation_kind IN (\n            'rename_campaign', 'archive_campaign', 'restore_campaign', 'trash_campaign'\n        )\n    ),\n    CHECK (resulting_revision = basis_revision + 1),\n    CHECK (from_lifecycle IN ('active', 'archived', 'tombstoned')),\n    CHECK (to_lifecycle IN ('active', 'archived', 'tombstoned')),\n    CHECK (from_writer IN ('none', 'builder', 'dm')),\n    CHECK (to_writer IN ('none', 'builder', 'dm'))\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_lock_memberships",
+    "table": "campaign_lock_memberships",
+    "sql": "CREATE TABLE campaign_lock_memberships (\n    lock_id TEXT NOT NULL,\n    closure_order INTEGER NOT NULL CHECK (closure_order >= 0),\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    role TEXT NOT NULL CHECK (role IN ('primary', 'dependency')),\n    PRIMARY KEY (lock_id, closure_order),\n    UNIQUE (lock_id, package_id),\n    FOREIGN KEY (lock_id) REFERENCES campaign_locks(lock_id) ON DELETE CASCADE,\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES packages(package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_locks",
+    "table": "campaign_locks",
+    "sql": "CREATE TABLE campaign_locks (\n    lock_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL,\n    closure_sha256 TEXT NOT NULL,\n    availability TEXT NOT NULL CHECK (availability IN ('available', 'legacy_unavailable')),\n    predecessor_lock_id TEXT,\n    created_revision INTEGER NOT NULL CHECK (created_revision >= 0),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (predecessor_lock_id) REFERENCES campaign_locks(lock_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_operations",
+    "table": "campaign_operations",
+    "sql": "CREATE TABLE campaign_operations (\n    operation_id TEXT PRIMARY KEY,\n    operation_kind TEXT NOT NULL,\n    campaign_id TEXT NOT NULL,\n    semantic_payload_json TEXT NOT NULL,\n    semantic_payload_sha256 TEXT NOT NULL,\n    result_json TEXT NOT NULL,\n    basis_turn_id TEXT,\n    basis_lock_id TEXT,\n    basis_revision INTEGER NOT NULL CHECK (basis_revision >= 0),\n    resulting_revision INTEGER NOT NULL CHECK (resulting_revision >= 0),\n    FOREIGN KEY (campaign_id, basis_turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (basis_lock_id) REFERENCES campaign_locks(lock_id),\n    CHECK (\n        (basis_turn_id IS NULL AND basis_lock_id IS NULL\n            AND operation_kind IN (\n                'rename_campaign', 'archive_campaign', 'restore_campaign',\n                'trash_campaign', 'purge_campaign'\n            ))\n        OR\n        (basis_turn_id IS NOT NULL AND basis_lock_id IS NOT NULL\n            AND operation_kind != 'purge_campaign')\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_package_memberships",
+    "table": "campaign_package_memberships",
+    "sql": "CREATE TABLE campaign_package_memberships (\n    campaign_id TEXT NOT NULL,\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    sha256 TEXT NOT NULL,\n    role TEXT NOT NULL CHECK (role IN ('primary', 'dependency')),\n    load_order INTEGER NOT NULL CHECK (load_order >= 0),\n    PRIMARY KEY (campaign_id, package_id, version, sha256),\n    UNIQUE (campaign_id, load_order),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (package_id, version, sha256)\n        REFERENCES packages(package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_plans",
+    "table": "campaign_plans",
+    "sql": "CREATE TABLE campaign_plans (\n    plan_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL,\n    package_lock_id TEXT NOT NULL,\n    source_session_id TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    content_json TEXT NOT NULL,\n    provenance_json TEXT NOT NULL,\n    validation_outcome TEXT NOT NULL CHECK (validation_outcome = 'valid'),\n    acceptance_status TEXT NOT NULL CHECK (acceptance_status = 'accepted'),\n    plan_revision INTEGER NOT NULL CHECK (plan_revision > 0),\n    resulting_campaign_revision INTEGER NOT NULL CHECK (resulting_campaign_revision > 0),\n    payload_sha256 TEXT NOT NULL,\n    UNIQUE (campaign_id, plan_revision),\n    UNIQUE (campaign_id, resulting_campaign_revision),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (package_lock_id) REFERENCES campaign_locks(lock_id),\n    FOREIGN KEY (source_session_id) REFERENCES agent_sessions(session_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_recovery_receipts",
+    "table": "campaign_recovery_receipts",
+    "sql": "CREATE TABLE campaign_recovery_receipts (\n    recovery_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL UNIQUE,\n    semantic_payload_json TEXT NOT NULL,\n    semantic_payload_sha256 TEXT NOT NULL,\n    archive_sha256 TEXT NOT NULL,\n    archive_byte_count INTEGER NOT NULL CHECK (archive_byte_count >= 0),\n    captured_revision INTEGER NOT NULL CHECK (captured_revision >= 0),\n    result_json TEXT NOT NULL,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_revisions",
+    "table": "campaign_revisions",
+    "sql": "CREATE TABLE campaign_revisions (\n    campaign_id TEXT NOT NULL,\n    revision INTEGER NOT NULL,\n    action_id TEXT, activation_id TEXT, plan_id TEXT, handoff_id TEXT, construction_operation_id TEXT, lifecycle_operation_id TEXT, continuity_operation_id TEXT REFERENCES campaign_operations(operation_id),\n    PRIMARY KEY (campaign_id, revision),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (campaign_id, action_id) REFERENCES actions(campaign_id, action_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_state",
+    "table": "campaign_state",
+    "sql": "CREATE TABLE campaign_state (\n    campaign_id TEXT NOT NULL,\n    namespace TEXT NOT NULL,\n    state_key TEXT NOT NULL,\n    value_json TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, namespace, state_key),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaign_state_namespace_owners",
+    "table": "campaign_state_namespace_owners",
+    "sql": "CREATE TABLE campaign_state_namespace_owners (\n    campaign_id TEXT NOT NULL,\n    namespace TEXT NOT NULL,\n    owner_package_id TEXT,\n    PRIMARY KEY (campaign_id, namespace),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "campaigns",
+    "table": "campaigns",
+    "sql": "CREATE TABLE campaigns (\n    campaign_id TEXT PRIMARY KEY,\n    display_name TEXT NOT NULL,\n    lifecycle TEXT NOT NULL CHECK (lifecycle IN ('active', 'archived', 'tombstoned')),\n    writer TEXT NOT NULL CHECK (writer IN ('builder', 'dm', 'none')),\n    revision INTEGER NOT NULL CHECK (revision >= 0),\n    lock_hash TEXT NOT NULL\n, current_lock_id TEXT)"
+   },
+   {
+    "type": "table",
+    "name": "canonical_events",
+    "table": "canonical_events",
+    "sql": "CREATE TABLE canonical_events (\n    campaign_id TEXT NOT NULL,\n    sequence INTEGER NOT NULL,\n    event_type TEXT NOT NULL CHECK (event_type IN (\n        'think', 'talk', 'action_declared', 'tool_call', 'tool_result',\n        'state_mutation', 'consequence', 'action_committed', 'action_failed'\n    )),\n    turn_id TEXT NOT NULL,\n    action_id TEXT,\n    safe_payload_json TEXT NOT NULL,\n    visibility TEXT NOT NULL CHECK (visibility IN ('internal_safe', 'player_safe')),\n    attempt_id TEXT,\n    attempt_ordinal INTEGER,\n    PRIMARY KEY (campaign_id, sequence),\n    UNIQUE (campaign_id, attempt_id, attempt_ordinal),\n    FOREIGN KEY (campaign_id, action_id) REFERENCES actions(campaign_id, action_id),\n    CHECK (\n        (\n            event_type IN ('think', 'talk')\n            AND action_id IS NULL\n            AND visibility = 'player_safe'\n            AND attempt_id IS NOT NULL\n            AND attempt_ordinal IS NOT NULL\n            AND attempt_ordinal >= 0\n        ) OR (\n            event_type NOT IN ('think', 'talk')\n            AND action_id IS NOT NULL\n            AND attempt_id IS NULL\n            AND attempt_ordinal IS NULL\n            AND (\n                (event_type IN ('tool_call', 'tool_result') AND visibility = 'player_safe')\n                OR\n                (event_type NOT IN ('tool_call', 'tool_result')\n                    AND visibility = 'internal_safe')\n            )\n        )\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "consequences",
+    "table": "consequences",
+    "sql": "CREATE TABLE consequences (\n    campaign_id TEXT NOT NULL,\n    action_id TEXT NOT NULL,\n    ordinal INTEGER NOT NULL,\n    payload_json TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, action_id, ordinal),\n    FOREIGN KEY (campaign_id, action_id) REFERENCES actions(campaign_id, action_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "idempotency_records",
+    "table": "idempotency_records",
+    "sql": "CREATE TABLE idempotency_records (\n    campaign_id TEXT NOT NULL,\n    idempotency_key TEXT NOT NULL,\n    payload_hash TEXT NOT NULL,\n    action_id TEXT NOT NULL,\n    status TEXT NOT NULL,\n    result_json TEXT NOT NULL,\n    resulting_revision INTEGER NOT NULL,\n    PRIMARY KEY (campaign_id, idempotency_key),\n    FOREIGN KEY (campaign_id, action_id) REFERENCES actions(campaign_id, action_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "mechanics_choice_resolutions",
+    "table": "mechanics_choice_resolutions",
+    "sql": "CREATE TABLE mechanics_choice_resolutions (\n    campaign_id TEXT NOT NULL,\n    resolution_id TEXT NOT NULL,\n    action_id TEXT NOT NULL,\n    choice_id TEXT NOT NULL,\n    option_id TEXT NOT NULL,\n    resolution_sha256 TEXT NOT NULL,\n    descriptor_sha256 TEXT NOT NULL,\n    session_id TEXT,\n    resulting_revision INTEGER NOT NULL CHECK (resulting_revision >= 1),\n    PRIMARY KEY (campaign_id, resolution_id),\n    UNIQUE (campaign_id, action_id),\n    FOREIGN KEY (campaign_id, action_id) REFERENCES actions(campaign_id, action_id),\n    FOREIGN KEY (session_id) REFERENCES agent_sessions(session_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "mutations",
+    "table": "mutations",
+    "sql": "CREATE TABLE mutations (\n    campaign_id TEXT NOT NULL,\n    action_id TEXT NOT NULL,\n    ordinal INTEGER NOT NULL,\n    namespace TEXT NOT NULL,\n    state_key TEXT NOT NULL,\n    before_json TEXT NOT NULL,\n    after_json TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, action_id, ordinal),\n    FOREIGN KEY (campaign_id, action_id) REFERENCES actions(campaign_id, action_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "narration_interruptions",
+    "table": "narration_interruptions",
+    "sql": "CREATE TABLE narration_interruptions (\n    campaign_id TEXT NOT NULL,\n    interruption_id TEXT NOT NULL,\n    turn_id TEXT NOT NULL,\n    last_action_id TEXT,\n    failed_attempt_id TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('retryable', 'resolved')),\n    resolving_retry_id TEXT,\n    resolved_sequence INTEGER,\n    PRIMARY KEY (campaign_id, interruption_id),\n    UNIQUE (campaign_id, failed_attempt_id),\n    UNIQUE (campaign_id, resolving_retry_id),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (campaign_id, turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (campaign_id, last_action_id) REFERENCES actions(campaign_id, action_id),\n    FOREIGN KEY (campaign_id, resolved_sequence)\n        REFERENCES canonical_events(campaign_id, sequence),\n    CHECK (\n        (status = 'retryable' AND resolved_sequence IS NULL)\n        OR\n        (status = 'resolved' AND resolving_retry_id IS NOT NULL\n            AND resolved_sequence IS NOT NULL)\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_activations",
+    "table": "package_activations",
+    "sql": "CREATE TABLE package_activations (\n    activation_id TEXT PRIMARY KEY,\n    campaign_id TEXT NOT NULL,\n    payload_sha256 TEXT NOT NULL,\n    candidate_id TEXT NOT NULL,\n    old_lock_id TEXT NOT NULL,\n    new_lock_id TEXT NOT NULL,\n    migration_id TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('committed', 'failed')),\n    resulting_revision INTEGER NOT NULL,\n    result_json TEXT NOT NULL,\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (candidate_id) REFERENCES package_candidates(candidate_id),\n    FOREIGN KEY (old_lock_id) REFERENCES campaign_locks(lock_id),\n    FOREIGN KEY (new_lock_id) REFERENCES campaign_locks(lock_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_blob_chunks",
+    "table": "package_blob_chunks",
+    "sql": "CREATE TABLE package_blob_chunks (\n    blob_sha256 TEXT NOT NULL,\n    chunk_order INTEGER NOT NULL CHECK (chunk_order >= 0),\n    byte_count INTEGER NOT NULL CHECK (byte_count >= 0),\n    chunk_sha256 TEXT NOT NULL,\n    data BLOB NOT NULL,\n    PRIMARY KEY (blob_sha256, chunk_order),\n    FOREIGN KEY (blob_sha256) REFERENCES package_blobs(blob_sha256) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_blobs",
+    "table": "package_blobs",
+    "sql": "CREATE TABLE package_blobs (\n    blob_sha256 TEXT PRIMARY KEY,\n    byte_count INTEGER NOT NULL CHECK (byte_count >= 0),\n    chunk_count INTEGER NOT NULL CHECK (chunk_count >= 0)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_candidate_memberships",
+    "table": "package_candidate_memberships",
+    "sql": "CREATE TABLE package_candidate_memberships (\n    candidate_id TEXT NOT NULL,\n    closure_order INTEGER NOT NULL CHECK (closure_order >= 0),\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    PRIMARY KEY (candidate_id, closure_order),\n    UNIQUE (candidate_id, package_id),\n    FOREIGN KEY (candidate_id) REFERENCES package_candidates(candidate_id) ON DELETE CASCADE,\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_candidates",
+    "table": "package_candidates",
+    "sql": "CREATE TABLE package_candidates (\n    candidate_id TEXT PRIMARY KEY,\n    install_id TEXT NOT NULL UNIQUE,\n    status TEXT NOT NULL CHECK (status IN ('validated', 'activated', 'failed')),\n    closure_sha256 TEXT NOT NULL,\n    report_json TEXT NOT NULL,\n    FOREIGN KEY (install_id) REFERENCES package_staging(install_id)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_capabilities",
+    "table": "package_capabilities",
+    "sql": "CREATE TABLE package_capabilities (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    capability_order INTEGER NOT NULL CHECK (capability_order >= 0),\n    capability TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, capability_order),\n    UNIQUE (package_id, version, content_sha256, capability),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_dependencies",
+    "table": "package_dependencies",
+    "sql": "CREATE TABLE package_dependencies (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    sha256 TEXT NOT NULL,\n    dependency_order INTEGER NOT NULL CHECK (dependency_order >= 0),\n    dependency_id TEXT NOT NULL,\n    dependency_version TEXT NOT NULL,\n    dependency_sha256 TEXT NOT NULL,\n    dependency_kind TEXT NOT NULL, dependency_namespace TEXT NOT NULL DEFAULT 'legacy',\n    PRIMARY KEY (package_id, version, sha256, dependency_order),\n    UNIQUE (package_id, version, sha256, dependency_id),\n    FOREIGN KEY (package_id, version, sha256)\n        REFERENCES packages(package_id, version, sha256),\n    FOREIGN KEY (dependency_id, dependency_version, dependency_sha256)\n        REFERENCES packages(package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_exact_dependencies",
+    "table": "package_exact_dependencies",
+    "sql": "CREATE TABLE package_exact_dependencies (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    dependency_order INTEGER NOT NULL CHECK (dependency_order >= 0),\n    dependency_namespace TEXT NOT NULL,\n    dependency_kind TEXT NOT NULL,\n    dependency_id TEXT NOT NULL,\n    dependency_version TEXT NOT NULL,\n    dependency_content_sha256 TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, dependency_order),\n    UNIQUE (package_id, version, content_sha256, dependency_namespace),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE,\n    FOREIGN KEY (dependency_id, dependency_version, dependency_content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_manifest_files",
+    "table": "package_manifest_files",
+    "sql": "CREATE TABLE package_manifest_files (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    file_order INTEGER NOT NULL CHECK (file_order >= 0),\n    portable_path TEXT NOT NULL,\n    byte_count INTEGER NOT NULL CHECK (byte_count >= 0),\n    blob_sha256 TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, file_order),\n    UNIQUE (package_id, version, content_sha256, portable_path),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE,\n    FOREIGN KEY (blob_sha256) REFERENCES package_blobs(blob_sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_manifests",
+    "table": "package_manifests",
+    "sql": "CREATE TABLE package_manifests (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    role TEXT NOT NULL CHECK (role IN ('primary', 'dependency')),\n    canonical_json TEXT NOT NULL,\n    metadata_json TEXT NOT NULL,\n    provenance_json TEXT NOT NULL,\n    compatibility_json TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('published', 'reclaimed')),\n    PRIMARY KEY (package_id, version, content_sha256),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES packages(package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_participant_artifacts",
+    "table": "package_participant_artifacts",
+    "sql": "CREATE TABLE package_participant_artifacts (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    artifact_order INTEGER NOT NULL CHECK (artifact_order >= 0),\n    kind TEXT NOT NULL,\n    schema_id TEXT NOT NULL,\n    schema_sha256 TEXT NOT NULL,\n    schema_json TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, artifact_order),\n    UNIQUE (package_id, version, content_sha256, kind),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_prompt_fragments",
+    "table": "package_prompt_fragments",
+    "sql": "CREATE TABLE package_prompt_fragments (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    surface_order INTEGER NOT NULL CHECK (surface_order >= 0),\n    fragment_id TEXT NOT NULL,\n    capability TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, surface_order),\n    UNIQUE (package_id, version, content_sha256, fragment_id),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_read_leases",
+    "table": "package_read_leases",
+    "sql": "CREATE TABLE package_read_leases (\n    lease_id TEXT PRIMARY KEY,\n    blob_sha256 TEXT NOT NULL,\n    FOREIGN KEY (blob_sha256) REFERENCES package_blobs(blob_sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_recovery_roots",
+    "table": "package_recovery_roots",
+    "sql": "CREATE TABLE package_recovery_roots (\n    root_id TEXT PRIMARY KEY,\n    blob_sha256 TEXT NOT NULL,\n    FOREIGN KEY (blob_sha256) REFERENCES package_blobs(blob_sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_staging",
+    "table": "package_staging",
+    "sql": "CREATE TABLE package_staging (\n    install_id TEXT PRIMARY KEY,\n    status TEXT NOT NULL CHECK (status IN ('staging', 'published', 'failed')),\n    manifest_json TEXT NOT NULL,\n    report_json TEXT NOT NULL\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_staging_chunks",
+    "table": "package_staging_chunks",
+    "sql": "CREATE TABLE package_staging_chunks (\n    install_id TEXT NOT NULL,\n    file_order INTEGER NOT NULL CHECK (file_order >= 0),\n    chunk_order INTEGER NOT NULL CHECK (chunk_order >= 0),\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    portable_path TEXT NOT NULL,\n    chunk_sha256 TEXT NOT NULL,\n    data BLOB NOT NULL,\n    PRIMARY KEY (install_id, file_order, chunk_order),\n    FOREIGN KEY (install_id) REFERENCES package_staging(install_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_tools",
+    "table": "package_tools",
+    "sql": "CREATE TABLE package_tools (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    tool_order INTEGER NOT NULL CHECK (tool_order >= 0),\n    tool_name TEXT NOT NULL,\n    capability TEXT NOT NULL,\n    input_schema_json TEXT NOT NULL,\n    state_predicates_json TEXT NOT NULL,\n    turn_statuses_json TEXT NOT NULL,\n    writers_json TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, tool_order),\n    UNIQUE (package_id, version, content_sha256, tool_name),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "package_ui_surfaces",
+    "table": "package_ui_surfaces",
+    "sql": "CREATE TABLE package_ui_surfaces (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    content_sha256 TEXT NOT NULL,\n    surface_order INTEGER NOT NULL CHECK (surface_order >= 0),\n    surface_id TEXT NOT NULL,\n    capability TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, content_sha256, surface_order),\n    UNIQUE (package_id, version, content_sha256, surface_id),\n    FOREIGN KEY (package_id, version, content_sha256)\n        REFERENCES package_manifests(package_id, version, content_sha256) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "packages",
+    "table": "packages",
+    "sql": "CREATE TABLE packages (\n    package_id TEXT NOT NULL,\n    version TEXT NOT NULL,\n    sha256 TEXT NOT NULL,\n    capabilities_json TEXT NOT NULL,\n    PRIMARY KEY (package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "participant_adaptations",
+    "table": "participant_adaptations",
+    "sql": "CREATE TABLE participant_adaptations (\n    operation_id TEXT PRIMARY KEY,\n    payload_sha256 TEXT NOT NULL,\n    source_campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    source_kind TEXT NOT NULL,\n    source_package_id TEXT NOT NULL,\n    source_package_version TEXT NOT NULL,\n    source_package_sha256 TEXT,\n    source_schema_id TEXT,\n    source_schema_sha256 TEXT,\n    source_data_sha256 TEXT NOT NULL,\n    destination_kind TEXT NOT NULL,\n    destination_package_id TEXT NOT NULL,\n    destination_package_version TEXT NOT NULL,\n    destination_package_sha256 TEXT NOT NULL,\n    destination_schema_id TEXT NOT NULL,\n    destination_schema_sha256 TEXT NOT NULL,\n    data_json TEXT NOT NULL,\n    FOREIGN KEY (\n        destination_package_id, destination_package_version,\n        destination_package_sha256, destination_kind\n    ) REFERENCES package_participant_artifacts(\n        package_id, version, content_sha256, kind\n    )\n)"
+   },
+   {
+    "type": "table",
+    "name": "participant_quarantines",
+    "table": "participant_quarantines",
+    "sql": "CREATE TABLE participant_quarantines (\n    campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    reason_code TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, participant_id),\n    FOREIGN KEY (campaign_id, participant_id)\n        REFERENCES participants(campaign_id, participant_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "participants",
+    "table": "participants",
+    "sql": "CREATE TABLE participants (\n    campaign_id TEXT NOT NULL,\n    participant_id TEXT NOT NULL,\n    kind TEXT NOT NULL,\n    package_id TEXT NOT NULL,\n    package_version TEXT NOT NULL,\n    data_json TEXT NOT NULL, package_sha256 TEXT, schema_id TEXT, schema_sha256 TEXT, validation_status TEXT NOT NULL DEFAULT 'quarantined'\n    CHECK (validation_status IN ('validated', 'quarantined')), adaptation_id TEXT\n    REFERENCES participant_adaptations(operation_id),\n    PRIMARY KEY (campaign_id, participant_id),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "pending_mechanics_action_aliases",
+    "table": "pending_mechanics_action_aliases",
+    "sql": "CREATE TABLE pending_mechanics_action_aliases (\n    campaign_id TEXT NOT NULL,\n    idempotency_key TEXT NOT NULL,\n    action_id TEXT NOT NULL,\n    payload_hash TEXT NOT NULL,\n    PRIMARY KEY (campaign_id, idempotency_key),\n    FOREIGN KEY (campaign_id, action_id)\n        REFERENCES pending_mechanics_actions(campaign_id, action_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "pending_mechanics_actions",
+    "table": "pending_mechanics_actions",
+    "sql": "CREATE TABLE pending_mechanics_actions (\n    campaign_id TEXT PRIMARY KEY,\n    action_id TEXT NOT NULL,\n    turn_id TEXT NOT NULL,\n    basis_revision INTEGER NOT NULL CHECK (basis_revision >= 0),\n    writer TEXT NOT NULL CHECK (writer IN ('builder', 'dm', 'none')),\n    package_id TEXT NOT NULL,\n    package_version TEXT NOT NULL,\n    package_sha256 TEXT NOT NULL,\n    lock_id TEXT NOT NULL,\n    tool_name TEXT NOT NULL,\n    parameters_json TEXT NOT NULL,\n    payload_hash TEXT NOT NULL,\n    initiating_session_id TEXT,\n    choice_id TEXT NOT NULL,\n    descriptor_json TEXT NOT NULL,\n    descriptor_sha256 TEXT NOT NULL,\n    UNIQUE (campaign_id, action_id),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE,\n    FOREIGN KEY (campaign_id, turn_id) REFERENCES turns(campaign_id, turn_id),\n    FOREIGN KEY (lock_id) REFERENCES campaign_locks(lock_id),\n    FOREIGN KEY (initiating_session_id) REFERENCES agent_sessions(session_id),\n    FOREIGN KEY (campaign_id, package_id, package_version, package_sha256)\n        REFERENCES campaign_package_memberships(campaign_id, package_id, version, sha256)\n)"
+   },
+   {
+    "type": "table",
+    "name": "provider_private_records",
+    "table": "provider_private_records",
+    "sql": "CREATE TABLE provider_private_records (\n    session_id TEXT NOT NULL,\n    agent_session_id TEXT,\n    builder_session_id TEXT,\n    attempt_id TEXT NOT NULL,\n    response_id TEXT NOT NULL,\n    turn_id TEXT NOT NULL,\n    basis_message_id TEXT NOT NULL,\n    source_order INTEGER NOT NULL CHECK (source_order >= 0),\n    provider_id TEXT NOT NULL,\n    model_id TEXT NOT NULL,\n    kind TEXT NOT NULL CHECK (kind IN ('thinking', 'continuation')),\n    payload TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('partial', 'completed', 'interrupted')),\n    PRIMARY KEY (session_id, attempt_id, source_order),\n    FOREIGN KEY (agent_session_id) REFERENCES agent_sessions(session_id) ON DELETE CASCADE,\n    FOREIGN KEY (builder_session_id) REFERENCES standalone_builder_chats(session_id)\n        ON DELETE CASCADE,\n    CHECK (\n        (agent_session_id = session_id AND builder_session_id IS NULL)\n        OR (builder_session_id = session_id AND agent_session_id IS NULL)\n    ),\n    CHECK (agent_session_id IS NOT NULL OR builder_session_id IS NOT NULL)\n)"
+   },
+   {
+    "type": "table",
+    "name": "schema_migrations",
+    "table": "schema_migrations",
+    "sql": "CREATE TABLE schema_migrations (\n    version INTEGER PRIMARY KEY,\n    applied_name TEXT NOT NULL UNIQUE,\n    sql_sha256 TEXT NOT NULL\n)"
+   },
+   {
+    "type": "table",
+    "name": "standalone_builder_chat_messages",
+    "table": "standalone_builder_chat_messages",
+    "sql": "CREATE TABLE standalone_builder_chat_messages (\n    session_id TEXT NOT NULL,\n    sequence INTEGER NOT NULL CHECK (sequence > 0),\n    message_id TEXT NOT NULL,\n    kind TEXT NOT NULL CHECK (kind IN (\n        'user', 'safe_think', 'talk', 'steering', 'evidence', 'human_review'\n    )),\n    content_json TEXT NOT NULL,\n    canonical_sequence INTEGER CHECK (canonical_sequence IS NULL),\n    PRIMARY KEY (session_id, sequence),\n    UNIQUE (session_id, message_id),\n    FOREIGN KEY (session_id) REFERENCES standalone_builder_chats(session_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "table",
+    "name": "standalone_builder_chats",
+    "table": "standalone_builder_chats",
+    "sql": "CREATE TABLE standalone_builder_chats (\n    session_id TEXT PRIMARY KEY,\n    provider_id TEXT NOT NULL,\n    model_id TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN (\n        'active', 'stopped', 'completed', 'review_required'\n    )),\n    display_name TEXT NOT NULL CHECK (\n        length(display_name) BETWEEN 1 AND 120 AND display_name = trim(display_name)\n    ),\n    created_ordinal INTEGER NOT NULL UNIQUE CHECK (created_ordinal > 0),\n    payload_sha256 TEXT NOT NULL\n, reasoning_effort TEXT, reasoning_effort_once TEXT)"
+   },
+   {
+    "type": "table",
+    "name": "turns",
+    "table": "turns",
+    "sql": "CREATE TABLE turns (\n    campaign_id TEXT NOT NULL,\n    turn_id TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('open', 'completed')),\n    created_revision INTEGER NOT NULL,\n    PRIMARY KEY (campaign_id, turn_id),\n    FOREIGN KEY (campaign_id) REFERENCES campaigns(campaign_id) ON DELETE CASCADE\n)"
+   },
+   {
+    "type": "trigger",
+    "name": "campaign_state_owner_delete_requires_empty",
+    "table": "campaign_state_namespace_owners",
+    "sql": "CREATE TRIGGER campaign_state_owner_delete_requires_empty\nBEFORE DELETE ON campaign_state_namespace_owners\nWHEN EXISTS (\n    SELECT 1 FROM campaign_state AS state\n    WHERE state.campaign_id = OLD.campaign_id\n      AND state.namespace = OLD.namespace\n)\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner still has state');\nEND"
+   },
+   {
+    "type": "trigger",
+    "name": "campaign_state_owner_immutable",
+    "table": "campaign_state_namespace_owners",
+    "sql": "CREATE TRIGGER campaign_state_owner_immutable\nBEFORE UPDATE ON campaign_state_namespace_owners\nBEGIN\n    SELECT RAISE(ABORT, 'campaign state namespace owner is immutable');\nEND"
+   },
+   {
+    "type": "trigger",
+    "name": "campaign_state_owner_matches_current_lock",
+    "table": "campaign_state_namespace_owners",
+    "sql": "CREATE TRIGGER campaign_state_owner_matches_current_lock\nBEFORE INSERT ON campaign_state_namespace_owners\nBEGIN\n    SELECT CASE WHEN\n        (\n            NEW.owner_package_id IS NULL\n            AND EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n            )\n        )\n        OR (\n            NEW.owner_package_id IS NOT NULL\n            AND NOT EXISTS (\n                SELECT 1 FROM campaigns AS campaign\n                JOIN campaign_lock_memberships AS membership\n                  ON membership.lock_id = campaign.current_lock_id\n                WHERE campaign.campaign_id = NEW.campaign_id\n                  AND membership.package_id = NEW.owner_package_id\n            )\n        )\n        OR EXISTS (\n            SELECT 1 FROM campaigns AS campaign\n            JOIN campaign_lock_memberships AS membership\n              ON membership.lock_id = campaign.current_lock_id\n            WHERE campaign.campaign_id = NEW.campaign_id\n              AND NEW.namespace LIKE membership.package_id || '.%'\n              AND membership.package_id <> NEW.owner_package_id\n        )\n        THEN RAISE(ABORT, 'campaign state namespace owner conflicts with current lock')\n    END;\nEND"
+   },
+   {
+    "type": "trigger",
+    "name": "campaign_state_owner_required_insert",
+    "table": "campaign_state",
+    "sql": "CREATE TRIGGER campaign_state_owner_required_insert\nBEFORE INSERT ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   },
+   {
+    "type": "trigger",
+    "name": "campaign_state_owner_required_update",
+    "table": "campaign_state",
+    "sql": "CREATE TRIGGER campaign_state_owner_required_update\nBEFORE UPDATE OF campaign_id, namespace ON campaign_state\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1 FROM campaign_state_namespace_owners AS owner\n        WHERE owner.campaign_id = NEW.campaign_id\n          AND owner.namespace = NEW.namespace\n    ) THEN RAISE(ABORT, 'campaign state namespace owner is required') END;\nEND"
+   },
+   {
+    "type": "trigger",
+    "name": "mutation_requires_matching_namespace_owner",
+    "table": "mutations",
+    "sql": "CREATE TRIGGER mutation_requires_matching_namespace_owner\nBEFORE INSERT ON mutations\nBEGIN\n    SELECT CASE WHEN NOT EXISTS (\n        SELECT 1\n        FROM actions AS action\n        JOIN campaign_state_namespace_owners AS owner\n          ON owner.campaign_id = NEW.campaign_id\n         AND owner.namespace = NEW.namespace\n        WHERE action.campaign_id = NEW.campaign_id\n          AND action.action_id = NEW.action_id\n          AND owner.owner_package_id IS NOT NULL\n          AND owner.owner_package_id = action.package_id\n    ) THEN RAISE(ABORT, 'mutation package does not own state namespace') END;\nEND"
+   }
+  ],
+  "tables": {
+   "actions": {
+    "columns": [
+     "campaign_id",
+     "action_id",
+     "turn_id",
+     "expected_revision",
+     "resulting_revision",
+     "writer",
+     "package_id",
+     "package_version",
+     "package_sha256",
+     "tool_name",
+     "status",
+     "payload_json",
+     "payload_hash",
+     "result_json",
+     "lock_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "agent_session_messages": {
+    "columns": [
+     "session_id",
+     "sequence",
+     "message_id",
+     "kind",
+     "content_json",
+     "canonical_sequence"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "agent_sessions": {
+    "columns": [
+     "session_id",
+     "campaign_id",
+     "role",
+     "provider_id",
+     "model_id",
+     "status",
+     "parent_session_id",
+     "selected_skill",
+     "scope_json",
+     "payload_sha256",
+     "reasoning_effort",
+     "reasoning_effort_once"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "authority_schema_extensions": {
+    "columns": [
+     "extension_name",
+     "extension_sha256",
+     "predecessor_migration_name",
+     "predecessor_sql_sha256"
+    ],
+    "row_count": 3,
+    "rows": [
+     {
+      "extension_name": "f5_probe_01_stable_campaign_identity",
+      "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+      "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+      "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+     },
+     {
+      "extension_name": "f5_reversible_lifecycle_v3",
+      "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+      "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+      "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+     },
+     {
+      "extension_name": "f5_portable_campaign_recovery_v1",
+      "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+      "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+      "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+     }
+    ]
+   },
+   "builder_dm_handoffs": {
+    "columns": [
+     "handoff_id",
+     "campaign_id",
+     "payload_sha256",
+     "builder_session_id",
+     "dm_session_id",
+     "package_lock_id",
+     "package_candidate_id",
+     "plan_id",
+     "plan_revision",
+     "plan_content_sha256",
+     "expected_revision",
+     "resulting_campaign_revision",
+     "chronology_ordinal",
+     "completed_turn_id",
+     "safe_payload_json"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_constructions": {
+    "columns": [
+     "campaign_id",
+     "confirmation_operation_id",
+     "authority_turn_id",
+     "authority_lock_id",
+     "confirmation_revision",
+     "lane",
+     "canonical_input_json",
+     "begin_operation_id",
+     "begin_revision",
+     "canonical_plan_json",
+     "completion_operation_id",
+     "completion_revision",
+     "canonical_representation_sha256"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_continuity_records": {
+    "columns": [
+     "campaign_id",
+     "sequence",
+     "entry_id",
+     "record_id",
+     "kind",
+     "status",
+     "payload_json",
+     "basis_message_ids_json",
+     "operation_id",
+     "admitted_revision"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_lifecycle_state": {
+    "columns": [
+     "campaign_id",
+     "retained_active_writer",
+     "designated_session_id",
+     "tombstone_prior_lifecycle",
+     "tombstone_prior_writer",
+     "tombstone_prior_session_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_lifecycle_transitions": {
+    "columns": [
+     "operation_id",
+     "campaign_id",
+     "operation_kind",
+     "basis_revision",
+     "resulting_revision",
+     "from_lifecycle",
+     "to_lifecycle",
+     "from_writer",
+     "to_writer",
+     "designated_session_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_lock_memberships": {
+    "columns": [
+     "lock_id",
+     "closure_order",
+     "package_id",
+     "version",
+     "content_sha256",
+     "role"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_locks": {
+    "columns": [
+     "lock_id",
+     "campaign_id",
+     "closure_sha256",
+     "availability",
+     "predecessor_lock_id",
+     "created_revision"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_operations": {
+    "columns": [
+     "operation_id",
+     "operation_kind",
+     "campaign_id",
+     "semantic_payload_json",
+     "semantic_payload_sha256",
+     "result_json",
+     "basis_turn_id",
+     "basis_lock_id",
+     "basis_revision",
+     "resulting_revision"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_package_memberships": {
+    "columns": [
+     "campaign_id",
+     "package_id",
+     "version",
+     "sha256",
+     "role",
+     "load_order"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_plans": {
+    "columns": [
+     "plan_id",
+     "campaign_id",
+     "package_lock_id",
+     "source_session_id",
+     "content_sha256",
+     "content_json",
+     "provenance_json",
+     "validation_outcome",
+     "acceptance_status",
+     "plan_revision",
+     "resulting_campaign_revision",
+     "payload_sha256"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_recovery_receipts": {
+    "columns": [
+     "recovery_id",
+     "campaign_id",
+     "semantic_payload_json",
+     "semantic_payload_sha256",
+     "archive_sha256",
+     "archive_byte_count",
+     "captured_revision",
+     "result_json"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_revisions": {
+    "columns": [
+     "campaign_id",
+     "revision",
+     "action_id",
+     "activation_id",
+     "plan_id",
+     "handoff_id",
+     "construction_operation_id",
+     "lifecycle_operation_id",
+     "continuity_operation_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_state": {
+    "columns": [
+     "campaign_id",
+     "namespace",
+     "state_key",
+     "value_json"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaign_state_namespace_owners": {
+    "columns": [
+     "campaign_id",
+     "namespace",
+     "owner_package_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "campaigns": {
+    "columns": [
+     "campaign_id",
+     "display_name",
+     "lifecycle",
+     "writer",
+     "revision",
+     "lock_hash",
+     "current_lock_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "canonical_events": {
+    "columns": [
+     "campaign_id",
+     "sequence",
+     "event_type",
+     "turn_id",
+     "action_id",
+     "safe_payload_json",
+     "visibility",
+     "attempt_id",
+     "attempt_ordinal"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "consequences": {
+    "columns": [
+     "campaign_id",
+     "action_id",
+     "ordinal",
+     "payload_json"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "idempotency_records": {
+    "columns": [
+     "campaign_id",
+     "idempotency_key",
+     "payload_hash",
+     "action_id",
+     "status",
+     "result_json",
+     "resulting_revision"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "mechanics_choice_resolutions": {
+    "columns": [
+     "campaign_id",
+     "resolution_id",
+     "action_id",
+     "choice_id",
+     "option_id",
+     "resolution_sha256",
+     "descriptor_sha256",
+     "session_id",
+     "resulting_revision"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "mutations": {
+    "columns": [
+     "campaign_id",
+     "action_id",
+     "ordinal",
+     "namespace",
+     "state_key",
+     "before_json",
+     "after_json"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "narration_interruptions": {
+    "columns": [
+     "campaign_id",
+     "interruption_id",
+     "turn_id",
+     "last_action_id",
+     "failed_attempt_id",
+     "status",
+     "resolving_retry_id",
+     "resolved_sequence"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "package_activations": {
+    "columns": [
+     "activation_id",
+     "campaign_id",
+     "payload_sha256",
+     "candidate_id",
+     "old_lock_id",
+     "new_lock_id",
+     "migration_id",
+     "status",
+     "resulting_revision",
+     "result_json"
+    ],
+    "row_count": 0,
+    "rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   "package_blob_chunks": {
+    "columns": [
+     "blob_sha256",
+     "chunk_order",
+     "byte_count",
+     "chunk_sha256",
+     "data"
+    ],
+    "row_count": 340,
+    "rows_sha256": "91c83b6c3e68c3cb2b8156817856f85c863d16a16fe734a9d396ff2853fffe2d"
+   },
+   "package_blobs": {
+    "columns": [
+     "blob_sha256",
+     "byte_count",
+     "chunk_count"
+    ],
+    "row_count": 58,
+    "rows_sha256": "56613b4296720c1e8538ff940dbb15dd4ba73a9e482eebc730d7df601d266cce"
+   },
+   "package_candidate_memberships": {
+    "columns": [
+     "candidate_id",
+     "closure_order",
+     "package_id",
+     "version",
+     "content_sha256"
+    ],
+    "row_count": 4,
+    "rows_sha256": "4477e67430f4dc74db3f77efe0c0f39c79a4a93df34ada141507a0edd3507620"
+   },
+   "package_candidates": {
+    "columns": [
+     "candidate_id",
+     "install_id",
+     "status",
+     "closure_sha256",
+     "report_json"
+    ],
+    "row_count": 2,
+    "rows_sha256": "77b8e2c621e2d98f9d9d12f4cb26d391635daca8af8cd40198986767287464ff"
+   },
+   "package_capabilities": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "capability_order",
+     "capability"
+    ],
+    "row_count": 16,
+    "rows_sha256": "c0450e66a23c3c24c59dbe45c9f1a24e4768d510c6605ddd541932e0d6459dd9"
+   },
+   "package_dependencies": {
+    "columns": [
+     "package_id",
+     "version",
+     "sha256",
+     "dependency_order",
+     "dependency_id",
+     "dependency_version",
+     "dependency_sha256",
+     "dependency_kind",
+     "dependency_namespace"
+    ],
+    "row_count": 2,
+    "rows_sha256": "bf18bc76f9b453b493bdd38f51c5f6f379d25b539457f7682c0463c6807ad271"
+   },
+   "package_exact_dependencies": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "dependency_order",
+     "dependency_namespace",
+     "dependency_kind",
+     "dependency_id",
+     "dependency_version",
+     "dependency_content_sha256"
+    ],
+    "row_count": 2,
+    "rows_sha256": "a929a83916e69246ce1ef5562ce30d3394fd8355eb0f3f738b22c77ba005a74d"
+   },
+   "package_manifest_files": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "file_order",
+     "portable_path",
+     "byte_count",
+     "blob_sha256"
+    ],
+    "row_count": 64,
+    "rows_sha256": "63e1d1e09ae9fd60d3ae83a354962ea9481b252e1bd7d95f2ae1aebdf650ba4e"
+   },
+   "package_manifests": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "role",
+     "canonical_json",
+     "metadata_json",
+     "provenance_json",
+     "compatibility_json",
+     "status"
+    ],
+    "row_count": 4,
+    "rows_sha256": "3849847c06092a20698ea3b42394bf26eaa86ee15b242737693860093b0cc550"
+   },
+   "package_participant_artifacts": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "artifact_order",
+     "kind",
+     "schema_id",
+     "schema_sha256",
+     "schema_json"
+    ],
+    "row_count": 2,
+    "rows_sha256": "0e5374268ea87b0223dd6c01986525b975dca32a07d567ed11dfa35654ff72a5"
+   },
+   "package_prompt_fragments": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "surface_order",
+     "fragment_id",
+     "capability"
+    ],
+    "row_count": 2,
+    "rows_sha256": "5efa8ff3cffd697be4ccd71c7055bf2ce73dab863e74220a7fccecbb2cbea5dd"
+   },
+   "package_read_leases": {
+    "columns": [
+     "lease_id",
+     "blob_sha256"
+    ],
+    "row_count": 0,
+    "rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   "package_recovery_roots": {
+    "columns": [
+     "root_id",
+     "blob_sha256"
+    ],
+    "row_count": 0,
+    "rows_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+   },
+   "package_staging": {
+    "columns": [
+     "install_id",
+     "status",
+     "manifest_json",
+     "report_json"
+    ],
+    "row_count": 2,
+    "rows_sha256": "b159525926dfa8e06a108bdbf5b6b77ac7e838b14af892614ace05c859992fc9"
+   },
+   "package_staging_chunks": {
+    "columns": [
+     "install_id",
+     "file_order",
+     "chunk_order",
+     "package_id",
+     "version",
+     "content_sha256",
+     "portable_path",
+     "chunk_sha256",
+     "data"
+    ],
+    "row_count": 346,
+    "rows_sha256": "e3d5135ae40ee575cbc496a5a78e753b66f1664e3ad6a77154d529aee4c24b8b"
+   },
+   "package_tools": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "tool_order",
+     "tool_name",
+     "capability",
+     "input_schema_json",
+     "state_predicates_json",
+     "turn_statuses_json",
+     "writers_json"
+    ],
+    "row_count": 185,
+    "rows_sha256": "6ce8ed8e9de9d3fa4aefd6b460230fa91c89880447d7d8e955ff3173af133899"
+   },
+   "package_ui_surfaces": {
+    "columns": [
+     "package_id",
+     "version",
+     "content_sha256",
+     "surface_order",
+     "surface_id",
+     "capability"
+    ],
+    "row_count": 6,
+    "rows_sha256": "a6257d357aa611de48871306d245af2ddbb9828a90bfbb32f0920105a77e1c47"
+   },
+   "packages": {
+    "columns": [
+     "package_id",
+     "version",
+     "sha256",
+     "capabilities_json"
+    ],
+    "row_count": 4,
+    "rows_sha256": "2122817326a575ee841922d2262bf4bcd3e9e7c1e9ec7dc01469051a6967fd8f"
+   },
+   "participant_adaptations": {
+    "columns": [
+     "operation_id",
+     "payload_sha256",
+     "source_campaign_id",
+     "participant_id",
+     "source_kind",
+     "source_package_id",
+     "source_package_version",
+     "source_package_sha256",
+     "source_schema_id",
+     "source_schema_sha256",
+     "source_data_sha256",
+     "destination_kind",
+     "destination_package_id",
+     "destination_package_version",
+     "destination_package_sha256",
+     "destination_schema_id",
+     "destination_schema_sha256",
+     "data_json"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "participant_quarantines": {
+    "columns": [
+     "campaign_id",
+     "participant_id",
+     "reason_code"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "participants": {
+    "columns": [
+     "campaign_id",
+     "participant_id",
+     "kind",
+     "package_id",
+     "package_version",
+     "data_json",
+     "package_sha256",
+     "schema_id",
+     "schema_sha256",
+     "validation_status",
+     "adaptation_id"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "pending_mechanics_action_aliases": {
+    "columns": [
+     "campaign_id",
+     "idempotency_key",
+     "action_id",
+     "payload_hash"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "pending_mechanics_actions": {
+    "columns": [
+     "campaign_id",
+     "action_id",
+     "turn_id",
+     "basis_revision",
+     "writer",
+     "package_id",
+     "package_version",
+     "package_sha256",
+     "lock_id",
+     "tool_name",
+     "parameters_json",
+     "payload_hash",
+     "initiating_session_id",
+     "choice_id",
+     "descriptor_json",
+     "descriptor_sha256"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "provider_private_records": {
+    "columns": [
+     "session_id",
+     "agent_session_id",
+     "builder_session_id",
+     "attempt_id",
+     "response_id",
+     "turn_id",
+     "basis_message_id",
+     "source_order",
+     "provider_id",
+     "model_id",
+     "kind",
+     "payload",
+     "status"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "schema_migrations": {
+    "columns": [
+     "version",
+     "applied_name",
+     "sql_sha256"
+    ],
+    "row_count": 12,
+    "rows": [
+     {
+      "version": 1,
+      "applied_name": "f1_neutral_authority",
+      "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+     },
+     {
+      "version": 2,
+      "applied_name": "f2_provisional_event_protocol",
+      "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+     },
+     {
+      "version": 3,
+      "applied_name": "f3_sqlite_package_library",
+      "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+     },
+     {
+      "version": 4,
+      "applied_name": "f4_builder_dm_sessions",
+      "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+     },
+     {
+      "version": 5,
+      "applied_name": "f5_campaign_lifecycle_recovery",
+      "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+     },
+     {
+      "version": 6,
+      "applied_name": "f7_relational_state_namespace_ownership",
+      "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+     },
+     {
+      "version": 7,
+      "applied_name": "mechanics_choice_reservations",
+      "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+     },
+     {
+      "version": 8,
+      "applied_name": "standalone_builder_chats",
+      "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+     },
+     {
+      "version": 9,
+      "applied_name": "campaign_state_continuity",
+      "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+     },
+     {
+      "version": 10,
+      "applied_name": "unbound_draft_lifecycle",
+      "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+     },
+     {
+      "version": 11,
+      "applied_name": "private_provider_records",
+      "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+     },
+     {
+      "version": 12,
+      "applied_name": "session_reasoning_preferences",
+      "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+     }
+    ]
+   },
+   "standalone_builder_chat_messages": {
+    "columns": [
+     "session_id",
+     "sequence",
+     "message_id",
+     "kind",
+     "content_json",
+     "canonical_sequence"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "standalone_builder_chats": {
+    "columns": [
+     "session_id",
+     "provider_id",
+     "model_id",
+     "status",
+     "display_name",
+     "created_ordinal",
+     "payload_sha256",
+     "reasoning_effort",
+     "reasoning_effort_once"
+    ],
+    "row_count": 0,
+    "rows": []
+   },
+   "turns": {
+    "columns": [
+     "campaign_id",
+     "turn_id",
+     "status",
+     "created_revision"
+    ],
+    "row_count": 0,
+    "rows": []
+   }
+  }
+ },
+ "files": [
+  {
+   "path": ".desktop-drafts.json",
+   "bytes": 330,
+   "text": "{\"format_version\":1,\"sessions\":[{\"ooc_open\":false,\"ooc_text\":\"\",\"questions\":[{\"question_key\":\"q1\",\"selection\":\"b\",\"text\":\"Maybe\"}],\"session_id\":\"session-a\",\"text\":\"Half-written plan — été\"}],\"update_view\":{\"campaign_id\":\"campaign-a\",\"kind\":\"session\",\"operation_id\":\"0123456789abcdef0123456789abcdef\",\"session_id\":\"session-a\"}}"
+  },
+  {
+   "path": "authority.sqlite3"
+  },
+  {
+   "path": "authority.sqlite3-shm"
+  },
+  {
+   "path": "authority.sqlite3-wal"
+  },
+  {
+   "path": "authority.sqlite3.authority-owner.owner.lock"
+  },
+  {
+   "path": "diagnostics/runtime.jsonl",
+   "lines": [
+    {
+     "format": 1,
+     "event": "owner_started",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "other_operation",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.0,
+     "id": "0d5d4d35462a4603b0724728755fa220",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233919.139205,
+     "last_seen": 1795233919.139205,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "handshake_status",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 8.9,
+     "id": "2fd84677b69c479192485d1cccb2ecb9",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2129438,
+     "last_seen": 1795233932.2181847,
+     "count": 2
+    },
+    {
+     "format": 1,
+     "event": "renderer_error",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "renderer",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "internal_error",
+     "error_type": "none",
+     "duration_ms": 0.0,
+     "id": "03ec9cea878d4015b1ffc9e3df7f1216",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2131095,
+     "last_seen": 1795233932.2131095,
+     "count": 2
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "record_local_fault",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.0,
+     "id": "24b763bde4034b7e89e74993ba981e74",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2131288,
+     "last_seen": 1795233932.2131288,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "record_local_fault",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "ValueError",
+     "duration_ms": 0.0,
+     "id": "c85befb718984c73ac8337f3a3fa4633",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2131972,
+     "last_seen": 1795233932.2160008,
+     "count": 3
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "other_operation",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "OwnerProtocolError",
+     "duration_ms": 0.8,
+     "id": "7e60410d3ec74fdb8bbd97ca034d0956",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2140303,
+     "last_seen": 1795233932.2181337,
+     "count": 3
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "other_operation",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "other_rejection",
+     "error_type": "OtherError",
+     "duration_ms": 0.1,
+     "id": "68bb401b390c450a852a199cbfe192db",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.214186,
+     "last_seen": 1795233932.21759,
+     "count": 3
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "renderer",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "OwnerProtocolError",
+     "duration_ms": 0.0,
+     "id": "75080c5ead50427fbf34b31c7f33f196",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2142591,
+     "last_seen": 1795233932.2142591,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "cancel_local_report",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "OwnerProtocolError",
+     "duration_ms": 0.0,
+     "id": "ee3cf37b8eaa42cc9fbcc6b7ce988dfa",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2143009,
+     "last_seen": 1795233932.2143009,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "preview_local_report",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.1,
+     "id": "1fe44509b03743b3bd426f8bd82bdf77",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.214483,
+     "last_seen": 1795233932.2147813,
+     "count": 2
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "cancel_local_report",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.0,
+     "id": "186e3ac2685c40629e499004f0fce39e",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2145758,
+     "last_seen": 1795233932.2145758,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "save_local_report",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "ValueError",
+     "duration_ms": 0.0,
+     "id": "9c590b3c92634bc39a7662988d255c65",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2146254,
+     "last_seen": 1795233932.2158642,
+     "count": 2
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "save_local_report",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "OwnerProtocolError",
+     "duration_ms": 0.0,
+     "id": "feb39420067e403a8fd2069534da2dc5",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2148705,
+     "last_seen": 1795233932.2148705,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "save_local_report",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.9,
+     "id": "4aa5a7d99345402fa8a6c56e702e62a4",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.215783,
+     "last_seen": 1795233932.215783,
+     "count": 1
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "preview_local_report",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "ValueError",
+     "duration_ms": 0.0,
+     "id": "6d1889d86f154cb485ac1d0fc0d034d0",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.215909,
+     "last_seen": 1795233932.2159443,
+     "count": 2
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "other_operation",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.9,
+     "id": "8fde54bf3ac0497082fce549f934c251",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2161336,
+     "last_seen": 1795233932.217343,
+     "count": 3
+    },
+    {
+     "format": 1,
+     "event": "owner_stopped",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "other_operation",
+     "outcome": "ok",
+     "severity": "info",
+     "error_code": "none",
+     "error_type": "none",
+     "duration_ms": 0.0,
+     "id": "85be53b1929840f69aaf67f2499294ab",
+     "session": "38c88dd4d1ba465ebbb1f574fc44a2bb",
+     "first_seen": 1795233932.2183022,
+     "last_seen": 1795233932.2183022,
+     "count": 1
+    }
+   ]
+  },
+  {
+   "path": "migration-sources/authority.pre-migration-v3.sqlite3"
+  }
+ ]
+}

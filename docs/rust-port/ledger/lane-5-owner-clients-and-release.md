@@ -15,12 +15,12 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/desktop_update/checkpoint.py` | 418 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/controller.py` | 383 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/discovery.py` | 113 | `sylvia-owner::desktop_update` | pending | |
-| `src/sylvia_gm/application/desktop_update/drafts.py` | 102 | `sylvia-owner::desktop_update` | pending | |
+| `src/sylvia_gm/application/desktop_update/drafts.py` | 102 | `sylvia-owner::desktop_update::drafts` | ported | `local-services` |
 | `src/sylvia_gm/application/desktop_update/helper.py` | 433 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/identity.py` | 39 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/installed.py` | 410 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/launch.py` | 71 | `sylvia-owner::desktop_update` | pending | |
-| `src/sylvia_gm/application/desktop_update/manifest.py` | 458 | `sylvia-owner::desktop_update` | pending | |
+| `src/sylvia_gm/application/desktop_update/manifest.py` | 458 | `sylvia-owner::desktop_update::manifest` | in progress | `bounded_json`, `canonical_bytes`, `MANIFEST_LIMIT` only |
 | `src/sylvia_gm/application/desktop_update/payload.py` | 139 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/preparation.py` | 337 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/processes.py` | 171 | `sylvia-owner::desktop_update` | pending | |
@@ -32,7 +32,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/desktop_update/runtime.py` | 63 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/service.py` | 334 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/desktop_update/startup.py` | 221 | `sylvia-owner::desktop_update` | pending | |
-| `src/sylvia_gm/application/desktop_update/storage.py` | 404 | `sylvia-owner::desktop_update` | pending | |
+| `src/sylvia_gm/application/desktop_update/storage.py` | 404 | `sylvia-owner::desktop_update::storage` | in progress | `operation_id`, `directory_identity`, `checked_file`, `atomic_receipt` only |
 | `src/sylvia_gm/application/desktop_update/transport.py` | 374 | `sylvia-owner::desktop_update` | pending | |
 | `src/sylvia_gm/application/launch_compatibility.py` | 31 | `sylvia-app::launch_compatibility` | pending | |
 | `src/sylvia_gm/build_workspace.py` | 67 | `sylvia-owner` | pending | |
@@ -40,21 +40,21 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/covered_source_delivery.py` | 116 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/__init__.py` | 22 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/_chat_start.py` | 143 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/_display_reads.py` | 61 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/_local_diagnostics.py` | 438 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/_display_reads.py` | 61 | `sylvia-owner::display_reads` | ported | `local-services` |
+| `src/sylvia_gm/interfaces/_local_diagnostics.py` | 438 | `sylvia-owner::diagnostics` | ported | `local-services` (replies and report content; `runtime.jsonl` itself is volatile, covered by unit tests); Python quirk kept: `record()` returns the owner session id, not a record id, once closed |
 | `src/sylvia_gm/interfaces/_session_reasoning.py` | 177 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/__init__.py` | 31 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/actions.py` | 157 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/builder.py` | 169 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/commands/campaigns.py` | 1,118 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/commands/campaigns.py` | 1,118 | `sylvia-owner::commands::campaigns` | in progress | `handle_handshake_status` |
 | `src/sylvia_gm/interfaces/commands/character_chat.py` | 112 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/packages.py` | 127 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/providers.py` | 322 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/registry.py` | 354 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/sessions.py` | 1,416 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/local_api.py` | 820 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/local_api.py` | 820 | `sylvia-owner` | in progress | `handshake_status` only |
 | `src/sylvia_gm/interfaces/local_owner.py` | 1,444 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/owner_process.py` | 2,245 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/interfaces/owner_process.py` | 2,245 | `sylvia-owner::run` | in progress | run loop: execution model, local services, diagnostics on replies; gates, reservation and provider errors next |
 | `src/sylvia_gm/interfaces/ruleset_test_worker.py` | 96 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/webui.py` | 847 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/local_dictation.py` | 346 | `sylvia-owner` | pending | |

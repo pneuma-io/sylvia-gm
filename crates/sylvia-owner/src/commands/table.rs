@@ -33,9 +33,13 @@ const fn pending(name: &'static str, topic: &'static str, webui: bool, diagnosti
     Command { name, topic, webui, diagnostics, status: Status::Pending }
 }
 
+const fn ported(name: &'static str, topic: &'static str, webui: bool, diagnostics: bool) -> Command {
+    Command { name, topic, webui, diagnostics, status: Status::Ported }
+}
+
 /// Every command in `COMMAND_REGISTRY`, in Python's declaration order.
 pub const REGISTRY: &[Command] = &[
-    pending("handshake_status", "campaigns", false, true),
+    ported("handshake_status", "campaigns", false, true),
     pending("campaign_index", "campaigns", true, true),
     pending("campaign_creation_catalog", "campaigns", true, true),
     pending("ready_campaign_catalog", "campaigns", true, false),
@@ -152,14 +156,14 @@ pub const REGISTRY: &[Command] = &[
     pending("export_campaign_file", "campaigns", false, true),
     pending("recover_campaign", "campaigns", false, true),
     pending("recover_campaign_file", "campaigns", false, true),
-    pending("cancel_display_load", "", true, false),
-    pending("cancel_local_report", "", false, true),
-    pending("load_desktop_drafts", "", true, false),
-    pending("preview_local_report", "", false, true),
-    pending("record_local_fault", "", true, true),
-    pending("renderer", "", false, true),
-    pending("save_desktop_drafts", "", true, false),
-    pending("save_local_report", "", false, true),
+    ported("cancel_display_load", "", true, false),
+    ported("cancel_local_report", "", false, true),
+    ported("load_desktop_drafts", "", true, false),
+    ported("preview_local_report", "", false, true),
+    ported("record_local_fault", "", true, true),
+    ported("renderer", "", false, true),
+    ported("save_desktop_drafts", "", true, false),
+    ported("save_local_report", "", false, true),
 ];
 
 /// Methods `owner_process.run` answers itself before consulting the registry.

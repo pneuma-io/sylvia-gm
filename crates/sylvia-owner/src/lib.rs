@@ -6,15 +6,21 @@
 //! `src/sylvia_gm/interfaces/owner_process.py` and is started in the real desktop through the
 //! existing `SYLVIA_GM_OWNER_EXECUTABLE` override.
 //!
-//! What exists today is the frame: launch handshake, line protocol, request validation, the
-//! command table and shutdown. Every command in the table still answers `rust_port_pending`.
+//! What exists today: launch handshake, line protocol, request validation, the command table,
+//! Python's execution model (inline commands, display reads, model-bound tasks), local
+//! diagnostics, desktop drafts, display-load cancellation and `handshake_status`. Every
+//! other command still answers `rust_port_pending`.
 //! A command is ported by adding its handler under [`commands`] and flipping its status in
 //! `commands/table.rs`; `docs/rust-port/commands.md` is the burn-down.
 
 pub mod commands;
+pub mod desktop_update;
+pub mod diagnostics;
 pub mod dispatch;
+pub mod display_reads;
 pub mod handshake;
 pub mod protocol;
 pub mod run;
+pub mod util;
 
 pub use run::run;

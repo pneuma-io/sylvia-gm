@@ -56,6 +56,11 @@ regex = "1"
 # Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate
 # rejects (content schema patterns, docs/rust-port/sites/regex-sites.md). Added by lane 1.
 fancy-regex = "0.14"
+# Owner (lane 5), Windows only: the numeric OS version local diagnostics records
+# (`sys.getwindowsversion()`), and file identity and link counts for the desktop update's
+# folder checks (`os.stat` st_dev, st_ino and st_nlink), without unsafe code in the owner.
+windows-version = "0.1"
+winapi-util = "0.1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "io-util", "io-std", "process", "net"] }
 # Lane 4: provider streams are pull-based like Python async generators (Stream, StreamExt).
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
