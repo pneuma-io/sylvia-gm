@@ -8,13 +8,21 @@
 //! - [`bundled_packages`]: deterministic archives of the first-party bundled packages.
 //! - [`campaign_starting_world`]: a Plan's authored game state with the selected party placed.
 //! - [`network_graph`]: visible graph projection and dynamic-intent binding.
+//! - [`path_guardrail`]: Builder file paths kept inside one allowed root.
+//! - [`plan_state_admission`]: a Plan's package-owned starting state checked against its Ruleset.
 //! - [`package_materialization`]: drafts completed, archived with `zipfile`'s exact bytes, and pre-admitted.
 //! - [`setting_character_requirements`]: Setting-owned Character File information.
+//! - [`srd_lite_character_compatibility`]: the retained SRD Lite 0.2 character contract.
+//! - [`workspace_files`]: Builder file writes that refuse a stale version.
 //! - [`srd_lite_weapon_set_migration`]: the SRD Lite 0.2 to 0.3 saved weapon-set migration.
 
 pub mod bundled_packages;
 pub mod campaign_starting_world;
 pub mod network_graph;
 pub mod package_materialization;
+pub mod path_guardrail;
+pub mod plan_state_admission;
 pub mod setting_character_requirements;
+pub mod srd_lite_character_compatibility;
 pub mod srd_lite_weapon_set_migration;
+pub mod workspace_files;

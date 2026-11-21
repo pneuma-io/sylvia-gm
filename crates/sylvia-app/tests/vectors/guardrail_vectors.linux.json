@@ -1,0 +1,834 @@
+{
+ "python": "3.12.3",
+ "platform": "linux",
+ "links": [
+  "link-out",
+  "link-in"
+ ],
+ "dirs": [
+  "docs",
+  "docs/deep",
+  ".builder-sources",
+  ".builder-sources/pack",
+  ".builder-sources-purge-pending",
+  "Mixed Case"
+ ],
+ "files": [
+  "docs/readme.md",
+  "docs/deep/notes.txt",
+  ".builder-sources/pack/a.json",
+  "Mixed Case/File.TXT",
+  ".env",
+  "secret.key"
+ ],
+ "link_targets": {
+  "link-out": "../outside",
+  "link-in": "docs"
+ },
+ "cases": [
+  {
+   "raw": "",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>"
+   ]
+  },
+  {
+   "raw": "",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>"
+   ]
+  },
+  {
+   "raw": ".",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>"
+   ]
+  },
+  {
+   "raw": ".",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>"
+   ]
+  },
+  {
+   "raw": "docs",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs"
+   ]
+  },
+  {
+   "raw": "docs",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs"
+   ]
+  },
+  {
+   "raw": "docs/readme.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/readme.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/missing/new.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/missing/new.md"
+   ]
+  },
+  {
+   "raw": "docs/missing/new.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/missing/new.md"
+   ]
+  },
+  {
+   "raw": "docs/../docs/readme.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/../docs/readme.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/./deep/notes.txt",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/deep/notes.txt"
+   ]
+  },
+  {
+   "raw": "docs/./deep/notes.txt",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/deep/notes.txt"
+   ]
+  },
+  {
+   "raw": "../outside",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '../outside' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "../outside",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '../outside' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "../outside/x.txt",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '../outside/x.txt' resolves to '<PARENT>/outside/x.txt', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside/x.txt",
+    ""
+   ]
+  },
+  {
+   "raw": "../outside/x.txt",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '../outside/x.txt' resolves to '<PARENT>/outside/x.txt', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside/x.txt",
+    ""
+   ]
+  },
+  {
+   "raw": "docs/../../outside",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: 'docs/../../outside' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "docs/../../outside",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'docs/../../outside' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "missing.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/missing.md"
+   ]
+  },
+  {
+   "raw": "missing.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/missing.md"
+   ]
+  },
+  {
+   "raw": "missing/a/b/c.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/missing/a/b/c.md"
+   ]
+  },
+  {
+   "raw": "missing/a/b/c.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/missing/a/b/c.md"
+   ]
+  },
+  {
+   "raw": ".builder-sources/pack/a.json",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/.builder-sources/pack/a.json"
+   ]
+  },
+  {
+   "raw": ".builder-sources/pack/a.json",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.builder-sources/pack/a.json' resolves to '<ROOT>/.builder-sources/pack/a.json', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Attached Builder sources are read-only.",
+    "<ROOT>/.builder-sources/pack/a.json",
+    "Attached Builder sources are read-only."
+   ]
+  },
+  {
+   "raw": ".builder-sources/new.json",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/.builder-sources/new.json"
+   ]
+  },
+  {
+   "raw": ".builder-sources/new.json",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.builder-sources/new.json' resolves to '<ROOT>/.builder-sources/new.json', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Attached Builder sources are read-only.",
+    "<ROOT>/.builder-sources/new.json",
+    "Attached Builder sources are read-only."
+   ]
+  },
+  {
+   "raw": ".BUILDER-SOURCES/new.json",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/.BUILDER-SOURCES/new.json"
+   ]
+  },
+  {
+   "raw": ".BUILDER-SOURCES/new.json",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.BUILDER-SOURCES/new.json' resolves to '<ROOT>/.BUILDER-SOURCES/new.json', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Attached Builder sources are read-only.",
+    "<ROOT>/.BUILDER-SOURCES/new.json",
+    "Attached Builder sources are read-only."
+   ]
+  },
+  {
+   "raw": ".builder-sources-purge-pending/x",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '.builder-sources-purge-pending/x' resolves to '<ROOT>/.builder-sources-purge-pending/x', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: This owner-managed lifecycle path is not available to Builder tools.",
+    "<ROOT>/.builder-sources-purge-pending/x",
+    "This owner-managed lifecycle path is not available to Builder tools."
+   ]
+  },
+  {
+   "raw": ".builder-sources-purge-pending/x",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.builder-sources-purge-pending/x' resolves to '<ROOT>/.builder-sources-purge-pending/x', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: This owner-managed lifecycle path is not available to Builder tools.",
+    "<ROOT>/.builder-sources-purge-pending/x",
+    "This owner-managed lifecycle path is not available to Builder tools."
+   ]
+  },
+  {
+   "raw": ".Builder-Sources-Purge-Pending",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '.Builder-Sources-Purge-Pending' resolves to '<ROOT>/.Builder-Sources-Purge-Pending', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: This owner-managed lifecycle path is not available to Builder tools.",
+    "<ROOT>/.Builder-Sources-Purge-Pending",
+    "This owner-managed lifecycle path is not available to Builder tools."
+   ]
+  },
+  {
+   "raw": ".Builder-Sources-Purge-Pending",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.Builder-Sources-Purge-Pending' resolves to '<ROOT>/.Builder-Sources-Purge-Pending', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: This owner-managed lifecycle path is not available to Builder tools.",
+    "<ROOT>/.Builder-Sources-Purge-Pending",
+    "This owner-managed lifecycle path is not available to Builder tools."
+   ]
+  },
+  {
+   "raw": "mixed case/file.txt",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/mixed case/file.txt"
+   ]
+  },
+  {
+   "raw": "mixed case/file.txt",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/mixed case/file.txt"
+   ]
+  },
+  {
+   "raw": "MIXED CASE",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/MIXED CASE"
+   ]
+  },
+  {
+   "raw": "MIXED CASE",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/MIXED CASE"
+   ]
+  },
+  {
+   "raw": ".env",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/.env"
+   ]
+  },
+  {
+   "raw": ".env",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.env' resolves to '<ROOT>/.env', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to '.env' files is blocked for security.",
+    "<ROOT>/.env",
+    "Write access to '.env' files is blocked for security."
+   ]
+  },
+  {
+   "raw": ".env.local",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/.env.local"
+   ]
+  },
+  {
+   "raw": ".env.local",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.env.local' resolves to '<ROOT>/.env.local', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to '.env.local' files is blocked for security.",
+    "<ROOT>/.env.local",
+    "Write access to '.env.local' files is blocked for security."
+   ]
+  },
+  {
+   "raw": "config/.env.production",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/config/.env.production"
+   ]
+  },
+  {
+   "raw": "config/.env.production",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'config/.env.production' resolves to '<ROOT>/config/.env.production', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to '.env.production' files is blocked for security.",
+    "<ROOT>/config/.env.production",
+    "Write access to '.env.production' files is blocked for security."
+   ]
+  },
+  {
+   "raw": "my.env",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/my.env"
+   ]
+  },
+  {
+   "raw": "my.env",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'my.env' resolves to '<ROOT>/my.env', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to 'my.env' files is blocked for security.",
+    "<ROOT>/my.env",
+    "Write access to 'my.env' files is blocked for security."
+   ]
+  },
+  {
+   "raw": "secret.key",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/secret.key"
+   ]
+  },
+  {
+   "raw": "secret.key",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'secret.key' resolves to '<ROOT>/secret.key', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to 'secret.key' files is blocked for security.",
+    "<ROOT>/secret.key",
+    "Write access to 'secret.key' files is blocked for security."
+   ]
+  },
+  {
+   "raw": "cert.pem",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/cert.pem"
+   ]
+  },
+  {
+   "raw": "cert.pem",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'cert.pem' resolves to '<ROOT>/cert.pem', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to 'cert.pem' files is blocked for security.",
+    "<ROOT>/cert.pem",
+    "Write access to 'cert.pem' files is blocked for security."
+   ]
+  },
+  {
+   "raw": "a.pem.bak",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/a.pem.bak"
+   ]
+  },
+  {
+   "raw": "a.pem.bak",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/a.pem.bak"
+   ]
+  },
+  {
+   "raw": "key",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/key"
+   ]
+  },
+  {
+   "raw": "key",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/key"
+   ]
+  },
+  {
+   "raw": ".keys",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/.keys"
+   ]
+  },
+  {
+   "raw": ".keys",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '.keys' resolves to '<ROOT>/.keys', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: Write access to '.keys' files is blocked for security.",
+    "<ROOT>/.keys",
+    "Write access to '.keys' files is blocked for security."
+   ]
+  },
+  {
+   "raw": "notes.KEY",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/notes.KEY"
+   ]
+  },
+  {
+   "raw": "notes.KEY",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/notes.KEY"
+   ]
+  },
+  {
+   "raw": "link-out",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: 'link-out' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "link-out",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'link-out' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "link-out/x.txt",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: 'link-out/x.txt' resolves to '<PARENT>/outside/x.txt', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside/x.txt",
+    ""
+   ]
+  },
+  {
+   "raw": "link-out/x.txt",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'link-out/x.txt' resolves to '<PARENT>/outside/x.txt', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside/x.txt",
+    ""
+   ]
+  },
+  {
+   "raw": "link-in/readme.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "link-in/readme.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs\\deep\\notes.txt",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs\\deep\\notes.txt"
+   ]
+  },
+  {
+   "raw": "docs\\deep\\notes.txt",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs\\deep\\notes.txt"
+   ]
+  },
+  {
+   "raw": "docs/deep/../readme.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/deep/../readme.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "a\u0000b",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: 'a\u0000b' resolves to 'a\u0000b', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: embedded null byte",
+    "a\u0000b",
+    "embedded null byte"
+   ]
+  },
+  {
+   "raw": "a\u0000b",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: 'a\u0000b' resolves to 'a\u0000b', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project. Reason: embedded null byte",
+    "a\u0000b",
+    "embedded null byte"
+   ]
+  },
+  {
+   "raw": "docs//readme.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs//readme.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/readme.md/",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "docs/readme.md/",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "  spaced.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/  spaced.md"
+   ]
+  },
+  {
+   "raw": "  spaced.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/  spaced.md"
+   ]
+  },
+  {
+   "raw": "trailing. ",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/trailing. "
+   ]
+  },
+  {
+   "raw": "trailing. ",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/trailing. "
+   ]
+  },
+  {
+   "raw": "C:relative.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/C:relative.md"
+   ]
+  },
+  {
+   "raw": "C:relative.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/C:relative.md"
+   ]
+  },
+  {
+   "raw": "/absolute.md",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '/absolute.md' resolves to '/absolute.md', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "/absolute.md",
+    ""
+   ]
+  },
+  {
+   "raw": "/absolute.md",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '/absolute.md' resolves to '/absolute.md', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "/absolute.md",
+    ""
+   ]
+  },
+  {
+   "raw": "\\\\server\\share\\x.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/\\\\server\\share\\x.md"
+   ]
+  },
+  {
+   "raw": "\\\\server\\share\\x.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/\\\\server\\share\\x.md"
+   ]
+  },
+  {
+   "raw": "<ABSROOT>/docs/readme.md",
+   "for_write": false,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "<ABSROOT>/docs/readme.md",
+   "for_write": true,
+   "outcome": [
+    "ok",
+    "<ROOT>/docs/readme.md"
+   ]
+  },
+  {
+   "raw": "<ABSROOT>/../outside",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '<ROOT>/../outside' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "<ABSROOT>/../outside",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '<ROOT>/../outside' resolves to '<PARENT>/outside', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside",
+    ""
+   ]
+  },
+  {
+   "raw": "<ABSPARENT>/outside/y",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '<PARENT>/outside/y' resolves to '<PARENT>/outside/y', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside/y",
+    ""
+   ]
+  },
+  {
+   "raw": "<ABSPARENT>/outside/y",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '<PARENT>/outside/y' resolves to '<PARENT>/outside/y', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<PARENT>/outside/y",
+    ""
+   ]
+  },
+  {
+   "raw": "<ABSROOT-UPPER>/docs/readme.md",
+   "for_write": false,
+   "outcome": [
+    "blocked",
+    "Access denied: '<ROOT-UPPER>/docs/readme.md' resolves to '<ROOT-UPPER>/docs/readme.md', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<ROOT-UPPER>/docs/readme.md",
+    ""
+   ]
+  },
+  {
+   "raw": "<ABSROOT-UPPER>/docs/readme.md",
+   "for_write": true,
+   "outcome": [
+    "blocked",
+    "Access denied: '<ROOT-UPPER>/docs/readme.md' resolves to '<ROOT-UPPER>/docs/readme.md', which is outside the project directory '<ROOT>'. The Builder agent can only access files within the Sylvia GM project.",
+    "<ROOT-UPPER>/docs/readme.md",
+    ""
+   ]
+  }
+ ]
+}
