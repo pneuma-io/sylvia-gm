@@ -683,7 +683,11 @@ fn owned_trees_round_trip_every_dumped_value() {
                 let again = data.to_loaded();
                 if !text.contains("&id") {
                     assert_eq!(value_record_root(&again), value_record_root(&loaded), "{text:?}");
-                    assert_eq!(pyyaml::safe_dump(&again).unwrap(), pyyaml::safe_dump(&loaded).unwrap(), "{text:?}");
+                    assert_eq!(
+                        pyyaml::safe_dump(&again).unwrap(),
+                        pyyaml::safe_dump(&loaded).unwrap(),
+                        "{text:?}"
+                    );
                 }
                 checked += 1;
             }
