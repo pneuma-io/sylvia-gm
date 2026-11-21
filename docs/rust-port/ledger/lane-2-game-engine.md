@@ -16,7 +16,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/map_segment_preview.py` | 59 | `sylvia-app::map_segment_preview` | pending | |
 | `src/sylvia_gm/application/package_runtime.py` | 1,643 | `sylvia-app::package_runtime` | pending | |
 | `src/sylvia_gm/application/piece_table.py` | 274 | `sylvia-app::piece_table` | pending | |
-| `src/sylvia_gm/application/player_actions.py` | 343 | `sylvia-app::player_actions` | pending | Must close before cutover: lane 3's stored-authority verifier (PR 315) checks a failed player action's consequence through `valid_player_action_consequence` (with `player_control_origin`). Until both are ported, the Rust startup check accepts consequences Python refuses. Port them first, as a small PR, and tell lane 3 so it can switch its call over. |
+| `src/sylvia_gm/application/player_actions.py` | 343 | `sylvia-app::player_actions` | in progress | Ported: `PLAYER_ACTION_ORIGIN`, `player_control_origin`, `valid_player_action_consequence` (`player_action_vectors`). Lane 3's stored-authority verifier (PR 315) needs the last one, so its call switches over to close that cutover gap. Still to port: `parse_player_controls` (with PR B), `player_action_request_matches`, `validate_player_control`, `resolve_party_action_parameters`, `retain_player_action_origin`, `player_action_origins`, `player_action_records`, `resolve_inventory_action_parameters`. |
 | `src/sylvia_gm/application/result_card_admission.py` | 179 | `sylvia-app::result_card_admission` | pending | |
 | `src/sylvia_gm/application/result_cards.py` | 243 | `sylvia-app::result_cards` | pending | |
 | `src/sylvia_gm/application/shot_effects.py` | 376 | `sylvia-app::shot_effects` | pending | |

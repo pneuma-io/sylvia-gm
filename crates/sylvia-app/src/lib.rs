@@ -9,8 +9,12 @@
 //! - [`network_graph`]: visible graph projection and dynamic-intent binding.
 //! - [`setting_character_requirements`]: Setting-owned Character File information.
 //! - [`srd_lite_weapon_set_migration`]: the SRD Lite 0.2 to 0.3 saved weapon-set migration.
+//!
+//! Lane 2 (game engine):
+//! - [`player_actions`]: the owner marker of a direct player action.
 
 pub mod campaign_starting_world;
 pub mod network_graph;
+pub mod player_actions;
 pub mod setting_character_requirements;
 pub mod srd_lite_weapon_set_migration;
