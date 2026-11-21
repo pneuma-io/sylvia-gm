@@ -12,10 +12,14 @@
 //!   hashes, package files, portable paths and the strict JSON readers.
 //! - [`content`]: content definitions and `validate_content_shape` (JSON Schema Draft 2020-12).
 //! - [`error`]: the `ValueError` / `TypeError` the domain raises, and `RulesetDiagnostic`.
+//! - [`model_capability`]: `domain/model_capability.py`, capability tiers and model guidance.
+//! - [`session`]: `domain/session.py`, Builder and DM session, handoff and plan records.
 
 pub mod authority;
 pub mod content;
 pub mod error;
+pub mod model_capability;
 pub mod package_library;
+pub mod session;
 
 pub use error::{DomainError, DomainResult};
