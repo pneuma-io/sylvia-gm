@@ -51,7 +51,7 @@ async function withPanel(failStartup, check, renderer = 'party') {
             }});
           }
           if (command === 'panel_window_message' && args.payload.type === 'ready') {
-            if (failStartup) throw new Error('Synthetic transport unavailable');
+            if (failStartup) throw new Error('command_rejected: Synthetic transport unavailable');
             presentation = {
               presentation_sequence: 1, busy: false, theme: 'slate',
               characterInspection: { campaignId: 'synthetic', rulesetId: 'fixture', id: 'asha', expanded: [] },
@@ -99,7 +99,8 @@ async function withPanel(failStartup, check, renderer = 'party') {
 for (const failStartup of [false, true]) test(`detached panel startup ${failStartup ? 'shows a recovery error' : 'renders the first owner projection'}`, { timeout: 15000 }, async () => {
   await withPanel(failStartup, async (page, status, content, errors) => {
     if (failStartup) {
-      assert.match(status, /Could not load campaign panels: .*Synthetic transport unavailable/);
+      // The desktop host's "owner_code: " prefix is not shown to the player (#240).
+      assert.match(status, /Could not load campaign panels: Synthetic transport unavailable\./);
       assert.match(status, /Close this window to return the panels to the sidebar/);
     } else {
       assert.ok(content.includes('Asha'), `Panel did not render: status=${status}; errors=${JSON.stringify(errors)}`);

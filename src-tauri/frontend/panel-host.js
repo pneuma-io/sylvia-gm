@@ -2,6 +2,12 @@
 (() => {
   'use strict';
 
+  // The desktop host rejects with "owner_code: message"; show only the owner's words.
+  function ownerWords(error) {
+    return String(error?.message || error || '').replace(/^Error:\s*/, '')
+      .replace(/^[a-z]+(?:_[a-z]+)+:\s+/, '').trim();
+  }
+
   function create({ state, renderPanel, render, dispatch, selection, busy, status, visible = () => true }) {
     const store = window.SylviaPanelWorkspace.createStore(localStorage);
     const effects = window.SylviaShotPlayback.create({ storage: localStorage });
@@ -266,7 +272,7 @@
           return;
         }
         if (sameContext(captured)) await publishRegistered();
-      }).catch((error) => status(`Panel windows could not be updated: ${error}`));
+      }).catch((error) => status(`Panel windows could not be updated: ${ownerWords(error)}`));
     }
 
     function leave() {
@@ -1123,7 +1129,7 @@
           void Promise.resolve(changed({type:'tab',groupId,panelId})).then(() => {
             if (sameContext(captured)) container.querySelector(
               `[data-workspace-tab="${CSS.escape(groupId)}"][data-workspace-panel="${CSS.escape(panelId)}"]`)?.focus();
-          }).catch(error => status(`Panel tab could not be selected: ${error}`));
+          }).catch(error => status(`Panel tab could not be selected: ${ownerWords(error)}`));
         });
         button.addEventListener('dragstart', (event) => {
           const surface = state.panelProjection.surfaces.find((item) => item.id === button.dataset.workspacePanel);
