@@ -1132,7 +1132,10 @@
       "builder_question_messages": []
      }
     }
-   ]
+   ],
+   "reopen": {
+    "ok": null
+   }
   },
   "activity": {
    "operations": [
@@ -1406,7 +1409,10 @@
      "code": "session_unavailable",
      "message": "Agent session is unavailable"
     }
-   ]
+   ],
+   "reopen": {
+    "ok": null
+   }
   },
   "plans": {
    "operations": [
@@ -1756,7 +1762,10 @@
     {
      "ok": null
     }
-   ]
+   ],
+   "reopen": {
+    "ok": null
+   }
   },
   "children_and_review": {
    "operations": [
@@ -2433,7 +2442,13 @@
       ]
      }
     }
-   ]
+   ],
+   "reopen": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "not_a_valid_starting_state": "`require_agent_human_review` on `builder-1` puts the source session of the accepted Plan in review, which `_verify_session_identities` refuses (\"Stored Campaign Plan source session is invalid\"). The owner never reaches it: `AuthorityOwner.require_builder_human_review` has no caller in 0.4.1, and the app only stops or restores sessions."
   }
  }
 }

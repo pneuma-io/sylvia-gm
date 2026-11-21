@@ -27,6 +27,7 @@ pub mod sessions;
 pub mod sql;
 pub mod store;
 pub mod stored;
+pub mod stored_sessions;
 mod verify;
 
 pub use error::{StoreError, StoreResult};

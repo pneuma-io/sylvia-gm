@@ -717,6 +717,63 @@ pub fn verify_published_lock(connection: &Connection, package_lock: &PackageLock
     Ok(())
 }
 
+/// `primary_manifest_for_lock`: the exact primary manifest of a lock, `None` for no rules.
+pub fn primary_manifest_for_lock(
+    connection: &Connection,
+    lock_id: &str,
+) -> StoreResult<Option<PackageManifest>> {
+    read_lock_record(connection, lock_id)?;
+    let rows = exact_rows(
+        connection,
+        "SELECT package_id, version, content_sha256 FROM campaign_lock_memberships          WHERE lock_id = ? AND role = 'primary' ORDER BY closure_order",
+        &[&lock_id],
+    )?;
+    let members: i64 = connection.query_row(
+        "SELECT COUNT(*) FROM campaign_lock_memberships WHERE lock_id = ?",
+        [lock_id],
+        |row| row.get(0),
+    )?;
+    if rows.is_empty() && members == 0 {
+        return Ok(None);
+    }
+    if rows.len() != 1 {
+        return Err(rejected(
+            "Campaign package lock does not have one exact primary package",
+            "package_lock_invalid",
+        ));
+    }
+    let (package_id, version, sha256) = (py_str(&rows[0][0]), py_str(&rows[0][1]), py_str(&rows[0][2]));
+    let manifest = manifest_from_identity(connection, (&package_id, &version, &sha256))?;
+    if manifest.role != sylvia_domain::authority::PackageRole::Primary {
+        return Err(rejected(
+            "Campaign package lock primary role conflicts with its manifest",
+            "package_lock_invalid",
+        ));
+    }
+    Ok(Some(manifest))
+}
+
+/// `lock_is_ancestor`: follow the current lock's authenticated predecessor chain.
+pub fn lock_is_ancestor(connection: &Connection, campaign_id: &str, lock_id: &str) -> StoreResult<bool> {
+    let mut current = crate::campaigns::current_lock_record(connection, campaign_id)?;
+    let mut seen: HashSet<String> = HashSet::new();
+    while seen.insert(current.lock_id.clone()) {
+        if current.campaign_id != campaign_id {
+            return Ok(false);
+        }
+        if current.lock_id == lock_id {
+            return Ok(true);
+        }
+        let Some(predecessor) = current.predecessor_lock_id.clone() else { return Ok(false) };
+        let previous = read_lock_record(connection, &predecessor)?;
+        if previous.created_revision >= current.created_revision {
+            return Ok(false);
+        }
+        current = previous;
+    }
+    Ok(false)
+}
+
 /// `COMPATIBLE_UPDATE_AUTHORITY`.
 pub const COMPATIBLE_UPDATE_AUTHORITY: &str = "campaign-compatible-update.v1";
 

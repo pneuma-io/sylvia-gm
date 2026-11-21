@@ -13,6 +13,7 @@ fn base(name: &str) -> Vec<u8> {
     let relative = match name {
         "riichi" => "tests/vectors/packages/seed_riichi.sqlite3.gz",
         "story" => "tests/vectors/session_pages/seed.sqlite3.gz",
+        "children" => "tests/vectors/stored_authority/children.sqlite3.gz",
         other => panic!("unknown base {other}"),
     };
     let mut bytes = Vec::new();

@@ -376,6 +376,28 @@ def checkpoint(database: Path) -> bytes:
     return database.read_bytes()
 
 
+# Profiles a run leaves that Python's own startup refuses, because the run calls store functions
+# in an order the owner never does. No later test may start from them.
+NOT_VALID_STARTING_STATES = {
+    "children_and_review": (
+        "`require_agent_human_review` on `builder-1` puts the source session of the accepted Plan "
+        "in review, which `_verify_session_identities` refuses (\"Stored Campaign Plan source session "
+        "is invalid\"). The owner never reaches it: `AuthorityOwner.require_builder_human_review` "
+        "has no caller in 0.4.1, and the app only stops or restores sessions."
+    ),
+}
+
+
+def reopen_outcome(path: Path) -> dict[str, object]:
+    """What the next startup says about a run's final profile."""
+    try:
+        store = a._open_for_application_owner(path)
+    except Exception as error:  # noqa: BLE001 - the failure is the recorded behaviour
+        return {"error": type(error).__name__, "code": getattr(error, "code", None), "message": str(error)}
+    store.close()
+    return {"ok": None}
+
+
 def main() -> None:
     if OUT.exists():
         shutil.rmtree(OUT)
@@ -395,7 +417,14 @@ def main() -> None:
                 store.close()
             (OUT / f"{name}.sqlite3.gz").write_bytes(
                 gzip.compress(checkpoint(folder / "authority.sqlite3"), mtime=0))
-            record["runs"][name] = {"operations": operations, "outcomes": outcomes}  # type: ignore[index]
+            reopened = reopen_outcome(folder / "authority.sqlite3")
+            if (reopened.get("error") is not None) != (name in NOT_VALID_STARTING_STATES):
+                raise AssertionError(f"{name}: reopening gave {reopened}; update NOT_VALID_STARTING_STATES")
+            record["runs"][name] = {  # type: ignore[index]
+                "operations": operations, "outcomes": outcomes, "reopen": reopened,
+                **({"not_a_valid_starting_state": NOT_VALID_STARTING_STATES[name]}
+                   if name in NOT_VALID_STARTING_STATES else {}),
+            }
     text = json.dumps(record, indent=1, ensure_ascii=True) + "\n"
     (OUT / "session_page_runs.json").write_bytes(text.encode("utf-8"))
 

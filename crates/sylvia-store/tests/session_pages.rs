@@ -221,5 +221,17 @@ fn every_session_page_run_matches_python() {
         };
         let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
         assert!(differences.is_empty(), "{name}: database differs from Python's: {differences:#?}");
+        // The next startup says of the run's final profile what Python's says; a run marked
+        // `not_a_valid_starting_state` is refused by both, and no test may start from it.
+        let reopen = &run_record["reopen"];
+        match (AuthorityStore::open_for_application_owner(&database, None), reopen.get("error")) {
+            (Ok(mut store), None) => store.close(),
+            (Err(error), Some(_)) => {
+                assert!(run_record.get("not_a_valid_starting_state").is_some(), "{name}: unexpected refusal");
+                let coded = error.at_startup();
+                assert_eq!(coded.message, reopen["message"].as_str().unwrap(), "{name}: reopen");
+            }
+            (got, _) => panic!("{name}: reopening gave {:?}, Python {reopen}", got.map(|_| ())),
+        }
     }
 }
