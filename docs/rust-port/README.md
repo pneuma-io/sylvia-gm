@@ -117,6 +117,7 @@ The lists in `sites/` give every occurrence by lane. The traps behind them:
 | Float text | `repr`: `1e+16`, `1e-05`, half-to-even on ties | `Display`: `10000000000000000`, half-up | `pyjson::float_repr` |
 | Integer versus float | `1` and `1.0` are different and encode differently | same in `serde_json`, lost by `as f64` | keep `Json` numbers as they arrive |
 | Big integers | unlimited | 64-bit | `pyjson::loads` refuses them; see `differences.md` |
+| Integer overflow | cannot happen | `+`, `-`, `*` panic in debug builds and wrap in release | on any value from content, the model or the player, use `checked_*` and refuse on overflow with a declared message; never store a clamped value |
 | Dict order | insertion order | `HashMap` is random | `JsonMap` (ordered) or `IndexMap`; `BTreeMap` only where Python sorted |
 | String length | `len(str)` counts code points | `str::len` counts bytes | `chars().count()` |
 | Slicing | by code point | by byte | slice by `char_indices` |
