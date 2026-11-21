@@ -1,0 +1,2187 @@
+{
+ "python": "3.12.11",
+ "mount_filesystem_type": [
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/home/user/data",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/home/user/data",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/homework",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/home",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /mnt/data rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/mnt/database/x",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /mnt/data rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/mnt/data/x",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /srv rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /srv rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/srv/a",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /srv rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /srv rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/srv/a",
+   "type": "tmpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /my\\040disk rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/my disk/file",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /tab\\011dir rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/tab\tdir/f",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /back\\134slash rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/back\\slash/f",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /data/ rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/data/f",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime - ext4 /dev/sda1 rw",
+   "path": "/x",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 master:2 - ext4 /dev/sda1 rw",
+   "path": "/x",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /broken rw",
+   "path": "/broken/x",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/x",
+   "type": null
+  },
+  {
+   "mountinfo": "garbage\n36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/x",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\r\n36 25 8:1 / /opt rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/opt/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\u000b36 25 8:1 / /opt rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/opt/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\u001c36 25 8:1 / /opt rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/opt/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\u202836 25 8:1 / /opt rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/opt/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\u008536 25 8:1 / /opt rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/opt/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /opt rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "relative/path",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/x",
+   "type": "fuse.sshfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /caf\u00e9 rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/caf\u00e9/x",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - - xfs /dev/sda1 rw",
+   "path": "/a/b",
+   "type": "-"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "beegfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "lustre"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "fuse.sshfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "nfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/other",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "ntfs3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "glusterfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/",
+   "type": "nfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/other",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "overlay"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "beegfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/other",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "glusterfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "lustre"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "nfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "fuse.sshfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "fuse.sshfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/",
+   "type": "beegfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "lustre"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "zfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "overlay"
+  },
+  {
+   "mountinfo": "",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/a",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/a",
+   "type": "virtiofs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "nfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/",
+   "type": "squashfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/a",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "glusterfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/other",
+   "type": "fuse.rclone"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "fuse.sshfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "tmpfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/other",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "fuse.rclone"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/other",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/other",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/",
+   "type": "lustre"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "zfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "ntfs3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "lustre"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/a",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - 9p /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "fuse.sshfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/other",
+   "type": "cifs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "fuse.rclone"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "tmpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "ntfs3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "fuse.rclone"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/a",
+   "type": "lustre"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "squashfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "virtiofs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "overlay"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "virtiofs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "beegfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - zfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - vfat /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "fuse.rclone"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "davfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "smb3"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - davfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home/u rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - lustre /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "vfat"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "9p"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - smbfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "overlay"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - beegfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - cifs /dev/sda1 rw",
+   "path": "/a",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": "overlay"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - nfs4 /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/a",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /x/ rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "afs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - btrfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "btrfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - gpfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": "cifs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/b/c/d",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/a/bc",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - tmpfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - davfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "tmpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /home rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ceph /dev/sda1 rw",
+   "path": "/a",
+   "type": "ext4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - smb3 /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - gpfs /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/other",
+   "type": "gpfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - xfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - fuse.sshfs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - overlay /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - btrfs /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - fuse /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "zfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/a/bc",
+   "type": "tmpfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/x/y",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - fuse.rclone /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - virtiofs /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - fuse /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - nfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": "fuse"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - smb3 /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /ab rw,relatime shared:1 - afs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /a rw,relatime shared:1 - virtiofs /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "virtiofs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - vfat /dev/sda1 rw\n36 25 8:1 / /home rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/m n/z",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - tmpfs /dev/sda1 rw",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - ntfs3 /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - ceph /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - overlay /dev/sda1 rw",
+   "path": "/other",
+   "type": "ceph"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a rw,relatime shared:1 - nfs4 /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - squashfs /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - ext4 /dev/sda1 rw",
+   "path": "/a/b/c/d",
+   "type": "nfs4"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - lustre /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / /m\\040n rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/",
+   "type": "glusterfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - xfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "xfs"
+  },
+  {
+   "mountinfo": "",
+   "path": "/other",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /ab rw,relatime shared:1 - squashfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/b/c rw,relatime shared:1 - afs /dev/sda1 rw",
+   "path": "/home/u/f",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / / rw,relatime shared:1 - cifs /dev/sda1 rw\n36 25 8:1 / / rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b rw,relatime shared:1 - beegfs /dev/sda1 rw",
+   "path": "/x/y",
+   "type": "smbfs"
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - smbfs /dev/sda1 rw\n36 25 8:1 / /x/ rw,relatime shared:1 - fuse.rclone /dev/sda1 rw",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/ab/c",
+   "type": null
+  },
+  {
+   "mountinfo": "36 25 8:1 / /a/bc rw,relatime shared:1 - ext4 /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - zfs /dev/sda1 rw\n36 25 8:1 / /a/bc rw,relatime shared:1 - 9p /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - glusterfs /dev/sda1 rw\n36 25 8:1 / /a/b/c rw,relatime shared:1 - ntfs3 /dev/sda1 rw\n36 25 8:1 / /home/u rw,relatime shared:1 - glusterfs /dev/sda1 rw",
+   "path": "/",
+   "type": null
+  },
+  {
+   "mountinfo": "",
+   "path": "/x/y",
+   "type": null
+  }
+ ],
+ "classify_filesystem": {
+  "9p": "remote",
+  "afs": "remote",
+  "beegfs": "remote",
+  "btrfs": null,
+  "ceph": "remote",
+  "cifs": "remote",
+  "davfs": "remote",
+  "ext4": null,
+  "fuse": "unsupported",
+  "fuse.rclone": "remote",
+  "fuse.sshfs": "remote",
+  "glusterfs": "remote",
+  "gpfs": "remote",
+  "lustre": "remote",
+  "nfs": "remote",
+  "nfs4": "remote",
+  "ntfs3": "unsupported",
+  "overlay": "unsupported",
+  "smb3": "remote",
+  "smbfs": "remote",
+  "squashfs": "unsupported",
+  "tmpfs": "unsupported",
+  "vfat": "unsupported",
+  "virtiofs": "remote",
+  "xfs": null,
+  "zfs": "unsupported"
+ },
+ "classify_none": "unknown",
+ "local_filesystems": [
+  "btrfs",
+  "ext4",
+  "xfs"
+ ],
+ "remote_filesystems": [
+  "9p",
+  "afs",
+  "beegfs",
+  "ceph",
+  "cifs",
+  "davfs",
+  "fuse.rclone",
+  "fuse.sshfs",
+  "glusterfs",
+  "gpfs",
+  "lustre",
+  "nfs",
+  "nfs4",
+  "smb3",
+  "smbfs",
+  "virtiofs"
+ ]
+}

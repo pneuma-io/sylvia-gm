@@ -51,6 +51,12 @@ hex = "0.4"
 rusqlite = { version = "0.34", features = ["bundled", "backup"] }
 # Store tests only: the Python-made fixture databases are kept gzip-compressed.
 flate2 = "1"
+# Store safe-file primitives (`infrastructure/safe_file.py`). Linux: safe openat/statat/
+# unlinkat/renameat/fsync on descriptors. Windows: handle identity without unsafe code, and the
+# three kernel32 calls with no safe binding (GetDriveTypeW, the delete disposition, MoveFileExW).
+rustix = { version = "1", features = ["fs"] }
+winapi-util = "0.1"
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem"] }
 getrandom = "0.2"
 regex = "1"
 # Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate

@@ -29,6 +29,9 @@ pub enum StoreError {
     /// Any other Python exception (`ValueError`, `OSError`, `RuntimeError`), with its text.
     #[error("{0}")]
     Other(String),
+    /// `_BackupFailure`, a `CommandRejected` with its phase, reason and cleanup codes.
+    #[error("Database backup failed")]
+    Backup(crate::backup::BackupFailure),
     /// Behaviour the port has not reached yet. Never a Python outcome; it names the pull
     /// request expected to replace it, so a database that needs it is refused rather than
     /// migrated differently.
@@ -65,7 +68,7 @@ impl StoreError {
                     .with_error_type("SchemaIdentityError")
             }
             Self::NotPorted(what) => CodedError::new("not_ported", format!("not yet ported: {what}")),
-            Self::Coded(_) | Self::Other(_) => {
+            Self::Coded(_) | Self::Other(_) | Self::Backup(_) => {
                 CodedError::new(SCHEMA_IDENTITY_MISMATCH, "Authority stored integrity could not be verified")
                     .with_error_type("SchemaIdentityError")
             }

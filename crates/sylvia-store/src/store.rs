@@ -27,8 +27,6 @@ use sylvia_base::CodedError;
 
 /// `timeout=30.0` on every operation connection.
 const BUSY_TIMEOUT: Duration = Duration::from_secs(30);
-/// `_BACKUP_PAGES_PER_STEP`.
-const BACKUP_PAGES_PER_STEP: std::os::raw::c_int = 16;
 
 /// Run before migrations, under the ownership lock (Python's `before_migration`).
 pub type BeforeMigration = Box<dyn FnOnce() -> Result<(), CodedError> + Send>;
@@ -514,51 +512,14 @@ impl AuthorityStore {
         if let Some(parent) = target.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        self.backup_database_interim(&target)
+        self.backup_database(&target)
     }
 
-    /// Interim stand-in for `backup_database`: an online copy (16 pages per step, 10 ms
-    /// between steps, as Python's) into a private temporary file beside the target, then a
-    /// rename over it. The verified, sealed and durably published copy with its failure codes
-    /// arrives with `safe_file.py` in the next lane 3 pull request.
-    fn backup_database_interim(&self, target: &Path) -> StoreResult<()> {
-        let parent = target.parent().unwrap_or_else(|| Path::new(""));
-        let name = target.file_name().unwrap_or_default().to_string_lossy();
-        let temporary = parent.join(format!(".{name}.{}.{}.backup-tmp", std::process::id(), unique_suffix()));
-        let copied = (|| -> StoreResult<()> {
-            let source = Connection::open_with_flags(
-                &self.database_path,
-                OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX,
-            )?;
-            source.busy_timeout(BUSY_TIMEOUT)?;
-            let mut destination = Connection::open_with_flags(
-                &temporary,
-                OpenFlags::SQLITE_OPEN_READ_WRITE
-                    | OpenFlags::SQLITE_OPEN_CREATE
-                    | OpenFlags::SQLITE_OPEN_NO_MUTEX,
-            )?;
-            destination.busy_timeout(BUSY_TIMEOUT)?;
-            {
-                let backup = rusqlite::backup::Backup::new(&source, &mut destination)?;
-                backup.run_to_completion(BACKUP_PAGES_PER_STEP, Duration::from_millis(10), None)?;
-            }
-            destination.close().map_err(|(_, error)| error)?;
-            source.close().map_err(|(_, error)| error)?;
-            for suffix in ["-journal", "-wal", "-shm"] {
-                let mut sidecar = temporary.clone().into_os_string();
-                sidecar.push(suffix);
-                let sidecar = PathBuf::from(sidecar);
-                if sidecar.exists() {
-                    std::fs::remove_file(&sidecar)?;
-                }
-            }
-            std::fs::rename(&temporary, target)?;
-            Ok(())
-        })();
-        if copied.is_err() && temporary.exists() {
-            let _ = std::fs::remove_file(&temporary);
-        }
-        copied
+    /// `backup_database`: durably publish one coherent online copy in the supported local
+    /// envelope (Windows fixed disks, or Linux ext4, xfs or btrfs). The caller must manage the
+    /// target directory exclusively for the whole call. Fails with `backup_<phase>_<reason>`.
+    pub fn backup_database(&self, target: &Path) -> StoreResult<()> {
+        crate::backup::Backup::new(&self.database_path).run(target).map_err(StoreError::Backup)
     }
 }
 
@@ -591,15 +552,6 @@ fn rollback_if_open(connection: &Connection) {
     if !connection.is_autocommit() {
         let _ = connection.execute_batch("ROLLBACK");
     }
-}
-
-fn unique_suffix() -> u128 {
-    use std::sync::atomic::{AtomicU64, Ordering};
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-    let nanos = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |elapsed| elapsed.as_nanos());
-    nanos ^ u128::from(COUNTER.fetch_add(1, Ordering::Relaxed))
 }
 
 /// `Path.resolve()` (non-strict): absolute, with the existing part's links resolved.
