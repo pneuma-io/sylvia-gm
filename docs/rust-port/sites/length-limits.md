@@ -116,9 +116,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/panel_layout.py:18` | `parse_panel_layout` | len() against a limit | `if len(value) > PANEL_LAYOUT_BYTE_LIMIT:` | |
 | `domain/panel_layout.py:53` | `parse_panel_layout.tree` | len() against a limit | `if not isinstance(value, Mapping) or depth > 16 or len(node_ids) >= 256:` | |
 | `domain/panel_layout.py:84` | `parse_panel_layout` | len() against a limit | `if len(title.encode("utf-8")) > 256:` | |
-| `domain/session.py:252` | `SessionRecord.__post_init__` | len() against a limit | `not isinstance(value, str) or not 1 <= len(value) <= 32` | |
-| `domain/session.py:263` | `SessionRecord.__post_init__` | len() against a limit | `if not self.scope or len(self.scope) > 8 or any(not item for item in self.scope):` | |
-| `domain/session.py:479` | `BuilderChatRecord.__post_init__` | len() against a limit | `if len(self.display_name) > 120:` | |
+| `domain/session.py:252` | `SessionRecord.__post_init__` | len() against a limit | `not isinstance(value, str) or not 1 <= len(value) <= 32` | `sylvia-domain` session_vectors |
+| `domain/session.py:263` | `SessionRecord.__post_init__` | len() against a limit | `if not self.scope or len(self.scope) > 8 or any(not item for item in self.scope):` | `sylvia-domain` session_vectors |
+| `domain/session.py:479` | `BuilderChatRecord.__post_init__` | len() against a limit | `if len(self.display_name) > 120:` | `sylvia-domain` session_vectors |
 | `domain/starting_state.py:36` | `_path` | len() against a limit | `or not 1 <= len(value) <= 16):` | |
 | `domain/starting_state.py:39` | `_path` | len() against a limit | `if not isinstance(part, str) or not part or len(part) > 128:` | |
 | `domain/starting_state.py:51` | `parse_state_schemas` | len() against a limit | `or not 1 <= len(value) <= 32):` | |
