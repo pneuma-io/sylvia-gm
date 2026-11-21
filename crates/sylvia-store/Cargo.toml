@@ -10,6 +10,7 @@ publish.workspace = true
 
 [dependencies]
 sylvia-base.workspace = true
+sylvia-domain.workspace = true
 thiserror.workspace = true
 rusqlite.workspace = true
 tokio.workspace = true
@@ -26,6 +27,7 @@ winapi-util.workspace = true
 windows-sys.workspace = true
 
 [dev-dependencies]
+sylvia-compare = { path = "../sylvia-compare" }
 hex.workspace = true
 serde_json.workspace = true
 flate2.workspace = true

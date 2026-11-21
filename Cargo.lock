@@ -640,6 +640,8 @@ dependencies = [
  "serde_json",
  "sha2",
  "sylvia-base",
+ "sylvia-compare",
+ "sylvia-domain",
  "thiserror",
  "tokio",
  "winapi-util",
