@@ -595,6 +595,17 @@ test('audit export shows actionable save errors and permits another Save As', as
   assert.equal(h.calls.submissions.length, 0);
 });
 
+test('the ChatGPT account page shows a refusal without the desktop host code', async () => {
+  const h = harness();
+  h.state.bridge.chatgpt_connection = async () => {
+    throw 'command_rejected: Install the Codex runtime before connecting ChatGPT.';
+  };
+  h.showSettingsTab('accounts');
+  await h.flush();
+  assert.equal(h.node('chatgpt-connection-status').textContent,
+    'Install the Codex runtime before connecting ChatGPT.');
+});
+
 test('account sign-in polls pending consent and stops after connection or leaving the page', async () => {
   const h = harness();
   let signedIn = false;
