@@ -1,7 +1,5 @@
 //! Run one scripted session against an owner and record everything observable.
 
-use crate::dbdump;
-use crate::diff::Rules;
 use crate::owner::{Owner, OwnerCommand};
 use crate::standin::{self, Standin};
 use serde::Deserialize;
@@ -9,6 +7,8 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::time::Duration;
 use sylvia_base::{Json, JsonMap};
+use sylvia_compare::dbdump;
+use sylvia_compare::diff::Rules;
 
 /// A scripted session: the same requests are sent to whichever owner is under test.
 #[derive(Debug, Clone, Deserialize)]

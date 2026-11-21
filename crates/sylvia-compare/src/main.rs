@@ -17,8 +17,6 @@
 //! `FOLDER/<session name>.work`. `check` records into a scratch folder and compares with the
 //! reference; it exits 1 when they differ. See `docs/rust-port/comparison-tool.md`.
 
-mod dbdump;
-mod diff;
 mod owner;
 mod session;
 mod standin;
@@ -28,6 +26,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::Json;
+use sylvia_compare::diff;
 
 fn main() -> ExitCode {
     let arguments: Vec<String> = std::env::args().skip(1).collect();

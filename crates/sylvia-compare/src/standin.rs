@@ -21,7 +21,6 @@
 //! The server is a small HTTP/1.1 implementation on `std::net`, because holding a stream open
 //! and dropping one mid-body need control over the socket that an HTTP library hides.
 
-use crate::dbdump::encoding_of;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json::json;
@@ -33,6 +32,7 @@ use std::sync::{Arc, Condvar, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{Json, JsonMap};
+use sylvia_compare::dbdump::encoding_of;
 
 /// Model identifier the stand-in lists.
 pub const MODEL: &str = "standin-narrator";

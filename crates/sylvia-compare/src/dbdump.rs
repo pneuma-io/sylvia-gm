@@ -127,7 +127,7 @@ fn text_value(text: &str) -> Json {
 }
 
 /// Name the `json.dumps` options that reproduce `text` from its parsed value, or `other`.
-pub(crate) fn encoding_of(text: &str, parsed: &Json) -> &'static str {
+pub fn encoding_of(text: &str, parsed: &Json) -> &'static str {
     use sylvia_base::pyjson::{dumps, Dump};
     let candidates = [
         ("canonical", Dump::CANONICAL),
