@@ -106,7 +106,12 @@ impl Owner {
 
         let mut ready = match owner.lines.recv_timeout(timeout) {
             Ok(Some(ready)) => ready,
-            Ok(None) => return Err("the owner exited before reporting ready".into()),
+            // An owner that ends its launch without a reply (Python's "startup failed") is a
+            // refusal too, recorded with a null reply and its exit code.
+            Ok(None) => {
+                let exit_code = owner.close(Duration::from_secs(60))?;
+                return Ok(Launch::Refused { reply: Json::Null, exit_code });
+            }
             Err(_) => return Err(format!("the owner was not ready within {} s", timeout.as_secs())),
         };
         if ready.get("ok") != Some(&Json::Bool(true)) {

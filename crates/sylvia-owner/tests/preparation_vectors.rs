@@ -14,6 +14,8 @@ use sylvia_owner::desktop_update::launch::Installation;
 use sylvia_owner::desktop_update::manifest::{parse_manifest, Context, KeyRing, Version, APP_VERSION};
 use sylvia_owner::desktop_update::payload::extract_portable;
 use sylvia_owner::desktop_update::preparation::PreparedUpdate;
+use sylvia_owner::desktop_update::recovery::RecoveryOperation;
+use sylvia_owner::desktop_update::recovery_service::RecoveryService;
 use sylvia_owner::desktop_update::restart::{RestartContext, RestartHandshake};
 use sylvia_owner::desktop_update::startup::{authorize_startup, AuthorizedStartup};
 use sylvia_owner::desktop_update::storage::{is_update_error, UpdateStore};
@@ -51,12 +53,16 @@ fn outcome(result: CodedResult<J>) -> J {
 
 fn listing(root: &Path) -> J {
     use sha2::Digest;
+    // Each restored file gets its own random temporary folder; its name is folded as the
+    // generator folds it.
+    let temp = regex::Regex::new("((?:^|/)(?:restoring|restore-payload)/)[0-9a-f]{32}").unwrap();
     let mut rows = Vec::new();
     let mut pending = vec![root.to_path_buf()];
     while let Some(folder) = pending.pop() {
         for entry in std::fs::read_dir(&folder).unwrap() {
             let path = entry.unwrap().path();
             let relative = path.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/");
+            let relative = temp.replace_all(&relative, "${1}<temp>").to_string();
             if path.is_dir() {
                 rows.push(json!([relative, "dir"]));
                 pending.push(path);
@@ -153,6 +159,7 @@ fn run(scenario: &J, index: usize) -> J {
     let mut handshake: Option<RestartHandshake> = None;
     let mut nonce = String::new();
     let mut startup: Option<AuthorizedStartup> = None;
+    let mut recovery: Option<RecoveryOperation> = None;
     let mut results = Vec::new();
     for op in scenario["ops"].as_array().unwrap() {
         let name = op["op"].as_str().unwrap();
@@ -250,6 +257,109 @@ fn run(scenario: &J, index: usize) -> J {
                 }))
             }
             "startup_confirm" => outcome(startup.as_mut().unwrap().confirm().map(J::Bool)),
+            "recovery_new" => outcome(RecoveryOperation::new(prepared.clone().unwrap()).map(|made| {
+                recovery = Some(made);
+                J::Null
+            })),
+            "recovery_inspect" => outcome(recovery.as_mut().unwrap().inspect().map(J::Object)),
+            "recovery_rollback" => {
+                let exited = op.get("exited").is_none_or(|value| value == true);
+                outcome(
+                    recovery
+                        .as_mut()
+                        .unwrap()
+                        .rollback(op["choice"].as_str().unwrap(), &|| Ok(exited))
+                        .map(|()| J::Null),
+                )
+            }
+            "recovery_create_restart" => {
+                outcome(recovery.as_mut().unwrap().create_restart(&op["identity"]).and_then(|made| {
+                    nonce = made.load()?["nonce"].as_str().unwrap().to_string();
+                    Ok(json!(nonce))
+                }))
+            }
+            "recovery_retry" => {
+                let exited = op.get("exited").is_none_or(|value| value == true);
+                let expected = op.get("nonce").and_then(J::as_str).unwrap_or(&nonce).to_string();
+                outcome(
+                    recovery
+                        .as_mut()
+                        .unwrap()
+                        .retry_restart(&expected, &op["identity"], &|| Ok(exited))
+                        .and_then(|made| {
+                            nonce = made.load()?["nonce"].as_str().unwrap().to_string();
+                            Ok(json!(nonce))
+                        }),
+                )
+            }
+            "recovery_launch" => {
+                outcome(recovery.as_ref().unwrap().handshake.launch_once(|arguments| Ok(json!(arguments))))
+            }
+            "recovery_confirm_handshake" => {
+                let context = RestartContext {
+                    nonce: &nonce,
+                    live: &live,
+                    desktop_version: APP_VERSION,
+                    owner_version: APP_VERSION,
+                    target: TARGET,
+                    distribution: "portable",
+                    storage_compatibility: 1,
+                };
+                outcome(recovery.as_ref().unwrap().handshake.confirm(&context).map(|()| J::Null))
+            }
+            "recovery_confirmed" => outcome(recovery.as_ref().unwrap().handshake.confirmed().map(J::Bool)),
+            "recovery_confirm" => outcome(recovery.as_mut().unwrap().confirm().map(|()| J::Null)),
+            "service_state" | "service_handoff" => {
+                let native = op.get("native").and_then(J::as_str).unwrap_or(APP_VERSION);
+                let current_text = op.get("current").and_then(J::as_str).unwrap_or(APP_VERSION);
+                let context = json!({
+                    "live": live.to_string_lossy(), "data_root": data.to_string_lossy(), "version": native,
+                    "target": TARGET, "distribution": "portable",
+                });
+                let host = json!({"version": native, "target": TARGET, "distribution": "portable"});
+                outcome(Installation::for_recovery(Some(&context), &data).and_then(|installation| {
+                    let service = RecoveryService {
+                        installation: installation.expect("a context"),
+                        current: Version::parse_text(current_text).unwrap(),
+                        keyring: ring.clone(),
+                        native_version: native.to_string(),
+                    };
+                    let mut params = serde_json::Map::new();
+                    params.insert("host".into(), host);
+                    if name == "service_state" {
+                        service.handle("state", &params).map(J::Object)
+                    } else {
+                        params.insert("operation_id".into(), json!(OP));
+                        params.insert(
+                            "choice".into(),
+                            json!(op.get("choice").and_then(J::as_str).unwrap_or("keep")),
+                        );
+                        params.insert("restart_nonce".into(), J::Null);
+                        service.handle("handoff", &params).map(J::Object)
+                    }
+                }))
+            }
+            "authorize_recovery_startup" => {
+                let context = json!({
+                    "live": live.to_string_lossy(), "data_root": data.to_string_lossy(), "version": APP_VERSION,
+                    "target": TARGET, "distribution": "portable",
+                });
+                let request =
+                    json!({"operation_id": OP, "attempt": ATTEMPT, "nonce": nonce, "recovery": true});
+                let running = Version::parse_text(APP_VERSION).unwrap();
+                outcome(Installation::from_launch(Some(&context), &data).and_then(|installation| {
+                    startup = authorize_startup(
+                        &data,
+                        installation.as_ref(),
+                        Some(&request),
+                        &running,
+                        APP_VERSION,
+                        1,
+                        &ring,
+                    )?;
+                    Ok(J::Null)
+                }))
+            }
             "extract" => {
                 let base = data.join(".application-updates").join(OP);
                 let raw = std::fs::read(base.join("manifest.json")).unwrap();

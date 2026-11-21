@@ -202,26 +202,56 @@ where
     W: Write + Send + 'static,
 {
     let (frame_sender, mut frames) = mpsc::unbounded_channel::<Frame>();
+    let (mode_sender, mode) = std::sync::mpsc::channel::<InputMode>();
     std::thread::Builder::new()
         .name("sylvia-owner-stdin".into())
-        .spawn(move || read_frames(input, &frame_sender))
+        .spawn(move || read_frames(input, &frame_sender, &mode))
         .expect("the stdin reader thread starts");
 
     let (reply_sender, replies) = mpsc::unbounded_channel::<Json>();
     let writer = tokio::task::spawn_blocking(move || write_replies(output, replies));
     let replies = Replies { sender: reply_sender, closing: Arc::new(AtomicBool::new(false)) };
 
-    let code = serve(&mut frames, &replies).await;
+    let code = serve(&mut frames, &replies, &mode_sender).await;
     // Dropping the last sender lets the writer drain what is queued and stop.
     drop(replies);
     let _ = writer.await;
     code
 }
 
-fn read_frames(mut input: impl BufRead, frames: &mpsc::UnboundedSender<Frame>) {
+/// How the stdin thread reads after the launch envelope: owner messages, or the raw lines of
+/// the recovery-only owner (`run_recovery` reads its own bounded requests).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum InputMode {
+    Owner,
+    Recovery,
+}
+
+fn read_frames(
+    mut input: impl BufRead,
+    frames: &mpsc::UnboundedSender<Frame>,
+    mode: &std::sync::mpsc::Receiver<InputMode>,
+) {
+    let first = protocol::read_message(&mut input);
+    let last = matches!(first, Frame::End | Frame::Fatal(_));
+    if frames.send(first).is_err() || last {
+        return;
+    }
+    // The serve loop decides, from the launch envelope, how the rest is read.
+    let Ok(mode) = mode.recv() else { return };
     loop {
-        let frame = protocol::read_message(&mut input);
-        let last = matches!(frame, Frame::End | Frame::Fatal(_));
+        let (frame, last) = match mode {
+            InputMode::Owner => {
+                let frame = protocol::read_message(&mut input);
+                let last = matches!(frame, Frame::End | Frame::Fatal(_));
+                (frame, last)
+            }
+            InputMode::Recovery => {
+                let line = protocol::read_raw_line(&mut input);
+                let last = !matches!(line, crate::desktop_update::recovery_service::RecoveryLine::Line(_));
+                (Frame::Raw(line), last)
+            }
+        };
         if frames.send(frame).is_err() || last {
             return;
         }
@@ -335,6 +365,40 @@ fn abort_desktop_update(
     Ok(())
 }
 
+/// `run_recovery(launch, ...)`: an interrupted update met a native update context, so this
+/// owner serves only update recovery. It opens no authority, migrates nothing and reads no
+/// campaign. An exception Python lets escape ends it without a reply (exit code 2).
+async fn serve_recovery(
+    frames: &mut mpsc::UnboundedReceiver<Frame>,
+    replies: &Replies,
+    envelope: JsonMap,
+) -> i32 {
+    use crate::desktop_update::recovery_service::{
+        recovery_launch, recovery_step, RecoveryLine, RecoveryStep,
+    };
+    let Some(Ok(launched)) = blocking(move || recovery_launch(&envelope)).await else {
+        return startup_failed();
+    };
+    replies.send(launched.ready);
+    let service = Arc::new(launched.service);
+    loop {
+        let line = match frames.recv().await {
+            Some(Frame::Raw(line)) => line,
+            _ => RecoveryLine::End,
+        };
+        let step_service = Arc::clone(&service);
+        match blocking(move || recovery_step(&step_service, line)).await {
+            Some(RecoveryStep::Reply(reply)) => replies.send(reply),
+            Some(RecoveryStep::Closed(reply)) => {
+                replies.send(reply);
+                return EXIT_OK;
+            }
+            Some(RecoveryStep::End) => return EXIT_OK,
+            Some(RecoveryStep::Failed) | None => return startup_failed(),
+        }
+    }
+}
+
 /// Python's fixed refusal when the update startup check fails.
 fn update_recovery_refusal() -> Json {
     let mut error = JsonMap::new();
@@ -355,26 +419,33 @@ async fn blocking<T: Send + 'static>(work: impl FnOnce() -> T + Send + 'static) 
     tokio::task::spawn_blocking(work).await.ok()
 }
 
-async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -> i32 {
+async fn serve(
+    frames: &mut mpsc::UnboundedReceiver<Frame>,
+    replies: &Replies,
+    mode: &std::sync::mpsc::Sender<InputMode>,
+) -> i32 {
     // Launch: the first message must be a valid launch envelope. Any failure here ends the
     // owner without a reply, as Python does ("Sylvia GM owner startup failed" on stderr).
     let launched = match frames.recv().await {
-        Some(Frame::Message(envelope)) => match blocking(move || launch(&envelope)).await {
-            Some(Ok(launched)) => launched,
-            Some(Err(LaunchFailure::Update { recovery })) => {
-                if recovery {
-                    // Python's recovery-only owner (`run_recovery`) needs update preparation,
-                    // which is not ported yet.
-                    return startup_failed();
+        Some(Frame::Message(envelope)) => {
+            let launch_envelope = envelope.clone();
+            match blocking(move || launch(&launch_envelope)).await {
+                Some(Ok(launched)) => launched,
+                Some(Err(LaunchFailure::Update { recovery })) => {
+                    if recovery {
+                        let _ = mode.send(InputMode::Recovery);
+                        return serve_recovery(frames, replies, envelope).await;
+                    }
+                    // No authority acquisition, schema migration or provider work occurred.
+                    replies.send(update_recovery_refusal());
+                    return EXIT_STARTUP_FAILED;
                 }
-                // No authority acquisition, schema migration or provider work occurred.
-                replies.send(update_recovery_refusal());
-                return EXIT_STARTUP_FAILED;
+                _ => return startup_failed(),
             }
-            _ => return startup_failed(),
-        },
+        }
         _ => return startup_failed(),
     };
+    let _ = mode.send(InputMode::Owner);
     let Launched { context, response_hex, store_thread, installation, startup } = launched;
     let diagnostics = Arc::new(LocalDiagnostics::new(&context.storage_root));
     let owner = Arc::new(Owner {
@@ -442,6 +513,8 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
                 continue;
             }
             Some(Frame::Message(request)) => request,
+            // Raw lines are read only for the recovery-only owner, never in this loop.
+            Some(Frame::Raw(_)) => continue,
         };
         let id = request.get("id").and_then(Json::as_str).filter(|id| !id.is_empty());
         let (id, method, params, load_id) = match validate(&request, id) {

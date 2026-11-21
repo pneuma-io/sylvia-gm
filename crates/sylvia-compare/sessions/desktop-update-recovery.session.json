@@ -1,0 +1,173 @@
+{
+ "name": "desktop-update-recovery",
+ "description": "The recovery-only owner as 0.4.1 ships it: an update interrupted mid-apply meets the desktop's update context, so the owner serves only recovery requests on its own bounded pipe. With no trusted key the retained preparation cannot be authenticated; the session covers the request checks, the refused methods, shutdown, and launches that end without a reply (an invalid context) or with the ordinary refusal (no context).",
+ "summarise_tables": [
+  "^package_",
+  "^packages$"
+ ],
+ "seed_files": [
+  {
+   "path": "data/.application-updates/0123456789abcdef0123456789abcdef/attempts/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/prepared-update.json",
+   "json": {
+    "format_version": 2,
+    "current_version": "0.4.1",
+    "version": "0.4.2"
+   }
+  },
+  {
+   "path": "data/.application-updates/0123456789abcdef0123456789abcdef/selected-attempt.json",
+   "json": {
+    "format_version": 1,
+    "attempt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   }
+  },
+  {
+   "path": "data/.application-updates/0123456789abcdef0123456789abcdef/manifest.json",
+   "json": {
+    "signed": {
+     "version": "0.4.2"
+    },
+    "key_id": "release-key",
+    "signature": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+Pw=="
+   }
+  },
+  {
+   "path": "data/.application-updates/current.json",
+   "json": {
+    "format_version": 1,
+    "operation_id": "0123456789abcdef0123456789abcdef",
+    "phase": "applying",
+    "version": "0.4.2",
+    "error_code": null
+   }
+  }
+ ],
+ "launch": {
+  "desktop_update_context": {
+   "live": "${app_root}",
+   "data_root": "${data_root}",
+   "version": "0.4.1",
+   "target": "windows-x86_64",
+   "distribution": "installed"
+  }
+ },
+ "steps": [
+  {
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   }
+  },
+  {
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "portable"
+    }
+   }
+  },
+  {
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    },
+    "extra": 1
+   }
+  },
+  {
+   "method": "desktop_update_recovery_handoff",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    },
+    "operation_id": "0123456789abcdef0123456789abcdef",
+    "choice": "keep",
+    "restart_nonce": null
+   }
+  },
+  {
+   "method": "desktop_update_recovery_handoff",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   }
+  },
+  {
+   "method": "campaign_index",
+   "params": {}
+  },
+  {
+   "method": "desktop_update_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   }
+  },
+  {
+   "method": "shutdown",
+   "params": {
+    "unexpected": true
+   }
+  },
+  {
+   "method": "shutdown"
+  },
+  {
+   "relaunch": true,
+   "launch": {
+    "desktop_update_context": {
+     "live": "${app_root}",
+     "data_root": "${data_root}",
+     "version": "not a version",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   }
+  },
+  {
+   "relaunch": true,
+   "launch": {}
+  },
+  {
+   "relaunch": true
+  },
+  {
+   "method": "desktop_update_recovery_state",
+   "params": {
+    "host": {
+     "version": "0.4.1",
+     "target": "windows-x86_64",
+     "distribution": "installed"
+    }
+   }
+  },
+  {
+   "method": "shutdown"
+  }
+ ],
+ "rules": {
+  "ignore_keys": [
+   "diagnostic_id"
+  ],
+  "volatile_files": [
+   "^diagnostics/"
+  ]
+ }
+}
