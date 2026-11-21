@@ -1,6 +1,6 @@
 # Lane 1 ledger: Formats and content
 
-Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 109 files, 32,115 lines.
+Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 111 files, 32,577 lines.
 
 One row per Python file this lane retires. Status is `pending`, `in progress`,
 `ported` (Rust replacement merged and its comparison checks pass) or `retired`
@@ -103,6 +103,8 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/session.py` | 499 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/starting_state.py` | 89 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/infrastructure/package_archive.py` | 365 | `sylvia-domain::package_archive` | pending | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. |
+| `src/sylvia_gm/infrastructure/zip_bounds.py` | 97 | `sylvia-domain::package_archive` | pending | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. |
 | `src/sylvia_gm/planning/__init__.py` | 52 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/planning/_campaign_bible.py` | 178 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/planning/_planning_output.py` | 71 | `sylvia-domain` | pending | |

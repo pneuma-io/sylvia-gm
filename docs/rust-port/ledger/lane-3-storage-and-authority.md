@@ -1,6 +1,6 @@
 # Lane 3 ledger: Storage and authority
 
-Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 34 files, 37,421 lines.
+Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 32 files, 36,959 lines.
 
 One row per Python file this lane retires. Status is `pending`, `in progress`,
 `ported` (Rust replacement merged and its comparison checks pass) or `retired`
@@ -23,7 +23,6 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/infrastructure/launch_handshake.py` | 138 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/owner_lock.py` | 68 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/owner_process_probe.py` | 118 | `sylvia-store` | pending | |
-| `src/sylvia_gm/infrastructure/package_archive.py` | 365 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/participant_history.py` | 32 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/private_records_archive.py` | 104 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/safe_file.py` | 607 | `sylvia-store` | pending | |
@@ -42,4 +41,3 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/infrastructure/sqlite_sequel.py` | 227 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/sqlite_session.py` | 1,104 | `sylvia-store` | pending | |
 | `src/sylvia_gm/infrastructure/sqlite_state_ownership.py` | 438 | `sylvia-store` | pending | |
-| `src/sylvia_gm/infrastructure/zip_bounds.py` | 97 | `sylvia-store` | pending | |
