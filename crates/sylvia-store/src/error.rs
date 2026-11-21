@@ -12,9 +12,14 @@ pub const SCHEMA_IDENTITY_MISMATCH: &str = "schema_identity_mismatch";
 
 /// A `SchemaIdentityError` with Python's message.
 pub fn schema_identity(message: &str) -> StoreError {
-    StoreError::Coded(
-        CodedError::new(SCHEMA_IDENTITY_MISMATCH, message).with_error_type("SchemaIdentityError"),
-    )
+    sylvia_domain::DomainError::authority("SchemaIdentityError", message).into()
+}
+
+/// The `CodedError` of one of Python's domain exception classes, from lane 1's constructors.
+pub(crate) fn authority_coded(error_type: &'static str, message: &str) -> CodedError {
+    sylvia_domain::DomainError::authority(error_type, message)
+        .rejection()
+        .expect("an authority error is always a rejection")
 }
 
 /// One failure inside the store.
@@ -63,7 +68,7 @@ impl From<std::io::Error> for StoreError {
 
 /// A Python `ValueError(message)`: the owner replies `command_rejected` with the message.
 pub fn value_error(message: impl Into<String>) -> StoreError {
-    StoreError::Coded(CodedError::rejected(message).with_error_type("ValueError"))
+    sylvia_domain::DomainError::value(message).into()
 }
 
 impl StoreError {
@@ -92,13 +97,11 @@ impl StoreError {
         match self {
             Self::Coded(error) if error.code == SCHEMA_IDENTITY_MISMATCH => error,
             Self::Sqlite(_) => {
-                CodedError::new(SCHEMA_IDENTITY_MISMATCH, "Authority schema identity could not be verified")
-                    .with_error_type("SchemaIdentityError")
+                authority_coded("SchemaIdentityError", "Authority schema identity could not be verified")
             }
             Self::NotPorted(what) => CodedError::new("not_ported", format!("not yet ported: {what}")),
             Self::Coded(_) | Self::Other(_) | Self::Backup(_) => {
-                CodedError::new(SCHEMA_IDENTITY_MISMATCH, "Authority stored integrity could not be verified")
-                    .with_error_type("SchemaIdentityError")
+                authority_coded("SchemaIdentityError", "Authority stored integrity could not be verified")
             }
         }
     }

@@ -22,6 +22,7 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-provider` SSE decoding, request building and URL normalisation (lane 4) | The OpenAI Python SDK's SSE decoder and request assembly; `httpx.URL` normalisation | openai 2.53.0; httpx 0.28.1 | Apache-2.0 (openai); BSD-3-Clause (httpx) | lane 4 |
 | `sylvia-store/src/launch.rs` (`py_fromhex`) | CPython's `bytes.fromhex` (`Objects/bytesobject.c`, `_PyBytes_FromHex`): whitespace skipped before each pair | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 | `sylvia-store/src/safe_file/linux.rs` (`normpath`, `abspath`) | CPython's `posixpath.normpath` and `posixpath.abspath` (`Lib/posixpath.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
+| `sylvia-store/src/sessions.rs` (`is_reserved_windows_name`) | CPython's `PureWindowsPath.is_reserved` and `_WIN_RESERVED_NAMES` (`Lib/pathlib.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.

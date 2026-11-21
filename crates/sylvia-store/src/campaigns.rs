@@ -40,13 +40,13 @@ pub struct CampaignIndexRecord {
 }
 
 /// One row by column name.
-struct Named<'a> {
-    columns: &'a [String],
-    values: Vec<Value>,
+pub(crate) struct Named<'a> {
+    pub(crate) columns: &'a [String],
+    pub(crate) values: Vec<Value>,
 }
 
 impl Named<'_> {
-    fn get(&self, column: &str) -> StoreResult<&Value> {
+    pub(crate) fn get(&self, column: &str) -> StoreResult<&Value> {
         let index = self
             .columns
             .iter()
@@ -55,29 +55,29 @@ impl Named<'_> {
         Ok(&self.values[index])
     }
 
-    fn has(&self, column: &str) -> bool {
+    pub(crate) fn has(&self, column: &str) -> bool {
         self.columns.iter().any(|name| name == column)
     }
 
-    fn text(&self, column: &str) -> StoreResult<String> {
+    pub(crate) fn text(&self, column: &str) -> StoreResult<String> {
         Ok(py_str(self.get(column)?))
     }
 
-    fn optional_text(&self, column: &str) -> StoreResult<Option<String>> {
+    pub(crate) fn optional_text(&self, column: &str) -> StoreResult<Option<String>> {
         Ok(match self.get(column)? {
             Value::Null => None,
             value => Some(py_str(value)),
         })
     }
 
-    fn int(&self, column: &str) -> StoreResult<i64> {
+    pub(crate) fn int(&self, column: &str) -> StoreResult<i64> {
         py_int(self.get(column)?)
             .ok_or_else(|| crate::error::value_error("invalid literal for int() with base 10"))
     }
 }
 
 /// Every row of a query, by column name.
-fn named_rows(
+pub(crate) fn named_rows(
     connection: &Connection,
     query: &str,
     values: &[&dyn rusqlite::ToSql],
@@ -91,7 +91,7 @@ fn named_rows(
     Ok((columns, rows))
 }
 
-fn parse<T>(text: &str, parse: fn(&str) -> Option<T>, name: &str) -> StoreResult<T> {
+pub(crate) fn parse<T>(text: &str, parse: fn(&str) -> Option<T>, name: &str) -> StoreResult<T> {
     parse(text).ok_or_else(|| crate::error::value_error(format!("'{text}' is not a valid {name}")))
 }
 
@@ -263,7 +263,7 @@ pub fn current_lock_record(connection: &Connection, campaign_id: &str) -> StoreR
 }
 
 /// `sqlite_session._load_value` / `_load_payload`: canonical session JSON, an object.
-fn session_payload(text: &str) -> StoreResult<JsonMap> {
+pub(crate) fn session_payload(text: &str) -> StoreResult<JsonMap> {
     let parsed =
         sylvia_base::pyjson::loads(text).map_err(|error| crate::error::value_error(error.message))?;
     if crate::actions::dump(&parsed) != text {
@@ -276,7 +276,7 @@ fn session_payload(text: &str) -> StoreResult<JsonMap> {
 }
 
 /// `sqlite_session.session_from_row`.
-fn session_from_row(row: &Named<'_>) -> StoreResult<SessionRecord> {
+pub(crate) fn session_from_row(row: &Named<'_>) -> StoreResult<SessionRecord> {
     let scope = match sylvia_base::pyjson::loads(&row.text("scope_json")?)
         .map_err(|error| crate::error::value_error(error.message))?
     {
@@ -311,7 +311,7 @@ fn session_from_row(row: &Named<'_>) -> StoreResult<SessionRecord> {
     Ok(record)
 }
 
-fn python_type(value: &Json) -> &'static str {
+pub(crate) fn python_type(value: &Json) -> &'static str {
     match value {
         Json::Null => "NoneType",
         Json::Bool(_) => "bool",

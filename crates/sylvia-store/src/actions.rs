@@ -17,7 +17,7 @@ use crate::store::AuthorityStore;
 use rusqlite::types::Value;
 use rusqlite::{params, Connection, OptionalExtension};
 use sylvia_base::pyjson::{dumps, Dump};
-use sylvia_base::{CodedError, Json, JsonMap};
+use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
     canonical_payload_is_safe, mechanic_outcome_is_safe, ActionReceipt, ActionStatus, CanonicalEventType,
     LifecycleState, MechanicOutcome, TurnStatus, WriterRole,
@@ -50,11 +50,15 @@ pub(crate) fn load_payload(text: &str) -> StoreResult<JsonMap> {
 
 /// `CommandRejected(message, code=...)`.
 pub(crate) fn rejected(message: &str, code: &str) -> StoreError {
-    StoreError::Coded(CodedError::new(code, message).with_error_type("CommandRejected"))
+    sylvia_domain::DomainError::command_rejected_with(message, code, Vec::new()).into()
 }
 
+/// One of Python's `AuthorityError` classes, through lane 1's constructor; `code` is the
+/// class's code, checked here so a call site cannot drift from it.
 fn coded(kind: &'static str, code: &str, message: &str) -> StoreError {
-    StoreError::Coded(CodedError::new(code, message).with_error_type(kind))
+    let error = crate::error::authority_coded(kind, message);
+    debug_assert_eq!(error.code, code, "{kind}'s code");
+    StoreError::Coded(error)
 }
 
 /// One `commit_action` call: Python's keyword arguments without the not-yet-ported ones.
@@ -172,12 +176,8 @@ fn package_uses_content_declarations(
     let Some(row) = row else {
         return Err(rejected("Action package is unavailable", "command_rejected"));
     };
-    let manifest = sylvia_base::pyjson::loads(&py_str(&row[0])).map_err(|_| {
-        StoreError::Coded(
-            CodedError::new(crate::error::SCHEMA_IDENTITY_MISMATCH, "Package manifest identity is invalid")
-                .with_error_type("SchemaIdentityError"),
-        )
-    })?;
+    let manifest = sylvia_base::pyjson::loads(&py_str(&row[0]))
+        .map_err(|_| crate::error::schema_identity("Package manifest identity is invalid"))?;
     Ok(matches!(manifest.get("content_declarations"), Some(Json::String(_))))
 }
 

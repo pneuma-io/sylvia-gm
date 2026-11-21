@@ -19,6 +19,7 @@ pub mod owner_lock;
 pub mod pytext;
 pub mod safe_file;
 pub mod schema;
+pub mod sessions;
 pub mod sql;
 pub mod store;
 mod verify;
