@@ -1,18 +1,36 @@
 //! `domain/package_library.py`: package, closure, catalog, activation and reference contracts.
 //!
-//! This first part holds the identities every other lane builds on: the canonical bytes and
-//! the hashes over them, exact package files and dependencies, portable paths, the strict JSON
-//! readers, and the candidate, lock-record and activation records. Manifests, closure
-//! resolution and content declarations follow in later pull requests.
+//! It holds the identities every other lane builds on (canonical bytes and the hashes over
+//! them, exact package files and dependencies, portable paths, the strict JSON readers, and the
+//! candidate, lock-record and activation records), then manifests ([`manifest_from_record`]),
+//! content declarations, gameplay support, Campaign Setting knowledge and exact closures.
 
+mod declarations;
+mod graph;
+mod manifest;
+mod record;
 mod strict_json;
+
+pub use declarations::*;
+pub use graph::{
+    campaign_setting_entries, manifest_index, resolve_exact_closure, resolve_package_graph, PackageGraphNode,
+    PackageIdentity,
+};
+
+pub use manifest::{
+    manifest_from_record, PackageManifest, ParticipantArtifactDeclaration, StatePredicate,
+    SurfaceDeclaration, ToolDeclaration, NETWORK_UI_DYNAMIC_SELECTIONS, PACKAGE_HOST_CONTRACT,
+    PACKAGE_RUNTIME_FORMAT, SUPPORTED_ENGINE_FEATURES, TACTICAL_UI_DYNAMIC_SELECTIONS, UI_DYNAMIC_SELECTIONS,
+};
 
 pub use strict_json::{
     parse_canonical_json_bytes, parse_content_json_bytes, preflight_json_shape, JsonShapeLimits,
     DEFAULT_LABEL,
 };
 
-use crate::authority::{str_enum, validate_authority_identity, PackageLock};
+use crate::authority::{
+    str_enum, validate_authority_identity, validate_authority_identity_value, PackageLock,
+};
 use crate::error::{DomainError, DomainResult};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{pyjson, pystr, Json, JsonMap};
@@ -144,6 +162,22 @@ impl PackageFile {
         validate_authority_identity(&file.sha256, "Package file SHA-256", true)?;
         Ok(file)
     }
+    /// `PackageFile(path, byte_count, sha256)` from record values of any JSON type, checked in
+    /// Python's order: the path, then the byte count, then the SHA-256.
+    ///
+    /// A byte count beyond `i64` is refused here. Python accepts it at this point and refuses
+    /// the archive later, when the member's real size is compared.
+    pub fn from_record_values(path: &Json, byte_count: i128, sha256: &Json) -> DomainResult<Self> {
+        let path = validate_portable_path_value(path)?;
+        if byte_count < 0 {
+            return Err(DomainError::value("Package file byte count cannot be negative"));
+        }
+        let byte_count = i64::try_from(byte_count)
+            .map_err(|_| DomainError::value("Package file byte count is too large"))?;
+        let sha256 = validate_authority_identity_value(sha256, "Package file SHA-256", true)?;
+        Self::new(path, byte_count, sha256)
+    }
+
     pub fn path(&self) -> &str {
         &self.path
     }

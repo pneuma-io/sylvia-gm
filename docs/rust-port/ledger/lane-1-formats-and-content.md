@@ -92,17 +92,17 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain::content::validation` | ported | `validate_content_shape`, `ContentShapeError`; the engine (`content::schema`) also serves lanes 2 and 4 and `state/_schema.py`, with jsonschema 4.26 messages |
 | `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain::error` | in progress | `RulesetDiagnostic` done; the authority error classes follow |
 | `src/sylvia_gm/domain/interview_contribution.py` | 150 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain::inventory` | in progress | Shared schemas done (data, `generate_inventory_schema.py`); `validate_holdings`, `transfer_holding` and `player_inventory` follow |
 | `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/model_capability.py` | 333 | `sylvia-domain::model_capability` | ported | Tiers, placements, registry, guidance decisions and payloads |
 | `src/sylvia_gm/domain/no_ruleset_plan.py` | 124 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/package_library.py` | 2,211 | `sylvia-domain::package_library` | in progress | Done: canonical bytes, closure/content/schema/activation hashes, files, dependencies, portable paths, strict JSON readers, candidate/lock/activation records. Next: manifests, closure resolution, content declarations |
+| `src/sylvia_gm/domain/package_library.py` | 2,211 | `sylvia-domain::package_library` | ported | Manifests, declarations, gameplay support, setting knowledge and closures; Python operator quirks via `pyops` |
 | `src/sylvia_gm/domain/panel_layout.py` | 105 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/provider_records.py` | 17 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/ruleset_tests.py` | 95 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/session.py` | 499 | `sylvia-domain::session` | ported | Validated records keep private fields behind `new` (or `validated()` for the evidence records) |
-| `src/sylvia_gm/domain/starting_state.py` | 89 | `sylvia-domain` | pending | |
-| `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/starting_state.py` | 89 | `sylvia-domain::starting_state` | ported |  |
+| `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain::state_ownership` | ported | Replaces lane 3's marked private copy |
 | `src/sylvia_gm/infrastructure/package_archive.py` | 365 | `sylvia-domain::package_archive` | pending | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. |
 | `src/sylvia_gm/infrastructure/zip_bounds.py` | 97 | `sylvia-domain::package_archive` | pending | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. |
 | `src/sylvia_gm/planning/__init__.py` | 52 | `sylvia-domain` | pending | |

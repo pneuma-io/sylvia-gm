@@ -99,30 +99,30 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/inventory.py:125` | `validate_holdings` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | |
 | `domain/mechanics_choices.py:63` | `answers_from_payload` | len() against a limit | `if not isinstance(value, Sequence) or isinstance(value, (str, bytes)) or len(value) >= 64:` | |
 | `domain/no_ruleset_plan.py:79` | `validate_no_ruleset_world` | len() against a limit | `if not isinstance(name, str) or not name.strip() or name != name.strip() or len(name) > 300:` | |
-| `domain/package_library.py:114` | `_validate_mechanical_inventory_declaration` | len() against a limit | `if not 1 <= len(names) <= 32:` | |
-| `domain/package_library.py:803` | `_safe_small_label` | len() against a limit | `if len(value.encode("utf-8")) > 256 or "/" in value or "\\" in value or ":" in value:` | |
-| `domain/package_library.py:818` | `_sorted_unique_identities` | len() against a limit | `if len(item.encode("utf-8")) > 512:` | |
-| `domain/package_library.py:877` | `_content_sources` | len() against a limit | `or len(item.encode("utf-8")) > 256` | |
-| `domain/package_library.py:964` | `parse_campaign_setting_knowledge_bytes` | len() against a limit | `if len(value) > CAMPAIGN_SETTING_KNOWLEDGE_BYTE_LIMIT:` | |
-| `domain/package_library.py:1019` | `parse_campaign_setting_knowledge_bytes` | len() against a limit | `or len(text.encode("utf-8")) > 4_000` | |
-| `domain/package_library.py:1063` | `parse_gameplay_support_bytes` | len() against a limit | `if len(value) > GAMEPLAY_SUPPORT_BYTE_LIMIT:` | |
-| `domain/package_library.py:1155` | `parse_content_declarations_bytes` | len() against a limit | `if len(value) > CONTENT_DECLARATION_BYTE_LIMIT:` | |
-| `domain/package_library.py:1561` | `_surface_source` | len() against a limit | `if not kinds or len(kinds) > 16 or any(not isinstance(item, str) for item in kinds):` | |
-| `domain/package_library.py:1570` | `_surface_source` | len() against a limit | `if not path or len(path) > 16 or any(not isinstance(item, str) for item in path):` | |
-| `domain/package_library.py:1577` | `_surface_source` | len() against a limit | `if not entries or len(entries) > 16:` | |
-| `domain/package_library.py:1587` | `_surface_source` | len() against a limit | `if not fields or len(fields) > 16:` | |
-| `domain/package_library.py:1698` | `_ui_surface` | len() against a limit | `or len(bindings) > 16` | |
-| `domain/package_library.py:1713` | `_ui_surface` | len() against a limit | `if len(actions) > 16:` | |
+| `domain/package_library.py:114` | `_validate_mechanical_inventory_declaration` | len() against a limit | `if not 1 <= len(names) <= 32:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:803` | `_safe_small_label` | len() against a limit | `if len(value.encode("utf-8")) > 256 or "/" in value or "\\" in value or ":" in value:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:818` | `_sorted_unique_identities` | len() against a limit | `if len(item.encode("utf-8")) > 512:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:877` | `_content_sources` | len() against a limit | `or len(item.encode("utf-8")) > 256` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:964` | `parse_campaign_setting_knowledge_bytes` | len() against a limit | `if len(value) > CAMPAIGN_SETTING_KNOWLEDGE_BYTE_LIMIT:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1019` | `parse_campaign_setting_knowledge_bytes` | len() against a limit | `or len(text.encode("utf-8")) > 4_000` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1063` | `parse_gameplay_support_bytes` | len() against a limit | `if len(value) > GAMEPLAY_SUPPORT_BYTE_LIMIT:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1155` | `parse_content_declarations_bytes` | len() against a limit | `if len(value) > CONTENT_DECLARATION_BYTE_LIMIT:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1561` | `_surface_source` | len() against a limit | `if not kinds or len(kinds) > 16 or any(not isinstance(item, str) for item in kinds):` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1570` | `_surface_source` | len() against a limit | `if not path or len(path) > 16 or any(not isinstance(item, str) for item in path):` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1577` | `_surface_source` | len() against a limit | `if not entries or len(entries) > 16:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1587` | `_surface_source` | len() against a limit | `if not fields or len(fields) > 16:` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1698` | `_ui_surface` | len() against a limit | `or len(bindings) > 16` | `sylvia-domain` manifest_vectors |
+| `domain/package_library.py:1713` | `_ui_surface` | len() against a limit | `if len(actions) > 16:` | `sylvia-domain` manifest_vectors |
 | `domain/panel_layout.py:18` | `parse_panel_layout` | len() against a limit | `if len(value) > PANEL_LAYOUT_BYTE_LIMIT:` | |
 | `domain/panel_layout.py:53` | `parse_panel_layout.tree` | len() against a limit | `if not isinstance(value, Mapping) or depth > 16 or len(node_ids) >= 256:` | |
 | `domain/panel_layout.py:84` | `parse_panel_layout` | len() against a limit | `if len(title.encode("utf-8")) > 256:` | |
 | `domain/session.py:252` | `SessionRecord.__post_init__` | len() against a limit | `not isinstance(value, str) or not 1 <= len(value) <= 32` | `sylvia-domain` session_vectors |
 | `domain/session.py:263` | `SessionRecord.__post_init__` | len() against a limit | `if not self.scope or len(self.scope) > 8 or any(not item for item in self.scope):` | `sylvia-domain` session_vectors |
 | `domain/session.py:479` | `BuilderChatRecord.__post_init__` | len() against a limit | `if len(self.display_name) > 120:` | `sylvia-domain` session_vectors |
-| `domain/starting_state.py:36` | `_path` | len() against a limit | `or not 1 <= len(value) <= 16):` | |
-| `domain/starting_state.py:39` | `_path` | len() against a limit | `if not isinstance(part, str) or not part or len(part) > 128:` | |
-| `domain/starting_state.py:51` | `parse_state_schemas` | len() against a limit | `or not 1 <= len(value) <= 32):` | |
-| `domain/starting_state.py:66` | `parse_state_schemas` | len() against a limit | `or len(references) > 128):` | |
+| `domain/starting_state.py:36` | `_path` | len() against a limit | `or not 1 <= len(value) <= 16):` | `sylvia-domain` manifest_vectors |
+| `domain/starting_state.py:39` | `_path` | len() against a limit | `if not isinstance(part, str) or not part or len(part) > 128:` | `sylvia-domain` manifest_vectors |
+| `domain/starting_state.py:51` | `parse_state_schemas` | len() against a limit | `or not 1 <= len(value) <= 32):` | `sylvia-domain` manifest_vectors |
+| `domain/starting_state.py:66` | `parse_state_schemas` | len() against a limit | `or len(references) > 128):` | `sylvia-domain` manifest_vectors |
 
 ## Lane 2: Game engine
 

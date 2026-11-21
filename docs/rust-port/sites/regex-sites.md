@@ -86,7 +86,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `domain/content_validation.py:54` | `_field_path` | re.fullmatch; plain | `elif isinstance(part, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_-]{0,95}", part):` | `sylvia-domain` content_vectors |
 | `domain/content_validation.py:115` | `validate_content_shape` | re.search; pattern built at run time, check by hand | `and not any(re.search(pattern, field) for pattern in patterns)` | `sylvia-domain` content_vectors (no shipped schema has `patternProperties`; the engine refuses it) |
 | `domain/package_library.py:757` | `validate_portable_path` | re.match; plain | `if re.match(r"^[A-Za-z]:", path):` | `sylvia-domain` identity_vectors |
-| `domain/starting_state.py:14` | `<module>` | re.compile; plain | `_BINDING = re.compile(r"\$[a-zA-Z_][a-zA-Z0-9_]{0,63}\Z")` | |
+| `domain/starting_state.py:14` | `<module>` | re.compile; plain | `_BINDING = re.compile(r"\$[a-zA-Z_][a-zA-Z0-9_]{0,63}\Z")` | `sylvia-domain` manifest_vectors |
 | `state/_validators.py:133` | `_validate_spell_slots` | re.compile; pattern built at run time, check by hand | `_re = re.compile(_SPELL_SLOT_KEY_RE)` | |
 | `state/_validators.py:305` | `validate_entity_id` | re.match; plain | `if not re.match(r"^[a-z0-9_-]+$", entity_id):` | |
 
