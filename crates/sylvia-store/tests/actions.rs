@@ -86,6 +86,7 @@ fn run(store: &mut AuthorityStore, op: &Json) -> StoreResult<Json> {
             if op.get("fault").is_some() {
                 store.set_faults(Faults {
                     before_commit: Some(Box::new(|| Err(StoreError::Other("fault before commit".into())))),
+                    ..Faults::default()
                 });
             }
             let outcome = store.commit_action(&command(op)).map(|value| receipt(&value));

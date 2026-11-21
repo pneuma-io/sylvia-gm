@@ -47,11 +47,17 @@ pub struct AuthorityStore {
 pub struct Faults {
     /// `_before_commit`, in `commit_action`.
     pub before_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
+    /// `_before_package_publication`, in `publish_package_archive`.
+    pub before_package_publication: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
 }
 
 impl std::fmt::Debug for Faults {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter.debug_struct("Faults").field("before_commit", &self.before_commit.is_some()).finish()
+        formatter
+            .debug_struct("Faults")
+            .field("before_commit", &self.before_commit.is_some())
+            .field("before_package_publication", &self.before_package_publication.is_some())
+            .finish()
     }
 }
 
@@ -280,12 +286,10 @@ impl AuthorityStore {
         verify_exact_schema_identity(connection, Some(version))?;
         // sqlite_packages.clear_stale_read_leases
         connection.execute("DELETE FROM package_read_leases", [])?;
-        // Not yet ported: the stored-content verifiers Python runs here
-        // (`_verify_stored_authority`, `sqlite_packages.verify_package_authority` and, at schema
-        // 12, `sqlite_campaign.verify_f5_campaign_authority` and
-        // `sqlite_continuity.verify_authority`). They only refuse databases whose rows break
-        // the authority's invariants; each arrives with the transaction family that owns its
-        // tables (see the lane 3 ledger).
+        // `_verify_stored_authority` runs here first in Python and is still to come (see the
+        // lane 3 ledger); until then a database it would refuse for an earlier reason may be
+        // refused here, or later, with a different message.
+        crate::packages::verify_package_authority(connection)?;
         if version == CAMPAIGN_SCHEMA_VERSION {
             // `verify_f5_campaign_authority` runs before this in Python; it is still to come.
             crate::continuity::verify_authority(connection)?;

@@ -83,6 +83,7 @@ fn run(store: &mut AuthorityStore, op: &Json) -> StoreResult<Json> {
             if op["fault"].as_bool().unwrap() {
                 store.set_faults(Faults {
                     before_commit: Some(Box::new(|| Err(StoreError::Other("fault before commit".into())))),
+                    ..Faults::default()
                 });
             }
             let result = store.commit_campaign_continuity_batch(&commands);
