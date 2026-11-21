@@ -918,13 +918,9 @@ dependencies = [
 name = "sylvia-app"
 version = "0.4.1"
 dependencies = [
- "serde",
  "serde_json",
  "sylvia-base",
  "sylvia-domain",
- "sylvia-engine",
- "sylvia-store",
- "thiserror",
 ]
 
 [[package]]

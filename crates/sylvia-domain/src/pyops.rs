@@ -239,6 +239,29 @@ pub fn py_last(value: &Json) -> crate::error::DomainResult<Json> {
     }
 }
 
+/// `item in container`, with the `TypeError` Python raises and its text.
+pub fn py_contains(item: &Json, container: &Json) -> crate::error::DomainResult<bool> {
+    use crate::error::DomainError;
+    match container {
+        Json::Object(map) => {
+            py_require_hashable(item)?;
+            Ok(item.as_str().is_some_and(|key| map.contains_key(key)))
+        }
+        Json::Array(items) => Ok(items.iter().any(|member| py_eq(member, item))),
+        Json::String(text) => match item {
+            Json::String(needle) => Ok(text.contains(needle.as_str())),
+            other => Err(DomainError::type_error(format!(
+                "'in <string>' requires string as left operand, not {}",
+                py_type_name(other)
+            ))),
+        },
+        other => Err(DomainError::type_error(format!(
+            "argument of type '{}' is not iterable",
+            py_type_name(other)
+        ))),
+    }
+}
+
 /// Hash `value` as a `set` or `dict` operation would: `TypeError` for a `list` or `dict`.
 pub fn py_require_hashable(value: &Json) -> crate::error::DomainResult<()> {
     if py_hashable(value) {

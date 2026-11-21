@@ -60,8 +60,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` | |
 | `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` | |
 | `application/schema_admission.py:86` | `validate_json_schema` | len() against a limit | `or not 1 <= len(branches) <= 256` | `sylvia-domain` schema_admission_vectors |
-| `application/setting_character_requirements.py:76` | `parse_setting_character_requirements` | len() against a limit | `if not encoded or len(encoded) > _BYTE_LIMIT:` | |
-| `application/setting_character_requirements.py:145` | `validate_setting_character_data` | len() against a limit | `if len(canonical_json_bytes(captured)) > _BYTE_LIMIT:` | |
+| `application/setting_character_requirements.py:76` | `parse_setting_character_requirements` | len() against a limit | `if not encoded or len(encoded) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
+| `application/setting_character_requirements.py:145` | `validate_setting_character_data` | len() against a limit | `if len(canonical_json_bytes(captured)) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
 | `builder/_campaign_plan_materializer.py:54` | `_bounded_text` | len() against a limit | `if len(value) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
 | `builder/_package_materializer.py:101` | `_read_descriptor` | len() against a limit | `if len(raw) > _DESCRIPTOR_BYTE_LIMIT:` | |
 | `builder/_package_materializer.py:159` | `_read_payloads` | len() against a limit | `if len(retained_entries) >= _PAYLOAD_ENTRY_LIMIT:` | |
