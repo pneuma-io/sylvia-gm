@@ -551,6 +551,7 @@ name = "sylvia-base"
 version = "0.4.1"
 dependencies = [
  "hex",
+ "regex",
  "serde",
  "serde_json",
  "sha2",

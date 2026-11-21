@@ -9,11 +9,14 @@
 //! - [`error`]: the coded error every owner reply is built from.
 //! - [`pystr`]: Python `str` behaviour Rust lacks (whitespace, case folding, `upper`, code-point
 //!   `len`), on Unicode 15.0.
+//! - [`pyyaml`]: YAML loaded and dumped exactly as PyYAML 6.0.3 does (`SafeLoader`,
+//!   `CSafeLoader`, `safe_dump`).
 
 pub mod error;
 pub mod hash;
 pub mod pyjson;
 pub mod pystr;
+pub mod pyyaml;
 
 pub use error::{CodedError, CodedResult};
 
