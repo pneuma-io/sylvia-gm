@@ -19,6 +19,8 @@
 //! - [`package_archive`]: `infrastructure/package_archive.py` and `zip_bounds.py`, with CPython's
 //!   `zipfile` read path; [`panel_layout`]: `domain/panel_layout.py`.
 //! - [`schema_admission`]: `application/schema_admission.py`, the admitted JSON-schema subset.
+//! - [`player_actions`] (lane 2): the owner marker checks of `application/player_actions.py`,
+//!   which the stored-authority verifier uses.
 //! - [`pyops`]: Python `==`, `in`, `set()` and subscripting on JSON values, for untrusted records.
 //! - [`yaml_bounds`]: `application/_yaml_bounds.py`, the composed-YAML size check the bounded
 //!   loaders run before construction.
@@ -42,6 +44,7 @@ pub mod no_ruleset_plan;
 pub mod package_archive;
 pub mod package_library;
 pub mod panel_layout;
+pub mod player_actions;
 pub mod provider_records;
 pub mod pyops;
 pub mod ruleset_tests;
