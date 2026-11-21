@@ -16,6 +16,7 @@
 mod cp437_table;
 pub mod zip_bounds;
 pub mod zipfile;
+pub mod zipfile_write;
 
 use crate::authority::{PackageLock, PackageRole};
 use crate::content::validate_content_shape;
