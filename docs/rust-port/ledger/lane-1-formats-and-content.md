@@ -86,7 +86,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/_runtime_executable_reference.py` | 225 | `sylvia-domain::content::catalog` | ported | Data only, and read only by `_content_schema_runtime.py` and `_content_schema_ruleset.py`: exported with them as `content/definitions/package_runtime.procedural.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/authority.py` | 1,128 | `sylvia-domain::authority` | ported | Validated types keep private fields behind `new`; `Mechanic` and `NarrationStream` (callables) left to lanes 2 and 4 |
 | `src/sylvia_gm/domain/campaign_ending.py` | 99 | `sylvia-domain::campaign_ending` | ported | `plan_reading_vectors` (every shipped Campaign Plan) |
-| `src/sylvia_gm/domain/campaign_plan.py` | 759 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/domain/campaign_plan.py` | 759 | `sylvia-domain::campaign_plan` | ported | `campaign_plan_vectors` (every shipped Campaign Plan) |
 | `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain::campaign_sequel` | ported | `domain_records_vectors` |
 | `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain::content::catalog` | ported | `list_content_definitions`, `get_content_definition` |
 | `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain::content::validation` | ported | `validate_content_shape`, `ContentShapeError`; the engine (`content::schema`) also serves lanes 2 and 4 and `state/_schema.py`, with jsonschema 4.26 messages |

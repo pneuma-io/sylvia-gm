@@ -20,6 +20,7 @@
 //!   `zipfile` read path; [`panel_layout`]: `domain/panel_layout.py`.
 //! - [`schema_admission`]: `application/schema_admission.py`, the admitted JSON-schema subset.
 //! - [`pyops`]: Python `==`, `in`, `set()` and subscripting on JSON values, for untrusted records.
+//! - [`campaign_plan`]: `domain/campaign_plan.py`, the structured Campaign Plan validator.
 //! - [`campaign_ending`], [`no_ruleset_plan`]: Campaign Plan endings and No Ruleset worlds.
 //! - [`interview_contribution`]: artifact-owned Campaign Interview questions.
 //! - [`campaign_sequel`]: appended adventures; [`mechanics_choices`], [`provider_records`],
@@ -27,6 +28,7 @@
 
 pub mod authority;
 pub mod campaign_ending;
+pub mod campaign_plan;
 pub mod campaign_sequel;
 pub mod content;
 pub mod error;
