@@ -350,7 +350,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/helper.py:335` | `main` | len() against a limit | `or not 0 < len(row[name]) <= 4096` | |
 | `application/desktop_update/installed.py:78` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
 | `application/desktop_update/installed.py:85` | `WindowsRegistration.read` | len() against a limit | `if kind != winreg.REG_SZ or not isinstance(value, str) or len(value) > 4096:` | |
-| `application/desktop_update/launch.py:49` | `Installation._from_launch` | len() against a limit | `or not 0 < len(value[name]) <= 4096` | |
+| `application/desktop_update/launch.py:49` | `Installation._from_launch` | len() against a limit | `or not 0 < len(value[name]) <= 4096` | `controller_vectors` |
 | `application/desktop_update/manifest.py:61` | `Version.parse` | len() against a limit | `if not isinstance(value, str) or len(value) > 128:` | `update_vectors` |
 | `application/desktop_update/manifest.py:191` | `release_url` | len() against a limit | `or len(value) > 2048` | `update_vectors` |
 | `application/desktop_update/manifest.py:228` | `payload_path` | len() against a limit | `if not isinstance(value, str) or not 0 < len(value) <= 240 or not value.isascii():` | `update_vectors` |
@@ -360,7 +360,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/recovery_service.py:170` | `run_recovery` | len() against a limit | `not isinstance(identity, str) or not 0 < len(identity) <= 128` | |
 | `application/desktop_update/replacement.py:129` | `_inventory` | len() against a limit | `if not isinstance(entries, dict) or not 3 <= len(entries) <= 4096:` | |
 | `application/desktop_update/replacement.py:253` | `PortableReplacement._restore_receipt` | len() against a limit | `or not 3 <= len(row["old"]) <= 4097` | |
-| `application/desktop_update/service.py:109` | `DesktopUpdateService.handle` | len() against a limit | `or len(host["target"]) > 64` | |
+| `application/desktop_update/service.py:109` | `DesktopUpdateService.handle` | len() against a limit | `or len(host["target"]) > 64` | `desktop-update` |
 | `application/desktop_update/storage.py:278` | `atomic_receipt` | len() against a limit | `if len(raw) > MANIFEST_LIMIT:` | `local-services`, `sylvia-owner` tests |
 | `application/desktop_update/transport.py:239` | `content_length` | len() against a limit | `or len(length) > 20` | `update_vectors` |
 | `application/desktop_update/transport.py:278` | `metadata_bytes` | len() against a limit | `if len(result) > MANIFEST_LIMIT:` | `update_vectors` |

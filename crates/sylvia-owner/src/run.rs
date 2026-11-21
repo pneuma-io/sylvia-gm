@@ -15,13 +15,18 @@
 //! A model-bound command reserves provider work for its session before it starts, as Python's
 //! `provider_request_work` does, and releases it before its reply is written.
 //!
-//! Not ported yet: the desktop update methods and the state behind the update gates (lane 5's
-//! desktop update assignment), `acquire_owner` and the internal handshake (lane 3), the bundled
-//! package installs and Builder migrations at launch (lanes 1 and 3), the provider resolver and
-//! session loop (lane 4).
+//! The desktop update: the startup check before any saved data opens (and again under the
+//! ownership lock, before migrations), the `desktop_update_*` methods, the update reservation
+//! and both update gates. Not ported yet: the recovery-only owner Python starts when an
+//! interrupted update meets a native update context, and confirming an update restart; both
+//! need update preparation. Also not ported: the bundled package installs and Builder
+//! migrations at launch (lanes 1 and 3), the provider resolver and session loop (lane 4).
 
-use crate::commands::RUN_LOOP_METHODS;
 use crate::desktop_update::drafts::DraftStore;
+use crate::desktop_update::launch::Installation;
+use crate::desktop_update::service::DesktopUpdateService;
+use crate::desktop_update::startup::{owner_startup_context, AuthorizedStartup};
+use crate::desktop_update::storage::operation_id;
 use crate::diagnostics::{Fields, LocalDiagnostics};
 use crate::dispatch::{self, required_text, DispatchContext, DispatchResult, Failure, PORT_PENDING};
 use crate::display_reads::DisplayReads;
@@ -89,9 +94,7 @@ const UPDATE_RESERVED_METHODS: &[&str] = &[
     "builder_chat_index",
 ];
 
-/// The desktop update state the run loop's gates read. Until the desktop update is ported
-/// nothing sets it: no launch carries an update context the Rust owner understands, and no
-/// update is ever reserved, so both gates stay open, as they do in Python without an update.
+/// The desktop update state the run loop's gates read, taken before each request.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct UpdateGates {
     /// `update_startup is not None and not update_start_confirmed`.
@@ -239,6 +242,102 @@ struct Owner {
     diagnostics: Arc<LocalDiagnostics>,
     /// `desktop_drafts`, opened on first use.
     drafts: Mutex<Option<Arc<DraftStore>>>,
+    /// `desktop_updates`, made on first use.
+    updates: Mutex<Option<Arc<DesktopUpdateService>>>,
+    /// `update_installation`: the native update context, when the launch gave a valid one.
+    update_installation: Option<Installation>,
+    /// `update_startup`: the update restart this owner was started to confirm.
+    update_startup: Option<AuthorizedStartup>,
+    /// `update_start_confirmed`.
+    update_start_confirmed: AtomicBool,
+    /// `supervisor._desktop_update_operation`: the update that has reserved this owner.
+    update_operation: Arc<Mutex<Option<String>>>,
+    /// Python's `closing` event, for the updater's `reserved` check.
+    closing: Arc<AtomicBool>,
+}
+
+impl Owner {
+    /// The gates' view of the update state.
+    fn gates(&self) -> UpdateGates {
+        UpdateGates {
+            startup_unconfirmed: self.update_startup.is_some()
+                && !self.update_start_confirmed.load(Ordering::SeqCst),
+            reserved_operation: self.update_operation.lock().expect("update reservation lock").clone(),
+        }
+    }
+
+    /// `desktop_updates`, made on first use with the run loop's reservation callbacks.
+    fn updates(&self) -> Arc<DesktopUpdateService> {
+        let mut slot = self.updates.lock().expect("updates lock");
+        if let Some(service) = &*slot {
+            return Arc::clone(service);
+        }
+        let (operation, closing) = (Arc::clone(&self.update_operation), Arc::clone(&self.closing));
+        let reserved: crate::desktop_update::service::Reserved = Arc::new(move |identity: &str| {
+            !closing.load(Ordering::SeqCst)
+                && operation.lock().expect("update reservation lock").as_deref() == Some(identity)
+        });
+        let operation = Arc::clone(&self.update_operation);
+        let release: crate::desktop_update::service::Release =
+            Arc::new(move |identity: &str| abort_desktop_update(&operation, identity));
+        let service = Arc::new(DesktopUpdateService::new(
+            &self.context.storage_root,
+            self.update_installation.clone(),
+            Some(reserved),
+            Some(release),
+        ));
+        *slot = Some(Arc::clone(&service));
+        service
+    }
+}
+
+/// `supervisor.begin_desktop_update(identity)`: reserve an idle owner without stopping work or
+/// changing committed game state. Lane 4's session loop is not in the owner yet, so no
+/// narration lease or provider work can be active here.
+fn begin_desktop_update(
+    operation: &Mutex<Option<String>>,
+    identity: &str,
+) -> Result<(), sylvia_base::CodedError> {
+    let mut operation = operation.lock().expect("update reservation lock");
+    match operation.as_deref() {
+        Some(existing) if existing == identity => Ok(()),
+        Some(_) => Err(sylvia_base::CodedError::new("update_in_progress", "Another update is preparing")),
+        None => {
+            *operation = Some(identity.to_owned());
+            Ok(())
+        }
+    }
+}
+
+/// `supervisor.abort_desktop_update(identity)`: release only the selected reservation.
+fn abort_desktop_update(
+    operation: &Mutex<Option<String>>,
+    identity: &str,
+) -> Result<(), sylvia_base::CodedError> {
+    let mut operation = operation.lock().expect("update reservation lock");
+    if operation.as_deref() != Some(identity) {
+        return Err(sylvia_base::CodedError::new(
+            "stale_update_operation",
+            "This update reservation is stale",
+        ));
+    }
+    *operation = None;
+    Ok(())
+}
+
+/// Python's fixed refusal when the update startup check fails.
+fn update_recovery_refusal() -> Json {
+    let mut error = JsonMap::new();
+    error.insert("code".into(), "update_recovery_required".into());
+    error.insert(
+        "message".into(),
+        "The interrupted update must be reconciled before opening saved data.".into(),
+    );
+    let mut reply = JsonMap::new();
+    reply.insert("ok".into(), false.into());
+    reply.insert("type".into(), "update_recovery_required".into());
+    reply.insert("error".into(), Json::Object(error));
+    Json::Object(reply)
 }
 
 /// Run blocking store work (opening, closing) off the runtime's worker threads.
@@ -249,15 +348,36 @@ async fn blocking<T: Send + 'static>(work: impl FnOnce() -> T + Send + 'static) 
 async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -> i32 {
     // Launch: the first message must be a valid launch envelope. Any failure here ends the
     // owner without a reply, as Python does ("Sylvia GM owner startup failed" on stderr).
-    let (context, response_hex, store_thread) = match frames.recv().await {
+    let launched = match frames.recv().await {
         Some(Frame::Message(envelope)) => match blocking(move || launch(&envelope)).await {
             Some(Ok(launched)) => launched,
+            Some(Err(LaunchFailure::Update { recovery })) => {
+                if recovery {
+                    // Python's recovery-only owner (`run_recovery`) needs update preparation,
+                    // which is not ported yet.
+                    return startup_failed();
+                }
+                // No authority acquisition, schema migration or provider work occurred.
+                replies.send(update_recovery_refusal());
+                return EXIT_STARTUP_FAILED;
+            }
             _ => return startup_failed(),
         },
         _ => return startup_failed(),
     };
+    let Launched { context, response_hex, store_thread, installation, startup } = launched;
     let diagnostics = Arc::new(LocalDiagnostics::new(&context.storage_root));
-    let owner = Arc::new(Owner { diagnostics, context, drafts: Mutex::new(None) });
+    let owner = Arc::new(Owner {
+        diagnostics,
+        context,
+        drafts: Mutex::new(None),
+        updates: Mutex::new(None),
+        update_installation: installation,
+        update_startup: startup,
+        update_start_confirmed: AtomicBool::new(false),
+        update_operation: Arc::new(Mutex::new(None)),
+        closing: Arc::clone(&replies.closing),
+    });
     // Python's `application_owner.prepare_new_campaign_storage()`, after diagnostics opened.
     if owner.context.store.call(|store| store.prepare_new_campaign_storage()).await.is_err() {
         owner.diagnostics.record(
@@ -288,7 +408,6 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
         )
     };
     let mut workers = tokio::task::JoinSet::new();
-    let gates = UpdateGates::default();
 
     let code = loop {
         let frame = tokio::select! {
@@ -323,8 +442,23 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
             }
         };
 
-        if let Some(refusal) = gates.refusal(&id, &method) {
+        if let Some(refusal) = owner.gates().refusal(&id, &method) {
             replies.send(refusal);
+            continue;
+        }
+        if matches!(
+            method.as_str(),
+            "desktop_update_reserve" | "desktop_update_abort" | "desktop_update_shutdown"
+        ) {
+            // Workers still running count as admitted work, as Python's live threads do.
+            while workers.try_join_next().is_some() {}
+            let busy = !workers.is_empty() || !display_reads.idle();
+            let (reply, closed) = update_lifecycle(&owner, &id, &method, &params, busy);
+            replies.send(reply);
+            if closed {
+                // An idle owner closes; no provider cancellation or replay.
+                break EXIT_OK;
+            }
             continue;
         }
         if method == "shutdown" {
@@ -332,12 +466,6 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
             result.insert("status".into(), Json::String("closed".into()));
             replies.send(protocol::ok_reply(&id, Json::Object(result)));
             break EXIT_OK;
-        }
-        if RUN_LOOP_METHODS.contains(&method.as_str()) {
-            let error =
-                protocol::plain_error(PORT_PENDING, &format!("The Rust owner does not answer {method} yet."));
-            replies.send(protocol::error_reply(Some(&id), error));
-            continue;
         }
         if method == "cancel_display_load" {
             display_reads.cancel(load_id.as_deref().expect("validated"));
@@ -393,6 +521,10 @@ async fn serve(frames: &mut mpsc::UnboundedReceiver<Frame>, replies: &Replies) -
     // Python's `finally`: stop writing, let running display reads finish, give workers five
     // seconds, then the last diagnostics write.
     replies.closing.store(true, Ordering::SeqCst);
+    let updates = owner.updates.lock().expect("updates lock").clone();
+    if let Some(updates) = updates {
+        updates.close().await;
+    }
     display_reads.close().await;
     let deadline = tokio::time::sleep(Duration::from_secs(5));
     tokio::pin!(deadline);
@@ -418,6 +550,73 @@ async fn close_owner(owner: Arc<Owner>, store_thread: StoreThread) {
     let joined = blocking(move || store_thread.join());
     let _ = tokio::time::timeout(Duration::from_secs(5), joined).await;
     let _ = blocking(move || diagnostics.close()).await;
+}
+
+/// `desktop_update_reserve`, `desktop_update_abort` and `desktop_update_shutdown`, which
+/// Python answers in the run loop itself, without a diagnostics record. Returns the reply and
+/// whether the owner now closes. `busy` is Python's `workers or not display_reads.idle()`.
+fn update_lifecycle(
+    owner: &Owner,
+    request_id: &str,
+    method: &str,
+    params: &JsonMap,
+    busy: bool,
+) -> (Json, bool) {
+    let outcome = (|| -> Result<&'static str, sylvia_base::CodedError> {
+        if params.len() != 1 || !params.contains_key("operation_id") {
+            return Err(sylvia_base::CodedError::rejected("Unsupported update lifecycle request"));
+        }
+        let identity = operation_id(&params["operation_id"])?;
+        let updates = owner.updates.lock().expect("updates lock").clone();
+        if method == "desktop_update_abort" {
+            if let Some(updates) = &updates {
+                updates.abort_preparation(&identity)?;
+            }
+            abort_desktop_update(&owner.update_operation, &identity)?;
+            return Ok("aborted");
+        }
+        if busy || updates.as_ref().is_some_and(|updates| updates.preparing()) {
+            return Err(sylvia_base::CodedError::new(
+                "update_busy",
+                "Finish admitted work and loading before updating",
+            ));
+        }
+        if method == "desktop_update_reserve" {
+            begin_desktop_update(&owner.update_operation, &identity)?;
+            return Ok("reserved");
+        }
+        let reserved = owner.update_operation.lock().expect("update reservation lock").clone();
+        if reserved.as_deref() == Some(identity.as_str()) {
+            if let Some(updates) = &updates {
+                updates.arm_shutdown(&identity)?;
+            }
+            return Ok("closed");
+        }
+        Err(sylvia_base::CodedError::new("stale_update_operation", "This update reservation is stale"))
+    })();
+    match outcome {
+        Ok(status) => {
+            let mut result = JsonMap::new();
+            result.insert("status".into(), status.into());
+            (protocol::ok_reply(request_id, Json::Object(result)), status == "closed")
+        }
+        Err(error) => (
+            protocol::error_reply(Some(request_id), protocol::plain_error(&error.code, &error.message)),
+            false,
+        ),
+    }
+}
+
+/// `desktop_update_confirm_startup`: only an owner started to confirm an update restart
+/// answers it, and confirming one needs update preparation (not ported yet).
+fn confirm_update_startup(owner: &Owner, params: &JsonMap) -> DispatchResult {
+    if params.len() != 1 || !params.contains_key("host") || owner.update_startup.is_none() {
+        return Err(Failure::protocol("No update startup is awaiting confirmation"));
+    }
+    Err(Failure::Rejected(sylvia_base::CodedError::new(
+        PORT_PENDING,
+        "The Rust owner does not confirm update restarts yet.",
+    )))
 }
 
 /// The provider-work reservation of a model-bound command, taken before it runs as a task.
@@ -451,6 +650,17 @@ async fn execute_request(
 ) -> Json {
     let started = Instant::now();
     let outcome = match method {
+        "desktop_update_confirm_startup" => confirm_update_startup(owner, params),
+        "desktop_update_state"
+        | "desktop_update_check"
+        | "desktop_update_download"
+        | "desktop_update_cancel"
+        | "desktop_update_defer"
+        | "desktop_update_prepare"
+        | "desktop_update_handoff" => {
+            let action = method.trim_start_matches("desktop_update_");
+            owner.updates().handle(action, params).map(Json::Object).map_err(Failure::from)
+        }
         "load_desktop_drafts" | "save_desktop_drafts" => drafts(owner, method, params),
         "record_local_fault" => {
             owner.diagnostics.client_fault(params.get("category"), params.get("delta")).map_err(Failure::from)
@@ -600,20 +810,41 @@ fn startup_failed() -> i32 {
 /// handshake is issued) and complete the internal handshake. A failure after the store opened
 /// closes it again, as `supervisor.shutdown()` does.
 ///
-/// Not ported yet: the update-startup check and its `before_migration` hook (the desktop
-/// update), so `before_migration` is `None`, as it is in Python without an update context.
-fn launch(envelope: &JsonMap) -> Result<(DispatchContext, String, StoreThread), ()> {
+/// Before any of that, the desktop update's startup check (`owner_startup_context`) reads the
+/// update folder only; it runs again under the ownership lock, before migrations, as Python's
+/// `before_migration` hook. The second run's context is the one kept, as in Python.
+fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
+    // A context Python's recovery-only owner would serve (`run_recovery`).
+    let recovery = envelope.get("desktop_update_context").is_some_and(|context| !context.is_null());
+    let update_refused = |error: &sylvia_base::CodedError| LaunchFailure::Update {
+        recovery: recovery && error.code == "update_recovery_required",
+    };
+    let checked = Arc::new(Mutex::new(
+        owner_startup_context(envelope, resolve_database_path).map_err(|e| update_refused(&e))?,
+    ));
     if envelope.get("type").and_then(Json::as_str) != Some("launch") {
-        return Err(());
+        return Err(LaunchFailure::Other);
     }
     let text = |key: &str| envelope.get(key).and_then(Json::as_str).filter(|value| !value.is_empty());
-    let secret_hex = text("secret_hex").ok_or(())?;
-    let database_path = resolve_database_path(Path::new(text("database_path").ok_or(())?)).ok_or(())?;
-    let owner_id = text("owner_id").ok_or(())?.to_owned();
-    let storage_root = database_path.parent().map(Path::to_path_buf).ok_or(())?;
-    std::fs::create_dir_all(&storage_root).map_err(|_| ())?;
-    let response_hex = derive_owner_response(secret_hex).map_err(|_| ())?;
-    let acquired = acquire_owner(&database_path, None).map_err(|_| ())?;
+    let secret_hex = text("secret_hex").ok_or(LaunchFailure::Other)?;
+    let database_path = resolve_database_path(Path::new(text("database_path").ok_or(LaunchFailure::Other)?))
+        .ok_or(LaunchFailure::Other)?;
+    let owner_id = text("owner_id").ok_or(LaunchFailure::Other)?.to_owned();
+    let storage_root = database_path.parent().map(Path::to_path_buf).ok_or(LaunchFailure::Other)?;
+    std::fs::create_dir_all(&storage_root).map_err(|_| LaunchFailure::Other)?;
+    let response_hex = derive_owner_response(secret_hex).map_err(|_| LaunchFailure::Other)?;
+    let (hook_envelope, hook_checked) = (envelope.clone(), Arc::clone(&checked));
+    let before_migration: sylvia_store::store::BeforeMigration = Box::new(move || {
+        let context = owner_startup_context(&hook_envelope, resolve_database_path)?;
+        *hook_checked.lock().expect("startup context lock") = context;
+        Ok(())
+    });
+    let acquired = acquire_owner(&database_path, Some(before_migration)).map_err(|error| match error {
+        sylvia_store::StoreError::Coded(error) if crate::desktop_update::storage::is_update_error(&error) => {
+            update_refused(&error)
+        }
+        _ => LaunchFailure::Other,
+    })?;
     let (store, store_thread, mut handshake) = (acquired.store, acquired.thread, acquired.handshake);
     // `supervisor.complete_handshake(derive_owner_response(internal.secret_hex))`.
     let verified = derive_owner_response(&acquired.credential.secret_hex)
@@ -621,7 +852,7 @@ fn launch(envelope: &JsonMap) -> Result<(DispatchContext, String, StoreThread), 
     if verified.is_err() {
         drop(store);
         store_thread.join();
-        return Err(());
+        return Err(LaunchFailure::Other);
     }
     let context = DispatchContext {
         owner_id,
@@ -634,7 +865,27 @@ fn launch(envelope: &JsonMap) -> Result<(DispatchContext, String, StoreThread), 
         session_loop: None,
         record_provider_warning: Arc::new(|_: &str| {}),
     };
-    Ok((context, response_hex, store_thread))
+    let (installation, startup) = std::mem::take(&mut *checked.lock().expect("startup context lock"));
+    Ok(Launched { context, response_hex, store_thread, installation, startup })
+}
+
+/// A launched owner: its dispatch context, the external handshake reply, the store thread,
+/// and what the launch said about updates.
+struct Launched {
+    context: DispatchContext,
+    response_hex: String,
+    store_thread: StoreThread,
+    installation: Option<Installation>,
+    startup: Option<AuthorizedStartup>,
+}
+
+/// Why a launch failed.
+enum LaunchFailure {
+    /// The update startup check refused (an `UpdateError`). `recovery` says Python would now
+    /// serve its recovery-only owner instead of replying with the refusal.
+    Update { recovery: bool },
+    /// Anything else: Python's "Sylvia GM owner startup failed", with no reply.
+    Other,
 }
 
 /// `Path(text).expanduser().resolve()`: `~` becomes the home folder, then the path is made

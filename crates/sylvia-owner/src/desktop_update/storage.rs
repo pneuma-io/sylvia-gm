@@ -1,14 +1,346 @@
-//! The parts of `application/desktop_update/storage.py` the drafts store uses: refusing
-//! aliased folders, reading a file that must not change while it is read, and replacing a
-//! receipt atomically.
+//! `application/desktop_update/storage.py`: update-owned staging and small durable receipts,
+//! never campaign or credential storage. Folders are refused when aliased, files when they
+//! change while read, and receipts are replaced atomically.
 
-use super::manifest::{canonical_bytes, MANIFEST_LIMIT};
+use super::manifest::{bounded_json, canonical_bytes, MANIFEST_LIMIT};
 use super::update_error;
 use crate::util::uuid4_hex;
 use std::io::{Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::time::SystemTime;
-use sylvia_base::{CodedResult, Json};
+use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+
+/// `UpdatePhase`: every phase a receipt or the controller can be in. `idle` exists only in
+/// controller memory, never in a receipt.
+pub mod phase {
+    pub const CHECKING: &str = "checking";
+    pub const AVAILABLE: &str = "available";
+    pub const CURRENT: &str = "current";
+    pub const DOWNLOADING: &str = "downloading";
+    pub const VERIFIED: &str = "verified";
+    pub const DEFERRED: &str = "deferred";
+    pub const CANCELLED: &str = "cancelled";
+    pub const INTERRUPTED: &str = "interrupted";
+    pub const ERROR: &str = "error";
+    pub const PREPARING: &str = "preparing";
+    pub const PREPARED: &str = "prepared";
+    pub const CLOSING: &str = "closing";
+    pub const APPLYING: &str = "applying";
+    pub const AWAITING_RESTART: &str = "awaiting_restart";
+    pub const RECOVERY_REQUIRED: &str = "recovery_required";
+    pub const ROLLING_BACK: &str = "rolling_back";
+    pub const ROLLBACK_READY: &str = "rollback_ready";
+    pub const ROLLBACK_AWAITING_RESTART: &str = "rollback_awaiting_restart";
+    pub const CONFIRMED: &str = "confirmed";
+    pub const ROLLED_BACK: &str = "rolled_back";
+    pub const IDLE: &str = "idle";
+    /// `UpdateViewPhase.UNAVAILABLE`.
+    pub const UNAVAILABLE: &str = "unavailable";
+    /// `UpdateViewPhase.RECOVERING`.
+    pub const RECOVERING: &str = "recovering";
+}
+
+/// `PHASES`: every `UpdatePhase` except `idle`.
+pub const PHASES: [&str; 20] = [
+    phase::CHECKING,
+    phase::AVAILABLE,
+    phase::CURRENT,
+    phase::DOWNLOADING,
+    phase::VERIFIED,
+    phase::DEFERRED,
+    phase::CANCELLED,
+    phase::INTERRUPTED,
+    phase::ERROR,
+    phase::PREPARING,
+    phase::PREPARED,
+    phase::CLOSING,
+    phase::APPLYING,
+    phase::AWAITING_RESTART,
+    phase::RECOVERY_REQUIRED,
+    phase::ROLLING_BACK,
+    phase::ROLLBACK_READY,
+    phase::ROLLBACK_AWAITING_RESTART,
+    phase::CONFIRMED,
+    phase::ROLLED_BACK,
+];
+
+/// `EMPTY_TERMINAL_PHASES`: phases whose operation folder may be empty and pruned.
+pub const EMPTY_TERMINAL_PHASES: [&str; 4] =
+    [phase::CURRENT, phase::ERROR, phase::CANCELLED, phase::INTERRUPTED];
+
+/// `UPDATE_MOVES`: the phases each phase may move to. Python's receipts are not checked
+/// against it at run time; its tests check the controller's moves against it, as
+/// `controller::tests` does here.
+pub const UPDATE_MOVES: [(&str, &[&str]); 21] = {
+    use phase::*;
+    [
+        (
+            IDLE,
+            &[
+                CHECKING,
+                AVAILABLE,
+                CURRENT,
+                VERIFIED,
+                DEFERRED,
+                CANCELLED,
+                INTERRUPTED,
+                ERROR,
+                RECOVERY_REQUIRED,
+                CONFIRMED,
+                ROLLED_BACK,
+            ],
+        ),
+        (CHECKING, &[CHECKING, AVAILABLE, CURRENT, CANCELLED, ERROR, INTERRUPTED]),
+        (AVAILABLE, &[AVAILABLE, CHECKING, DOWNLOADING, DEFERRED, ERROR, CANCELLED]),
+        (CURRENT, &[CURRENT, CHECKING, ERROR, CANCELLED]),
+        (DOWNLOADING, &[DOWNLOADING, CHECKING, VERIFIED, CANCELLED, ERROR, INTERRUPTED]),
+        (VERIFIED, &[VERIFIED, CHECKING, PREPARING, DEFERRED, ERROR, CANCELLED]),
+        (DEFERRED, &[DEFERRED, CHECKING, DOWNLOADING, PREPARING, ERROR]),
+        (CANCELLED, &[CANCELLED, CHECKING, ERROR]),
+        (INTERRUPTED, &[INTERRUPTED, CHECKING]),
+        (ERROR, &[ERROR, CHECKING, PREPARING]),
+        (PREPARING, &[PREPARING, PREPARED, VERIFIED, CANCELLED, ERROR, RECOVERY_REQUIRED]),
+        (
+            PREPARED,
+            &[
+                PREPARED,
+                DEFERRED,
+                CLOSING,
+                APPLYING,
+                VERIFIED,
+                ROLLING_BACK,
+                CANCELLED,
+                ERROR,
+                RECOVERY_REQUIRED,
+            ],
+        ),
+        (CLOSING, &[CLOSING, APPLYING, ROLLING_BACK, RECOVERY_REQUIRED]),
+        (APPLYING, &[APPLYING, AWAITING_RESTART, ROLLING_BACK, RECOVERY_REQUIRED]),
+        (AWAITING_RESTART, &[AWAITING_RESTART, APPLYING, CONFIRMED, ROLLING_BACK, RECOVERY_REQUIRED]),
+        (RECOVERY_REQUIRED, &[RECOVERY_REQUIRED, ROLLING_BACK]),
+        (ROLLING_BACK, &[ROLLING_BACK, ROLLBACK_READY, RECOVERY_REQUIRED]),
+        (ROLLBACK_READY, &[ROLLBACK_READY, ROLLBACK_AWAITING_RESTART, RECOVERY_REQUIRED]),
+        (ROLLBACK_AWAITING_RESTART, &[ROLLBACK_AWAITING_RESTART, ROLLED_BACK, RECOVERY_REQUIRED]),
+        (CONFIRMED, &[CONFIRMED, CHECKING, ROLLING_BACK]),
+        (ROLLED_BACK, &[ROLLED_BACK, CHECKING]),
+    ]
+};
+
+/// An `OSError` the Python code lets escape (a failed `mkdir`, for example). It is not an
+/// `UpdateError`, so the controller reports its generic failure and the owner an internal
+/// error, as Python's handlers do.
+pub fn os_error(error: &std::io::Error) -> CodedError {
+    let error_type = match error.kind() {
+        std::io::ErrorKind::NotFound => "FileNotFoundError",
+        std::io::ErrorKind::AlreadyExists => "FileExistsError",
+        std::io::ErrorKind::PermissionDenied => "PermissionError",
+        _ => "OSError",
+    };
+    CodedError::new("internal_error", error.to_string()).with_error_type(error_type)
+}
+
+/// Whether an error stands for Python's `UpdateError` (not an escaped `OSError`).
+pub fn is_update_error(error: &CodedError) -> bool {
+    error.error_type == Some("UpdateError")
+}
+
+/// `path.exists() or path.is_symlink()`.
+pub fn present(path: &Path) -> bool {
+    std::fs::symlink_metadata(path).is_ok()
+}
+
+/// `operation_id(value)` for text.
+pub fn operation_id_text(value: &str) -> CodedResult<String> {
+    operation_id(&Json::String(value.to_string()))
+}
+
+/// `ensure_directory(path)`: check the existing ancestry before creating each missing folder,
+/// never through an alias.
+pub fn ensure_directory(path: &Path) -> CodedResult<()> {
+    if !path.is_absolute() || path.components().any(|part| matches!(part, Component::ParentDir)) {
+        return Err(update_error("unsafe_staging", "An absolute update-owned folder is required."));
+    }
+    let mut missing: Vec<&Path> = Vec::new();
+    let mut ancestor = path;
+    while !present(ancestor) {
+        missing.push(ancestor);
+        match ancestor.parent() {
+            Some(parent) => ancestor = parent,
+            None => break,
+        }
+    }
+    directory_identity(ancestor)?;
+    for child in missing.into_iter().rev() {
+        let parent_path = child.parent().unwrap_or(Path::new(""));
+        let parent = directory_identity(parent_path)?;
+        match std::fs::create_dir(child) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists && child.is_dir() => {}
+            Err(error) => return Err(os_error(&error)),
+        }
+        if directory_identity(parent_path)? != parent {
+            return Err(update_error("unsafe_staging", "The update staging parent changed."));
+        }
+        directory_identity(child)?;
+    }
+    Ok(())
+}
+
+/// `UpdateStore`: one active receipt (`current.json`) with separately retained operation
+/// folders. Nothing is deleted automatically.
+#[derive(Debug, Clone)]
+pub struct UpdateStore {
+    pub root: PathBuf,
+    identity: Identity,
+}
+
+/// A loaded `current.json`.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Receipt {
+    pub operation_id: String,
+    pub phase: String,
+    pub version: Option<String>,
+    pub error_code: Option<String>,
+}
+
+fn error_code_valid(code: &str) -> bool {
+    (1..=64).contains(&code.len()) && code.bytes().all(|byte| byte.is_ascii_lowercase() || byte == b'_')
+}
+
+impl UpdateStore {
+    /// `UpdateStore(root)`: the parent must be unaliased; the root is created if missing.
+    pub fn new(root: &Path) -> CodedResult<Self> {
+        directory_identity(root.parent().unwrap_or(Path::new("")))?;
+        match std::fs::create_dir(root) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists && root.is_dir() => {}
+            Err(error) => return Err(os_error(&error)),
+        }
+        let identity = directory_identity(root)?;
+        Ok(Self { root: root.to_path_buf(), identity })
+    }
+
+    fn check(&self) -> CodedResult<()> {
+        if directory_identity(&self.root)? != self.identity {
+            return Err(update_error("unsafe_staging", "The update staging folder changed."));
+        }
+        Ok(())
+    }
+
+    /// `stage(identity)`: an existing, unaliased operation folder.
+    pub fn stage(&self, identity: &str) -> CodedResult<PathBuf> {
+        self.check()?;
+        let stage = self.root.join(operation_id_text(identity)?);
+        directory_identity(&stage)?;
+        Ok(stage)
+    }
+
+    /// `create()`: a fresh operation folder. Retained interruptions are never deleted to make
+    /// room for another download.
+    pub fn create(&self) -> CodedResult<(String, PathBuf)> {
+        self.check()?;
+        let entries = std::fs::read_dir(&self.root).map_err(|error| os_error(&error))?;
+        let mut count = 0usize;
+        for entry in entries {
+            entry.map_err(|error| os_error(&error))?;
+            count += 1;
+        }
+        if count >= 65 {
+            return Err(update_error(
+                "staging_limit",
+                "Retained update files need review before another download.",
+            ));
+        }
+        let identity = uuid4_hex();
+        let stage = self.root.join(&identity);
+        std::fs::create_dir(&stage).map_err(|error| os_error(&error))?;
+        directory_identity(&stage)?;
+        Ok((identity, stage))
+    }
+
+    /// `save(identity, phase, version, error_code)`.
+    pub fn save(
+        &self,
+        identity: &str,
+        phase: &str,
+        version: Option<&str>,
+        error_code: Option<&str>,
+    ) -> CodedResult<()> {
+        self.stage(identity)?;
+        if !PHASES.contains(&phase) || error_code.is_some_and(|code| !error_code_valid(code)) {
+            return Err(update_error("invalid_journal", "The update state cannot be recorded."));
+        }
+        let mut row = JsonMap::new();
+        row.insert("format_version".into(), 1.into());
+        row.insert("operation_id".into(), identity.into());
+        row.insert("phase".into(), phase.into());
+        row.insert("version".into(), version.map_or(Json::Null, Json::from));
+        row.insert("error_code".into(), error_code.map_or(Json::Null, Json::from));
+        atomic_receipt(&self.root.join("current.json"), &Json::Object(row))
+    }
+
+    /// `load()`: the active receipt, or `None` when there is none.
+    pub fn load(&self) -> CodedResult<Option<Receipt>> {
+        self.check()?;
+        let path = self.root.join("current.json");
+        if !present(&path) {
+            return Ok(None);
+        }
+        let row = bounded_json(&checked_file(&path, 16 * 1024)?, 16 * 1024)?;
+        let invalid =
+            || update_error("invalid_journal", "The update receipt is invalid; recovery needs review.");
+        let Json::Object(row) = row else {
+            return Err(invalid());
+        };
+        let keys = ["format_version", "operation_id", "phase", "version", "error_code"];
+        if row.len() != keys.len() || !keys.iter().all(|key| row.contains_key(*key)) {
+            return Err(invalid());
+        }
+        let format_ok = row["format_version"].is_number() && row["format_version"].as_i64() == Some(1);
+        let phase = row["phase"].as_str().filter(|phase| PHASES.contains(phase));
+        let version_ok = row["version"].is_null() || row["version"].is_string();
+        let error_ok = match &row["error_code"] {
+            Json::Null => true,
+            Json::String(code) => error_code_valid(code),
+            _ => false,
+        };
+        let (true, Some(phase), true, true) = (format_ok, phase, version_ok, error_ok) else {
+            return Err(invalid());
+        };
+        let identity = operation_id(&row["operation_id"])?;
+        let stage = self.root.join(&identity);
+        if !EMPTY_TERMINAL_PHASES.contains(&phase) || present(&stage) {
+            self.stage(&identity)?;
+        }
+        Ok(Some(Receipt {
+            operation_id: identity,
+            phase: phase.to_string(),
+            version: row["version"].as_str().map(str::to_string),
+            error_code: row["error_code"].as_str().map(str::to_string),
+        }))
+    }
+
+    /// `prune_empty_terminal(identity)`: remove only this operation's empty terminal folder,
+    /// never any retained bytes.
+    pub fn prune_empty_terminal(&self, identity: &str) -> CodedResult<()> {
+        let Some(row) = self.load()? else {
+            return Ok(());
+        };
+        if row.operation_id != operation_id_text(identity)?
+            || !EMPTY_TERMINAL_PHASES.contains(&row.phase.as_str())
+        {
+            return Ok(());
+        }
+        let stage = self.root.join(identity);
+        if !present(&stage) {
+            return Ok(());
+        }
+        self.stage(identity)?;
+        // Not recursive: partial downloads, manifests and recovery files stay.
+        let _ = std::fs::remove_dir(&stage);
+        Ok(())
+    }
+}
 
 /// `FILE_ATTRIBUTE_REPARSE_POINT`.
 #[cfg(windows)]
@@ -59,6 +391,11 @@ fn is_reparse_point(path: &Path) -> std::io::Result<bool> {
 }
 
 /// A path's text as `pathlib` compares it: components joined, case-folded on Windows.
+/// `left == right` for two `pathlib` paths: the same components, case-insensitively on Windows.
+pub fn same_path(left: &Path, right: &Path) -> bool {
+    comparable(left) == comparable(right)
+}
+
 fn comparable(path: &Path) -> Vec<String> {
     path.components()
         .filter(|component| !matches!(component, Component::CurDir))

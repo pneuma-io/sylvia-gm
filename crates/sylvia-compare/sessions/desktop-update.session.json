@@ -1,0 +1,68 @@
+{
+ "name": "desktop-update",
+ "description": "The desktop updater as 0.4.1 ships it: no trusted key, so state is the unavailable view and every other action is refused; the request and host checks; the reservation, abort and shutdown rules and both update gates; and the startup check, which refuses a restart with no retained update, a missing database path, an unreadable receipt and an update interrupted mid-apply before any saved data opens.",
+ "summarise_tables": ["^package_", "^packages$"],
+ "steps": [
+  {"method": "desktop_update_state", "params": {}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "extra": 1}},
+  {"method": "desktop_update_apply", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_download", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}}},
+  {"method": "desktop_update_download", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789ABCDEF0123456789abcdef"}},
+  {"method": "desktop_update_state", "params": {"host": "windows"}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.0", "target": "windows-x86_64", "distribution": "installed"}}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": 7, "distribution": "installed"}}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "distribution": "installed"}}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "msi"}}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed", "extra": true}}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}}},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "portable"}}},
+  {"method": "desktop_update_check", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}}},
+  {"method": "desktop_update_download", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_cancel", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_defer", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_prepare", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_handoff", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}, "operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_confirm_startup", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}}},
+  {"method": "desktop_update_reserve", "params": {}},
+  {"method": "desktop_update_reserve", "params": {"operation_id": "not-an-operation"}},
+  {"method": "desktop_update_abort", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_shutdown", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_reserve", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_reserve", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_reserve", "params": {"operation_id": "fedcba9876543210fedcba9876543210"}},
+  {"method": "handshake_status"},
+  {"method": "campaign_index"},
+  {"method": "load_desktop_drafts"},
+  {"method": "desktop_update_state", "params": {"host": {"version": "0.4.1", "target": "windows-x86_64", "distribution": "installed"}}},
+  {"method": "desktop_update_shutdown", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_abort", "params": {"operation_id": "fedcba9876543210fedcba9876543210"}},
+  {"method": "desktop_update_abort", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "handshake_status"},
+  {"method": "shutdown"},
+  {"relaunch": true, "launch": {"desktop_update_start": {"operation_id": "0123456789abcdef0123456789abcdef", "attempt": "0123456789abcdef0123456789abcdef", "nonce": "0123456789abcdef0123456789abcdef"}}},
+  {"relaunch": true, "launch": {"database_path": ""}},
+  {"relaunch": true,
+   "seed": [
+    {"path": "data/.application-updates/0123456789abcdef0123456789abcdef", "directory": true},
+    {"path": "data/.application-updates/current.json", "json": {"format_version": 1, "operation_id": "0123456789abcdef0123456789abcdef", "phase": "applying", "version": "0.4.2", "error_code": null}}
+   ]},
+  {"relaunch": true,
+   "seed": [
+    {"path": "data/.application-updates/current.json", "text": "{"}
+   ]},
+  {"relaunch": true,
+   "seed": [
+    {"path": "data/.application-updates/current.json", "json": {"format_version": 1, "operation_id": "fedcba9876543210fedcba9876543210", "phase": "available", "version": "0.4.2", "error_code": null}}
+   ]},
+  {"relaunch": true,
+   "seed": [
+    {"path": "data/.application-updates/current.json", "json": {"format_version": 1, "operation_id": "fedcba9876543210fedcba9876543210", "phase": "error", "version": null, "error_code": "network_unavailable"}}
+   ]},
+  {"method": "desktop_update_reserve", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}},
+  {"method": "desktop_update_shutdown", "params": {"operation_id": "0123456789abcdef0123456789abcdef"}}
+ ],
+ "rules": {
+  "ignore_keys": ["diagnostic_id"],
+  "volatile_files": ["^diagnostics/"]
+ }
+}

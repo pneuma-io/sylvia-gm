@@ -127,14 +127,26 @@ fn closing_input_ends_the_owner_cleanly() {
 
 #[test]
 fn a_bad_launch_ends_the_owner_without_a_reply() {
-    for envelope in [
-        r#"{"type":"hello"}"#,
-        r#"{"type":"launch","secret_hex":"abc","database_path":"x/y.sqlite3","owner_id":"o"}"#,
-        "not json",
-    ] {
+    for envelope in
+        [r#"{"type":"launch","secret_hex":"abc","database_path":"x/y.sqlite3","owner_id":"o"}"#, "not json"]
+    {
         let mut owner = Session::start();
         owner.send(envelope);
         assert_eq!(owner.read(), "", "no reply to {envelope}");
         assert_eq!(owner.exit_code(), Some(2));
     }
+}
+
+#[test]
+fn a_launch_without_a_database_path_is_refused_by_the_update_check() {
+    // Python's `owner_startup_context` reads `database_path` first: without one it raises
+    // `invalid_restart`, which the owner answers with its update refusal (checked against the
+    // Python owner on this input).
+    let mut owner = Session::start();
+    owner.send(r#"{"type":"hello"}"#);
+    assert_eq!(
+        owner.read(),
+        r#"{"ok":false,"type":"update_recovery_required","error":{"code":"update_recovery_required","message":"The interrupted update must be reconciled before opening saved data."}}"#
+    );
+    assert_eq!(owner.exit_code(), Some(2));
 }
