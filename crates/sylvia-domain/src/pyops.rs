@@ -76,6 +76,34 @@ impl PartialEq for NumericValue {
     }
 }
 
+/// Python's ordering of two numbers (`int` or `float`, never `bool`), exact between the two.
+/// `None` unless both are numbers.
+pub fn py_number_cmp(a: &Json, b: &Json) -> Option<std::cmp::Ordering> {
+    let (Json::Number(_), Json::Number(_)) = (a, b) else { return None };
+    match (numeric(a)?, numeric(b)?) {
+        (NumericValue::Int(x), NumericValue::Int(y)) => Some(x.cmp(&y)),
+        (NumericValue::Float(x), NumericValue::Float(y)) => x.partial_cmp(&y),
+        (NumericValue::Int(x), NumericValue::Float(y)) => Some(int_float(x, y)),
+        (NumericValue::Float(x), NumericValue::Int(y)) => Some(int_float(y, x).reverse()),
+    }
+}
+
+/// The order of an integer against a finite float, without rounding the integer.
+fn int_float(int: i128, float: f64) -> std::cmp::Ordering {
+    use std::cmp::Ordering;
+    if float >= 2f64.powi(100) {
+        return Ordering::Less;
+    }
+    if float <= -(2f64.powi(100)) {
+        return Ordering::Greater;
+    }
+    let floor = float.floor();
+    match int.cmp(&(floor as i128)) {
+        Ordering::Equal if float > floor => Ordering::Less,
+        order => order,
+    }
+}
+
 /// `bool(value)`.
 pub fn py_truthy(value: &Json) -> bool {
     match value {
