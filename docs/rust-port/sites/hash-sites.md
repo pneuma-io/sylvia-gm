@@ -148,10 +148,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/campaign_archive.py:2325` | `_scan_authority_member` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `infrastructure/campaign_archive.py:2471` | `_validate_streamed_authority.streamed_closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
 | `infrastructure/campaign_archive.py:3095` | `stage_campaign_archive` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/launch_handshake.py:84` | `LaunchHandshake.issue` | hmac.new | `response = hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | |
-| `infrastructure/launch_handshake.py:107` | `LaunchHandshake.verify` | hmac.compare_digest | `if not hmac.compare_digest( hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(), response_hex, ):` | |
-| `infrastructure/launch_handshake.py:108` | `LaunchHandshake.verify` | hmac.new | `hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(),` | |
-| `infrastructure/launch_handshake.py:138` | `derive_owner_response` | hmac.new | `return hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | |
+| `infrastructure/launch_handshake.py:84` | `LaunchHandshake.issue` | hmac.new | `response = hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | yes |
+| `infrastructure/launch_handshake.py:107` | `LaunchHandshake.verify` | hmac.compare_digest | `if not hmac.compare_digest( hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(), response_hex, ):` | yes |
+| `infrastructure/launch_handshake.py:108` | `LaunchHandshake.verify` | hmac.new | `hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(),` | yes |
+| `infrastructure/launch_handshake.py:138` | `derive_owner_response` | hmac.new | `return hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | yes |
 | `infrastructure/package_archive.py:238` | `admit_package_archive` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `infrastructure/sqlite_authority.py:509` | `<module>` | hashlib.sha256 | `_MIGRATION_1_SHA256 = hashlib.sha256(_MIGRATION_1.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:587` | `<module>` | hashlib.sha256 | `_MIGRATION_2_SHA256 = hashlib.sha256(_MIGRATION_2.strip().encode("utf-8")).hexdigest()` | yes |

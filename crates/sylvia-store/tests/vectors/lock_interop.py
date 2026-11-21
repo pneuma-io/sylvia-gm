@@ -6,6 +6,7 @@ Run with the snapshot's interpreter from the repository root, after
     .venv/Scripts/python.exe -B crates/sylvia-store/tests/vectors/lock_interop.py <probe> <folder>
 
 <probe> is target/debug/examples/owner_lock_probe(.exe); <folder> is an empty scratch folder.
+It checks the owner lock and the second-instance probe (`probe_owner_live`) both ways.
 It prints one line per check and exits 1 if any check fails. Reference tooling only.
 """
 
@@ -22,6 +23,7 @@ from sylvia_gm.infrastructure.owner_lock import (  # noqa: E402
     DatabaseOwnerLock,
     authority_lock_identity,
 )
+from sylvia_gm.infrastructure.owner_process_probe import probe_owner_live  # noqa: E402
 
 
 def main() -> int:
@@ -40,6 +42,8 @@ def main() -> int:
     held = DatabaseOwnerLock(identity)
     result = subprocess.run([probe, str(database), "try"], capture_output=True, text=True)
     check("python holds, rust refused", result.stdout.startswith("conflict"), result.stdout.strip())
+    result = subprocess.run([probe, str(database), "probe"], capture_output=True, text=True)
+    check("python holds, rust probe sees it", result.stdout.strip() == "live", result.stdout.strip())
     held.close()
 
     # 2. Rust holds the lock; Python is refused.
@@ -55,6 +59,8 @@ def main() -> int:
         check("rust holds, python refused", True, f"OwnerConflict: {error}")
     else:
         check("rust holds, python refused", False, "Python acquired the lock")
+    seen = probe_owner_live(database)
+    check("rust holds, python probe sees it", seen.owner_live, seen.reason)
     holder.stdin.close()
     holder.wait(timeout=30)
 
@@ -63,6 +69,10 @@ def main() -> int:
     check("released, rust acquires", result.stdout.strip() == "acquired", result.stdout.strip())
     DatabaseOwnerLock(identity).close()
     check("released, python acquires", True, "acquired")
+    result = subprocess.run([probe, str(database), "probe"], capture_output=True, text=True)
+    check("released, rust probe sees it free", result.stdout.strip() == "free", result.stdout.strip())
+    seen = probe_owner_live(database)
+    check("released, python probe sees it free", not seen.owner_live, seen.reason)
     content = (folder / "authority.sqlite3.authority-owner.owner.lock").read_bytes()
     check("lock file content", content == b"0", repr(content))
     return 1 if failures else 0

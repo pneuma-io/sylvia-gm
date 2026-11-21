@@ -603,7 +603,7 @@ fn unique_suffix() -> u128 {
 }
 
 /// `Path.resolve()` (non-strict): absolute, with the existing part's links resolved.
-fn resolve(path: &Path) -> PathBuf {
+pub(crate) fn resolve(path: &Path) -> PathBuf {
     let absolute = std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf());
     if let Ok(canonical) = std::fs::canonicalize(&absolute) {
         return strip_verbatim(canonical);

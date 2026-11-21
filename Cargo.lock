@@ -613,8 +613,12 @@ name = "sylvia-store"
 version = "0.4.1"
 dependencies = [
  "flate2",
+ "getrandom",
+ "hex",
+ "hmac",
  "rusqlite",
  "serde_json",
+ "sha2",
  "sylvia-base",
  "thiserror",
  "tokio",

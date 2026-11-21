@@ -1,0 +1,317 @@
+{
+ "python": "3.12.11",
+ "transcript": "sylvia-gm-f6-local-owner-handshake-v1",
+ "derive": [
+  {
+   "secret": "0000000000000000000000000000000000000000000000000000000000000000",
+   "ok": "4fb9309946ecc5fc5713fca4f1f0529eb2e86b1b435c41e266f21dea2f100b75"
+  },
+  {
+   "secret": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+   "ok": "3f1db336f8984c7ba444fcc04814cd778f93973af20cb3c0d5ba024bc78c1148"
+  },
+  {
+   "secret": "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF",
+   "ok": "3f1db336f8984c7ba444fcc04814cd778f93973af20cb3c0d5ba024bc78c1148"
+  },
+  {
+   "secret": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+   "ok": "b2273ff0767be958d407ccc946e1fb8b6a82e57f03b3afd085250fa9b24a13ac"
+  },
+  {
+   "secret": "abc",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret must be 64 hex characters"
+  },
+  {
+   "secret": "",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret must be 64 hex characters"
+  },
+  {
+   "secret": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "000000000000000000000000000000000000000000000000000000000000000",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret must be 64 hex characters"
+  },
+  {
+   "secret": "00000000000000000000000000000000000000000000000000000000000000000",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret must be 64 hex characters"
+  },
+  {
+   "secret": " 000000000000000000000000000000000000000000000000000000000000000 ",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret must be 64 hex characters"
+  },
+  {
+   "secret": "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t00\t0",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "00\n00\r00\u000b00\f0000000000000000000000000000000000000000000000000000    ",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret must be 64 hex characters"
+  },
+  {
+   "secret": "                                                                ",
+   "ok": "4fb9309946ecc5fc5713fca4f1f0529eb2e86b1b435c41e266f21dea2f100b75"
+  },
+  {
+   "secret": "0 00000000000000000000000000000000000000000000000000000000000000",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "00000000000000000000000000000000000000000000000000000000000000\u00e9\u00e9",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "00000000000000000000000000000000000000000000000000000000000000\u0660\u0661",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "00000000000000000000000000000000000000000000000000000000000000\u001c0",
+   "error": "LaunchHandshakeError",
+   "message": "Owner secret is not valid hexadecimal"
+  },
+  {
+   "secret": "f0862c4759ca9b15561201f52e295c592b2a985d6459589ae61d3e68eb137814",
+   "ok": "b5bc962b8ac9e39430b23641001b988cbf24b4d3e511d413bc286822d4167be3"
+  },
+  {
+   "secret": "5326173bad355e00e85985c0dce7a46e063732de9d2c21439eb6d69e5ee35f62",
+   "ok": "c64cd64ca1156d75c29b2f270ab1440e09519f97ca05b7fac87525ffb08b79c1"
+  },
+  {
+   "secret": "6fee95a9e3756e4384053899b0fc3ee077b58678657b761ddba97f96bd5ccfc4",
+   "ok": "4a7ce36dbbd6ac513d8b8e7ddefb9219391a7198092be3f2269163f898523912"
+  },
+  {
+   "secret": "b113641e7657fd4ffdd9182ef34eec31430193645f7acfbb4e500779eeade78a",
+   "ok": "7946c9ff79e0983d8dc3829ff3bbcadf5229df07ed84908fa4212a219bf8a945"
+  },
+  {
+   "secret": "2269c39e92b48e2084c7afaa89837938d37d19d3c25810614d3fbe9540a606e5",
+   "ok": "b6a3326f4ad177a0b96f8a8ec6801315677a1661658628abfb06766736ff7b61"
+  },
+  {
+   "secret": "0afe993c2ba09fefe3bae2fbca76e39890bd1d7aba7e9be8b6ccad4eacddfebf",
+   "ok": "5de3b03e301bdc6e039b0952368e58b7ba55cd91aa6420da8dc365939b62f2f2"
+  },
+  {
+   "secret": "4d0fa7427e13f0c10b4eb388a30fb2330d9c87370b093363ce3a372aa5e681cb",
+   "ok": "98bb8d37dd5230ae100c445a837658cc2fcdce375ae5a6f76fc5d1e2dfdd3b8f"
+  },
+  {
+   "secret": "8baf2a4ce64b452cf9b28514c183c5d21df48e929fed79f8daf345e050358972",
+   "ok": "ea9e3afdd80d63ee833bae48c0fa60bfd4035651399a5ccfa8f57a0047744143"
+  },
+  {
+   "secret": "873bd530c8aaf6426cdae01aa59dfac63b0392ef2dcefc3ecc4b39f352463498",
+   "ok": "b8a78860b73621b147ed22605886ef41fde9ae8562b42c69bf5d8b099c28b1a2"
+  },
+  {
+   "secret": "c062da5f0e910723833dc3e46ef783d15ea996a04762ee128dcfc75a39ade18d",
+   "ok": "40dddf1ff6f52eabccf87dce30f33ab54bf4bb197d3000ac461b0ade85ea6460"
+  },
+  {
+   "secret": "51414b0c9b148ae36eaf77084476eded98516cbe1f135f2c1f879da4cf7425d1",
+   "ok": "83d90a515d9f3067577e89b4dd4f0aa285c2f844bbbc5f30be936c7726e01c15"
+  },
+  {
+   "secret": "d2e3047c5ed13ca281851af4b46c491adc521ccdaa644ac1ffa70d5b8b0142cf",
+   "ok": "1c838e2322bc499a72359744d38cd168673d9bba2b266a7ca9f97e54e9147c07"
+  },
+  {
+   "secret": "4a7f3d8c7a319d5a644ac47f96e1d57b59702ffee53a55f8f5ad4f4cc93534d4",
+   "ok": "79d6d26e7d84482d4fec7bd4f1b16f4d2f44ec7369ec499807cd23e2e0a7c2d0"
+  },
+  {
+   "secret": "4a72885500ba3a261e04a18875cb578332cfe041b4a3c08a49cb63db10da7334",
+   "ok": "9a1431827f6dbd8686225b4ff54d3d256b6d1ea2d98d7de28ed06ee4de24cc3f"
+  },
+  {
+   "secret": "25b700752419640cc050d9e6dab3cb2c7bf9e189565b3d33d710bb6a47414af5",
+   "ok": "6cc49d3b518c0de21d055b3f3812bd7cb4b6e854341b9f449b53d8d19696d355"
+  },
+  {
+   "secret": "fd3c620169e82550706982952f7a080ea0e8ed9b04a3eaddcd8d66402be655ee",
+   "ok": "41a37fa6f65405b7312473ff571d296f2491f7b4b739ffc1b2c108fddba287f1"
+  },
+  {
+   "secret": "0a67c4c68a1b420d72b42c8a9a1e16c055af957669e7b5ca4cf79d832ed72202",
+   "ok": "bd26b7b16aecc81d4235bc39769022be71df3e820323ec31c966df532c2edcf3"
+  },
+  {
+   "secret": "8d0c524f7a3473532468a3eff9af7301032d095e50636f393ee500be2a5c8167",
+   "ok": "5749999a4b400cdf696d5b519b0d23c184717f081b5d1c945c97ce12564b1c93"
+  },
+  {
+   "secret": "07f2f63e0af1ea78f8ef3b8f02151642e976a14d3abf8f1293d37d9e269f7310",
+   "ok": "232c5f574b20ee857eab92492866c2a85e0cdf6e65f302b0cfb08b7bd59100a4"
+  },
+  {
+   "secret": "1d2bc34b7fb4817cdc5ec8a838a3277745f36e444573cec98fad04acd7764d17",
+   "ok": "ea7a954eadebc5034f401b82075ab27d3c7cb12ba08a71deda78c6972713bd5e"
+  },
+  {
+   "secret": "3fb1c09c7db33d849adc7c7e850d344d04ae4c97689f75dfb5563d3801cc54bc",
+   "ok": "64c117f2280843898815422f7bd83b176839498b963bcc0e62f219c2de2a4832"
+  },
+  {
+   "secret": "21a7ad2615180f4ba1360b63ebdb93200630c1976ad04fa69d40d6f066a766ac",
+   "ok": "b096a67dd343cf3e1bc98c1ffb822ad2f4fe1e9ba2255193db1b282c848d538a"
+  },
+  {
+   "secret": "cce4cbae6d2ac994c5bd064f1ee709328eb678549d1c2604cc1e3ffc4e39c895",
+   "ok": "9c2e4766c0987b79a825e43c8c707e8b43492c88e6e2b0cc3c646d148d4edfc0"
+  },
+  {
+   "secret": "682ca03695c8e2ab87087c5ac4aed70d67d7cc4b1905765e4c94bd52b4e587b4",
+   "ok": "fe0892b30722287689d560f1d6a2c4a2db18a8e2b355a5b66c0b6c969996add7"
+  },
+  {
+   "secret": "3c4f02e1a190643f67bd588afd02611ce2dd541eed62bd2142c379a6a52c221f",
+   "ok": "49427d70dddc93935f6714f01fd7b0f2010ea3d671b6095c265e009dada0b226"
+  },
+  {
+   "secret": "25d598b5450e84485dfda457465b74c6927b471e4daf7c914adb91f4141575bc",
+   "ok": "8b016ecf67f63206e65a5049231fc5b7ef7b8d38c8d2a5eb355dd927d23cc486"
+  },
+  {
+   "secret": "b2dde4a435320725bba7ba94fe34a6635cf1ce51b66bbe7ad4e3544efdbcb569",
+   "ok": "8a6e6dcff7c6883b4b6770d81f7ca732c8f10d4e387dcc6f7c7de1b32bae893e"
+  },
+  {
+   "secret": "6bd5e2570e3708fcda2ca3091ff2e0e88871e1cf522e68f8433f9d5cf477f887",
+   "ok": "cb8db076739461c393b4dccbd5caedbca4a0166c78531625f1c4567ecee72f72"
+  },
+  {
+   "secret": "82e88421f93a97186287b10ea644e1c3f9619a5fd7a24fbafb65ebaac3dd1e40",
+   "ok": "d3a7a4aa913dd8e66f2848b41eac5557371afe7fc4734fcb5d4a18e02affaa4b"
+  },
+  {
+   "secret": "b68f5a5b67cf851f9ef25466955be537eb2deeb6479296adf435f211971f9bd2",
+   "ok": "c830733b699eaa599016b0a67cb8063eebdc129c7324ae0e224de5fc3e4eee3f"
+  },
+  {
+   "secret": "0ef2f136e0c1d18ccc2e38b2216bb677c5ae5ad37e44f093ef59b9a00c864902",
+   "ok": "25ca3447ef69964af69d529382dff30661f92be58a664b61824f61e1bc46430d"
+  },
+  {
+   "secret": "537be722602d83217f3d7dde9fbfd67ea2ab43eb3bf90407370e61284e5bec07",
+   "ok": "0ec52963c349e31e01ba168517ce640fef027506006371f518fa452c46f5b782"
+  },
+  {
+   "secret": "5fbc6712a86e85cdda1eb287e560b84ed98bc8115e869c0cb9163b2dd7a7dd42",
+   "ok": "b8c9081c0fedbcb8975f579996aa3347703511340ecafbfe766d24d9897d2a1f"
+  },
+  {
+   "secret": "fad2a8573c2c809728a20443f711ac77fa4e8bf89558fb8afdc3574566c5410a",
+   "ok": "3dce299af34466da996ffb186c76bfa0685dd88cf9f34ff38f80ff19c14d8a2f"
+  },
+  {
+   "secret": "6d0a1e619bd7d82061506968d9bce0986c5469156b4a0e27e3ce3a4f81e646ea",
+   "ok": "77c874af979a0e1a1cfed07b09840483cf0a242ec649a8a208e16bf74a2d83b2"
+  },
+  {
+   "secret": "484a525855adb9497bc2b07d86556501146abd972a3c5187cfe88c81a08b6e19",
+   "ok": "ab097cb1e185530e60ab9d7e1375a37d761aead0ab33823d91153a9adf3a0b9e"
+  },
+  {
+   "secret": "92beb444fe50c31a207f026a3e006d51992ad621c9cee313d567c5fcf1ade9c9",
+   "ok": "53c7124823a051c844807ba6b5fdd74c3e5ea3d234995cd2d69383b1e65a0113"
+  },
+  {
+   "secret": "7023047e1e3210e81f0ebee478c1baba4065eb1f5e6abfc1757c5e22019e64ed",
+   "ok": "c55a58500ad59f23233e4c963e900c6c3d76e385132ba493b8ab92151fcc0b50"
+  },
+  {
+   "secret": "14ec22d3a54a501cfd98df8da98972e47afbc2ec847137c7fbb9fe041603117a",
+   "ok": "250e2765aeca016967cd4bc1ec1636e4297d4ff53ed53729d04fb0a36e7096c9"
+  },
+  {
+   "secret": "8f51587dc38b8a5492e827fb7e1c134dd1e6d3710918cb2ad54a2d17b81fe55e",
+   "ok": "d19c62bbe835831005ba31a3d30c63dfbe6fb5d7a8b24e744a23b817f28f0edc"
+  }
+ ],
+ "verify_secret": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+ "verify": [
+  {
+   "response": "3f1db336f8984c7ba444fcc04814cd778f93973af20cb3c0d5ba024bc78c1148",
+   "ok": null
+  },
+  {
+   "response": "3F1DB336F8984C7BA444FCC04814CD778F93973AF20CB3C0D5BA024BC78C1148",
+   "error": "LaunchHandshakeError",
+   "message": "Owner response did not match the per-launch secret"
+  },
+  {
+   "response": "3f1db336f8984c7ba444fcc04814cd778f93973af20cb3c0d5ba024bc78c114",
+   "error": "LaunchHandshakeError",
+   "message": "Owner response did not match the per-launch secret"
+  },
+  {
+   "response": "3f1db336f8984c7ba444fcc04814cd778f93973af20cb3c0d5ba024bc78c11480",
+   "error": "LaunchHandshakeError",
+   "message": "Owner response did not match the per-launch secret"
+  },
+  {
+   "response": "",
+   "error": "LaunchHandshakeError",
+   "message": "Owner response is missing"
+  },
+  {
+   "response": "0000000000000000000000000000000000000000000000000000000000000000",
+   "error": "LaunchHandshakeError",
+   "message": "Owner response did not match the per-launch secret"
+  },
+  {
+   "response": "\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9",
+   "error": "TypeError",
+   "message": "comparing strings with non-ASCII characters is not supported"
+  },
+  {
+   "response": "x",
+   "error": "LaunchHandshakeError",
+   "message": "Owner response did not match the per-launch secret"
+  }
+ ],
+ "lifecycle": {
+  "issue_after_issue": {
+   "error": "LaunchHandshakeError",
+   "message": "Launch handshake already issued"
+  },
+  "issue_after_verify": {
+   "error": "LaunchHandshakeError",
+   "message": "Launch handshake already consumed"
+  },
+  "verify_after_verify": {
+   "error": "LaunchHandshakeError",
+   "message": "Launch handshake was not issued or already consumed"
+  },
+  "verify_without_issue": {
+   "error": "LaunchHandshakeError",
+   "message": "Launch handshake was not issued or already consumed"
+  },
+  "repr": "LaunchHandshake(<sealed>)"
+ }
+}

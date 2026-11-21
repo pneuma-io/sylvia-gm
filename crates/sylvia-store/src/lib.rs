@@ -10,6 +10,7 @@
 
 pub mod error;
 pub mod handle;
+pub mod launch;
 pub mod owner_lock;
 pub mod pytext;
 pub mod schema;
