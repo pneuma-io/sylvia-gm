@@ -66,6 +66,17 @@ impl From<std::io::Error> for StoreError {
     }
 }
 
+/// A failed `json.loads`: Python's `JSONDecodeError` (a `ValueError`) as `pyjson::loads`
+/// reports it, with its class and text, or a `ValueError` with `pyjson`'s own message for a
+/// declared limit.
+pub(crate) fn json_error(error: sylvia_base::CodedError) -> StoreError {
+    if error.error_type == Some("JSONDecodeError") {
+        StoreError::Coded(error)
+    } else {
+        value_error(error.message)
+    }
+}
+
 /// A Python `ValueError(message)`: the owner replies `command_rejected` with the message.
 pub fn value_error(message: impl Into<String>) -> StoreError {
     sylvia_domain::DomainError::value(message).into()

@@ -40,7 +40,7 @@ impl PlanRow {
 
 /// `json.loads(text)`: a `JSONDecodeError` is a `ValueError`.
 pub(crate) fn json_loads(text: &str) -> StoreResult<Json> {
-    sylvia_base::pyjson::loads(text).map_err(|error| value_error(error.message))
+    sylvia_base::pyjson::loads(text).map_err(crate::error::json_error)
 }
 
 /// A JSON value bound as a SQLite parameter, as `sqlite3` binds the object it parses to.

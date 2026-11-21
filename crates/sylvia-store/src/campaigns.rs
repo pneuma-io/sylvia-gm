@@ -267,8 +267,7 @@ pub fn current_lock_record(connection: &Connection, campaign_id: &str) -> StoreR
 
 /// `sqlite_session._load_value` / `_load_payload`: canonical session JSON, an object.
 pub(crate) fn session_payload(text: &str) -> StoreResult<JsonMap> {
-    let parsed =
-        sylvia_base::pyjson::loads(text).map_err(|error| crate::error::value_error(error.message))?;
+    let parsed = sylvia_base::pyjson::loads(text).map_err(crate::error::json_error)?;
     if crate::actions::dump(&parsed) != text {
         return Err(crate::error::value_error("Stored session JSON is not canonical"));
     }
@@ -281,7 +280,7 @@ pub(crate) fn session_payload(text: &str) -> StoreResult<JsonMap> {
 /// `sqlite_session.session_from_row`.
 pub(crate) fn session_from_row(row: &Named<'_>) -> StoreResult<SessionRecord> {
     let scope = match sylvia_base::pyjson::loads(&row.text("scope_json")?)
-        .map_err(|error| crate::error::value_error(error.message))?
+        .map_err(crate::error::json_error)?
     {
         Json::Array(items) => items.iter().map(json_str).collect(),
         Json::String(text) => text.chars().map(String::from).collect(),
@@ -399,8 +398,7 @@ fn interview_name(
     let Some(content) = content else {
         return Ok(None);
     };
-    let parsed = sylvia_base::pyjson::loads(&py_str(&content))
-        .map_err(|error| crate::error::value_error(error.message))?;
+    let parsed = sylvia_base::pyjson::loads(&py_str(&content)).map_err(crate::error::json_error)?;
     let Json::Object(content) = parsed else {
         return Err(StoreError::Other(format!("'{}' object has no attribute 'get'", python_type(&parsed))));
     };
@@ -474,8 +472,9 @@ fn campaign_index_in(connection: &Connection) -> StoreResult<Vec<CampaignIndexRe
                     )
                     .optional()?;
                 let metadata = match metadata {
-                    Some(text) => sylvia_base::pyjson::loads(&py_str(&text))
-                        .map_err(|error| crate::error::value_error(error.message))?,
+                    Some(text) => {
+                        sylvia_base::pyjson::loads(&py_str(&text)).map_err(crate::error::json_error)?
+                    }
                     None => Json::Object(JsonMap::new()),
                 };
                 let label = match &metadata {

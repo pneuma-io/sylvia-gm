@@ -12,7 +12,7 @@ only from observation (vectors), without reading or following the source, does n
 
 | Rust code | Translates | Upstream version | Licence | Added by |
 | --- | --- | --- | --- | --- |
-| `sylvia-base/src/pyjson.rs` | CPython's JSON encoder rules and float `repr` (`Lib/json/encoder.py`, `Python/dtoa.c` behaviour) | CPython 3.12.11 | PSF License Version 2 | manager |
+| `sylvia-base/src/pyjson.rs`, `pyjson/decode_error.rs` | CPython's JSON encoder rules and float `repr` (`Lib/json/encoder.py`, `Python/dtoa.c` behaviour), and where its decoder finds the first error and how `JSONDecodeError` words it (`Modules/_json.c` scanner, `Lib/json/decoder.py`, `Lib/json/__init__.py`) | CPython 3.12.11 | PSF License Version 2 | manager |
 | `sylvia-base/src/pystr/` | CPython `str` methods, `int()`/`float()` string parsing, `repr` (`Objects/unicodeobject.c`, `Objects/longobject.c`, `Objects/floatobject.c`, `Python/pystrtod.c`) | CPython 3.12.11 | PSF License Version 2 | lanes 1 and 2 |
 | `sylvia-engine/src/pyrandom.rs` | CPython's `random.Random` (`Lib/random.py`, `Modules/_randommodule.c`), including MT19937 | CPython 3.12.11 | PSF License Version 2; MT19937 also BSD-3-Clause (Makoto Matsumoto and Takuji Nishimura) | lane 2 |
 | `sylvia-engine/src/pynum.rs` | CPython's builtin `sum()` (`builtin_sum_impl` in `Python/bltinmodule.c`: the integer and Neumaier-compensated float fast paths and the C `long` bounds) | CPython 3.12.11 | PSF License Version 2 | lane 2 |
