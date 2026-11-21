@@ -40,20 +40,10 @@ fn now_micros() -> i64 {
     i64::try_from(since.as_micros()).unwrap_or(i64::MAX)
 }
 
-/// Python's whitespace for `str.split()` and `str.strip()`.
-pub fn is_python_space(character: char) -> bool {
-    matches!(
-        character,
-        '\t' | '\n' | '\u{0B}' | '\u{0C}' | '\r' | '\u{1C}'..='\u{1F}' | ' ' | '\u{85}' | '\u{A0}'
-            | '\u{1680}' | '\u{2000}'..='\u{200A}' | '\u{2028}' | '\u{2029}' | '\u{202F}'
-            | '\u{205F}' | '\u{3000}'
-    )
-}
-
 /// The whitespace `float()` and `int()` strip: ASCII space, tab, line feed, `\v`, `\f`, `\r`
 /// and the non-ASCII Unicode spaces. Unlike `str.split()`, they keep `\x1c` to `\x1f`.
 fn is_number_space(character: char) -> bool {
-    is_python_space(character) && !('\u{1C}'..='\u{1F}').contains(&character)
+    sylvia_base::pystr::is_space(character) && !('\u{1C}'..='\u{1F}').contains(&character)
 }
 
 /// Remove single underscores between digits, as Python's numeric literals allow; `None` when an
@@ -166,7 +156,7 @@ fn named_zone(zone: &str) -> Option<i64> {
 #[allow(clippy::type_complexity)]
 fn parsedate_tz(data: &str) -> Option<([i64; 6], Option<i64>)> {
     let mut data: Vec<String> =
-        data.split(is_python_space).filter(|s| !s.is_empty()).map(str::to_owned).collect();
+        data.split(sylvia_base::pystr::is_space).filter(|s| !s.is_empty()).map(str::to_owned).collect();
     if data.is_empty() {
         return None;
     }

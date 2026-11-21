@@ -85,9 +85,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:831` | `_discovery_model` | .casefold() | `if preset_id in {"opencode_go", "opencode_zen"} and model_id.casefold().startswith("jev-"):` | |
 | `config/provider_settings.py:1370` | `discover_provider_models` | .casefold() | `and search not in model_id.casefold()` | |
 | `provider/_model_facts.py:270` | `inferred_model_protocol` | .casefold() | `identity = model_id.casefold()` | |
-| `provider/_openai_compat.py:113` | `_InlineReasoningFilter.feed` | .casefold() | `lowered = self._buffer.casefold()` | |
-| `provider/_openai_compat.py:117` | `_InlineReasoningFilter.feed` | .casefold() | `if (index := lowered.find(marker.casefold())) >= 0` | |
-| `provider/_openai_compat.py:155` | `_InlineReasoningFilter._partial_marker_suffix` | .casefold() | `if any(marker.casefold().startswith(suffix) for marker, _ in cls._MARKERS):` | |
+| `provider/_openai_compat.py:113` | `_InlineReasoningFilter.feed` | .casefold() | `lowered = self._buffer.casefold()` || yes |
+| `provider/_openai_compat.py:117` | `_InlineReasoningFilter.feed` | .casefold() | `if (index := lowered.find(marker.casefold())) >= 0` || yes |
+| `provider/_openai_compat.py:155` | `_InlineReasoningFilter._partial_marker_suffix` | .casefold() | `if any(marker.casefold().startswith(suffix) for marker, _ in cls._MARKERS):` || yes |
 | `provider/_reasoning.py:131` | `configure_reasoning` | .casefold() | `model.transport == "anthropic_messages" and wire_id.casefold() == "minimax-m3"` | |
 | `provider/_request_metadata.py:23` | `<module>` | .casefold() | `_OPENCODE_SESSION_HEADER.casefold(),` | |
 | `provider/_request_metadata.py:24` | `<module>` | .casefold() | `_OPENCODE_CLIENT_HEADER.casefold(),` | |

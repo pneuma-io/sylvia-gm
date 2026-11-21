@@ -69,7 +69,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/provider/_admin_audit.py` | 417 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_anthropic.py` | 1,145 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_base.py` | 519 | `sylvia-provider` | ported | `types`, `provider` (trait, `FakeProvider`). `closing_provider_stream` and `release_provider_idle` become dropping the stream and the trait's default `release_idle`. `TimeoutConfig.to_httpx_timeout` lands with the HTTP client. Vectors: `tests/base_vectors.rs` |
-| `src/sylvia_gm/provider/_chat_metadata.py` | 93 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_chat_metadata.py` | 93 | `sylvia-provider` | ported | `chat::ChatCompletionMetadata`, reading SDK models with `construct` semantics (`pyobj`). Vectors: `tests/chat_vectors.rs` |
 | `src/sylvia_gm/provider/_chatgpt.py` | 1,522 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_chatgpt_account.py` | 177 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_chatgpt_model_facts.py` | 61 | `sylvia-provider` | pending | |
@@ -89,8 +89,8 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/provider/_lifecycle.py` | 75 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_model_facts.py` | 277 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_models.py` | 235 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_native_output.py` | 87 | `sylvia-provider` | pending | |
-| `src/sylvia_gm/provider/_openai_compat.py` | 1,339 | `sylvia-provider` | pending | |
+| `src/sylvia_gm/provider/_native_output.py` | 87 | `sylvia-provider` | in progress | `chat::split_chat_content` and `sse::DoneTracker` ported (vectors: `tests/chat_vectors.rs`); `native_output` and `responses_finish` come with the Responses transport |
+| `src/sylvia_gm/provider/_openai_compat.py` | 1,339 | `sylvia-provider` | in progress | Chat Completions pieces ported in `chat` (format_request, the SDK body and key order, chunk and completion parsing, `_InlineReasoningFilter` with Python's casefold-length slicing kept, usage and cache readers, status mapping, preserve flags) and `sse` (the SDK's SSE decoder). Remaining: `OpenAICompatProvider` over HTTP, `ResponsesTransport`. Admin audit note for later: Python stores `_plain(tool_call_delta)`, which for Chat Completions is the pydantic repr string of a `ChoiceDeltaToolCall` |
 | `src/sylvia_gm/provider/_output_policy.py` | 26 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_protocol_routes.py` | 63 | `sylvia-provider` | pending | |
 | `src/sylvia_gm/provider/_reasoning.py` | 379 | `sylvia-provider` | pending | |
