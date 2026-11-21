@@ -103,7 +103,9 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    desktop shell's version); Linux calls use `rustix`. Approved so far:
    `sylvia-store/src/safe_file/windows.rs` (`GetDriveTypeW`, `SetFileInformationByHandle`
    with `FileDispositionInfo`, and `MoveFileExW` with `MOVEFILE_REPLACE_EXISTING |
-   MOVEFILE_WRITE_THROUGH`), mirroring `infrastructure/safe_file.py`'s ctypes calls.
+   MOVEFILE_WRITE_THROUGH`), mirroring `infrastructure/safe_file.py`'s ctypes calls; and
+   `sylvia-provider/src/config/protection/windows.rs` (`CryptProtectData`,
+   `CryptUnprotectData`, `LocalFree`), mirroring `config/_credential_protection.py`'s DPAPI calls.
 
 ## Concurrency
 
