@@ -75,9 +75,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` | |
 | `campaign/rift.py:406` | `materialize_rift_selection` | len() against a limit | `if len(companion_ids) > RIFT_RULESET_COMPANION_MAXIMUM or len(set(companion_ids)) != len(` | |
 | `campaign/rift.py:410` | `materialize_rift_selection` | len() against a limit | `if not isinstance(customization_notes, str) or len(customization_notes) > 4_000:` | |
-| `domain/authority.py:652` | `mechanic_outcome_is_safe` | len() against a limit | `or not 2 <= len(choice.options) <= 16` | |
-| `domain/authority.py:653` | `mechanic_outcome_is_safe` | len() against a limit | `or len(choice.prompt.encode("utf-8")) > 4096` | |
-| `domain/authority.py:667` | `mechanic_outcome_is_safe` | len() against a limit | `or len(option.label.encode("utf-8")) > 1024` | |
+| `domain/authority.py:652` | `mechanic_outcome_is_safe` | len() against a limit | `or not 2 <= len(choice.options) <= 16` | `sylvia-domain` identity_vectors |
+| `domain/authority.py:653` | `mechanic_outcome_is_safe` | len() against a limit | `or len(choice.prompt.encode("utf-8")) > 4096` | `sylvia-domain` identity_vectors |
+| `domain/authority.py:667` | `mechanic_outcome_is_safe` | len() against a limit | `or len(option.label.encode("utf-8")) > 1024` | `sylvia-domain` identity_vectors |
 | `domain/campaign_plan.py:219` | `_validate_party_placements` | len() against a limit | `or not 1 <= len(value) <= 64` | |
 | `domain/campaign_plan.py:249` | `_validate_party_placements` | len() against a limit | `or len(appends) > 16` | |
 | `domain/campaign_plan.py:335` | `parse_starting_party_policy` | len() against a limit | `or len(required) > 64` | |

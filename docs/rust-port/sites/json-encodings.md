@@ -24,7 +24,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `campaign/_folder.py:466` | `_write_status_atomic` | Dump::INDENT2 | `tmp_path.write_text(json.dumps(data, indent=2), encoding="utf-8")` | |
 | `campaign/_folder.py:502` | `_update_status` | Dump::INDENT2 | `tmp_path.write_text(json.dumps(data, indent=2), encoding="utf-8")` | |
 | `domain/model_capability.py:327` | `_canonical_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
-| `domain/package_library.py:573` | `canonical_json_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
+| `domain/package_library.py:573` | `canonical_json_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-domain` identity_vectors |
 | `domain/package_library.py:1480` | `validate_content_declaration_links` | Dump::DEFAULT | `detail = json.dumps(sorted(linked - local)[:8])` | |
 | `domain/package_library.py:1495` | `validate_content_declaration_links` | Dump::DEFAULT | `detail = json.dumps(sorted(local - linked)[:8])` | |
 | `domain/session.py:123` | `builder_dm_handoff_payload_sha256` | Dump::CANONICAL + allow_nan= | `encoded = json.dumps( { "handoff_id": handoff_id, "campaign_id": campaign_id, "builder_session_id": builder_session_id, "dm_session_id": dm_session...` | |

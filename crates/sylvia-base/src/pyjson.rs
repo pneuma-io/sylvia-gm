@@ -15,6 +15,8 @@
 //! - integers outside `i64`/`u64` are rejected by [`loads`]; Python accepts arbitrary size;
 //! - lone UTF-16 surrogates cannot exist in a Rust `String`; Python strings can hold them;
 //! - the `NaN`/`Infinity` literals Python accepts on input are rejected.
+//! - JSON nested 128 or more arrays or objects deep is rejected by [`loads`] (`serde_json`'s
+//!   recursion limit; 127 levels read); Python reads roughly a thousand, its interpreter stack.
 
 use crate::{CodedError, Json};
 use std::fmt::Write as _;
@@ -393,6 +395,16 @@ mod tests {
         assert!(loads(r#""123456789012345678901234567890""#).is_ok());
         assert!(loads("123456789012345678901234567890.0").is_ok());
         assert!(loads(r#""escaped \" 99999999999999999999999""#).is_ok());
+    }
+
+    #[test]
+    fn nesting_is_limited_to_127_levels() {
+        let nested = |depth: usize| format!("{}{}", "[".repeat(depth), "]".repeat(depth));
+        assert!(loads(&nested(127)).is_ok());
+        assert!(loads(&nested(128)).is_err());
+        let objects = |depth: usize| format!("{}1{}", "{\"a\":".repeat(depth), "}".repeat(depth));
+        assert!(loads(&objects(127)).is_ok());
+        assert!(loads(&objects(128)).is_err());
     }
 
     #[test]
