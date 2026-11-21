@@ -9,7 +9,7 @@ file; a row moves to another lane only through the manager.
 
 | Python file | Lines | Rust target | Status | Notes |
 | --- | ---: | --- | --- | --- |
-| `src/sylvia_gm/application/authority.py` | 9,922 | `sylvia-store::authority` | pending | |
+| `src/sylvia_gm/application/authority.py` | 9,922 | `sylvia-store::authority` | in progress | `campaign_index` (`_campaign_index_entry`, `CampaignIndexEntry`, `CampaignSessionIndexEntry`; `_operation()` refuses a closed owner), proven against `AuthorityOwner.campaign_index()` in `tests/vectors/campaigns`. |
 | `src/sylvia_gm/application/campaign_inventory.py` | 231 | `sylvia-app::campaign_inventory` | pending | |
 | `src/sylvia_gm/application/campaign_rules_update.py` | 816 | `sylvia-app::campaign_rules_update` | pending | |
 | `src/sylvia_gm/application/campaign_sequels.py` | 274 | `sylvia-app::campaign_sequels` | pending | |

@@ -9,6 +9,7 @@
 //! exact schema identity check. The stored-content verifiers and transaction families follow.
 
 pub mod actions;
+pub mod authority;
 pub mod backup;
 pub mod campaigns;
 pub mod error;
