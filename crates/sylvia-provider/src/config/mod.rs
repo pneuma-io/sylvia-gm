@@ -13,12 +13,15 @@
 pub mod env;
 pub mod loader;
 pub mod merge;
+pub mod presets;
 pub mod protection;
+pub mod provider_settings;
 mod pyvalue;
 pub mod resolver;
 pub mod user_settings;
 
 pub use loader::{load_config, provider_credentials, ProviderDef, Secret, SylviaGMConfig};
+pub use pyvalue::{from_json as data_from_json, reply_json};
 pub use sylvia_base::pyyaml::Data;
 
 use std::sync::{Condvar, Mutex};
@@ -49,6 +52,25 @@ impl ConfigFailure {
     /// Whether Python raises `ConfigError`.
     pub fn is_config_error(&self) -> bool {
         matches!(self, Self::Config(_))
+    }
+
+    /// The owner's reply error, as `owner_process` builds it: a `ConfigError` or any
+    /// `ValueError` (its subclasses included) is `command_rejected` with its class as
+    /// `error_type`; `None` for anything else, which the owner reports as an internal error.
+    pub fn rejection(&self) -> Option<sylvia_base::CodedError> {
+        let (message, class) = match self {
+            Self::Config(message) => (message.as_str(), "ConfigError"),
+            Self::Python { class, message }
+                if matches!(
+                    *class,
+                    "ValueError" | "UnicodeError" | "UnicodeDecodeError" | "JSONDecodeError"
+                ) =>
+            {
+                (message.as_str(), *class)
+            }
+            Self::Python { .. } => return None,
+        };
+        Some(sylvia_base::CodedError::rejected(message).with_error_type(class))
     }
 }
 
