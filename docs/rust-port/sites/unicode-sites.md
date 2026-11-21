@@ -16,14 +16,14 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/bundled_packages.py:147` | `_package_payload` | .casefold() | `if path.suffix.casefold() in _TEXT_PACKAGE_SUFFIXES:` | |
-| `application/bundled_packages.py:476` | `bundled_rift_source_catalog` | .casefold() | `return tuple(path for path in values if not needle or needle in path.casefold())[:512]` | |
+| `application/bundled_packages.py:147` | `_package_payload` | .casefold() | `if path.suffix.casefold() in _TEXT_PACKAGE_SUFFIXES:` |  `sylvia-app` bundled_vectors |
+| `application/bundled_packages.py:476` | `bundled_rift_source_catalog` | .casefold() | `return tuple(path for path in values if not needle or needle in path.casefold())[:512]` |  `sylvia-app` bundled_vectors |
 | `application/character_card_import.py:154` | `_asset_uri` | .isspace() | `if len(uri) > 4096 or "\x00" in uri or any(c.isspace() for c in uri):` | |
 | `application/character_profiles.py:134` | `validate_character_profile` | .isspace() | `if any(character.isspace() for character in uri):` | |
 | `application/import_repair.py:132` | `_folded_portable_name` | unicodedata.normalize | `if unicodedata.normalize("NFC", name) != name:` | |
 | `application/import_repair.py:134` | `_folded_portable_name` | .casefold() | `return name.casefold()` | |
 | `application/library_sources.py:41` | `LibrarySourceReader.candidates` | .casefold() | `folded = query.casefold()` | |
-| `application/package_materialization.py:161` | `materialize_package_archive` | .casefold() | `folded = path.casefold()` | |
+| `application/package_materialization.py:161` | `materialize_package_archive` | .casefold() | `folded = path.casefold()` |  `sylvia-app` bundled_vectors |
 | `builder/_package_materializer.py:176` | `_read_payloads` | .casefold() | `normalized = relative.casefold()` | |
 | `builder/_package_record_edits.py:193` | `apply_package_record_edits` | .casefold() | `if len({name.casefold() for name in expected_paths}) != len(expected_paths):` | |
 | `builder/_plan_snapshot_materializer.py:179` | `_removed_paths` | .casefold() | `if len({item.casefold() for item in result}) != len(result):` | |
