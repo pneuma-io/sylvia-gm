@@ -13,6 +13,7 @@ fn base(name: &str) -> Vec<u8> {
     let relative = match name {
         "riichi" => "tests/vectors/packages/seed_riichi.sqlite3.gz",
         "story" => "tests/vectors/session_pages/seed.sqlite3.gz",
+        "constructed" => "tests/vectors/campaigns/seed.sqlite3.gz",
         "children" => "tests/vectors/stored_authority/children.sqlite3.gz",
         "archived" => "tests/vectors/stored_authority/archived.sqlite3.gz",
         "trashed" => "tests/vectors/stored_authority/trashed.sqlite3.gz",

@@ -1681,6 +1681,722 @@
     "code": "schema_identity_mismatch",
     "message": "Saved campaign records failed an integrity check"
    }
+  },
+  {
+   "name": "constructed_untouched",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "operation_kind_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET operation_kind = 'rename_campaign' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "operation_hash_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_sha256 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "operation_payload_unsafe",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"canonical_input\":{\"private_reasoning\":1},\"lane\":\"customize\",\"operation_id\":\"begin-ruleless\",\"operation_kind\":\"begin_campaign_construction\"}', semantic_payload_sha256 = 'fad9bcad914fff152492547478743e5de3c48199c09b2cc70ca72422ee52b9bb' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "operation_payload_kind_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"canonical_input\":{\"fixture\":\"campaign-index\"},\"lane\":\"customize\",\"operation_id\":\"begin-ruleless\",\"operation_kind\":\"rename_campaign\"}', semantic_payload_sha256 = '17360dc416f490b90164fe8aea6c536cbc83fa36bd64089961a6b2276e29f6ec' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "result_revision_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"lane\":\"customize\",\"resulting_revision\":5}' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign operation result authority is invalid"
+   }
+  },
+  {
+   "name": "result_revision_float",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"lane\":\"customize\",\"resulting_revision\":1.0}' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "result_lane_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"lane\":\"speedrun\",\"resulting_revision\":1}' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign operation lane authority is invalid"
+   }
+  },
+  {
+   "name": "result_lane_differs_from_construction",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"lane\":\"quick_start\",\"resulting_revision\":1}' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_result_extra_key",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"f5ec52ed-0108-4475-92e1-bc7656670b14\",\"note\":\"x\",\"resulting_revision\":0}' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign operation lane authority is invalid"
+   }
+  },
+  {
+   "name": "completion_result_sha_uppercase",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"canonical_representation_sha256\":\"99093306DCE6FEC32CED921D658CAFA77F042B7327ADD031AD798454037AD1FC\",\"lane\":\"customize\",\"resulting_revision\":2}' WHERE operation_id = 'construction-complete-4a4b97133864fe33934ec185'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "completion_result_without_sha",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"lane\":\"customize\",\"resulting_revision\":2}' WHERE operation_id = 'construction-complete-4a4b97133864fe33934ec185'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign operation result kind is invalid"
+   }
+  },
+  {
+   "name": "completion_result_sha_number",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"1509bb0a-9bf1-4331-8a11-8783593942a4\",\"canonical_representation_sha256\":7,\"lane\":\"customize\",\"resulting_revision\":2}' WHERE operation_id = 'construction-complete-4a4b97133864fe33934ec185'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign operation result kind is invalid"
+   }
+  },
+  {
+   "name": "result_not_object",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '[]' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "operation_basis_turn_missing",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET basis_turn_id = 'turn-gone' WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "operation_basis_after_result",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET basis_revision = 3 WHERE operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "operation_orphaned",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO campaign_operations (operation_id, operation_kind, campaign_id, semantic_payload_json, semantic_payload_sha256, result_json, basis_turn_id, basis_lock_id, basis_revision, resulting_revision) SELECT 'confirm-spare', operation_kind, campaign_id, semantic_payload_json, semantic_payload_sha256, result_json, basis_turn_id, basis_lock_id, basis_revision, resulting_revision FROM campaign_operations WHERE operation_id = 'confirm-interview'",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-spare\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '4688dd156cfbe8dea20f811eae10f63a87ed2910ca808a0d85bfee8f0d499758' WHERE operation_id = 'confirm-spare'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_begin_revision_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET begin_revision = 2 WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_begin_revision_text",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET begin_revision = 'one' WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_input_changed",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET canonical_input_json = '{\"fixture\":\"other\"}' WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_input_not_canonical",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET canonical_input_json = '{\"fixture\": \"campaign-index\"}' WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_plan_changed",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET canonical_plan_json = '{\"campaign_plan_markdown\":\"# Other\\n\"}' WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_representation_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET canonical_representation_sha256 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_lane_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET lane = 'quick_start' WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "unbegun_with_lane",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET lane = 'customize' WHERE confirmation_operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "incomplete_with_plan",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET completion_operation_id = NULL WHERE begin_operation_id = 'begin-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "construction_confirmation_revision_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_constructions SET confirmation_revision = 1 WHERE confirmation_operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_display_name_edited",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"Another Name\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'c3a3d8a1a95fc26bbe2a8b779bcd1e0cf4090e797c82eb6e8378d0f21985ccc9' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "confirmation_display_name_blank",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\" \",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'f86fe9c05a27361b0a1850a7560d645583e37991327321715b8a582333081447' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_display_name_missing",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '2a62641d38285e4906638a42ce84dc276fb5952a0b561cb734fbb2ce2d140cdb' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_turn_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-other\"}', semantic_payload_sha256 = '42ffb7e6ba17d63e3201ca642e24b7d4af7b40dca8653a2ae8966832de471afa' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_lock_payload_changed",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-ruleless\"},\"display_name\":\"Ruleless Road\",\"operation_id\":\"confirm-ruleless\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[{\"package_id\":\"pneuma.other\"}],\"turn_id\":\"turn-ruleless-builder\"}', semantic_payload_sha256 = 'e609fa767d5692e857962250e9f9d1bcbe095d29752393392c785c6da10c4115' WHERE operation_id = 'confirm-ruleless'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_extra_member",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"note\":\"x\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'a3445821f3d6c03710f58b78c36568189de153ec9fa4ad4ba2e28226629454c3' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_participants_signed",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"participants\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'c2d59dc833b6f5c40827e531a12542b238503f603412c149e979334b082fd422' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "confirmation_participants_differ",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"participants\":[{\"participant_id\":\"hero\"}],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'c8da5bd6d246cf3738725184c846f77946942cd9d8ca43d7efc2d268758fde20' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_initial_state_list",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"initial_state\":[],\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '6c6ef8a1016fb21572793cdac45d8f520789014b1d5d0c73580360f81afe116a' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "confirmation_initial_state_object",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"initial_state\":{},\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '14cc95ba3463661e4b4709f626d9777e30b76018d4edc6fc1dede2d5e844c6b1' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_candidate_number",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_candidate_id\":5,\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'bc20c7f59d9a6e740642fbe530d90768f78b55c5d7142b1fd0ad3598ec3759d6' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_candidate_unknown",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_candidate_id\":\"candidate-gone\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '032038ced1fed5d92c10a2400296fa8d709d880faecbc3192ec80a59ad38fd53' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   }
+  },
+  {
+   "name": "confirmation_builder_not_object",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":\"builder-interview\",\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '88ee5013eb52f71b7c4d225f06712b2dd3db4042ca69036d616bfb87aa4836e2' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_builder_skill_other",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD RULESET\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '25d4d62438c1801f457efe6a8a8bfd2ebd3fc09617ea7d0187a60a010dd1e2dd' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_builder_skill_unknown",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CASTLE\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'c24ea3cf295232952694f3a69c26a0e475cf75bb98892ab2a13e5dbb0b4d9704' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_builder_session_unknown",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-gone\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = 'bd363fa67e734bcbe86041ea0a59310cc42949218ef52973a46ee19ba4f3dbfa' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_builder_provider_padded",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":\"synthetic.provider/model\",\"provider_id\":\" synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '3dcfcc9ebafb69fc9baef43dacefb63dc70d51a856e15be223b0e49a62f15f83' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_builder_model_number",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"builder_session\":{\"model_id\":3,\"provider_id\":\"synthetic.provider\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"builder-interview\"},\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '5caf7afb0048a63baacd6f3c2a008b23e2fb291bc20be3970ee10cb096b71520' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "confirmation_builder_dropped",
+   "base": "constructed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"display_name\":\"New campaign interview\",\"operation_id\":\"confirm-interview\",\"operation_kind\":\"confirm_new_campaign\",\"package_lock\":[],\"turn_id\":\"turn-interview\"}', semantic_payload_sha256 = '02feff96b38c261bca12975803ad76b7ed4a2d000dbc7d6a81053176d3d467c0' WHERE operation_id = 'confirm-interview'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "continuity_session_dropped",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"basis_message_ids\":[\"u-1\"],\"campaign_id\":\"campaign-story\",\"kind\":\"plan_progress\",\"operation_id\":\"op-1\",\"operation_kind\":\"commit_campaign_continuity\",\"payload\":{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"},\"record_id\":\"act-1\",\"status\":\"active\",\"turn_id\":\"turn-2\"}', semantic_payload_sha256 = '87ecc107090136797590cd4367c72e0bef80077ddf16a48db50f7247e89ac6d3' WHERE operation_id = 'op-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "continuity_status_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET semantic_payload_json = '{\"basis_message_ids\":[\"u-1\"],\"campaign_id\":\"campaign-story\",\"kind\":\"plan_progress\",\"operation_id\":\"op-1\",\"operation_kind\":\"commit_campaign_continuity\",\"payload\":{\"plan_item_id\":\"act-1\",\"status\":\"resolved\"},\"record_id\":\"act-1\",\"session_id\":\"dm-1\",\"status\":\"withdrawn\",\"turn_id\":\"turn-2\"}', semantic_payload_sha256 = '15bcf78bf7e6574543a26dd4389bd015c21e0c1e042120962eddc26af692a2c7' WHERE operation_id = 'op-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "continuity_result_record_other",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"campaign-story\",\"kind\":\"plan_progress\",\"operation_id\":\"op-1\",\"record_id\":\"record-other\",\"resulting_revision\":3}' WHERE operation_id = 'op-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "continuity_resulting_two_ahead",
+   "base": "story",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET basis_revision = 1 WHERE operation_id = 'op-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_transition_session_dropped",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_lifecycle_transitions SET designated_session_id = NULL"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_result_writer_other",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"campaign-story\",\"lifecycle\":\"archived\",\"resulting_revision\":9,\"session_id\":\"dm-1\",\"writer\":\"dm\"}' WHERE operation_id = 'life-0'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
+  },
+  {
+   "name": "archived_result_lifecycle_unknown",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"campaign-story\",\"lifecycle\":\"gone\",\"resulting_revision\":9,\"session_id\":\"dm-1\",\"writer\":\"none\"}' WHERE operation_id = 'life-0'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign lifecycle result authority is invalid"
+   }
+  },
+  {
+   "name": "archived_result_session_number",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"campaign-story\",\"lifecycle\":\"archived\",\"resulting_revision\":9,\"session_id\":5,\"writer\":\"none\"}' WHERE operation_id = 'life-0'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign lifecycle session authority is invalid"
+   }
+  },
+  {
+   "name": "archived_result_extra_key",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET result_json = '{\"campaign_id\":\"campaign-story\",\"lifecycle\":\"archived\",\"note\":\"x\",\"resulting_revision\":9,\"session_id\":\"dm-1\",\"writer\":\"none\"}' WHERE operation_id = 'life-0'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Campaign lifecycle result authority is invalid"
+   }
+  },
+  {
+   "name": "archived_operation_basis_other",
+   "base": "archived",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_operations SET basis_revision = 7 WHERE operation_id = 'life-0'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign construction records failed an integrity check"
+   }
   }
  ]
 }
