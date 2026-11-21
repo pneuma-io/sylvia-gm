@@ -22,6 +22,9 @@
       '<p data-rules="status" role="status" aria-live="polite"></p>';
     const el = name => root.querySelector(`[data-rules="${name}"]`);
     const status = text => { el('status').textContent = text; };
+    // The desktop host rejects with "owner_code: message"; show only the owner's words.
+    const words = error => String(error?.message || error || '').replace(/^Error:\s*/, '')
+      .replace(/^[a-z]+(?:_[a-z]+)+:\s+/, '').trim();
     const text = (parent, tag, value) => {
       const node = doc.createElement(tag); node.textContent = value; parent.append(node); return node;
     };
@@ -53,7 +56,7 @@
         status(`Current: ${result.current_label}. ` + (available
           ? 'Select a snapshot to check against your saved campaign.'
           : 'No other eligible snapshot is installed for this Ruleset and Setting.'));
-      } catch (error) { if (request === generation) status(String(error.message || error)); }
+      } catch (error) { if (request === generation) status(words(error)); }
     });
     el('versions').addEventListener('change', () => { ++generation; clear(); status('Preview this selection before adopting.'); });
     el('preview').addEventListener('click', async () => {
@@ -85,7 +88,7 @@
         el('cancel').hidden = false;
         status(result.compatible ? 'Compatible with unchanged saved values. Review, then choose Adopt.'
           : 'No changes applied. Resolve these conflicts before previewing again.');
-      } catch (error) { if (request === generation) status(String(error.message || error)); }
+      } catch (error) { if (request === generation) status(words(error)); }
     });
     el('cancel').addEventListener('click', () => { ++generation; clear(); status('Review cancelled. No changes applied.'); });
     el('adopt').addEventListener('click', async () => {
@@ -113,7 +116,7 @@
       } catch (error) {
         // Keep the exact operation identity for an acknowledgement-loss retry.
         if (current(preview.campaign_id, request))
-          status(`${error.message || error} Review again if the campaign changed; retry uses the same adoption request.`);
+          status(`${words(error)} Review again if the campaign changed; retry uses the same adoption request.`);
       } finally { ['load', 'versions', 'preview', 'adopt', 'cancel'].forEach(name => { el(name).disabled = false; }); }
     });
     return { reset() { ++generation; clear(); el('selection').hidden = true; el('preview').hidden = true; status('Choose a version for the selected campaign.'); } };

@@ -319,7 +319,8 @@ const SylviaGMFrontend = (() => {
       dispatch: dispatchPanelWindowRequest, selection: applyPanelSelection,
       visible: (surface) => !['encounter', 'inventory'].includes(surface.renderer) || Boolean(panelContent(surface)),
       busy: () => selectedSessionIsWorking() || campaignDisplayPending(),
-      status: (text) => { setInlineStatus(String(text), 'panels'); },
+      // A rejected panel request arrives as the host's error; show only the owner's words.
+      status: (text) => { setInlineStatus(ownerErrorText(text), 'panels'); },
     });
     return panelHost;
   }
@@ -1348,7 +1349,7 @@ const SylviaGMFrontend = (() => {
       try {
         await gamePanels().init();
       } catch (error) {
-        setInlineStatus(`Could not load campaign panels: ${error}. Close this window to return the panels to the sidebar, then try again.`, 'panels');
+        setInlineStatus(`Could not load campaign panels: ${ownerErrorText(error)}. Close this window to return the panels to the sidebar, then try again.`, 'panels');
       }
       return;
     }
@@ -3066,7 +3067,7 @@ const SylviaGMFrontend = (() => {
       }
     } catch (error) {
       refreshPendingLogin = false;
-      status.textContent = String(error && error.message || error || 'ChatGPT connection unavailable.');
+      status.textContent = ownerErrorText(error) || 'ChatGPT connection unavailable.';
     } finally {
       buttons.forEach((button) => { button.disabled = false; });
       buttons.forEach((button) => {
@@ -3299,7 +3300,7 @@ const SylviaGMFrontend = (() => {
       }
     } catch (error) {
       pollAgain = false;
-      status.textContent = String(error && error.message || error || 'Claude Code connection unavailable.');
+      status.textContent = ownerErrorText(error) || 'Claude Code connection unavailable.';
     } finally {
       buttons.forEach((button) => { button.disabled = false; });
       claudeRequestBusy = false;
@@ -14854,6 +14855,13 @@ const SylviaGMFrontend = (() => {
     const payload = projection && projection.safe_payload || {};
     return `${kind}-${payload.action_id || projection && projection.action_id ||
       payload.interruption_id || ''}`;
+  }
+
+  // An error's text for a status line. The desktop host rejects with "owner_code: message";
+  // show only the owner's words, wherever the error is shown (#240).
+  function ownerErrorText(error) {
+    return String(error?.message || error || '').replace(/^Error:\s*/, '')
+      .replace(/^[a-z]+(?:_[a-z]+)+:\s+/, '').trim();
   }
 
   // The desktop host rejects with "owner_code: message"; show only the owner's words (#223).
