@@ -53,7 +53,12 @@ fn guardrail_matches_python_on_this_platform() {
     let root_text = guardrail.allowed_root().to_owned();
     let separator = if cfg!(windows) { '\\' } else { '/' };
     let parent_text = root_text[..root_text.rfind(separator).unwrap()].to_owned();
-    let mask = |text: &str| text.replace(&root_text, "<ROOT>").replace(&parent_text, "<PARENT>");
+    let mask = |text: &str| {
+        text.replace(&root_text, "<ROOT>")
+            .replace(&root_text.to_uppercase(), "<ROOT-UPPER>")
+            .replace(&parent_text, "<PARENT>")
+            .replace(&parent_text.to_uppercase(), "<PARENT-UPPER>")
+    };
     let expand = |raw: &str| {
         raw.replace("<ABSROOT-UPPER>", &root_text.to_uppercase())
             .replace("<ABSROOT>", &root_text)

@@ -54,7 +54,7 @@ const INTERNAL_ROOTS: [&str; 1] = [".builder-sources-purge-pending"];
 #[cfg(windows)]
 const EMBEDDED_NULL: &str = "stat: embedded null character in path";
 #[cfg(not(windows))]
-const EMBEDDED_NULL: &str = "lstat: embedded null character in path";
+const EMBEDDED_NULL: &str = "embedded null byte";
 
 impl PathGuardrail {
     /// `PathGuardrail(allowed_root)`: the root, resolved.

@@ -12,7 +12,8 @@ Rust test reads the one for the platform it runs on.
 The script builds a small project tree in a fresh temporary directory (files, folders, the
 internal and read-only roots, and a symbolic link where the platform allows one), then validates
 raw paths against it for reading and writing. Outcomes are the resolved path or the error text,
-with the tree's location written as `<ROOT>` and its parent as `<PARENT>`, so no machine path is
+with the tree's location written as `<ROOT>` and its parent as `<PARENT>` (`<ROOT-UPPER>` and
+`<PARENT-UPPER>` for their upper-case forms, which POSIX keeps unresolved), so no machine path is
 recorded. The Rust test builds the same tree and substitutes its own locations.
 This script is reference tooling for the port and is retired with the Python source.
 """
@@ -73,7 +74,9 @@ def build(base: Path) -> tuple[Path, list[str]]:
 
 
 def masked(text: str, root: Path, parent: Path) -> str:
-    for value, mark in ((str(root), "<ROOT>"), (str(parent), "<PARENT>")):
+    marks = ((str(root), "<ROOT>"), (str(root).upper(), "<ROOT-UPPER>"), (str(parent), "<PARENT>"),
+             (str(parent).upper(), "<PARENT-UPPER>"))
+    for value, mark in marks:
         text = text.replace(value, mark)
     return text
 
@@ -107,7 +110,7 @@ def main() -> None:
         text = json.dumps({"python": sys.version.split()[0], "platform": PLATFORM, "links": links,
                            "dirs": TREE_DIRS, "files": TREE_FILES, "link_targets": dict(LINKS), "cases": cases},
                           ensure_ascii=True, indent=1) + "\n"
-        for marker in (str(base), os.path.expanduser("~")):
+        for marker in (str(base), str(base).upper(), os.path.expanduser("~")):
             assert marker not in text, "a machine path leaked into the vectors"
         OUTPUT.write_text(text, encoding="utf-8", newline="\n")
         print(PLATFORM, len(cases), "cases, links:", links)
