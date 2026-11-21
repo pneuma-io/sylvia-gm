@@ -1,0 +1,230 @@
+{
+ "python": "3.12.11",
+ "campaign_index": [
+  {
+   "campaign": {
+    "campaign_id": "campaign-a2",
+    "display_name": "Alpha",
+    "lifecycle": "active",
+    "writer": "dm",
+    "revision": 0
+   },
+   "package_lock": [],
+   "package_labels": [],
+   "session_activity_ordinal": 0,
+   "turns": [
+    [
+     "turn-campaign-a2",
+     "open"
+    ]
+   ],
+   "top_level_sessions": [],
+   "handoffs": [],
+   "interview_name": null
+  },
+  {
+   "campaign": {
+    "campaign_id": "campaign-a1",
+    "display_name": "alpha",
+    "lifecycle": "active",
+    "writer": "dm",
+    "revision": 0
+   },
+   "package_lock": [],
+   "package_labels": [],
+   "session_activity_ordinal": 0,
+   "turns": [
+    [
+     "turn-campaign-a1",
+     "open"
+    ]
+   ],
+   "top_level_sessions": [],
+   "handoffs": [],
+   "interview_name": null
+  },
+  {
+   "campaign": {
+    "campaign_id": "campaign-b",
+    "display_name": "beta",
+    "lifecycle": "active",
+    "writer": "dm",
+    "revision": 0
+   },
+   "package_lock": [],
+   "package_labels": [],
+   "session_activity_ordinal": 0,
+   "turns": [
+    [
+     "turn-campaign-b",
+     "open"
+    ]
+   ],
+   "top_level_sessions": [],
+   "handoffs": [],
+   "interview_name": null
+  },
+  {
+   "campaign": {
+    "campaign_id": "campaign-clockwork",
+    "display_name": "clockwork Vale",
+    "lifecycle": "active",
+    "writer": "dm",
+    "revision": 0
+   },
+   "package_lock": [
+    {
+     "package_id": "synthetic.actions",
+     "version": "1.0.0",
+     "sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+     "role": "primary",
+     "load_order": 0,
+     "dependencies": [],
+     "capabilities": [
+      "synthetic.checks"
+     ]
+    }
+   ],
+   "package_labels": [
+    [
+     "synthetic.actions",
+     "Synthetic action runs"
+    ]
+   ],
+   "session_activity_ordinal": 4,
+   "turns": [
+    [
+     "turn-clockwork",
+     "open"
+    ]
+   ],
+   "top_level_sessions": [
+    {
+     "session_id": "dm-clockwork",
+     "campaign_id": "campaign-clockwork",
+     "role": "dm",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    }
+   ],
+   "handoffs": [],
+   "interview_name": null
+  },
+  {
+   "campaign": {
+    "campaign_id": "06f8873c-85cc-40f9-b6ee-6f4410b643d0",
+    "display_name": "New campaign interview",
+    "lifecycle": "active",
+    "writer": "builder",
+    "revision": 0
+   },
+   "package_lock": [],
+   "package_labels": [],
+   "session_activity_ordinal": 6,
+   "turns": [
+    [
+     "turn-interview",
+     "open"
+    ]
+   ],
+   "top_level_sessions": [
+    {
+     "session_id": "builder-interview",
+     "campaign_id": "06f8873c-85cc-40f9-b6ee-6f4410b643d0",
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": "BUILD CAMPAIGN PLAN",
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    }
+   ],
+   "handoffs": [],
+   "interview_name": "Moonlit Keep"
+  },
+  {
+   "campaign": {
+    "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+    "display_name": "Ruleless Road",
+    "lifecycle": "active",
+    "writer": "dm",
+    "revision": 4
+   },
+   "package_lock": [],
+   "package_labels": [],
+   "session_activity_ordinal": 1,
+   "turns": [
+    [
+     "turn-ruleless-builder",
+     "completed"
+    ]
+   ],
+   "top_level_sessions": [
+    {
+     "session_id": "builder-ruleless",
+     "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+     "role": "builder",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": "BUILD CAMPAIGN PLAN",
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    },
+    {
+     "session_id": "session-dm-db362d269262fb8b779fd4dc",
+     "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+     "role": "dm",
+     "provider_id": "synthetic.provider",
+     "model_id": "synthetic.provider/model",
+     "status": "active",
+     "parent_session_id": null,
+     "selected_skill": null,
+     "scope": [],
+     "reasoning_effort": null,
+     "reasoning_effort_once": null
+    }
+   ],
+   "handoffs": [
+    {
+     "handoff_id": "builder-dm-handoff-db362d269262fb8b779fd4dc",
+     "campaign_id": "eef90020-5306-4384-a089-502e0d6888e2",
+     "builder_session_id": "builder-ruleless",
+     "dm_session_id": "session-dm-db362d269262fb8b779fd4dc",
+     "package_lock_id": "lock-58ef0adb8f4392a4f8a4e5d41e95d45686d44343",
+     "package_candidate_id": null,
+     "plan_id": "campaign-plan-db362d269262fb8b779fd4dc",
+     "plan_revision": 1,
+     "plan_content_sha256": "42246c5ec114705fc40e3e3a44dc7c5b1c246bfe5d68d55b3fc03e810274f7e9",
+     "expected_revision": 3,
+     "resulting_campaign_revision": 4,
+     "chronology_ordinal": 1,
+     "completed_turn_id": "turn-ruleless-builder",
+     "model_guidance": {
+      "minimum_tier_id": null,
+      "model_id": "synthetic.provider/model",
+      "override_accepted": false,
+      "placement_evidence_sha256": null,
+      "placement_tier_id": null,
+      "registry_version": "sylvia.capability.registry.v1",
+      "status": "not_applicable",
+      "warning_code": null
+     },
+     "payload_sha256": "eb5b73ec12dab96e5684e8aa230991d7b9b2764a416def41ef4eb05dc113d46f"
+    }
+   ],
+   "interview_name": null
+  }
+ ]
+}

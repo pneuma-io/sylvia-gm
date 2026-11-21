@@ -344,7 +344,7 @@ impl AuthorityStore {
         .iter()
         .map(|row| {
             let version = crate::pytext::py_int(&row[0])
-                .ok_or_else(|| StoreError::Other("invalid literal for int() with base 10".into()))?;
+                .ok_or_else(|| crate::error::value_error("invalid literal for int() with base 10"))?;
             Ok((version, py_str(&row[1]), py_str(&row[2])))
         })
         .collect::<StoreResult<_>>()?;

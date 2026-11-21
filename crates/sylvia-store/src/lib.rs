@@ -10,6 +10,7 @@
 
 pub mod actions;
 pub mod backup;
+pub mod campaigns;
 pub mod error;
 pub mod handle;
 pub mod launch;

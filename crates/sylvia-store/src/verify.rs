@@ -95,9 +95,8 @@ fn migration_rows(connection: &Connection) -> StoreResult<MigrationRows> {
     )?;
     rows.iter()
         .map(|row| {
-            let version = py_int(&row[0]).ok_or_else(|| {
-                crate::error::StoreError::Other("invalid literal for int() with base 10".into())
-            })?;
+            let version = py_int(&row[0])
+                .ok_or_else(|| crate::error::value_error("invalid literal for int() with base 10"))?;
             Ok((version, py_str(&row[1]), py_str(&row[2])))
         })
         .collect()
