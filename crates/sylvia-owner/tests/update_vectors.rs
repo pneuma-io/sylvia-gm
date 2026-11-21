@@ -6,6 +6,7 @@ mod support;
 use serde_json::{json, Value as J};
 use std::collections::BTreeMap;
 use support::{temporary_folder, Scripted};
+use sylvia_base::pyurl::{unquote_strict, urlsplit};
 use sylvia_base::CodedResult;
 use sylvia_owner::desktop_update::discovery::{discover, retain_current_manifest};
 use sylvia_owner::desktop_update::manifest::{
@@ -15,7 +16,6 @@ use sylvia_owner::desktop_update::manifest::{
 use sylvia_owner::desktop_update::transport::{
     check_final_location, check_redirect, download_artifact, metadata_bytes, official_request, Cancel,
 };
-use sylvia_owner::desktop_update::url::{unquote_strict, urlsplit};
 
 fn vectors() -> &'static J {
     static VECTORS: std::sync::OnceLock<J> = std::sync::OnceLock::new();

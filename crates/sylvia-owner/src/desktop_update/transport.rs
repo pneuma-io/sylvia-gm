@@ -9,11 +9,11 @@
 use super::manifest::{Manifest, MANIFEST_LIMIT, OFFICIAL_RELEASES};
 use super::storage::stage_identity;
 use super::update_error;
-use super::url::{has_bare_percent, unquote_strict, urlsplit};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use sylvia_base::pyurl::{has_bare_percent, unquote_strict, urlsplit};
 use sylvia_base::{CodedError, CodedResult};
 
 /// `_CHUNK`.

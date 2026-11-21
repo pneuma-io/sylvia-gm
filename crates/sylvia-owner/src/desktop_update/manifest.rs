@@ -5,12 +5,12 @@
 //! `update_vectors` compares every refusal and every accepted manifest with the snapshot.
 
 use super::update_error;
-use super::url::{has_bare_percent, unquote_strict, urlsplit};
 use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, HashSet};
 use std::sync::OnceLock;
 use sylvia_base::pyjson;
+use sylvia_base::pyurl::{has_bare_percent, unquote_strict, urlsplit};
 use sylvia_base::{CodedError, CodedResult, Json};
 
 /// `MANIFEST_LIMIT`.
