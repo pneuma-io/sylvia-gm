@@ -5,7 +5,7 @@ Run with the snapshot's own Windows interpreter, from the repository root:
     .venv/Scripts/python.exe -I crates/sylvia-base/tests/vectors/generate_winreg_vectors.py
 
 Each value below is written with `reg import` into a scratch key under
-HKEY_CURRENT_USER\\Software\\sylvia-gm-port-tests (deleted afterwards), as raw bytes, so the
+HKEY_CURRENT_USER\\Software (deleted in both views afterwards, and checked), as raw bytes, so the
 shapes `Reg2Py` treats differently can be made. Then Python's `winreg.OpenKey` and
 `winreg.QueryValueEx` read each one back, and the result is recorded: a string as UTF-16 code
 units (it may hold a lone surrogate), a number, or the `OSError`'s `winerror`. A one- to
@@ -26,7 +26,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "winreg_vectors.json"
-SUBKEY = rf"Software\sylvia-gm-port-tests\winreg-vectors-{os.getpid()}"
+# A key of its own directly under Software, so deleting it leaves no parent behind.
+SUBKEY = rf"Software\sylvia-gm-port-test-winreg-vectors-{os.getpid()}"
 
 
 def sz(text: str, *, nul: bool = True) -> str:
@@ -53,6 +54,16 @@ VALUES = [
     ("Multi", 7, sz("a\0b\0")),
     ("", 1, sz("the default value")),
 ]
+
+
+def delete_scratch_key(subkey: str) -> None:
+    """Delete a scratch HKCU key in both registry views, then make sure it is gone in both."""
+    for view in ("/reg:64", "/reg:32"):
+        # A view where the key is already gone answers 1; the query below is the check.
+        subprocess.run(["reg", "delete", "HKCU\\" + subkey, "/f", view], capture_output=True)
+    for view in ("/reg:64", "/reg:32"):
+        if subprocess.run(["reg", "query", "HKCU\\" + subkey, view], capture_output=True).returncode == 0:
+            raise RuntimeError(f"The scratch key HKCU\\{subkey} is still there ({view}).")
 
 
 def reg_file() -> str:
@@ -91,7 +102,7 @@ def main() -> None:
         cases.append({"name": "Missing", "kind": None, "data": None, "result": read(SUBKEY, "Missing")})
         missing_key = read(SUBKEY + r"\absent", "")
     finally:
-        subprocess.run(["reg", "delete", "HKCU\\" + SUBKEY, "/f"], capture_output=True)
+        delete_scratch_key(SUBKEY)
         shutil.rmtree(folder)
     vectors = {"python": sys.version.split()[0], "values": cases, "missing_key": missing_key}
     OUTPUT.write_text(json.dumps(vectors, indent=1, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")

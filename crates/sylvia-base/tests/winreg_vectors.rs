@@ -13,10 +13,25 @@ fn vectors() -> J {
 
 struct Scratch(String);
 
+/// Delete a scratch current-user key in both registry views; `true` once it is gone in both.
+fn delete_scratch_key(subkey: &str) -> bool {
+    let key = format!(r"HKCU\{subkey}");
+    for view in ["/reg:64", "/reg:32"] {
+        // A view where the key is already gone answers 1; the query below is the check.
+        let _ = std::process::Command::new("reg").args(["delete", &key, "/f", view]).output();
+    }
+    ["/reg:64", "/reg:32"].iter().all(|view| {
+        std::process::Command::new("reg")
+            .args(["query", &key, view])
+            .output()
+            .is_ok_and(|output| !output.status.success())
+    })
+}
+
+/// Removes the scratch key even when the test fails part-way; the test also checks it is gone.
 impl Drop for Scratch {
     fn drop(&mut self) {
-        let _ =
-            std::process::Command::new("reg").args(["delete", &format!(r"HKCU\{}", self.0), "/f"]).output();
+        let _ = delete_scratch_key(&self.0);
     }
 }
 
@@ -63,7 +78,8 @@ fn expected(result: &J) -> Result<Value, Error> {
 #[test]
 fn values_read_like_python_winreg() {
     let vectors = vectors();
-    let subkey = format!(r"Software\sylvia-gm-port-tests\winreg-test-{}", std::process::id());
+    // A key of its own directly under Software, so deleting it leaves no parent behind.
+    let subkey = format!(r"Software\sylvia-gm-port-test-winreg-{}", std::process::id());
     let _scratch = Scratch(subkey.clone());
     let values = vectors["values"].as_array().unwrap();
     import(&subkey, values);
@@ -85,4 +101,5 @@ fn values_read_like_python_winreg() {
     let missing = query_value_ex(Root::CurrentUser, &format!(r"{subkey}\absent"), "");
     assert_eq!(missing, expected(&vectors["missing_key"]));
     assert!(missing.unwrap_err().is_not_found());
+    assert!(delete_scratch_key(&subkey), "the scratch key HKCU\\{subkey} is still there");
 }

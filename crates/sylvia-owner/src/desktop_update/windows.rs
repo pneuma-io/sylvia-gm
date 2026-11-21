@@ -170,7 +170,37 @@ unsafe extern "system" fn dialog_callback(
     // on this same thread, for the whole `TaskDialogIndirect` call that delivers these
     // notifications; nothing else holds a reference to it meanwhile.
     let notify = unsafe { &mut *(data as *mut Notify<'_>) };
-    notify(window as isize, notification)
+    // A panic cannot unwind through `extern "system"`; it would abort the helper mid-update.
+    // As ctypes does for an exception in a callback, report it on stderr and answer `S_OK`.
+    // The report is one fixed line: the helper never shows native errors or machine paths.
+    quiet_panics();
+    IN_CALLBACK.with(|flag| flag.set(true));
+    let outcome =
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| notify(window as isize, notification)));
+    IN_CALLBACK.with(|flag| flag.set(false));
+    outcome.unwrap_or_else(|_| {
+        eprintln!("Exception ignored on calling the update status dialog's callback.");
+        0
+    })
+}
+
+thread_local! {
+    /// Set while [`dialog_callback`] runs `notify`, whose panics it reports itself.
+    static IN_CALLBACK: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Keep the default panic message (its text and source location) out of a callback's panic;
+/// every other panic is reported as before.
+fn quiet_panics() {
+    static INSTALLED: std::sync::Once = std::sync::Once::new();
+    INSTALLED.call_once(|| {
+        let previous = std::panic::take_hook();
+        std::panic::set_hook(Box::new(move |info| {
+            if !IN_CALLBACK.with(std::cell::Cell::get) {
+                previous(info);
+            }
+        }));
+    });
 }
 
 /// `TaskDialogIndirect(config, &chosen, None, None)` with one button and the callback timer:
@@ -355,5 +385,31 @@ mod tests {
         assert!(!inherited(handle));
         // SAFETY (test): this test owns the handle and closes it once.
         drop(unsafe { OwnedHandle::from_raw_handle(handle) });
+    }
+
+    #[test]
+    fn a_panic_in_the_dialog_callback_answers_s_ok_and_does_not_unwind() {
+        let mut calls = 0;
+        let mut ordinary = |_window: isize, notification: u32| {
+            calls += 1;
+            if notification == 2 {
+                1
+            } else {
+                0
+            }
+        };
+        let mut notify: Notify<'_> = &mut ordinary;
+        let data = &mut notify as *mut Notify<'_> as isize;
+        // SAFETY (test): `data` points to `notify`, alive on this frame for both calls.
+        assert_eq!(unsafe { dialog_callback(std::ptr::null_mut(), 2, 0, 0, data) }, 1);
+        assert_eq!(unsafe { dialog_callback(std::ptr::null_mut(), 4, 0, 0, data) }, 0);
+        assert_eq!(calls, 2);
+
+        let mut panicking = |_window: isize, _notification: u32| -> i32 { panic!("a fault in the callback") };
+        let mut notify: Notify<'_> = &mut panicking;
+        let data = &mut notify as *mut Notify<'_> as isize;
+        // SAFETY (test): as above. Without the catch this panic would abort the test process.
+        assert_eq!(unsafe { dialog_callback(std::ptr::null_mut(), 4, 0, 0, data) }, 0);
+        assert!(!IN_CALLBACK.with(std::cell::Cell::get), "the flag is cleared after a caught panic");
     }
 }

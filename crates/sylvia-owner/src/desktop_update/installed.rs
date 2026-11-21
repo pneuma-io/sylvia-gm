@@ -689,13 +689,12 @@ mod tests {
     fn the_real_registry_reads_like_python() {
         let vectors: Json =
             serde_json::from_str(include_str!("../../tests/vectors/helper_vectors.json")).unwrap();
-        let key = format!(r"Software\sylvia-gm-port-tests\registry-read-{}", std::process::id());
+        // A key of its own directly under Software, so deleting it leaves no parent behind.
+        let key = format!(r"Software\sylvia-gm-port-test-registry-read-{}", std::process::id());
         struct Cleanup(String);
         impl Drop for Cleanup {
             fn drop(&mut self) {
-                let _ = std::process::Command::new("reg")
-                    .args(["delete", &format!(r"HKCU\{}", self.0), "/f"])
-                    .output();
+                let _ = delete_scratch_key(&self.0);
             }
         }
         let _cleanup = Cleanup(key.clone());
@@ -738,5 +737,21 @@ mod tests {
                 };
             assert_eq!(got, case["result"], "{}", case["name"]);
         }
+        assert!(delete_scratch_key(&key), "the scratch key HKCU\\{key} is still there");
+    }
+
+    /// Delete a scratch current-user key in both registry views; `true` once it is gone in both.
+    fn delete_scratch_key(subkey: &str) -> bool {
+        let key = format!(r"HKCU\{subkey}");
+        for view in ["/reg:64", "/reg:32"] {
+            // A view where the key is already gone answers 1; the query below is the check.
+            let _ = std::process::Command::new("reg").args(["delete", &key, "/f", view]).output();
+        }
+        ["/reg:64", "/reg:32"].iter().all(|view| {
+            std::process::Command::new("reg")
+                .args(["query", &key, view])
+                .output()
+                .is_ok_and(|output| !output.status.success())
+        })
     }
 }
