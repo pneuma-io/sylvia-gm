@@ -18,6 +18,7 @@ from sylvia_gm.runtime._parameter_declarations import resolve_parameter_declarat
 
 from .build_srd_5_2_1_mechanics import _tool_schema
 from .srd_lite_spell_repairs import apply_repairs
+from .srd_lite_window_repairs import NEW_PUBLIC_TOOLS
 from .update_srd_gm_feedback import _replace_entry, _without_descriptions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,6 +70,7 @@ def update(version):
         # Refresh a model-facing schema only when its executable claims changed.
         if _without_descriptions(inputs_before[tool["name"]]) != _without_descriptions(incoming):
             tool["input_schema"] = incoming
+    _add_public_tools(record, expanded)
     record["version"] = version
     _write_json(record_path, record)
     identity_path = PACKAGE / "package-identity.json"
@@ -93,6 +95,32 @@ def update(version):
             ),
             flush=True,
         )
+
+
+def _add_public_tools(record, expanded):
+    """Declare each public operation a repair added, beside the operation it follows."""
+    declarations_path = PACKAGE / "content/content-declarations.json"
+    declarations = json.loads(declarations_path.read_bytes())
+    for name, spec in NEW_PUBLIC_TOOLS.items():
+        if name not in expanded["tools"]:
+            raise ValueError("A declared public operation is missing from the runtime: " + name)
+        names = [tool["name"] for tool in record["tools"]]
+        if name not in names:
+            record["tools"].insert(names.index(spec["after"]) + 1, {
+                "capability": spec["capability"],
+                "input_schema": _tool_schema(expanded["tools"][name]),
+                "name": name,
+                "state_predicates": spec["state_predicates"],
+                "turn_statuses": spec["turn_statuses"],
+                "writers": spec["writers"],
+            })
+        (inclusion,) = [
+            row for row in declarations["inclusions"]
+            if spec["after"] in row.get("links", {}).get("tools", ())
+        ]
+        if name not in inclusion["links"]["tools"]:
+            inclusion["links"]["tools"] = sorted([*inclusion["links"]["tools"], name])
+    declarations_path.write_bytes(json.dumps(declarations, separators=(",", ":")).encode("utf-8"))
 
 
 def write_catalogue_for(version):

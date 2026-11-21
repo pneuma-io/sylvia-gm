@@ -15,7 +15,7 @@ Native Windows and live-provider acceptance remain separate evidence layers. Bro
 The reviewed combined code/content import is private Git commit
 `cebc66f2245af071f6b2f4cfdeeefbeb980a70de`, followed by the README correction
 `56b0164885834ccac2a1c6f1f98607da2b0202a1`. SRD Lite at that import was 0.3.14 (main now
-bundles 0.3.28; see `rulesets/srd-lite/package-identity.json`), primary content
+bundles 0.3.29; see `rulesets/srd-lite/package-identity.json`), primary content
 identity `e07292d409287b5f7a31062d369f12fb8243736b5c286a8d9ced683d10b596e0`.
 This successor retains base species Speed during advancement, validates resulting walking Speed,
 and displays the computed result before confirmation. The optional Speed result row preserves
