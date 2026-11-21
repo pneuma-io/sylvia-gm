@@ -20,6 +20,7 @@
 mod owner;
 mod session;
 mod standin;
+mod webui;
 
 use owner::OwnerCommand;
 use std::path::{Path, PathBuf};

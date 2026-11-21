@@ -1,0 +1,1744 @@
+{
+ "name": "webui-guard",
+ "description": "The local WebUI host's boundary, request by request: the bootstrap cookie, exact Host and Origin, Sec-Fetch, the same-origin header, the session cookie, command request checks and idempotency, host-only commands, argument renaming, static-asset path tricks, downloads, upload fields, names and size limits (whole and chunked), unknown routes, and Stop.",
+ "webui": true,
+ "summarise_tables": [
+  "^package_",
+  "^packages$"
+ ],
+ "steps": [
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   },
+   "save_cookie": true
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Host",
+      "localhost:1"
+     ],
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Host",
+      "${authority}"
+     ],
+     [
+      "Host",
+      "${authority}"
+     ],
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ],
+    "no_host": true
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "cross-site"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "cross-site"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "same-site"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": [
+     [
+      "Origin",
+      "http://evil.example"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "Origin",
+      "${origin}"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "http://evil.example"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "2"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "sylvia_webui_1=wrong"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "x"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/logout",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "text/plain"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "text": "{\"id\":\"a\",\"method\":\"application_info\"}"
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "text": "{not json"
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "bad id!",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": 7
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info",
+     "params": []
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "info-1",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "info-1",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "info-1",
+     "method": "application_info",
+     "params": {
+      "different": true
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "update-state",
+     "method": "desktop_update_state"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "update-startup",
+     "method": "desktop_update_startup_state"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "handshake",
+     "method": "handshake_status"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "install",
+     "method": "install_package",
+     "params": {
+      "archiveBytes": "x"
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "drafts-1",
+     "method": "load_desktop_drafts"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "drafts-2",
+     "method": "load_desktop_drafts",
+     "params": {
+      "unexpectedKey": 1
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "drafts-3",
+     "method": "save_desktop_drafts",
+     "params": {
+      "drafts": {
+       "format_version": 1,
+       "sessions": []
+      }
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "path-1",
+     "method": "save_desktop_drafts",
+     "params": {
+      "destinationPath": "C:/x"
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "path-2",
+     "method": "load_desktop_drafts",
+     "params": {
+      "host": "x"
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "fault-1",
+     "method": "record_local_fault",
+     "params": {
+      "category": "renderer_error",
+      "delta": 1
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "export-1",
+     "method": "export_campaign_file",
+     "params": {
+      "campaignId": "c",
+      "exportId": "bad id!"
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "export-2",
+     "method": "backup_authority",
+     "params": {
+      "backupId": null
+     }
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "repeat": 67108865
+   }
+  },
+  {
+   "http": {
+    "method": "HEAD",
+    "path": "/app.js",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/webui-bridge.js",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/no-such-file.js",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html.bak",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/../pyproject.toml",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/%2e%2e/pyproject.toml",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/..%2fpyproject.toml",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/frontend/../app.js",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/README.md",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/api/download/nothing",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/api/download/nothing",
+    "headers": [
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/api/download/..%2f..%2fauthority.sqlite3",
+    "headers": [
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "a.zip",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/nothing",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "a.zip",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": []
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "content": "{}"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "content": "[]"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "content": "{bad"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "content": "{}"
+     },
+     {
+      "name": "params",
+      "content": "{}"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "content": "{}",
+      "headers": [
+       [
+        "Content-Transfer-Encoding",
+        "base64"
+       ]
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "content": "{\"sourcePath\": \"C:/x\"}"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "other",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "../a.zip",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "a:b.zip",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "CON",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "content": "x"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "a.zip",
+      "content": "x"
+     },
+     {
+      "name": "file",
+      "filename": "b.zip",
+      "content": "y"
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "params",
+      "repeat": 16385
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "big.zip",
+      "repeat": 50331649
+     }
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/upload/package",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "multipart": [
+     {
+      "name": "file",
+      "filename": "big.zip",
+      "repeat": 50331649
+     }
+    ],
+    "chunked": 65536
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/nothing",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "http": {
+    "method": "PUT",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/stop",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  }
+ ],
+ "rules": {
+  "ignore_keys": [
+   "date",
+   "server"
+  ],
+  "scrub": [
+   {
+    "pattern": "sylvia_webui_<port>=[A-Za-z0-9_-]{43}",
+    "with": "sylvia_webui_<port>=<session>"
+   }
+  ],
+  "volatile_files": [
+   "^diagnostics/"
+  ]
+ }
+}

@@ -12,6 +12,10 @@ publish.workspace = true
 name = "sylvia-gm-owner"
 path = "src/main.rs"
 
+[[bin]]
+name = "sylvia-gm"
+path = "src/bin/sylvia-gm.rs"
+
 [dependencies]
 sylvia-base.workspace = true
 serde_json.workspace = true
@@ -20,6 +24,13 @@ tokio.workspace = true
 serde.workspace = true
 getrandom.workspace = true
 futures-util.workspace = true
+hyper.workspace = true
+hyper-util.workspace = true
+http-body-util.workspace = true
+multer.workspace = true
+bytes.workspace = true
+regex.workspace = true
+sha2.workspace = true
 sylvia-domain.workspace = true
 sylvia-store.workspace = true
 sylvia-provider.workspace = true

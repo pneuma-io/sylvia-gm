@@ -28,11 +28,15 @@ cargo build -p sylvia-owner -p sylvia-compare
 
 compare="target/debug/sylvia-compare$exe"
 owner="target/debug/sylvia-gm-owner$exe"
+# WebUI host sessions ("webui": true) run the host instead of the owner.
+host="target/debug/sylvia-gm$exe"
 sessions=crates/sylvia-compare/sessions
 recordings="crates/sylvia-compare/recordings/$platform"
 work="$(mktemp -d)"
 trap 'rm -rf "${work:?}"' EXIT
 python_owner=(--owner "$python" --arg -B --arg -m --arg sylvia_gm.interfaces.owner_process)
+python_host=(--owner "$python" --arg -B --arg -m --arg sylvia_gm.main)
+is_webui() { grep -q '"webui": true' "$1"; }
 
 if [ "${1:-}" = "--record-python" ]; then
   echo "== record from the Python owner ($platform)"
@@ -40,11 +44,12 @@ if [ "${1:-}" = "--record-python" ]; then
   mkdir -p "$recordings"
   for session in "$sessions"/*.session.json; do
     name="$(basename "$session" .session.json)"
-    "$compare" record --session "$session" --out "$work/record-$name" "${python_owner[@]}"
+    if is_webui "$session"; then python_command=("${python_host[@]}"); else python_command=("${python_owner[@]}"); fi
+    "$compare" record --session "$session" --out "$work/record-$name" "${python_command[@]}"
     # A reference is only kept if Python reproduces it: anything that varies between two
     # Python runs must be declared in the session's rules first.
     "$compare" check --session "$session" --reference "$work/record-$name/$name.recording.json" \
-      --work "$work/again-$name" "${python_owner[@]}"
+      --work "$work/again-$name" "${python_command[@]}"
     cp "$work/record-$name/$name.recording.json" "$recordings/"
   done
 fi
@@ -57,6 +62,7 @@ for session in "$sessions"/*.session.json; do
     echo "$name: no $platform recording yet"
     continue
   fi
-  "$compare" check --session "$session" --reference "$reference" --owner "$owner" \
+  program="$owner"; if is_webui "$session"; then program="$host"; fi
+  "$compare" check --session "$session" --reference "$reference" --owner "$program" \
     --work "$work/rust-$name" --limit 0 || true
 done

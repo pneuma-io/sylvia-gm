@@ -1,0 +1,460 @@
+{
+ "name": "webui-remote",
+ "description": "The WebUI host in private HTTPS mode: the sign-in page for unauthenticated navigation, the remote Host only, access-key sign-in and its refusals, the remote session cookie, sign-out, the five-attempts-a-minute budget, and Stop.",
+ "webui": true,
+ "webui_remote": {
+  "origin": "https://node.tail1.ts.net",
+  "key": "remote-access-key-for-the-comparison-session-0123456789"
+ },
+ "summarise_tables": [
+  "^package_",
+  "^packages$"
+ ],
+ "steps": [
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Host",
+      "${address}"
+     ],
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": []
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "a",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "text/plain"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "text": "key"
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "not-the-key-not-the-key-not-the-key-not-the-key"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "remote-access-key-for-the-comparison-session-0123456789"
+    }
+   },
+   "save_cookie": true
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "info",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.html",
+    "headers": [
+     [
+      "Sec-Fetch-Site",
+      "none"
+     ],
+     [
+      "Sec-Fetch-Mode",
+      "navigate"
+     ],
+     [
+      "Sec-Fetch-Dest",
+      "document"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "GET",
+    "path": "/app.js",
+    "headers": [
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ]
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/logout",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/command",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "id": "info-2",
+     "method": "application_info"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "remote-access-key-for-the-comparison-session-0123456789"
+    }
+   },
+   "save_cookie": true
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "x"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {
+     "key": "remote-access-key-for-the-comparison-session-0123456789"
+    }
+   }
+  },
+  {
+   "http": {
+    "method": "POST",
+    "path": "/api/stop",
+    "headers": [
+     [
+      "Origin",
+      "${origin}"
+     ],
+     [
+      "X-Sylvia-WebUI",
+      "1"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "Cookie",
+      "${cookie}"
+     ]
+    ],
+    "json": {}
+   }
+  }
+ ],
+ "rules": {
+  "ignore_keys": [
+   "date",
+   "server"
+  ],
+  "scrub": [
+   {
+    "pattern": "__Host-sylvia_webui=[A-Za-z0-9_-]{43}",
+    "with": "__Host-sylvia_webui=<session>"
+   }
+  ],
+  "volatile_files": [
+   "^diagnostics/"
+  ]
+ }
+}

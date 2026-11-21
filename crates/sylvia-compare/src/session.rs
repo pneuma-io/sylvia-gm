@@ -22,6 +22,14 @@ pub struct Session {
     /// `${standin_model}` to the steps.
     #[serde(default)]
     pub standin: bool,
+    /// A WebUI host session: `--owner` is the host program, started with `--webui --data-root
+    /// <data> --port 0` appended, and the steps are `http` requests. `${origin}` and
+    /// `${authority}` name the host; `${cookie}` is what the last `save_cookie` step was set.
+    #[serde(default)]
+    pub webui: bool,
+    /// Start the WebUI host in private HTTPS mode with this origin and access key.
+    #[serde(default)]
+    pub webui_remote: Option<crate::webui::Remote>,
     /// What the stand-in narrates: `fixed` (default) or `journey`, which answers "The Game
     /// Master answers: " and the player's message, as the Stop and resume fixtures do.
     #[serde(default)]
@@ -75,6 +83,13 @@ pub struct Step {
     /// lets every `[late]` request being held answer.
     #[serde(default)]
     pub standin: Option<StandinControl>,
+    /// An HTTP request to the WebUI host (WebUI sessions only); see [`crate::webui::HttpStep`].
+    /// Placeholders are replaced before it is read.
+    #[serde(default)]
+    pub http: Option<Json>,
+    /// Keep the cookies this response sets as `${cookie}`.
+    #[serde(default)]
+    pub save_cookie: bool,
     /// Start the owner again on the same data folder. Must follow a `shutdown` step. The
     /// recording keeps the previous launch's exit code and the new launch's ready message.
     #[serde(default)]
@@ -156,7 +171,11 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
         variables.insert("standin_model".into(), standin::MODEL.into());
     }
 
-    let outcome = run_steps(session, command, &database, &mut variables, standin.as_ref());
+    let outcome = if session.webui {
+        run_webui_steps(session, command, &data_root, &mut variables)
+    } else {
+        run_steps(session, command, &database, &mut variables, standin.as_ref())
+    };
     let model_requests = standin.map(Standin::finish).unwrap_or_default();
     let (ready, steps, exit_code, stopped) = outcome?;
 
@@ -182,6 +201,15 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
     let escaped_work = &escaped_work[1..escaped_work.len() - 1];
     text = text.replace(escaped_work, "<work>");
     text = text.replace(&escaped_work.replace("\\\\", "/"), "<work>");
+    if let Some(Json::String(address)) = variables.get("address") {
+        // Only the loopback address varies between runs; a remote origin is the session's own.
+        text = text.replace(&format!("http://{address}"), "<webui_origin>");
+        text = text.replace(address.as_str(), "<webui_authority>");
+        // The local cookie is named after the port.
+        if let Some((_, port)) = address.rsplit_once(':') {
+            text = text.replace(&format!("sylvia_webui_{port}"), "sylvia_webui_<port>");
+        }
+    }
     if let Some(Json::String(url)) = variables.get("standin_url") {
         text = text.replace(url.as_str(), "<standin_url>");
         text = text.replace(url.trim_end_matches("/v1"), "<standin_origin>");
@@ -328,6 +356,83 @@ fn run_steps(
     }
     let exit_code = owner.close(Duration::from_secs(60))?;
     Ok((ready, recorded, exit_code, stopped))
+}
+
+/// Run a WebUI session: start the host, send each request, then wait for the host to exit
+/// (a session ends with a request to `/api/stop`).
+fn run_webui_steps(
+    session: &Session,
+    command: &OwnerCommand,
+    data_root: &Path,
+    variables: &mut HashMap<String, Json>,
+) -> Result<StepsOutcome, String> {
+    let host = crate::webui::Host::launch(
+        command,
+        data_root,
+        session.webui_remote.as_ref(),
+        Duration::from_secs(session.ready_timeout_s),
+    )?;
+    variables.insert("origin".into(), host.origin.clone().into());
+    variables.insert("authority".into(), host.authority.clone().into());
+    variables.insert("address".into(), host.address.clone().into());
+    variables.insert("cookie".into(), "".into());
+    let mut recorded = Vec::new();
+    let mut stopped = Json::Null;
+    for (index, step) in session.steps.iter().enumerate() {
+        let id = step.id.clone().unwrap_or_else(|| format!("s{index}"));
+        let Some(raw) = &step.http else {
+            return Err(format!("step {index} of a WebUI session has no http request"));
+        };
+        let substituted = substitute(raw, variables)?;
+        let request: crate::webui::HttpStep = serde_json::from_value(substituted.clone())
+            .map_err(|error| format!("step {index} is not a valid http request: {error}"))?;
+        let (response, sent) =
+            crate::webui::send(&request, &host.authority, &host.address, Duration::from_secs(step.timeout_s))
+                .map_err(|error| format!("step {index}: {error}"))?;
+        let mut entry = JsonMap::new();
+        entry.insert("id".into(), id.into());
+        let mut http = JsonMap::new();
+        http.insert("method".into(), request.method.clone().into());
+        http.insert("path".into(), request.path.clone().into());
+        http.insert(
+            "headers".into(),
+            Json::Array(
+                sent.into_iter().map(|(name, value)| Json::Array(vec![name.into(), value.into()])).collect(),
+            ),
+        );
+        for key in ["json", "text", "repeat", "multipart", "chunked"] {
+            if let Some(value) = substituted.get(key) {
+                http.insert(key.into(), value.clone());
+            }
+        }
+        entry.insert("http".into(), Json::Object(http));
+        let recorded_response = crate::webui::record_response(&response);
+        if step.save_cookie {
+            variables.insert("cookie".into(), crate::webui::cookies(&response).into());
+        }
+        let mut stop = None;
+        for (name, pointer) in &step.save {
+            match recorded_response.pointer(pointer) {
+                Some(value) => {
+                    variables.insert(name.clone(), value.clone());
+                }
+                None => stop = Some(format!("step {index} has nothing at {pointer} to save")),
+            }
+        }
+        entry.insert("response".into(), recorded_response);
+        recorded.push(Json::Object(entry));
+        if let Some(reason) = stop {
+            stopped = Json::String(format!("{reason}; {} of {} steps ran", index + 1, session.steps.len()));
+            break;
+        }
+    }
+    let (exit_code, output, problem) = host.finish(Duration::from_secs(60));
+    if let (Some(problem), true) = (problem, stopped.is_null()) {
+        stopped = Json::String(problem);
+    }
+    let mut ready = JsonMap::new();
+    ready.insert("output".into(), Json::Array(output.into_iter().map(Json::String).collect()));
+    Ok((Json::Object(ready), recorded, exit_code, stopped))
 }
 
 /// Replace `${name}` in every string of `value`. A string that is exactly one placeholder
