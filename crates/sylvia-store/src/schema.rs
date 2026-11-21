@@ -326,13 +326,13 @@ pub fn apply_purge_extension(connection: &Connection) -> StoreResult<()> {
     )?;
     connection.execute("DROP TABLE campaign_operations_purge_shadow", [])?;
     if all_rows(connection, &ordered)? != before {
-        return Err(StoreError::Other("Campaign operation receipt rebuild changed existing rows".into()));
+        return Err(crate::error::value_error("Campaign operation receipt rebuild changed existing rows"));
     }
     if !all_rows(connection, "PRAGMA foreign_key_check")?.is_empty() {
-        return Err(StoreError::Other("Campaign purge extension has invalid foreign keys".into()));
+        return Err(crate::error::value_error("Campaign purge extension has invalid foreign keys"));
     }
     if !integrity_ok(connection)? {
-        return Err(StoreError::Other("Campaign purge extension failed integrity verification".into()));
+        return Err(crate::error::value_error("Campaign purge extension failed integrity verification"));
     }
     Ok(())
 }
@@ -498,17 +498,19 @@ pub fn apply_draft_lifecycle_migration(connection: &Connection) -> StoreResult<(
         all_rows(connection, "SELECT * FROM campaign_constructions ORDER BY campaign_id")?;
     execute_statements(connection, sql::MIGRATION_10)?;
     if all_rows(connection, "SELECT * FROM campaign_operations ORDER BY operation_id")? != before_operations {
-        return Err(StoreError::Other("Draft lifecycle migration changed campaign operation history".into()));
+        return Err(crate::error::value_error(
+            "Draft lifecycle migration changed campaign operation history",
+        ));
     }
     if all_rows(connection, "SELECT * FROM campaign_constructions ORDER BY campaign_id")?
         != before_constructions
     {
-        return Err(StoreError::Other(
-            "Draft lifecycle migration changed campaign construction history".into(),
+        return Err(crate::error::value_error(
+            "Draft lifecycle migration changed campaign construction history",
         ));
     }
     if !all_rows(connection, "PRAGMA foreign_key_check")?.is_empty() {
-        return Err(StoreError::Other("Draft lifecycle migration has invalid foreign keys".into()));
+        return Err(crate::error::value_error("Draft lifecycle migration has invalid foreign keys"));
     }
     Ok(())
 }
@@ -542,7 +544,7 @@ pub fn migrate_legacy_campaigns(connection: &Connection) -> StoreResult<()> {
         let mut representation = Vec::with_capacity(rows.len());
         for row in &rows {
             let load_order = crate::pytext::py_int(&row[4])
-                .ok_or_else(|| StoreError::Other("invalid literal for int()".into()))?;
+                .ok_or_else(|| crate::error::value_error("invalid literal for int() with base 10"))?;
             let mut item = JsonMap::new();
             item.insert("id".into(), Json::String(crate::pytext::py_str(&row[0])));
             item.insert("version".into(), Json::String(crate::pytext::py_str(&row[1])));
@@ -559,7 +561,7 @@ pub fn migrate_legacy_campaigns(connection: &Connection) -> StoreResult<()> {
         )?;
         for row in &rows {
             let load_order = crate::pytext::py_int(&row[4])
-                .ok_or_else(|| StoreError::Other("invalid literal for int()".into()))?;
+                .ok_or_else(|| crate::error::value_error("invalid literal for int() with base 10"))?;
             connection.execute(
                 "INSERT INTO campaign_lock_memberships VALUES (?, ?, ?, ?, ?, ?)",
                 rusqlite::params![

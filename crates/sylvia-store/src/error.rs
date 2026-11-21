@@ -45,13 +45,41 @@ impl From<CodedError> for StoreError {
     }
 }
 
+/// A lane 1 domain `ValueError` is a rejection the owner reports; a `TypeError` is a fault.
+impl From<sylvia_domain::DomainError> for StoreError {
+    fn from(error: sylvia_domain::DomainError) -> Self {
+        match error.rejection() {
+            Some(coded) => Self::Coded(coded),
+            None => Self::Other(error.message().to_owned()),
+        }
+    }
+}
+
 impl From<std::io::Error> for StoreError {
     fn from(error: std::io::Error) -> Self {
         Self::Other(error.to_string())
     }
 }
 
+/// A Python `ValueError(message)`: the owner replies `command_rejected` with the message.
+pub fn value_error(message: impl Into<String>) -> StoreError {
+    StoreError::Coded(CodedError::rejected(message).with_error_type("ValueError"))
+}
+
 impl StoreError {
+    /// The owner reply for this error, as Python's owner gives it: every exception it catches
+    /// (`ValueError`, `CommandRejected`, the `AuthorityError` family) is a rejection with
+    /// Python's code, message and class. `None` is a fault it does not catch (a
+    /// `sqlite3.Error`, `TypeError`, `KeyError` and the like, and work not yet ported), which
+    /// becomes the owner's internal-error reply.
+    pub fn rejection(&self) -> Option<CodedError> {
+        match self {
+            Self::Coded(error) => Some(error.clone()),
+            Self::Backup(failure) => Some(failure.to_coded()),
+            Self::Sqlite(_) | Self::Other(_) | Self::NotPorted(_) => None,
+        }
+    }
+
     /// Whether this is a `SchemaIdentityError`.
     pub fn is_schema_identity(&self) -> bool {
         matches!(self, Self::Coded(error) if error.code == SCHEMA_IDENTITY_MISMATCH)

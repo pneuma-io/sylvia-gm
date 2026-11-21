@@ -11,7 +11,7 @@
 //! [`CommitAction`] has no fields for them yet, and an outcome with participant mutations is
 //! refused with [`StoreError::NotPorted`].
 
-use crate::error::{StoreError, StoreResult};
+use crate::error::{value_error, StoreError, StoreResult};
 use crate::pytext::{py_int, py_str};
 use crate::store::AuthorityStore;
 use rusqlite::types::Value;
@@ -22,6 +22,7 @@ use sylvia_domain::authority::{
     canonical_payload_is_safe, mechanic_outcome_is_safe, ActionReceipt, ActionStatus, CanonicalEventType,
     LifecycleState, MechanicOutcome, TurnStatus, WriterRole,
 };
+use sylvia_domain::state_ownership::owner_matches_package_lock;
 
 /// `_dump`: the canonical stored text (sorted keys, compact, UTF-8).
 pub(crate) fn dump(value: &Json) -> String {
@@ -32,9 +33,9 @@ pub(crate) fn dump(value: &Json) -> String {
 /// be exactly the canonical text of its value (which also refuses repeated members).
 pub(crate) fn load_json(text: &str) -> StoreResult<Json> {
     let parsed = sylvia_base::pyjson::loads(text)
-        .map_err(|_| StoreError::Other("Stored JSON is not the exact canonical representation".into()))?;
+        .map_err(|_| value_error("Stored JSON is not the exact canonical representation"))?;
     if dump(&parsed) != text {
-        return Err(StoreError::Other("Stored JSON is not the exact canonical representation".into()));
+        return Err(value_error("Stored JSON is not the exact canonical representation"));
     }
     Ok(parsed)
 }
@@ -96,11 +97,11 @@ pub(crate) fn require_active_campaign(connection: &Connection, campaign_id: &str
 /// `Enum(str(value))`; Python raises `ValueError` for an unknown value.
 fn parse_enum<T>(value: &Value, parse: fn(&str) -> Option<T>, name: &str) -> StoreResult<T> {
     let text = py_str(value);
-    parse(&text).ok_or_else(|| StoreError::Other(format!("'{text}' is not a valid {name}")))
+    parse(&text).ok_or_else(|| value_error(format!("'{text}' is not a valid {name}")))
 }
 
 fn int(value: &Value) -> StoreResult<i64> {
-    py_int(value).ok_or_else(|| StoreError::Other("invalid literal for int() with base 10".into()))
+    py_int(value).ok_or_else(|| value_error("invalid literal for int() with base 10"))
 }
 
 /// The receipt Python builds from an `actions` or `idempotency_records` row.
@@ -127,20 +128,6 @@ fn one_row(
         })
         .optional()?;
     Ok(row)
-}
-
-/// `domain.state_ownership.owner_matches_package_lock`. Lane 1 owns that 23-line module and
-/// has not ported it yet; this copy is replaced by its port when it lands.
-fn owner_matches_package_lock(package_ids: &[String], namespace: &str, owner: Option<&str>) -> bool {
-    if package_ids.is_empty() {
-        return owner.is_none();
-    }
-    let Some(owner) = owner.filter(|owner| package_ids.iter().any(|id| id == owner)) else {
-        return false;
-    };
-    let prefix: Vec<&String> =
-        package_ids.iter().filter(|id| namespace.starts_with(&format!("{id}."))).collect();
-    prefix.len() <= 1 && prefix.first().is_none_or(|first| first.as_str() == owner)
 }
 
 fn current_package_ids(connection: &Connection, campaign_id: &str) -> StoreResult<Vec<String>> {
@@ -212,7 +199,7 @@ fn owner_for_mutation(
             value => Some(py_str(value)),
         };
         let ids = current_package_ids(connection, &command.campaign_id)?;
-        if !owner_matches_package_lock(&ids, namespace, recorded.as_deref())
+        if !owner_matches_package_lock(ids.iter().map(String::as_str), namespace, recorded.as_deref())
             || recorded.as_deref() != Some(command.package_id.as_str())
         {
             return Err(failed());
