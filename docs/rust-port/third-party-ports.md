@@ -33,6 +33,8 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-store/src/sessions.rs` (`is_reserved_windows_name`) | CPython's `PureWindowsPath.is_reserved` and `_WIN_RESERVED_NAMES` (`Lib/pathlib.py`) | CPython 3.12.11 | PSF License Version 2 | lane 3 |
 | `sylvia-owner/src/desktop_update/manifest.rs` (`b64decode_strict`) | CPython's `binascii.a2b_base64` in strict mode, as `base64.b64decode(..., validate=True)` calls it (`Modules/binascii.c`) | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 | `sylvia-owner/src/desktop_update/windows.rs` (`disk_free`, `dirname_wide`) | CPython's `os__getdiskusage_impl` and `_dirnameW` (`Modules/posixmodule.c`), as `shutil.disk_usage` calls them | CPython 3.12.11 | PSF License Version 2 | lane 5 |
+| `sylvia-base/src/winreg.rs` (`sz_units`, `dword`, `Key::query_raw`) | CPython's `winreg.QueryValueEx` and `Reg2Py` for `REG_SZ` (`PC/winreg.c`): the size query, the doubling read and the cut at the first NUL | CPython 3.12 (source read from the 3.12 branch; vectors from 3.12.11) | PSF License Version 2 | lane 5 |
+| `sylvia-owner/src/desktop_update/installed.rs` (`list2cmdline`) | CPython's `subprocess.list2cmdline` (`Lib/subprocess.py`) | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.

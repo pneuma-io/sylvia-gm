@@ -6,10 +6,6 @@
 //! `unavailable` view. That is the shipped behaviour and the `desktop-update` session checks
 //! it. The paths behind a pinned key are reached only through [`DesktopUpdateService::with_trust`],
 //! which the vector tests use the way Python's tests patch `PUBLIC_KEYS`.
-//!
-//! Not ported yet: the `prepare` and `handoff` actions, `abort_preparation`'s and
-//! `arm_shutdown`'s checks of a prepared update, which need update preparation
-//! (`preparation.py`). They answer [`PREPARATION_PENDING`].
 
 use super::controller::{Setup, UpdateController, SOURCE};
 use super::launch::Installation;
@@ -29,9 +25,6 @@ use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 pub fn public_keys() -> BTreeMap<String, [u8; 32]> {
     BTreeMap::new()
 }
-
-/// The code a not-yet-ported preparation path answers with.
-pub const PREPARATION_PENDING: &str = "rust_port_pending";
 
 /// Makes the transport a restored controller uses (Python constructs `HttpsTransport()`).
 pub type TransportFactory = Arc<dyn Fn() -> Arc<dyn Transport> + Send + Sync>;
