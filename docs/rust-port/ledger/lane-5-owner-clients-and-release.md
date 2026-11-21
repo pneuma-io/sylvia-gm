@@ -46,7 +46,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/interfaces/commands/__init__.py` | 31 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/actions.py` | 157 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/builder.py` | 169 | `sylvia-owner` | pending | |
-| `src/sylvia_gm/interfaces/commands/campaigns.py` | 1,118 | `sylvia-owner::commands::campaigns` | in progress | `handle_handshake_status` |
+| `src/sylvia_gm/interfaces/commands/campaigns.py` | 1,118 | `sylvia-owner::commands::campaigns` | in progress | `handle_handshake_status`, `handle_campaign_index` |
 | `src/sylvia_gm/interfaces/commands/character_chat.py` | 112 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/packages.py` | 127 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/providers.py` | 322 | `sylvia-owner` | pending | |

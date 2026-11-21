@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 10 of 137 (`shutdown`, `handshake_status` and the eight run-loop commands: display-load cancellation, desktop drafts, local reports and faults, `renderer`).
+Ported: 11 of 137 (`shutdown`, `handshake_status`, `campaign_index` and the eight run-loop commands: display-load cancellation, desktop drafts, local reports and faults, `renderer`).
 
 ## Run-loop methods
 
@@ -32,7 +32,7 @@ Ported: 10 of 137 (`shutdown`, `handshake_status` and the eight run-loop command
 | Command | Python handler | WebUI | Rust | Comparison session |
 | --- | --- | --- | --- | --- |
 | `handshake_status` | `campaigns.handle_handshake_status` | no | yes | `local-services` |
-| `campaign_index` | `campaigns.handle_campaign_index` | yes | no | |
+| `campaign_index` | `campaigns.handle_campaign_index` | yes | yes | `startup`, `ruleless-turn` |
 | `campaign_creation_catalog` | `campaigns.handle_campaign_creation_catalog` | yes | no | |
 | `ready_campaign_catalog` | `campaigns.handle_ready_campaign_catalog` | yes | no | |
 | `customize_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | no | |
