@@ -7,6 +7,7 @@
 
 pub mod dice;
 pub mod dice_expr;
+pub mod expr;
 pub mod pyerror;
 pub mod pynum;
 pub mod pyrandom;
