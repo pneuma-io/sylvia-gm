@@ -41,6 +41,8 @@ pub mod private_records;
 pub mod purge;
 pub mod pytext;
 pub mod recovery;
+pub mod recovery_graph;
+pub mod recovery_staging;
 pub mod safe_file;
 pub mod schema;
 pub mod sequel;

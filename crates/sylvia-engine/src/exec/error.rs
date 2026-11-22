@@ -20,6 +20,10 @@ pub enum ExecError {
     /// Any other exception: its class (`ValueError`, `KeyError`, `PackageRuntimeError`, ...) and
     /// `str(error)`.
     Python { class: &'static str, message: String },
+    /// Code the port has not reached yet, named. It is no Python exception: it passes through
+    /// every handler and catch-all, as `Suspended` does, so "not ported yet" never becomes a
+    /// gameplay failure. The owner answers `rust_port_pending`.
+    PortPending(String),
 }
 
 impl ExecError {
@@ -48,6 +52,17 @@ impl ExecError {
         Self::Python { class: "ValueError", message: message.into() }
     }
 
+    /// Code not yet ported, named as `not yet ported: {what}`.
+    pub fn port_pending(what: impl std::fmt::Display) -> Self {
+        Self::PortPending(format!("not yet ported: {what}"))
+    }
+
+    /// Whether this leaves every execution layer untouched (a suspended choice or code not yet
+    /// ported).
+    pub fn passes_through(&self) -> bool {
+        matches!(self, Self::Suspended(_) | Self::PortPending(_))
+    }
+
     /// Python's class name.
     pub fn class_name(&self) -> &'static str {
         match self {
@@ -55,6 +70,7 @@ impl ExecError {
             Self::Suspended(_) => "MechanicsChoiceSuspended",
             Self::Effect { .. } => "EffectExecutionError",
             Self::Expression { class, .. } | Self::Python { class, .. } => class,
+            Self::PortPending(_) => "RustPortPending",
         }
     }
 
@@ -65,6 +81,7 @@ impl ExecError {
             Self::Suspended(_) => "Package mechanic is awaiting an authorized choice".into(),
             Self::Effect { effect_type, message } => format!("Effect '{effect_type}' failed: {message}"),
             Self::Expression { message, .. } | Self::Python { message, .. } => message.clone(),
+            Self::PortPending(message) => message.clone(),
         }
     }
 
@@ -72,7 +89,9 @@ impl ExecError {
     /// anything else becomes `EffectExecutionError(effect_type, str(error))`.
     pub fn in_effect(self, effect_type: &str) -> Self {
         match self {
-            Self::PreCondition { .. } | Self::Suspended(_) | Self::Effect { .. } => self,
+            Self::PreCondition { .. } | Self::Suspended(_) | Self::Effect { .. } | Self::PortPending(_) => {
+                self
+            }
             other => Self::effect(effect_type, other.message()),
         }
     }

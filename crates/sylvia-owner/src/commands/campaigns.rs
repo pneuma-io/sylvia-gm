@@ -506,6 +506,51 @@ pub async fn handle_export_campaign(ctx: &DispatchContext, params: &JsonMap) -> 
     Ok(Json::Object(reply))
 }
 
+/// `handle_recover_campaign`: recover `exports/<export_id>.sylvia-gm-campaign` under the storage
+/// root.
+pub async fn handle_recover_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let export_id = required_artifact_id(params, "export_id")?;
+    let source = ctx.storage_root.join("exports").join(format!("{export_id}.sylvia-gm-campaign"));
+    let recovery_id = required(params, "recovery_id")?;
+    recover_campaign(ctx, &recovery_id, &source).await
+}
+
+/// `handle_recover_campaign_file`: recover a chosen file, which must resolve to an existing
+/// `.sylvia-gm-campaign` file.
+pub async fn handle_recover_campaign_file(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let source_path = required(params, "source_path")?;
+    // `Path(...).resolve(strict=True)`: a failure is an uncaught `OSError` of its kind.
+    let source = resolve_strict(std::path::Path::new(&source_path)).map_err(|error| {
+        let class = match error.kind() {
+            std::io::ErrorKind::NotFound => "FileNotFoundError",
+            std::io::ErrorKind::PermissionDenied => "PermissionError",
+            _ => "OSError",
+        };
+        sylvia_base::CodedError::new("internal_error", error.to_string()).with_error_type(class)
+    })?;
+    if source.extension().is_none_or(|extension| extension != "sylvia-gm-campaign") || !source.is_file() {
+        return Err(protocol("Selected recovery source is not a Sylvia GM campaign archive"));
+    }
+    let recovery_id = required(params, "recovery_id")?;
+    recover_campaign(ctx, &recovery_id, &source).await
+}
+
+async fn recover_campaign(
+    ctx: &DispatchContext,
+    recovery_id: &str,
+    source: &std::path::Path,
+) -> CodedResult<Json> {
+    let result = sylvia_app::authority::portable::recover_campaign(&ctx.store, recovery_id, source)
+        .await
+        .map_err(store_error)?;
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), result.campaign_id.into());
+    value.insert("captured_revision".into(), result.captured_revision.into());
+    value.insert("archive_sha256".into(), result.archive_sha256.into());
+    value.insert("byte_count".into(), result.byte_count.into());
+    Ok(Json::Object(value))
+}
+
 /// `_required_artifact_id(payload, key)`: a nonempty string matching
 /// `[A-Za-z0-9][A-Za-z0-9._-]{0,127}` in full.
 fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<String> {
@@ -1103,5 +1148,179 @@ mod tests {
         drop(context);
         tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
         let _ = std::fs::remove_dir_all(folder);
+    }
+
+    /// The archive validation vectors' archives, by case name.
+    fn validation_archives() -> std::collections::HashMap<String, Vec<u8>> {
+        let record = read_json("crates/sylvia-store/tests/vectors/archive_validation/validation_runs.json");
+        let mut data = Vec::new();
+        flate2::read::GzDecoder::new(
+            std::fs::File::open(workspace(
+                "crates/sylvia-store/tests/vectors/archive_validation/archives.bin.gz",
+            ))
+            .unwrap(),
+        )
+        .read_to_end(&mut data)
+        .unwrap();
+        record["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|case| {
+                let (offset, length) =
+                    (case["offset"].as_u64().unwrap() as usize, case["length"].as_u64().unwrap() as usize);
+                (case["name"].as_str().unwrap().to_owned(), data[offset..offset + length].to_vec())
+            })
+            .collect()
+    }
+
+    /// Lower-case hex to bytes.
+    fn from_hex(text: &str) -> Vec<u8> {
+        (0..text.len()).step_by(2).map(|at| u8::from_str_radix(&text[at..at + 2], 16).unwrap()).collect()
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn recoveries_answer_and_store_as_pythons_handlers_do() {
+        // Lane 3's Python run of `handle_recover_campaign` and `handle_recover_campaign_file`
+        // (`generate_recovery_runs.py`) on three storage roots: the handlers' checks, staging's
+        // refusals, every damaged archive of the validation vectors, replays, collisions, purges
+        // of recovered campaigns and both commit seams. Each reply and each final database must be
+        // Python's.
+        let record = read_json("crates/sylvia-app/tests/vectors/recovery/recovery_runs.json");
+        let archives = validation_archives();
+        let bases = [
+            ("fresh", "crates/sylvia-store/tests/vectors/packages/seed_fresh.sqlite3.gz"),
+            ("damaged", "crates/sylvia-store/tests/vectors/packages/seed_fresh.sqlite3.gz"),
+            ("purged", "crates/sylvia-app/tests/vectors/purge/purge_runs.sqlite3.gz"),
+        ];
+        let mut failures = Vec::new();
+        for (name, base) in bases {
+            // A short root, as in the export test.
+            let folder = std::env::temp_dir().join(format!("sgr-{}-{name}", std::process::id()));
+            let _ = std::fs::remove_dir_all(&folder);
+            std::fs::create_dir_all(&folder).unwrap();
+            let database = folder.join("authority.sqlite3");
+            gunzip_to(base, &database);
+            let armed: std::sync::Arc<std::sync::Mutex<Option<String>>> = Default::default();
+            let seam = |seam: &'static str| {
+                let armed = std::sync::Arc::clone(&armed);
+                Box::new(move || -> sylvia_store::StoreResult<()> {
+                    if armed.lock().unwrap().as_deref() == Some(seam) {
+                        return Err(sylvia_store::StoreError::Other(format!("{seam} recovery commit fault")));
+                    }
+                    Ok(())
+                }) as Box<dyn Fn() -> sylvia_store::StoreResult<()> + Send>
+            };
+            let faults = sylvia_store::store::Faults {
+                before_recovery_commit: Some(seam("before")),
+                after_recovery_commit: Some(seam("after")),
+                ..sylvia_store::store::Faults::default()
+            };
+            let path = database.clone();
+            let (store, thread) = sylvia_store::StoreHandle::spawn(move || {
+                let mut store = sylvia_store::AuthorityStore::open_for_application_owner(&path, None)?;
+                store.set_faults(faults);
+                Ok(store)
+            })
+            .unwrap();
+            let context = crate::dispatch::DispatchContext {
+                owner_id: "recovery-test".into(),
+                storage_root: folder.clone(),
+                handshake_verified: true,
+                method: String::new(),
+                gm_system_prompt: None,
+                store,
+                providers: None,
+                session_loop: None,
+                bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+                    sylvia_app::bundled_packages::BundledSources::from_repository_root(
+                        &crate::util::source_root(),
+                    ),
+                )),
+                record_provider_warning: std::sync::Arc::new(|_: &str| {}),
+            };
+            let root = folder.to_string_lossy().replace('\\', "/");
+            for (index, run) in record["roots"][name].as_array().unwrap().iter().enumerate() {
+                let method = run["op"].as_str().unwrap();
+                let label = format!("{name} #{index} {method}");
+                let want = &run["outcome"];
+                match method {
+                    "write" => {
+                        let path = folder.join(run["path"].as_str().unwrap());
+                        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+                        let bytes = match run.get("hex") {
+                            Some(hex) => from_hex(hex.as_str().unwrap()),
+                            None => {
+                                let mut bytes = archives[run["archive"].as_str().unwrap()].clone();
+                                bytes.extend(from_hex(run["suffix"].as_str().unwrap()));
+                                bytes
+                            }
+                        };
+                        std::fs::write(&path, bytes).unwrap();
+                        continue;
+                    }
+                    "mkdir" => {
+                        std::fs::create_dir_all(folder.join(run["path"].as_str().unwrap())).unwrap();
+                        continue;
+                    }
+                    _ => {}
+                }
+                let mut params = run["params"].as_object().unwrap().clone();
+                for value in params.values_mut() {
+                    if let Some(text) = value.as_str() {
+                        *value = text.replace("<root>", &root).into();
+                    }
+                }
+                let mut asked = context.clone();
+                asked.method = method.to_owned();
+                *armed.lock().unwrap() = run["fault"].as_str().map(str::to_owned);
+                let reply = crate::dispatch::dispatch(&asked, method, &params).await;
+                *armed.lock().unwrap() = None;
+                let got = match reply {
+                    Ok(value) => serde_json::json!({ "ok": value }),
+                    Err(crate::dispatch::Failure::Rejected(error)) => serde_json::json!({
+                        "error": error.error_type,
+                        "code": error.code,
+                        "message": error.message,
+                    }),
+                    Err(crate::dispatch::Failure::Internal { error_type }) => {
+                        serde_json::json!({ "error": error_type })
+                    }
+                    Err(other) => serde_json::json!({ "other": format!("{other:?}") }),
+                };
+                // Python's internal errors are compared by class (the generator's `Fault` is a
+                // `RuntimeError`); its other failures by class, code and message. A protocol
+                // refusal carries the owner's own code.
+                let expected = match want["error"].as_str() {
+                    None => serde_json::json!({ "ok": want["ok"] }),
+                    Some("Fault") => serde_json::json!({ "error": "RuntimeError" }),
+                    Some(class @ ("FileNotFoundError" | "BadZipFile")) => {
+                        serde_json::json!({ "error": class })
+                    }
+                    Some(class) => serde_json::json!({
+                        "error": class,
+                        "code": if class == "OwnerProtocolError" {
+                            got["code"].clone()
+                        } else {
+                            want["code"].as_str().unwrap_or("command_rejected").into()
+                        },
+                        "message": want["message"],
+                    }),
+                };
+                let (got_text, expected_text) = (got.to_string(), expected.to_string());
+                if got_text != expected_text {
+                    failures.push(format!("{label}\n  Rust   {got}\n  Python {expected}"));
+                }
+            }
+            drop(context);
+            tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+            let python = folder.join("python.sqlite3");
+            gunzip_to(&format!("crates/sylvia-app/tests/vectors/recovery/{name}.sqlite3.gz"), &python);
+            if table_rows(&database) != table_rows(&python) {
+                failures.push(format!("{name}: the final database differs from Python's"));
+            }
+            let _ = std::fs::remove_dir_all(folder);
+        }
+        assert!(failures.is_empty(), "{} recovery runs differ:\n{}", failures.len(), failures.join("\n"));
     }
 }

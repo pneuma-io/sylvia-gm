@@ -1386,7 +1386,16 @@ fn streamed_closure_index(summary: &Summary) -> Json {
 /// refusal Python gives.
 pub fn validate_campaign_archive(path: &Path, expected_campaign_id: &str) -> Result<JsonMap, StoreError> {
     let Ok(file) = std::fs::File::open(path) else { return Err(failure("portable_export_invalid_zip")) };
-    let Ok(archive) = ZipArchive::open_file(&file) else {
+    validate_campaign_archive_file(&file, expected_campaign_id)
+}
+
+/// `validate_campaign_archive(raw, expected_campaign_id=...)` on an open file, as recovery passes
+/// its sealed spool.
+pub fn validate_campaign_archive_file(
+    file: &std::fs::File,
+    expected_campaign_id: &str,
+) -> Result<JsonMap, StoreError> {
+    let Ok(archive) = ZipArchive::open_file(file) else {
         return Err(failure("portable_export_invalid_zip"));
     };
     match validate_open_archive(&archive, expected_campaign_id) {
@@ -1394,6 +1403,11 @@ pub fn validate_campaign_archive(path: &Path, expected_campaign_id: &str) -> Res
         Err(Fail::Rejected(error)) => Err(error),
         Err(Fail::Fault) => Err(failure("portable_export_invalid_archive")),
     }
+}
+
+/// Whether `_validate_zip_metadata(info)` accepts the member.
+pub(crate) fn zip_metadata_is_exact(info: &ZipInfo) -> bool {
+    validate_zip_metadata(info).is_ok()
 }
 
 fn validate_open_archive(archive: &ZipArchive<'_>, expected_campaign_id: &str) -> Checked<JsonMap> {

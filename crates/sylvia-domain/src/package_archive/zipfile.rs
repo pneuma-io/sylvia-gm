@@ -133,6 +133,18 @@ impl ZipSource for SliceSource<'_> {
     }
 }
 
+/// An open file as a [`ZipSource`], read by position; its length is taken now, as
+/// [`ZipArchive::open_file`] takes it. Portable campaign recovery reads its spools this way.
+pub fn file_source(file: &std::fs::File) -> ZipResult<Box<dyn ZipSource + '_>> {
+    let len = file.metadata().map_err(|error| ZipError::Os(error.to_string()))?.len();
+    Ok(Box::new(FileSource { file, len }))
+}
+
+/// A byte slice as a [`ZipSource`].
+pub fn slice_source(data: &[u8]) -> Box<dyn ZipSource + '_> {
+    Box::new(SliceSource(data))
+}
+
 /// A file read by position (`FileExt::seek_read` on Windows, `FileExt::read_at` elsewhere).
 /// Neither promises a full read, so each call loops until it has `count` bytes or reaches the
 /// end. On Windows `seek_read` also moves the file cursor; nothing here relies on it.
