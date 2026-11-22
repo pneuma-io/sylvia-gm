@@ -35,12 +35,28 @@ import sys
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 
+import sylvia_gm.runtime._effect_executor as effect_executor
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
+from sylvia_gm.dice import seeded_rolls
+from sylvia_gm.runtime._exceptions import MechanicsChoiceSuspended
 from sylvia_gm.runtime._runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
+from sylvia_gm.runtime._types import ChoiceResolutionControl, RuntimeChoiceOption, RuntimeChoiceRequest
 
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "execution_vectors.json"
+HANDLERS_OUTPUT = HERE / "execution_handlers_vectors.json"
+
+
+class _InOrder:
+    """`secrets.SystemRandom()` for the vectors: OS randomness cannot be compared, so the
+    generator keeps the original order and the Rust test compares shuffled lists as multisets."""
+
+    def shuffle(self, values):
+        return None
+
+
+effect_executor.secrets.SystemRandom = _InOrder
 NAMESPACE = "pkg.test"
 
 STATE = {
@@ -76,24 +92,43 @@ def plain(value):
     return value
 
 
-def run(document: dict, tool: str, params: dict, state=STATE, participants=PARTICIPANTS) -> dict:
+def choice_request(value: dict) -> RuntimeChoiceRequest:
+    return RuntimeChoiceRequest(value["choice_id"], value["prompt"], tuple(
+        RuntimeChoiceOption(option["option_id"], option["label"]) for option in value["options"]))
+
+
+def run(document: dict, tool: str, params: dict, state=STATE, participants=PARTICIPANTS, seed=None,
+        choice=None) -> dict:
     try:
         runtime = RulesetRuntime(None, copy.deepcopy(document))
     except Exception as error:  # noqa: BLE001
         return {"load_error": [type(error).__name__, str(error)]}
     tools = runtime.tools
     bridge = AuthorityMemoryStateBridge(NAMESPACE, copy.deepcopy(state), copy.deepcopy(participants))
+    control = None
+    if choice is not None:
+        control = ChoiceResolutionControl(
+            choice_id=choice["choice_id"], option_id=choice["option_id"],
+            expected_request=choice_request(choice["expected_request"]),
+            prior_answers=tuple((choice_request(request), option) for request, option in choice["prior_answers"]))
+    extras = {} if control is None else {"mechanics_choice_resolution": control}
 
     def nested(name, nested_params, parent):
         return execute_tool(name, nested_params, tools, bridge, runtime.ruleset_config, runtime.definitions,
-                            bridge.combat_state, tool_executor=nested, budget=parent.budget)
+                            bridge.combat_state, tool_executor=nested, extras=extras, budget=parent.budget)
 
     try:
-        result = execute_tool(tool, copy.deepcopy(params), tools, bridge, runtime.ruleset_config,
-                              runtime.definitions, bridge.combat_state, tool_executor=nested)
+        with seeded_rolls(seed):
+            result = execute_tool(tool, copy.deepcopy(params), tools, bridge, runtime.ruleset_config,
+                                  runtime.definitions, bridge.combat_state, tool_executor=nested, extras=extras)
+    except MechanicsChoiceSuspended as suspended:
+        return {"raise": [type(suspended).__name__, str(suspended)], "request": plain(suspended.request),
+                **({} if control is None else {"control": [control.consumed, control.replayed_answers]})}
     except Exception as error:  # noqa: BLE001 - every exception class is behaviour here
         return {"raise": [type(error).__name__, str(error)]}
     record = {"result": plain(result)}
+    if control is not None:
+        record["control"] = [control.consumed, control.replayed_answers]
     try:
         record["mutations"] = [[m.namespace, m.key, plain(m.value)] for m in bridge.mutations()]
         record["participant_mutations"] = [[m.participant_id, plain(m.data)] for m in bridge.participant_mutations()]
@@ -338,7 +373,242 @@ def wide(value) -> bool:
     return False
 
 
+ROLL_STATE = copy.deepcopy(STATE)
+ROLL_STATE[f"{NAMESPACE}.entities"]["orc"]["abilities"] = {"dex": {"modifier": 3}, "str": {"score": 12, "modifier": -1},
+                                                           "wis": "odd"}
+ROLL_STATE[f"{NAMESPACE}.state"]["rolls"] = [{"name": "b", "init": 3}, {"name": "a", "init": 9}, {"name": "c", "init": 3}]
+DEFINITIONS = {"weapons": {"axe": {"damage": "1d8"}}, "table": {"1": "one", "2": "two", "x": None},
+               "encounters": {"wolf": {"weight": 3, "hp": 5}, "bear": {"weight": 1, "_key": "custom-bear"}, "ghost": "boo"},
+               "flat": {"a": 1, "b": 2, "c": 3}, "empty": {}, "nested": {"inner": {"k": "v"}}}
+
+CHOICE_OPTIONS = [{"id": "attack", "label": "Attack {target.name}"}, {"id": "flee", "label": "Flee"}]
+REQUEST = {"choice_id": "c1", "prompt": "Choose for Orc",
+           "options": [{"option_id": "attack", "label": "Attack Orc"}, {"option_id": "flee", "label": "Flee"}]}
+
+
+def handler_tools(effects, **options) -> dict:
+    document = tools(effects, **options)
+    document["definitions"] = copy.deepcopy(DEFINITIONS)
+    return document
+
+
+def handler_targeted() -> list[dict]:
+    cases = []
+
+    def case(effects, params=None, choice=None, **options):
+        item = {"document": handler_tools(effects, **options), "tool": "main",
+                "params": BASE_PARAMS if params is None else params}
+        if choice is not None:
+            item["choice"] = choice
+        cases.append(item)
+
+    for body in ({"expression": "1d20"}, {"expression": "2d6+3"}, {"expression": "{amount}d4"}, {"expression": "d8", "modifier": "amount"},
+                 {"expression": "d20", "advantage": "true"}, {"expression": "d20", "disadvantage": "true"},
+                 {"expression": "d20", "advantage": "true", "disadvantage": "true"}, {"expression": "1d6", "critical": "true"},
+                 {"expression": "3d6", "explode": True, "explode_on": 6, "max_explosions": 2}, {"expression": "2d6", "explode": "amount > 1"},
+                 {"expression": "bogus"}, {"expression": "0d6"}, {"expression": "1d1"}, {"modifier": "'x'"}, {"modifier": "missing"},
+                 {"expression": "1d6", "explode": True, "max_explosions": "'x'"}, "x"):
+        case([{"dice": body, "store_as": "_roll"}, {"set": {"field": "_t", "value": "_roll.total"}}])
+    case([{"dice": {"expression": "1d20"}}])
+    for body in ({"target": "target", "ability": "dex", "dc": 12}, {"target": "target", "ability": "str", "dc": "amount + 10"},
+                 {"target": "target", "ability": "wis"}, {"target": "target", "ability": "cha"}, {"target": "elf"}, {"target": 3},
+                 {"target": "target", "dc": "'x'"}):
+        case([{"save_throw": body, "store_as": "_save"}, {"set": {"field": "_ok", "value": "_save.success"}}])
+    for effect in ({"apply_damage": {"target": "target", "amount": "amount + 1"}}, {"apply_damage": {"target": "elf", "amount": 100}},
+                   {"apply_damage": {"target": "box", "amount": 1}}, {"apply_damage": {"target": "ghost", "amount": 1}},
+                   {"apply_damage": {"target": "target", "amount": -3}}, {"heal": {"target": "target", "amount": 99}},
+                   {"heal": {"target": "elf", "amount": 1}}, {"heal": {"target": "box"}},
+                   {"apply_condition": {"target": "target", "condition": "stunned"}}, {"apply_condition": {"target": "target", "condition": "prone"}},
+                   {"remove_condition": {"target": "target", "condition": "prone"}}, {"remove_condition": {"target": "elf", "condition": "x"}},
+                   {"apply_condition": {"target": "target", "condition": "{target.name}-marked"}},
+                   {"apply_ability_damage": {"target": "target", "ability": "str", "amount": 5}},
+                   {"apply_ability_damage": {"target": "elf", "ability": "dex", "amount": 1}}, {"apply_damage": "x"},
+                   {"apply_damage": {"target": ["x"], "amount": 1}}):
+        case([effect, {"set": {"field": "_hp", "value": "target.hp"}}])
+    for body in ({"pool": "5d6", "threshold": 5}, {"pool": "{amount}d10", "threshold": "amount + 5", "modifier": 1}, {"pool": "x"}, {}):
+        case([{"count_successes": body, "store_as": "_pool"}])
+    for effects in ([{"dice": {"expression": "4d6"}, "store_as": "_r"}, {"reroll": {"source": "_r", "predicate": "ones"}, "store_as": "_rr"}],
+                    [{"dice": {"expression": "4d6"}, "store_as": "_r"}, {"reroll": {"source": "_r", "predicate": "failures", "threshold": 4,
+                                                                                    "consequence": [{"log": {"message": "pushed"}}]}}],
+                    [{"set": {"field": "_r", "value": {"sides": 6, "count": 2, "results": [1, 5], "total": 6, "modifier": 0}}},
+                     {"reroll": {"source": "_r", "predicate": "all", "modifier": "amount"}}],
+                    [{"reroll": {"source": "_none"}}], [{"set": {"field": "_r", "value": 3}}, {"reroll": {"source": "_r"}}],
+                    [{"dice": {"expression": "2d6"}, "store_as": "_r"}, {"reroll": {"source": "_r", "predicate": "bogus"}}]):
+        case(effects)
+    for body in ({"pool": 6, "hunger": 2}, {"pool": "amount + 3", "hunger": "amount", "sides": 10, "threshold": 6, "modifier": 1},
+                 {"pool": 3, "hunger": 5}, {"pool": "'x'"}):
+        case([{"hunger_dice": body, "store_as": "_h"}])
+    for body, store in (({"table": "definitions.table", "key": "'1'"}, "_v"), ({"table": "definitions.table", "key": "1"}, "_v"),
+                        ({"table": "definitions.table", "key": "2.0", "default": "dflt"}, "_v"),
+                        ({"table": "definitions.table", "key": "'x'", "default": "dflt"}, "_v"),
+                        ({"table": "definitions.table", "key": "'zz'", "required": True}, "_v"),
+                        ({"table": "definitions.missing", "key": "'1'", "required": True}, "_v"),
+                        ({"table": "definitions.missing", "key": "'1'", "default": 5}, "_v"),
+                        ({"table": "definitions.table", "key": "'1'", "required": "yes"}, "_v"),
+                        ({"table": "definitions.table", "key": "'1'", "required": True, "default": 1}, "_v"),
+                        ({"table": "definitions.table", "key": "'1'"}, "v"), ({"table": "other.table", "key": "'1'"}, "_v"),
+                        ({"table": "definitions.nested.inner", "key": "'k'"}, "_v"), ({"table": "definitions.table", "key": "1 +"}, "_v"),
+                        ({"table": "definitions.table", "key": "state.items"}, "_v"), ({"table": 5, "key": "1"}, "_v")):
+        case([{"table_lookup": body, "store_as": store}])
+    for body in ({"table": "definitions.encounters"}, {"table": "definitions.encounters", "roll": "1d4"},
+                 {"table": "definitions.flat", "roll": "1d6+1"}, {"table": "definitions.empty", "default": "none"},
+                 {"table": "definitions.missing", "default": "nothing"}, {"table": "definitions.flat", "weight_field": "w"},
+                 {"table": "definitions.encounters", "roll": "1d100"}):
+        case([{"random_table": body, "store_as": "_pick"}])
+    for effects in ([{"for_each": {"collection": "_xs", "as": "_x", "do": [{"log": {"message": "{_x}"}}]}}],
+                    [{"set": {"field": "_xs", "value": "state.items"}},
+                     {"for_each": {"collection": "_xs", "as": "_x", "do": [{"log": {"message": "{_x}"}}]}}],
+                    [{"set": {"field": "_xs", "value": "state.rolls"}}, {"for_each": {"collection": "_xs", "do": [{"set": {"field": "_last", "value": "_item.name"}}]}}],
+                    [{"for_each": {"collection": "missing", "do": [{"log": {"message": "never"}}]}}],
+                    [{"set": {"field": "_xs", "value": "state.rolls"}}, {"sort": {"collection": "_xs", "by": "init"}}],
+                    [{"set": {"field": "_xs", "value": "state.rolls"}}, {"sort": {"collection": "_xs", "by": "init", "direction": "asc"}}],
+                    [{"set": {"field": "_xs", "value": "state.rolls"}}, {"sort": {"collection": "_xs", "by": "name", "direction": "DESC"}}],
+                    [{"set": {"field": "_xs", "value": "state.rolls"}}, {"set": {"field": "_alias", "value": "_xs"}},
+                     {"sort": {"collection": "_xs", "by": "init"}}],
+                    [{"set": {"field": "_xs", "value": "state.items"}}, {"sort": {"collection": "_xs", "by": "x"}}],
+                    [{"set": {"field": "_xs", "value": [3, "a"]}}, {"sort": {"collection": "_xs", "by": "real"}}],
+                    [{"sort": "x"}], [{"set": {"field": "_xs", "value": "state.rolls"}}, {"sort": {"collection": "_xs", "by": "init", "direction": 1}}],
+                    [{"list_push": {"list": "_q", "value": "'a'"}}, {"list_push": {"list": "_q", "value": "amount"}}, {"list_pop": {"list": "_q"}, "store_as": "_p"}],
+                    [{"list_push": {"list": "_q", "value": "'a'"}, "store_as": "_r"}, {"list_push": {"list": "_q", "value": "'b'"}}],
+                    [{"set": {"field": "_q", "value": "state.items"}}, {"set": {"field": "_alias", "value": "_q"}}, {"list_push": {"list": "_q", "value": "'z'"}}],
+                    [{"list_pop": {"list": "_none"}}], [{"set": {"field": "_q", "value": 3}}, {"list_push": {"list": "_q", "value": 1}}],
+                    [{"list_push": {"list": "", "value": 1}}], [{"list_push": "x"}],
+                    [{"shuffle": {"collection": "state.items"}, "store_as": "_deck"}], [{"shuffle": {"collection": "state.items"}, "store_as": "deck"}],
+                    [{"shuffle": {"collection": "indices(5)"}, "store_as": "_deck"}, {"set": {"field": "_n", "value": "len(_deck)"}}],
+                    [{"shuffle": {"x": 1}, "store_as": "_deck"}],
+                    # Python iterates the list object by index: items the body adds are visited too.
+                    [{"set": {"field": "_q", "value": "state.items"}}, {"for_each": {"collection": "_q", "as": "_x", "do": [
+                        {"condition": "len(_q) < 5", "on_true": [{"list_push": {"list": "_q", "value": "_x"}}]}]}}],
+                    [{"set": {"field": "_q", "value": "state.items"}},
+                     {"for_each": {"collection": "_q", "as": "_x", "do": [{"list_push": {"list": "_q", "value": 1}}]}}],
+                    [{"set": {"field": "_xs", "value": "state.rolls"}}, {"for_each": {"collection": "_xs", "as": "_x", "do": [
+                        {"sort": {"collection": "_xs", "by": "init", "direction": "asc"}}, {"log": {"message": "{_x.name}"}}]}}],
+                    [{"set": {"field": "_q", "value": "state.items"}}, {"set": {"field": "_alias", "value": "_q"}},
+                     {"list_pop": {"list": "_alias"}, "store_as": "_p"}, {"set": {"field": "_left", "value": "state.items"}}],
+                    [{"set": {"field": "_x", "value": "_logs"}}, {"log": {"message": "one"}}, {"log": {"message": "two"}}],
+                    [{"log": {"message": "zero"}}, {"set": {"field": "_x", "value": "_logs"}}, {"log": {"message": "one"}}],
+                    [{"narrate": "zero"}, {"set": {"field": "_n", "value": "_narrative_directives"}}, {"narrate": "one"}],
+                    # A snapshot kept from before a refresh is a separate copy of the entity.
+                    [{"set": {"field": "_c", "value": "target.conditions"}}, {"set": {"field": "target.hp", "value": 1}},
+                     {"list_push": {"list": "_c", "value": "'x'"}}, {"set": {"field": "_after", "value": "target.conditions"}}],
+                    # One literal makes a fresh list each time it runs.
+                    [{"for_each": {"collection": "_xs", "as": "_x", "do": [{"set": {"field": "_v_{_x}", "value": [0]}}]}},
+                     {"list_push": {"list": "_v_1", "value": "'x'"}}],
+                    [{"set": {"field": "_xs", "value": [1, 2]}},
+                     {"for_each": {"collection": "_xs", "as": "_x", "do": [{"set": {"field": "_v_{_x}", "value": [0]}}]}},
+                     {"list_push": {"list": "_v_1", "value": "'x'"}}],
+                    [{"set": {"field": "_r", "value": {"count": 2, "results": [1, 5], "total": 6}}}, {"reroll": {"source": "_r"}}],
+                    [{"random_table": {"table": "definitions.flat", "roll": "1d2+4"}, "store_as": "_pick"}],
+                    [{"random_table": {"table": "definitions.flat", "roll": "1d2+1"}, "store_as": "_pick"}],
+                    [{"random_table": {"table": "definitions.encounters", "roll": "1d2+3"}, "store_as": "_pick"}]):
+        case(effects)
+    choice_effect = {"request_choice": {"choice_id": "c1", "prompt": "Choose for {target.name}", "options": CHOICE_OPTIONS},
+                     "store_as": "_choice"}
+    after = {"set": {"field": "_chosen", "value": "_choice"}}
+    case([choice_effect, after])
+    case([choice_effect, after], choice={"choice_id": "c1", "option_id": "flee", "expected_request": REQUEST, "prior_answers": []})
+    case([choice_effect, after], choice={"choice_id": "c1", "option_id": "nope", "expected_request": REQUEST, "prior_answers": []})
+    case([choice_effect, after], choice={"choice_id": "c2", "option_id": "flee", "expected_request": REQUEST, "prior_answers": []})
+    case([choice_effect, choice_effect, after],
+         choice={"choice_id": "c1", "option_id": "flee", "expected_request": REQUEST, "prior_answers": []})
+    case([choice_effect, choice_effect, after],
+         choice={"choice_id": "c1", "option_id": "attack", "expected_request": REQUEST, "prior_answers": [[REQUEST, "flee"]]})
+    case([choice_effect, after],
+         choice={"choice_id": "c1", "option_id": "attack", "expected_request": REQUEST, "prior_answers": [[REQUEST, "gone"]]})
+    for body in ({"choice_id": "", "prompt": "p", "options": CHOICE_OPTIONS}, {"choice_id": "c", "prompt": "p", "options": CHOICE_OPTIONS[:1]},
+                 {"choice_id": "c", "prompt": "p", "options": [{"id": "a", "label": "A"}, {"id": "a", "label": "B"}]},
+                 {"choice_id": "c", "prompt": "p", "options": [{"id": "-a", "label": "A"}, {"id": "b", "label": "B"}]},
+                 {"choice_id": "c", "prompt": "p", "options": [{"id": "a", "label": "{missing}"}, {"id": "b", "label": ""}]},
+                 {"choice_id": "c", "prompt": "x" * 4097, "options": CHOICE_OPTIONS},
+                 {"choice_id": "c", "prompt": "p", "options": [{"id": f"o{i}", "label": "L"} for i in range(17)]},
+                 {"choice_id": "c", "prompt": "p", "options": "_opts"}):
+        case([{"set": {"field": "_opts", "value": CHOICE_OPTIONS}}, {"request_choice": body, "store_as": "_c"}])
+    case([{"shuffle": {"collection": "state.items"}, "store_as": "_deck"}, choice_effect])
+    return cases
+
+
+ROLL_EXPRESSIONS = ["1d6", "2d6", "1d20", "3d4+1", "{amount}d6", "d8", "4d10"]
+
+
+def random_handler_effect(rng):
+    kind = rng.choice(["dice", "save", "damage", "heal", "condition", "pool", "reroll", "hunger", "table", "random_table",
+                       "for_each", "sort", "push", "pop", "set"])
+    if kind == "dice":
+        body = {"expression": rng.choice(ROLL_EXPRESSIONS)}
+        for key in ("advantage", "disadvantage", "critical"):
+            if rng.random() < 0.2:
+                body[key] = rng.choice(["true", "false", "amount > 1"])
+        if rng.random() < 0.3:
+            body["modifier"] = rng.choice(["amount", "1", "target.hp"])
+        if rng.random() < 0.2:
+            body["explode"] = True
+        return {"dice": body, "store_as": rng.choice(["_roll", "_r2"])}
+    if kind == "save":
+        return {"save_throw": {"target": rng.choice(["target", "elf"]), "ability": rng.choice(["dex", "str", "con"]),
+                               "dc": rng.choice([8, 12, "amount + 9"])}, "store_as": "_save"}
+    if kind == "damage":
+        return {"apply_damage": {"target": rng.choice(["target", "elf"]), "amount": rng.choice([1, 3, "amount", "_roll.total"])}}
+    if kind == "heal":
+        return {"heal": {"target": rng.choice(["target", "elf"]), "amount": rng.choice([1, 5, "amount"])}}
+    if kind == "condition":
+        return {rng.choice(["apply_condition", "remove_condition"]): {"target": "target", "condition": rng.choice(["prone", "dazed"])}}
+    if kind == "pool":
+        return {"count_successes": {"pool": rng.choice(["5d6", "{amount}d10"]), "threshold": rng.choice([4, 6])}, "store_as": "_pool"}
+    if kind == "reroll":
+        return {"reroll": {"source": rng.choice(["_roll", "_r2"]), "predicate": rng.choice(["all", "ones"])}, "store_as": "_rr"}
+    if kind == "hunger":
+        return {"hunger_dice": {"pool": rng.choice([4, "amount + 2"]), "hunger": rng.choice([0, 1, 2])}, "store_as": "_h"}
+    if kind == "table":
+        return {"table_lookup": {"table": "definitions.table", "key": rng.choice(["'1'", "'2'", "'x'", "_roll.total"]),
+                                 "default": rng.choice([None, "d"])}, "store_as": "_v"}
+    if kind == "random_table":
+        return {"random_table": {"table": rng.choice(["definitions.encounters", "definitions.flat"]),
+                                 **({"roll": "1d4"} if rng.random() < 0.5 else {})}, "store_as": "_pick"}
+    if kind == "for_each":
+        return {"for_each": {"collection": rng.choice(["_xs", "_q"]), "as": "_x",
+                             "do": [{"log": {"message": "{_x}"}}, {"list_push": {"list": "_seen", "value": "_x"}}]}}
+    if kind == "sort":
+        return {"sort": {"collection": "_xs", "by": rng.choice(["init", "name"]), "direction": rng.choice(["asc", "desc"])}}
+    if kind == "push":
+        return {"list_push": {"list": rng.choice(["_q", "_xs"]), "value": rng.choice(["amount", "'v'", "_roll.total"])}}
+    if kind == "pop":
+        return {"list_pop": {"list": rng.choice(["_q", "_xs"])}, "store_as": "_p"}
+    return {"set": {"field": rng.choice(["_xs", "_q"]), "value": rng.choice(["state.rolls", "state.items", "_q", "_xs"])}}
+
+
+def random_handler_cases(rng, count):
+    cases = []
+    for _ in range(count):
+        effects = [random_handler_effect(rng) for _ in range(rng.randint(2, 7))]
+        params = {"target": rng.choice(["orc", "orc", "elf"]), "actor": "pc"}
+        if rng.random() < 0.5:
+            params["amount"] = rng.choice([1, 2, 3])
+        cases.append({"document": handler_tools(effects), "tool": "main", "params": params})
+    return cases
+
+
+def shuffled_vars(document) -> list[str]:
+    names = []
+    for effect in document["tools"]["main"]["effects"]:
+        if isinstance(effect, dict) and "shuffle" in effect and isinstance(effect.get("store_as"), str):
+            names.append(effect["store_as"])
+    return names
+
+
 def main() -> int:
+    handler_cases = handler_targeted() + random_handler_cases(random.Random(5151), 2500)
+    for index, item in enumerate(handler_cases):
+        item["seed"] = index
+        item.update(run(item["document"], item["tool"], item["params"], state=ROLL_STATE, seed=index,
+                        choice=item.get("choice")))
+        if shuffled_vars(item["document"]):
+            item["shuffled"] = shuffled_vars(item["document"])
+        if wide({key: item[key] for key in ("result", "mutations") if key in item}):
+            item["wide_int"] = True
+    HANDLERS_OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "namespace": NAMESPACE, "state": ROLL_STATE,
+                                             "participants": PARTICIPANTS, "cases": handler_cases},
+                                            ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
+    print(f"{len(handler_cases)} handler cases")
     cases = targeted() + random_cases(random.Random(4242), 2500)
     for item in cases:
         item.update(run(item["document"], item["tool"], item["params"]))

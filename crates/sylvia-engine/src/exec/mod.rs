@@ -7,6 +7,7 @@ pub mod bridge;
 pub mod context;
 pub mod effects;
 pub mod error;
+pub mod handlers;
 pub mod shape;
 pub mod template;
 pub mod tool;
