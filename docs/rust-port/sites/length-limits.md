@@ -45,17 +45,17 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` |  `sylvia-app` plan_admission_vectors |
 | `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` |  `sylvia-app` plan_snapshot_vectors |
 | `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` |  `sylvia-app` plan_state_vectors |
-| `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
-| `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
-| `application/reusable_participants.py:264` | `parse_setting_character` | len() against a limit | `or len(source.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
-| `application/reusable_participants.py:267` | `parse_setting_character` | len() against a limit | `or len(character_id) > 160` | |
-| `application/reusable_participants.py:337` | `parse_setting_character` | len() against a limit | `or len(summary) > 500` | |
-| `application/reusable_participants.py:377` | `parse_setting_character` | len() against a limit | `if not isinstance(name, str) or not name or name != name.strip() or len(name) > 160:` | |
-| `application/reusable_participants.py:397` | `parse_setting_character` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
-| `application/reusable_participants.py:438` | `validate_reusable_participant_draft` | len() against a limit | `or len(summary) > 500` | |
-| `application/reusable_participants.py:455` | `validate_reusable_participant_draft` | len() against a limit | `if not isinstance(name, str) or name != name.strip() or not name or len(name) > 160:` | |
-| `application/reusable_participants.py:736` | `load_reusable_participant` | len() against a limit | `or len(str(record["summary"])) > 500` | |
-| `application/reusable_participants.py:777` | `compatible_reusable_participants` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PARTICIPANTS:` | |
+| `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:264` | `parse_setting_character` | len() against a limit | `or len(source.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:267` | `parse_setting_character` | len() against a limit | `or len(character_id) > 160` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:337` | `parse_setting_character` | len() against a limit | `or len(summary) > 500` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:377` | `parse_setting_character` | len() against a limit | `if not isinstance(name, str) or not name or name != name.strip() or len(name) > 160:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:397` | `parse_setting_character` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:438` | `validate_reusable_participant_draft` | len() against a limit | `or len(summary) > 500` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:455` | `validate_reusable_participant_draft` | len() against a limit | `if not isinstance(name, str) or name != name.strip() or not name or len(name) > 160:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:736` | `load_reusable_participant` | len() against a limit | `or len(str(record["summary"])) > 500` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:777` | `compatible_reusable_participants` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PARTICIPANTS:` |  `sylvia-app` reusable_participant_vectors |
 | `application/reusable_plans.py:310` | `save_reusable_rift_plan` | len() against a limit | `or len(title) > 160` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` |  `sylvia-app` reusable_plan_vectors |

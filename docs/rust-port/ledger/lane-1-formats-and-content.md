@@ -41,7 +41,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/ready_campaigns.py` | 504 | `sylvia-app::ready_campaigns` | pending | |
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
 | `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | ported | `character_profile_vectors` (storage scripts: links, tampering, delete and retry) |
-| `src/sylvia_gm/application/reusable_participants.py` | 799 | `sylvia-app::reusable_participants` | pending | |
+| `src/sylvia_gm/application/reusable_participants.py` | 799 | `sylvia-app::reusable_participants` | ported | `reusable_participant_vectors`: Character File parses on the current and 0.3.0 SRD Lite declarations (including the retained-contract weapon-set migration), and a replayed save/load/list/delete scenario with SRD Lite's twelve starters. `ParticipantValidationError` is the new `DomainError::Issues`; a Character File with `NaN` is refused as invalid JSON (row 2) |
 | `src/sylvia_gm/application/reusable_plans.py` | 575 | `sylvia-app::reusable_plans` | ported | `reusable_plan_vectors` (a 430-step scenario replayed from Python). Validators are closures; the Rift fallback reads the caller's `BundledPackages`. Uses `pyjson::loads_bytes`, `pyre` templates, `pystr::splitlines` and `pystr::isidentifier` (`pytext_vectors`) |
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |
 | `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-domain::schema_admission` | ported | In `sylvia-domain`, not `sylvia-app`: package archive admission (this crate) and the engine, store and agent lanes call it |

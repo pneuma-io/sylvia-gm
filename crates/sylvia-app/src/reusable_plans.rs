@@ -96,7 +96,7 @@ fn library_root(storage_root: &Path) -> PathBuf {
     storage_root.join(LIBRARY_NAME)
 }
 
-fn json_error(error: CodedError) -> DomainError {
+pub(crate) fn json_error(error: CodedError) -> DomainError {
     match error.error_type {
         Some(class @ ("JSONDecodeError" | "UnicodeDecodeError")) => {
             DomainError::Diagnosed { error_type: class, message: error.message, diagnostics: Vec::new() }
@@ -105,22 +105,22 @@ fn json_error(error: CodedError) -> DomainError {
     }
 }
 
-fn unicode_error(message: String) -> DomainError {
+pub(crate) fn unicode_error(message: String) -> DomainError {
     DomainError::Diagnosed { error_type: "UnicodeDecodeError", message, diagnostics: Vec::new() }
 }
 
-fn read_bytes(path: &Path) -> DomainResult<Vec<u8>> {
+pub(crate) fn read_bytes(path: &Path) -> DomainResult<Vec<u8>> {
     std::fs::read(path).map_err(|error| os_error(&error, path))
 }
 
 /// `path.read_text(encoding="utf-8")`: a strict decode with universal newlines.
-fn read_text(path: &Path) -> DomainResult<String> {
+pub(crate) fn read_text(path: &Path) -> DomainResult<String> {
     let text = pystr::utf8_decode(&read_bytes(path)?).map_err(unicode_error)?;
     Ok(text.replace("\r\n", "\n").replace('\r', "\n"))
 }
 
 /// `json.loads(text)`.
-fn loads(text: &str) -> DomainResult<Json> {
+pub(crate) fn loads(text: &str) -> DomainResult<Json> {
     pyjson::loads(text).map_err(json_error)
 }
 
@@ -130,7 +130,7 @@ fn loads_bytes(data: &[u8]) -> DomainResult<Json> {
 }
 
 /// `re.fullmatch(r"[0-9a-f]{N}", text)`.
-fn lower_hex(text: &str, length: usize) -> bool {
+pub(crate) fn lower_hex(text: &str, length: usize) -> bool {
     text.len() == length && text.bytes().all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f'))
 }
 
@@ -237,7 +237,7 @@ fn generalized_rift_payload(payload: &JsonMap, title: &str, plan_id: &str) -> Do
 static TEMPORARY_NAMES: AtomicU64 = AtomicU64::new(0);
 
 /// A fresh name in the style of `tempfile`'s, unique within this process.
-fn temporary_name(prefix: &str, suffix: &str) -> String {
+pub(crate) fn temporary_name(prefix: &str, suffix: &str) -> String {
     let count = TEMPORARY_NAMES.fetch_add(1, Ordering::Relaxed);
     let nanos =
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |d| d.subsec_nanos());
@@ -245,7 +245,7 @@ fn temporary_name(prefix: &str, suffix: &str) -> String {
 }
 
 /// `_atomic_write(path, value)`: a fsynced temporary file renamed over `path`.
-fn atomic_write(path: &Path, value: &[u8]) -> DomainResult<()> {
+pub(crate) fn atomic_write(path: &Path, value: &[u8]) -> DomainResult<()> {
     let parent = path.parent().expect("a file in a directory");
     std::fs::create_dir_all(parent).map_err(|error| os_error(&error, parent))?;
     let name = path.file_name().expect("a file name").to_string_lossy();
@@ -656,7 +656,7 @@ pub fn load_reusable_campaign_plan(
 
 /// The classes `reusable_campaign_plan_catalog` catches: `OSError`, `UnicodeError`, `ValueError`
 /// and `CommandRejected`, with their subclasses.
-fn catalog_catches(error: &DomainError) -> bool {
+pub(crate) fn catalog_catches(error: &DomainError) -> bool {
     const CAUGHT: [&str; 13] = [
         "OSError",
         "FileNotFoundError",

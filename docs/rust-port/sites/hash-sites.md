@@ -53,11 +53,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/ready_campaigns.py:331` | `start_ready_campaign` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode()).hexdigest()[:24]` | |
 | `application/ready_campaigns.py:380` | `_start_ready_campaign` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode()).hexdigest()[:24]` | |
 | `application/ready_campaigns.py:395` | `_start_ready_campaign` | hashlib.sha256 | `campaign_suffix = hashlib.sha256(campaign_id.encode()).hexdigest()[:24]` | |
-| `application/reusable_participants.py:365` | `parse_setting_character` | hashlib.sha256 | `"source_content_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),` | |
-| `application/reusable_participants.py:405` | `parse_setting_character` | hashlib.sha256 | `content_sha256=hashlib.sha256(encoded).hexdigest(),` | |
-| `application/reusable_participants.py:516` | `save_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` | |
-| `application/reusable_participants.py:517` | `save_reusable_participant` | hashlib.sha256 | `operation_suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `application/reusable_participants.py:727` | `load_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` | |
+| `application/reusable_participants.py:365` | `parse_setting_character` | hashlib.sha256 | `"source_content_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:405` | `parse_setting_character` | hashlib.sha256 | `content_sha256=hashlib.sha256(encoded).hexdigest(),` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:516` | `save_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:517` | `save_reusable_participant` | hashlib.sha256 | `operation_suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:727` | `load_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` |  `sylvia-app` reusable_participant_vectors |
 | `application/reusable_plans.py:202` | `_save_validated_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256( canonical_json_bytes(validated.payload) + validated.readable_markdown.encode("utf-8") + contribution_bytes + (b"" ...` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:208` | `_save_validated_campaign_plan` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:223` | `_save_validated_campaign_plan` | hashlib.sha256 | `"source_plan_content_sha256": hashlib.sha256( canonical_json_bytes(source_payload) ).hexdigest(),` |  `sylvia-app` reusable_plan_vectors |
