@@ -3,9 +3,10 @@
 //! participants and nested calls). The rest arrive in later pull requests; until then the
 //! dispatcher refuses them by name.
 
-use super::context::{Combat, ExecutionContext};
+use super::context::{Combat, ExecutionContext, NestedMode};
 use super::error::{float_to_int, ExecError};
 use super::handlers;
+use super::time;
 use super::template::{resolve_params, resolve_template};
 use super::tool::{execute_tool, ToolHost};
 use crate::expr::value::{Dict, Value};
@@ -150,6 +151,16 @@ pub(crate) fn execute_effect(
         "list_pop" => handlers::handle_list_pop(&body, effect_map, ctx),
         "shuffle" => handlers::handle_shuffle(&body, effect_map, ctx),
         "request_choice" => handlers::handle_request_choice(&body, effect_map, ctx),
+        "trigger" => time::handle_trigger(&body, effect_map, ctx, host),
+        "set_flag" => time::handle_set_flag(&body, effect_map, ctx),
+        "advance_time" => time::handle_advance_time(&body, ctx),
+        "initiative" => time::handle_initiative(&body, effect_map, ctx),
+        "advance_initiative" => time::handle_advance_initiative(&body, effect_map, ctx),
+        "transition_scene" => time::handle_transition_scene(&body, ctx),
+        "defer" => time::handle_defer(&body, effect_map, ctx),
+        "register_initiative_trigger" => time::handle_register_initiative_trigger(&body, ctx),
+        "clock_create" => time::handle_clock_create(&body, ctx),
+        "clock_tick" => time::handle_clock_tick(&body, ctx),
         other => Err(ExecError::effect(other, "This effect is not yet ported to Rust")),
     };
     result.map_err(|error| error.in_effect(&effect_type))
@@ -561,15 +572,21 @@ fn handle_nested_call(
         return Err(ExecError::effect("call", "Nested tool name is required"));
     }
     let resolved = resolve_params(&params, ctx);
-    let resolved = host.nested_parameters(&tool_name, resolved, ctx.state_bridge.as_deref())?;
+    let resolved = match ctx.nested_mode {
+        NestedMode::Package => host.nested_parameters(&tool_name, resolved, ctx.state_bridge.as_deref())?,
+        NestedMode::Procedure => resolved,
+    };
     let store_as = effect.get("store_as").cloned().unwrap_or(Value::None);
     ctx.budget.enter_call().map_err(|error| ExecError::effect("call", error.message))?;
-    let combat = match &ctx.combat {
-        Combat::Bridge => Combat::Bridge,
-        Combat::Own(map) => Combat::Own(map.clone()),
+    // The package's nested executor passes the bridge's combat state; a procedure's passes a copy.
+    let combat = match (ctx.nested_mode, &ctx.combat) {
+        (NestedMode::Package, Combat::Bridge) => Combat::Bridge,
+        (_, _) => Combat::Own(ctx.combat_state()),
     };
     let budget = ctx.budget;
-    let choice = ctx.choice;
+    let choice = if ctx.nested_mode == NestedMode::Package { ctx.choice } else { None };
+    let procedure = ctx.procedure_executor.clone();
+    let mode = ctx.nested_mode;
     let result = execute_tool(
         &tool_name,
         &resolved,
@@ -579,6 +596,8 @@ fn handle_nested_call(
         Some(budget),
         &mut *ctx.dice,
         choice,
+        procedure,
+        mode,
     );
     budget.leave_call().map_err(ExecError::from)?;
     let result = result?;

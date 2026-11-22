@@ -34,6 +34,22 @@ pub struct Extras {
     pub participant_parameter_names: BTreeSet<String>,
 }
 
+/// How a nested `call` runs: as the package runtime's `nested` executor (the bridge's combat
+/// state, the choice control, prepared parameters) or as a procedure's `_make_nested_executor`
+/// (a copy of the combat state, no choice control).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NestedMode {
+    Package,
+    Procedure,
+}
+
+/// `ctx.procedure_executor`: a trigger's depth and the combat state its procedures run against.
+#[derive(Debug, Clone)]
+pub struct ProcedureExecutor {
+    pub depth: usize,
+    pub combat: Combat,
+}
+
 /// `ChoiceResolutionControl`: the owner's authorized answer for one suspended package choice,
 /// and the answers already given earlier in the same action. Shared by every nested call.
 #[derive(Debug)]
@@ -65,6 +81,10 @@ pub struct ExecutionContext<'a> {
     /// Lists changed in place so far, each old list with the one that replaced it (kept alive so
     /// their addresses stay unique while the call runs).
     pub list_history: Vec<(ListRef, ListRef)>,
+    /// `ctx.procedure_executor`.
+    pub procedure_executor: Option<ProcedureExecutor>,
+    /// How nested calls run.
+    pub nested_mode: NestedMode,
 }
 
 /// `copy.deepcopy(value)` for execution values: every container rebuilt, so nothing aliases the

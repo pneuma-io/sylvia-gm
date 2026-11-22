@@ -1,7 +1,7 @@
 //! `runtime/_tool_executor.py`: one tool invocation, from parameters to `ToolResult`.
 
 use super::bridge::StateBridge;
-use super::context::{ChoiceControl, Combat, ExecutionContext, Extras};
+use super::context::{ChoiceControl, Combat, ExecutionContext, Extras, NestedMode, ProcedureExecutor};
 use super::effects::execute_effects;
 use super::error::ExecError;
 use super::template::resolve_template;
@@ -172,6 +172,10 @@ pub trait ToolHost {
     fn tool(&self, name: &str) -> Option<&ExecTool>;
     fn ruleset_config(&self) -> &Value;
     fn definitions(&self) -> &Value;
+    /// The Ruleset's procedures, in order.
+    fn procedures(&self) -> &[super::procedures::ExecProcedure] {
+        &[]
+    }
     /// The parameters a nested `call` passes on (the package host binds state parameters).
     fn nested_parameters(
         &self,
@@ -406,6 +410,8 @@ fn build_context<'a>(
     budget: &'a ExecutionBudget,
     dice: &'a mut Dice,
     choice: Option<&'a ChoiceControl>,
+    procedure: Option<ProcedureExecutor>,
+    mode: NestedMode,
 ) -> ExecutionContext<'a> {
     let mut ctx = ExecutionContext {
         params: params.clone(),
@@ -421,6 +427,8 @@ fn build_context<'a>(
         dice,
         choice,
         list_history: Vec::new(),
+        procedure_executor: procedure,
+        nested_mode: mode,
     };
     if let Some(bridge) = ctx.state_bridge.as_deref() {
         if bridge.entity_exists("state") {
@@ -572,6 +580,8 @@ pub fn prepare_tool_context<'a>(
     budget: &'a ExecutionBudget,
     dice: &'a mut Dice,
     choice: Option<&'a ChoiceControl>,
+    procedure: Option<ProcedureExecutor>,
+    mode: NestedMode,
 ) -> Result<Prepared<'a>, ExecError> {
     let Some(tool) = host.tool(tool_name) else {
         return Ok(Prepared::Result(Box::new(ToolResult::failure(
@@ -608,7 +618,7 @@ pub fn prepare_tool_context<'a>(
             )
         })));
     }
-    let mut ctx = build_context(tool, &merged, bridge, host, combat, budget, dice, choice);
+    let mut ctx = build_context(tool, &merged, bridge, host, combat, budget, dice, choice, procedure, mode);
     inject_distance_vars(tool, &merged, &mut ctx);
     let mut failures: Vec<String> = Vec::new();
     let mut evaluation_error: Option<String> = None;
@@ -679,10 +689,12 @@ pub fn execute_tool(
     budget: Option<&ExecutionBudget>,
     dice: &mut Dice,
     choice: Option<&ChoiceControl>,
+    procedure: Option<ProcedureExecutor>,
+    mode: NestedMode,
 ) -> Result<ToolResult, ExecError> {
     let local = ExecutionBudget::default();
     let budget = budget.unwrap_or(&local);
-    let mut ctx = match prepare_tool_context(tool_name, params, host, bridge, combat, budget, dice, choice)? {
+    let mut ctx = match prepare_tool_context(tool_name, params, host, bridge, combat, budget, dice, choice, procedure, mode)? {
         Prepared::Result(result) => return Ok(*result),
         Prepared::Context(ctx) => ctx,
     };
