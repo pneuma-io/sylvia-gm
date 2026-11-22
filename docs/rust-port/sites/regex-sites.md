@@ -137,7 +137,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_schema_validator.py:1629` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_template_resolver.py:19` | `<module>` | re.compile; plain | `_TEMPLATE_RE: re.Pattern[str] = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}")  # noqa: E501` |  `sylvia-engine` execution_vectors |
 | `runtime/_template_resolver.py:67` | `resolve_params` | re.fullmatch; plain | `match = re.fullmatch(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}", value)  # noqa: E501` |  `sylvia-engine` execution_vectors |
-| `runtime/_time_manager.py:55` | `<module>` | re.compile; plain | `_DURATION_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$")` | |
+| `runtime/_time_manager.py:55` | `<module>` | re.compile; plain | `_DURATION_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$")` |  `sylvia-engine` execution_procedures_vectors |
 | `spatial/_interface.py:17` | `<module>` | re.compile; plain | `_IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")` | |
 
 ## Lane 3: Storage and authority
