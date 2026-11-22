@@ -122,12 +122,54 @@ def run(scene_value: dict, query_value: dict) -> dict | None:
     return {"result": result}
 
 
+# Coordinates on the scene's own boundaries (faces, radii, centres), nudged across the engine's
+# 1e-12 tolerance, so the tolerance branches are reached.
+SNAPS: list[list[float]] | None = None
+NUDGES = [0, 0, 0, 1e-13, -1e-13, 5e-13, -5e-13, 1e-12, -1e-12, 3e-12, -3e-12]
+
+
+def boundary_values(scene: dict) -> list[list[float]]:
+    axes: list[set[float]] = [set(), set(), set()]
+    for item in scene["geometry"]:
+        for i in range(3):
+            axes[i].update((item["volume"]["min"][i], item["volume"]["max"][i]))
+    for item in scene["entities"]:
+        position, footprint = item["position"], item["footprint"]
+        extents = footprint.get("half_extents") or [footprint["radius"]] * 2
+        for i in range(2):
+            axes[i].update((position[i], position[i] - extents[i], position[i] + extents[i]))
+        axes[2].update((position[2], position[2] + item["height"]))
+    for item in scene["zones"]:
+        shape = item["shape"]
+        if shape["kind"] == "box":
+            for i in range(3):
+                axes[i].update((shape["min"][i], shape["max"][i]))
+        else:
+            for i in range(2):
+                axes[i].update((shape["center"][i], shape["center"][i] - shape["radius"], shape["center"][i] + shape["radius"]))
+            axes[2].update((shape["center"][2], shape["center"][2] + shape["height"]))
+    return [sorted(float(value) for value in axis) for axis in axes]
+
+
 def point(rng, bounds, z=None):
     lower, upper = bounds["min"], bounds["max"]
     values = [round(rng.uniform(lower[i], upper[i]), rng.choice([0, 1, 3, 6])) for i in range(3)]
+    if SNAPS is not None and rng.random() < 0.5:
+        for i in range(3):
+            if rng.random() < 0.7:
+                values[i] = rng.choice(SNAPS[i]) + rng.choice(NUDGES)
     if z is not None:
         values[2] = z
     return values
+
+
+def aligned(rng, start, end):
+    """Make the segment (nearly) parallel to an axis plane: one coordinate copied, nudged."""
+    end = list(end)
+    if rng.random() < 0.35:
+        axis = rng.randrange(3)
+        end[axis] = start[axis] + rng.choice(NUDGES)
+    return end
 
 
 def selector(rng):
@@ -143,7 +185,8 @@ def random_query(rng: random.Random, scene: dict) -> dict:
     kind = rng.choice(list(RESOLVERS))
     floor = bounds["min"][2]
     if kind == "ray":
-        return {"kind": "ray", "map_id": map_id, "origin": point(rng, bounds), "destination": point(rng, bounds),
+        origin = point(rng, bounds)
+        return {"kind": "ray", "map_id": map_id, "origin": origin, "destination": aligned(rng, origin, point(rng, bounds)),
                 "include": rng.choice([["geometry"], ["entities"], ["geometry", "entities"]]), "max_intersections": rng.randint(1, 6)}
     if kind == "exposure":
         query = {"kind": "exposure", "map_id": map_id, "observer": {"point": point(rng, bounds)},
@@ -222,20 +265,115 @@ def random_query(rng: random.Random, scene: dict) -> dict:
     return query
 
 
+def row_scene() -> dict:
+    """Blocking circles almost exactly in line, so a facing support's angle wraps past 2*pi."""
+    scene = pillars(0, random.Random(3))
+    scene["map"]["id"] = "row"
+    scene["geometry"] = []
+    scene["entities"] = [entity("r.mover", [3, 10, 0], {"kind": "circle", "radius": 0.5}),
+                         entity("r.a", [10, 10, 0], {"kind": "circle", "radius": 1}),
+                         entity("r.b", [20, 10 - 1e-13, 0], {"kind": "circle", "radius": 1}),
+                         entity("r.c", [15, 10 + 1e-13, 0], {"kind": "circle", "radius": 1})]
+    for item in scene["entities"]:
+        item["map_id"] = "row"
+    return scene
+
+
+def tie_scene() -> dict:
+    """A wall and an entity sharing faces, so a ray meets both at the same parameter."""
+    scene = copy.deepcopy(fixtures.QUERY_SCENE)
+    scene["geometry"].append({"id": "z.wall", "map_id": "keep", "volume": {"kind": "box", "min": [5, 0, 0], "max": [6, 10, 4]},
+                              "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {},
+                              "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}})
+    scene["entities"].append({"id": "a.ent", "map_id": "keep", "position": [5.5, 5, 0], "footprint": {"kind": "box", "half_extents": [0.5, 0.5]},
+                              "height": 2, "facing": [1, 0], "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {}})
+    return scene
+
+
+def targeted_engine(scenes: list[dict]) -> list[tuple[int, dict]]:
+    cases = []
+    tie, row, yard = scenes.index(TIE), scenes.index(ROW), 3
+    for y in (5, 5.25, 4.5, 5.5):
+        cases.append((tie, {"kind": "ray", "map_id": "keep", "origin": [0, y, 1], "destination": [10, y, 1],
+                            "include": ["geometry", "entities"], "max_intersections": 8}))
+        cases.append((tie, {"kind": "exposure", "map_id": "keep", "observer": {"point": [0, y, 1]}, "target": {"entity_id": "elf"},
+                            "samples": {"horizontal": 3, "vertical": 2}, "include": ["geometry", "entities"]}))
+    # Observers inside opaque bodies.
+    for observer in ([5.5, 5, 1], [5.2, 2, 3], [8, 16, 0.5]):
+        cases.append((tie, {"kind": "exposure", "map_id": "keep", "observer": {"point": observer}, "target": {"entity_id": "orc"},
+                            "samples": {"horizontal": 4, "vertical": 3}, "include": ["geometry", "entities"]}))
+    # A box area at the corner of a circle's bounding box, and an upright prism near a circle.
+    for minimum in ([5.9, 5.9, 0], [5.85, 5.85, 0], [5.8, 5.8, 0]):
+        cases.append((0, {"kind": "area", "map_id": "keep", "shape": {"kind": "box", "min": minimum, "max": [7, 7, 1]},
+                          "include": ["entities"], "max_results": 4}))
+    for gap in (0, 5e-13, 2e-12, 1e-9, 1e-6, -1e-9):
+        cases.append((0, {"kind": "area", "map_id": "keep", "shape": {"kind": "prism", "origin": [3, 5.5, 0], "direction": [1, 0, 0],
+                                                                       "up": [0, 0, 1], "length": 2 - gap, "width": 1, "height": 1},
+                          "include": ["entities"], "max_results": 4}))
+    # Circle routes: sixteen and seventeen blocking circles; an angle that wraps.
+    yard_scene = scenes[yard]
+    others = [row["id"] for row in yard_scene["entities"] if row["id"] != "p.mover"]
+    for count in (15, 16, 17):
+        cases.append((yard, {"kind": "circle_route", "map_id": "yard", "moving_entity_id": "p.mover", "destination": [27, 27, 0],
+                             "moving_radius": 0.5, "circles": [{"entity_id": value, "radius": 1, "blocking": True} for value in others[:count]],
+                             "metadata_filter": NO_FILTER, "max_tests": 400}))
+    for radius in (0.5, 1, 1.5):
+        cases.append((row, {"kind": "circle_route", "map_id": "row", "moving_entity_id": "r.mover", "destination": [27, 10, 0],
+                            "moving_radius": radius, "circles": [{"entity_id": value, "radius": 1, "blocking": True} for value in ("r.a", "r.b", "r.c")],
+                            "metadata_filter": NO_FILTER, "max_tests": 600}))
+    return cases
+
+
+NO_FILTER = {"key": "", "value": "", "missing_matches": False}
+ROW = row_scene()
+TIE = tie_scene()
+
+
+def exhausted_paths(rng, scenes, cases):
+    """Unreachable goals with `max_steps` exactly the region's size: the frontier empties as the
+    budget runs out, which is not truncation."""
+    added = 0
+    while added < 40:
+        index = rng.randrange(len(scenes))
+        query = random_query(rng, scenes[index])
+        if query["kind"] != "path":
+            continue
+        query["max_steps"] = 100000
+        record = run(scenes[index], query)
+        if record is None or "result" not in record or record["result"]["found"]:
+            continue
+        for steps in (record["result"]["expanded"], record["result"]["expanded"] - 1):
+            if steps >= 1:
+                exact = {**query, "max_steps": steps}
+                again = run(scenes[index], exact)
+                if again is not None:
+                    cases.append({"scene": index, "query": exact, **again})
+        added += 1
+
+
 def main() -> int:
+    global SNAPS
     rng = random.Random(4807)
-    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2))]
+    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2)), ROW, TIE]
+    snaps = [boundary_values(scene) for scene in scenes]
     cases = []
     for query in fixtures.query_targeted():
         record = run(fixtures.QUERY_SCENE, query)
         if record is not None:
             cases.append({"scene": 0, "query": query, **record})
-    while len(cases) < 7000:
+    for index, query in targeted_engine(scenes):
+        record = run(scenes[index], query)
+        if record is not None:
+            cases.append({"scene": index, "query": query, **record})
+    exhausted_paths(rng, scenes[:4], cases)
+    while len(cases) < 9000:
         index = rng.randrange(len(scenes))
+        SNAPS = snaps[index] if rng.random() < 0.6 else None
         query = random_query(rng, scenes[index])
         record = run(scenes[index], query)
         if record is not None:
             cases.append({"scene": index, "query": query, **record})
+    SNAPS = None
     OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "platform": PLATFORM, "scenes": scenes, "cases": cases},
                                    ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
     kinds = {}
