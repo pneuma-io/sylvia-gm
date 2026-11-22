@@ -11,6 +11,7 @@
 pub mod actions;
 pub mod authority;
 pub mod backup;
+pub mod builder_sources;
 pub mod campaigns;
 pub mod continuity;
 pub mod error;
@@ -28,6 +29,7 @@ mod owner_sessions;
 pub mod package_reads;
 pub mod packages;
 mod participant_history;
+pub mod purge;
 pub mod pytext;
 pub mod safe_file;
 pub mod schema;

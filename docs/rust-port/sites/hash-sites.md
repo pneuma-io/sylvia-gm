@@ -124,8 +124,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:5479` | `AuthorityOwner.export_package_candidate` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `application/authority.py:6044` | `AuthorityOwner.read_campaign_reference` | hashlib.sha256 | `"content_sha256": hashlib.sha256(content_bytes).hexdigest(),` | |
 | `application/authority.py:7379` | `AuthorityOwner._player_action_in_owned_work` | hashlib.sha256 | `confirmation_token = hashlib.sha256(canonical_json_bytes({ "operation_id": operation_id, "origin": origin, "parameters": confirmation_parameters, "...` | |
-| `application/authority.py:8098` | `AuthorityOwner.purge_campaign` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | |
-| `application/authority.py:8173` | `AuthorityOwner.campaign_purge_receipt_exists` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | |
+| `application/authority.py:8098` | `AuthorityOwner.purge_campaign` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | `sylvia-app` purge |
+| `application/authority.py:8173` | `AuthorityOwner.campaign_purge_receipt_exists` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | `sylvia-app` purge (reconcile) |
 | `application/authority.py:8224` | `AuthorityOwner._lifecycle_operation` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | `sylvia-app` lifecycle |
 | `application/authority.py:9922` | `_semantic_hash` | hashlib.sha256 | `return hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
 | `application/campaign_rules_update.py:103` | `_offer_bundled_update` | hashlib.sha256 | `install_id="bundled-update-" + hashlib.sha256(raw).hexdigest(),` | |
@@ -135,7 +135,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/builder_source_ingestion.py:160` | `_source_identity` | hashlib.sha256 | `identity = hashlib.sha256( media_type.encode("utf-8") + b"\x00" + bytes.fromhex(content_sha256) ).hexdigest()[:24]` | |
 | `infrastructure/builder_source_ingestion.py:218` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256( b"\x00".join( item[2].encode("ascii") for item in sorted(extracted_sources, key=lambda row: row[0]) ) ).hexdigest(...` | |
 | `infrastructure/builder_source_ingestion.py:225` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256(batch_id.encode("utf-8")).hexdigest()[:24]` | |
-| `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
+| `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | `sylvia-app` purge |
 | `infrastructure/campaign_archive.py:724` | `source_authority_schema_claim_sha256` | hashlib.sha256 | `return hashlib.sha256(_json_bytes(preimage)).hexdigest()` | |
 | `infrastructure/campaign_archive.py:1550` | `_validate_manifest_derived_package_graph.closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
 | `infrastructure/campaign_archive.py:1696` | `_stream_member_digest` | hashlib.sha256 | `digest = hashlib.sha256()` | |

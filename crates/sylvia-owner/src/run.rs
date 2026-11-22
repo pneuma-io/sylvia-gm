@@ -468,6 +468,36 @@ async fn serve(
         close_owner(owner, store_thread).await;
         return startup_failed();
     }
+    // Python's `reconcile_builder_source_purges(storage_root, live campaign ids,
+    // application_owner.campaign_purge_receipt_exists)`, after storage preparation. (The bundled
+    // preinstalls and the legacy Builder chat migration Python runs between the two are not
+    // ported yet.) A failure ends the launch as the preparation's does.
+    let storage_root = owner.context.storage_root.clone();
+    let reconciled = owner
+        .context
+        .store
+        .call(move |store| {
+            let live: std::collections::HashSet<String> =
+                store.campaign_index_entries()?.into_iter().map(|entry| entry.campaign_id).collect();
+            sylvia_store::builder_sources::reconcile_builder_source_purges(
+                &storage_root,
+                &live,
+                &mut |operation, campaign| {
+                    sylvia_app::authority::lifecycle::campaign_purge_receipt_exists(
+                        store, operation, campaign,
+                    )
+                },
+            )
+        })
+        .await;
+    if reconciled.is_err() {
+        owner.diagnostics.record(
+            "owner_failed",
+            Fields { outcome: Some("error"), error_code: Some("internal_error"), ..Fields::default() },
+        );
+        close_owner(owner, store_thread).await;
+        return startup_failed();
+    }
     let mut ready = JsonMap::new();
     ready.insert("ok".into(), Json::Bool(true));
     ready.insert("type".into(), Json::String("ready".into()));

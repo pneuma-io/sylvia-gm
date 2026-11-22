@@ -155,6 +155,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::campaigns::handle_restore_archived_campaign(context, params).await
         }
         "trash_campaign" => commands::campaigns::handle_trash_campaign(context, params).await,
+        "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
         "restore_trashed_campaign" => {
             commands::campaigns::handle_restore_trashed_campaign(context, params).await
         }

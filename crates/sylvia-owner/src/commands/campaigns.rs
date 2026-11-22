@@ -411,6 +411,60 @@ pub async fn handle_restore_trashed_campaign(ctx: &DispatchContext, params: &Jso
     Ok(lifecycle_value(&result))
 }
 
+/// `handle_purge_campaign`: `application_owner.purge_campaign(...)` with the Builder sources'
+/// filesystem half: the campaign workspace's sources are quarantined after the store's preflight,
+/// restored if the purge fails, and deleted once it commits (or, for a replay, the quarantine
+/// this exact earlier purge left).
+pub async fn handle_purge_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_store::builder_sources::{
+        finalize_builder_source_purge, finalize_existing_builder_source_purge,
+        restore_builder_sources_after_failed_purge, stage_builder_sources_for_purge, BuilderSourcePurgeStage,
+    };
+    let campaign_id = required(params, "campaign_id")?;
+    let operation_id = required(params, "operation_id")?;
+    let workspace = ctx.storage_root.join("campaigns").join(&campaign_id);
+    let stage: std::sync::Arc<std::sync::Mutex<Option<BuilderSourcePurgeStage>>> = Default::default();
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let confirmation = required(params, "confirmation")?;
+    let mut prepare = {
+        let (stage, workspace, campaign_id, operation_id) =
+            (std::sync::Arc::clone(&stage), workspace.clone(), campaign_id.clone(), operation_id.clone());
+        move || {
+            let staged = stage_builder_sources_for_purge(&workspace, &campaign_id, &operation_id)?;
+            *stage.lock().unwrap_or_else(std::sync::PoisonError::into_inner) = Some(staged);
+            Ok(())
+        }
+    };
+    let mut rollback = {
+        let stage = std::sync::Arc::clone(&stage);
+        move || match stage.lock().unwrap_or_else(std::sync::PoisonError::into_inner).as_ref() {
+            Some(staged) => restore_builder_sources_after_failed_purge(staged),
+            None => Ok(()),
+        }
+    };
+    let result = sylvia_app::authority::lifecycle::purge_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+        &confirmation,
+        Some(&mut prepare),
+        Some(&mut rollback),
+    )
+    .await
+    .map_err(store_error)?;
+    let staged = stage.lock().unwrap_or_else(std::sync::PoisonError::into_inner).clone();
+    match staged {
+        None => finalize_existing_builder_source_purge(&workspace, &campaign_id, &operation_id),
+        Some(staged) => finalize_builder_source_purge(&staged),
+    }
+    .map_err(store_error)?;
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), result.campaign_id.as_str().into());
+    value.insert("resulting_revision".into(), result.resulting_revision.into());
+    Ok(Json::Object(value))
+}
+
 /// `_optional_text(payload, key)`: absent or `null` is `None`; anything else must be a
 /// nonempty string.
 fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
@@ -716,6 +770,158 @@ mod tests {
         }
         drop(context);
         tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+        let _ = std::fs::remove_dir_all(folder);
+    }
+
+    /// Every entry under `campaigns/`, relative, with each file's SHA-256: the generator's `tree`.
+    fn workspace_tree(root: &std::path::Path) -> Json {
+        fn walk(root: &std::path::Path, folder: &std::path::Path, entries: &mut Vec<(String, Json)>) {
+            for entry in std::fs::read_dir(folder).unwrap() {
+                let path = entry.unwrap().path();
+                let relative = path.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/");
+                if path.is_dir() {
+                    entries.push((relative.clone(), serde_json::json!([relative, "dir", null])));
+                    walk(root, &path, entries);
+                } else {
+                    let digest = sylvia_base::hash::sha256_hex(std::fs::read(&path).unwrap());
+                    entries.push((relative.clone(), serde_json::json!([relative, "file", digest])));
+                }
+            }
+        }
+        let mut entries = Vec::new();
+        if root.join("campaigns").exists() {
+            walk(root, &root.join("campaigns"), &mut entries);
+        }
+        entries.sort_by(|left, right| left.0.cmp(&right.0));
+        Json::Array(entries.into_iter().map(|(_, entry)| entry).collect())
+    }
+
+    /// Every table's rows, sorted, for comparing a database with Python's exactly.
+    fn table_rows(path: &std::path::Path) -> std::collections::BTreeMap<String, Vec<String>> {
+        let connection = rusqlite::Connection::open(path).unwrap();
+        let tables: Vec<String> = connection
+            .prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
+            .unwrap()
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<_, _>>()
+            .unwrap();
+        tables
+            .into_iter()
+            .map(|table| {
+                let mut statement = connection.prepare(&format!("SELECT * FROM \"{table}\"")).unwrap();
+                let width = statement.column_count();
+                let mut rows: Vec<String> = statement
+                    .query_map([], |row| {
+                        let values: Vec<rusqlite::types::Value> =
+                            (0..width).map(|index| row.get(index)).collect::<Result<_, _>>()?;
+                        Ok(format!("{values:?}"))
+                    })
+                    .unwrap()
+                    .collect::<Result<_, _>>()
+                    .unwrap();
+                rows.sort();
+                (table, rows)
+            })
+            .collect()
+    }
+
+    fn gunzip_to(relative: &str, target: &std::path::Path) {
+        let mut bytes = Vec::new();
+        flate2::read::GzDecoder::new(std::fs::File::open(workspace(relative)).unwrap())
+            .read_to_end(&mut bytes)
+            .unwrap();
+        std::fs::write(target, bytes).unwrap();
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn purges_answer_and_leave_the_workspace_as_pythons_handler_does() {
+        // Lane 3's Python run of `handle_purge_campaign` (`generate_purge_runs.py`): the owner's
+        // purge with the Builder sources' quarantine, restore and finalize, and `trash_campaign`,
+        // through the owner's dispatch. Each reply, the campaign workspace after each step, and
+        // the database afterwards must be Python's.
+        let record = read_json("crates/sylvia-app/tests/vectors/purge/purge_runs.json");
+        let folder = std::env::temp_dir().join(format!("sylvia-owner-purge-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&folder);
+        std::fs::create_dir_all(&folder).unwrap();
+        let database = folder.join("authority.sqlite3");
+        gunzip_to("crates/sylvia-app/tests/vectors/purge/seed.sqlite3.gz", &database);
+        let armed: std::sync::Arc<std::sync::Mutex<Option<String>>> = Default::default();
+        let seam = |name: &'static str| {
+            let armed = std::sync::Arc::clone(&armed);
+            Box::new(move || -> sylvia_store::StoreResult<()> {
+                if armed.lock().unwrap().as_deref() == Some(name) {
+                    return Err(sylvia_store::StoreError::Other(format!("{name} lifecycle commit fault")));
+                }
+                Ok(())
+            }) as Box<dyn Fn() -> sylvia_store::StoreResult<()> + Send>
+        };
+        let faults = sylvia_store::store::Faults {
+            before_lifecycle_commit: Some(seam("before")),
+            after_lifecycle_commit: Some(seam("after")),
+            ..sylvia_store::store::Faults::default()
+        };
+        let path = database.clone();
+        let (store, thread) = sylvia_store::StoreHandle::spawn(move || {
+            let mut store = sylvia_store::AuthorityStore::open_for_application_owner(&path, None)?;
+            store.set_faults(faults);
+            Ok(store)
+        })
+        .unwrap();
+        let context = crate::dispatch::DispatchContext {
+            owner_id: "purge-test".into(),
+            storage_root: folder.clone(),
+            handshake_verified: true,
+            method: String::new(),
+            gm_system_prompt: None,
+            store,
+            providers: None,
+            session_loop: None,
+            bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+                sylvia_app::bundled_packages::BundledSources::from_repository_root(
+                    &crate::util::source_root(),
+                ),
+            )),
+            record_provider_warning: std::sync::Arc::new(|_: &str| {}),
+        };
+        for (index, run) in record["runs"].as_array().unwrap().iter().enumerate() {
+            let method = run["op"].as_str().unwrap();
+            let label = format!("#{index} {method}");
+            let want = &run["outcome"];
+            if method == "write" {
+                let path = folder.join(run["path"].as_str().unwrap());
+                std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+                std::fs::write(&path, run["text"].as_str().unwrap().as_bytes()).unwrap();
+            } else {
+                *armed.lock().unwrap() = run["fault"].as_str().map(str::to_owned);
+                let params = run["params"].as_object().unwrap().clone();
+                let reply = crate::dispatch::dispatch(&context, method, &params).await;
+                *armed.lock().unwrap() = None;
+                match reply {
+                    Ok(value) => assert_eq!(value.to_string(), want["ok"].to_string(), "{label}"),
+                    // The generator's own fault class, from a commit seam: the owner's internal error.
+                    Err(crate::dispatch::Failure::Internal { .. }) => {
+                        assert_eq!(want["error"], "Fault", "{label}")
+                    }
+                    Err(crate::dispatch::Failure::Rejected(error)) => {
+                        assert_eq!(error.error_type, want["error"].as_str(), "{label}: type");
+                        assert_eq!(
+                            error.code,
+                            want["code"].as_str().unwrap_or("command_rejected"),
+                            "{label}: code"
+                        );
+                        assert_eq!(error.message, want["message"].as_str().unwrap(), "{label}: message");
+                    }
+                    Err(other) => panic!("{label}: Rust {other:?}, Python {want}"),
+                }
+            }
+            assert_eq!(workspace_tree(&folder), run["tree"], "{label}: the campaign workspace");
+        }
+        drop(context);
+        tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+        let python = folder.join("python.sqlite3");
+        gunzip_to("crates/sylvia-app/tests/vectors/purge/purge_runs.sqlite3.gz", &python);
+        assert_eq!(table_rows(&database), table_rows(&python), "the database differs from Python's");
         let _ = std::fs::remove_dir_all(folder);
     }
 }
