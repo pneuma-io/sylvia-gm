@@ -3,7 +3,11 @@
 Run with the snapshot's own interpreter, from the repository root, after the store generators
 whose profiles are the bases (`generate_session_page_runs.py`, `generate_stored_authority_runs.py`,
 `generate_campaign_index.py`, `generate_continuity_runs.py`,
-`generate_package_runs.py`):
+`generate_package_runs.py`). It also writes one base of its own, `snapshots/riichi_started.sqlite3.gz`:
+the cast base after Python's owner started a Riichi game on `campaign-table`, so the Ruleset's
+private state is set and the model's decision boundary is not empty. Its shuffles use a seeded
+`random.Random` in place of `secrets.SystemRandom`, as Python's Riichi tests pin them, so the
+base is the same on every run.
 
     .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_snapshot_runs.py
 
@@ -25,6 +29,8 @@ import dataclasses
 import enum
 import gzip
 import json
+import random
+import secrets
 import sqlite3
 import sys
 import tempfile
@@ -35,7 +41,8 @@ HERE = Path(__file__).resolve().parent
 REPOSITORY = HERE.parents[3]
 sys.path.insert(0, str(REPOSITORY / "src"))
 
-from sylvia_gm.application.authority import AuthorityOwner  # noqa: E402
+from sylvia_gm.application.authority import ActionCommand, AuthorityOwner  # noqa: E402
+from sylvia_gm.domain.authority import WriterRole  # noqa: E402
 
 OUT = HERE / "snapshots"
 STORE = REPOSITORY / "crates" / "sylvia-store" / "tests" / "vectors"
@@ -49,7 +56,37 @@ BASES = {
     "continuity": STORE / "continuity" / "batch_and_view.sqlite3.gz",
     # Schema 4: startup does not advance it, so participants are read without F5 identity.
     "v4": STORE / "packages" / "participants_v4.sqlite3.gz",
+    "riichi_started": OUT / "riichi_started.sqlite3.gz",
 }
+RIICHI = "pneuma.riichi-mahjong"
+
+
+def riichi_started(folder: Path) -> bytes:
+    """The cast base after `start_game` for `aki` on `campaign-table`, run by Python's owner."""
+    path = folder / "riichi-started" / "authority.sqlite3"
+    path.parent.mkdir()
+    path.write_bytes(gzip.decompress(BASES["cast"].read_bytes()))
+    system_random = secrets.SystemRandom
+    secrets.SystemRandom = lambda: random.Random(20261123)  # type: ignore[assignment,misc]
+    try:
+        _start_riichi(path)
+    finally:
+        secrets.SystemRandom = system_random  # type: ignore[misc]
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    connection.close()
+    return path.read_bytes()
+
+
+def _start_riichi(path: Path) -> None:
+    with AuthorityOwner.open(path, "snapshot-riichi") as owner:
+        receipt = owner.execute_action(ActionCommand(
+            campaign_id="campaign-table", action_id="action-start", idempotency_key="key-start",
+            turn_id="turn-table", owner_id="snapshot-riichi", writer=WriterRole.DM,
+            expected_revision=owner.snapshot("campaign-table").revision, package_id=RIICHI,
+            tool_name="start_game", parameters={"player": "aki", "match_format": "east_only"}))
+        if receipt.status.value != "committed":
+            raise SystemExit(f"start_game did not commit: {receipt.result}")
 
 
 def plain(value: object) -> object:
@@ -102,6 +139,7 @@ def main() -> None:
     OUT.mkdir(exist_ok=True)
     runs = []
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as scratch:
+        BASES["riichi_started"].write_bytes(gzip.compress(riichi_started(Path(scratch)), mtime=0))
         for base, source in BASES.items():
             database = Path(scratch) / base / "authority.sqlite3"
             database.parent.mkdir()
