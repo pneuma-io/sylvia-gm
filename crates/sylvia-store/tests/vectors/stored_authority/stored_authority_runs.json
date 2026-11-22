@@ -2625,6 +2625,818 @@
     "code": "schema_identity_mismatch",
     "message": "Saved campaign records failed an integrity check"
    }
+  },
+  {
+   "name": "cast_untouched",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "f5": {
+    "ok": null
+   }
+  },
+  {
+   "name": "f5_declaration_schema_id",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE package_participant_artifacts SET schema_id = 'other' WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant declaration authority is invalid"
+   }
+  },
+  {
+   "name": "f5_declaration_schema_json",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE package_participant_artifacts SET schema_json = '{}' WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant declaration authority is invalid"
+   }
+  },
+  {
+   "name": "f5_declaration_order",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE package_participant_artifacts SET artifact_order = 1 WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant declaration authority is invalid"
+   }
+  },
+  {
+   "name": "f5_declaration_order_text",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE package_participant_artifacts SET artifact_order = '0' WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "f5": {
+    "ok": null
+   }
+  },
+  {
+   "name": "f5_declaration_extra",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO package_participant_artifacts SELECT package_id, version, content_sha256, 1, 'dealer', schema_id, schema_sha256, schema_json FROM package_participant_artifacts WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant declaration authority is invalid"
+   }
+  },
+  {
+   "name": "f5_declarations_missing",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "DELETE FROM package_participant_artifacts WHERE package_id = 'pneuma.riichi-mahjong'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant declaration authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_operation_padded",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET operation_id = ' adapt-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation operation identity must not have leading or trailing whitespace"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_kind_blank",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_kind = ' '"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation source kind must be a non-whitespace string"
+   }
+  },
+  {
+   "name": "f5_adaptation_destination_schema_padded",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET destination_schema_id = destination_schema_id || ' '"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation destination schema identity must not have leading or trailing whitespace"
+   }
+  },
+  {
+   "name": "f5_adaptation_payload_uppercase",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET payload_sha256 = upper(payload_sha256)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation payload SHA-256 must be 64 lowercase hexadecimal characters"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_data_sha_short",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_data_sha256 = 'abc'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation source data SHA-256 must be 64 lowercase hexadecimal characters"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_schema_padded",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_schema_id = ' x'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation source schema identity must not have leading or trailing whitespace"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_schema_sha_uppercase",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_schema_sha256 = upper(source_schema_sha256)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Adaptation source schema SHA-256 must be 64 lowercase hexadecimal characters"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_schema_null",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_schema_id = NULL"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_kind_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_kind = 'dealer'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_missing",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_campaign_id = 'campaign-gone'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation source is unavailable"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_data_changed",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET data_json = '{\"control\":\"player\",\"name\":\"Aiko\"}' WHERE campaign_id = 'campaign-workshop'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_data_not_object",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET data_json = '[]' WHERE campaign_id = 'campaign-workshop'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored canonical JSON must be an object"
+   }
+  },
+  {
+   "name": "f5_adaptation_source_data_sha_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET source_data_sha256 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_payload_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET payload_sha256 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_data_not_object",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET data_json = '[]', payload_sha256 = '7d167d37c7367144f7fa180c76a0ec01e12fc7f1e919ca2136ef63f6d41ab869' WHERE operation_id = 'adapt-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored canonical JSON must be an object"
+   }
+  },
+  {
+   "name": "f5_adaptation_data_extra_member",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET data_json = '{\"control\":\"player\",\"name\":\"Aki\",\"x\":1}', payload_sha256 = '7e693a52541ffd3403028e62a1833cf3ad91aedd35818821c3b60fddf938496c' WHERE operation_id = 'adapt-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "CommandRejected",
+    "message": "Tool parameter 'Participant aki' contains undeclared field 'x'"
+   }
+  },
+  {
+   "name": "f5_adaptation_destination_kind_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET destination_kind = 'dealer', payload_sha256 = '2acbf593559210ec934f41e95ccaeba0b0fec2b28ff6d9bb5cf13bbe7e73678b' WHERE operation_id = 'adapt-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_destination_schema_sha_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET destination_schema_sha256 = 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc', payload_sha256 = '3c662095a66130ca23b51dfed66a02cf0b63b118d4a8158f1db717130b3b7a45' WHERE operation_id = 'adapt-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_adaptation_destination_schema_id_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participant_adaptations SET destination_schema_id = 'other.schema', payload_sha256 = '173880cc3185ab4aff6f65c807c1e672e8afc267eb9aeff147c31ba07b1d53df' WHERE operation_id = 'adapt-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored participant adaptation authority is invalid"
+   }
+  },
+  {
+   "name": "f5_participant_status_unknown",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET validation_status = 'pending' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "'pending' is not a valid ParticipantValidationStatus"
+   }
+  },
+  {
+   "name": "f5_participant_kind_padded",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET kind = ' player' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant kind must not have leading or trailing whitespace"
+   }
+  },
+  {
+   "name": "f5_participant_data_not_object",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET data_json = '[]' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Stored canonical JSON must be an object"
+   }
+  },
+  {
+   "name": "f5_participant_package_sha_null",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET package_sha256 = NULL WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Validated participants require exact package and schema identity"
+   }
+  },
+  {
+   "name": "f5_quarantined_claims_schema",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET validation_status = 'quarantined' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Quarantined participant claims schema proof"
+   }
+  },
+  {
+   "name": "f5_quarantined_claims_adaptation",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET validation_status = 'quarantined', schema_id = NULL, schema_sha256 = NULL WHERE campaign_id = 'campaign-table' AND participant_id = 'aki'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Quarantined participant claims schema proof"
+   }
+  },
+  {
+   "name": "f5_quarantined_without_evidence",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET validation_status = 'quarantined', schema_id = NULL, schema_sha256 = NULL WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Quarantined participant lacks evidence"
+   }
+  },
+  {
+   "name": "f5_quarantined_with_evidence",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET validation_status = 'quarantined', schema_id = NULL, schema_sha256 = NULL WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'",
+    "INSERT INTO participant_quarantines VALUES ('campaign-table', 'bo', 'exact_schema_proof_unavailable')"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "f5": {
+    "ok": null
+   }
+  },
+  {
+   "name": "f5_quarantined_blank_reason",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET validation_status = 'quarantined', schema_id = NULL, schema_sha256 = NULL WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'",
+    "INSERT INTO participant_quarantines VALUES ('campaign-table', 'bo', '')"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Quarantined participant lacks evidence"
+   }
+  },
+  {
+   "name": "f5_validated_with_quarantine",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO participant_quarantines VALUES ('campaign-table', 'bo', 'exact_schema_proof_unavailable')"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Validated participant exact authority is invalid"
+   }
+  },
+  {
+   "name": "f5_quarantine_orphaned",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "INSERT INTO participant_quarantines VALUES ('campaign-table', 'zed', 'exact_schema_proof_unavailable')"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant quarantine evidence is orphaned"
+   }
+  },
+  {
+   "name": "f5_participant_schema_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET schema_id = 'other.schema' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Validated participant exact authority is invalid"
+   }
+  },
+  {
+   "name": "f5_participant_schema_sha_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET schema_sha256 = 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Validated participant exact authority is invalid"
+   }
+  },
+  {
+   "name": "f5_participant_package_sha_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET package_sha256 = 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Validated participant exact authority is invalid"
+   }
+  },
+  {
+   "name": "f5_participant_data_invalid",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET data_json = '{\"control\":\"player\",\"name\":\"\"}' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "CommandRejected",
+    "message": "Tool parameter 'Participant bo.name' is shorter than its minimum length"
+   }
+  },
+  {
+   "name": "f5_participant_adaptation_unknown",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET adaptation_id = 'adapt-2' WHERE campaign_id = 'campaign-table' AND participant_id = 'aki'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant adaptation provenance does not match"
+   }
+  },
+  {
+   "name": "f5_participant_adaptation_padded",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET adaptation_id = 'adapt-1 ' WHERE campaign_id = 'campaign-table' AND participant_id = 'aki'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant adaptation identity must not have leading or trailing whitespace"
+   }
+  },
+  {
+   "name": "f5_participant_adaptation_other_participant",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE participants SET adaptation_id = 'adapt-1' WHERE campaign_id = 'campaign-table' AND participant_id = 'bo'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant adaptation provenance does not match"
+   }
+  },
+  {
+   "name": "f5_history_before_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akira\"},\"before\":{\"control\":\"player\",\"name\":\"Ako\"},\"kind\":\"participant_updated\",\"participant_id\":\"aki\"}' WHERE campaign_id = 'campaign-table'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akira\"},\"before\":{\"control\":\"player\",\"name\":\"Ako\"},\"kind\":\"participant_updated\",\"participant_id\":\"aki\"}' WHERE campaign_id = 'campaign-table' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant adaptation provenance does not match"
+   }
+  },
+  {
+   "name": "f5_history_after_other",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akiko\"},\"before\":{\"control\":\"player\",\"name\":\"Aki\"},\"kind\":\"participant_updated\",\"participant_id\":\"aki\"}' WHERE campaign_id = 'campaign-table'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akiko\"},\"before\":{\"control\":\"player\",\"name\":\"Aki\"},\"kind\":\"participant_updated\",\"participant_id\":\"aki\"}' WHERE campaign_id = 'campaign-table' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant update history is discontinuous"
+   }
+  },
+  {
+   "name": "f5_history_before_not_object",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akira\"},\"before\":\"Aki\",\"kind\":\"participant_updated\",\"participant_id\":\"aki\"}' WHERE campaign_id = 'campaign-table'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akira\"},\"before\":\"Aki\",\"kind\":\"participant_updated\",\"participant_id\":\"aki\"}' WHERE campaign_id = 'campaign-table' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant update history is discontinuous"
+   }
+  },
+  {
+   "name": "f5_history_other_participant",
+   "base": "cast",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akira\"},\"before\":{\"control\":\"player\",\"name\":\"Aki\"},\"kind\":\"participant_updated\",\"participant_id\":\"bo\"}' WHERE campaign_id = 'campaign-table'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"after\":{\"control\":\"player\",\"name\":\"Akira\"},\"before\":{\"control\":\"player\",\"name\":\"Aki\"},\"kind\":\"participant_updated\",\"participant_id\":\"bo\"}' WHERE campaign_id = 'campaign-table' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored integrity could not be verified"
+   },
+   "f5": {
+    "error": "ValueError",
+    "message": "Participant adaptation provenance does not match"
+   }
   }
  ]
 }

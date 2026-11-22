@@ -709,12 +709,17 @@ fn file_uri(path: &Path, query: &str) -> String {
 }
 
 /// `_verify_backup_authority`: the identity of a backup copy, then the stored-content verifiers
-/// Python runs on it. Parts of `_verify_stored_authority` and `verify_f5_campaign_authority`
-/// (from schema 5) are still to come, as at startup.
+/// Python runs on it: `verify_f5_campaign_authority` from schema 5, the continuity verifier from
+/// schema 9.
 fn verify_backup_authority(connection: &Connection) -> StoreResult<()> {
     let version = verify_backup_identity(connection)?;
     crate::stored::verify_stored_authority(connection)?;
     crate::packages::verify_package_authority(connection)?;
+    if (crate::schema::PRE_OWNERSHIP_CAMPAIGN_SCHEMA_VERSION..=crate::schema::CAMPAIGN_SCHEMA_VERSION)
+        .contains(&version)
+    {
+        crate::f5::verify_f5_campaign_authority(connection)?;
+    }
     if version >= crate::schema::PRE_DRAFT_LIFECYCLE_SCHEMA_VERSION {
         crate::continuity::verify_authority(connection)?;
     }
