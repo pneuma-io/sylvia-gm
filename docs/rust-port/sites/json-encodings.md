@@ -56,7 +56,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:9164` | `AuthorityOwner.export_admin_full_audit` | Dump::INDENT2.ascii(false) + allow_nan= | `encoded = json.dumps( thaw_json_value(diagnostic), ensure_ascii=False, allow_nan=False, indent=2, ).encode("utf-8")` | |
 | `application/authority.py:9915` | `_semantic_hash` | Dump::CANONICAL + allow_nan= | `encoded = json.dumps( payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, )` | |
 | `infrastructure/builder_source_ingestion.py:425` | `stage_builder_sources_for_purge` | Dump::WIRE.sorted(true) | `marker_bytes = json.dumps( _purge_marker(campaign_id, operation_id), sort_keys=True, separators=(",", ":"), ).encode("utf-8")` | |
-| `infrastructure/campaign_archive.py:688` | `_json_bytes` | Dump::WIRE.ascii(false) + allow_nan= | `return json.dumps( value, sort_keys=False, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
+| `infrastructure/campaign_archive.py:688` | `_json_bytes` | Dump::WIRE.ascii(false) + allow_nan= | `return json.dumps( value, sort_keys=False, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-store` campaign_archive |
 | `infrastructure/private_records_archive.py:79` | `encode` | Dump::WIRE.ascii(false) + allow_nan= | `line = (json.dumps(row, ensure_ascii=False, allow_nan=False, separators=(",", ":")) + "\n").encode("utf-8")` | |
 | `infrastructure/sqlite_authority.py:869` | `_dump` | Dump::CANONICAL + allow_nan= | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, )` | |
 | `infrastructure/sqlite_authority.py:2220` | `SQLiteAuthorityStore._read_export_rows` | Dump::CANONICAL + allow_nan= | `materialized["content_json"] = json.dumps( content, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, )` | |
@@ -65,7 +65,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:10925` | `SQLiteAuthorityStore.player_action_markers` | Dump::DEFAULT | `(marker_kind, campaign_id, json.dumps(action_ids)),` | |
 | `infrastructure/sqlite_authority.py:12307` | `SQLiteAuthorityStore._read_snapshot` | Dump::DEFAULT | `json.dumps(display_action_ids),` | |
 | `infrastructure/sqlite_continuity.py:49` | `_dump` | Dump::CANONICAL | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
-| `infrastructure/sqlite_recovery.py:258` | `result_json` | Dump::WIRE.ascii(false) + allow_nan= | `return json.dumps( { "campaign_id": result.campaign_id, "captured_revision": result.captured_revision, "archive_sha256": result.archive_sha256, "by...` | |
+| `infrastructure/sqlite_recovery.py:258` | `result_json` | Dump::WIRE.ascii(false) + allow_nan= | `return json.dumps( { "campaign_id": result.campaign_id, "captured_revision": result.captured_revision, "archive_sha256": result.archive_sha256, "by...` | `sylvia-store` stored_authority (`recovered`) |
 | `infrastructure/sqlite_session.py:306` | `_dump` | Dump::CANONICAL + allow_nan= | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, )` | |
 
 ## Lane 4: Providers and agents
