@@ -160,11 +160,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:598` | `<module>` | hashlib.sha256 | `_MIGRATION_5_SHA256 = hashlib.sha256(_MIGRATION_5.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:607` | `<module>` | hashlib.sha256 | `_MIGRATION_8_SHA256 = hashlib.sha256(_MIGRATION_8.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:944` | `_stored_action_hash` | hashlib.sha256 | `return hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | |
-| `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | |
-| `infrastructure/sqlite_authority.py:1586` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:1715` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:1738` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `or str(row["chunk_sha256"]) != hashlib.sha256(data).hexdigest()` | |
+| `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1586` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1715` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1738` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `or str(row["chunk_sha256"]) != hashlib.sha256(data).hexdigest()` | `sylvia-store` export_writer |
 | `infrastructure/sqlite_authority.py:4165` | `SQLiteAuthorityStore._verify_construction_authority` | hashlib.sha256 | `or hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | |
 | `infrastructure/sqlite_authority.py:4460` | `SQLiteAuthorityStore._verify_construction_authority` | hashlib.sha256 | `representation_sha256 = hashlib.sha256( canonical_json_bytes( { "canonical_input": canonical_input, "canonical_plan": canonical_plan, } ) ).hexdige...` | |
 | `infrastructure/sqlite_authority.py:5675` | `SQLiteAuthorityStore._verify_session_identities` | hashlib.sha256 | `if hashlib.sha256(_dump(plan.content).encode("utf-8")).hexdigest() != (` | |

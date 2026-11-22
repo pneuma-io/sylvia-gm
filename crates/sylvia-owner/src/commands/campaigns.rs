@@ -465,6 +465,83 @@ pub async fn handle_purge_campaign(ctx: &DispatchContext, params: &JsonMap) -> C
     Ok(Json::Object(value))
 }
 
+/// `handle_export_campaign`, for both `export_campaign` and `export_campaign_file`: one portable
+/// archive published at `exports/<export_id>.sylvia-gm-campaign` under the storage root. The
+/// file command also answers with the archive's resolved path.
+pub async fn handle_export_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let export_id = required_artifact_id(params, "export_id")?;
+    let exports = ctx.storage_root.join("exports");
+    let target = exports.join(format!("{export_id}.sylvia-gm-campaign"));
+    // Python's `mkdir(parents=True, exist_ok=True)`: a failure is an uncaught `OSError`.
+    std::fs::create_dir_all(&exports).map_err(|error| {
+        sylvia_base::CodedError::new("internal_error", error.to_string()).with_error_type("OSError")
+    })?;
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let include_thinking = optional_bool(params, "include_thinking")?;
+    let result = sylvia_app::authority::portable::export_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        &target,
+        include_thinking,
+    )
+    .await
+    .map_err(store_error)?;
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), result.campaign_id.into());
+    value.insert("captured_revision".into(), result.captured_revision.into());
+    value.insert("archive_sha256".into(), result.archive_sha256.into());
+    value.insert("byte_count".into(), result.byte_count.into());
+    if ctx.method != "export_campaign_file" {
+        return Ok(Json::Object(value));
+    }
+    // `str(target.resolve(strict=True))`; a failure is an uncaught `OSError`.
+    let resolved = resolve_strict(&target).map_err(|error| {
+        sylvia_base::CodedError::new("internal_error", error.to_string()).with_error_type("OSError")
+    })?;
+    let mut reply = JsonMap::new();
+    reply.insert("export".into(), Json::Object(value));
+    reply.insert("artifact_path".into(), resolved.to_string_lossy().into_owned().into());
+    Ok(Json::Object(reply))
+}
+
+/// `_required_artifact_id(payload, key)`: a nonempty string matching
+/// `[A-Za-z0-9][A-Za-z0-9._-]{0,127}` in full.
+fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<String> {
+    let value = required(params, key)?;
+    let mut characters = value.chars();
+    let first_ok = characters.next().is_some_and(|first| first.is_ascii_alphanumeric());
+    let rest_ok = characters.all(|character| character.is_ascii_alphanumeric() || "._-".contains(character));
+    if !first_ok || !rest_ok || value.chars().count() > 128 {
+        return Err(protocol(&format!("{key} is not a safe artifact identity")));
+    }
+    Ok(value)
+}
+
+/// `_optional_bool(payload, key)`: absent is `False`; anything present must be a boolean
+/// (`null` included).
+fn optional_bool(params: &JsonMap, key: &str) -> CodedResult<bool> {
+    match params.get(key) {
+        None => Ok(false),
+        Some(Json::Bool(value)) => Ok(*value),
+        Some(_) => Err(protocol(&format!("{key} must be a boolean"))),
+    }
+}
+
+/// `Path.resolve(strict=True)`, without Windows' `\\?\` prefix, which pathlib does not show.
+fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
+    let resolved = std::fs::canonicalize(path)?;
+    let text = resolved.to_string_lossy();
+    Ok(if let Some(rest) = text.strip_prefix(r"\\?\UNC\") {
+        std::path::PathBuf::from(format!(r"\\{rest}"))
+    } else if let Some(rest) = text.strip_prefix(r"\\?\") {
+        std::path::PathBuf::from(rest)
+    } else {
+        resolved
+    })
+}
+
 /// `_optional_text(payload, key)`: absent or `null` is `None`; anything else must be a
 /// nonempty string.
 fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
@@ -741,7 +818,7 @@ mod tests {
                 }
                 (Ok(value), None) => assert_eq!(value.to_string(), want["ok"].to_string(), "{label}"),
                 (Err(crate::dispatch::Failure::Rejected(error)), None) => {
-                    assert_eq!(error.error_type, want["error"].as_str(), "{label}: type");
+                    assert_eq!(error.error_type, want["error"].as_str(), "{label}: type {error:?}");
                     assert_eq!(error.code, want["code"].as_str().unwrap(), "{label}: code");
                     assert_eq!(error.message, want["message"].as_str().unwrap(), "{label}: message");
                 }
@@ -904,7 +981,7 @@ mod tests {
                         assert_eq!(want["error"], "Fault", "{label}")
                     }
                     Err(crate::dispatch::Failure::Rejected(error)) => {
-                        assert_eq!(error.error_type, want["error"].as_str(), "{label}: type");
+                        assert_eq!(error.error_type, want["error"].as_str(), "{label}: type {error:?}");
                         assert_eq!(
                             error.code,
                             want["code"].as_str().unwrap_or("command_rejected"),
@@ -922,6 +999,108 @@ mod tests {
         let python = folder.join("python.sqlite3");
         gunzip_to("crates/sylvia-app/tests/vectors/purge/purge_runs.sqlite3.gz", &python);
         assert_eq!(table_rows(&database), table_rows(&python), "the database differs from Python's");
+        let _ = std::fs::remove_dir_all(folder);
+    }
+
+    /// The generator's `tree`: `exports/` and everything under it, with each file's SHA-256.
+    fn exports_tree(root: &std::path::Path) -> Json {
+        let exports = root.join("exports");
+        if !exports.exists() {
+            return Json::Array(Vec::new());
+        }
+        let mut entries: Vec<(String, Json)> = Vec::new();
+        for entry in std::fs::read_dir(&exports).unwrap() {
+            let path = entry.unwrap().path();
+            let relative = format!("exports/{}", path.file_name().unwrap().to_string_lossy());
+            let entry = if path.is_dir() {
+                serde_json::json!([relative, "dir", null])
+            } else {
+                serde_json::json!([
+                    relative,
+                    "file",
+                    sylvia_base::hash::sha256_hex(std::fs::read(&path).unwrap())
+                ])
+            };
+            entries.push((relative, entry));
+        }
+        entries.sort_by(|left, right| left.0.cmp(&right.0));
+        let mut tree = vec![serde_json::json!(["exports", "dir", null])];
+        tree.extend(entries.into_iter().map(|(_, entry)| entry));
+        Json::Array(tree)
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn exports_answer_and_publish_as_pythons_handler_does() {
+        // Lane 3's Python run of `handle_export_campaign` (`generate_export_runs.py`): the
+        // handler's and the owner's checks, then exports of the story and Builder campaigns,
+        // through the owner's dispatch. Each reply and the exports folder after each call must be
+        // Python's.
+        let record = read_json("crates/sylvia-app/tests/vectors/export/export_runs.json");
+        // A short root, as Python's run had (`tmpXXXXXXXX/storage`): the 128-character export
+        // identity's claimed temporary then stays under `MAX_PATH`, which the owner's Win32 file
+        // calls are held to (see the PR).
+        let folder = std::env::temp_dir().join(format!("sgx-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&folder);
+        std::fs::create_dir_all(&folder).unwrap();
+        let database = folder.join("authority.sqlite3");
+        gunzip_to("crates/sylvia-store/tests/vectors/export_capture/story.sqlite3.gz", &database);
+        let path = database.clone();
+        let (store, thread) = sylvia_store::StoreHandle::spawn(move || {
+            sylvia_store::AuthorityStore::open_for_application_owner(&path, None)
+        })
+        .unwrap();
+        let context = crate::dispatch::DispatchContext {
+            owner_id: "export-test".into(),
+            storage_root: folder.clone(),
+            handshake_verified: true,
+            method: String::new(),
+            gm_system_prompt: None,
+            store,
+            providers: None,
+            session_loop: None,
+            bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+                sylvia_app::bundled_packages::BundledSources::from_repository_root(
+                    &crate::util::source_root(),
+                ),
+            )),
+            record_provider_warning: std::sync::Arc::new(|_: &str| {}),
+        };
+        let root = resolve_strict(&folder).unwrap();
+        for (index, run) in record["runs"].as_array().unwrap().iter().enumerate() {
+            let method = run["op"].as_str().unwrap();
+            let label = format!("#{index} {method}");
+            let want = &run["outcome"];
+            let mut asked = context.clone();
+            asked.method = method.to_owned();
+            let params = run["params"].as_object().unwrap().clone();
+            match crate::dispatch::dispatch(&asked, method, &params).await {
+                Ok(mut value) => {
+                    if let Some(path) = value.get("artifact_path").and_then(Json::as_str).map(str::to_owned) {
+                        // Python records the path relative to the resolved storage root.
+                        let relative = std::path::Path::new(&path).strip_prefix(&root).unwrap().to_path_buf();
+                        let parts: Vec<String> = relative
+                            .components()
+                            .map(|part| part.as_os_str().to_string_lossy().into_owned())
+                            .collect();
+                        value["artifact_path"] = parts.join("/").into();
+                    }
+                    assert_eq!(value.to_string(), want["ok"].to_string(), "{label}");
+                }
+                Err(crate::dispatch::Failure::Rejected(error)) => {
+                    assert_eq!(error.error_type, want["error"].as_str(), "{label}: type {error:?}");
+                    assert_eq!(
+                        error.code,
+                        want["code"].as_str().unwrap_or("command_rejected"),
+                        "{label}: code"
+                    );
+                    assert_eq!(error.message, want["message"].as_str().unwrap(), "{label}: message");
+                }
+                Err(other) => panic!("{label}: Rust {other:?}, Python {want}"),
+            }
+            assert_eq!(exports_tree(&folder), run["tree"], "{label}: the exports folder");
+        }
+        drop(context);
+        tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
         let _ = std::fs::remove_dir_all(folder);
     }
 }
