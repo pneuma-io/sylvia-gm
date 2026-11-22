@@ -1,0 +1,982 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "00000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": ""
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "07000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 11,
+     "data": "0100000000000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 11,
+     "data": "0000000000000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 11,
+     "data": ""
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 11,
+     "data": "0000000000010000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 3,
+     "data": "01"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 3,
+     "data": "00"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 3,
+     "data": ""
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 0,
+     "data": ""
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 0,
+     "data": "01"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 7,
+     "data": "610000000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 7,
+     "data": ""
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 7,
+     "data": "0000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 7,
+     "data": "00000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 1,
+     "data": "0000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 1,
+     "data": "30000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 2,
+     "data": "31000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://proxy.example:8080"
+    ],
+    [
+     "https",
+     "http://proxy.example:8080"
+    ],
+    [
+     "ftp",
+     "http://proxy.example:8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "700072006f00780079002e006500780061006d0070006c0065003a0038003000380030000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    }
+   ],
+   "proxies": []
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 4,
+     "data": "05000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://5"
+    ],
+    [
+     "https",
+     "http://5"
+    ],
+    [
+     "ftp",
+     "http://5"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 4,
+     "data": ""
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://0"
+    ],
+    [
+     "https",
+     "http://0"
+    ],
+    [
+     "ftp",
+     "http://0"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 11,
+     "data": "901f000000000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://8080"
+    ],
+    [
+     "https",
+     "http://8080"
+    ],
+    [
+     "ftp",
+     "http://8080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 3,
+     "data": "703a31"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://b'p:1'"
+    ],
+    [
+     "https",
+     "http://b'p:1'"
+    ],
+    [
+     "ftp",
+     "http://b'p:1'"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 3,
+     "data": "270aff5c22"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://b'\\'\\n\\xff\\\\\"'"
+    ],
+    [
+     "https",
+     "http://b'\\'\\n\\xff\\\\\"'"
+    ],
+    [
+     "ftp",
+     "http://b'\\'\\n\\xff\\\\\"'"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 3,
+     "data": "2722"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://b'\\'\"'"
+    ],
+    [
+     "https",
+     "http://b'\\'\"'"
+    ],
+    [
+     "ftp",
+     "http://b'\\'\"'"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 3,
+     "data": ""
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://None"
+    ],
+    [
+     "https",
+     "http://None"
+    ],
+    [
+     "ftp",
+     "http://None"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 0,
+     "data": ""
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://None"
+    ],
+    [
+     "https",
+     "http://None"
+    ],
+    [
+     "ftp",
+     "http://None"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 0,
+     "data": "68747470"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://b'http'"
+    ],
+    [
+     "https",
+     "http://b'http'"
+    ],
+    [
+     "ftp",
+     "http://b'http'"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 7,
+     "data": "68007400740070003d0061000000680074007400700073003d00620000000000"
+    }
+   ],
+   "proxies": [
+    [
+     "['http",
+     "a', 'https=b']"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 7,
+     "data": "610000006200"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://['a', 'b']"
+    ],
+    [
+     "https",
+     "http://['a', 'b']"
+    ],
+    [
+     "ftp",
+     "http://['a', 'b']"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 7,
+     "data": ""
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://None"
+    ],
+    [
+     "https",
+     "http://None"
+    ],
+    [
+     "ftp",
+     "http://None"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 7,
+     "data": "00000000780000000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://['', '', 'x']"
+    ],
+    [
+     "https",
+     "http://['', '', 'x']"
+    ],
+    [
+     "ftp",
+     "http://['', '', 'x']"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 7,
+     "data": "69007400270073000000000041"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://[\"it's\"]"
+    ],
+    [
+     "https",
+     "http://[\"it's\"]"
+    ],
+    [
+     "ftp",
+     "http://[\"it's\"]"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 2,
+     "data": "68007400740070003d0068003a0031003b00680074007400700073003d0068003a0032000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://h:1"
+    ],
+    [
+     "https",
+     "http://h:2"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "73006f0063006b0073003d0073003a0031003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "socks",
+     "socks://s:1080"
+    ],
+    [
+     "http",
+     "socks4://s:1080"
+    ],
+    [
+     "https",
+     "socks4://s:1080"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "68007400740070003d0061003b006200610064000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://a"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": ""
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://"
+    ],
+    [
+     "https",
+     "http://"
+    ],
+    [
+     "ftp",
+     "http://"
+    ]
+   ]
+  },
+  {
+   "values": [
+    {
+     "name": "ProxyEnable",
+     "kind": 4,
+     "data": "01000000"
+    },
+    {
+     "name": "ProxyServer",
+     "kind": 1,
+     "data": "7000720000dc780079003a0038003000380030000000"
+    }
+   ],
+   "proxies": [
+    [
+     "http",
+     "http://pr\ufffdxy:8080"
+    ],
+    [
+     "https",
+     "http://pr\ufffdxy:8080"
+    ],
+    [
+     "ftp",
+     "http://pr\ufffdxy:8080"
+    ]
+   ],
+   "row_3": true
+  }
+ ],
+ "missing_key": []
+}

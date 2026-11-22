@@ -312,7 +312,7 @@ fn verify_state_ownership(connection: &Connection) -> StoreResult<()> {
 }
 
 /// `_lock_representation`.
-fn lock_representation(package_lock: &PackageLock) -> String {
+pub(crate) fn lock_representation(package_lock: &PackageLock) -> String {
     let entries: Vec<Json> = package_lock
         .entries()
         .iter()

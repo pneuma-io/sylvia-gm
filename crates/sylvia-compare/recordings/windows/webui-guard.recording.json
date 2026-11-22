@@ -43,7 +43,7 @@
      "content-length": "101335",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/html; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "set-cookie": "sylvia_webui_<port>=<session>; HttpOnly; Path=/; SameSite=Strict",
@@ -90,7 +90,7 @@
      "content-length": "50",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -137,7 +137,7 @@
     "headers": {
      "content-length": "30",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "server": "Python/3.12 aiohttp/3.14.3"
     },
     "text": "Duplicate 'Host' header found."
@@ -173,7 +173,7 @@
     "headers": {
      "content-length": "33",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "server": "Python/3.12 aiohttp/3.14.3"
     },
     "text": "Missing 'Host' header in request."
@@ -207,7 +207,7 @@
      "content-length": "44",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -252,7 +252,7 @@
      "content-length": "101335",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/html; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "set-cookie": "sylvia_webui_<port>=<session>; HttpOnly; Path=/; SameSite=Strict",
@@ -291,7 +291,7 @@
      "content-length": "44",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -328,7 +328,7 @@
      "content-length": "16",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -369,7 +369,7 @@
      "content-length": "16",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -418,7 +418,7 @@
      "content-length": "40",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -471,7 +471,7 @@
      "content-length": "16",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -520,7 +520,7 @@
      "content-length": "40",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -573,7 +573,7 @@
      "content-length": "40",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -626,7 +626,7 @@
      "content-length": "32",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -683,7 +683,7 @@
      "content-length": "32",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -739,7 +739,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -793,7 +793,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -847,7 +847,7 @@
      "content-length": "27",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -901,7 +901,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -965,7 +965,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1029,7 +1029,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1093,7 +1093,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1157,7 +1157,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1222,7 +1222,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1286,7 +1286,7 @@
      "content-length": "161",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1353,7 +1353,7 @@
      "content-length": "161",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1423,7 +1423,7 @@
      "content-length": "118",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1487,7 +1487,7 @@
      "content-length": "143",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1552,7 +1552,7 @@
      "content-length": "42",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1615,7 +1615,7 @@
      "content-length": "144",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1682,7 +1682,7 @@
      "content-length": "144",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1746,7 +1746,7 @@
      "content-length": "61",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1813,7 +1813,7 @@
      "content-length": "100",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1883,7 +1883,7 @@
      "content-length": "43",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -1949,7 +1949,7 @@
      "content-length": "109",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2016,7 +2016,7 @@
      "content-length": "109",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2084,7 +2084,7 @@
      "content-length": "77",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2094,7 +2094,7 @@
     "json": {
      "ok": true,
      "result": {
-      "diagnostic_id": "a08f70a1a39341f1a86a2fcf3fac0dc2"
+      "diagnostic_id": "2e35764a3c2d443b97cfbf1f9e2862fa"
      }
     }
    }
@@ -2151,7 +2151,7 @@
      "content-length": "97",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2218,7 +2218,7 @@
      "content-length": "97",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:47 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:28 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2283,7 +2283,7 @@
      "content-length": "44",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2316,7 +2316,7 @@
      "content-length": "821565",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/javascript",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2349,7 +2349,7 @@
      "content-length": "821565",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/javascript",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2383,7 +2383,7 @@
      "content-length": "14731",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/javascript",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2416,7 +2416,7 @@
      "content-length": "101335",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/html; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "set-cookie": "sylvia_webui_<port>=<session>; HttpOnly; Path=/; SameSite=Strict",
@@ -2451,7 +2451,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2484,7 +2484,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2517,7 +2517,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2550,7 +2550,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2583,7 +2583,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2616,7 +2616,7 @@
      "content-length": "821565",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/javascript",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2650,7 +2650,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2683,7 +2683,7 @@
      "content-length": "32",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2720,7 +2720,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2757,7 +2757,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2813,7 +2813,7 @@
      "content-length": "32",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2873,7 +2873,7 @@
      "content-length": "14",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2927,7 +2927,7 @@
      "content-length": "86",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -2993,7 +2993,7 @@
      "content-length": "86",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3059,7 +3059,7 @@
      "content-length": "102",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3125,7 +3125,7 @@
      "content-length": "92",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3195,7 +3195,7 @@
      "content-length": "98",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3267,7 +3267,7 @@
      "content-length": "108",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3333,7 +3333,7 @@
      "content-length": "109",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3399,7 +3399,7 @@
      "content-length": "91",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3466,7 +3466,7 @@
      "content-length": "92",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3533,7 +3533,7 @@
      "content-length": "92",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3600,7 +3600,7 @@
      "content-length": "92",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3667,7 +3667,7 @@
      "content-length": "92",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3739,7 +3739,7 @@
      "content-length": "90",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3809,7 +3809,7 @@
      "content-length": "41",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:48 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3873,7 +3873,7 @@
      "content-length": "44",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:49 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:29 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3938,7 +3938,7 @@
      "content-length": "44",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:50 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:30 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -3993,7 +3993,7 @@
      "content-length": "23",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:50 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:30 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -4048,7 +4048,7 @@
      "content-length": "23",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:50 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:30 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -4103,7 +4103,7 @@
      "content-length": "23",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "text/plain; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:50 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:30 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -4157,7 +4157,7 @@
      "content-length": "44",
      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
      "content-type": "application/json; charset=utf-8",
-     "date": "Sat, 21 Nov 2026 05:52:51 GMT",
+     "date": "Sun, 22 Nov 2026 06:18:30 GMT",
      "referrer-policy": "no-referrer",
      "server": "Python/3.12 aiohttp/3.14.3",
      "x-content-type-options": "nosniff",
@@ -5463,7 +5463,7 @@
      "data"
     ],
     "row_count": 340,
-    "rows_sha256": "91c83b6c3e68c3cb2b8156817856f85c863d16a16fe734a9d396ff2853fffe2d"
+    "rows_sha256": "f0113c482e72258ce20978081d5f078ca9cb59d9aa302540ff6f85fbe8417426"
    },
    "package_blobs": {
     "columns": [
@@ -5472,7 +5472,7 @@
      "chunk_count"
     ],
     "row_count": 58,
-    "rows_sha256": "56613b4296720c1e8538ff940dbb15dd4ba73a9e482eebc730d7df601d266cce"
+    "rows_sha256": "6d7535d027e97acd3d2c76000c5c061a55c852a2026443602451f41233ab6640"
    },
    "package_candidate_memberships": {
     "columns": [
@@ -5483,7 +5483,7 @@
      "content_sha256"
     ],
     "row_count": 4,
-    "rows_sha256": "4477e67430f4dc74db3f77efe0c0f39c79a4a93df34ada141507a0edd3507620"
+    "rows_sha256": "58eaa87feb44c31b4dc1399f61b83e42198b748f9f04f5d6c73667af4698f5f4"
    },
    "package_candidates": {
     "columns": [
@@ -5494,7 +5494,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "77b8e2c621e2d98f9d9d12f4cb26d391635daca8af8cd40198986767287464ff"
+    "rows_sha256": "e588f60245a8165d7ceaf674c0ffbe995a9327247fa72a56d8b5d030de145d98"
    },
    "package_capabilities": {
     "columns": [
@@ -5505,7 +5505,7 @@
      "capability"
     ],
     "row_count": 16,
-    "rows_sha256": "c0450e66a23c3c24c59dbe45c9f1a24e4768d510c6605ddd541932e0d6459dd9"
+    "rows_sha256": "9f5dd33222cf1a28e67edca38173cee77a43857b21b762e52de4768a07e3f933"
    },
    "package_dependencies": {
     "columns": [
@@ -5520,7 +5520,7 @@
      "dependency_namespace"
     ],
     "row_count": 2,
-    "rows_sha256": "bf18bc76f9b453b493bdd38f51c5f6f379d25b539457f7682c0463c6807ad271"
+    "rows_sha256": "4791c9cf7f670910482d82ff027cdcc278cea553dccc8da94582c8966388d476"
    },
    "package_exact_dependencies": {
     "columns": [
@@ -5535,7 +5535,7 @@
      "dependency_content_sha256"
     ],
     "row_count": 2,
-    "rows_sha256": "a929a83916e69246ce1ef5562ce30d3394fd8355eb0f3f738b22c77ba005a74d"
+    "rows_sha256": "9790656ce276bde405f979a15fece98767f9530640ae80c56d756b4ac5e167ce"
    },
    "package_manifest_files": {
     "columns": [
@@ -5548,7 +5548,7 @@
      "blob_sha256"
     ],
     "row_count": 64,
-    "rows_sha256": "63e1d1e09ae9fd60d3ae83a354962ea9481b252e1bd7d95f2ae1aebdf650ba4e"
+    "rows_sha256": "3ce331b435a9cfde280a1e376b08b3239b650c35945d7649aa61f2cadefbfd7d"
    },
    "package_manifests": {
     "columns": [
@@ -5563,7 +5563,7 @@
      "status"
     ],
     "row_count": 4,
-    "rows_sha256": "3849847c06092a20698ea3b42394bf26eaa86ee15b242737693860093b0cc550"
+    "rows_sha256": "ae7965cded66d43313612398a56f3545d33517cd05d0b53d4e04014a4e24b8b7"
    },
    "package_participant_artifacts": {
     "columns": [
@@ -5577,7 +5577,7 @@
      "schema_json"
     ],
     "row_count": 2,
-    "rows_sha256": "0e5374268ea87b0223dd6c01986525b975dca32a07d567ed11dfa35654ff72a5"
+    "rows_sha256": "c1724be2acaaa0276c2f10637e0ae586fcecd1acaaa9177f90c2a614734f5a55"
    },
    "package_prompt_fragments": {
     "columns": [
@@ -5589,7 +5589,7 @@
      "capability"
     ],
     "row_count": 2,
-    "rows_sha256": "5efa8ff3cffd697be4ccd71c7055bf2ce73dab863e74220a7fccecbb2cbea5dd"
+    "rows_sha256": "20ab355e2fe5b9cc7abe4c7acd9bfb1595e60a9bd80aff22009827684ab8c142"
    },
    "package_read_leases": {
     "columns": [
@@ -5615,7 +5615,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "b159525926dfa8e06a108bdbf5b6b77ac7e838b14af892614ace05c859992fc9"
+    "rows_sha256": "8175431babc001d77e69a5aa91441547a341d1b29fead24afec62b0445739655"
    },
    "package_staging_chunks": {
     "columns": [
@@ -5630,7 +5630,7 @@
      "data"
     ],
     "row_count": 346,
-    "rows_sha256": "e3d5135ae40ee575cbc496a5a78e753b66f1664e3ad6a77154d529aee4c24b8b"
+    "rows_sha256": "2964f0e2f69e7c5eed25bae4bc05f025f2ecf7078bc977751f30a220b66f5fb5"
    },
    "package_tools": {
     "columns": [
@@ -5645,8 +5645,8 @@
      "turn_statuses_json",
      "writers_json"
     ],
-    "row_count": 185,
-    "rows_sha256": "6ce8ed8e9de9d3fa4aefd6b460230fa91c89880447d7d8e955ff3173af133899"
+    "row_count": 186,
+    "rows_sha256": "e73aab0c4600c545fc906efdaebeda84afb7547f6e1a976646cd55ea44aa7f18"
    },
    "package_ui_surfaces": {
     "columns": [
@@ -5658,7 +5658,7 @@
      "capability"
     ],
     "row_count": 6,
-    "rows_sha256": "a6257d357aa611de48871306d245af2ddbb9828a90bfbb32f0920105a77e1c47"
+    "rows_sha256": "54dd046542e7758f8f3e70f764ee2b2fdeba6d54504d125549d973978905f36d"
    },
    "packages": {
     "columns": [
@@ -5668,7 +5668,7 @@
      "capabilities_json"
     ],
     "row_count": 4,
-    "rows_sha256": "2122817326a575ee841922d2262bf4bcd3e9e7c1e9ec7dc01469051a6967fd8f"
+    "rows_sha256": "aa7abb7d6f585e980ceb446957c81e9a9e4d2843bcdeabaa98b3af44887e92f2"
    },
    "participant_adaptations": {
     "columns": [
@@ -5919,10 +5919,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "b9e147b0e820412eaec75f6e7341934d",
-     "session": "8a05baa4f25f4cb0912c799e1d507e8c",
-     "first_seen": 1795240339.0147667,
-     "last_seen": 1795240339.0147667,
+     "id": "04d51677c8d24827b3095fd3e6a13db6",
+     "session": "30e6bf90b7bf401a8088e737982da976",
+     "first_seen": 1795328283.3787193,
+     "last_seen": 1795328283.3787193,
      "count": 1
     },
     {
@@ -5942,11 +5942,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 15.0,
-     "id": "2d728a3e5bbc46e493564eedc421405d",
-     "session": "8a05baa4f25f4cb0912c799e1d507e8c",
-     "first_seen": 1795240367.7012997,
-     "last_seen": 1795240367.7148187,
+     "duration_ms": 16.0,
+     "id": "d2e1af943b48408f9becd33c4507158f",
+     "session": "30e6bf90b7bf401a8088e737982da976",
+     "first_seen": 1795328308.781013,
+     "last_seen": 1795328308.7935622,
      "count": 2
     },
     {
@@ -5967,10 +5967,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "db7373c132e74a1b9c1cedfff82aebae",
-     "session": "8a05baa4f25f4cb0912c799e1d507e8c",
-     "first_seen": 1795240367.7032967,
-     "last_seen": 1795240367.7032967,
+     "id": "98400c47b98e42e5b90bf440055801af",
+     "session": "30e6bf90b7bf401a8088e737982da976",
+     "first_seen": 1795328308.7830126,
+     "last_seen": 1795328308.7830126,
      "count": 1
     },
     {
@@ -5991,10 +5991,10 @@
      "error_code": "internal_error",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "a08f70a1a39341f1a86a2fcf3fac0dc2",
-     "session": "8a05baa4f25f4cb0912c799e1d507e8c",
-     "first_seen": 1795240367.7223437,
-     "last_seen": 1795240367.7223437,
+     "id": "2e35764a3c2d443b97cfbf1f9e2862fa",
+     "session": "30e6bf90b7bf401a8088e737982da976",
+     "first_seen": 1795328308.798559,
+     "last_seen": 1795328308.798559,
      "count": 1
     },
     {
@@ -6015,10 +6015,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "eba9e7b366cf4818bc075ad9c8aa6d2f",
-     "session": "8a05baa4f25f4cb0912c799e1d507e8c",
-     "first_seen": 1795240367.7223437,
-     "last_seen": 1795240367.7223437,
+     "id": "5946ae9011b9454192aa3e63ecf579b1",
+     "session": "30e6bf90b7bf401a8088e737982da976",
+     "first_seen": 1795328308.798559,
+     "last_seen": 1795328308.798559,
      "count": 1
     },
     {
@@ -6039,10 +6039,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "c6d766197f0f49b68a2cbba2db28836d",
-     "session": "8a05baa4f25f4cb0912c799e1d507e8c",
-     "first_seen": 1795240370.3236868,
-     "last_seen": 1795240370.3236868,
+     "id": "0bca452afce24d0485d709f24d80906c",
+     "session": "30e6bf90b7bf401a8088e737982da976",
+     "first_seen": 1795328310.3809454,
+     "last_seen": 1795328310.3809454,
      "count": 1
     }
    ]

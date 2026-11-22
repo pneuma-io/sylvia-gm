@@ -28,6 +28,20 @@ harness = false
 name = "webui_files"
 harness = false
 
+# Dictation against the native libraries the product ships (Windows): runs itself again under
+# each OpenBLAS thread setting, before the library loads. Never part of check.sh; see the
+# dictation check in docs/rust-port/README.md.
+[[test]]
+name = "dictation_native"
+harness = false
+required-features = ["dictation"]
+
+[features]
+# faster-whisper dictation on its native libraries (CTranslate2, ONNX Runtime, NumPy's OpenBLAS,
+# the LGPL libswresample), Windows only. Off by default: the normal build and check.sh never
+# build or load them.
+dictation = []
+
 [dependencies]
 sylvia-base.workspace = true
 serde_json.workspace = true
@@ -45,14 +59,18 @@ regex.workspace = true
 sha2.workspace = true
 sylvia-domain.workspace = true
 sylvia-store.workspace = true
+sylvia-app.workspace = true
 sylvia-provider.workspace = true
 sylvia-agent.workspace = true
 ed25519-dalek.workspace = true
 unicode-normalization.workspace = true
 rusqlite.workspace = true
+rustls.workspace = true
+tokio-rustls.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-version.workspace = true
+schannel.workspace = true
 winapi-util.workspace = true
 # The desktop update helper's direct Windows calls (`desktop_update/windows.rs`).
 windows-sys = { workspace = true, features = ["Win32_System_Threading", "Win32_System_LibraryLoader", "Win32_UI_Controls"] }
@@ -62,6 +80,7 @@ rustix.workspace = true
 
 [dev-dependencies]
 flate2.workspace = true
+rcgen.workspace = true
 
 [lints]
 workspace = true

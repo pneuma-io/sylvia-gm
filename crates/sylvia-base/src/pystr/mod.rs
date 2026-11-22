@@ -1,6 +1,7 @@
 //! Python `str` behaviour that Rust's `str` does not share, on CPython 3.12's Unicode 15.0
 //! tables. One file per topic; this file only declares and re-exports them.
 
+mod alnum;
 mod casefold;
 mod float_parse;
 mod int_parse;
@@ -8,6 +9,7 @@ mod len;
 mod repr;
 mod whitespace;
 
+pub use alnum::is_alnum;
 pub use casefold::{casefold, upper};
 pub use float_parse::parse_float;
 pub use int_parse::{decimal, parse_int, IntParseError, ValueError, INT_MAX_STR_DIGITS, INT_RANGE_MESSAGE};

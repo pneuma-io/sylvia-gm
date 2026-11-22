@@ -160,6 +160,56 @@ pub enum DomainError {
     },
 }
 
+/// `_NAMED_INPUT.findall(reason)`: every input a Ruleset refusal names, as in
+/// "Missing input 'target_distance'" or "Missing required parameter 'target_willing'".
+///
+/// The pattern is `\b(?:[Ii]nput|required parameter) '([A-Za-z][A-Za-z0-9_]{0,79})'`, matched
+/// left to right without overlap as `re.findall` does. Python's `\b` before the first word
+/// character needs the character before it, if any, not to be a word character, where a word
+/// character is `c.isalnum()` (CPython's table) or `_`.
+pub fn named_inputs(reason: &str) -> Vec<String> {
+    let chars: Vec<char> = reason.chars().collect();
+    let word = |c: char| sylvia_base::pystr::is_alnum(c) || c == '_';
+    let starts = |at: usize, text: &str| {
+        let wanted: Vec<char> = text.chars().collect();
+        chars.get(at..at + wanted.len()) == Some(&wanted[..])
+    };
+    let mut names = Vec::new();
+    let mut at = 0;
+    while at < chars.len() {
+        let boundary = at == 0 || !word(chars[at - 1]);
+        let prefix = if starts(at, "input") || starts(at, "Input") {
+            Some(5)
+        } else if starts(at, "required parameter") {
+            Some(18)
+        } else {
+            None
+        };
+        if let (true, Some(prefix)) = (boundary, prefix) {
+            let open = at + prefix;
+            if starts(open, " '") && chars.get(open + 2).is_some_and(char::is_ascii_alphabetic) {
+                let start = open + 2;
+                let mut end = start + 1;
+                while end < chars.len()
+                    && end - start < 80
+                    && (chars[end].is_ascii_alphanumeric() || chars[end] == '_')
+                {
+                    end += 1;
+                }
+                // A longer run cannot backtrack to a quote: every shorter end is followed by
+                // another identifier character.
+                if chars.get(end) == Some(&'\'') {
+                    names.push(chars[start..end].iter().collect());
+                    at = end + 1;
+                    continue;
+                }
+            }
+        }
+        at += 1;
+    }
+    names
+}
+
 /// `reason` is model-safe: nonempty, trimmed, at most 500 code points, no control characters.
 fn model_safe(reason: &str) -> bool {
     !reason.is_empty()
@@ -254,7 +304,15 @@ impl DomainError {
                 refusal_reasons.push(reason.to_owned());
             }
         }
-        let details = MechanicsDetails { refusal_reasons, ..Default::default() };
+        // A reason that names the caller's input ("Missing input 'x'", "input 'x'") gives its
+        // field path, so the GM can correct or report it without guessing (#279).
+        let mut field_paths: Vec<String> = Vec::new();
+        for name in refusal_reasons.iter().flat_map(|reason| named_inputs(reason)) {
+            if !field_paths.contains(&name) {
+                field_paths.push(name);
+            }
+        }
+        let details = MechanicsDetails { field_paths, refusal_reasons, ..Default::default() };
         match Self::mechanics_rejected(safe_reason, "ruleset_precondition_failed", details)? {
             Self::Rejected { code, message, diagnostics, mechanics, .. } => Ok(Self::Rejected {
                 error_type: "RulesetPreconditionRejected",

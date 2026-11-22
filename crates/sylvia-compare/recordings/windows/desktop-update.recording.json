@@ -17,7 +17,7 @@
      "code": "invalid_update_request",
      "message": "This desktop update request is unsupported.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -39,7 +39,7 @@
      "code": "invalid_update_request",
      "message": "This desktop update request is unsupported.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -61,7 +61,7 @@
      "code": "command_rejected",
      "message": "Unsupported owner method: desktop_update_apply",
      "diagnostics": [],
-     "diagnostic_id": "0ff2e2e8ce7346de9c3ce839007fc5b5"
+     "diagnostic_id": "410e12578a674ac587f5f0a129d5607b"
     }
    }
   },
@@ -82,7 +82,7 @@
      "code": "invalid_update_request",
      "message": "This desktop update request is unsupported.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -104,7 +104,7 @@
      "code": "invalid_operation",
      "message": "The update operation is no longer available.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -121,7 +121,7 @@
      "code": "wrong_component_version",
      "message": "The desktop and owner update context is inconsistent.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -142,7 +142,7 @@
      "code": "wrong_component_version",
      "message": "The desktop and owner update context is inconsistent.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -163,7 +163,7 @@
      "code": "wrong_component_version",
      "message": "The desktop and owner update context is inconsistent.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -184,7 +184,7 @@
      "code": "wrong_component_version",
      "message": "The desktop and owner update context is inconsistent.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -205,7 +205,7 @@
      "code": "wrong_component_version",
      "message": "The desktop and owner update context is inconsistent.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -227,7 +227,7 @@
      "code": "wrong_component_version",
      "message": "The desktop and owner update context is inconsistent.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -281,7 +281,7 @@
      "code": "changed_update_context",
      "message": "Restart this copy before using its updater.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -302,7 +302,7 @@
      "code": "trust_not_configured",
      "message": "This build has no trusted update key. Install an approved updater-capable bootstrap before updating.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -324,7 +324,7 @@
      "code": "trust_not_configured",
      "message": "This build has no trusted update key. Install an approved updater-capable bootstrap before updating.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -346,7 +346,7 @@
      "code": "trust_not_configured",
      "message": "This build has no trusted update key. Install an approved updater-capable bootstrap before updating.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -368,7 +368,7 @@
      "code": "trust_not_configured",
      "message": "This build has no trusted update key. Install an approved updater-capable bootstrap before updating.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -390,7 +390,7 @@
      "code": "trust_not_configured",
      "message": "This build has no trusted update key. Install an approved updater-capable bootstrap before updating.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -412,7 +412,7 @@
      "code": "trust_not_configured",
      "message": "This build has no trusted update key. Install an approved updater-capable bootstrap before updating.",
      "diagnostics": [],
-     "diagnostic_id": "5435d9807a5541b9a963195b3a2b7d83"
+     "diagnostic_id": "2c62dc17130743d39ec6c0351bce2f7c"
     }
    }
   },
@@ -433,7 +433,7 @@
      "code": "command_rejected",
      "message": "No update startup is awaiting confirmation",
      "diagnostics": [],
-     "diagnostic_id": "0ff2e2e8ce7346de9c3ce839007fc5b5"
+     "diagnostic_id": "410e12578a674ac587f5f0a129d5607b"
     }
    }
   },
@@ -2065,7 +2065,7 @@
      "data"
     ],
     "row_count": 340,
-    "rows_sha256": "91c83b6c3e68c3cb2b8156817856f85c863d16a16fe734a9d396ff2853fffe2d"
+    "rows_sha256": "f0113c482e72258ce20978081d5f078ca9cb59d9aa302540ff6f85fbe8417426"
    },
    "package_blobs": {
     "columns": [
@@ -2074,7 +2074,7 @@
      "chunk_count"
     ],
     "row_count": 58,
-    "rows_sha256": "56613b4296720c1e8538ff940dbb15dd4ba73a9e482eebc730d7df601d266cce"
+    "rows_sha256": "6d7535d027e97acd3d2c76000c5c061a55c852a2026443602451f41233ab6640"
    },
    "package_candidate_memberships": {
     "columns": [
@@ -2085,7 +2085,7 @@
      "content_sha256"
     ],
     "row_count": 4,
-    "rows_sha256": "4477e67430f4dc74db3f77efe0c0f39c79a4a93df34ada141507a0edd3507620"
+    "rows_sha256": "58eaa87feb44c31b4dc1399f61b83e42198b748f9f04f5d6c73667af4698f5f4"
    },
    "package_candidates": {
     "columns": [
@@ -2096,7 +2096,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "77b8e2c621e2d98f9d9d12f4cb26d391635daca8af8cd40198986767287464ff"
+    "rows_sha256": "e588f60245a8165d7ceaf674c0ffbe995a9327247fa72a56d8b5d030de145d98"
    },
    "package_capabilities": {
     "columns": [
@@ -2107,7 +2107,7 @@
      "capability"
     ],
     "row_count": 16,
-    "rows_sha256": "c0450e66a23c3c24c59dbe45c9f1a24e4768d510c6605ddd541932e0d6459dd9"
+    "rows_sha256": "9f5dd33222cf1a28e67edca38173cee77a43857b21b762e52de4768a07e3f933"
    },
    "package_dependencies": {
     "columns": [
@@ -2122,7 +2122,7 @@
      "dependency_namespace"
     ],
     "row_count": 2,
-    "rows_sha256": "bf18bc76f9b453b493bdd38f51c5f6f379d25b539457f7682c0463c6807ad271"
+    "rows_sha256": "4791c9cf7f670910482d82ff027cdcc278cea553dccc8da94582c8966388d476"
    },
    "package_exact_dependencies": {
     "columns": [
@@ -2137,7 +2137,7 @@
      "dependency_content_sha256"
     ],
     "row_count": 2,
-    "rows_sha256": "a929a83916e69246ce1ef5562ce30d3394fd8355eb0f3f738b22c77ba005a74d"
+    "rows_sha256": "9790656ce276bde405f979a15fece98767f9530640ae80c56d756b4ac5e167ce"
    },
    "package_manifest_files": {
     "columns": [
@@ -2150,7 +2150,7 @@
      "blob_sha256"
     ],
     "row_count": 64,
-    "rows_sha256": "63e1d1e09ae9fd60d3ae83a354962ea9481b252e1bd7d95f2ae1aebdf650ba4e"
+    "rows_sha256": "3ce331b435a9cfde280a1e376b08b3239b650c35945d7649aa61f2cadefbfd7d"
    },
    "package_manifests": {
     "columns": [
@@ -2165,7 +2165,7 @@
      "status"
     ],
     "row_count": 4,
-    "rows_sha256": "3849847c06092a20698ea3b42394bf26eaa86ee15b242737693860093b0cc550"
+    "rows_sha256": "ae7965cded66d43313612398a56f3545d33517cd05d0b53d4e04014a4e24b8b7"
    },
    "package_participant_artifacts": {
     "columns": [
@@ -2179,7 +2179,7 @@
      "schema_json"
     ],
     "row_count": 2,
-    "rows_sha256": "0e5374268ea87b0223dd6c01986525b975dca32a07d567ed11dfa35654ff72a5"
+    "rows_sha256": "c1724be2acaaa0276c2f10637e0ae586fcecd1acaaa9177f90c2a614734f5a55"
    },
    "package_prompt_fragments": {
     "columns": [
@@ -2191,7 +2191,7 @@
      "capability"
     ],
     "row_count": 2,
-    "rows_sha256": "5efa8ff3cffd697be4ccd71c7055bf2ce73dab863e74220a7fccecbb2cbea5dd"
+    "rows_sha256": "20ab355e2fe5b9cc7abe4c7acd9bfb1595e60a9bd80aff22009827684ab8c142"
    },
    "package_read_leases": {
     "columns": [
@@ -2217,7 +2217,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "b159525926dfa8e06a108bdbf5b6b77ac7e838b14af892614ace05c859992fc9"
+    "rows_sha256": "8175431babc001d77e69a5aa91441547a341d1b29fead24afec62b0445739655"
    },
    "package_staging_chunks": {
     "columns": [
@@ -2232,7 +2232,7 @@
      "data"
     ],
     "row_count": 346,
-    "rows_sha256": "e3d5135ae40ee575cbc496a5a78e753b66f1664e3ad6a77154d529aee4c24b8b"
+    "rows_sha256": "2964f0e2f69e7c5eed25bae4bc05f025f2ecf7078bc977751f30a220b66f5fb5"
    },
    "package_tools": {
     "columns": [
@@ -2247,8 +2247,8 @@
      "turn_statuses_json",
      "writers_json"
     ],
-    "row_count": 185,
-    "rows_sha256": "6ce8ed8e9de9d3fa4aefd6b460230fa91c89880447d7d8e955ff3173af133899"
+    "row_count": 186,
+    "rows_sha256": "e73aab0c4600c545fc906efdaebeda84afb7547f6e1a976646cd55ea44aa7f18"
    },
    "package_ui_surfaces": {
     "columns": [
@@ -2260,7 +2260,7 @@
      "capability"
     ],
     "row_count": 6,
-    "rows_sha256": "a6257d357aa611de48871306d245af2ddbb9828a90bfbb32f0920105a77e1c47"
+    "rows_sha256": "54dd046542e7758f8f3e70f764ee2b2fdeba6d54504d125549d973978905f36d"
    },
    "packages": {
     "columns": [
@@ -2270,7 +2270,7 @@
      "capabilities_json"
     ],
     "row_count": 4,
-    "rows_sha256": "2122817326a575ee841922d2262bf4bcd3e9e7c1e9ec7dc01469051a6967fd8f"
+    "rows_sha256": "aa7abb7d6f585e980ceb446957c81e9a9e4d2843bcdeabaa98b3af44887e92f2"
    },
    "participant_adaptations": {
     "columns": [
@@ -2521,10 +2521,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "d14b554e387b4928bed847438c4df195",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248301.4188619,
-     "last_seen": 1795248301.4188619,
+     "id": "fbdfab1fb0024d4f97e86674b25aefde",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327606.675983,
+     "last_seen": 1795327606.675983,
      "count": 1
     },
     {
@@ -2545,10 +2545,10 @@
      "error_code": "other_rejection",
      "error_type": "OtherError",
      "duration_ms": 0.0,
-     "id": "5435d9807a5541b9a963195b3a2b7d83",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248384.7290542,
-     "last_seen": 1795248384.7350557,
+     "id": "2c62dc17130743d39ec6c0351bce2f7c",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327629.5377266,
+     "last_seen": 1795327629.5412555,
      "count": 17
     },
     {
@@ -2569,10 +2569,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "0ff2e2e8ce7346de9c3ce839007fc5b5",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248384.7300565,
-     "last_seen": 1795248384.7350557,
+     "id": "410e12578a674ac587f5f0a129d5607b",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327629.5377266,
+     "last_seen": 1795327629.5412555,
      "count": 2
     },
     {
@@ -2592,11 +2592,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 15.0,
-     "id": "07a19a2bf15748fc81859014a20a07ff",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248384.7330556,
-     "last_seen": 1795248384.8026228,
+     "duration_ms": 16.0,
+     "id": "ff9b20e37be544ff81fa54bf28b3264a",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327629.5402412,
+     "last_seen": 1795327629.5825799,
      "count": 3
     },
     {
@@ -2616,11 +2616,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 47.0,
-     "id": "9d06c3509e5a46be9c15a8e353fafdc6",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248384.7915914,
-     "last_seen": 1795248384.7915914,
+     "duration_ms": 31.0,
+     "id": "354f219f0d19481a8121c08d2acaf413",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327629.575062,
+     "last_seen": 1795327629.575062,
      "count": 1
     },
     {
@@ -2641,10 +2641,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "ed996a8e7f97453c951c5232906477bd",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248384.8036215,
-     "last_seen": 1795248384.8036215,
+     "id": "e75ddb4ab3704848a16f4165304fd05b",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327629.5835786,
+     "last_seen": 1795327629.5835786,
      "count": 1
     },
     {
@@ -2665,10 +2665,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "a8097a43cd6a434ca4b9a8de1f099693",
-     "session": "dddc90d3b9bd48558d241418e05193cd",
-     "first_seen": 1795248384.804622,
-     "last_seen": 1795248384.804622,
+     "id": "331d9ccf4c774663adefb860f0894484",
+     "session": "6c8aa39b15d341f584000864002b9692",
+     "first_seen": 1795327629.5835786,
+     "last_seen": 1795327629.5835786,
      "count": 1
     },
     {
@@ -2689,10 +2689,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "a55762ff646b45fe9d853c1581100498",
-     "session": "2d9f97f380a442e8b3dd2963fc36e1fd",
-     "first_seen": 1795248502.9072766,
-     "last_seen": 1795248502.9072766,
+     "id": "dc70329a1739442e96eace9b9d064655",
+     "session": "c609a9b066db4b0da5b112339561858d",
+     "first_seen": 1795327658.7985942,
+     "last_seen": 1795327658.7985942,
      "count": 1
     },
     {
@@ -2713,10 +2713,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "b83b35a0f8fb4724b40df379a751396d",
-     "session": "2d9f97f380a442e8b3dd2963fc36e1fd",
-     "first_seen": 1795248502.9489155,
-     "last_seen": 1795248502.9489155,
+     "id": "f249d87bd37e41ceb5f05a1be70a8f8c",
+     "session": "c609a9b066db4b0da5b112339561858d",
+     "first_seen": 1795327658.8310297,
+     "last_seen": 1795327658.8310297,
      "count": 1
     }
    ]

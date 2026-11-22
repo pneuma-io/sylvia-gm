@@ -1,0 +1,475 @@
+{
+ "python": "3.12.11",
+ "operations": [
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-blank",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "   ",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-long",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": {
+    "repeat": "x",
+    "count": 131073
+   },
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-review",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "review",
+   "visible_answer": "An answer",
+   "answer": {},
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-unknown",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "epilogue",
+   "visible_answer": "An answer",
+   "answer": {},
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-negative",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": -1,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {},
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": " a-padded",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-list",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": [
+    "x"
+   ],
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-session",
+   "campaign_id": null,
+   "builder_session_id": "session-missing",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-ruleset",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "No Ruleset",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-ruleset",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "No Ruleset",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-ruleset",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "A different visible answer",
+   "answer": {
+    "candidate_id": "x"
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-stale",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "name",
+   "visible_answer": "Storm Courier",
+   "answer": {},
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-name",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 1,
+   "current_step": "name",
+   "visible_answer": "Storm Courier",
+   "answer": {
+    "display_name": "Storm Courier"
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-plan",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 2,
+   "current_step": "plan",
+   "visible_answer": "An answer",
+   "answer": {
+    "plan_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-contribution",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 2,
+   "current_step": "ruleset_contribution",
+   "visible_answer": "An answer",
+   "answer": {},
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-boundaries",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 2,
+   "current_step": "boundaries_preferences",
+   "visible_answer": "No graphic violence",
+   "answer": {
+    "boundaries": [
+     "graphic violence"
+    ],
+    "preferences": []
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-ruleset-again",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 3,
+   "current_step": "ruleset",
+   "visible_answer": "No Ruleset",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-name-again",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 4,
+   "current_step": "name",
+   "visible_answer": "Storm Courier",
+   "answer": {
+    "display_name": "Storm Courier"
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-boundaries-again",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 5,
+   "current_step": "boundaries_preferences",
+   "visible_answer": "None",
+   "answer": {
+    "boundaries": []
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-requests",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 6,
+   "current_step": "specific_requests",
+   "visible_answer": "No additional requests",
+   "answer": {
+    "requests": []
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-participants",
+   "campaign_id": null,
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 7,
+   "current_step": "participants",
+   "visible_answer": "Just me",
+   "answer": {
+    "participants": []
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-missing-campaign",
+   "campaign_id": "campaign-draft-missing",
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "a-bad-campaign",
+   "campaign_id": " campaign",
+   "builder_session_id": "session-guided-1",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": null
+   },
+   "not_ported": false
+  }
+ ],
+ "outcomes": [
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_campaign_interview_answer",
+   "message": "Guided Campaign answer is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Agent session is unavailable"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "name",
+    "construction_revision": 1,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-e463cf3caeb06177cc2c681c"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "name",
+    "construction_revision": 1,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-e463cf3caeb06177cc2c681c"
+   }
+  },
+  {
+   "error": "IdempotencyConflict",
+   "code": "idempotency_conflict",
+   "message": "Guided Campaign answer identity payload does not match"
+  },
+  {
+   "error": "StaleRevision",
+   "code": "stale_revision",
+   "message": "Guided Campaign Interview revision is stale"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "boundaries_preferences",
+    "construction_revision": 2,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-eeab8900927c8c2efc33487e"
+   }
+  },
+  {
+   "error": "StaleRevision",
+   "code": "stale_revision",
+   "message": "Guided Campaign Interview revision is stale"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "interview_contribution_unavailable",
+   "message": "Selected artifact has no Interview Contribution"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "specific_requests",
+    "construction_revision": 3,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-31fec9782713eec87ced1ee6"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "name",
+    "construction_revision": 4,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-129afb97eb8eff0170cde416"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "boundaries_preferences",
+    "construction_revision": 5,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-05a9b056d5797fe7d5e94ba1"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "specific_requests",
+    "construction_revision": 6,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-ba9b91c9ee0425cd06402fda"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "review",
+    "construction_revision": 7,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-6f047ffd355c5d676e4b8a1f"
+   }
+  },
+  {
+   "error": "StaleRevision",
+   "code": "stale_revision",
+   "message": "Guided Campaign Interview revision is stale"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "command_rejected",
+   "message": "Campaign is unavailable: missing or purged"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Campaign authority identity is invalid"
+  }
+ ]
+}

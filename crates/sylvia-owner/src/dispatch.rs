@@ -40,6 +40,9 @@ pub struct DispatchContext {
     pub providers: Option<Arc<dyn ProviderResolver>>,
     /// `session_loop` (lane 4).
     pub session_loop: Option<Arc<dyn SessionLoop>>,
+    /// The bundled package sources (the shipped Ruleset, Setting, Plan and archives), built once at
+    /// launch from [`crate::util::source_root`].
+    pub bundled: Arc<sylvia_app::bundled_packages::BundledPackages>,
     /// `record_provider_warning(code)`: a `provider_warning` record in local diagnostics.
     pub record_provider_warning: Arc<dyn Fn(&str) + Send + Sync>,
 }
@@ -139,6 +142,10 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "advance_guided_campaign_draft" => {
+            commands::campaigns::handle_advance_guided_campaign_draft(context, params).await
+        }
+        "start_guided_campaign" => commands::campaigns::handle_start_guided_campaign(context, params).await,
         "create_guided_campaign_draft" => {
             commands::campaigns::handle_create_guided_campaign_draft(context, params).await
         }

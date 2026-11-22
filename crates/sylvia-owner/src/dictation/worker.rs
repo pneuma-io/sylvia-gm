@@ -475,7 +475,7 @@ mod tests {
         let mut source = TextInput::with_newlines(Cursor::new(input.as_bytes().to_vec()), false);
         let mut output = Replies::with_newline(Vec::new(), "\n");
         let worker = Worker { directory, spec };
-        let code = serve(&mut source, &mut output, &worker, &mut Absent::default());
+        let code = serve(&mut source, &mut output, &worker, &mut Absent::offline());
         (code, String::from_utf8(output.into_inner()).unwrap())
     }
 
@@ -510,7 +510,7 @@ mod tests {
             (0, "{\"status\":\"ready\"}\n".into())
         );
         std::fs::remove_file(directory.join("model.bin")).unwrap();
-        // Until lane 4's HTTP client is in the owner, a download fails as an unreachable network.
+        // Offline, a download fails as an unreachable network does.
         assert_eq!(
             answer("{\"mode\":\"prepare\"}\n", &directory, &spec),
             (1, "{\"error\":\"download\"}\n".into())

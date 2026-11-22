@@ -2,7 +2,7 @@
 
 Run with the snapshot's own interpreter, from the repository root:
 
-    .venv/Scripts/python.exe -B crates/sylvia-store/tests/vectors/generate_guided_draft_runs.py
+    .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_guided_draft_runs.py
 
 It drives `create_guided_campaign_draft` on a new profile: identity refusals, a first Draft,
 an exact replay, replays that differ (name, Builder model, Builder session), a second Draft, and a
@@ -11,6 +11,9 @@ new operation that reuses a Draft's Builder session. It writes, under `guided/`,
 `draft_runs.json` (the operations and Python's outcome of each). `tests/guided.rs` replays them
 through the Rust store handle and compares the database. Identities are explicit and the
 owner's UUIDs are seeded, so a re-run writes byte-identical files. Reference tooling only.
+
+The four guided generators share `guided/` and build on this one's seed. Run them in order with
+`generate_guided_all.py` (draft, advance, start, finalize, ruleset).
 """
 
 from __future__ import annotations
@@ -18,7 +21,6 @@ from __future__ import annotations
 import gzip
 import json
 import random
-import shutil
 import sqlite3
 import sys
 import tempfile
@@ -33,6 +35,7 @@ uuid.uuid4 = lambda: uuid.UUID(int=_IDENTITIES.getrandbits(128), version=4)  # t
 from sylvia_gm.application.authority import AuthorityOwner  # noqa: E402
 
 OUT = Path(__file__).resolve().parent / "guided"
+OUTPUTS = ("seed.sqlite3.gz", "draft_runs.json", "draft_runs.sqlite3.gz")
 PROVIDER, MODEL = "standin", "standin/standin-narrator"
 
 
@@ -85,9 +88,10 @@ def checkpoint(database: Path) -> bytes:
 
 
 def main() -> None:
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir()
+    # Only this generator's own files: the advance, start and finalize runs share the folder.
+    OUT.mkdir(exist_ok=True)
+    for name in OUTPUTS:
+        (OUT / name).unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(dir=OUT.parent) as scratch:
         database = Path(scratch) / "authority.sqlite3"
         with AuthorityOwner.open(database, "guided-draft-runs") as owner:

@@ -20,7 +20,7 @@ pub mod presets;
 pub mod protection;
 pub mod provider_settings;
 pub mod provider_writes;
-mod pyvalue;
+pub(crate) mod pyvalue;
 pub mod resolver;
 pub mod user_settings;
 

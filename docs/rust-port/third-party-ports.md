@@ -26,6 +26,8 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-base/src/pyyaml/scanner_c.rs`, `parser_c.rs` (`Loader::C`) | libyaml's reader, scanner and parser (`src/reader.c`, `src/scanner.c`, `src/parser.c`) | libyaml 0.2.5 | MIT | lane 4 |
 | `sylvia-provider/src/sse.rs`, `openai_compat.rs`, `pyobj.rs`, `chat.rs` | The OpenAI Python SDK's SSE decoder (`_streaming.py`), request assembly (`_base_client.py`, `_utils/_json.py`) and `construct` model reading (`_models.py`) | openai 2.53.0 | Apache-2.0 | lane 4 |
 | `sylvia-provider/src/httpx_url.rs` | `httpx.URL` parsing and normalisation (`httpx/_urlparse.py`, `httpx/_urls.py`) | httpx 0.28.1 | BSD-3-Clause | lane 4 |
+| `sylvia-provider/src/proxy.rs` | `urllib.request.getproxies_environment` and the registry parsing of `getproxies_registry` (`Lib/urllib/request.py`), and `Reg2Py` with `countStrings`/`fixupMultiSZ` for the value types `sylvia_base::winreg` leaves to its callers (`PC/winreg.c`); httpx's `get_environment_proxies`, `URLPattern` and its priority order (`httpx/_utils.py`) | CPython 3.12.11; httpx 0.28.1 | PSF License Version 2; BSD-3-Clause | lane 4 |
+| `sylvia-provider/src/net.rs` | httpx's response header decoding (`httpx/_models.py`, `Headers`) and its client timing defaults | httpx 0.28.1 | BSD-3-Clause | lane 4 |
 | `sylvia-base/src/pyurl.rs` | CPython's `urllib.parse`: `urlsplit` with `_splitnetloc`, `_check_bracketed_netloc`, `_check_bracketed_host` and `_checknetloc`, `urlunsplit`, the `hostname`, `port`, `username` and `password` properties, `unquote` and `_unquote_impl` (`Lib/urllib/parse.py`); `ipaddress`'s address parsing (`Lib/ipaddress.py`). Lane 5's port (`desktop_update/url.rs`, PR 289) merged with lane 4's | CPython 3.12.11 | PSF License Version 2 | lanes 4 and 5 |
 | `sylvia-provider/src/config/host_browser/mod.rs` (`posix_normpath`) | CPython's `posixpath.normpath` (`Lib/posixpath.py`, `_path_normpath` in `Python/fileutils.c`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
 | `sylvia-store/src/launch.rs` (`py_fromhex`) | CPython's `bytes.fromhex` (`Objects/bytesobject.c`, `_PyBytes_FromHex`): whitespace skipped before each pair | CPython 3.12.11 | PSF License Version 2 | lane 3 |
@@ -38,5 +40,22 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-owner/src/webui/file_response.rs` (`prepare`, `etags`, `etag_match`, `http_range`) | aiohttp's `FileResponse.prepare`, `_make_response`, `_prepare_open_file` and `_etag_match` (`web_fileresponse.py`), the request's `if_match`, `_etag_values` and `http_range` (`web_request.py`) and `LIST_QUOTED_ETAG_RE` (`helpers.py`) | aiohttp 3.14.3 | Apache License 2.0 | lane 5 |
 | `sylvia-owner/src/webui/file_response.rs` (`parsedate`) | CPython's `email._parseaddr._parsedate_tz` (`Lib/email/_parseaddr.py`), as `email.utils.parsedate` and aiohttp's `parse_http_date` call it | CPython 3.12.11 | PSF License Version 2 | lane 5 |
 
+| `sylvia-owner/src/dictation/features.rs` (`RealFft`, `SinCos`, `radf4`, `radf5`) | pocketfft's real transform: `rfftp` (`factorize`, `comp_twiddle`, `exec`, `radf4`, `radf5`) and `sincos_2pibyn` (`pocketfft_hdronly.h`), and NumPy's half-complex unpacking (`rfft_impl` in `numpy/fft/_pocketfft_umath.cpp`) | pocketfft C++ at NumPy 2.5.4's submodule `33ae5dc`; NumPy 2.5.4 | BSD-3-Clause (pocketfft: Max-Planck-Society; NumPy) | lane 5 |
+| `sylvia-owner/src/dictation/features.rs` (`hann_window`, `mel_filters`, `linspace`, `pad_reflect`, `cabs`) | NumPy's `hanning`, `linspace`, `pad(mode="reflect")` (`_set_reflect_both`) and the SIMD complex `absolute` (`loops_unary_complex.dispatch.c.src`) | NumPy 2.5.4 | BSD-3-Clause | lane 5 |
+| `sylvia-owner/src/dictation/features.rs` (`log_mel`), `sylvia-owner/src/dictation/audio.rs` | faster-whisper's `FeatureExtractor` (`feature_extractor.py`) and `decode_audio`, `_group_frames` (`audio.py`) | faster-whisper 1.2.1 | MIT | lane 5 |
+
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.
+
+Not a translation, but a notice the release needs: the TLS trust roots of the provider HTTP client are the `webpki-roots` crate (1.0, CDLA-Permissive-2.0), Mozilla's CA bundle, as httpx uses `certifi`'s copy of the same bundle. `SSL_CERT_FILE` and `SSL_CERT_DIR` replace it, as they do for httpx.
+
+## Native libraries the Rust build loads
+
+Not translations: the Rust owner loads these libraries, the same files the Python build ships,
+so its results are theirs. Packaging must ship each one beside `sylvia-gm-owner` with its
+licence notice, and the hash pins the file the vectors were recorded with.
+
+| Library | Loaded by | File and SHA-256 | Version | Licence | Added by |
+| --- | --- | --- | --- | --- | --- |
+| OpenBLAS (NumPy's scipy-openblas, ILP64) | `sylvia-owner/src/dictation/openblas/windows.rs` | `libscipy_openblas64_-ed4f167a5330424524f45258e7ca2c8d.dll`, `ed4f167a5330424524f45258e7ca2c8d7f03c0cba1f30ee4985553ac1f88ecf8` (from the NumPy 2.5.4 wheel in `uv.lock`) | OpenBLAS 0.3.34.106.0 | BSD-3-Clause | lane 5 |
+| libswresample, libavutil (FFmpeg) | `sylvia-owner/src/dictation/swresample/windows.rs` | `swresample-6.dll`, `3d950dfb94a55fc3b25fdd55ea4c49aa0361506d0c304d2615d3fa49a21634ad`; `avutil-60.dll`, `4afe3a74c43b9860d64ebdbdaef30b8758d907a1d3128ff8fc0e28d3b7227008` (the project's MSVC LGPL build, `licenses/dictation/PYAV-LGPL-BUILD.json`) | FFmpeg 8.1.2 | LGPL-2.1-or-later (source offer as for the PyAV build) | lane 5 |

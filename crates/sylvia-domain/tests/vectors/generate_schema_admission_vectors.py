@@ -32,7 +32,7 @@ from sylvia_gm.application.schema_admission import (  # noqa: E402
     validate_references,
 )
 from sylvia_gm.domain.authority import thaw_json_value  # noqa: E402
-from sylvia_gm.domain.errors import MechanicsRejected, RulesetPreconditionRejected  # noqa: E402
+from sylvia_gm.domain.errors import _NAMED_INPUT, MechanicsRejected, RulesetPreconditionRejected  # noqa: E402
 
 OUTPUT = Path(__file__).with_name("schema_admission_vectors.json")
 RECORDING = ROOT / "crates/sylvia-compare/recordings/windows/startup.recording.json"
@@ -188,11 +188,41 @@ def main() -> None:
     for extra in reasons:
         rejections.append({"refusal_reasons": extra, "outcome": outcome(
             lambda: (_ for _ in ()).throw(MechanicsRejected("m", code="c", refusal_reasons=tuple(extra))))})
+    # field_paths (0.4.1, #279): the inputs a refusal names, through RulesetPreconditionRejected.
+    named = [
+        ["Missing input 'target_distance'"], ["Missing required parameter 'target_willing'"],
+        ["Input 'a' and input 'b'", "input 'a' again"], ["noinput 'x'", "_input 'x'", "1input 'x'"],
+        ["input 'x", "input '1x'", "input  'x'", "required  parameter 'x'", "Required parameter 'x'"],
+        ["INPUT 'x'", "input 'x-y'", "input 'x_9'", "input '" + "a" * 80 + "'", "input '" + "a" * 81 + "'"],
+        [chr(0xe9) + "input 'x'", chr(0xbd) + "input 'x'", chr(0x903) + "input 'x'", "(input 'p')"],
+        ["input 'ab'input 'cd'", "required parameter 'r' and input 'r'"],
+    ]
+    for extra in named:
+        rejections.append({"safe_reason": "Target is out of range", "reasons": extra, "outcome": outcome(
+            lambda: (_ for _ in ()).throw(RulesetPreconditionRejected("Target is out of range",
+                                                                     reasons=tuple(extra))))})
+    rejections.append({"safe_reason": "Missing input 'first'", "reasons": ["input 'second'", "input 'first'"],
+                       "outcome": outcome(lambda: (_ for _ in ()).throw(RulesetPreconditionRejected(
+                           "Missing input 'first'", reasons=("input 'second'", "input 'first'"))))})
+    texts = [text for group in named for text in group] + ["", "input", "input ''", chr(9) + "input 'x'",
+                                                           "input 'x'" + chr(10)]
+    named_inputs = [[text, _NAMED_INPUT.findall(text)] for text in texts]
+    blockers, start = [], None
+    for code in range(sys.maxunicode + 2):
+        surrogate = 0xD800 <= code <= 0xDFFF
+        blocked = code <= sys.maxunicode and not surrogate and not _NAMED_INPUT.findall(chr(code) + "input 'x'")
+        if blocked and start is None:
+            start = code
+        elif not blocked and start is not None:
+            blockers.append([start, code - 1])
+            start = None
     vectors = {
         "python": sys.version.split()[0],
         "synthetic": SYNTHETIC,
         "cases": cases,
         "rejections": rejections,
+        "named_inputs": named_inputs,
+        "named_input_blockers": blockers,
     }
     text = json.dumps(vectors, ensure_ascii=True, separators=(",", ":")) + "\n"
     OUTPUT.write_text(text, encoding="utf-8", newline="\n")

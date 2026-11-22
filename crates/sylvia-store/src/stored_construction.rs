@@ -45,7 +45,7 @@ const OPERATION_KINDS: [&str; 9] = [
 
 /// What `_campaign_operation_result` returns for one `campaign_operations` row.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum OperationResult {
+pub enum OperationResult {
     Confirmation(CampaignConfirmation),
     Begun(CampaignConstructionBegun),
     Completed(CampaignConstructionCompleted),
@@ -144,7 +144,7 @@ pub(crate) fn operation_result(row: &Named<'_>) -> StoreResult<OperationResult> 
 }
 
 /// `_operation_lock_payload`.
-fn operation_lock_payload(package_lock: &PackageLock) -> Json {
+pub(crate) fn operation_lock_payload(package_lock: &PackageLock) -> Json {
     Json::Array(
         package_lock
             .entries()

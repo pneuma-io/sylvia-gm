@@ -3,7 +3,7 @@
 Run with the snapshot's own interpreter (CPython 3.12, Unicode 15.0.0), from the repository
 root:
 
-    .venv/Scripts/python.exe -I crates/sylvia-engine/src/ruleset/generate_alnum_table.py
+    .venv/Scripts/python.exe -I crates/sylvia-base/src/pystr/generate_alnum_table.py
 
 The table is every character `str.isalnum()` accepts, which the Ruleset validator uses for
 model-decision preparation identifiers. This script is reference tooling for the port and is
