@@ -314,8 +314,9 @@ pub type Cancelled = Arc<dyn Fn() -> bool + Send + Sync>;
 /// `progress(text)`: an application progress hint, or `None` to clear it.
 pub type Progress = Arc<dyn Fn(Option<&str>) + Send + Sync>;
 /// `finalize_request(projected, request_tools)`: build and durably journal the wire list.
-pub type FinalizeRequest =
-    Arc<dyn Fn(Vec<JsonMap>, Option<Vec<Json>>) -> BoxFuture<'static, ProviderResult<Vec<JsonMap>>> + Send + Sync>;
+pub type FinalizeRequest = Arc<
+    dyn Fn(Vec<JsonMap>, Option<Vec<Json>>) -> BoxFuture<'static, ProviderResult<Vec<JsonMap>>> + Send + Sync,
+>;
 /// `measure_wire(projected, tools)`: the wire list a request would send.
 pub type MeasureWire = Arc<dyn Fn(&[JsonMap], Option<&[Json]>) -> Vec<JsonMap> + Send + Sync>;
 /// `rebase_wire()` and `strip_thinking()`.
