@@ -1037,8 +1037,9 @@ mod tests {
         // Python's.
         let record = read_json("crates/sylvia-app/tests/vectors/export/export_runs.json");
         // A short root, as Python's run had (`tmpXXXXXXXX/storage`): the 128-character export
-        // identity's claimed temporary then stays under `MAX_PATH`, which the owner's Win32 file
-        // calls are held to (see the PR).
+        // identity's claimed temporary then stays under `MAX_PATH`. A test binary carries no
+        // `longPathAware` manifest; the owner executables do, so their Win32 file calls take long
+        // paths exactly when Windows enables them, as Python's do.
         let folder = std::env::temp_dir().join(format!("sgx-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&folder);
         std::fs::create_dir_all(&folder).unwrap();
