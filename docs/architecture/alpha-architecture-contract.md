@@ -1713,6 +1713,17 @@ the ledger resets. Builder and participant requests do not use it.
   `cast_spell_outside_combat`, derived by `scripts.srd_lite_argument_contracts` as a sound
   over-approximation and stamped by `scripts.update_srd_argument_contracts`. Saved-campaign
   rules updates treat the declaration as model guidance.
+- **Combat casting windows (SRD Lite 0.3.29, #279).** In combat `begin_srd_spell_action`
+  reserves the Action and opens a casting window; `complete_srd_pending_action` resolves the
+  spell. A begin that commits must not leave a window its completion refuses for a scene fact:
+  every creature-targeting spell measures range, sight, touch and cover from the saved scene
+  at begin and again at completion, and begin refuses the remaining inputs its resolution
+  needs. A cast's own resolution is not blocked by its own window (completion records it as
+  `srd_resolving_cast_id` in the lasting state). `release_srd_unresolved_spell_cast` closes a
+  window whose completion was refused as a lost cast: the Action stays used and no slot is
+  spent. A Ruleset refusal that names `input 'x'` carries `x` as its field path.
+  `tests/test_srd_lite_combat_window_guarantee.py` checks every implemented spell; the
+  choice inputs still checked only at completion are listed in #291.
 - **ChatGPT runtime thread.** On `codex_app_server` the provider keeps the Codex runtime process
   and thread between the requests of a GM turn and between turns. At a Sylvia tool call the turn
   is left waiting, and the next request, which brings the call's result, answers the call inside

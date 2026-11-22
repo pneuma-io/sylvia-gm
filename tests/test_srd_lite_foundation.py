@@ -110,7 +110,7 @@ def _replay_event_consumer(case, name, parameters, action_id, monkeypatch):
 
 
 class Case:
-    def __init__(self, path, spell, *, guard_ac=1, positions=None, entity_changes=None, participant_changes=None, lighting="bright", casting_source=None, geometry=None, scene_override=None, inventory_additions=()):
+    def __init__(self, path, spell, *, guard_ac=1, positions=None, entity_changes=None, participant_changes=None, lighting="bright", casting_source=None, geometry=None, scene_override=None, inventory_additions=(), state_changes=None):
         self.path = path
         self.manager = None
         with zipfile.ZipFile(ARCHIVE) as package:
@@ -258,6 +258,7 @@ class Case:
             scene = deepcopy(scene_override)
             admit_spatial_scene(scene)
         state[FULL + ".state"] = {"lasting_tick": 0, "turn_effects": [], "spatial_scene": scene}
+        state[FULL + ".state"].update(deepcopy(state_changes or {}))
         self.parameters = {
             "spell": spell,
             "caster": "hero",

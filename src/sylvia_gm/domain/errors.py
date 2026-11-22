@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+
+# An input a Ruleset refusal names, as in "Missing input 'target_distance'" or, from a
+# resolution step's parameter check, "Missing required parameter 'target_willing'".
+_NAMED_INPUT = re.compile(
+    r"\b(?:[Ii]nput|required parameter) '([A-Za-z][A-Za-z0-9_]{0,79})'"
+)
 
 
 @dataclass(frozen=True)
@@ -164,10 +171,18 @@ class RulesetPreconditionRejected(MechanicsRejected):  # noqa: N818
             or any(ord(character) < 32 for character in safe_reason)
         ):
             raise ValueError("Ruleset precondition reason is not model-safe")
+        refusal_reasons = tuple(dict.fromkeys((safe_reason, *reasons)))
         super().__init__(
             safe_reason,
             code="ruleset_precondition_failed",
+            # A reason that names the caller's input ("Missing input 'x'", "input 'x'") gives
+            # its field path, so the GM can correct or report it without guessing (#279).
+            field_paths=tuple(
+                dict.fromkeys(
+                    name for reason in refusal_reasons for name in _NAMED_INPUT.findall(reason)
+                )
+            ),
             state_changed=False,
-            refusal_reasons=tuple(dict.fromkeys((safe_reason, *reasons))),
+            refusal_reasons=refusal_reasons,
         )
         self.safe_reason = safe_reason

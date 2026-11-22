@@ -35,7 +35,7 @@
   },
   "content_declarations": "content/content-declarations.json",
   "content_kind": "ruleset",
-  "content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+  "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
   "dependencies": [
     {
       "content_sha256": "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
@@ -107,9 +107,9 @@
       "sha256": "b187be2db7ca92e9197cc49765132be100e7f03f8ee3f0d57b1b00ba69ddced1"
     },
     {
-      "bytes": 12014,
+      "bytes": 12050,
       "path": "content/content-declarations.json",
-      "sha256": "25467162b3167b8075fa1eb3bf23a36f7c83df248bc66da464352b13b647d601"
+      "sha256": "2421cf64a84d7d9832008e21cdbb5b00ebdb3a63892f5bcda16d4f3fa8bf8215"
     },
     {
       "bytes": 122286,
@@ -159,7 +159,7 @@
     {
       "bytes": 93734,
       "path": "content/spell-catalogue.json",
-      "sha256": "393fa8f50fd3dae98d6aa4a9bc5c8beb7bab9645b530b60ee29cb932d5a4a8ae"
+      "sha256": "9d3f2ceab0860ced7511fcc0916b18f9ad6767c04a185c566181486d547824ee"
     },
     {
       "bytes": 5865,
@@ -189,7 +189,7 @@
     {
       "bytes": 1640,
       "path": "package-identity.json",
-      "sha256": "39d9aa05e3b4919f8d58e99b4a7eda3551399f8878a438ca3dc72e21ce05437a"
+      "sha256": "02df49676796fd57c33fd8c4f5e832366f66bd7a722a86041bfe60b3cd1b1313"
     },
     {
       "bytes": 25922,
@@ -212,9 +212,9 @@
       "sha256": "e99cb13cdf36dca41c67b9041bf91a536c8b49c730bb27a8909eb4385a8908e3"
     },
     {
-      "bytes": 14579173,
+      "bytes": 14589530,
       "path": "runtime/ruleset.yaml",
-      "sha256": "932e47dacbe4eb88d3e2727607cc96feab2f88a2e4be0cbd42a4f4692727313c"
+      "sha256": "e6a092189682306ca667e56d53a037ec471aacf6e5dea7f3b3349f8cb6103f38"
     },
     {
       "bytes": 59661,
@@ -26616,7 +26616,7 @@
             "wisdom_targets",
             "wish_target"
           ],
-          "derived_from_sha256": "7f2e27ec62a910c3fee010684363994a2147508f2d0e46920178dd0cddbffc79",
+          "derived_from_sha256": "a547e4384d1ef0f409f647de7c793888d73cc981f8c74918f6d670ebe2807413",
           "field": "spell_arguments",
           "selector": "spell",
           "version": 1
@@ -35954,7 +35954,7 @@
             "wisdom_targets",
             "wish_target"
           ],
-          "derived_from_sha256": "7f2e27ec62a910c3fee010684363994a2147508f2d0e46920178dd0cddbffc79",
+          "derived_from_sha256": "a547e4384d1ef0f409f647de7c793888d73cc981f8c74918f6d670ebe2807413",
           "field": "spell_arguments",
           "selector": "spell",
           "version": 1
@@ -40235,6 +40235,34 @@
         "type": "object"
       },
       "name": "complete_srd_pending_action",
+      "state_predicates": [],
+      "turn_statuses": [
+        "open"
+      ],
+      "writers": [
+        "dm"
+      ]
+    },
+    {
+      "capability": "dnd.srd.5.2.1.spells",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "lasting_state": {
+            "type": "string",
+            "x-sylvia-gm-model-hidden": true,
+            "x-sylvia-gm-reference": "entity"
+          },
+          "pending_action_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pending_action_id"
+        ],
+        "type": "object"
+      },
+      "name": "release_srd_unresolved_spell_cast",
       "state_predicates": [],
       "turn_statuses": [
         "open"
@@ -53211,5 +53239,5 @@
       "title": "Character"
     }
   ],
-  "version": "0.3.28"
+  "version": "0.3.29"
 }
