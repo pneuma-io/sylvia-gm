@@ -449,7 +449,7 @@
     "ok": true,
     "result": {
      "campaign_id": "campaign-draft-ae054b57f077ae58753be855",
-     "interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+     "interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
      "turn_id": "turn-dm-c5be850db2cbcdc9961630c2",
      "last_action_id": null,
      "failed_attempt_id": "attempt-stop-1",
@@ -469,7 +469,7 @@
      "receipts": [],
      "interruption": {
       "campaign_id": "campaign-draft-ae054b57f077ae58753be855",
-      "interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+      "interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
       "turn_id": "turn-dm-c5be850db2cbcdc9961630c2",
       "last_action_id": null,
       "failed_attempt_id": "attempt-stop-1",
@@ -515,7 +515,7 @@
       "sequence": null,
       "text": "Narration interrupted—Retry",
       "safe_payload": {
-       "interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+       "interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
        "failed_attempt_id": "attempt-stop-1",
        "resolving_retry_id": null,
        "can_redirect": true,
@@ -546,7 +546,7 @@
       "sequence": null,
       "text": "Narration interrupted—Retry",
       "safe_payload": {
-       "interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+       "interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
        "failed_attempt_id": "attempt-stop-1",
        "resolving_retry_id": null,
        "can_redirect": true,
@@ -634,7 +634,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 4,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-assistant-tools",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -657,7 +657,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -673,7 +673,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 5,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-tool-results",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -682,7 +682,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -704,11 +704,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 527,
+         "elapsed_ms": 664,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 9,
+         "quiet_ms": 84,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-c5be850db2cbcdc9961630c2",
@@ -760,11 +760,11 @@
        "kind": "evidence",
        "content": {
         "activity_timing": {
-         "elapsed_ms": 110,
+         "elapsed_ms": 147,
          "last_operation": null,
          "operation": null,
          "phase": "stopped",
-         "quiet_ms": 51,
+         "quiet_ms": 47,
          "revision": 4
         },
         "attempt_id": "attempt-stop-1",
@@ -851,7 +851,7 @@
     "builder_start": false,
     "player_action_id": null,
     "automatic_response": false,
-    "redirect_interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+    "redirect_interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
     "campaign_ending_choice": null
    },
    "reply": {
@@ -1055,7 +1055,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 4,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-assistant-tools",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1078,7 +1078,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1094,7 +1094,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 5,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-tool-results",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1103,7 +1103,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1125,11 +1125,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 527,
+         "elapsed_ms": 664,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 9,
+         "quiet_ms": 84,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-c5be850db2cbcdc9961630c2",
@@ -1181,11 +1181,11 @@
        "kind": "evidence",
        "content": {
         "activity_timing": {
-         "elapsed_ms": 110,
+         "elapsed_ms": 147,
          "last_operation": null,
          "operation": null,
          "phase": "stopped",
-         "quiet_ms": 51,
+         "quiet_ms": 47,
          "revision": 4
         },
         "attempt_id": "attempt-stop-1",
@@ -1211,7 +1211,7 @@
         "canonical_start_sequence": 1,
         "input_id": "attempt-stop-2",
         "input_kind": "user",
-        "redirect_interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+        "redirect_interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
         "redirected_from_message_id": "message-stop-1",
         "text": "I knock instead.",
         "turn_id": "turn-dm-c5be850db2cbcdc9961630c2"
@@ -1221,7 +1221,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 11,
-       "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-assistant-tools",
+       "message_id": "inference-96212063e20749878d301f772b9bfdc2-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1244,7 +1244,7 @@
          ]
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1260,7 +1260,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 12,
-       "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-tool-results",
+       "message_id": "inference-96212063e20749878d301f772b9bfdc2-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1269,7 +1269,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1291,11 +1291,11 @@
        "content": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 102,
+         "elapsed_ms": 292,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 6,
+         "quiet_ms": 90,
          "revision": 5
         },
         "attempt_id": "attempt-stop-2",
@@ -1541,7 +1541,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 4,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-assistant-tools",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1564,7 +1564,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1580,7 +1580,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 5,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-tool-results",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1589,7 +1589,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1611,11 +1611,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 527,
+         "elapsed_ms": 664,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 9,
+         "quiet_ms": 84,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-c5be850db2cbcdc9961630c2",
@@ -1667,11 +1667,11 @@
        "kind": "evidence",
        "content": {
         "activity_timing": {
-         "elapsed_ms": 110,
+         "elapsed_ms": 147,
          "last_operation": null,
          "operation": null,
          "phase": "stopped",
-         "quiet_ms": 51,
+         "quiet_ms": 47,
          "revision": 4
         },
         "attempt_id": "attempt-stop-1",
@@ -1697,7 +1697,7 @@
         "canonical_start_sequence": 1,
         "input_id": "attempt-stop-2",
         "input_kind": "user",
-        "redirect_interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+        "redirect_interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
         "redirected_from_message_id": "message-stop-1",
         "text": "I knock instead.",
         "turn_id": "turn-dm-c5be850db2cbcdc9961630c2"
@@ -1707,7 +1707,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 11,
-       "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-assistant-tools",
+       "message_id": "inference-96212063e20749878d301f772b9bfdc2-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1730,7 +1730,7 @@
          ]
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -1746,7 +1746,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 12,
-       "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-tool-results",
+       "message_id": "inference-96212063e20749878d301f772b9bfdc2-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -1755,7 +1755,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -1777,11 +1777,11 @@
        "content": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 102,
+         "elapsed_ms": 292,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 6,
+         "quiet_ms": 90,
          "revision": 5
         },
         "attempt_id": "attempt-stop-2",
@@ -1845,8 +1845,8 @@
       "phase": "provider",
       "operation": null,
       "last_operation": null,
-      "elapsed_ms": 60,
-      "quiet_ms": 17,
+      "elapsed_ms": 50,
+      "quiet_ms": 13,
       "revision": 1
      },
      "context_status_hint": null,
@@ -2120,7 +2120,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 4,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-assistant-tools",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -2143,7 +2143,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -2159,7 +2159,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 5,
-       "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-tool-results",
+       "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -2168,7 +2168,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -2190,11 +2190,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 527,
+         "elapsed_ms": 664,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 9,
+         "quiet_ms": 84,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-c5be850db2cbcdc9961630c2",
@@ -2246,11 +2246,11 @@
        "kind": "evidence",
        "content": {
         "activity_timing": {
-         "elapsed_ms": 110,
+         "elapsed_ms": 147,
          "last_operation": null,
          "operation": null,
          "phase": "stopped",
-         "quiet_ms": 51,
+         "quiet_ms": 47,
          "revision": 4
         },
         "attempt_id": "attempt-stop-1",
@@ -2276,7 +2276,7 @@
         "canonical_start_sequence": 1,
         "input_id": "attempt-stop-2",
         "input_kind": "user",
-        "redirect_interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+        "redirect_interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
         "redirected_from_message_id": "message-stop-1",
         "text": "I knock instead.",
         "turn_id": "turn-dm-c5be850db2cbcdc9961630c2"
@@ -2286,7 +2286,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 11,
-       "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-assistant-tools",
+       "message_id": "inference-96212063e20749878d301f772b9bfdc2-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -2309,7 +2309,7 @@
          ]
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -2325,7 +2325,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 12,
-       "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-tool-results",
+       "message_id": "inference-96212063e20749878d301f772b9bfdc2-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -2334,7 +2334,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -2356,11 +2356,11 @@
        "content": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 102,
+         "elapsed_ms": 292,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 6,
+         "quiet_ms": 90,
          "revision": 5
         },
         "attempt_id": "attempt-stop-2",
@@ -2408,7 +2408,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 16,
-       "message_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75-assistant-tools",
+       "message_id": "inference-f846f0e4f9b14172a89ad674add2e6ca-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -2431,7 +2431,7 @@
          ]
         },
         "basis_message_id": "message-stop-3",
-        "inference_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75",
+        "inference_id": "inference-f846f0e4f9b14172a89ad674add2e6ca",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -2447,7 +2447,7 @@
       {
        "session_id": "session-dm-c5be850db2cbcdc9961630c2",
        "sequence": 17,
-       "message_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75-tool-results",
+       "message_id": "inference-f846f0e4f9b14172a89ad674add2e6ca-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -2456,7 +2456,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-stop-3",
-        "inference_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75",
+        "inference_id": "inference-f846f0e4f9b14172a89ad674add2e6ca",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -2478,11 +2478,11 @@
        "content": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 125,
+         "elapsed_ms": 229,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 5,
+         "quiet_ms": 43,
          "revision": 5
         },
         "attempt_id": "attempt-stop-3",
@@ -2591,7 +2591,7 @@
    "headers": [
     [
      "Host",
-     "127.0.0.1:45015"
+     "127.0.0.1:36273"
     ],
     [
      "Accept-Encoding",
@@ -3176,7 +3176,7 @@
    "headers": [
     [
      "Host",
-     "127.0.0.1:45015"
+     "127.0.0.1:36273"
     ],
     [
      "Accept-Encoding",
@@ -3777,7 +3777,7 @@
    "headers": [
     [
      "Host",
-     "127.0.0.1:45015"
+     "127.0.0.1:36273"
     ],
     [
      "Accept-Encoding",
@@ -4382,7 +4382,7 @@
    "headers": [
     [
      "Host",
-     "127.0.0.1:45015"
+     "127.0.0.1:36273"
     ],
     [
      "Accept-Encoding",
@@ -6292,7 +6292,7 @@
      {
       "session_id": "session-dm-c5be850db2cbcdc9961630c2",
       "sequence": 4,
-      "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-assistant-tools",
+      "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -6317,7 +6317,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -6334,7 +6334,7 @@
      {
       "session_id": "session-dm-c5be850db2cbcdc9961630c2",
       "sequence": 5,
-      "message_id": "inference-ade1fe1354f74e4db9463bb845b95b66-tool-results",
+      "message_id": "inference-e9324dc4540f452ab8c39ee0601afc0a-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -6345,7 +6345,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-c5be850db2cbcdc9961630c2",
-        "inference_id": "inference-ade1fe1354f74e4db9463bb845b95b66",
+        "inference_id": "inference-e9324dc4540f452ab8c39ee0601afc0a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -6370,11 +6370,11 @@
        "$json": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 527,
+         "elapsed_ms": 664,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 9,
+         "quiet_ms": 84,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-c5be850db2cbcdc9961630c2",
@@ -6435,11 +6435,11 @@
        "$encoding": "canonical",
        "$json": {
         "activity_timing": {
-         "elapsed_ms": 110,
+         "elapsed_ms": 147,
          "last_operation": null,
          "operation": null,
          "phase": "stopped",
-         "quiet_ms": 51,
+         "quiet_ms": 47,
          "revision": 4
         },
         "attempt_id": "attempt-stop-1",
@@ -6468,7 +6468,7 @@
         "canonical_start_sequence": 1,
         "input_id": "attempt-stop-2",
         "input_kind": "user",
-        "redirect_interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+        "redirect_interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
         "redirected_from_message_id": "message-stop-1",
         "text": "I knock instead.",
         "turn_id": "turn-dm-c5be850db2cbcdc9961630c2"
@@ -6479,7 +6479,7 @@
      {
       "session_id": "session-dm-c5be850db2cbcdc9961630c2",
       "sequence": 11,
-      "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-assistant-tools",
+      "message_id": "inference-96212063e20749878d301f772b9bfdc2-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -6504,7 +6504,7 @@
          ]
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -6521,7 +6521,7 @@
      {
       "session_id": "session-dm-c5be850db2cbcdc9961630c2",
       "sequence": 12,
-      "message_id": "inference-dbeaa49c1fb0407a9a285647bd749257-tool-results",
+      "message_id": "inference-96212063e20749878d301f772b9bfdc2-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -6532,7 +6532,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-stop-2",
-        "inference_id": "inference-dbeaa49c1fb0407a9a285647bd749257",
+        "inference_id": "inference-96212063e20749878d301f772b9bfdc2",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -6557,11 +6557,11 @@
        "$json": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 102,
+         "elapsed_ms": 292,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 6,
+         "quiet_ms": 90,
          "revision": 5
         },
         "attempt_id": "attempt-stop-2",
@@ -6616,7 +6616,7 @@
      {
       "session_id": "session-dm-c5be850db2cbcdc9961630c2",
       "sequence": 16,
-      "message_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75-assistant-tools",
+      "message_id": "inference-f846f0e4f9b14172a89ad674add2e6ca-assistant-tools",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -6641,7 +6641,7 @@
          ]
         },
         "basis_message_id": "message-stop-3",
-        "inference_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75",
+        "inference_id": "inference-f846f0e4f9b14172a89ad674add2e6ca",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -6658,7 +6658,7 @@
      {
       "session_id": "session-dm-c5be850db2cbcdc9961630c2",
       "sequence": 17,
-      "message_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75-tool-results",
+      "message_id": "inference-f846f0e4f9b14172a89ad674add2e6ca-tool-results",
       "kind": "evidence",
       "content_json": {
        "$encoding": "canonical",
@@ -6669,7 +6669,7 @@
          "source_order": 1
         },
         "basis_message_id": "message-stop-3",
-        "inference_id": "inference-d49b8e0ab8a846fca55b94358bd8fe75",
+        "inference_id": "inference-f846f0e4f9b14172a89ad674add2e6ca",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -6694,11 +6694,11 @@
        "$json": {
         "activity": "turn_completed",
         "activity_timing": {
-         "elapsed_ms": 125,
+         "elapsed_ms": 229,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 5,
+         "quiet_ms": 43,
          "revision": 5
         },
         "attempt_id": "attempt-stop-3",
@@ -7452,7 +7452,7 @@
     "rows": [
      {
       "campaign_id": "campaign-draft-ae054b57f077ae58753be855",
-      "interruption_id": "interruption-e132dbcd-29db-4fff-9f7d-1a6dc3ed98ec",
+      "interruption_id": "interruption-734511bb-8b40-4794-b105-1972ba59ad0f",
       "turn_id": "turn-dm-c5be850db2cbcdc9961630c2",
       "last_action_id": null,
       "failed_attempt_id": "attempt-stop-1",
@@ -7487,7 +7487,7 @@
      "data"
     ],
     "row_count": 340,
-    "rows_sha256": "91c83b6c3e68c3cb2b8156817856f85c863d16a16fe734a9d396ff2853fffe2d"
+    "rows_sha256": "f0113c482e72258ce20978081d5f078ca9cb59d9aa302540ff6f85fbe8417426"
    },
    "package_blobs": {
     "columns": [
@@ -7496,7 +7496,7 @@
      "chunk_count"
     ],
     "row_count": 58,
-    "rows_sha256": "56613b4296720c1e8538ff940dbb15dd4ba73a9e482eebc730d7df601d266cce"
+    "rows_sha256": "6d7535d027e97acd3d2c76000c5c061a55c852a2026443602451f41233ab6640"
    },
    "package_candidate_memberships": {
     "columns": [
@@ -7507,7 +7507,7 @@
      "content_sha256"
     ],
     "row_count": 4,
-    "rows_sha256": "4477e67430f4dc74db3f77efe0c0f39c79a4a93df34ada141507a0edd3507620"
+    "rows_sha256": "58eaa87feb44c31b4dc1399f61b83e42198b748f9f04f5d6c73667af4698f5f4"
    },
    "package_candidates": {
     "columns": [
@@ -7518,7 +7518,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "77b8e2c621e2d98f9d9d12f4cb26d391635daca8af8cd40198986767287464ff"
+    "rows_sha256": "e588f60245a8165d7ceaf674c0ffbe995a9327247fa72a56d8b5d030de145d98"
    },
    "package_capabilities": {
     "columns": [
@@ -7529,7 +7529,7 @@
      "capability"
     ],
     "row_count": 16,
-    "rows_sha256": "c0450e66a23c3c24c59dbe45c9f1a24e4768d510c6605ddd541932e0d6459dd9"
+    "rows_sha256": "9f5dd33222cf1a28e67edca38173cee77a43857b21b762e52de4768a07e3f933"
    },
    "package_dependencies": {
     "columns": [
@@ -7544,7 +7544,7 @@
      "dependency_namespace"
     ],
     "row_count": 2,
-    "rows_sha256": "bf18bc76f9b453b493bdd38f51c5f6f379d25b539457f7682c0463c6807ad271"
+    "rows_sha256": "4791c9cf7f670910482d82ff027cdcc278cea553dccc8da94582c8966388d476"
    },
    "package_exact_dependencies": {
     "columns": [
@@ -7559,7 +7559,7 @@
      "dependency_content_sha256"
     ],
     "row_count": 2,
-    "rows_sha256": "a929a83916e69246ce1ef5562ce30d3394fd8355eb0f3f738b22c77ba005a74d"
+    "rows_sha256": "9790656ce276bde405f979a15fece98767f9530640ae80c56d756b4ac5e167ce"
    },
    "package_manifest_files": {
     "columns": [
@@ -7572,7 +7572,7 @@
      "blob_sha256"
     ],
     "row_count": 64,
-    "rows_sha256": "63e1d1e09ae9fd60d3ae83a354962ea9481b252e1bd7d95f2ae1aebdf650ba4e"
+    "rows_sha256": "3ce331b435a9cfde280a1e376b08b3239b650c35945d7649aa61f2cadefbfd7d"
    },
    "package_manifests": {
     "columns": [
@@ -7587,7 +7587,7 @@
      "status"
     ],
     "row_count": 4,
-    "rows_sha256": "3849847c06092a20698ea3b42394bf26eaa86ee15b242737693860093b0cc550"
+    "rows_sha256": "ae7965cded66d43313612398a56f3545d33517cd05d0b53d4e04014a4e24b8b7"
    },
    "package_participant_artifacts": {
     "columns": [
@@ -7601,7 +7601,7 @@
      "schema_json"
     ],
     "row_count": 2,
-    "rows_sha256": "0e5374268ea87b0223dd6c01986525b975dca32a07d567ed11dfa35654ff72a5"
+    "rows_sha256": "c1724be2acaaa0276c2f10637e0ae586fcecd1acaaa9177f90c2a614734f5a55"
    },
    "package_prompt_fragments": {
     "columns": [
@@ -7613,7 +7613,7 @@
      "capability"
     ],
     "row_count": 2,
-    "rows_sha256": "5efa8ff3cffd697be4ccd71c7055bf2ce73dab863e74220a7fccecbb2cbea5dd"
+    "rows_sha256": "20ab355e2fe5b9cc7abe4c7acd9bfb1595e60a9bd80aff22009827684ab8c142"
    },
    "package_read_leases": {
     "columns": [
@@ -7639,7 +7639,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "b159525926dfa8e06a108bdbf5b6b77ac7e838b14af892614ace05c859992fc9"
+    "rows_sha256": "8175431babc001d77e69a5aa91441547a341d1b29fead24afec62b0445739655"
    },
    "package_staging_chunks": {
     "columns": [
@@ -7654,7 +7654,7 @@
      "data"
     ],
     "row_count": 346,
-    "rows_sha256": "e3d5135ae40ee575cbc496a5a78e753b66f1664e3ad6a77154d529aee4c24b8b"
+    "rows_sha256": "2964f0e2f69e7c5eed25bae4bc05f025f2ecf7078bc977751f30a220b66f5fb5"
    },
    "package_tools": {
     "columns": [
@@ -7669,8 +7669,8 @@
      "turn_statuses_json",
      "writers_json"
     ],
-    "row_count": 185,
-    "rows_sha256": "6ce8ed8e9de9d3fa4aefd6b460230fa91c89880447d7d8e955ff3173af133899"
+    "row_count": 186,
+    "rows_sha256": "e73aab0c4600c545fc906efdaebeda84afb7547f6e1a976646cd55ea44aa7f18"
    },
    "package_ui_surfaces": {
     "columns": [
@@ -7682,7 +7682,7 @@
      "capability"
     ],
     "row_count": 6,
-    "rows_sha256": "a6257d357aa611de48871306d245af2ddbb9828a90bfbb32f0920105a77e1c47"
+    "rows_sha256": "54dd046542e7758f8f3e70f764ee2b2fdeba6d54504d125549d973978905f36d"
    },
    "packages": {
     "columns": [
@@ -7692,7 +7692,7 @@
      "capabilities_json"
     ],
     "row_count": 4,
-    "rows_sha256": "2122817326a575ee841922d2262bf4bcd3e9e7c1e9ec7dc01469051a6967fd8f"
+    "rows_sha256": "aa7abb7d6f585e980ceb446957c81e9a9e4d2843bcdeabaa98b3af44887e92f2"
    },
    "participant_adaptations": {
     "columns": [
@@ -7958,10 +7958,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "bf5d576c54c64da1800d2018a2680c5b",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232427.9544346,
-     "last_seen": 1795232427.9544346,
+     "id": "1c3f39258706466eb201cff6a6ec32ce",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795336995.644823,
+     "last_seen": 1795336995.644823,
      "count": 1
     },
     {
@@ -7978,11 +7978,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 26.6,
-     "id": "7332448da1304da3be7670391376e76b",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232443.5061605,
-     "last_seen": 1795232443.5061605,
+     "duration_ms": 86.8,
+     "id": "daeb499e918949418fecb24e7a29ebb6",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337016.4915671,
+     "last_seen": 1795337016.4915671,
      "count": 1
     },
     {
@@ -8000,10 +8000,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.1,
-     "id": "5a068b934bc349389449d646b6adc79c",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232443.5066104,
-     "last_seen": 1795232443.5066104,
+     "id": "c9abe392ad28498bac4725e102d967d0",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337016.491945,
+     "last_seen": 1795337016.491945,
      "count": 1
     },
     {
@@ -8020,11 +8020,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 582.4,
-     "id": "a6ea8683080347bb860ab32033022b96",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232444.0891304,
-     "last_seen": 1795232444.0891304,
+     "duration_ms": 574.7,
+     "id": "d2fe86e5be25441898030d6b2ecf61cf",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337017.0668073,
+     "last_seen": 1795337017.0668073,
      "count": 1
     },
     {
@@ -8041,11 +8041,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 17.3,
-     "id": "622a581aafe7429985daee13c033cda6",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232444.105583,
-     "last_seen": 1795232444.1571977,
+     "duration_ms": 86.6,
+     "id": "9160ce07e5694986a49a023d37a69a14",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337017.1485639,
+     "last_seen": 1795337017.4008143,
      "count": 4
     },
     {
@@ -8062,11 +8062,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 902.0,
-     "id": "ea28b19e433148c082e9909232bf5f8e",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232445.059528,
-     "last_seen": 1795232445.059528,
+     "duration_ms": 821.8,
+     "id": "158f2b7b5b4f453182f4386e47ce6b06",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337018.2229135,
+     "last_seen": 1795337018.2229135,
      "count": 1
     },
     {
@@ -8083,11 +8083,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 1200.1,
-     "id": "82311fc9be5143e988a21fa94b53ca84",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232446.2602603,
-     "last_seen": 1795232446.2602603,
+     "duration_ms": 863.2,
+     "id": "6b27b294a63a401d99999ed8d9d79bad",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337019.086385,
+     "last_seen": 1795337019.086385,
      "count": 1
     },
     {
@@ -8104,11 +8104,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 591.3,
-     "id": "cb39a6a5a9b94157b1e2da95b1934763",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232446.852114,
-     "last_seen": 1795232446.852114,
+     "duration_ms": 897.8,
+     "id": "e50cd6f44337434188f2c714f4ffda36",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337019.984645,
+     "last_seen": 1795337019.984645,
      "count": 1
     },
     {
@@ -8125,11 +8125,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 2.2,
-     "id": "83a061894ab24cacb573fa8378d7528c",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232446.8546617,
-     "last_seen": 1795232447.228562,
+     "duration_ms": 1.3,
+     "id": "dd0e9313c30f4d188f461bce11eddbd1",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337019.9862957,
+     "last_seen": 1795337020.886834,
      "count": 2
     },
     {
@@ -8146,11 +8146,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 6.2,
-     "id": "56e4ed272fb9456185877d25a7455120",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232446.939987,
-     "last_seen": 1795232446.939987,
+     "duration_ms": 58.1,
+     "id": "c1b66402e9b74ead89fd010d3aa13905",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337020.1840973,
+     "last_seen": 1795337020.1840973,
      "count": 1
     },
     {
@@ -8167,11 +8167,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 167.3,
-     "id": "8052cc050b41482ca859cb3226b96beb",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232447.0111067,
-     "last_seen": 1795232447.3964045,
+     "duration_ms": 555.9,
+     "id": "d097925f2f0f46f491a9b493b14a8e5f",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337020.2808836,
+     "last_seen": 1795337021.2737913,
      "count": 3
     },
     {
@@ -8188,11 +8188,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 12.0,
-     "id": "bb368a91639e4692a740e1ee3700b698",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232447.023758,
-     "last_seen": 1795232447.4055586,
+     "duration_ms": 7.9,
+     "id": "0674d513e4334d71b1455c772d7352d6",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337020.2891517,
+     "last_seen": 1795337021.2802846,
      "count": 7
     },
     {
@@ -8209,11 +8209,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 15.2,
-     "id": "6e05f1e9352a4874818bca7d108460f0",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232447.0477386,
-     "last_seen": 1795232447.4178264,
+     "duration_ms": 11.2,
+     "id": "85e347647d2e4c73ab933557750d1a91",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337020.305556,
+     "last_seen": 1795337021.2916667,
      "count": 4
     },
     {
@@ -8231,10 +8231,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "dfbb66c778974896bddd6cf6a20ca69a",
-     "session": "3c5e7d4c9b884685b1f6b6477af3a234",
-     "first_seen": 1795232447.4184985,
-     "last_seen": 1795232447.4184985,
+     "id": "e0e9ff024de74841ba027071b66e2bb8",
+     "session": "afe889e9064545df9c360971d443a020",
+     "first_seen": 1795337021.2921793,
+     "last_seen": 1795337021.2921793,
      "count": 1
     }
    ]
