@@ -31,6 +31,7 @@ pub mod character_profiles;
 pub mod character_rules;
 pub mod initial_character_state;
 pub mod interview_content;
+pub mod library_sources;
 pub mod network_graph;
 pub mod package_library;
 pub mod package_materialization;
