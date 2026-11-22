@@ -1,0 +1,2428 @@
+{
+ "python": "3.12.11",
+ "runs": [
+  {
+   "base": "cast",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": "Run Riichi Mahjong through start_game and take_action. Use the named player and three isolated NPC decision contexts. The host dispatches NPC choices from that seat's permitted observations. Keep your continuous campaign context and narrate only their committed public results. Resolve the player's currently declared action through the offered IDs, then stop at the next player decision. Never inspect the wall, NPC hands or NPC thinking. The table, legal actions, scores and saved match state belong to the engine. Use ordinary gameplay/OOC transitions and preserve the table during conversation. There is no adventuring rules layer. Tile labels m, p and s mean characters, circles and bamboo; red fives are marked explicitly."
+   }
+  },
+  {
+   "base": "cast",
+   "read": "catalog",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": [
+     "start_game",
+     "take_action"
+    ]
+   }
+  },
+  {
+   "base": "cast",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": {
+     "kind": "gm",
+     "campaign_id": "campaign-table",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": "Run Riichi Mahjong through start_game and take_action. Use the named player and three isolated NPC decision contexts. The host dispatches NPC choices from that seat's permitted observations. Keep your continuous campaign context and narrate only their committed public results. Resolve the player's currently declared action through the offered IDs, then stop at the next player decision. Never inspect the wall, NPC hands or NPC thinking. The table, legal actions, scores and saved match state belong to the engine. Use ordinary gameplay/OOC transitions and preserve the table during conversation. There is no adventuring rules layer. Tile labels m, p and s mean characters, circles and bamboo; red fives are marked explicitly."
+   }
+  },
+  {
+   "base": "cast",
+   "read": "catalog",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "cast",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": {
+     "kind": "gm",
+     "campaign_id": "campaign-workshop",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_locked_pneuma.riichi-mahjong",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-mahjong",
+      "version": "0.1.1",
+      "content_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_locked_pneuma.riichi-club",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-club",
+      "version": "0.1.1",
+      "content_sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_locked_pneuma.riichi-mahjong",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-mahjong",
+      "version": "0.1.1",
+      "content_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_locked_pneuma.riichi-club",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-club",
+      "version": "0.1.1",
+      "content_sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "outcome": {
+    "ok": "NO RULESET PLAY (Sylvia application-owned guide; this campaign has no Ruleset)\n\nThere is no Ruleset, so there are no game mechanics here: no combat mode, turn order or rounds, no dice or rolls, no checks, saves or difficulty numbers, no numeric health, damage, defence or other statistics, and no levels or experience. Never ask the player to roll or to make a check, and never present a number as a mechanical result, in narration, character speech or out-of-character notes. Parts of the shared GM contract about Ruleset tools, game panels, action queues, character classes or exposed mechanics do not apply to this campaign.\n\nResolve uncertain, risky or contested actions with GM judgment in prose. Weigh the established fiction, what the character has shown they can do, their situation and the Campaign Plan, then narrate a clear and fair outcome: success, partial success, a cost, or a consequence. Fights and danger still happen as story. Describe them in the fiction and give the player meaningful choices, without rounds or turn order. If the player asks for a roll or a statistic, briefly say out of character that this campaign uses story judgment instead, then resolve the action.\n\nSylvia is this campaign's memory, so ground every response in it. Campaign State in the fresh context is current truth. Before introducing a person, place, object, clue or piece of history, check whether it already exists: search the campaign knowledge and read the Campaign Plan or the exact record. Follow the Campaign Plan's premise, direction and prepared material, and never contradict it or recorded facts. When play needs something new, make it consistent with both and record it.\n\nRecord lasting truth in the Campaign File in the same call as the response: people and places as entities with their current location, status and relationships; decisions, discoveries, promises and consequences as memories; the current scene and location; and Plan Progress when it is offered.\n\nTrack useful items. Record each notable object as an entity with entity_kind \"object\" and attributes for: description (what it is and looks like); purpose (what it does or is for, in story terms, never as a numeric bonus); location (where it is, or who has it); and any limits or conditions play has established. When Fallback Inventory updates are offered, also record who holds and owns a carried item there, using the object's entity_id as its item_id. Update the object's record whenever it moves, changes hands, is used up, breaks or reveals something new. An item does only what its record and the Plan say. A new ability needs a story reason and an updated record.\n"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_context_owner",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-a1",
+   "outcome": {
+    "ok": "NO RULESET PLAY (Sylvia application-owned guide; this campaign has no Ruleset)\n\nThere is no Ruleset, so there are no game mechanics here: no combat mode, turn order or rounds, no dice or rolls, no checks, saves or difficulty numbers, no numeric health, damage, defence or other statistics, and no levels or experience. Never ask the player to roll or to make a check, and never present a number as a mechanical result, in narration, character speech or out-of-character notes. Parts of the shared GM contract about Ruleset tools, game panels, action queues, character classes or exposed mechanics do not apply to this campaign.\n\nResolve uncertain, risky or contested actions with GM judgment in prose. Weigh the established fiction, what the character has shown they can do, their situation and the Campaign Plan, then narrate a clear and fair outcome: success, partial success, a cost, or a consequence. Fights and danger still happen as story. Describe them in the fiction and give the player meaningful choices, without rounds or turn order. If the player asks for a roll or a statistic, briefly say out of character that this campaign uses story judgment instead, then resolve the action.\n\nSylvia is this campaign's memory, so ground every response in it. Campaign State in the fresh context is current truth. Before introducing a person, place, object, clue or piece of history, check whether it already exists: search the campaign knowledge and read the Campaign Plan or the exact record. Follow the Campaign Plan's premise, direction and prepared material, and never contradict it or recorded facts. When play needs something new, make it consistent with both and record it.\n\nRecord lasting truth in the Campaign File in the same call as the response: people and places as entities with their current location, status and relationships; decisions, discoveries, promises and consequences as memories; the current scene and location; and Plan Progress when it is offered.\n\nTrack useful items. Record each notable object as an entity with entity_kind \"object\" and attributes for: description (what it is and looks like); purpose (what it does or is for, in story terms, never as a numeric bonus); location (where it is, or who has it); and any limits or conditions play has established. When Fallback Inventory updates are offered, also record who holds and owns a carried item there, using the object's entity_id as its item_id. Update the object's record whenever it moves, changes hands, is used up, breaks or reveals something new. An item does only what its record and the Plan say. A new ability needs a story reason and an updated record.\n"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-a1",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-a1",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-a2",
+   "outcome": {
+    "ok": "NO RULESET PLAY (Sylvia application-owned guide; this campaign has no Ruleset)\n\nThere is no Ruleset, so there are no game mechanics here: no combat mode, turn order or rounds, no dice or rolls, no checks, saves or difficulty numbers, no numeric health, damage, defence or other statistics, and no levels or experience. Never ask the player to roll or to make a check, and never present a number as a mechanical result, in narration, character speech or out-of-character notes. Parts of the shared GM contract about Ruleset tools, game panels, action queues, character classes or exposed mechanics do not apply to this campaign.\n\nResolve uncertain, risky or contested actions with GM judgment in prose. Weigh the established fiction, what the character has shown they can do, their situation and the Campaign Plan, then narrate a clear and fair outcome: success, partial success, a cost, or a consequence. Fights and danger still happen as story. Describe them in the fiction and give the player meaningful choices, without rounds or turn order. If the player asks for a roll or a statistic, briefly say out of character that this campaign uses story judgment instead, then resolve the action.\n\nSylvia is this campaign's memory, so ground every response in it. Campaign State in the fresh context is current truth. Before introducing a person, place, object, clue or piece of history, check whether it already exists: search the campaign knowledge and read the Campaign Plan or the exact record. Follow the Campaign Plan's premise, direction and prepared material, and never contradict it or recorded facts. When play needs something new, make it consistent with both and record it.\n\nRecord lasting truth in the Campaign File in the same call as the response: people and places as entities with their current location, status and relationships; decisions, discoveries, promises and consequences as memories; the current scene and location; and Plan Progress when it is offered.\n\nTrack useful items. Record each notable object as an entity with entity_kind \"object\" and attributes for: description (what it is and looks like); purpose (what it does or is for, in story terms, never as a numeric bonus); location (where it is, or who has it); and any limits or conditions play has established. When Fallback Inventory updates are offered, also record who holds and owns a carried item there, using the object's entity_id as its item_id. Update the object's record whenever it moves, changes hands, is used up, breaks or reveals something new. An item does only what its record and the Plan say. A new ability needs a story reason and an updated record.\n"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-a2",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-a2",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-b",
+   "outcome": {
+    "ok": "NO RULESET PLAY (Sylvia application-owned guide; this campaign has no Ruleset)\n\nThere is no Ruleset, so there are no game mechanics here: no combat mode, turn order or rounds, no dice or rolls, no checks, saves or difficulty numbers, no numeric health, damage, defence or other statistics, and no levels or experience. Never ask the player to roll or to make a check, and never present a number as a mechanical result, in narration, character speech or out-of-character notes. Parts of the shared GM contract about Ruleset tools, game panels, action queues, character classes or exposed mechanics do not apply to this campaign.\n\nResolve uncertain, risky or contested actions with GM judgment in prose. Weigh the established fiction, what the character has shown they can do, their situation and the Campaign Plan, then narrate a clear and fair outcome: success, partial success, a cost, or a consequence. Fights and danger still happen as story. Describe them in the fiction and give the player meaningful choices, without rounds or turn order. If the player asks for a roll or a statistic, briefly say out of character that this campaign uses story judgment instead, then resolve the action.\n\nSylvia is this campaign's memory, so ground every response in it. Campaign State in the fresh context is current truth. Before introducing a person, place, object, clue or piece of history, check whether it already exists: search the campaign knowledge and read the Campaign Plan or the exact record. Follow the Campaign Plan's premise, direction and prepared material, and never contradict it or recorded facts. When play needs something new, make it consistent with both and record it.\n\nRecord lasting truth in the Campaign File in the same call as the response: people and places as entities with their current location, status and relationships; decisions, discoveries, promises and consequences as memories; the current scene and location; and Plan Progress when it is offered.\n\nTrack useful items. Record each notable object as an entity with entity_kind \"object\" and attributes for: description (what it is and looks like); purpose (what it does or is for, in story terms, never as a numeric bonus); location (where it is, or who has it); and any limits or conditions play has established. When Fallback Inventory updates are offered, also record who holds and owns a carried item there, using the object's entity_id as its item_id. Update the object's record whenever it moves, changes hands, is used up, breaks or reveals something new. An item does only what its record and the Plan say. A new ability needs a story reason and an updated record.\n"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-b",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-b",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-clockwork",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-clockwork",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-clockwork",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_context_owner",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "builder-interview",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "builder-ruleless",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "dm-clockwork",
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "session-dm-4a4b97133864fe33934ec185",
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a1",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-a2",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-b",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-clockwork",
+   "case": "binding_locked_synthetic.actions",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "synthetic.actions",
+      "version": "1.0.0",
+      "content_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-build",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "catalog",
+   "campaign_id": "campaign-build",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-build",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-story",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "catalog",
+   "campaign_id": "campaign-story",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-story",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "builder-1",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "builder-2",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "dm-1",
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-build",
+   "case": "binding_locked_synthetic.actions",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "synthetic.actions",
+      "version": "1.0.0",
+      "content_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-story",
+   "case": "binding_locked_synthetic.actions",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "synthetic.actions",
+      "version": "1.0.0",
+      "content_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  }
+ ]
+}

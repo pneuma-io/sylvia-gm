@@ -778,7 +778,7 @@ pub fn lock_is_ancestor(connection: &Connection, campaign_id: &str, lock_id: &st
 pub const COMPATIBLE_UPDATE_AUTHORITY: &str = "campaign-compatible-update.v1";
 
 /// `_compatible_migration_identity`.
-fn compatible_migration_identity(migration_id: &str) -> bool {
+pub(crate) fn compatible_migration_identity(migration_id: &str) -> bool {
     match migration_id.strip_prefix("compatible-update-") {
         Some(token) => token.chars().count() == 64 && token.chars().all(|c| "0123456789abcdef".contains(c)),
         None => false,
