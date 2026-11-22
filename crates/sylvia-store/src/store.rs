@@ -58,6 +58,10 @@ pub struct Faults {
     pub after_lifecycle_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
     /// `_export_failure_stage(stage)`, at each stage of a portable export.
     pub export_stage: Option<StageFault>,
+    /// `_before_recovery_commit`, in `recover_campaign`.
+    pub before_recovery_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
+    /// `_after_recovery_commit`, in `recover_campaign`: the lost acknowledgement.
+    pub after_recovery_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
 }
 
 impl std::fmt::Debug for Faults {
@@ -69,6 +73,8 @@ impl std::fmt::Debug for Faults {
             .field("before_lifecycle_commit", &self.before_lifecycle_commit.is_some())
             .field("after_lifecycle_commit", &self.after_lifecycle_commit.is_some())
             .field("export_stage", &self.export_stage.is_some())
+            .field("before_recovery_commit", &self.before_recovery_commit.is_some())
+            .field("after_recovery_commit", &self.after_recovery_commit.is_some())
             .finish()
     }
 }

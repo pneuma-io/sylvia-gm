@@ -780,7 +780,7 @@ impl Spool {
 
 /// `tempfile.TemporaryFile()`: `tmp` and eight characters of `_RandomNameSequence` in the
 /// system temporary folder, made exclusively and never left behind.
-fn temporary_file() -> std::io::Result<File> {
+pub(crate) fn temporary_file() -> std::io::Result<File> {
     const CHARACTERS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789_";
     let folder = std::env::temp_dir();
     for _ in 0..10_000 {
