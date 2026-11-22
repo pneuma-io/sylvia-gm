@@ -50,5 +50,11 @@ harness = false
 name = "claude_provider_vectors"
 harness = false
 
+# The ChatGPT account. It is also the stand-in Codex app-server its cases run against, which must
+# answer before a test harness reads its arguments.
+[[test]]
+name = "chatgpt_vectors"
+harness = false
+
 [lints]
 workspace = true
