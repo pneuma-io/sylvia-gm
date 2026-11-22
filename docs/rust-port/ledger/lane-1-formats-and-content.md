@@ -34,10 +34,10 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | ported | `package_library_vectors`: installs through a recording store (repository archives under 1 MB and two SRD-carrying ones, and archives built from the small Ruleset source), predicates, admissions, surfaces, rebinds and migrations. `PackageStorePort` is implemented for `sylvia_store::AuthorityStore` |
 | `src/sylvia_gm/application/package_materialization.py` | 260 | `sylvia-app::package_materialization` | ported | `bundled_vectors` (every bundled archive byte for byte, synthetic drafts); ZIP bytes through `package_archive::zipfile_write` |
 | `src/sylvia_gm/application/plan_bundle.py` | 164 | `sylvia-app::plan_bundle` | pending | |
-| `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | pending | |
+| `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | ported | `plan_admission_vectors`. Uses lane 2's `resolve_surface_source` and lane 1's `network_graph` projection |
 | `src/sylvia_gm/application/plan_snapshot.py` | 113 | `sylvia-app::plan_snapshot` | pending | |
-| `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | pending | |
-| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads; the rest of `plan_spatial_admission.py` waits on lane 2's `tactical_grid` and `spatial` |
+| `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | ported | `plan_admission_vectors`. Uses lane 2's `resolve_surface_source` and `admit_spatial_scene`; `_plan_state` is `plan_state_admission::plan_state` |
+| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads |
 | `src/sylvia_gm/application/ready_campaigns.py` | 504 | `sylvia-app::ready_campaigns` | pending | |
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
 | `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | ported | `character_profile_vectors` (storage scripts: links, tampering, delete and retry) |
