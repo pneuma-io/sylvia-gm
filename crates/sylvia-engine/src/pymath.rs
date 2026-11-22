@@ -138,3 +138,46 @@ pub fn sum_floats(values: impl IntoIterator<Item = f64>) -> f64 {
         crate::pynum::PyNumber::Int(total) => total as f64,
     }
 }
+
+/// `x % y` for floats (`float_rem`): `fmod`, with the result taking the divisor's sign.
+pub fn float_mod(x: f64, y: f64) -> f64 {
+    let modulo = x % y;
+    if modulo != 0.0 {
+        if (y < 0.0) != (modulo < 0.0) {
+            modulo + y
+        } else {
+            modulo
+        }
+    } else {
+        0.0f64.copysign(y)
+    }
+}
+
+/// `math.remainder(x, y)` (`m_remainder`) for finite `x` and finite nonzero `y`.
+pub fn remainder(x: f64, y: f64) -> f64 {
+    let (absx, absy) = (x.abs(), y.abs());
+    let m = absx % absy;
+    let c = absy - m;
+    let r = if m < c {
+        m
+    } else if m > c {
+        -c
+    } else {
+        m - 2.0 * ((0.5 * (absx - m)) % absy)
+    };
+    1.0f64.copysign(x) * r
+}
+
+/// `max(values)`: the first of the largest (Python keeps the first on a tie).
+pub fn max_first(values: impl IntoIterator<Item = f64>) -> f64 {
+    let mut values = values.into_iter();
+    let first = values.next().expect("max() of an empty sequence");
+    values.fold(first, |best, value| if value > best { value } else { best })
+}
+
+/// `min(values)`: the first of the smallest.
+pub fn min_first(values: impl IntoIterator<Item = f64>) -> f64 {
+    let mut values = values.into_iter();
+    let first = values.next().expect("min() of an empty sequence");
+    values.fold(first, |best, value| if value < best { value } else { best })
+}
