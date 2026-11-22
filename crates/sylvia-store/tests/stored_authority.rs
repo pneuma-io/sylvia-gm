@@ -1,6 +1,8 @@
 //! `_verify_stored_authority` against Python (`tests/vectors/stored_authority`, written by
 //! `generate_stored_authority_runs.py`): each case damages a Python-made profile as Python's
-//! generator did, opens it with the Rust store, and must get Python's startup outcome.
+//! generator did, opens it with the Rust store, and must get Python's startup outcome. On the
+//! `cast` base each case also calls `verify_f5_campaign_authority` directly and must get Python's
+//! error class and message, which startup reports only as a stored-integrity failure.
 
 mod common;
 
@@ -18,6 +20,7 @@ fn base(name: &str) -> Vec<u8> {
         "archived" => "tests/vectors/stored_authority/archived.sqlite3.gz",
         "trashed" => "tests/vectors/stored_authority/trashed.sqlite3.gz",
         "failed" => "tests/vectors/stored_authority/failed.sqlite3.gz",
+        "cast" => "tests/vectors/stored_authority/cast.sqlite3.gz",
         other => panic!("unknown base {other}"),
     };
     let mut bytes = Vec::new();
@@ -25,6 +28,22 @@ fn base(name: &str) -> Vec<u8> {
         .read_to_end(&mut bytes)
         .unwrap();
     bytes
+}
+
+/// The direct verifier's outcome against Python's `{"error": class, "message": text}`.
+fn f5_differs(name: &str, database: &Path, want: &serde_json::Value) -> Option<String> {
+    let connection = rusqlite::Connection::open(database).unwrap();
+    let got = match sylvia_store::f5::verify_f5_campaign_authority(&connection) {
+        Ok(()) => None,
+        Err(error) => Some(match error.rejection() {
+            Some(coded) => (coded.error_type.unwrap_or("").to_owned(), coded.message),
+            None => (String::from("not a rejection"), format!("{error:?}")),
+        }),
+    };
+    let wanted = want
+        .get("error")
+        .map(|kind| (kind.as_str().unwrap().to_owned(), want["message"].as_str().unwrap().to_owned()));
+    (got != wanted).then(|| format!("{name}: Rust's verifier {got:?}, Python's {wanted:?}"))
 }
 
 #[test]
@@ -43,6 +62,9 @@ fn damaged_profiles_open_as_python_opens_them() {
             for statement in case["sql"].as_array().unwrap() {
                 connection.execute_batch(statement.as_str().unwrap()).unwrap();
             }
+        }
+        if let Some(want) = case.get("f5") {
+            failures.extend(f5_differs(name, &database, want));
         }
         let want = &case["outcome"];
         let failure = match (AuthorityStore::open_for_application_owner(&database, None), want.get("error")) {

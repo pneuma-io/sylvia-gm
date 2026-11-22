@@ -289,7 +289,7 @@ impl AuthorityStore {
         crate::stored::verify_stored_authority(connection)?;
         crate::packages::verify_package_authority(connection)?;
         if version == CAMPAIGN_SCHEMA_VERSION {
-            // `verify_f5_campaign_authority` runs before this in Python; it is still to come.
+            crate::f5::verify_f5_campaign_authority(connection)?;
             crate::continuity::verify_authority(connection)?;
             // Exclusive owner startup cannot inherit a live provider attempt.
             connection.execute(

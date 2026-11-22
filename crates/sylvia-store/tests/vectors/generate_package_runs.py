@@ -182,9 +182,9 @@ RUNS: list[dict[str, object]] = [
         f"UPDATE package_dependencies SET dependency_kind = 'other' WHERE package_id = '{RIICHI_DEPENDENCY}'")},
     {"name": "conflict_manifest", "seed": "riichi", "operations": conflict(
         f"UPDATE package_manifests SET metadata_json = '{{}}' WHERE package_id = '{RIICHI_PRIMARY}'")},
-    # Reopening this one reaches `verify_f5_campaign_authority`, which is still to come in Rust.
+    # Reopening this one reaches `verify_f5_campaign_authority`.
     {"name": "conflict_declarations", "seed": "riichi", "operations": conflict(
-        f"UPDATE package_participant_artifacts SET schema_id = 'other' WHERE package_id = '{RIICHI_PRIMARY}'")[:-1]},
+        f"UPDATE package_participant_artifacts SET schema_id = 'other' WHERE package_id = '{RIICHI_PRIMARY}'")},
     {"name": "conflict_blob", "seed": "riichi", "operations": conflict(
         "UPDATE package_blob_chunks SET chunk_sha256 = '" + "1" * 64 + "' WHERE chunk_order = 0 AND blob_sha256 = "
         "(SELECT blob_sha256 FROM package_manifest_files WHERE portable_path = 'world.md')")},

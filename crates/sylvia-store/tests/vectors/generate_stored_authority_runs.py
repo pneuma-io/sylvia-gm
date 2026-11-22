@@ -7,9 +7,10 @@ Run with the snapshot's own interpreter, from the repository root, after
 
 Each case copies a base profile (`riichi`: a new profile with the bundled Riichi closure;
 `story`: the session-page profile with a played DM campaign, an action, its state and its
-namespace owner), applies its SQL through a second connection with foreign keys off, as damage
+namespace owner; `cast`: the Riichi profile with validated participants and an adaptation, for
+`verify_f5_campaign_authority`), applies its SQL through a second connection with foreign keys off, as damage
 would arrive (CHECK constraints off), and opens the profile with `_open_for_application_owner`, which runs the startup
-verifiers. It writes `stored_authority/stored_authority_runs.json`; `tests/stored_authority.rs`
+verifiers; on the `cast` base it also calls `verify_f5_campaign_authority` directly. It writes `stored_authority/stored_authority_runs.json`; `tests/stored_authority.rs`
 replays every case on the Rust store. Reference tooling only.
 """
 
@@ -171,6 +172,107 @@ def failed_base(folder: Path) -> bytes:
     return path.read_bytes()
 
 
+def cast_base(folder: Path) -> bytes:
+    """The Riichi profile with participants, made by Python's owner and store (written as
+    `stored_authority/cast.sqlite3.gz`): a Builder campaign with `aki`, an adaptation `adapt-1`
+    of `aki` into the same exact player schema, and a DM campaign with the adapted `aki` and with
+    `bo`, whose one action renames `aki` (a `participant_updated` consequence)."""
+    from sylvia_gm.application.authority import AuthorityOwner, CampaignCreate
+    from sylvia_gm.domain.authority import (
+        ActionStatus,
+        MechanicOutcome,
+        Participant,
+        ParticipantMutation,
+        ParticipantValidationStatus,
+        WriterRole,
+    )
+
+    path = folder / "cast" / "authority.sqlite3"
+    path.parent.mkdir()
+    path.write_bytes(gzip.decompress(BASES["riichi"].read_bytes()))
+    with AuthorityOwner.open(path, "stored-authority-cast") as owner:
+        lock = owner.package_candidate("candidate-install-1").package_lock
+        primary = next(entry for entry in lock.entries if entry.package_id == PRIMARY)
+        declaration = owner.exact_participant_declarations(primary.package_id, primary.version, primary.sha256)[0]
+
+        def player(participant_id: str, name: str, adaptation_id: str | None = None) -> Participant:
+            return Participant(
+                participant_id=participant_id, kind="player", package_id=primary.package_id,
+                package_version=primary.version, package_sha256=primary.sha256,
+                schema_id=declaration.schema_id, schema_sha256=declaration.schema_sha256,
+                validation_status=ParticipantValidationStatus.VALIDATED,
+                data={"name": name, "control": "player"}, adaptation_id=adaptation_id)
+
+        owner.create_campaign(CampaignCreate(
+            campaign_id="campaign-workshop", display_name="Workshop", writer=WriterRole.BUILDER,
+            package_lock=lock, turn_id="turn-workshop", participants=(player("aki", "Aki"),)))
+        owner.adapt_participant_artifact(
+            source_campaign_id="campaign-workshop", participant_id="aki",
+            destination_package_id=primary.package_id, destination_package_version=primary.version,
+            destination_package_sha256=primary.sha256, destination_kind="player",
+            canonical_data={"name": "Aki", "control": "player"}, operation_id="adapt-1")
+        owner.create_campaign(CampaignCreate(
+            campaign_id="campaign-table", display_name="Table", writer=WriterRole.DM, package_lock=lock,
+            turn_id="turn-table", participants=(player("aki", "Aki", "adapt-1"), player("bo", "Bo"))))
+    store = a._open_for_application_owner(path)
+    try:
+        values = {
+            "campaign_id": "campaign-table", "action_id": "action-1",
+            "expected_revision": store.snapshot("campaign-table").revision, "turn_id": "turn-table",
+            "package_id": primary.package_id, "package_version": primary.version,
+            "package_sha256": primary.sha256, "tool_name": "rename", "parameters": {"note": "renamed"}}
+        store.commit_action(
+            **values, writer=WriterRole.DM, idempotency_key="key-1",
+            payload_hash=a._stored_action_hash(**values, writer="dm"),
+            outcome=MechanicOutcome(result={"renamed": True}, participant_mutations=(
+                ParticipantMutation(participant_id="aki", data={"name": "Akira", "control": "player"}),)),
+            status=ActionStatus.COMMITTED)
+    finally:
+        store.close()
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    connection.close()
+    return path.read_bytes()
+
+
+def adaptation_sql(connection: sqlite3.Connection, **changes: object) -> list[str]:
+    """SQL changing `adapt-1`'s columns, with its payload SHA-256 recomputed as Python's store
+    would write it, so the damage reaches the checks after the hash."""
+    from sylvia_gm.infrastructure import sqlite_campaign
+
+    connection.row_factory = sqlite3.Row
+    try:
+        row = dict(connection.execute("SELECT * FROM participant_adaptations WHERE operation_id = 'adapt-1'").fetchone())
+    finally:
+        connection.row_factory = None
+    row.update(changes)
+    data = json.loads(str(row["data_json"]))
+    digest = sqlite_campaign.adaptation_payload_sha256(
+        source_campaign_id=row["source_campaign_id"], participant_id=row["participant_id"],
+        destination_package_id=row["destination_package_id"],
+        destination_package_version=row["destination_package_version"],
+        destination_package_sha256=row["destination_package_sha256"], destination_kind=row["destination_kind"],
+        destination_schema_id=row["destination_schema_id"],
+        destination_schema_sha256=row["destination_schema_sha256"], data=data)
+    assignments = ", ".join(f"{column} = '{str(value).replace(chr(39), chr(39) * 2)}'" for column, value in changes.items())
+    return [f"UPDATE participant_adaptations SET {assignments}, payload_sha256 = '{digest}' "
+            "WHERE operation_id = 'adapt-1'"]
+
+
+def history_sql(connection: sqlite3.Connection, **changes: object) -> list[str]:
+    """SQL changing `aki`'s rename consequence in both places it is stored."""
+    row = connection.execute("SELECT payload_json FROM consequences WHERE campaign_id = 'campaign-table'").fetchone()
+    value = json.loads(row[0])
+    for key, item in changes.items():
+        value[key] = item
+    text = a._dump(value).replace("'", "''")
+    return [
+        f"UPDATE consequences SET payload_json = '{text}' WHERE campaign_id = 'campaign-table'",
+        f"UPDATE canonical_events SET safe_payload_json = '{text}' "
+        "WHERE campaign_id = 'campaign-table' AND event_type = 'consequence'",
+    ]
+
+
 def marker_sql(connection: sqlite3.Connection, change) -> list[str]:  # noqa: ANN001
     """SQL changing the failed action's marker in both places it is stored: its consequence row
     and its canonical consequence event."""
@@ -195,6 +297,111 @@ PRIMARY = "pneuma.riichi-mahjong"
 STORY = "campaign_id = 'campaign-story'"
 CHECKS_OFF = "PRAGMA ignore_check_constraints = ON"
 BLOCKS = '{"response_blocks":[{"kind":"narration","text":"I dive. The sea answers."}],"text":"I dive. The sea answers."}'
+
+TABLE_BO = "campaign_id = 'campaign-table' AND participant_id = 'bo'"
+TABLE_AKI = "campaign_id = 'campaign-table' AND participant_id = 'aki'"
+QUARANTINE_BO = ("UPDATE participants SET validation_status = 'quarantined', schema_id = NULL, "
+                 f"schema_sha256 = NULL WHERE {TABLE_BO}")
+DECLARATIONS = "package_participant_artifacts"
+OF_PRIMARY = f"WHERE package_id = '{PRIMARY}'"
+PLAYER_AKI = {"name": "Aki", "control": "player"}
+
+# `verify_f5_campaign_authority`, on the `cast` base.
+F5_CASES: list[dict[str, object]] = [
+    {"name": "cast_untouched", "base": "cast", "sql": []},
+    {"name": "f5_declaration_schema_id", "base": "cast", "sql": [f"UPDATE {DECLARATIONS} SET schema_id = 'other' {OF_PRIMARY}"]},
+    {"name": "f5_declaration_schema_json", "base": "cast", "sql": [f"UPDATE {DECLARATIONS} SET schema_json = '{{}}' {OF_PRIMARY}"]},
+    {"name": "f5_declaration_order", "base": "cast", "sql": [f"UPDATE {DECLARATIONS} SET artifact_order = 1 {OF_PRIMARY}"]},
+    {"name": "f5_declaration_order_text", "base": "cast", "sql": [f"UPDATE {DECLARATIONS} SET artifact_order = '0' {OF_PRIMARY}"]},
+    {"name": "f5_declaration_extra", "base": "cast", "sql": [
+        f"INSERT INTO package_participant_artifacts SELECT package_id, version, content_sha256, 1, 'dealer', "
+        f"schema_id, schema_sha256, schema_json FROM {DECLARATIONS} {OF_PRIMARY}"]},
+    {"name": "f5_declarations_missing", "base": "cast", "sql": [f"DELETE FROM {DECLARATIONS} {OF_PRIMARY}"]},
+    {"name": "f5_adaptation_operation_padded", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET operation_id = ' adapt-1'"]},
+    {"name": "f5_adaptation_source_kind_blank", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_kind = ' '"]},
+    {"name": "f5_adaptation_destination_schema_padded", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET destination_schema_id = destination_schema_id || ' '"]},
+    {"name": "f5_adaptation_payload_uppercase", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET payload_sha256 = upper(payload_sha256)"]},
+    {"name": "f5_adaptation_source_data_sha_short", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_data_sha256 = 'abc'"]},
+    {"name": "f5_adaptation_source_schema_padded", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_schema_id = ' x'"]},
+    {"name": "f5_adaptation_source_schema_sha_uppercase", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_schema_sha256 = upper(source_schema_sha256)"]},
+    {"name": "f5_adaptation_source_schema_null", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_schema_id = NULL"]},
+    {"name": "f5_adaptation_source_kind_other", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_kind = 'dealer'"]},
+    {"name": "f5_adaptation_source_missing", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_campaign_id = 'campaign-gone'"]},
+    {"name": "f5_adaptation_source_data_changed", "base": "cast", "sql": [
+        "UPDATE participants SET data_json = '{\"control\":\"player\",\"name\":\"Aiko\"}' "
+        "WHERE campaign_id = 'campaign-workshop'"]},
+    {"name": "f5_adaptation_source_data_not_object", "base": "cast", "sql": [
+        "UPDATE participants SET data_json = '[]' WHERE campaign_id = 'campaign-workshop'"]},
+    {"name": "f5_adaptation_source_data_sha_other", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET source_data_sha256 = '" + "a" * 64 + "'"]},
+    {"name": "f5_adaptation_payload_other", "base": "cast", "sql": [
+        "UPDATE participant_adaptations SET payload_sha256 = '" + "b" * 64 + "'"]},
+    {"name": "f5_adaptation_data_not_object", "base": "cast", "sql": [],
+     "computed": [lambda connection: adaptation_sql(connection, data_json="[]")]},
+    {"name": "f5_adaptation_data_extra_member", "base": "cast", "sql": [],
+     "computed": [lambda connection: adaptation_sql(
+         connection, data_json=a._dump({**PLAYER_AKI, "x": 1}))]},
+    {"name": "f5_adaptation_destination_kind_other", "base": "cast", "sql": [],
+     "computed": [lambda connection: adaptation_sql(connection, destination_kind="dealer")]},
+    {"name": "f5_adaptation_destination_schema_sha_other", "base": "cast", "sql": [],
+     "computed": [lambda connection: adaptation_sql(connection, destination_schema_sha256="c" * 64)]},
+    {"name": "f5_adaptation_destination_schema_id_other", "base": "cast", "sql": [],
+     "computed": [lambda connection: adaptation_sql(connection, destination_schema_id="other.schema")]},
+    {"name": "f5_participant_status_unknown", "base": "cast", "sql": [
+        f"UPDATE participants SET validation_status = 'pending' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_kind_padded", "base": "cast", "sql": [
+        f"UPDATE participants SET kind = ' player' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_data_not_object", "base": "cast", "sql": [
+        f"UPDATE participants SET data_json = '[]' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_package_sha_null", "base": "cast", "sql": [
+        f"UPDATE participants SET package_sha256 = NULL WHERE {TABLE_BO}"]},
+    {"name": "f5_quarantined_claims_schema", "base": "cast", "sql": [
+        f"UPDATE participants SET validation_status = 'quarantined' WHERE {TABLE_BO}"]},
+    {"name": "f5_quarantined_claims_adaptation", "base": "cast", "sql": [
+        f"UPDATE participants SET validation_status = 'quarantined', schema_id = NULL, schema_sha256 = NULL "
+        f"WHERE {TABLE_AKI}"]},
+    {"name": "f5_quarantined_without_evidence", "base": "cast", "sql": [QUARANTINE_BO]},
+    {"name": "f5_quarantined_with_evidence", "base": "cast", "sql": [
+        QUARANTINE_BO, "INSERT INTO participant_quarantines VALUES ('campaign-table', 'bo', 'exact_schema_proof_unavailable')"]},
+    {"name": "f5_quarantined_blank_reason", "base": "cast", "sql": [
+        QUARANTINE_BO, "INSERT INTO participant_quarantines VALUES ('campaign-table', 'bo', '')"]},
+    {"name": "f5_validated_with_quarantine", "base": "cast", "sql": [
+        "INSERT INTO participant_quarantines VALUES ('campaign-table', 'bo', 'exact_schema_proof_unavailable')"]},
+    {"name": "f5_quarantine_orphaned", "base": "cast", "sql": [
+        "INSERT INTO participant_quarantines VALUES ('campaign-table', 'zed', 'exact_schema_proof_unavailable')"]},
+    {"name": "f5_participant_schema_other", "base": "cast", "sql": [
+        f"UPDATE participants SET schema_id = 'other.schema' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_schema_sha_other", "base": "cast", "sql": [
+        f"UPDATE participants SET schema_sha256 = '{'d' * 64}' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_package_sha_other", "base": "cast", "sql": [
+        f"UPDATE participants SET package_sha256 = '{'e' * 64}' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_data_invalid", "base": "cast", "sql": [
+        f"UPDATE participants SET data_json = '{{\"control\":\"player\",\"name\":\"\"}}' WHERE {TABLE_BO}"]},
+    {"name": "f5_participant_adaptation_unknown", "base": "cast", "sql": [
+        f"UPDATE participants SET adaptation_id = 'adapt-2' WHERE {TABLE_AKI}"]},
+    {"name": "f5_participant_adaptation_padded", "base": "cast", "sql": [
+        f"UPDATE participants SET adaptation_id = 'adapt-1 ' WHERE {TABLE_AKI}"]},
+    {"name": "f5_participant_adaptation_other_participant", "base": "cast", "sql": [
+        f"UPDATE participants SET adaptation_id = 'adapt-1' WHERE {TABLE_BO}"]},
+    {"name": "f5_history_before_other", "base": "cast", "sql": [],
+     "computed": [lambda connection: history_sql(connection, before={"name": "Ako", "control": "player"})]},
+    {"name": "f5_history_after_other", "base": "cast", "sql": [],
+     "computed": [lambda connection: history_sql(connection, after={"name": "Akiko", "control": "player"})]},
+    {"name": "f5_history_before_not_object", "base": "cast", "sql": [],
+     "computed": [lambda connection: history_sql(connection, before="Aki")]},
+    {"name": "f5_history_other_participant", "base": "cast", "sql": [],
+     "computed": [lambda connection: history_sql(connection, participant_id="bo")]},
+]
 
 CASES: list[dict[str, object]] = [
     {"name": "riichi_untouched", "base": "riichi", "sql": []},
@@ -623,6 +830,7 @@ CASES: list[dict[str, object]] = [
         lambda marker: {"kind": "check_rolled", "total": 3}]},
     {"name": "failed_marker_origin_list", "base": "failed", "sql": [], "markers": [
         lambda marker: edited(marker, origin=[])]},
+    *F5_CASES,
 ]
 
 
@@ -632,6 +840,22 @@ def outcome(path: Path) -> dict[str, object]:
     except Exception as error:  # noqa: BLE001 - the failure is the recorded behaviour
         return {"error": type(error).__name__, "code": getattr(error, "code", None), "message": str(error)}
     store.close()
+    return {"ok": None}
+
+
+def f5_outcome(path: Path) -> dict[str, object]:
+    """`verify_f5_campaign_authority` called directly, since startup reports any refusal as
+    "Authority stored integrity could not be verified"."""
+    from sylvia_gm.infrastructure import sqlite_campaign
+
+    connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
+    try:
+        sqlite_campaign.verify_f5_campaign_authority(connection)
+    except Exception as error:  # noqa: BLE001 - the failure is the recorded behaviour
+        return {"error": type(error).__name__, "message": str(error)}
+    finally:
+        connection.close()
     return {"ok": None}
 
 
@@ -646,6 +870,8 @@ def main() -> None:
         (OUT / "children.sqlite3.gz").write_bytes(gzip.compress(bases["children"], mtime=0))
         bases["failed"] = failed_base(Path(scratch))
         (OUT / "failed.sqlite3.gz").write_bytes(gzip.compress(bases["failed"], mtime=0))
+        bases["cast"] = cast_base(Path(scratch))
+        (OUT / "cast.sqlite3.gz").write_bytes(gzip.compress(bases["cast"], mtime=0))
         for name, kinds in LIFECYCLE_BASES.items():
             bases[name] = lifecycle_base(Path(scratch), name, kinds)
             (OUT / f"{name}.sqlite3.gz").write_bytes(gzip.compress(bases[name], mtime=0))
@@ -677,9 +903,15 @@ def main() -> None:
                     for statement in marker_sql(connection, change):
                         statements.append(statement)
                         connection.execute(statement)
+                for build in case.pop("computed", ()):  # type: ignore[attr-defined]
+                    for statement in build(connection):
+                        statements.append(statement)
+                        connection.execute(statement)
             finally:
                 connection.close()
-            results.append({**case, "sql": statements, "outcome": outcome(path)})
+            # The verifier's own outcome first: startup may write to the profile it opens.
+            f5 = {"f5": f5_outcome(path)} if case["base"] == "cast" else {}
+            results.append({**case, "sql": statements, "outcome": outcome(path), **f5})
     record = {"python": sys.version.split()[0], "cases": results}
     (OUT / "stored_authority_runs.json").write_bytes((json.dumps(record, indent=1, ensure_ascii=True) + "\n").encode("utf-8"))
 

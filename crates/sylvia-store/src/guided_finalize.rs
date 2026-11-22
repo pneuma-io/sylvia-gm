@@ -6,17 +6,12 @@
 //! The owner handler, `handle_finalize_campaign_construction`, is not ported: before this
 //! commits it runs `_preflight_guided_start`, which needs lane 4's provider session adapter.
 //!
-//! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently:
-//! - a construction that is not a guided Interview (the prepared and legacy Builder paths, which
-//!   chain `complete_campaign_construction`, `record_builder_evidence`, `admit_campaign_plan`,
-//!   `complete_turn` and `handoff_builder_to_dm`);
-//! - a Ruleset that declares required starting state, which `plan_state_admission` (lane 1's,
-//!   in `sylvia-app`) checks.
+//! A construction that is not a guided Interview (the prepared and legacy Builder paths) is not
+//! yet ported, and `sylvia_app::authority::guided` refuses it (`StoreError::NotPorted`).
 //!
 //! Python's owner never gives its `AuthorityOwner` a model capability registry, so guidance is
 //! assessed against the empty one (`EMPTY_MODEL_CAPABILITY_REGISTRY`), as here. Before
-//! committing, Python also runs `sqlite_campaign.verify_f5_campaign_authority`, which is not
-//! ported yet (see `guided_start`).
+//! committing, it runs `sqlite_campaign.verify_f5_campaign_authority` (`f5`), as Python does.
 
 use crate::actions::{dump, load_payload};
 use crate::campaigns::{current_lock_record, named_rows, Named};
@@ -462,8 +457,7 @@ impl AuthorityStore {
             )?;
             crate::stored::verify_stored_authority(connection)?;
             crate::packages::verify_package_authority(connection)?;
-            // `sqlite_campaign.verify_f5_campaign_authority` runs here in Python (see the module
-            // documentation).
+            crate::f5::verify_f5_campaign_authority(connection)?;
             crate::continuity::verify_authority(connection)?;
             Ok(GuidedStart {
                 completed: CampaignConstructionCompleted {
