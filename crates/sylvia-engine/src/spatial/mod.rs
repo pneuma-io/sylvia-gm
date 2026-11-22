@@ -4,6 +4,9 @@
 //! written (an integer stays an integer, a float a float), and every bound is checked on their
 //! `float(...)` values.
 
+mod clearance;
+mod convex;
+mod engine;
 mod mutation;
 mod query;
 mod scene;
@@ -75,4 +78,13 @@ impl From<SpatialError> for DomainError {
             SpatialError::Uncaught { error_type, message } => DomainError::Uncaught { error_type, message },
         }
     }
+}
+
+/// The engine's resolver for an admitted query (every kind but `placement`), before result
+/// admission and caching: `_engine._resolve_*(_compile(scene), query.as_payload())`.
+pub fn resolve_spatial_query(
+    scene: &AdmittedSpatialScene,
+    query: &AdmittedSpatialQuery,
+) -> Result<sylvia_base::JsonMap, SpatialValidationError> {
+    engine::resolve(&engine::compile(scene), query.payload())
 }

@@ -95,3 +95,105 @@ pub fn dist(p: &[f64], q: &[f64]) -> f64 {
     let max = values.iter().fold(0.0f64, |max, x| if *x > max { *x } else { max });
     vector_norm(&mut values, max, found_nan)
 }
+
+/// `round(x, digits)` for a float and `0 <= digits <= 22`: the exact binary value rounded half
+/// to even at that decimal place, then read back (CPython's `double_round`, which formats with
+/// `_Py_dg_dtoa` mode 3 and parses the digits).
+pub fn round_digits(x: f64, digits: u32) -> f64 {
+    assert!(digits <= 22, "the decimal scale must fit u128 arithmetic");
+    if !x.is_finite() || x == 0.0 {
+        return x;
+    }
+    let bits = x.abs().to_bits();
+    let biased = ((bits >> 52) & 0x7ff) as i64;
+    let fraction = bits & ((1u64 << 52) - 1);
+    let (mantissa, exponent) =
+        if biased == 0 { (fraction, -1074) } else { (fraction | (1u64 << 52), biased - 1075) };
+    if exponent >= 0 {
+        // An integer: no digits to round.
+        return x;
+    }
+    let scaled = u128::from(mantissa) * 10u128.pow(digits);
+    let shift = (-exponent) as u32;
+    let rounded = if shift >= 128 {
+        0
+    } else {
+        let quotient = scaled >> shift;
+        let remainder = scaled & ((1u128 << shift) - 1);
+        let half = 1u128 << (shift - 1);
+        match remainder.cmp(&half) {
+            std::cmp::Ordering::Greater => quotient + 1,
+            std::cmp::Ordering::Less => quotient,
+            std::cmp::Ordering::Equal => quotient + (quotient & 1),
+        }
+    };
+    let magnitude: f64 = format!("{rounded}e-{digits}").parse().expect("a decimal literal");
+    magnitude.copysign(x)
+}
+
+/// `sum(values)` over floats (CPython 3.12's compensated float path).
+pub fn sum_floats(values: impl IntoIterator<Item = f64>) -> f64 {
+    match crate::pynum::py_sum_numbers(values.into_iter().map(crate::pynum::PyNumber::Float)) {
+        crate::pynum::PyNumber::Float(total) => total,
+        crate::pynum::PyNumber::Int(total) => total as f64,
+    }
+}
+
+/// `x % y` for floats (`float_rem`): `fmod`, with the result taking the divisor's sign.
+pub fn float_mod(x: f64, y: f64) -> f64 {
+    let modulo = x % y;
+    if modulo != 0.0 {
+        if (y < 0.0) != (modulo < 0.0) {
+            modulo + y
+        } else {
+            modulo
+        }
+    } else {
+        0.0f64.copysign(y)
+    }
+}
+
+/// `math.remainder(x, y)` (`m_remainder`) for finite `x` and finite nonzero `y`.
+pub fn remainder(x: f64, y: f64) -> f64 {
+    let (absx, absy) = (x.abs(), y.abs());
+    let m = absx % absy;
+    let c = absy - m;
+    let r = if m < c {
+        m
+    } else if m > c {
+        -c
+    } else {
+        m - 2.0 * ((0.5 * (absx - m)) % absy)
+    };
+    1.0f64.copysign(x) * r
+}
+
+/// `max(values)`: the first of the largest (Python keeps the first on a tie).
+pub fn max_first(values: impl IntoIterator<Item = f64>) -> f64 {
+    let mut values = values.into_iter();
+    let first = values.next().expect("max() of an empty sequence");
+    values.fold(first, |best, value| if value > best { value } else { best })
+}
+
+/// `min(values)`: the first of the smallest.
+pub fn min_first(values: impl IntoIterator<Item = f64>) -> f64 {
+    let mut values = values.into_iter();
+    let first = values.next().expect("min() of an empty sequence");
+    values.fold(first, |best, value| if value < best { value } else { best })
+}
+
+/// `math.cos(x)`: the platform C library's `cos`, as CPython calls it. The argument passes
+/// through `black_box` so the compiler can't fold a constant call with its own arithmetic.
+pub fn cos(x: f64) -> f64 {
+    std::hint::black_box(x).cos()
+}
+
+/// `math.sin(x)`: the platform C library's `sin`.
+pub fn sin(x: f64) -> f64 {
+    std::hint::black_box(x).sin()
+}
+
+/// `math.atan2(y, x)` for finite arguments: the platform C library's `atan2`.
+pub fn atan2(y: f64, x: f64) -> f64 {
+    std::hint::black_box(y).atan2(std::hint::black_box(x))
+}

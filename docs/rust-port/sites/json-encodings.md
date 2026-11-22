@@ -63,7 +63,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:6318` | `SQLiteAuthorityStore.campaign_session_contexts` | Dump::DEFAULT | `(row["session_id"], json.dumps(evidence_kinds)),` | |
 | `infrastructure/sqlite_authority.py:10900` | `SQLiteAuthorityStore.response_window_actions` | Dump::DEFAULT | `"attempts": json.dumps(sorted(response_attempts or ()))},` | |
 | `infrastructure/sqlite_authority.py:10925` | `SQLiteAuthorityStore.player_action_markers` | Dump::DEFAULT | `(marker_kind, campaign_id, json.dumps(action_ids)),` | |
-| `infrastructure/sqlite_authority.py:12307` | `SQLiteAuthorityStore._read_snapshot` | Dump::DEFAULT | `json.dumps(display_action_ids),` | |
+| `infrastructure/sqlite_authority.py:12307` | `SQLiteAuthorityStore._read_snapshot` | Dump::DEFAULT | `json.dumps(display_action_ids),` | `sylvia-store` snapshots |
 | `infrastructure/sqlite_continuity.py:49` | `_dump` | Dump::CANONICAL | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
 | `infrastructure/sqlite_recovery.py:258` | `result_json` | Dump::WIRE.ascii(false) + allow_nan= | `return json.dumps( { "campaign_id": result.campaign_id, "captured_revision": result.captured_revision, "archive_sha256": result.archive_sha256, "by...` | `sylvia-store` stored_authority (`recovered`) |
 | `infrastructure/sqlite_session.py:306` | `_dump` | Dump::CANONICAL + allow_nan= | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, )` | |
@@ -148,8 +148,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/loader.py:234` | `load_config` | Dump::DEFAULT | `provider["credential_overrides"] = SecretStr(json.dumps(overrides))` | |
 | `config/loader.py:242` | `load_config` | Dump::DEFAULT | `provider["protected_credentials"] = SecretStr(json.dumps(envelope))` | |
 | `provider/_admin_audit.py:83` | `_serialization_projection` | Dump::CANONICAL + allow_nan= | `encoded = json.dumps( _plain(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
-| `provider/_anthropic.py:388` | `AnthropicMessagesTransport.parse_response` | Dump::DEFAULT | `arguments=json.dumps( block.get("input", {}) if isinstance(block, dict) else getattr(block, "input", {}) ),` | |
-| `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | |
+| `provider/_anthropic.py:388` | `AnthropicMessagesTransport.parse_response` | Dump::DEFAULT | `arguments=json.dumps( block.get("input", {}) if isinstance(block, dict) else getattr(block, "input", {}) ),` | `sylvia-provider` anthropic_vectors |
+| `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | `sylvia-provider` anthropic_vectors |
 | `provider/_chatgpt.py:319` | `_in_place_answer` | Dump::DEFAULT.ascii(false) | `result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)` | |
 | `provider/_chatgpt.py:1313` | `ChatGPTProvider._attempt` | Dump::DEFAULT + allow_nan= | `arguments = json.dumps( params.get("arguments"), ensure_ascii=True, allow_nan=False )` | |
 | `provider/_claude.py:131` | `prepare_request` | Dump::DEFAULT + allow_nan= | `history = json.loads(json.dumps(request["messages"], allow_nan=False))` | |
@@ -167,7 +167,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_codex_rpc.py:294` | `CodexConnection._write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | |
 | `provider/_context_fit.py:85` | `_canonical_request_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( {"messages": messages, "tools": tools or [], "options": dict(options)}, sort_keys=True, separators=(",", ":"), ensure_ascii=Fals...` | `sylvia-provider` context_fit_vectors |
 | `provider/_context_fit.py:97` | `_canonical_value_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-provider` context_fit_vectors |
-| `provider/_gemini.py:228` | `GeminiProvider._parse` | Dump::DEFAULT | `arguments=json.dumps(fn.get("args", {})),` | |
+| `provider/_gemini.py:228` | `GeminiProvider._parse` | Dump::DEFAULT | `arguments=json.dumps(fn.get("args", {})),` | `sylvia-provider` gemini_vectors |
 | `provider/_hooks.py:443` | `DumpHook._atomic_write` | Dump::INDENT2 + default= | `tmp_path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")` | |
 | `provider/_token_estimate.py:13` | `_size` | Dump::CANONICAL | `return len(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))` | `sylvia-provider` context_fit_vectors |
 | `session/_prompt_assembler.py:451` | `PromptAssembler.build_character` | Dump::DEFAULT.sorted(true) + default= | `state_payload = json.dumps( {"characters": characters_dict, "scene_tags": sorted(tags)}, sort_keys=True, default=str, )` | |

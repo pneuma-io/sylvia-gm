@@ -29,8 +29,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/import_repair_sessions.py:91` | `start_import_repair_chat` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", repair_id) is None:` | |
 | `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` |  `sylvia-app` package_library_vectors |
 | `application/plan_bundle.py:119` | `_read_bundle` | re.fullmatch; plain | `or re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", identity) is None` | |
-| `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` | |
-| `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` | |
+| `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` |  `sylvia-app` reusable_participant_vectors |
 | `application/reusable_plans.py:94` | `_strip_section` | re.compile; pattern built at run time, check by hand | `pattern = re.compile( rf"\n+## {re.escape(heading)}\s*\n.*?(?=\n## \|\Z)", flags=re.DOTALL, )` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:325` | `save_reusable_rift_plan` | re.sub; plain | `markdown = re.sub(r"^# .*?$", f"# {title}", markdown, count=1, flags=re.MULTILINE)` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:355` | `load_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", artifact_id) is None:` |  `sylvia-app` reusable_plan_vectors |

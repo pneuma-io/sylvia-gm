@@ -7,7 +7,7 @@
 //! `OpenAICompatProvider` picks it for `transport == "responses"` (`openai_compat.rs`).
 //!
 //! The response JSON is read as the OpenAI SDK reads it, from the SDK's own model table
-//! (`responses_models.json`, from `generate_responses_models.py`). The SDK builds its models
+//! (`responses_models.json`, from `generate_sdk_models.py`). The SDK builds its models
 //! leniently: a declared field the JSON lacks reads as `None`, an undeclared name falls back to
 //! `getattr`'s default, and a plain dict has no attributes at all. Retained output items are
 //! dumped as `model_dump(mode="json", exclude_none=True)` dumps the constructed models.
@@ -15,6 +15,7 @@
 use crate::chat::{ChatError, SdkRequest};
 use crate::error::{ErrorKind, ProviderError};
 use crate::pyobj::{int_or_zero, py_repr, py_str, truthy, Incidental};
+use crate::sdk_models::{Node, Table};
 use crate::types::{CacheUsage, ProviderResponse, ProviderStreamChunk, PyValue, TokenUsage, ToolCall};
 use std::sync::OnceLock;
 use sylvia_base::{Json, JsonMap};
@@ -293,241 +294,35 @@ pub fn sdk_request(request: &JsonMap) -> Result<SdkRequest, Incidental> {
 
 // ── The SDK's models ──────────────────────────────────────────────────────────────────────
 
-/// A declared type's shape (see `generate_responses_models.py`).
-#[derive(Debug)]
-enum Shape {
-    Model(String),
-    List(Box<Shape>),
-    Dict(Box<Shape>),
-    Union { variants: Vec<(String, String)>, first: String },
-    Either(Vec<Shape>),
-    Float,
-    Any,
-}
-
-/// One declared field: its name, the JSON key it is read from, and its shape.
-#[derive(Debug)]
-struct Field {
-    name: String,
-    key: String,
-    shape: Shape,
-}
-
-struct Models {
-    output_item: Shape,
-    response: Shape,
-    stream_event: Shape,
-    models: std::collections::HashMap<String, Vec<Field>>,
-}
-
-fn shape(value: &Json) -> Shape {
-    match value {
-        Json::String(kind) if kind == "float" => Shape::Float,
-        Json::Object(map) => {
-            if let Some(Json::String(name)) = map.get("model") {
-                Shape::Model(name.clone())
-            } else if let Some(inner) = map.get("list") {
-                Shape::List(Box::new(shape(inner)))
-            } else if let Some(inner) = map.get("dict") {
-                Shape::Dict(Box::new(shape(inner)))
-            } else if let Some(Json::Object(variants)) = map.get("union") {
-                Shape::Union {
-                    variants: variants
-                        .iter()
-                        .map(|(kind, model)| (kind.clone(), model.as_str().unwrap_or_default().to_owned()))
-                        .collect(),
-                    first: map.get("first").and_then(Json::as_str).unwrap_or_default().to_owned(),
-                }
-            } else if let Some(Json::Array(options)) = map.get("either") {
-                Shape::Either(options.iter().map(shape).collect())
-            } else {
-                Shape::Any
-            }
-        }
-        _ => Shape::Any,
-    }
-}
-
-fn table() -> &'static Json {
-    static TABLE: OnceLock<Json> = OnceLock::new();
-    TABLE.get_or_init(|| {
-        serde_json::from_str(include_str!("responses_models.json")).expect("the model table is JSON")
-    })
-}
-
-fn models() -> &'static Models {
-    static MODELS: OnceLock<Models> = OnceLock::new();
-    MODELS.get_or_init(|| {
-        let table = table();
-        let models = table["models"]
-            .as_object()
-            .expect("models")
-            .iter()
-            .map(|(name, fields)| {
-                let fields = fields
-                    .as_array()
-                    .expect("fields")
-                    .iter()
-                    .map(|field| Field {
-                        name: field[0].as_str().expect("name").to_owned(),
-                        key: field[1].as_str().expect("key").to_owned(),
-                        shape: shape(&field[2]),
-                    })
-                    .collect();
-                (name.clone(), fields)
-            })
-            .collect();
-        Models {
-            output_item: shape(&table["output_item"]),
-            response: shape(&table["response"]),
-            stream_event: shape(&table["stream_event"]),
-            models,
-        }
-    })
+/// The locked OpenAI SDK's Responses models (`sdk_models`).
+fn table() -> &'static Table {
+    static TABLE: OnceLock<Table> = OnceLock::new();
+    TABLE.get_or_init(|| Table::parse(include_str!("responses_models.json")))
 }
 
 /// The SDK's `openai` and `pydantic` versions the table was made from.
 pub fn model_table_versions() -> (String, String) {
-    let table = table();
-    (
-        table["openai"].as_str().unwrap_or_default().into(),
-        table["pydantic"].as_str().unwrap_or_default().into(),
-    )
+    (table().version("openai").into(), table().version("pydantic").into())
 }
 
 static NULL: Json = Json::Null;
 
-/// A JSON value as the SDK constructed it: the model it became, if any.
-#[derive(Clone, Copy)]
-struct Node<'a> {
-    value: &'a Json,
-    shape: Option<&'a Shape>,
-}
-
-impl<'a> Node<'a> {
-    fn new(value: &'a Json, shape: &'a Shape) -> Self {
-        Self { value, shape: Some(shape) }
-    }
-
-    /// The shape that applies to this value: unions resolved as `construct_type` resolves them.
-    fn resolved(shape: &'a Shape, value: &'a Json) -> Option<&'a Shape> {
-        match shape {
-            Shape::Either(options) => options
-                .iter()
-                .find(|option| match (option, value) {
-                    (Shape::List(_), Json::Array(_)) => true,
-                    (Shape::Model(_) | Shape::Union { .. } | Shape::Dict(_), Json::Object(_)) => true,
-                    (Shape::Float, Json::Number(_)) => true,
-                    (Shape::Any, _) => !matches!(value, Json::Array(_) | Json::Object(_)),
-                    _ => false,
-                })
-                .and_then(|option| Self::resolved(option, value)),
-            other => Some(other),
-        }
-    }
-
-    /// The model this value was constructed as: a declared model or union on a JSON object.
-    fn model(&self) -> Option<&'a str> {
-        let Json::Object(map) = self.value else { return None };
-        match self.shape.and_then(|shape| Self::resolved(shape, self.value))? {
-            Shape::Model(name) => Some(name),
-            Shape::Union { variants, first } => Some(match map.get("type") {
-                Some(Json::String(kind)) => variants
-                    .iter()
-                    .find(|(variant, _)| variant == kind)
-                    .map_or(first.as_str(), |(_, model)| model),
-                _ => first,
-            }),
-            _ => None,
-        }
-    }
-
-    fn is_none(&self) -> bool {
-        self.value.is_null()
-    }
-
-    /// `getattr(value, name)`: a declared field (`None` when the JSON lacks it), an extra field
-    /// the JSON carries, or `None` for an `AttributeError` (a plain dict, string or list, or a
-    /// name the model does not have).
-    fn attr(&self, name: &str) -> Option<Node<'a>> {
-        let model = self.model()?;
-        let map = self.value.as_object()?;
-        let fields = models().models.get(model)?;
-        if let Some(field) = fields.iter().find(|field| field.name == name) {
-            return Some(Node { value: map.get(&field.key).unwrap_or(&NULL), shape: Some(&field.shape) });
-        }
-        if fields.iter().any(|field| field.key == name) {
-            return None;
-        }
-        map.get(name).map(|value| Node { value, shape: None })
-    }
-
-    /// `getattr(value, name, default)` as a JSON value.
-    fn attr_or(&self, name: &str, default: &'a Json) -> &'a Json {
-        self.attr(name).map_or(default, |node| node.value)
-    }
-
-    /// The items `for item in value` would give, each with its declared shape.
-    fn items(&self) -> Option<Vec<Node<'a>>> {
-        let Json::Array(items) = self.value else { return None };
-        let inner = match self.shape.and_then(|shape| Self::resolved(shape, self.value)) {
-            Some(Shape::List(inner)) => Some(inner.as_ref()),
-            _ => None,
-        };
-        Some(items.iter().map(|value| Node { value, shape: inner }).collect())
-    }
-}
-
-/// `model_dump(mode="json", exclude_none=True)` of `value` as the SDK constructed it for `shape`.
-/// Only a model's own keys whose value is `None` are left out (declared or extra); a model's
-/// declared fields come first, in declaration order and under their names, then its extra fields
-/// as sent; an integer in a `float` field is written as a float. Anything that is not a model
-/// (list items, `Dict` and `Any` values, extra fields) is kept exactly as sent, `None`s included.
-fn dump(value: &Json, shape: Option<&Shape>) -> Json {
-    let node = Node { value, shape };
-    if let Some(model) = node.model() {
-        return dump_model(value.as_object().expect("a model is an object"), model);
-    }
-    match (shape.and_then(|shape| Node::resolved(shape, value)), value) {
-        (Some(Shape::List(inner)), Json::Array(items)) => {
-            Json::Array(items.iter().map(|item| dump(item, Some(inner))).collect())
-        }
-        (Some(Shape::Dict(inner)), Json::Object(map)) => {
-            Json::Object(map.iter().map(|(key, item)| (key.clone(), dump(item, Some(inner)))).collect())
-        }
-        (Some(Shape::Float), Json::Number(number)) if !number.is_f64() => {
-            number.as_f64().and_then(serde_json::Number::from_f64).map_or_else(|| value.clone(), Json::Number)
-        }
-        _ => value.clone(),
-    }
-}
-
-fn dump_model(map: &JsonMap, model: &str) -> Json {
-    let Some(fields) = models().models.get(model) else { return Json::Object(map.clone()) };
-    let mut out = JsonMap::new();
-    for field in fields {
-        if let Some(value) = map.get(&field.key).filter(|value| !value.is_null()) {
-            out.insert(field.name.clone(), dump(value, Some(&field.shape)));
-        }
-    }
-    for (key, value) in map {
-        if !fields.iter().any(|field| &field.key == key) && !value.is_null() {
-            out.insert(key.clone(), value.clone());
-        }
-    }
-    Json::Object(out)
-}
-
 /// `native_output(items)` on `items` constructed as a list of output items.
 fn native_output_of(items: Option<Node<'_>>) -> ResponsesResult<Vec<Json>> {
-    let Some(items) = items.and_then(|node| node.items()) else { return Ok(Vec::new()) };
+    match items.and_then(|node| node.items()) {
+        Some(items) => retained(items),
+        None => Ok(Vec::new()),
+    }
+}
+
+fn retained(items: Vec<Node<'_>>) -> ResponsesResult<Vec<Json>> {
     let mut result = Vec::new();
     for item in items {
         // A non-object item is neither a mapping nor an SDK model: `vars(item)` raises.
         if !item.value.is_object() {
             return Err(Incidental("vars() argument must have __dict__ attribute".into()).into());
         }
-        let value = dump(item.value, item.shape);
+        let value = item.dump();
         if !matches!(get(&value, "type"), Some(Json::String(_))) {
             return Err(invalid("Responses output item is malformed"));
         }
@@ -539,15 +334,9 @@ fn native_output_of(items: Option<Node<'_>>) -> ResponsesResult<Vec<Json>> {
 /// `native_output(items)`: complete Responses output items, opaque reasoning included, for
 /// private storage, from a JSON list of output items.
 pub fn native_output(items: Option<&Json>) -> ResponsesResult<Vec<Json>> {
-    let list = Shape::List(Box::new(clone_union(&models().output_item)));
-    native_output_of(items.map(|items| Node { value: items, shape: Some(&list) }))
-}
-
-fn clone_union(shape: &Shape) -> Shape {
-    match shape {
-        Shape::Union { variants, first } => Shape::Union { variants: variants.clone(), first: first.clone() },
-        Shape::Model(name) => Shape::Model(name.clone()),
-        _ => Shape::Any,
+    match items.and_then(|items| Node::list_of(table(), items, "output_item")) {
+        Some(items) => retained(items),
+        None => Ok(Vec::new()),
     }
 }
 
@@ -578,7 +367,7 @@ fn finish_of(response: Option<Node<'_>>) -> ResponsesResult<String> {
 
 /// `responses_finish(response)` on a JSON `Response`.
 pub fn responses_finish(response: Option<&Json>) -> ResponsesResult<String> {
-    finish_of(response.map(|value| Node::new(value, &models().response)))
+    finish_of(response.map(|value| Node::root(table(), value, "response")))
 }
 
 /// `_responses_reasoning_effort(response)`: the effort the Responses result says it used, if it
@@ -690,9 +479,8 @@ fn call_identity(item: Node<'_>) -> String {
 
 /// `ResponsesTransport.parse_response(raw_response, model_id)`.
 pub fn parse_response(raw: &Json, model_id: &str) -> ResponsesResult<ProviderResponse> {
-    let shapes = models();
     // A body that is not an object is not constructed: every attribute is its default.
-    let response = raw.is_object().then(|| Node::new(raw, &shapes.response));
+    let response = raw.is_object().then(|| Node::root(table(), raw, "response"));
     let text = match response {
         Some(response) => output_text(response)?.unwrap_or_default(),
         None => String::new(),
@@ -856,7 +644,7 @@ fn parse_event(event: Node<'_>) -> ResponsesResult<Option<ProviderStreamChunk>> 
 
 /// `ResponsesTransport.parse_stream_chunk(raw_chunk)`: one SDK stream event, from its JSON.
 pub fn parse_stream_chunk(event: &Json) -> ResponsesResult<Option<ProviderStreamChunk>> {
-    parse_event(Node::new(event, &models().stream_event))
+    parse_event(Node::root(table(), event, "stream_event"))
 }
 
 /// The per-stream work `OpenAICompatProvider.generate_stream` does for the Responses transport:
@@ -894,7 +682,7 @@ impl ResponsesStreamState {
 
     /// One SDK event in; the chunks to yield out.
     pub fn on_chunk(&mut self, raw: &Json) -> ResponsesResult<Vec<ProviderStreamChunk>> {
-        let event = Node::new(raw, &models().stream_event);
+        let event = Node::root(table(), raw, "stream_event");
         let mut usage = event.attr("usage").filter(|node| !node.is_none());
         if usage.is_none()
             && matches!(event_type(event), "response.completed" | "response.failed" | "response.incomplete")
