@@ -46,7 +46,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/interfaces/commands/__init__.py` | 31 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/actions.py` | 157 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/builder.py` | 169 | `sylvia-owner::commands::builder` | in progress | `handle_builder_chat_index`, `handle_rename_builder_chat`, `handle_delete_builder_chat` (on lane 3's `StoreHandle` operations and lanes). A rename and a delete of an existing chat wait for `create_builder_chat` in the owner |
-| `src/sylvia_gm/interfaces/commands/campaigns.py` | 1,118 | `sylvia-owner::commands::campaigns` | in progress | `handle_handshake_status`, `handle_campaign_index`; `handle_create_guided_campaign_draft` (lane 3, #330) |
+| `src/sylvia_gm/interfaces/commands/campaigns.py` | 1,118 | `sylvia-owner::commands::campaigns` | in progress | `handle_handshake_status`, `handle_campaign_index`; `handle_create_guided_campaign_draft` (lane 3, #330); `handle_advance_guided_campaign_draft` (lane 3, #334) |
 | `src/sylvia_gm/interfaces/commands/character_chat.py` | 112 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/packages.py` | 127 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/interfaces/commands/providers.py` | 322 | `sylvia-owner` | pending | |

@@ -120,6 +120,18 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    ctypes calls; and `sylvia-base/src/winreg.rs` (`RegOpenKeyExW`, `RegQueryValueExW`,
    `RegCloseKey`; read-only, HKCU, closed on drop), CPython's `winreg.QueryValueEx` with
    `Reg2Py`'s string rules, shared by the desktop update and the HTTP client's proxy read.
+   Native libraries the Python build ships, loaded so that results are theirs (each behind
+   sylvia-owner's `dictation` feature, Windows only, loaded by full path with
+   `LoadLibraryExW(..., LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32)`,
+   never freed, each `GetProcAddress` cast to its typed function pointer beside its lookup with
+   the C prototype quoted; listed with file hashes in `third-party-ports.md`):
+   `sylvia-owner/src/dictation/swresample/windows.rs` (libswresample 6.x as PyAV uses it:
+   `swresample_version` gate, `swr_alloc_set_opts2`, `swr_init`, `swr_get_out_samples`,
+   `swr_convert`, `swr_free` on an owned context, a `#[repr(C)]` `AVChannelLayout` with size and
+   alignment assertions) and `sylvia-owner/src/dictation/openblas/windows.rs` (NumPy's
+   scipy-openblas: `scipy_openblas_get_config64_` version gate, `scipy_cblas_sgemm64_`,
+   `scipy_cblas_sgemv64_`; no thread-count call, the library reads `OMP_NUM_THREADS` itself
+   as it does under Python).
 
 ## Concurrency
 
