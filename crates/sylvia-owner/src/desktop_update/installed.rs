@@ -741,6 +741,7 @@ mod tests {
     }
 
     /// Delete a scratch current-user key in both registry views; `true` once it is gone in both.
+    #[cfg(windows)]
     fn delete_scratch_key(subkey: &str) -> bool {
         let key = format!(r"HKCU\{subkey}");
         for view in ["/reg:64", "/reg:32"] {
