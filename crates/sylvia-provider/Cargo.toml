@@ -38,5 +38,11 @@ serde_json.workspace = true
 name = "runtime_process"
 harness = false
 
+# Kept processes, the native transcript and the Claude settings. It is also the stand-in for
+# Claude Code in the settings cases, which must answer before a test harness reads its arguments.
+[[test]]
+name = "kept_vectors"
+harness = false
+
 [lints]
 workspace = true

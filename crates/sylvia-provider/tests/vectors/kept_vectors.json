@@ -1,0 +1,3499 @@
+{
+ "python": "3.12.11",
+ "now": "2026-11-21T08:00:00.123456+00:00",
+ "continue_text": "SYLVIA_GM_CONTINUE (application invocation, not player speech): Continue.",
+ "process_settings": {
+  "": "persistent",
+  "persistent": "persistent",
+  "per-step": "per-step",
+  " Per_Step ": "per-step",
+  "STEP": "per-step",
+  "kept": "persistent",
+  "steps": "persistent"
+ },
+ "extends": [
+  {
+   "history": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x"
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "held": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x",
+       "cache_control": {
+        "type": "ephemeral"
+       }
+      }
+     ]
+    }
+   ],
+   "extends": true
+  },
+  {
+   "history": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x"
+      }
+     ]
+    }
+   ],
+   "held": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x",
+       "cache_control": {
+        "type": "ephemeral"
+       }
+      }
+     ]
+    }
+   ],
+   "extends": false
+  },
+  {
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x"
+      }
+     ]
+    }
+   ],
+   "held": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x",
+       "cache_control": {
+        "type": "ephemeral"
+       }
+      }
+     ]
+    }
+   ],
+   "extends": false
+  },
+  {
+   "history": [
+    {
+     "n": 1
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "held": [
+    {
+     "n": 1.0
+    }
+   ],
+   "extends": false
+  },
+  {
+   "history": [
+    {
+     "n": true
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "held": [
+    {
+     "n": 1
+    }
+   ],
+   "extends": false
+  },
+  {
+   "history": [
+    {
+     "b": 1,
+     "a": 2
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "held": [
+    {
+     "a": 2,
+     "b": 1
+    }
+   ],
+   "extends": true
+  },
+  {
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "held": [],
+   "extends": true
+  }
+ ],
+ "continuations": [
+  {
+   "name": "prompt",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "I step in."
+    }
+   ],
+   "delivery": [
+    "prompt",
+    [
+     {
+      "type": "text",
+      "text": "I step in."
+     }
+    ]
+   ]
+  },
+  {
+   "name": "prompt-two-users",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "A"
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "B"
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "prompt",
+    [
+     {
+      "type": "text",
+      "text": "A"
+     },
+     {
+      "type": "text",
+      "text": "B"
+     }
+    ]
+   ]
+  },
+  {
+   "name": "prompt-skips-continue",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "[host-seal abc123] SYLVIA_GM_CONTINUE (application invocation, not player speech): Continue."
+      },
+      {
+       "type": "text",
+       "text": "Go"
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "prompt",
+    [
+     {
+      "type": "text",
+      "text": "Go"
+     }
+    ]
+   ]
+  },
+  {
+   "name": "prompt-only-continue",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "[host-seal abc123] SYLVIA_GM_CONTINUE (application invocation, not player speech): Continue."
+    }
+   ],
+   "mismatch": "no_prompt"
+  },
+  {
+   "name": "no-tail",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "mismatch": "no_reply_copy"
+  },
+  {
+   "name": "tail-starts-user",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "mismatch": "no_reply_copy"
+  },
+  {
+   "name": "text-differs",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": "Other."
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "mismatch": "model_text_differs"
+  },
+  {
+   "name": "reply-with-call",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      },
+      {
+       "type": "tool_use",
+       "id": "x"
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "mismatch": "tail_not_deliverable"
+  },
+  {
+   "name": "no-user-after",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    }
+   ],
+   "mismatch": "tail_not_deliverable"
+  },
+  {
+   "name": "assistant-after",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    }
+   ],
+   "mismatch": "tail_not_deliverable"
+  },
+  {
+   "name": "image-block",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "mismatch": "content_not_deliverable"
+  },
+  {
+   "name": "content-not-blocks",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": 5
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "mismatch": "content_not_deliverable"
+  },
+  {
+   "name": "answer",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "answer-with-sealed",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      },
+      {
+       "type": "text",
+       "text": "[host-seal abc123] You see a goblin."
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      },
+      {
+       "type": "text",
+       "text": "[host-seal abc123] You see a goblin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "answer-error",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7",
+       "is_error": true
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      }
+     ],
+     "isError": true
+    }
+   ]
+  },
+  {
+   "name": "answer-blocks",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": [
+        {
+         "type": "text",
+         "text": "7"
+        },
+        {
+         "type": "text",
+         "text": "!"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      },
+      {
+       "type": "text",
+       "text": "!"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "answer-image",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": [
+        {
+         "type": "image"
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "mismatch": "content_not_deliverable"
+  },
+  {
+   "name": "answer-later-sealed",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "[host-seal abc123] Later."
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      },
+      {
+       "type": "text",
+       "text": "[host-seal abc123] Later."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "answer-narration-copy",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      }
+     ]
+    },
+    {
+     "role": "assistant",
+     "content": "Sylvia narrates."
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "[host-seal abc123] x"
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      },
+      {
+       "type": "text",
+       "text": "[host-seal abc123] x"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "answer-narration-other",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      }
+     ]
+    },
+    {
+     "role": "assistant",
+     "content": "New words."
+    }
+   ],
+   "mismatch": "tail_not_deliverable"
+  },
+  {
+   "name": "answer-player-speech",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "I run!"
+    }
+   ],
+   "mismatch": "player_speech_after_call"
+  },
+  {
+   "name": "answer-continue-skipped",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      },
+      {
+       "type": "text",
+       "text": "[host-seal abc123] SYLVIA_GM_CONTINUE (application invocation, not player speech): Continue."
+      }
+     ]
+    }
+   ],
+   "delivery": [
+    "answer",
+    {
+     "content": [
+      {
+       "type": "text",
+       "text": "7"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "answer-wrong-call",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_2",
+       "content": "7"
+      }
+     ]
+    }
+   ],
+   "mismatch": "no_call_result"
+  },
+  {
+   "name": "answer-two-calls",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1"
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1"
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      }
+     ]
+    }
+   ],
+   "mismatch": "no_call_result"
+  },
+  {
+   "name": "answer-missing",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    }
+   ],
+   "mismatch": "no_call_result"
+  },
+  {
+   "name": "answer-empty-blocks",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": []
+    }
+   ],
+   "raw": [
+    "ValueError",
+    "not enough values to unpack (expected at least 1, got 0)"
+   ]
+  },
+  {
+   "name": "answer-not-result",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "plain"
+    }
+   ],
+   "mismatch": "no_call_result"
+  },
+  {
+   "name": "answer-extra-image",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "Rolling.",
+    "pending": {
+     "request_id": "r1"
+    },
+    "call_id": "toolu_1",
+    "call_arguments": {
+     "n": 2,
+     "why": "Sylvia narrates."
+    }
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "Rolling."
+      },
+      {
+       "type": "tool_use",
+       "id": "toolu_1",
+       "name": "roll",
+       "input": {
+        "n": 2
+       }
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "tool_result",
+       "tool_use_id": "toolu_1",
+       "content": "7"
+      },
+      {
+       "type": "image"
+      }
+     ]
+    }
+   ],
+   "mismatch": "content_not_deliverable"
+  },
+  {
+   "name": "text-not-string",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": 5
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "raw": [
+    "TypeError",
+    "sequence item 0: expected str instance, int found"
+   ]
+  },
+  {
+   "name": "message-not-dict",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": "I open the door."
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    "nonsense"
+   ],
+   "raw": [
+    "AttributeError",
+    "'str' object has no attribute 'get'"
+   ]
+  },
+  {
+   "name": "cache-control-ignored",
+   "state": {
+    "held": [
+     {
+      "role": "user",
+      "content": [
+       {
+        "type": "text",
+        "text": "x",
+        "cache_control": {
+         "type": "ephemeral"
+        }
+       }
+      ]
+     }
+    ],
+    "spoken": "It creaks.",
+    "pending": null,
+    "call_id": "",
+    "call_arguments": null
+   },
+   "history": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "text",
+       "text": "x"
+      }
+     ]
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "text",
+       "text": "It creaks."
+      }
+     ]
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "delivery": [
+    "prompt",
+    [
+     {
+      "type": "text",
+      "text": "I open the door."
+     }
+    ]
+   ]
+  }
+ ],
+ "pools": [
+  {
+   "name": "keep-and-take",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "take",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      },
+      {
+       "role": "assistant",
+       "content": "b"
+      },
+      {
+       "role": "user",
+       "content": "c"
+      }
+     ]
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [],
+    [
+     "A",
+     []
+    ],
+    0
+   ]
+  },
+  {
+   "name": "take-no-extension-closes-earlier-forms",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      },
+      {
+       "role": "assistant",
+       "content": "b"
+      },
+      {
+       "role": "user",
+       "content": "c"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "B",
+     "home-1",
+     "m",
+     "other",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      },
+      {
+       "role": "assistant",
+       "content": "b"
+      },
+      {
+       "role": "user",
+       "content": "c"
+      }
+     ],
+     0
+    ],
+    [
+     "take",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ]
+    ],
+    [
+     "len"
+    ],
+    [
+     "models"
+    ]
+   ],
+   "results": [
+    [],
+    [],
+    [
+     null,
+     [
+      "A"
+     ]
+    ],
+    1,
+    [
+     "m"
+    ]
+   ]
+  },
+  {
+   "name": "other-home-closes",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "take",
+     "home-2",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      },
+      {
+       "role": "assistant",
+       "content": "b"
+      },
+      {
+       "role": "user",
+       "content": "c"
+      }
+     ]
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [],
+    [
+     null,
+     [
+      "A"
+     ]
+    ],
+    0
+   ]
+  },
+  {
+   "name": "limit-evicts-oldest",
+   "limit": 2,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m1",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "B",
+     "home-1",
+     "m2",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "C",
+     "home-1",
+     "m3",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "len"
+    ],
+    [
+     "models"
+    ]
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "A"
+    ],
+    2,
+    [
+     "m2",
+     "m3"
+    ]
+   ]
+  },
+  {
+   "name": "limit-zero",
+   "limit": 0,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [
+     "A"
+    ],
+    0
+   ]
+  },
+  {
+   "name": "release-moves-generation",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "generation",
+     "home-1"
+    ],
+    [
+     "release",
+     "home-1",
+     null
+    ],
+    [
+     "generation",
+     "home-1"
+    ],
+    [
+     "keep",
+     "B",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "C",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     1
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [],
+    0,
+    [
+     "A"
+    ],
+    1,
+    [
+     "B"
+    ],
+    [],
+    1
+   ]
+  },
+  {
+   "name": "release-model",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m1",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "B",
+     "home-1",
+     "m2",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "release",
+     "home-1",
+     "m1"
+    ],
+    [
+     "models"
+    ],
+    [
+     "generation",
+     "home-1"
+    ]
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "A"
+    ],
+    [
+     "m2"
+    ],
+    1
+   ]
+  },
+  {
+   "name": "release-all",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "B",
+     "home-2",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "release",
+     null,
+     null
+    ],
+    [
+     "generation",
+     "home-1"
+    ],
+    [
+     "generation",
+     "home-2"
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "A",
+     "B"
+    ],
+    1,
+    1,
+    0
+   ]
+  },
+  {
+   "name": "newest-extension-wins",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "keep",
+     "B",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "take",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      },
+      {
+       "role": "assistant",
+       "content": "b"
+      },
+      {
+       "role": "user",
+       "content": "c"
+      }
+     ]
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "B",
+     []
+    ],
+    1
+   ]
+  },
+  {
+   "name": "tools-differ",
+   "limit": 4,
+   "idle": 1800,
+   "ops": [
+    [
+     "keep",
+     "A",
+     "home-1",
+     "m",
+     "s",
+     "t",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      }
+     ],
+     0
+    ],
+    [
+     "take",
+     "home-1",
+     "m",
+     "s",
+     "other-tools",
+     [
+      {
+       "role": "user",
+       "content": "a"
+      },
+      {
+       "role": "assistant",
+       "content": "b"
+      },
+      {
+       "role": "user",
+       "content": "c"
+      }
+     ]
+    ],
+    [
+     "len"
+    ]
+   ],
+   "results": [
+    [],
+    [
+     null,
+     [
+      "A"
+     ]
+    ],
+    0
+   ]
+  }
+ ],
+ "prompt": [
+  {
+   "type": "text",
+   "text": "Go"
+  }
+ ],
+ "session_id": "0f8fad5b-d9cb-469f-a165-70867728950e",
+ "native": [
+  {
+   "name": "collected",
+   "rows": "{\"type\": \"summary\"}\n{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n{\"type\": \"attachment\", \"rendered\": \"\"}\n{\"type\": \"api-request\"}\n",
+   "op": "collect",
+   "status": "collected",
+   "records": [
+    {
+     "attachment": {
+      "kind": "env"
+     },
+     "rendered": "Env: x",
+     "renderedRole": "user"
+    }
+   ],
+   "reason": null,
+   "answer": null
+  },
+  {
+   "name": "rounds",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n{\"type\": \"assistant\", \"message\": {\"id\": \"msg_round\", \"type\": \"message\", \"role\": \"assistant\", \"model\": \"claude\", \"content\": [{\"type\": \"thinking\", \"thinking\": \"x\"}, {\"type\": \"tool_use\", \"id\": \"ts\", \"name\": \"ToolSearch\"}], \"usage\": {\"input_tokens\": 1}, \"stop_reason\": \"tool_use\"}}\n{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"ts\"}], \"extra\": 1}}\n{\"type\": \"assistant\", \"message\": {\"content\": [{\"type\": \"thinking\"}]}}\n{\"type\": \"assistant\", \"message\": {\"id\": \"msg_final\", \"content\": [{\"type\": \"text\", \"text\": \"done\"}]}}\n{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n",
+   "op": "collect",
+   "final": "msg_final",
+   "status": "collected",
+   "records": [
+    {
+     "attachment": {
+      "kind": "env"
+     },
+     "rendered": "Env: x",
+     "renderedRole": "user"
+    },
+    {
+     "type": "assistant",
+     "message": {
+      "id": "msg_round",
+      "type": "message",
+      "role": "assistant",
+      "model": "claude",
+      "content": [
+       {
+        "type": "tool_use",
+        "id": "ts",
+        "name": "ToolSearch"
+       }
+      ],
+      "stop_reason": "tool_use"
+     }
+    },
+    {
+     "type": "user",
+     "message": {
+      "role": "user",
+      "content": [
+       {
+        "type": "tool_result",
+        "tool_use_id": "ts"
+       }
+      ]
+     }
+    }
+   ],
+   "reason": null,
+   "answer": null
+  },
+  {
+   "name": "missing-prompt",
+   "rows": "{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n",
+   "op": "collect",
+   "status": "unknown",
+   "records": [],
+   "reason": "prompt_record_missing",
+   "answer": null
+  },
+  {
+   "name": "cli-inserted",
+   "rows": "{\"type\": \"assistant\", \"message\": {\"model\": \"<synthetic>\"}}\n{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n",
+   "op": "collect",
+   "status": "unknown",
+   "records": [],
+   "reason": "cli_inserted_turn",
+   "answer": null
+  },
+  {
+   "name": "unreadable-line",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{oops\n",
+   "op": "collect",
+   "status": "unknown",
+   "records": [],
+   "reason": "session_file_unreadable",
+   "answer": null
+  },
+  {
+   "name": "not-objects",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n[1]\n",
+   "op": "collect",
+   "status": "unknown",
+   "records": [],
+   "reason": "session_file_unreadable",
+   "answer": null
+  },
+  {
+   "name": "attachment-not-dict",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{\"type\": \"attachment\", \"attachment\": 5, \"rendered\": \"x\"}\n",
+   "op": "collect",
+   "status": "unknown",
+   "records": [],
+   "reason": "session_file_unreadable",
+   "answer": null
+  },
+  {
+   "name": "no-file",
+   "rows": null,
+   "op": "collect",
+   "status": "unknown",
+   "records": [],
+   "reason": "session_file_missing",
+   "answer": null
+  },
+  {
+   "name": "answer",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"toolu_1\", \"content\": \"7\"}]}}\n{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n{\"type\": \"assistant\", \"message\": {}}\n{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n",
+   "op": "answer",
+   "status": "collected",
+   "records": [
+    {
+     "attachment": {
+      "kind": "env"
+     },
+     "rendered": "Env: x",
+     "renderedRole": "user"
+    }
+   ],
+   "reason": null,
+   "answer": {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_1",
+      "content": "7"
+     }
+    ]
+   }
+  },
+  {
+   "name": "answer-rounds",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"toolu_1\", \"content\": \"7\"}]}}\n{\"type\": \"assistant\", \"message\": {\"id\": \"msg_round\", \"type\": \"message\", \"role\": \"assistant\", \"model\": \"claude\", \"content\": [{\"type\": \"thinking\", \"thinking\": \"x\"}, {\"type\": \"tool_use\", \"id\": \"ts\", \"name\": \"ToolSearch\"}], \"usage\": {\"input_tokens\": 1}, \"stop_reason\": \"tool_use\"}}\n{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"ts\"}], \"extra\": 1}}\n{\"type\": \"assistant\", \"message\": {\"id\": \"msg_final\", \"content\": [{\"type\": \"text\", \"text\": \"done\"}]}}\n",
+   "op": "answer",
+   "final": "msg_final",
+   "requests": 0,
+   "status": "collected",
+   "records": [
+    {
+     "type": "assistant",
+     "message": {
+      "id": "msg_round",
+      "type": "message",
+      "role": "assistant",
+      "model": "claude",
+      "content": [
+       {
+        "type": "tool_use",
+        "id": "ts",
+        "name": "ToolSearch"
+       }
+      ],
+      "stop_reason": "tool_use"
+     }
+    },
+    {
+     "type": "user",
+     "message": {
+      "role": "user",
+      "content": [
+       {
+        "type": "tool_result",
+        "tool_use_id": "ts"
+       }
+      ]
+     }
+    }
+   ],
+   "reason": null,
+   "answer": {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_1",
+      "content": "7"
+     }
+    ]
+   }
+  },
+  {
+   "name": "answer-waits-for-requests",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"toolu_1\", \"content\": \"7\"}]}}\n{\"type\": \"api-request\"}\n",
+   "op": "answer",
+   "requests": 2,
+   "status": "unknown",
+   "records": [],
+   "reason": "answer_record_missing",
+   "answer": null
+  },
+  {
+   "name": "answer-missing",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n",
+   "op": "answer",
+   "status": "unknown",
+   "records": [],
+   "reason": "answer_record_missing",
+   "answer": null
+  },
+  {
+   "name": "answer-skips-bad-lines",
+   "rows": "{partial\n{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"tool_result\", \"tool_use_id\": \"toolu_1\", \"content\": \"7\"}]}}\n{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n",
+   "op": "answer",
+   "status": "collected",
+   "records": [
+    {
+     "attachment": {
+      "kind": "env"
+     },
+     "rendered": "Env: x",
+     "renderedRole": "user"
+    }
+   ],
+   "reason": null,
+   "answer": {
+    "role": "user",
+    "content": [
+     {
+      "type": "tool_result",
+      "tool_use_id": "toolu_1",
+      "content": "7"
+     }
+    ]
+   }
+  },
+  {
+   "name": "flush-bookkeeping",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{\"type\": \"api-request-start\"}\n",
+   "op": "flush",
+   "flushed": true
+  },
+  {
+   "name": "flush-requests",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n{\"type\": \"api-request\"}\n{\"type\": \"api-request\"}\n",
+   "op": "flush",
+   "requests": 2,
+   "flushed": true
+  },
+  {
+   "name": "flush-quiet",
+   "rows": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Go\"}]}}\n",
+   "op": "flush",
+   "flushed": true
+  },
+  {
+   "name": "flush-no-prompt",
+   "rows": "{\"type\": \"attachment\", \"attachment\": {\"kind\": \"env\"}, \"rendered\": \"Env: x\", \"renderedRole\": \"user\"}\n",
+   "op": "flush",
+   "flushed": false
+  },
+  {
+   "name": "flush-no-file",
+   "rows": null,
+   "op": "flush",
+   "flushed": false
+  }
+ ],
+ "cleanup": {
+  "layout": {
+   "profile/projects/-w/0f8fad5b-d9cb-469f-a165-70867728950e.jsonl": 1999996400.0,
+   "profile/projects/-w/0f8fad5b-d9cb-469f-a165-70867728950e/tool.txt": 1999996400.0,
+   "profile/projects/-w/11111111-2222-3333-4444-555555555555.jsonl": 1999999940.0,
+   "profile/projects/-w/AAAAAAAA-2222-3333-4444-555555555555.jsonl": 1999996400.0,
+   "profile/projects/-w/not-a-session.jsonl": 1999996400.0,
+   "profile/projects/-w/22222222-2222-3333-4444-555555555555.jsonl": 1999996400.0,
+   "steps/step-old/file.txt": 1999996400.0,
+   "steps/step-fresh/file.txt": 1999999940.0,
+   "steps/step-active/file.txt": 1999996400.0,
+   "cache/claude-cli-nodejs/-w/mcp-logs-x/log.txt": 1999996400.0,
+   "cache/claude-cli-nodejs/-w/other/log.txt": 1999996400.0
+  },
+  "now": 2000000000.0,
+  "session_files": [
+   "projects/-w/0f8fad5b-d9cb-469f-a165-70867728950e",
+   "projects/-w/0f8fad5b-d9cb-469f-a165-70867728950e.jsonl"
+  ],
+  "swept": 4,
+  "after_sweep": [
+   "cache/claude-cli-nodejs/-w/mcp-logs-x/log.txt",
+   "cache/claude-cli-nodejs/-w/other/log.txt",
+   "profile/projects/-w/11111111-2222-3333-4444-555555555555.jsonl",
+   "profile/projects/-w/22222222-2222-3333-4444-555555555555.jsonl",
+   "profile/projects/-w/not-a-session.jsonl",
+   "steps/step-active/file.txt",
+   "steps/step-fresh/file.txt"
+  ],
+  "debug_logs": 1,
+  "outside": false,
+  "deleted": true,
+  "after": [
+   "cache/claude-cli-nodejs/-w/other/log.txt",
+   "profile/projects/-w/11111111-2222-3333-4444-555555555555.jsonl",
+   "profile/projects/-w/not-a-session.jsonl",
+   "steps/step-active/file.txt",
+   "steps/step-fresh/file.txt"
+  ]
+ },
+ "settings": [
+  {
+   "name": "not-installed",
+   "runtime": null,
+   "calls": [
+    [
+     "status",
+     null
+    ],
+    [
+     "login",
+     null
+    ],
+    [
+     "add_model",
+     null
+    ],
+    [
+     "cancel",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": false,
+      "supported": false,
+      "version": null,
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": null,
+      "billing": "unknown",
+      "executable": null,
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone."
+     }
+    },
+    {
+     "error": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone."
+    },
+    {
+     "error": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone."
+    },
+    {
+     "status": {
+      "installed": false,
+      "supported": false,
+      "version": null,
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": null,
+      "billing": "unknown",
+      "executable": null,
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone."
+     }
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "bad-action",
+   "runtime": null,
+   "calls": [
+    [
+     "dance",
+     null
+    ],
+    [
+     5,
+     null
+    ]
+   ],
+   "results": [
+    {
+     "error": "This Claude connection action is unavailable."
+    },
+    {
+     "error": "This Claude connection action is unavailable."
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "bad-options",
+   "runtime": null,
+   "calls": [
+    [
+     "status",
+     {
+      "other": 1
+     }
+    ],
+    [
+     "status",
+     [
+      1
+     ]
+    ],
+    [
+     "status",
+     {
+      "model": 1
+     }
+    ]
+   ],
+   "results": [
+    {
+     "error": "Claude connection options are invalid."
+    },
+    {
+     "error": "Claude connection options are invalid."
+    },
+    {
+     "status": {
+      "installed": false,
+      "supported": false,
+      "version": null,
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": null,
+      "billing": "unknown",
+      "executable": null,
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone."
+     }
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "damaged",
+   "runtime": "damaged",
+   "calls": [
+    [
+     "status",
+     null
+    ],
+    [
+     "logout",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": false,
+      "version": null,
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": null,
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+     }
+    },
+    {
+     "error": "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "signed-out",
+   "runtime": {
+    "signed_in": false,
+    "auth_method": "none",
+    "billing": "unknown"
+   },
+   "calls": [
+    [
+     "status",
+     null
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": null,
+       "max_output_tokens": null
+      }
+     }
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sign in through Sylvia's copy of Claude Code to continue."
+     }
+    },
+    {
+     "error": "Sign in through Claude before adding a runtime model."
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "signed-in",
+   "runtime": {
+    "signed_in": true,
+    "auth_method": "claude.ai",
+    "billing": "subscription"
+   },
+   "calls": [
+    [
+     "status",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": true,
+      "login_pending": false,
+      "auth_method": "claude.ai",
+      "billing": "subscription",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Claude is signed in. Usage is billed directly under the selected account's terms."
+     }
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "login",
+   "runtime": {
+    "signed_in": false,
+    "auth_method": "none",
+    "billing": "unknown"
+   },
+   "calls": [
+    [
+     "login",
+     null
+    ],
+    [
+     "status",
+     null
+    ],
+    [
+     "login",
+     {
+      "account_type": "api"
+     }
+    ],
+    [
+     "cancel",
+     null
+    ],
+    [
+     "status",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": true,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Finish sign-in in Claude's browser window."
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": true,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Finish sign-in in Claude's browser window."
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": true,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Finish sign-in in Claude's browser window."
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sign in through Sylvia's copy of Claude Code to continue."
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sign in through Sylvia's copy of Claude Code to continue."
+     }
+    }
+   ],
+   "launched": [
+    [
+     "release"
+    ],
+    [
+     "login",
+     "login"
+    ]
+   ],
+   "config": null
+  },
+  {
+   "name": "login-console",
+   "runtime": {
+    "signed_in": false,
+    "auth_method": "none",
+    "billing": "unknown"
+   },
+   "calls": [
+    [
+     "login",
+     {
+      "account_type": "api"
+     }
+    ],
+    [
+     "cancel",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": true,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Finish sign-in in Claude's browser window."
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": false,
+      "login_pending": false,
+      "auth_method": "none",
+      "billing": "unknown",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Sign in through Sylvia's copy of Claude Code to continue."
+     }
+    }
+   ],
+   "launched": [
+    [
+     "release"
+    ],
+    [
+     "login",
+     "--console"
+    ]
+   ],
+   "config": null
+  },
+  {
+   "name": "login-bad-account",
+   "runtime": {
+    "signed_in": false,
+    "auth_method": "none",
+    "billing": "unknown"
+   },
+   "calls": [
+    [
+     "login",
+     {
+      "account_type": "team"
+     }
+    ]
+   ],
+   "results": [
+    {
+     "error": "Choose a Claude subscription or Console API account."
+    }
+   ],
+   "launched": [],
+   "config": null
+  },
+  {
+   "name": "logout",
+   "runtime": {
+    "signed_in": true,
+    "auth_method": "claude.ai",
+    "billing": "subscription"
+   },
+   "calls": [
+    [
+     "logout",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": true,
+      "login_pending": false,
+      "auth_method": "claude.ai",
+      "billing": "subscription",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Claude is signed in. Usage is billed directly under the selected account's terms."
+     }
+    }
+   ],
+   "launched": [
+    [
+     "release"
+    ],
+    [
+     "run",
+     "logout"
+    ]
+   ],
+   "config": null
+  },
+  {
+   "name": "add-model",
+   "runtime": {
+    "signed_in": true,
+    "auth_method": "claude.ai",
+    "billing": "subscription"
+   },
+   "calls": [
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": null,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "opus[1m]",
+       "context_window": 200000,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "my-model",
+       "context_window": 512,
+       "max_output_tokens": null
+      }
+     }
+    ]
+   ],
+   "results": [
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": true,
+      "login_pending": false,
+      "auth_method": "claude.ai",
+      "billing": "subscription",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Claude is signed in. Usage is billed directly under the selected account's terms.",
+      "saved_model": "claude-runtime/claude-opus-5-5"
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": true,
+      "login_pending": false,
+      "auth_method": "claude.ai",
+      "billing": "subscription",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Claude is signed in. Usage is billed directly under the selected account's terms.",
+      "saved_model": "claude-runtime/opus[1m]"
+     }
+    },
+    {
+     "status": {
+      "installed": true,
+      "supported": true,
+      "version": "2.1.400",
+      "signed_in": true,
+      "login_pending": false,
+      "auth_method": "claude.ai",
+      "billing": "subscription",
+      "executable": "<executable>",
+      "install": {
+       "state": "idle",
+       "version": null,
+       "received": 0,
+       "total": null,
+       "message": null
+      },
+      "message": "Claude is signed in. Usage is billed directly under the selected account's terms.",
+      "saved_model": "claude-runtime/my-model"
+     }
+    }
+   ],
+   "launched": [],
+   "config": "providers:\n  claude_runtime:\n    enabled: true\n    preset_id: claude_runtime\n    mode: subscription\n    name: Claude (local runtime)\n    base_url: https://claude.ai\n    api_key: ''\n    headers: {}\n    models:\n    - id: claude-opus-5-5\n      name: claude-opus-5-5 (Claude)\n      declared_context_window: null\n      declared_context_source: unknown\n      runtime_context_window: 1000000\n      runtime_context_source: model_catalog\n      configured_context_window: null\n      effective_context_window: 1000000\n      effective_context_source: model_catalog\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-17'\n      configured_context_observed_at: null\n      context_observed_at: '2026-11-17'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 1000000\n      context_window_source: model_catalog\n      max_output_tokens: null\n      declared_max_output_tokens: null\n      configured_output_tokens: null\n      output_allowance_source: runtime_managed\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: claude_code\n      supports_streaming: true\n      supports_tools: true\n    - id: opus[1m]\n      name: opus[1m] (Claude)\n      declared_context_window: null\n      declared_context_source: unknown\n      runtime_context_window: 1000000\n      runtime_context_source: model_catalog\n      configured_context_window: 200000\n      effective_context_window: 200000\n      effective_context_source: user_configured\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-17'\n      configured_context_observed_at: '2026-11-21T08:00:00.123456+00:00'\n      context_observed_at: '2026-11-17'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 200000\n      context_window_source: user_configured\n      max_output_tokens: null\n      declared_max_output_tokens: null\n      configured_output_tokens: null\n      output_allowance_source: runtime_managed\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: claude_code\n      supports_streaming: true\n      supports_tools: true\n    - id: my-model\n      name: my-model (Claude)\n      declared_context_window: null\n      declared_context_source: unknown\n      runtime_context_window: null\n      runtime_context_source: unknown\n      configured_context_window: 512\n      effective_context_window: 512\n      effective_context_source: user_configured\n      declared_context_observed_at: null\n      runtime_context_observed_at: null\n      configured_context_observed_at: '2026-11-21T08:00:00.123456+00:00'\n      context_observed_at: null\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 512\n      context_window_source: user_configured\n      max_output_tokens: null\n      declared_max_output_tokens: null\n      configured_output_tokens: null\n      output_allowance_source: runtime_managed\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: claude_code\n      supports_streaming: true\n      supports_tools: true\n"
+  },
+  {
+   "name": "add-model-refusals",
+   "runtime": {
+    "signed_in": true,
+    "auth_method": "claude.ai",
+    "billing": "subscription"
+   },
+   "calls": [
+    [
+     "add_model",
+     {}
+    ],
+    [
+     "add_model",
+     {
+      "model": "x"
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "x"
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "-bad",
+       "context_window": null,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+       "context_window": null,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "caf\u00e9",
+       "context_window": null,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": 5,
+       "context_window": null,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": null,
+       "max_output_tokens": 10
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": 511,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": true,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": 1500.0,
+       "max_output_tokens": null
+      }
+     }
+    ],
+    [
+     "add_model",
+     {
+      "model": {
+       "id": "claude-opus-5-5",
+       "context_window": 10000001,
+       "max_output_tokens": null
+      }
+     }
+    ]
+   ],
+   "results": [
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "Enter an official Claude model alias or model ID."
+    },
+    {
+     "error": "The Claude runtime manages the response allowance."
+    },
+    {
+     "error": "Enter a positive context limit of at least 512 tokens, or leave it blank."
+    },
+    {
+     "error": "Enter a positive context limit of at least 512 tokens, or leave it blank."
+    },
+    {
+     "error": "Enter a positive context limit of at least 512 tokens, or leave it blank."
+    },
+    {
+     "error": "Enter a positive context limit of at least 512 tokens, or leave it blank."
+    }
+   ],
+   "launched": [],
+   "config": null
+  }
+ ]
+}
