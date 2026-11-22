@@ -45,7 +45,7 @@ const OPERATION_KINDS: [&str; 9] = [
 
 /// What `_campaign_operation_result` returns for one `campaign_operations` row.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum OperationResult {
+pub enum OperationResult {
     Confirmation(CampaignConfirmation),
     Begun(CampaignConstructionBegun),
     Completed(CampaignConstructionCompleted),

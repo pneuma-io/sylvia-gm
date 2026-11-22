@@ -1,8 +1,7 @@
 //! Finishing a guided campaign's construction: completion, Campaign Plan admission, the
 //! Builder-to-DM handoff and the first DM TURN in one transaction, in the store
-//! (`SQLiteAuthorityStore.commit_guided_campaign_start`) and the application owner
-//! (`AuthorityOwner.finalize_campaign_construction`, with `_model_guidance_for_lock` and
-//! `_validate_required_plan_state`).
+//! (`SQLiteAuthorityStore.commit_guided_campaign_start`). The application half
+//! (`AuthorityOwner.finalize_campaign_construction`) is `sylvia_app::authority::guided`.
 //!
 //! The owner handler, `handle_finalize_campaign_construction`, is not ported: before this
 //! commits it runs `_preflight_guided_start`, which needs lane 4's provider session adapter.
@@ -22,32 +21,23 @@
 use crate::actions::{dump, load_payload};
 use crate::campaigns::{current_lock_record, named_rows, Named};
 use crate::error::{schema_identity, StoreError, StoreResult};
-use crate::guided::digest24;
-use crate::handle::StoreHandle;
 use crate::packages::primary_manifest_for_lock;
 use crate::sessions::{append_message, insert_session, read_handoff, read_messages, read_plan, read_session};
 use crate::store::AuthorityStore;
 use rusqlite::params;
 use rusqlite::types::Value;
-use std::collections::BTreeSet;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::authority::{
-    owned_payload, validate_authority_identity, CampaignConstructionCompleted, PackageRole, WriterRole,
-};
-use sylvia_domain::campaign_plan::{
-    validate_campaign_plan, CampaignPlanExpectations, CAMPAIGN_PLAN_FORMAT_VERSION,
-};
+use sylvia_domain::authority::{CampaignConstructionCompleted, WriterRole};
 use sylvia_domain::model_capability::{
-    model_guidance_payload, model_guidance_payload_sha256, ModelCapabilityRegistry, ModelGuidanceDecision,
+    model_guidance_payload, model_guidance_payload_sha256, ModelGuidanceDecision,
 };
-use sylvia_domain::package_library::{campaign_setting_entries, canonical_json_bytes, PackageLockRecord};
-use sylvia_domain::pyops::py_eq;
+use sylvia_domain::package_library::canonical_json_bytes;
 use sylvia_domain::session::{
     builder_dm_handoff_payload_sha256, campaign_plan_payload_sha256, BuilderDMHandoff,
     BuilderDMHandoffFields, BuilderDMHandoffRequest, BuilderEvidence, CampaignPlan, CampaignPlanFields,
-    CampaignPlanRequest, EvidenceSourceKind, PlanAcceptanceStatus, PlanValidationOutcome, SessionMessageKind,
-    SessionRecord, SessionRecordFields, SessionStatus,
+    CampaignPlanRequest, PlanAcceptanceStatus, PlanValidationOutcome, SessionMessageKind, SessionRecord,
+    SessionRecordFields, SessionStatus,
 };
 
 fn coded(kind: &'static str, message: &str) -> StoreError {
@@ -487,274 +477,5 @@ impl AuthorityStore {
                 dm_turn_id: start.dm_turn_id.to_owned(),
             })
         })
-    }
-}
-
-/// `AuthorityOwner.finalize_campaign_construction`'s arguments.
-pub struct FinalizeConstruction<'a> {
-    pub campaign_id: &'a str,
-    pub dm_provider_id: &'a str,
-    pub dm_model_id: &'a str,
-    pub plan_artifact_text: &'a str,
-    pub structured_plan: Option<&'a JsonMap>,
-    pub model_guidance_override: bool,
-}
-
-/// `{"id", "version", "content_sha256"}` of one lock entry, as a structured Plan binds it.
-fn binding(entry: &sylvia_domain::authority::PackageLockEntry) -> Json {
-    let mut value = JsonMap::new();
-    value.insert("id".into(), entry.package_id().into());
-    value.insert("version".into(), entry.version().into());
-    value.insert("content_sha256".into(), entry.sha256().into());
-    Json::Object(value)
-}
-
-impl StoreHandle {
-    /// `AuthorityOwner._model_guidance_for_lock` against the owner's (empty) registry.
-    async fn model_guidance_for_lock(
-        &self,
-        lock_id: &str,
-        model_id: &str,
-        override_accepted: bool,
-    ) -> StoreResult<ModelGuidanceDecision> {
-        let lock_id = lock_id.to_owned();
-        let minimum = self
-            .call(move |store| {
-                Ok(primary_manifest_for_lock(&store.connect()?, &lock_id)?
-                    .map(|manifest| manifest.minimum_model_capability_tier))
-            })
-            .await?;
-        Ok(ModelCapabilityRegistry::empty().assess(model_id, minimum.as_deref(), override_accepted)?)
-    }
-
-    /// `AuthorityOwner.finalize_campaign_construction` for a guided Interview: materialise,
-    /// admit, checkpoint and hand the construction to the DM in one store transaction.
-    pub async fn finalize_campaign_construction(
-        &self,
-        finalize: &FinalizeConstruction<'_>,
-    ) -> StoreResult<(CampaignConstructionCompleted, CampaignPlan, BuilderDMHandoff)> {
-        validate_authority_identity(finalize.campaign_id, "Campaign identity", false)?;
-        validate_authority_identity(finalize.dm_provider_id, "DM provider identity", false)?;
-        validate_authority_identity(finalize.dm_model_id, "DM model identity", false)?;
-        let campaign_id = finalize.campaign_id.to_owned();
-        let basis = {
-            let campaign_id = campaign_id.clone();
-            self.call(move |store| store.campaign_construction_basis(&campaign_id)).await?
-        };
-        let lock: PackageLockRecord = {
-            let campaign_id = campaign_id.clone();
-            self.call(move |store| current_lock_record(&store.connect()?, &campaign_id)).await?
-        };
-        if lock.lock_id != basis.package_lock_id {
-            return Err(rejected("Campaign construction package lock basis has drifted", "command_rejected"));
-        }
-        if !lock.package_lock.entries().is_empty() {
-            let Some(candidate_id) = basis.package_candidate_id.clone() else {
-                return Err(rejected(
-                    "Campaign construction package candidate basis is unavailable",
-                    "command_rejected",
-                ));
-            };
-            let candidate = self.call(move |store| store.package_candidate(&candidate_id)).await?;
-            if candidate.package_lock() != &lock.package_lock
-                || candidate.closure_sha256() != lock.closure_sha256
-            {
-                return Err(rejected(
-                    "Campaign construction package candidate basis is inexact",
-                    "command_rejected",
-                ));
-            }
-        } else if basis.package_candidate_id.is_some() {
-            return Err(rejected(
-                "No-rules construction cannot bind a package candidate",
-                "command_rejected",
-            ));
-        }
-        if sylvia_base::pystr::strip(finalize.plan_artifact_text).is_empty() {
-            return Err(rejected("Campaign plan file is empty or unusable", "command_rejected"));
-        }
-        let plan_content = match finalize.structured_plan {
-            None => {
-                let mut content = JsonMap::new();
-                content.insert("campaign_plan_markdown".into(), finalize.plan_artifact_text.into());
-                content
-            }
-            Some(structured) => {
-                let captured = owned_payload(&Json::Object(structured.clone()))?;
-                let format_ok = captured.get("format_id")
-                    == Some(&Json::String("sylvia-gm-campaign-plan".into()))
-                    && captured
-                        .get("format_version")
-                        .is_some_and(|version| py_eq(version, &Json::from(CAMPAIGN_PLAN_FORMAT_VERSION)));
-                let Some(Json::Object(bindings)) = captured.get("bindings").filter(|_| format_ok) else {
-                    return Err(rejected("Structured Campaign Plan format is invalid", "command_rejected"));
-                };
-                let primary =
-                    lock.package_lock.entries().iter().find(|entry| entry.role() == PackageRole::Primary);
-                let settings = campaign_setting_entries(&lock.package_lock);
-                let expected_ruleset = primary.map_or(Json::Null, binding);
-                let expected_setting = if settings.len() == 1 { binding(settings[0]) } else { Json::Null };
-                let bound = |key: &str| bindings.get(key).cloned().unwrap_or(Json::Null);
-                if !py_eq(&bound("ruleset"), &expected_ruleset)
-                    || !py_eq(&bound("campaign_setting"), &expected_setting)
-                    || !py_eq(&bound("package_closure_sha256"), &Json::from(lock.closure_sha256.as_str()))
-                {
-                    return Err(rejected(
-                        "Structured Campaign Plan package bindings are stale",
-                        "command_rejected",
-                    ));
-                }
-                if primary.is_none() {
-                    let paths = BTreeSet::new();
-                    let knowledge = BTreeSet::new();
-                    validate_campaign_plan(
-                        &Json::Object(captured.clone()),
-                        finalize.plan_artifact_text,
-                        CampaignPlanExpectations {
-                            expected_ruleset: None,
-                            expected_setting: None,
-                            expected_closure_sha256: &lock.closure_sha256,
-                            setting_paths: &paths,
-                            setting_knowledge_ids: &knowledge,
-                        },
-                    )
-                    .map_err(|error| {
-                        rejected(
-                            &format!("No Ruleset Campaign Plan is invalid: {}", error.message()),
-                            "invalid_campaign_plan",
-                        )
-                    })?;
-                }
-                let mut content = JsonMap::new();
-                content.insert(
-                    "artifact_content_sha256".into(),
-                    canonical_sha256(&Json::Object(captured.clone())).into(),
-                );
-                content.insert("campaign_plan".into(), Json::Object(captured));
-                content.insert("campaign_plan_markdown".into(), finalize.plan_artifact_text.into());
-                content.insert("package_lock_id".into(), lock.lock_id.as_str().into());
-                content
-            }
-        };
-        // `_validate_required_plan_state`: nothing to check unless the Ruleset declares required
-        // starting state, which needs lane 1's `plan_state_admission`.
-        {
-            let lock_id = lock.lock_id.clone();
-            let manifest =
-                self.call(move |store| primary_manifest_for_lock(&store.connect()?, &lock_id)).await?;
-            if manifest.is_some_and(|manifest| manifest.state_schemas.iter().any(|schema| schema.required)) {
-                return Err(StoreError::NotPorted(
-                    "required Ruleset starting state (lane 1's plan_state_admission)",
-                ));
-            }
-        }
-        let content_sha256 = canonical_sha256(&Json::Object(plan_content.clone()));
-        let suffix = digest24(finalize.campaign_id);
-        let completion_id = format!("construction-complete-{suffix}");
-        let evidence_id = format!("construction-evidence-{suffix}");
-        let plan_id = format!("campaign-plan-{suffix}");
-        let handoff_id = format!("builder-dm-handoff-{suffix}");
-        let dm_session_id = format!("session-dm-{suffix}");
-        let builder_context = {
-            let session_id = basis.builder_session_id.clone();
-            self.call(move |store| store.session_context(&session_id)).await?
-        };
-        let guided = builder_context.messages.iter().any(|message| {
-            message.kind() == SessionMessageKind::Evidence
-                && message.content().get("kind") == Some(&Json::String("campaign_interview_state".into()))
-        });
-        if !guided {
-            return Err(StoreError::NotPorted("finalizing a construction that is not a guided Interview"));
-        }
-        let guidance = self
-            .model_guidance_for_lock(&lock.lock_id, finalize.dm_model_id, finalize.model_guidance_override)
-            .await?;
-        if !guidance.may_continue() {
-            let code = guidance
-                .fields()
-                .warning_code
-                .clone()
-                .unwrap_or_else(|| "model_guidance_confirmation_required".into());
-            return Err(rejected("Selected model capability guidance requires explicit confirmation", &code));
-        }
-        let mut completion_payload = JsonMap::new();
-        completion_payload.insert("operation_id".into(), completion_id.as_str().into());
-        completion_payload.insert("operation_kind".into(), "complete_campaign_construction".into());
-        completion_payload.insert("campaign_id".into(), finalize.campaign_id.into());
-        completion_payload.insert("canonical_plan".into(), Json::Object(plan_content.clone()));
-        let completion_payload_sha256 = canonical_sha256(&Json::Object(completion_payload.clone()));
-        let completion_revision = basis
-            .begin_revision
-            .checked_add(1)
-            .ok_or_else(|| StoreError::Other("campaign revision overflow".into()))?;
-        let plan_payload_sha256 = campaign_plan_payload_sha256(&CampaignPlanRequest {
-            plan_id: plan_id.clone(),
-            campaign_id: campaign_id.clone(),
-            source_session_id: basis.builder_session_id.clone(),
-            expected_revision: completion_revision,
-            expected_package_lock_id: lock.lock_id.clone(),
-            content_sha256: content_sha256.clone(),
-            content: Json::Object(plan_content.clone()),
-            provenance_evidence_ids: vec![evidence_id.clone()],
-            validation_outcome: PlanValidationOutcome::Valid,
-            acceptance_status: PlanAcceptanceStatus::Accepted,
-        })?;
-        let handoff_payload_sha256 = builder_dm_handoff_payload_sha256(&BuilderDMHandoffRequest {
-            handoff_id: handoff_id.clone(),
-            campaign_id: campaign_id.clone(),
-            builder_session_id: basis.builder_session_id.clone(),
-            dm_session_id: dm_session_id.clone(),
-            dm_provider_id: finalize.dm_provider_id.to_owned(),
-            dm_model_id: finalize.dm_model_id.to_owned(),
-            expected_writer: WriterRole::Builder,
-            expected_revision: completion_revision + 1,
-            expected_package_lock_id: lock.lock_id.clone(),
-            expected_package_candidate_id: basis.package_candidate_id.clone(),
-            plan_id: plan_id.clone(),
-            expected_plan_revision: 1,
-            expected_plan_content_sha256: content_sha256.clone(),
-            completed_turn_id: basis.authority_turn_id.clone(),
-            model_guidance_sha256: model_guidance_payload_sha256(&guidance),
-        });
-        let evidence = BuilderEvidence {
-            evidence_id: evidence_id.clone(),
-            source_kind: EvidenceSourceKind::UserProvided,
-            content_sha256: content_sha256.clone(),
-            source_locator: None,
-            safe_excerpt: "Owner-materialized guided Campaign Plan.".into(),
-            claims: vec!["construction-input".into(), "package-lock".into(), "participant-artifacts".into()],
-        }
-        .validated()?;
-        let dm_turn_id = format!("turn-dm-{suffix}");
-        let (dm_provider_id, dm_model_id) =
-            (finalize.dm_provider_id.to_owned(), finalize.dm_model_id.to_owned());
-        let candidate_id = basis.package_candidate_id.clone();
-        let begin_revision = basis.begin_revision;
-        let started = self
-            .call(move |store| {
-                store.commit_guided_campaign_start(&GuidedStartCommit {
-                    completion_id: &completion_id,
-                    completion_semantic_payload: &completion_payload,
-                    completion_payload_sha256: &completion_payload_sha256,
-                    campaign_id: &campaign_id,
-                    expected_begin_revision: begin_revision,
-                    canonical_plan: &plan_content,
-                    evidence: &evidence,
-                    plan_id: &plan_id,
-                    plan_content_sha256: &content_sha256,
-                    plan_content: &plan_content,
-                    plan_payload_sha256: &plan_payload_sha256,
-                    handoff_id: &handoff_id,
-                    dm_session_id: &dm_session_id,
-                    dm_provider_id: &dm_provider_id,
-                    dm_model_id: &dm_model_id,
-                    expected_package_candidate_id: candidate_id.as_deref(),
-                    model_guidance: &guidance,
-                    handoff_payload_sha256: &handoff_payload_sha256,
-                    dm_turn_id: &dm_turn_id,
-                })
-            })
-            .await?;
-        Ok((started.completed, started.plan, started.handoff))
     }
 }

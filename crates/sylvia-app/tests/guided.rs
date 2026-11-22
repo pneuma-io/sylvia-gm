@@ -7,14 +7,26 @@
 //! `advance_guided_campaign_draft`. Each outcome must be Python's, and the database afterwards
 //! must match Python's. Steps that need an Interview Contribution are refused as not yet ported.
 
-mod common;
-
 use flate2::read::GzDecoder;
 use serde_json::json;
 use std::io::Read;
 use std::path::Path;
+use sylvia_app::authority::guided;
 use sylvia_base::Json;
 use sylvia_store::{AuthorityStore, StoreHandle, StoreResult};
+
+/// A fresh, empty folder under Cargo's per-test temporary root.
+fn work_folder(name: &str) -> std::path::PathBuf {
+    let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join(name);
+    let _ = std::fs::remove_dir_all(&folder);
+    std::fs::create_dir_all(&folder).expect("work folder");
+    folder
+}
+
+fn read_json(relative: &str) -> Json {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(relative);
+    serde_json::from_str(&std::fs::read_to_string(&path).expect("vector file")).expect("valid JSON")
+}
 
 fn gunzip(name: &str) -> Vec<u8> {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("tests/vectors/guided/{name}.sqlite3.gz"));
@@ -45,8 +57,9 @@ fn visible(op: &Json) -> String {
 
 async fn advance(handle: &StoreHandle, op: &Json, campaign_id: &str) -> StoreResult<Json> {
     let campaign = op["campaign_id"].as_str().unwrap_or(campaign_id);
-    let draft = handle
-        .advance_guided_campaign_draft(&sylvia_store::guided_advance::AdvanceAnswer {
+    let draft = guided::advance_guided_campaign_draft(
+        handle,
+        &guided::AdvanceAnswer {
             operation_id: text(op, "operation_id"),
             campaign_id: campaign,
             builder_session_id: text(op, "builder_session_id"),
@@ -54,22 +67,23 @@ async fn advance(handle: &StoreHandle, op: &Json, campaign_id: &str) -> StoreRes
             current_step: text(op, "current_step"),
             visible_answer: &visible(op),
             answer: &op["answer"],
-        })
-        .await?;
+        },
+    )
+    .await?;
     Ok(draft_json(&draft))
 }
 
 async fn run(handle: &StoreHandle, op: &Json) -> StoreResult<Json> {
     assert_eq!(text(op, "op"), "create_guided_campaign_draft");
-    let draft = handle
-        .create_guided_campaign_draft(
-            text(op, "operation_id"),
-            text(op, "display_name"),
-            text(op, "builder_session_id"),
-            text(op, "builder_provider_id"),
-            text(op, "builder_model_id"),
-        )
-        .await?;
+    let draft = guided::create_guided_campaign_draft(
+        handle,
+        text(op, "operation_id"),
+        text(op, "display_name"),
+        text(op, "builder_session_id"),
+        text(op, "builder_provider_id"),
+        text(op, "builder_model_id"),
+    )
+    .await?;
     Ok(json!({
         "campaign_id": draft.campaign_id, "builder_session_id": draft.builder_session_id,
         "current_step": draft.current_step, "construction_revision": draft.construction_revision,
@@ -94,8 +108,8 @@ fn check(label: &str, got: StoreResult<Json>, want: &Json) {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn guided_drafts_match_python() {
-    let record = common::read_json("tests/vectors/guided/draft_runs.json");
-    let folder = common::work_folder("guided-draft-runs");
+    let record = read_json("tests/vectors/guided/draft_runs.json");
+    let folder = work_folder("guided-draft-runs");
     let database = folder.join("authority.sqlite3");
     std::fs::write(&database, gunzip("seed")).unwrap();
     let path = database.clone();
@@ -120,8 +134,8 @@ async fn guided_drafts_match_python() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn guided_interview_answers_match_python() {
-    let record = common::read_json("tests/vectors/guided/advance_runs.json");
-    let folder = common::work_folder("guided-advance-runs");
+    let record = read_json("tests/vectors/guided/advance_runs.json");
+    let folder = work_folder("guided-advance-runs");
     let database = folder.join("authority.sqlite3");
     std::fs::write(&database, gunzip("seed")).unwrap();
     let path = database.clone();
@@ -204,8 +218,9 @@ async fn start_step(
         }
         "bind_guided_campaign_basis" => {
             let lock = sylvia_domain::authority::PackageLock::new(Vec::new()).unwrap();
-            let confirmation = handle
-                .bind_guided_campaign_basis(&sylvia_store::guided_start::BindRequest {
+            let confirmation = guided::bind_guided_campaign_basis(
+                handle,
+                &guided::BindRequest {
                     operation_id: text(op, "operation_id"),
                     campaign_id: &campaign,
                     display_name: text(op, "display_name"),
@@ -213,28 +228,29 @@ async fn start_step(
                     turn_id: text(op, "turn_id"),
                     builder_session_id: text(op, "builder_session_id"),
                     package_candidate_id: None,
-                })
-                .await?;
+                },
+            )
+            .await?;
             Ok(
                 json!({"campaign_id": confirmation.campaign_id, "resulting_revision": confirmation.resulting_revision}),
             )
         }
         "begin_campaign_construction" => {
-            let begun = handle
-                .begin_campaign_construction(
-                    text(op, "operation_id"),
-                    &campaign,
-                    text(op, "lane"),
-                    op["expected_revision"].as_i64().unwrap(),
-                    &op["canonical_input"],
-                )
-                .await?;
+            let begun = guided::begin_campaign_construction(
+                handle,
+                text(op, "operation_id"),
+                &campaign,
+                text(op, "lane"),
+                op["expected_revision"].as_i64().unwrap(),
+                &op["canonical_input"],
+            )
+            .await?;
             Ok(
                 json!({"campaign_id": begun.campaign_id, "lane": begun.lane, "resulting_revision": begun.resulting_revision}),
             )
         }
         "campaign_construction_basis" => {
-            Ok(basis_json(&handle.campaign_construction_basis(&campaign).await?))
+            Ok(basis_json(&guided::campaign_construction_basis(handle, &campaign).await?))
         }
         other => panic!("unknown operation {other}"),
     }
@@ -242,8 +258,8 @@ async fn start_step(
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn guided_start_matches_python() {
-    let record = common::read_json("tests/vectors/guided/start_runs.json");
-    let folder = common::work_folder("guided-start-runs");
+    let record = read_json("tests/vectors/guided/start_runs.json");
+    let folder = work_folder("guided-start-runs");
     let database = folder.join("authority.sqlite3");
     std::fs::write(&database, gunzip("seed")).unwrap();
     let path = database.clone();
@@ -277,16 +293,18 @@ async fn finalize_step(
     }
     let key = op["campaign"].as_str().unwrap();
     let campaign = campaigns.get(key).cloned().unwrap_or_else(|| key.to_owned());
-    let (completed, plan, handoff) = handle
-        .finalize_campaign_construction(&sylvia_store::guided_finalize::FinalizeConstruction {
+    let (completed, plan, handoff) = guided::finalize_campaign_construction(
+        handle,
+        &guided::FinalizeConstruction {
             campaign_id: &campaign,
             dm_provider_id: text(op, "dm_provider_id"),
             dm_model_id: text(op, "dm_model_id"),
             plan_artifact_text: text(op, "plan_artifact_text"),
             structured_plan: op["structured_plan"].as_object(),
             model_guidance_override: op["model_guidance_override"].as_bool().unwrap(),
-        })
-        .await?;
+        },
+    )
+    .await?;
     let plan_fields = plan.fields();
     let handoff_fields = handoff.fields();
     Ok(json!({
@@ -305,8 +323,8 @@ async fn finalize_step(
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn guided_finalize_matches_python() {
-    let record = common::read_json("tests/vectors/guided/finalize_runs.json");
-    let folder = common::work_folder("guided-finalize-runs");
+    let record = read_json("tests/vectors/guided/finalize_runs.json");
+    let folder = work_folder("guided-finalize-runs");
     let database = folder.join("authority.sqlite3");
     std::fs::write(&database, gunzip("seed")).unwrap();
     let path = database.clone();

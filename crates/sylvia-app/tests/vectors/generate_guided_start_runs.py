@@ -4,7 +4,7 @@
 Run with the snapshot's own interpreter, from the repository root, after
 `generate_guided_draft_runs.py` (its new profile is the base):
 
-    .venv/Scripts/python.exe -B crates/sylvia-store/tests/vectors/generate_guided_start_runs.py
+    .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_guided_start_runs.py
 
 It makes a No Ruleset Draft and answers its Interview to the review, then binds and begins it as
 `handle_start_guided_campaign` does: the basis read before anything exists, a binding refused

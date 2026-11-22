@@ -1,8 +1,6 @@
-//! The guided campaign interview: Python's `create_guided_campaign_draft`, in the store
-//! (`SQLiteAuthorityStore`) and in the application owner (`AuthorityOwner`).
-//!
-//! Later commands of the interview (`advance_guided_campaign_draft`, `start_guided_campaign`)
-//! join this module as they are ported.
+//! The guided campaign interview's first store operation: `SQLiteAuthorityStore`'s
+//! `create_guided_campaign_draft`. The application half (`AuthorityOwner`) is
+//! `sylvia_app::authority::guided`.
 
 use crate::campaigns::{named_rows, parse, Named};
 use crate::error::{StoreError, StoreResult};
@@ -11,11 +9,9 @@ use crate::store::AuthorityStore;
 use rusqlite::Connection;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::authority::{
-    validate_authority_identity, CampaignRecord, GuidedCampaignDraft, LifecycleState, WriterRole,
-};
+use sylvia_domain::authority::{CampaignRecord, GuidedCampaignDraft, LifecycleState, WriterRole};
 use sylvia_domain::pyops::py_eq;
-use sylvia_domain::session::{SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus};
+use sylvia_domain::session::{SessionMessageKind, SessionRecord};
 
 /// `_UNBOUND_CAMPAIGN_LOCK_HASH`.
 const UNBOUND_CAMPAIGN_LOCK_HASH: &str = "unbound";
@@ -151,56 +147,4 @@ impl AuthorityStore {
 fn verify_written(connection: &Connection) -> StoreResult<()> {
     crate::stored::verify_stored_authority(connection)?;
     crate::packages::verify_package_authority(connection)
-}
-
-/// `CommandRejected("Guided Campaign Draft authority is invalid", code=...)`.
-fn invalid_draft_identity() -> StoreError {
-    crate::actions::rejected("Guided Campaign Draft authority is invalid", "invalid_authority_identity")
-}
-
-impl crate::handle::StoreHandle {
-    /// `AuthorityOwner.create_guided_campaign_draft`: the identity checks, the Draft's
-    /// campaign identity from the operation, its Builder session and campaign records, then
-    /// the store's create. `_operation()` only refuses work once the owner is closing (see
-    /// [`Self::rename_builder_chat`](crate::handle::StoreHandle::rename_builder_chat)).
-    pub async fn create_guided_campaign_draft(
-        &self,
-        operation_id: &str,
-        display_name: &str,
-        builder_session_id: &str,
-        builder_provider_id: &str,
-        builder_model_id: &str,
-    ) -> StoreResult<GuidedCampaignDraft> {
-        for (value, label) in [
-            (operation_id, "Campaign operation identity"),
-            (display_name, "Campaign display name"),
-            (builder_session_id, "Builder session identity"),
-            (builder_provider_id, "Builder provider identity"),
-            (builder_model_id, "Builder model identity"),
-        ] {
-            if validate_authority_identity(value, label, false).is_err() {
-                return Err(invalid_draft_identity());
-            }
-        }
-        let campaign_id = format!("campaign-draft-{}", digest24(operation_id));
-        let session = SessionRecord::new(SessionRecordFields {
-            session_id: builder_session_id.to_owned(),
-            campaign_id: Some(campaign_id.clone()),
-            role: WriterRole::Builder,
-            provider_id: builder_provider_id.to_owned(),
-            model_id: builder_model_id.to_owned(),
-            status: SessionStatus::Active,
-            selected_skill: Some("BUILD CAMPAIGN PLAN".into()),
-            ..SessionRecordFields::default()
-        })?;
-        let campaign = CampaignRecord {
-            campaign_id,
-            display_name: display_name.to_owned(),
-            lifecycle: LifecycleState::Active,
-            writer: WriterRole::Builder,
-            revision: 0,
-        };
-        let operation_id = operation_id.to_owned();
-        self.call(move |store| store.create_guided_campaign_draft(&operation_id, &campaign, &session)).await
-    }
 }

@@ -43,6 +43,7 @@ pub use error::{StoreError, StoreResult};
 pub use handle::{StoreHandle, StoreThread};
 pub use lanes::{LaneGuard, LaneHold, LaneRegistry, OwnerLanes};
 pub use store::AuthorityStore;
+pub use stored_construction::OperationResult;
 
 /// The SQLite library this crate is built with (`sqlite3.sqlite_version` in Python).
 pub fn sqlite_version() -> &'static str {

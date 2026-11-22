@@ -906,10 +906,14 @@ dependencies = [
 name = "sylvia-app"
 version = "0.4.1"
 dependencies = [
+ "flate2",
  "serde_json",
  "sylvia-base",
+ "sylvia-compare",
  "sylvia-domain",
  "sylvia-engine",
+ "sylvia-store",
+ "tokio",
 ]
 
 [[package]]
@@ -993,6 +997,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sylvia-agent",
+ "sylvia-app",
  "sylvia-base",
  "sylvia-domain",
  "sylvia-provider",

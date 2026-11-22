@@ -1,70 +1,17 @@
 //! `advance_guided_campaign_draft`: one Campaign Interview answer, the next question and the new
-//! resume state, in the store (`SQLiteAuthorityStore`) and the application owner
-//! (`AuthorityOwner`, with `_next_guided_question` and `_guided_answer_value`).
-//!
-//! Not yet ported, so refused rather than run differently: answering a step that needs an
-//! Interview Contribution (`_guided_contribution_object`, which reads package sidecars). That is
-//! the `plan` step and the three `*_contribution` steps. A No Ruleset interview, which the model
-//! sessions take, never reaches them.
+//! resume state, in the store (`SQLiteAuthorityStore`). The application half (`AuthorityOwner`,
+//! with `_next_guided_question` and `_guided_answer_value`, and the steps it does not run yet) is
+//! `sylvia_app::authority::guided`.
 
 use crate::campaigns::{json_str, named_rows, Named};
 use crate::error::{schema_identity, StoreError, StoreResult};
 use crate::guided::digest24;
-use crate::handle::StoreHandle;
 use crate::sessions::{append_message, message_from_row, read_session};
 use crate::store::AuthorityStore;
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::authority::{owned_payload, validate_authority_identity, GuidedCampaignDraft, WriterRole};
+use sylvia_domain::authority::{owned_payload, GuidedCampaignDraft, WriterRole};
 use sylvia_domain::pyops::py_eq;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind, SessionStatus};
-
-/// `_GUIDED_CAMPAIGN_STEPS`.
-pub const GUIDED_CAMPAIGN_STEPS: [&str; 11] = [
-    "ruleset",
-    "setting",
-    "plan",
-    "ruleset_contribution",
-    "setting_contribution",
-    "plan_contribution",
-    "name",
-    "participants",
-    "boundaries_preferences",
-    "specific_requests",
-    "review",
-];
-
-/// `_GUIDED_CONTRIBUTION_STEPS` (its keys).
-const GUIDED_CONTRIBUTION_STEPS: [&str; 3] =
-    ["ruleset_contribution", "setting_contribution", "plan_contribution"];
-
-/// `_MAX_GUIDED_VISIBLE_ANSWER_CHARS`.
-const MAX_GUIDED_VISIBLE_ANSWER_CHARS: usize = 131_072;
-
-/// `_GUIDED_CAMPAIGN_QUESTIONS`.
-fn guided_question(step: &str) -> &'static str {
-    match step {
-        "ruleset" => "Choose a Ruleset for this campaign, or choose No Ruleset for narrative-only play.",
-        "ruleset_contribution" => "Answer the selected Ruleset's campaign setup questions.",
-        "setting" => "Choose a compatible Campaign Setting.",
-        "setting_contribution" => "Answer the selected Campaign Setting's setup questions.",
-        "plan" => "Choose a compatible Campaign Plan.",
-        "plan_contribution" => "Answer the selected Campaign Plan's setup questions.",
-        "name" => "Review or edit the suggested campaign name.",
-        "participants" => "Choose or create the participants required by this campaign.",
-        "boundaries_preferences" => "State any hard Boundaries and softer Preferences.",
-        "specific_requests" => "Add any Specific Requests, or choose No additional requests.",
-        "review" => "Review the spoiler-free campaign summary before choosing Ready to Begin.",
-        other => unreachable!("no question for step {other}"),
-    }
-}
-
-fn step_index(step: &str) -> usize {
-    GUIDED_CAMPAIGN_STEPS.iter().position(|item| *item == step).expect("a known step")
-}
-
-fn needs_contribution(step: &str) -> bool {
-    step == "plan" || GUIDED_CONTRIBUTION_STEPS.contains(&step)
-}
 
 fn coded(kind: &'static str, message: &str) -> StoreError {
     StoreError::Coded(crate::error::authority_coded(kind, message))
@@ -276,144 +223,4 @@ impl AuthorityStore {
 
 fn object(pairs: Vec<(&str, Json)>) -> JsonMap {
     pairs.into_iter().map(|(key, value)| (key.to_owned(), value)).collect()
-}
-
-/// The application's arguments: `AuthorityOwner.advance_guided_campaign_draft`'s keywords.
-pub struct AdvanceAnswer<'a> {
-    pub operation_id: &'a str,
-    pub campaign_id: &'a str,
-    pub builder_session_id: &'a str,
-    pub expected_construction_revision: i64,
-    pub current_step: &'a str,
-    pub visible_answer: &'a str,
-    pub answer: &'a Json,
-}
-
-impl StoreHandle {
-    /// `AuthorityOwner._guided_answer_value(session_id, step)`: one accepted Interview answer from
-    /// its canonical User message, as the latest Interview State names it.
-    pub(crate) async fn guided_answer_value(
-        &self,
-        session_id: &str,
-        step: &str,
-    ) -> StoreResult<Option<JsonMap>> {
-        let session = session_id.to_owned();
-        let context = self.call(move |store| store.session_context(&session)).await?;
-        let Some(state) = context.messages.iter().rev().find(|message| {
-            message.kind() == SessionMessageKind::Evidence
-                && message.content().get("kind") == Some(&Json::String("campaign_interview_state".into()))
-        }) else {
-            return Ok(None);
-        };
-        let Some(Json::Object(references)) = state.content().get("answers") else { return Ok(None) };
-        let Some(Json::String(message_id)) = references.get(step) else { return Ok(None) };
-        let message = context
-            .messages
-            .iter()
-            .find(|item| item.message_id() == message_id && item.kind() == SessionMessageKind::User);
-        Ok(match message.and_then(|message| message.content().get("interview_value")) {
-            Some(Json::Object(value)) => Some(value.clone()),
-            _ => None,
-        })
-    }
-
-    /// `AuthorityOwner._next_guided_question`: No Ruleset skips the content steps; other steps
-    /// follow in order. Steps that need an Interview Contribution are not ported yet.
-    async fn next_guided_question(
-        &self,
-        session_id: &str,
-        current_step: &str,
-        answer: &JsonMap,
-    ) -> StoreResult<(&'static str, &'static str)> {
-        let ruleset_answer = if current_step == "ruleset" {
-            Some(answer.clone())
-        } else {
-            self.guided_answer_value(session_id, "ruleset").await?
-        };
-        if let Some(ruleset) = &ruleset_answer {
-            if matches!(ruleset.get("candidate_id"), None | Some(Json::Null)) {
-                if current_step == "ruleset" {
-                    return Ok(("name", guided_question("name")));
-                }
-                if current_step == "name" {
-                    return Ok(("boundaries_preferences", guided_question("boundaries_preferences")));
-                }
-            }
-        }
-        if needs_contribution(current_step) {
-            return Err(StoreError::NotPorted(
-                "Campaign Interview Contribution steps (_guided_contribution_object)",
-            ));
-        }
-        let step = GUIDED_CAMPAIGN_STEPS[step_index(current_step) + 1];
-        Ok((step, guided_question(step)))
-    }
-
-    /// `AuthorityOwner.advance_guided_campaign_draft`: `_operation()` and the campaign's work,
-    /// the answer checks, the next question, then the store's advance.
-    pub async fn advance_guided_campaign_draft(
-        &self,
-        advance: &AdvanceAnswer<'_>,
-    ) -> StoreResult<GuidedCampaignDraft> {
-        let campaign_id = advance.campaign_id.to_owned();
-        let _work = self
-            .lanes()
-            .work
-            .begin(&campaign_id, || {
-                let campaign_id = campaign_id.clone();
-                async move { self.call(move |store| store.campaign_lifecycle(&campaign_id)).await }
-            })
-            .await?;
-        let invalid = || rejected("Guided Campaign answer is invalid", "invalid_campaign_interview_answer");
-        for (value, label) in [
-            (advance.operation_id, "Campaign operation identity"),
-            (advance.campaign_id, "Campaign identity"),
-            (advance.builder_session_id, "Builder session identity"),
-        ] {
-            if validate_authority_identity(value, label, false).is_err() {
-                return Err(invalid());
-            }
-        }
-        let answerable = &GUIDED_CAMPAIGN_STEPS[..GUIDED_CAMPAIGN_STEPS.len() - 1];
-        if !answerable.contains(&advance.current_step)
-            || advance.expected_construction_revision < 0
-            || sylvia_base::pystr::strip(advance.visible_answer).is_empty()
-            || advance.visible_answer.chars().count() > MAX_GUIDED_VISIBLE_ANSWER_CHARS
-        {
-            return Err(invalid());
-        }
-        let captured = owned_payload(advance.answer).map_err(|_| invalid())?;
-        if GUIDED_CONTRIBUTION_STEPS.contains(&advance.current_step) {
-            return Err(StoreError::NotPorted(
-                "Campaign Interview Contribution steps (_guided_contribution_object)",
-            ));
-        }
-        let index = step_index(advance.current_step);
-        let (next_step, next_question) =
-            self.next_guided_question(advance.builder_session_id, advance.current_step, &captured).await?;
-        let preceding: Vec<&'static str> = GUIDED_CAMPAIGN_STEPS[..index].to_vec();
-        let (operation_id, campaign_id, session_id, current_step, visible_answer) = (
-            advance.operation_id.to_owned(),
-            advance.campaign_id.to_owned(),
-            advance.builder_session_id.to_owned(),
-            advance.current_step.to_owned(),
-            advance.visible_answer.to_owned(),
-        );
-        let expected = advance.expected_construction_revision;
-        self.call(move |store| {
-            store.advance_guided_campaign_draft(&AdvanceDraft {
-                operation_id: &operation_id,
-                campaign_id: &campaign_id,
-                builder_session_id: &session_id,
-                expected_construction_revision: expected,
-                current_step: &current_step,
-                visible_answer: &visible_answer,
-                answer: &captured,
-                preceding_steps: &preceding,
-                next_step,
-                next_question,
-            })
-        })
-        .await
-    }
 }
