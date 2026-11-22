@@ -31,7 +31,7 @@
     "id": "s1",
     "ok": true,
     "result": {
-     "diagnostic_id": "7a7e7e7cf3ac4151a2610d42095ade2a"
+     "diagnostic_id": "0cffb8fb02cb4b4d90a4ada5f7dabfab"
     }
    }
   },
@@ -49,7 +49,7 @@
      "code": "command_rejected",
      "message": "Unknown app failure category.",
      "diagnostics": [],
-     "diagnostic_id": "5b7f6dd66b58410b9629927031494999"
+     "diagnostic_id": "8d934f48797f4e5aa16bb29221b1cba2"
     }
    }
   },
@@ -66,7 +66,7 @@
      "code": "command_rejected",
      "message": "Unsupported draft storage request",
      "diagnostics": [],
-     "diagnostic_id": "5e00113cc4384021a6c00a188f62b3e7"
+     "diagnostic_id": "02116202cc7c48858b7f002758187ec9"
     }
    }
   },
@@ -86,7 +86,7 @@
      "code": "invalid_drafts",
      "message": "Unsent drafts could not be saved safely.",
      "diagnostics": [],
-     "diagnostic_id": "83056890f28c4afabcec11f0cc300979"
+     "diagnostic_id": "dcf68e1392a44df3bc665ba12c652669"
     }
    }
   },
@@ -101,7 +101,7 @@
      "code": "command_rejected",
      "message": "Unsupported owner method: renderer",
      "diagnostics": [],
-     "diagnostic_id": "d5815a6730724a3da57f63bd8bf031ef"
+     "diagnostic_id": "a4b868fa82f645ba858d02a720da4306"
     }
    }
   },
@@ -116,7 +116,7 @@
      "code": "command_rejected",
      "message": "preview_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "2d642c3622cd4df89be2c8fdb6b460da"
+     "diagnostic_id": "c208c7dba7634ef4a8364dbb45e54408"
     }
    }
   },
@@ -132,9 +132,9 @@
     "id": "s7",
     "ok": true,
     "result": {
-     "preview_id": "a93e55db614d45d0b21c5819f1177237",
-     "content": "{\n  \"format\": \"sylvia-local-report-v1\",\n  \"application\": {\n    \"version\": \"0.4.1\",\n    \"build_version\": \"0.4.1\",\n    \"runtime\": \"source\",\n    \"platform\": {\n      \"os\": \"windows\",\n      \"major\": 10,\n      \"minor\": 0,\n      \"build\": 26300\n    }\n  },\n  \"retention\": {\n    \"max_storage_bytes\": 1048576,\n    \"max_age_days\": 7\n  },\n  \"storage_status\": \"available\",\n  \"report_kind\": \"app_problem\",\n  \"player_entered\": {\n    \"reproduction_steps\": \"Open the app, then close it \\u00e9\",\n    \"feedback\": \"Fine\"\n  },\n  \"diagnostics\": [\n    {\n      \"format\": 1,\n      \"event\": \"owner_started\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"1aea3eeb788d4cfe963bcdded986e969\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"handshake_status\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"9a3e690f00584d7aa034125e5acacb22\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"renderer_error\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"internal_error\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"7a7e7e7cf3ac4151a2610d42095ade2a\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 2\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"2ffff8d4c66c42efbaff3008178f8593\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"5b7f6dd66b58410b9629927031494999\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"5e00113cc4384021a6c00a188f62b3e7\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"other_rejection\",\n      \"error_type\": \"OtherError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"83056890f28c4afabcec11f0cc300979\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"d5815a6730724a3da57f63bd8bf031ef\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"2d642c3622cd4df89be2c8fdb6b460da\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    }\n  ]\n}\n",
-     "bytes": 6422
+     "preview_id": "c0ba452dcd9942a784202b4b60b55212",
+     "content": "{\n  \"format\": \"sylvia-local-report-v1\",\n  \"application\": {\n    \"version\": \"0.4.1\",\n    \"build_version\": \"0.4.1\",\n    \"runtime\": \"source\",\n    \"platform\": {\n      \"os\": \"windows\",\n      \"major\": 10,\n      \"minor\": 0,\n      \"build\": 26300\n    }\n  },\n  \"retention\": {\n    \"max_storage_bytes\": 1048576,\n    \"max_age_days\": 7\n  },\n  \"storage_status\": \"available\",\n  \"report_kind\": \"app_problem\",\n  \"player_entered\": {\n    \"reproduction_steps\": \"Open the app, then close it \\u00e9\",\n    \"feedback\": \"Fine\"\n  },\n  \"diagnostics\": [\n    {\n      \"format\": 1,\n      \"event\": \"owner_started\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"00b456b95e6c492dadc119ea3d8dc9c9\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"handshake_status\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"f7fcae9ab6bb4544af1590793edbfa97\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"renderer_error\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"internal_error\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"0cffb8fb02cb4b4d90a4ada5f7dabfab\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 2\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"9ef3bd4655664285a7e5e7989259fa4c\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"8d934f48797f4e5aa16bb29221b1cba2\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"02116202cc7c48858b7f002758187ec9\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"other_rejection\",\n      \"error_type\": \"OtherError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"dcf68e1392a44df3bc665ba12c652669\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"a4b868fa82f645ba858d02a720da4306\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"c208c7dba7634ef4a8364dbb45e54408\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    }\n  ]\n}\n",
+     "bytes": 6430
     }
    }
   },
@@ -142,7 +142,7 @@
    "id": "s8",
    "method": "cancel_local_report",
    "params": {
-    "preview_id": "a93e55db614d45d0b21c5819f1177237"
+    "preview_id": "c0ba452dcd9942a784202b4b60b55212"
    },
    "reply": {
     "id": "s8",
@@ -156,7 +156,7 @@
    "id": "s9",
    "method": "save_local_report",
    "params": {
-    "preview_id": "a93e55db614d45d0b21c5819f1177237",
+    "preview_id": "c0ba452dcd9942a784202b4b60b55212",
     "destination_path": "<work>\\data/../saved-report.json"
    },
    "reply": {
@@ -166,7 +166,7 @@
      "code": "command_rejected",
      "message": "Preview this report again before saving.",
      "diagnostics": [],
-     "diagnostic_id": "eff1366a6e9f481481004702596b1efb"
+     "diagnostic_id": "fedae567e06a4e7984486e4ff8850705"
     }
    }
   },
@@ -180,9 +180,9 @@
     "id": "s10",
     "ok": true,
     "result": {
-     "preview_id": "ee5dc207be48475b9cae7711c599e50b",
-     "content": "{\n  \"format\": \"sylvia-local-report-v1\",\n  \"application\": {\n    \"version\": \"0.4.1\",\n    \"build_version\": \"0.4.1\",\n    \"runtime\": \"source\",\n    \"platform\": {\n      \"os\": \"windows\",\n      \"major\": 10,\n      \"minor\": 0,\n      \"build\": 26300\n    }\n  },\n  \"retention\": {\n    \"max_storage_bytes\": 1048576,\n    \"max_age_days\": 7\n  },\n  \"storage_status\": \"available\",\n  \"report_kind\": \"model_feedback\",\n  \"player_entered\": {\n    \"reproduction_steps\": \"\",\n    \"feedback\": \"\"\n  },\n  \"diagnostics\": [\n    {\n      \"format\": 1,\n      \"event\": \"owner_started\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"1aea3eeb788d4cfe963bcdded986e969\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"handshake_status\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"9a3e690f00584d7aa034125e5acacb22\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"renderer_error\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"internal_error\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"7a7e7e7cf3ac4151a2610d42095ade2a\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 2\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"2ffff8d4c66c42efbaff3008178f8593\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"5b7f6dd66b58410b9629927031494999\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"5e00113cc4384021a6c00a188f62b3e7\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"other_rejection\",\n      \"error_type\": \"OtherError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"83056890f28c4afabcec11f0cc300979\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"d5815a6730724a3da57f63bd8bf031ef\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"2d642c3622cd4df89be2c8fdb6b460da\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"preview_local_report\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"6fb3a62ab44942c7bfabdaefa4ea1c20\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"e7afae485d6b46af9b87e7a60caa4503\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"save_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"eff1366a6e9f481481004702596b1efb\",\n      \"session\": \"42952a8b0bd14164ad28f1df76e6372d\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    }\n  ]\n}\n",
-     "bytes": 8343
+     "preview_id": "167c318d050846fd8b1f17b391069f8b",
+     "content": "{\n  \"format\": \"sylvia-local-report-v1\",\n  \"application\": {\n    \"version\": \"0.4.1\",\n    \"build_version\": \"0.4.1\",\n    \"runtime\": \"source\",\n    \"platform\": {\n      \"os\": \"windows\",\n      \"major\": 10,\n      \"minor\": 0,\n      \"build\": 26300\n    }\n  },\n  \"retention\": {\n    \"max_storage_bytes\": 1048576,\n    \"max_age_days\": 7\n  },\n  \"storage_status\": \"available\",\n  \"report_kind\": \"model_feedback\",\n  \"player_entered\": {\n    \"reproduction_steps\": \"\",\n    \"feedback\": \"\"\n  },\n  \"diagnostics\": [\n    {\n      \"format\": 1,\n      \"event\": \"owner_started\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"00b456b95e6c492dadc119ea3d8dc9c9\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"handshake_status\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"f7fcae9ab6bb4544af1590793edbfa97\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"renderer_error\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"internal_error\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"0cffb8fb02cb4b4d90a4ada5f7dabfab\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 2\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"9ef3bd4655664285a7e5e7989259fa4c\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"record_local_fault\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"8d934f48797f4e5aa16bb29221b1cba2\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"02116202cc7c48858b7f002758187ec9\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"other_operation\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"other_rejection\",\n      \"error_type\": \"OtherError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"dcf68e1392a44df3bc665ba12c652669\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"renderer\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"a4b868fa82f645ba858d02a720da4306\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"OwnerProtocolError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"c208c7dba7634ef4a8364dbb45e54408\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"preview_local_report\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"60b904a7bd4545bba73a18b650386fd8\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"cancel_local_report\",\n      \"outcome\": \"ok\",\n      \"severity\": \"info\",\n      \"error_code\": \"none\",\n      \"error_type\": \"none\",\n      \"duration_ms\": <duration>,\n      \"id\": \"7c66b38f2e55486dbfca507e64a4b053\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    },\n    {\n      \"format\": 1,\n      \"event\": \"command_completed\",\n      \"app_version\": \"0.4.1\",\n      \"build_version\": \"0.4.1\",\n      \"runtime\": \"source\",\n      \"platform\": {\n        \"os\": \"windows\",\n        \"major\": 10,\n        \"minor\": 0,\n        \"build\": 26300\n      },\n      \"operation\": \"save_local_report\",\n      \"outcome\": \"error\",\n      \"severity\": \"error\",\n      \"error_code\": \"command_rejected\",\n      \"error_type\": \"ValueError\",\n      \"duration_ms\": <duration>,\n      \"id\": \"fedae567e06a4e7984486e4ff8850705\",\n      \"session\": \"fb142c8aa58547d097d509ec2feeb08b\",\n      \"first_seen\": <time>,\n      \"last_seen\": <time>,\n      \"count\": 1\n    }\n  ]\n}\n",
+     "bytes": 8351
     }
    }
   },
@@ -190,7 +190,7 @@
    "id": "s11",
    "method": "save_local_report",
    "params": {
-    "preview_id": "ee5dc207be48475b9cae7711c599e50b",
+    "preview_id": "167c318d050846fd8b1f17b391069f8b",
     "destination_path": "saved-report.json"
    },
    "reply": {
@@ -200,7 +200,7 @@
      "code": "command_rejected",
      "message": "Choose a local report file.",
      "diagnostics": [],
-     "diagnostic_id": "2d064e863ce44d1393c175fe6e677b1f"
+     "diagnostic_id": "ebf2b13a3df646c59f82265c861ee61b"
     }
    }
   },
@@ -208,7 +208,7 @@
    "id": "s12",
    "method": "save_local_report",
    "params": {
-    "preview_id": "ee5dc207be48475b9cae7711c599e50b",
+    "preview_id": "167c318d050846fd8b1f17b391069f8b",
     "destination_path": "<work>\\data/../saved-report.json"
    },
    "reply": {
@@ -216,7 +216,7 @@
     "ok": true,
     "result": {
      "status": "saved",
-     "bytes": 8343
+     "bytes": 8351
     }
    }
   },
@@ -224,7 +224,7 @@
    "id": "s13",
    "method": "save_local_report",
    "params": {
-    "preview_id": "ee5dc207be48475b9cae7711c599e50b",
+    "preview_id": "167c318d050846fd8b1f17b391069f8b",
     "destination_path": "<work>\\data/../saved-report.json"
    },
    "reply": {
@@ -234,7 +234,7 @@
      "code": "command_rejected",
      "message": "Preview this report again before saving.",
      "diagnostics": [],
-     "diagnostic_id": "eff1366a6e9f481481004702596b1efb"
+     "diagnostic_id": "fedae567e06a4e7984486e4ff8850705"
     }
    }
   },
@@ -251,7 +251,7 @@
      "code": "command_rejected",
      "message": "Choose an app problem or model feedback.",
      "diagnostics": [],
-     "diagnostic_id": "d1a337c06bd1406db525871cde92af5b"
+     "diagnostic_id": "d48dbd4dafc94f0385be4d8b619347b5"
     }
    }
   },
@@ -269,7 +269,7 @@
      "code": "command_rejected",
      "message": "Report fields must each contain at most 4,000 characters.",
      "diagnostics": [],
-     "diagnostic_id": "d1a337c06bd1406db525871cde92af5b"
+     "diagnostic_id": "d48dbd4dafc94f0385be4d8b619347b5"
     }
    }
   },
@@ -287,7 +287,7 @@
      "code": "command_rejected",
      "message": "App failure count must be an integer from 1 to 65535.",
      "diagnostics": [],
-     "diagnostic_id": "5b7f6dd66b58410b9629927031494999"
+     "diagnostic_id": "8d934f48797f4e5aa16bb29221b1cba2"
     }
    }
   },
@@ -305,7 +305,7 @@
      "code": "command_rejected",
      "message": "App failure count must be an integer from 1 to 65535.",
      "diagnostics": [],
-     "diagnostic_id": "5b7f6dd66b58410b9629927031494999"
+     "diagnostic_id": "8d934f48797f4e5aa16bb29221b1cba2"
     }
    }
   },
@@ -414,7 +414,7 @@
      "code": "invalid_operation",
      "message": "The update operation is no longer available.",
      "diagnostics": [],
-     "diagnostic_id": "83056890f28c4afabcec11f0cc300979"
+     "diagnostic_id": "dcf68e1392a44df3bc665ba12c652669"
     }
    }
   },
@@ -447,7 +447,7 @@
      "code": "invalid_drafts",
      "message": "Unsent question fields could not be saved.",
      "diagnostics": [],
-     "diagnostic_id": "83056890f28c4afabcec11f0cc300979"
+     "diagnostic_id": "dcf68e1392a44df3bc665ba12c652669"
     }
    }
   },
@@ -462,7 +462,7 @@
      "code": "command_rejected",
      "message": "Unsupported draft storage request",
      "diagnostics": [],
-     "diagnostic_id": "5e00113cc4384021a6c00a188f62b3e7"
+     "diagnostic_id": "02116202cc7c48858b7f002758187ec9"
     }
    }
   },
@@ -570,7 +570,7 @@
      "code": "command_rejected",
      "message": "Unsupported owner method: no_such_method",
      "diagnostics": [],
-     "diagnostic_id": "5e00113cc4384021a6c00a188f62b3e7"
+     "diagnostic_id": "02116202cc7c48858b7f002758187ec9"
     }
    }
   },
@@ -1893,7 +1893,7 @@
      "data"
     ],
     "row_count": 340,
-    "rows_sha256": "91c83b6c3e68c3cb2b8156817856f85c863d16a16fe734a9d396ff2853fffe2d"
+    "rows_sha256": "f0113c482e72258ce20978081d5f078ca9cb59d9aa302540ff6f85fbe8417426"
    },
    "package_blobs": {
     "columns": [
@@ -1902,7 +1902,7 @@
      "chunk_count"
     ],
     "row_count": 58,
-    "rows_sha256": "56613b4296720c1e8538ff940dbb15dd4ba73a9e482eebc730d7df601d266cce"
+    "rows_sha256": "6d7535d027e97acd3d2c76000c5c061a55c852a2026443602451f41233ab6640"
    },
    "package_candidate_memberships": {
     "columns": [
@@ -1913,7 +1913,7 @@
      "content_sha256"
     ],
     "row_count": 4,
-    "rows_sha256": "4477e67430f4dc74db3f77efe0c0f39c79a4a93df34ada141507a0edd3507620"
+    "rows_sha256": "58eaa87feb44c31b4dc1399f61b83e42198b748f9f04f5d6c73667af4698f5f4"
    },
    "package_candidates": {
     "columns": [
@@ -1924,7 +1924,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "77b8e2c621e2d98f9d9d12f4cb26d391635daca8af8cd40198986767287464ff"
+    "rows_sha256": "e588f60245a8165d7ceaf674c0ffbe995a9327247fa72a56d8b5d030de145d98"
    },
    "package_capabilities": {
     "columns": [
@@ -1935,7 +1935,7 @@
      "capability"
     ],
     "row_count": 16,
-    "rows_sha256": "c0450e66a23c3c24c59dbe45c9f1a24e4768d510c6605ddd541932e0d6459dd9"
+    "rows_sha256": "9f5dd33222cf1a28e67edca38173cee77a43857b21b762e52de4768a07e3f933"
    },
    "package_dependencies": {
     "columns": [
@@ -1950,7 +1950,7 @@
      "dependency_namespace"
     ],
     "row_count": 2,
-    "rows_sha256": "bf18bc76f9b453b493bdd38f51c5f6f379d25b539457f7682c0463c6807ad271"
+    "rows_sha256": "4791c9cf7f670910482d82ff027cdcc278cea553dccc8da94582c8966388d476"
    },
    "package_exact_dependencies": {
     "columns": [
@@ -1965,7 +1965,7 @@
      "dependency_content_sha256"
     ],
     "row_count": 2,
-    "rows_sha256": "a929a83916e69246ce1ef5562ce30d3394fd8355eb0f3f738b22c77ba005a74d"
+    "rows_sha256": "9790656ce276bde405f979a15fece98767f9530640ae80c56d756b4ac5e167ce"
    },
    "package_manifest_files": {
     "columns": [
@@ -1978,7 +1978,7 @@
      "blob_sha256"
     ],
     "row_count": 64,
-    "rows_sha256": "63e1d1e09ae9fd60d3ae83a354962ea9481b252e1bd7d95f2ae1aebdf650ba4e"
+    "rows_sha256": "3ce331b435a9cfde280a1e376b08b3239b650c35945d7649aa61f2cadefbfd7d"
    },
    "package_manifests": {
     "columns": [
@@ -1993,7 +1993,7 @@
      "status"
     ],
     "row_count": 4,
-    "rows_sha256": "3849847c06092a20698ea3b42394bf26eaa86ee15b242737693860093b0cc550"
+    "rows_sha256": "ae7965cded66d43313612398a56f3545d33517cd05d0b53d4e04014a4e24b8b7"
    },
    "package_participant_artifacts": {
     "columns": [
@@ -2007,7 +2007,7 @@
      "schema_json"
     ],
     "row_count": 2,
-    "rows_sha256": "0e5374268ea87b0223dd6c01986525b975dca32a07d567ed11dfa35654ff72a5"
+    "rows_sha256": "c1724be2acaaa0276c2f10637e0ae586fcecd1acaaa9177f90c2a614734f5a55"
    },
    "package_prompt_fragments": {
     "columns": [
@@ -2019,7 +2019,7 @@
      "capability"
     ],
     "row_count": 2,
-    "rows_sha256": "5efa8ff3cffd697be4ccd71c7055bf2ce73dab863e74220a7fccecbb2cbea5dd"
+    "rows_sha256": "20ab355e2fe5b9cc7abe4c7acd9bfb1595e60a9bd80aff22009827684ab8c142"
    },
    "package_read_leases": {
     "columns": [
@@ -2045,7 +2045,7 @@
      "report_json"
     ],
     "row_count": 2,
-    "rows_sha256": "b159525926dfa8e06a108bdbf5b6b77ac7e838b14af892614ace05c859992fc9"
+    "rows_sha256": "8175431babc001d77e69a5aa91441547a341d1b29fead24afec62b0445739655"
    },
    "package_staging_chunks": {
     "columns": [
@@ -2060,7 +2060,7 @@
      "data"
     ],
     "row_count": 346,
-    "rows_sha256": "e3d5135ae40ee575cbc496a5a78e753b66f1664e3ad6a77154d529aee4c24b8b"
+    "rows_sha256": "2964f0e2f69e7c5eed25bae4bc05f025f2ecf7078bc977751f30a220b66f5fb5"
    },
    "package_tools": {
     "columns": [
@@ -2075,8 +2075,8 @@
      "turn_statuses_json",
      "writers_json"
     ],
-    "row_count": 185,
-    "rows_sha256": "6ce8ed8e9de9d3fa4aefd6b460230fa91c89880447d7d8e955ff3173af133899"
+    "row_count": 186,
+    "rows_sha256": "e73aab0c4600c545fc906efdaebeda84afb7547f6e1a976646cd55ea44aa7f18"
    },
    "package_ui_surfaces": {
     "columns": [
@@ -2088,7 +2088,7 @@
      "capability"
     ],
     "row_count": 6,
-    "rows_sha256": "a6257d357aa611de48871306d245af2ddbb9828a90bfbb32f0920105a77e1c47"
+    "rows_sha256": "54dd046542e7758f8f3e70f764ee2b2fdeba6d54504d125549d973978905f36d"
    },
    "packages": {
     "columns": [
@@ -2098,7 +2098,7 @@
      "capabilities_json"
     ],
     "row_count": 4,
-    "rows_sha256": "2122817326a575ee841922d2262bf4bcd3e9e7c1e9ec7dc01469051a6967fd8f"
+    "rows_sha256": "aa7abb7d6f585e980ceb446957c81e9a9e4d2843bcdeabaa98b3af44887e92f2"
    },
    "participant_adaptations": {
     "columns": [
@@ -2349,10 +2349,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "1aea3eeb788d4cfe963bcdded986e969",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233061.468103,
-     "last_seen": 1795233061.468103,
+     "id": "00b456b95e6c492dadc119ea3d8dc9c9",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327779.6428058,
+     "last_seen": 1795327779.6428058,
      "count": 1
     },
     {
@@ -2372,11 +2372,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 16.0,
-     "id": "9a3e690f00584d7aa034125e5acacb22",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.098993,
-     "last_seen": 1795233082.1300375,
+     "duration_ms": 31.0,
+     "id": "f7fcae9ab6bb4544af1590793edbfa97",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8407,
+     "last_seen": 1795327814.9180086,
      "count": 2
     },
     {
@@ -2397,10 +2397,10 @@
      "error_code": "internal_error",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "7a7e7e7cf3ac4151a2610d42095ade2a",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.098993,
-     "last_seen": 1795233082.098993,
+     "id": "0cffb8fb02cb4b4d90a4ada5f7dabfab",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8417006,
+     "last_seen": 1795327814.8417006,
      "count": 2
     },
     {
@@ -2421,10 +2421,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "2ffff8d4c66c42efbaff3008178f8593",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.098993,
-     "last_seen": 1795233082.098993,
+     "id": "9ef3bd4655664285a7e5e7989259fa4c",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8417006,
+     "last_seen": 1795327814.8417006,
      "count": 1
     },
     {
@@ -2445,10 +2445,10 @@
      "error_code": "command_rejected",
      "error_type": "ValueError",
      "duration_ms": 0.0,
-     "id": "5b7f6dd66b58410b9629927031494999",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.098993,
-     "last_seen": 1795233082.1101978,
+     "id": "8d934f48797f4e5aa16bb29221b1cba2",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8417006,
+     "last_seen": 1795327814.8592691,
      "count": 3
     },
     {
@@ -2469,10 +2469,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "5e00113cc4384021a6c00a188f62b3e7",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.10257,
-     "last_seen": 1795233082.1300375,
+     "id": "02116202cc7c48858b7f002758187ec9",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8477104,
+     "last_seen": 1795327814.9180086,
      "count": 3
     },
     {
@@ -2493,10 +2493,10 @@
      "error_code": "other_rejection",
      "error_type": "OtherError",
      "duration_ms": 0.0,
-     "id": "83056890f28c4afabcec11f0cc300979",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1035783,
-     "last_seen": 1795233082.1280162,
+     "id": "dcf68e1392a44df3bc665ba12c652669",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8507447,
+     "last_seen": 1795327814.9004726,
      "count": 3
     },
     {
@@ -2517,10 +2517,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "d5815a6730724a3da57f63bd8bf031ef",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1035783,
-     "last_seen": 1795233082.1035783,
+     "id": "a4b868fa82f645ba858d02a720da4306",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8517454,
+     "last_seen": 1795327814.8517454,
      "count": 1
     },
     {
@@ -2541,10 +2541,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "2d642c3622cd4df89be2c8fdb6b460da",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1035783,
-     "last_seen": 1795233082.1035783,
+     "id": "c208c7dba7634ef4a8364dbb45e54408",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8517454,
+     "last_seen": 1795327814.8517454,
      "count": 1
     },
     {
@@ -2565,10 +2565,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "6fb3a62ab44942c7bfabdaefa4ea1c20",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1050866,
-     "last_seen": 1795233082.1056032,
+     "id": "60b904a7bd4545bba73a18b650386fd8",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8527577,
+     "last_seen": 1795327814.8537574,
      "count": 2
     },
     {
@@ -2589,10 +2589,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "e7afae485d6b46af9b87e7a60caa4503",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1050866,
-     "last_seen": 1795233082.1050866,
+     "id": "7c66b38f2e55486dbfca507e64a4b053",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8527577,
+     "last_seen": 1795327814.8527577,
      "count": 1
     },
     {
@@ -2613,10 +2613,10 @@
      "error_code": "command_rejected",
      "error_type": "ValueError",
      "duration_ms": 0.0,
-     "id": "eff1366a6e9f481481004702596b1efb",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1050866,
-     "last_seen": 1795233082.1091986,
+     "id": "fedae567e06a4e7984486e4ff8850705",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8537574,
+     "last_seen": 1795327814.8577578,
      "count": 2
     },
     {
@@ -2637,10 +2637,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "2d064e863ce44d1393c175fe6e677b1f",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1056032,
-     "last_seen": 1795233082.1056032,
+     "id": "ebf2b13a3df646c59f82265c861ee61b",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8547568,
+     "last_seen": 1795327814.8547568,
      "count": 1
     },
     {
@@ -2660,11 +2660,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 16.0,
-     "id": "5e0ef607acd8465097147fcd40e6294a",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1091986,
-     "last_seen": 1795233082.1091986,
+     "duration_ms": 15.0,
+     "id": "89c5bd9d0a9445a3b0f867cf531aaa77",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8577578,
+     "last_seen": 1795327814.8577578,
      "count": 1
     },
     {
@@ -2685,10 +2685,10 @@
      "error_code": "command_rejected",
      "error_type": "ValueError",
      "duration_ms": 0.0,
-     "id": "d1a337c06bd1406db525871cde92af5b",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1091986,
-     "last_seen": 1795233082.1091986,
+     "id": "d48dbd4dafc94f0385be4d8b619347b5",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8577578,
+     "last_seen": 1795327814.8577578,
      "count": 2
     },
     {
@@ -2708,11 +2708,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 15.0,
-     "id": "944085ae001f409baeffff3cd8591c63",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1112885,
-     "last_seen": 1795233082.1249225,
+     "duration_ms": 16.0,
+     "id": "0911c081148a4c3c81a1de8161d2c444",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.8622942,
+     "last_seen": 1795327814.8924232,
      "count": 3
     },
     {
@@ -2733,10 +2733,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "c875b9837e044ced85ebdf0de7835a29",
-     "session": "42952a8b0bd14164ad28f1df76e6372d",
-     "first_seen": 1795233082.1300375,
-     "last_seen": 1795233082.1300375,
+     "id": "0335b7e1a95141b0802bf098f368ec92",
+     "session": "fb142c8aa58547d097d509ec2feeb08b",
+     "first_seen": 1795327814.9180086,
+     "last_seen": 1795327814.9180086,
      "count": 1
     }
    ]
