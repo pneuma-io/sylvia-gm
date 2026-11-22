@@ -195,14 +195,14 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_chat.py:49` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` | |
 | `config/_credential_protection.py:83` | `<module>` | re.compile; plain | `_TEMPORARY_NAME = re.compile(r"\.credential-key-[0-9a-f]{16}\.tmp")` | |
 | `config/_resolver.py:18` | `<module>` | re.compile; NEEDS fancy-regex: lookbehind | `_VAR_PATTERN = re.compile(r"(?<!\$)\$\{([A-Za-z_][A-Za-z0-9_]*)\}")` | |
-| `config/claude_settings.py:178` | `claude_settings_action` | re.fullmatch; plain | `or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._\[\]-]{0,127}", model["id"])` | |
+| `config/claude_settings.py:178` | `claude_settings_action` | re.fullmatch; plain | `or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._\[\]-]{0,127}", model["id"])` | `sylvia-provider` kept_vectors |
 | `config/provider_settings.py:44` | `<module>` | re.compile; NEEDS fancy-regex: atomic/possessive | `_HEADER_NAME = re.compile(r"^[A-Za-z0-9!#$%&'*+.^_'\|~-]{1,80}$")` | |
 | `config/provider_settings.py:45` | `<module>` | re.compile; plain | `_PROFILE_ID = re.compile(r"^[a-z][a-z0-9_]{0,63}$")` | |
 | `config/provider_settings.py:47` | `<module>` | re.compile; plain | `_NATIVE_SETTING = re.compile(r"[a-z][a-z0-9_-]{0,31}")` | |
 | `provider/_claude.py:118` | `prepare_request` | re.fullmatch; plain | `if not isinstance(name, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) is None:` | |
 | `provider/_claude_install.py:188` | `_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", text.strip())` | `sylvia-provider` install_vectors |
 | `provider/_claude_install.py:334` | `ClaudeInstaller._install` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", checksum) is None` | `sylvia-provider` install_vectors |
-| `provider/_claude_native.py:38` | `<module>` | re.compile; plain | `_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)` | |
+| `provider/_claude_native.py:38` | `<module>` | re.compile; plain | `_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)` | `sylvia-provider` kept_vectors |
 | `provider/_claude_runtime.py:238` | `find_runtime` | re.fullmatch; plain | `if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():` | `sylvia-provider` runtime_process |
 | `provider/_claude_runtime.py:260` | `runtime_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)` | `sylvia-provider` runtime_process |
 | `provider/_model_facts.py:145` | `claude_model_id` | re.sub; plain | `bare = re.sub(r"[-@]\d{8}$", "", model_id.strip().casefold().rsplit("/", 1)[-1])` | |
