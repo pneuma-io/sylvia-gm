@@ -10,6 +10,7 @@ use sylvia_domain::authority::{
     CampaignConstructionBasis, CampaignDisplaySnapshot, CampaignSnapshot, CanonicalReplay,
     ModelDecisionBoundary,
 };
+use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::SessionContext;
 use sylvia_provider::BoxFuture;
 
@@ -79,4 +80,27 @@ pub trait OpeningReads: Send + Sync {
         &'a self,
         campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<CampaignConstructionBasis>>;
+}
+
+/// The owner calls a GM turn makes beyond the request assembly's reads (`TurnOwner`, agreed
+/// with lane 3): each is the owner's whole operation, locks included. The turn-loop PRs add
+/// their calls as they land; one not yet ported answers `rust_port_pending`.
+pub trait TurnOwner: OpeningReads {
+    /// `model_decision_boundary(campaign_id)`: the current actor or side decision scope.
+    fn model_decision_boundary<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<ModelDecisionBoundary>>>;
+
+    /// `campaign_preparation_boundary(campaign_id)`: the required starting choices, if any.
+    fn campaign_preparation_boundary<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<ModelDecisionBoundary>>>;
+
+    /// `current_package_lock(campaign_id)`.
+    fn current_package_lock<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<PackageLockRecord>>;
+
+    /// `record_admin_full_audit(payload)`: kept only while Admin Full Audit is on.
+    fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()>;
 }

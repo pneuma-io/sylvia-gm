@@ -1,0 +1,174 @@
+[
+ {
+  "package_id": "sylvia.application",
+  "package_version": "1",
+  "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "name": "read_action_sequence_controls",
+  "capability": "action_sequence.read_action_sequence_controls",
+  "input_schema": {
+   "type": "object",
+   "properties": {},
+   "required": [],
+   "additionalProperties": false
+  },
+  "parameter_derivations": null,
+  "description": "READ-ONLY: discover the campaign's actual declared panel sources, bindings, selection data and current player-control scope. Each selection_contract lists the exact required selection keys and current map_revision or graph_revision context values. Copy context values exactly and fill other keys from player intent. A displayed actor is never a control grant. Manual busy flags remain truthful while this GM operation owns work; the shared queue service separately validates the owning operation and each actor.",
+  "category": "reference",
+  "model_behavior": "optional"
+ },
+ {
+  "package_id": "sylvia.application",
+  "package_version": "1",
+  "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "name": "read_action_sequence",
+  "capability": "action_sequence.read_action_sequence",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "sequence_id": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  },
+  "parameter_derivations": null,
+  "description": "READ-ONLY: inspect one saved executable action queue, or the latest queue when its ID is omitted. Pending intentions differ from committed receipts awaiting narration. Use the saved version and exact committed action IDs; never recreate a committed step.",
+  "category": "reference",
+  "model_behavior": "optional"
+ },
+ {
+  "package_id": "sylvia.application",
+  "package_version": "1",
+  "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "name": "compose_action_sequence",
+  "capability": "action_sequence.compose_action_sequence",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "sequence_id": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "expected_revision": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "expected_version": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "steps": {
+     "type": "array",
+     "minItems": 0,
+     "maxItems": 32,
+     "items": {
+      "type": "object",
+      "properties": {
+       "step_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 256
+       },
+       "source": {
+        "type": "object",
+        "properties": {
+         "kind": {
+          "type": "string",
+          "enum": [
+           "panel",
+           "result_card"
+          ]
+         },
+         "surface_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+         },
+         "action_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+         },
+         "button_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7
+         }
+        },
+        "required": [
+         "kind",
+         "action_id"
+        ],
+        "additionalProperties": false,
+        "description": "An exact declared panel source, or an exact saved result-card button source."
+       },
+       "selection": {
+        "type": [
+         "object",
+         "null"
+        ],
+        "additionalProperties": true,
+        "description": "Use exactly the discovered control's selection_contract.required_keys; copy its context values, including map_revision, without alteration. Fill remaining keys from player intent. Never supply an owner-derived path."
+       }
+      },
+      "required": [
+       "step_id",
+       "source",
+       "selection"
+      ],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "sequence_id",
+    "expected_revision",
+    "steps"
+   ],
+   "additionalProperties": false
+  },
+  "parameter_derivations": null,
+  "description": "Compose or edit ordered intentions using only exact sources discovered by read_action_sequence_controls, including each control's exact selection_contract keys and context values. The same authoritative player controls validate them. Editing spends no resources and cannot undo committed mechanics. Preserve every existing committed step. An empty intention list removes only pending intentions. Later steps are revalidated after earlier outcomes and may become illegal. expected_version defaults to zero for a new queue. Composition returns the exact queue and confirmation for inspection.",
+  "category": "action_sequence",
+  "model_behavior": "optional"
+ },
+ {
+  "package_id": "sylvia.application",
+  "package_version": "1",
+  "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "name": "execute_action_sequence",
+  "capability": "action_sequence.execute_action_sequence",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "sequence_id": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    },
+    "expected_version": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "confirmation": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 256
+    }
+   },
+   "required": [
+    "sequence_id",
+    "expected_version"
+   ],
+   "additionalProperties": false
+  },
+  "parameter_derivations": null,
+  "description": "Execute the inspected saved queue through the same authoritative action pipeline. When the player explicitly requested that exact sequence, use the confirmation returned by compose/read; otherwise inspect and obtain the player's decision before executing. Only currently controlled, eligible actors may act. Stop on failed, stale or paused results; do not resume remaining intentions without a fresh player direction. Never implicitly End Turn, expand actor control, reroll or repeat a committed step. Narrate the committed outcomes together afterward through the ordinary Campaign File disposition.",
+  "category": "action_sequence",
+  "model_behavior": "optional"
+ }
+]
