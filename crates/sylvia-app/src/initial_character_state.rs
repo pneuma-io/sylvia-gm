@@ -1,20 +1,24 @@
-//! `application/initial_character_state.py`, its admission half: the checks a Ruleset's
-//! initial character declaration must pass before its package is installed, and the authored
-//! input schema.
+//! `application/initial_character_state.py`: materialize and verify Ruleset-declared initial
+//! character state, and the admission checks for its declaration.
 //!
-//! Ported: `validate_initial_character_contract` (`_calculation_contract`,
-//! `_schema_declares_path`, `_guard_expression`, with `character_rules::validate_character_rules`)
-//! and `initial_character_input_schema` (`_authored_schema`). Not yet ported: the
-//! materialize and verify functions, which run the character rules through
-//! `prepare_character_rules` and `verify_character_rules`, waiting on lane 2's effect executor.
+//! The calculations evaluate with lane 2's expression evaluator. `_RequiredInputs` is the
+//! evaluator's `required_inputs` flag: a missing key under the creation inputs raises
+//! `FieldNotFoundError` instead of giving `None`. Only a `merge(...)` result differs, which Python
+//! leaves a plain dict: differences row NEXT (merge results in creation calculations).
 
-use crate::character_rules::validate_character_rules;
+use crate::character_rules::{
+    prepare_character_rules, runtime_json, validate_character_rules, verify_character_rules,
+};
 use sylvia_base::{pyjson, Json, JsonMap};
 use sylvia_domain::error::{DomainError, DomainResult, RulesetDiagnostic};
 use sylvia_domain::package_library::canonical_json_bytes;
+use sylvia_domain::package_library::ParticipantArtifactDeclaration;
 use sylvia_domain::pyops::py_eq;
-use sylvia_domain::schema_admission::validate_json_schema;
+use sylvia_domain::schema_admission::{validate_json_schema, validate_parameters};
 use sylvia_engine::expr::parser::{parse_expression, Node};
+use sylvia_engine::expr::{
+    evaluate, Dict, EvalContext, EvalError, ExecutionBudget, ExpressionErrorKind, Value,
+};
 
 const MAX_CALCULATIONS: usize = 128;
 const READABLE_ROOTS: [&str; 5] = ["participant", "state", "setting_data", "rules", "campaign_state"];
@@ -123,7 +127,7 @@ fn expression_nodes(node: &Node) -> Vec<&Node> {
 
 /// `_guard_expression(expression, path=...)`: the existing expression language with only
 /// creation input roots readable.
-fn guard_expression(expression: &str, path: &str) -> DomainResult<()> {
+fn guard_expression(expression: &str, path: &str) -> DomainResult<Node> {
     let root = parse_expression(expression).map_err(|_| {
         rejection(
             "character_initial_state_expression_invalid",
@@ -147,7 +151,7 @@ fn guard_expression(expression: &str, path: &str) -> DomainResult<()> {
         }
         pending.extend(expression_nodes(node));
     }
-    Ok(())
+    Ok(root)
 }
 
 /// `_calculation_contract(schema, calculations)`: the admitted `(field, value, condition)`
@@ -302,4 +306,361 @@ pub fn initial_character_input_schema(
         }
     }
     Ok(result)
+}
+
+type Calculation = (String, String, Option<String>);
+
+/// `json.loads(canonical_json_bytes(value))`: the value in canonical (sorted) key order.
+fn canonical(value: &Json) -> Json {
+    let text = String::from_utf8(canonical_json_bytes(value)).expect("canonical JSON is UTF-8");
+    pyjson::loads(&text).expect("canonical JSON reads back")
+}
+
+fn canonical_object(value: &Json) -> JsonMap {
+    match canonical(value) {
+        Json::Object(map) => map,
+        _ => JsonMap::new(),
+    }
+}
+
+/// `_reads_root(node, name)`: whether any field read starts at `name`.
+fn reads_root(node: &Node, name: &str) -> bool {
+    let mut pending = vec![node];
+    while let Some(current) = pending.pop() {
+        if matches!(current, Node::Field(segments) if segments[0].0 == name) {
+            return true;
+        }
+        pending.extend(expression_nodes(current));
+    }
+    false
+}
+
+/// `_read_path(root, path)`, with `None` for Python's missing sentinel; `_path_present` is
+/// whether it is `Some`.
+fn read_path<'a>(root: &'a JsonMap, path: &str) -> Option<&'a Json> {
+    let mut parts = path.split('.');
+    let mut current = root.get(parts.next()?)?;
+    for part in parts {
+        current = current.as_object()?.get(part)?;
+    }
+    Some(current)
+}
+
+/// `_remove_path(root, path)`.
+fn remove_path(root: &mut JsonMap, path: &str) {
+    let parts: Vec<&str> = path.split('.').collect();
+    let mut current = root;
+    for part in &parts[..parts.len() - 1] {
+        match current.get_mut(*part) {
+            Some(Json::Object(next)) => current = next,
+            _ => return,
+        }
+    }
+    current.shift_remove(parts[parts.len() - 1]);
+}
+
+/// `_set_path(root, path, value)`: missing or null parents become objects.
+fn set_path(root: &mut JsonMap, path: &str, value: Json) -> DomainResult<()> {
+    let parts: Vec<&str> = path.split('.').collect();
+    let mut current = root;
+    for part in &parts[..parts.len() - 1] {
+        let existing = current.entry(part.to_string()).or_insert(Json::Null);
+        if existing.is_null() {
+            *existing = Json::Object(JsonMap::new());
+        }
+        let Json::Object(next) = existing else {
+            return Err(rejection(
+                "character_initial_state_calculation_failed",
+                "A calculated field's parent is not an object.",
+                &format!("entity_state.{path}"),
+                None,
+            ));
+        };
+        current = next;
+    }
+    current.insert(parts[parts.len() - 1].to_owned(), value);
+    Ok(())
+}
+
+/// How `_calculate` treats an exception: `CommandRejected` passes through, a missing input and
+/// the calculation classes (`ExpressionError`, `TypeError`, `ValueError`, `ArithmeticError`)
+/// become rejections, anything else escapes.
+enum Failure {
+    Missing,
+    Calculation,
+    Escape,
+}
+
+fn failure_of(class: &str, is_value_error: bool) -> Failure {
+    match class {
+        "FieldNotFoundError" => Failure::Missing,
+        "ExpressionError" | "TypeError" | "ValueError" | "ZeroDivisionError" | "OverflowError"
+        | "FloatingPointError" | "ArithmeticError" => Failure::Calculation,
+        _ if is_value_error => Failure::Calculation,
+        _ => Failure::Escape,
+    }
+}
+
+fn calculation_error(failure: Failure, path: &str, escape: DomainError) -> DomainError {
+    match failure {
+        Failure::Missing => rejection(
+            "character_initial_state_input_missing",
+            "A required expression input is unavailable.",
+            path,
+            Some("Supply the missing authored input or correct the calculation."),
+        ),
+        Failure::Calculation => rejection(
+            "character_initial_state_calculation_failed",
+            "The Ruleset could not calculate the declared starting value.",
+            path,
+            Some("Supply every required input and correct the calculation."),
+        ),
+        Failure::Escape => escape,
+    }
+}
+
+fn is_command_rejected(error: &DomainError) -> bool {
+    matches!(error.python_class(), "CommandRejected" | "MechanicsRejected")
+}
+
+/// A character-rules check inside a calculation: `CommandRejected` as it is, other classes as
+/// `_calculate` catches them.
+fn rules_error(error: DomainError, path: &str) -> DomainError {
+    if is_command_rejected(&error) {
+        return error;
+    }
+    let failure = failure_of(error.python_class(), error.is_value_error());
+    calculation_error(failure, path, error)
+}
+
+fn eval_error(error: EvalError, path: &str) -> DomainError {
+    let escape = DomainError::uncaught(error.class_name(), error.to_string());
+    let failure = match &error {
+        EvalError::Expression(inner) if inner.kind == ExpressionErrorKind::FieldNotFound => Failure::Missing,
+        EvalError::Expression(_) => Failure::Calculation,
+        EvalError::Py(inner) => failure_of(inner.kind.name(), false),
+    };
+    calculation_error(failure, path, escape)
+}
+
+/// `_calculate(...)`: apply each calculation in order to a copy of the authored state.
+fn calculate(
+    participant: &Json,
+    authored_state: &Json,
+    calculations: &[Calculation],
+    setting_data: Option<&Json>,
+    validation: Option<&Json>,
+    campaign_state: Option<&Json>,
+) -> DomainResult<JsonMap> {
+    let mut state = canonical_object(authored_state);
+    let participant_inputs = Value::from_json(&canonical(participant));
+    let empty = Json::Object(JsonMap::new());
+    let setting_inputs = Value::from_json(&canonical(setting_data.unwrap_or(&empty)));
+    let campaign_inputs = Value::from_json(&canonical(campaign_state.unwrap_or(&empty)));
+    let check_rules = prepare_character_rules(participant, validation, setting_data, campaign_state)?;
+    let (vars, entities, none) = (Dict::new(), Dict::new(), Value::None);
+    for (index, (field, expression, condition)) in calculations.iter().enumerate() {
+        let base = format!("initial_state_calculations[{index}]");
+        let value_path = format!("{base}.set.value");
+        let condition_path = format!("{base}.condition");
+        let state_json = Json::Object(state.clone());
+        let mut params = Dict::new();
+        params.insert("participant".into(), participant_inputs.clone());
+        params.insert("state".into(), Value::from_json(&state_json));
+        params.insert("setting_data".into(), setting_inputs.clone());
+        params.insert("rules".into(), Value::dict(Dict::new()));
+        params.insert("campaign_state".into(), campaign_inputs.clone());
+        let rules = |path: &str| -> DomainResult<Value> {
+            let results = check_rules.check(&state_json).map_err(|error| rules_error(error, path))?;
+            Ok(Value::from_json(&Json::Object(results)))
+        };
+        let budget = ExecutionBudget::default();
+        let evaluate_in = |node: &Node, params: &Dict, path: &str| -> DomainResult<Value> {
+            let context = EvalContext {
+                params,
+                vars: &vars,
+                entities: &entities,
+                combat_state: &none,
+                ruleset_config: &none,
+                definitions: &none,
+                budget: Some(&budget),
+                required_inputs: true,
+            };
+            evaluate(node, &context).map_err(|error| eval_error(error, path))
+        };
+        if let Some(condition) = condition {
+            let node = guard_expression(condition, &condition_path)?;
+            if reads_root(&node, "rules") {
+                params.insert("rules".into(), rules(&condition_path)?);
+            }
+            if !evaluate_in(&node, &params, &condition_path)?.truthy() {
+                continue;
+            }
+        }
+        let node = guard_expression(expression, &value_path)?;
+        if reads_root(&node, "rules") && !params["rules"].truthy() {
+            params.insert("rules".into(), rules(&value_path)?);
+        }
+        let value = evaluate_in(&node, &params, &value_path)?;
+        let finite = || {
+            rejection(
+                "character_initial_state_calculation_failed",
+                "A calculation must produce finite JSON data within the Character File limit.",
+                &value_path,
+                None,
+            )
+        };
+        let json = runtime_json(&value).map_err(|_| finite())?;
+        if canonical_json_bytes(&json).len() > 256 * 1024 {
+            return Err(finite());
+        }
+        set_path(&mut state, field, canonical(&json))?;
+    }
+    Ok(state)
+}
+
+/// `validate_parameters(value, schema)` with `CommandRejected` reported as `_schema_rejection`.
+fn validate_state(value: &JsonMap, schema: &JsonMap) -> DomainResult<()> {
+    validate_parameters(value, schema).map_err(|error| {
+        if is_command_rejected(&error) {
+            schema_rejection(&error)
+        } else {
+            error
+        }
+    })
+}
+
+/// The declaration's validation program; JSON `null` is Python's `None`.
+fn program(validation: Option<&Json>) -> Option<&Json> {
+    validation.filter(|value| !value.is_null())
+}
+
+/// `materialize_initial_character_state(participant, authored_state, ...)`: calculate
+/// Ruleset-owned outputs and validate one complete initial state.
+pub fn materialize_initial_character_state(
+    participant: &Json,
+    authored_state: &JsonMap,
+    entity_state_schema: &JsonMap,
+    initial_state_calculations: &[Json],
+    initial_state_validation: Option<&Json>,
+    setting_data: Option<&Json>,
+) -> DomainResult<JsonMap> {
+    let calculations = calculation_contract(entity_state_schema, initial_state_calculations)?;
+    for (field, _, _) in &calculations {
+        if read_path(authored_state, field).is_some() {
+            return Err(rejection(
+                "character_initial_state_calculated_field_authored",
+                "A Ruleset-calculated field was supplied as authored input.",
+                &format!("entity_state.{field}"),
+                Some("Remove the calculated field and let the Ruleset produce it."),
+            ));
+        }
+    }
+    let fields: Vec<String> = calculations.iter().map(|(field, _, _)| field.clone()).collect();
+    validate_state(authored_state, &authored_schema(entity_state_schema, &fields))?;
+    let validation = program(initial_state_validation);
+    let authored = Json::Object(authored_state.clone());
+    let completed = calculate(participant, &authored, &calculations, setting_data, validation, None)?;
+    validate_state(&completed, entity_state_schema)?;
+    verify_character_rules(participant, &Json::Object(completed.clone()), validation, setting_data, None)?;
+    Ok(completed)
+}
+
+/// `verify_initial_character_state(participant, complete_state, ...)`: recompute calculated
+/// fields and reject a stale or inconsistent saved state.
+pub fn verify_initial_character_state(
+    participant: &Json,
+    complete_state: &JsonMap,
+    entity_state_schema: &JsonMap,
+    initial_state_calculations: &[Json],
+    initial_state_validation: Option<&Json>,
+    setting_data: Option<&Json>,
+) -> DomainResult<JsonMap> {
+    let calculations = calculation_contract(entity_state_schema, initial_state_calculations)?;
+    let original = canonical_object(&Json::Object(complete_state.clone()));
+    let mut authored = original.clone();
+    for (field, _, _) in &calculations {
+        remove_path(&mut authored, field);
+    }
+    let validation = program(initial_state_validation);
+    let expected =
+        calculate(participant, &Json::Object(authored), &calculations, setting_data, validation, None)?;
+    for (field, _, _) in &calculations {
+        let matches = match (read_path(&original, field), read_path(&expected, field)) {
+            (None, None) => true,
+            (Some(saved), Some(recomputed)) => py_eq(saved, recomputed),
+            _ => false,
+        };
+        if !matches {
+            return Err(rejection(
+                "character_initial_state_calculated_value_mismatch",
+                "A saved Ruleset-calculated field does not match its declared calculation.",
+                &format!("entity_state.{field}"),
+                Some("Repair the Character File through Builder before using it."),
+            ));
+        }
+    }
+    validate_state(&original, entity_state_schema)?;
+    verify_character_rules(participant, &Json::Object(original.clone()), validation, setting_data, None)?;
+    Ok(original)
+}
+
+/// `initialize_campaign_character_state(participant, state, declaration, campaign_state,
+/// setting_data)`: apply only the calculations that read `campaign_state`, preserving injuries
+/// and source cards.
+pub fn initialize_campaign_character_state(
+    participant: &Json,
+    state: &JsonMap,
+    declaration: &ParticipantArtifactDeclaration,
+    campaign_state: &Json,
+    setting_data: Option<&Json>,
+) -> DomainResult<JsonMap> {
+    let Some(schema) = &declaration.entity_state_schema else {
+        return Ok(canonical_object(&Json::Object(state.clone())));
+    };
+    let calculations: Vec<Json> =
+        declaration.initial_state_calculations.iter().cloned().map(Json::Object).collect();
+    let selected: Vec<Calculation> = calculation_contract(schema, &calculations)?
+        .into_iter()
+        .filter(|(_, value, condition)| {
+            [Some(value.as_str()), condition.as_deref()].into_iter().flatten().any(|expression| {
+                parse_expression(expression).is_ok_and(|node| reads_root(&node, "campaign_state"))
+            })
+        })
+        .collect();
+    let validation = declaration.initial_state_validation.clone().map(Json::Object);
+    calculate(
+        participant,
+        &Json::Object(state.clone()),
+        &selected,
+        setting_data,
+        validation.as_ref(),
+        Some(campaign_state),
+    )
+}
+
+/// `verify_placed_character(participant, state, declaration, setting_data)`: recheck fields and
+/// choices after placement, preserving authored injuries and positions.
+pub fn verify_placed_character(
+    participant: &Json,
+    state: &JsonMap,
+    declaration: &ParticipantArtifactDeclaration,
+    setting_data: Option<&Json>,
+) -> DomainResult<()> {
+    if let Some(schema) = &declaration.entity_state_schema {
+        // Placement may add runtime fields such as token IDs and positions. Existing character
+        // fields still retain their declared types, ranges and nested extension policies.
+        let mut schema = schema.clone();
+        schema.insert("additionalProperties".into(), Json::Bool(true));
+        validate_state(state, &schema)?;
+    }
+    let validation = declaration.initial_state_validation.clone().map(Json::Object);
+    verify_character_rules(
+        participant,
+        &Json::Object(state.clone()),
+        validation.as_ref(),
+        setting_data,
+        None,
+    )?;
+    Ok(())
 }
