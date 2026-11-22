@@ -46,6 +46,7 @@ pub mod plan_state_admission;
 pub mod player_actions;
 pub mod result_card_admission;
 pub mod reusable_library_deletion;
+pub mod reusable_plans;
 pub mod ruleset_source;
 pub mod setting_character_requirements;
 pub mod srd_lite_character_compatibility;

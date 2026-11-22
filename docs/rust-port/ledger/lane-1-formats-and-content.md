@@ -42,7 +42,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
 | `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | ported | `character_profile_vectors` (storage scripts: links, tampering, delete and retry) |
 | `src/sylvia_gm/application/reusable_participants.py` | 799 | `sylvia-app::reusable_participants` | pending | |
-| `src/sylvia_gm/application/reusable_plans.py` | 575 | `sylvia-app::reusable_plans` | pending | |
+| `src/sylvia_gm/application/reusable_plans.py` | 575 | `sylvia-app::reusable_plans` | ported | `reusable_plan_vectors` (a 430-step scenario replayed from Python). Validators are closures; the Rift fallback reads the caller's `BundledPackages`. Uses `pyjson::loads_bytes`, `pyre` templates, `pystr::splitlines` and `pystr::isidentifier` (`pytext_vectors`) |
 | `src/sylvia_gm/application/ruleset_testing.py` | 111 | `sylvia-app::ruleset_testing` | pending | |
 | `src/sylvia_gm/application/schema_admission.py` | 741 | `sylvia-domain::schema_admission` | ported | In `sylvia-domain`, not `sylvia-app`: package archive admission (this crate) and the engine, store and agent lanes call it |
 | `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | ported | `app_leaves_vectors` |
