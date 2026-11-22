@@ -228,6 +228,9 @@ export SYLVIA_DICTATION_SPEECH_DIR=<speech folder>
 cargo test -p sylvia-owner --features dictation --test dictation_native
 cargo test -p sylvia-owner --features dictation --test dictation_engine
 cargo test -p sylvia-owner --features dictation --test dictation_transcribe
+cargo test -p sylvia-owner --features dictation --test dictation_recording
+.venv/Scripts/python.exe -I crates/sylvia-owner/tests/vectors/list_portaudio_devices.py <file outside the checkout>
+SYLVIA_DICTATION_PORTAUDIO_DEVICES=<that file> cargo test -p sylvia-owner --features dictation --test dictation_devices
 cargo test -p sylvia-owner --features dictation --lib dictation -- --include-ignored
 cargo clippy -p sylvia-owner --features dictation --all-targets -- -D warnings
 ```
@@ -238,7 +241,12 @@ speech worker) and `OMP_NUM_THREADS=1`; `dictation_engine` and `dictation_transc
 loads and its threads decide the bits, so do not set `OPENBLAS_NUM_THREADS` in the shell.
 `dictation_transcribe` compares whole transcriptions with faster-whisper's, segment by segment,
 and the worker's final text; the SAPI clips' hashes are in its vectors, so a different Windows
-voice build fails as a clip mismatch. It takes about ten minutes.
+voice build fails as a clip mismatch. It takes about ten minutes. `dictation_recording` plays the
+same speech into the worker's `Recording` as capture blocks and checks its WAV and final text.
+`dictation_devices` checks the device-id migration (difference row 38) on the machine's own
+microphones: every id the Python worker lists against the cpal list. It reads device metadata
+only, and the list it compares names this machine's devices, so it stays outside the checkout.
+No check opens a microphone: capture itself (a real stream on cpal) is confirmed by hand.
 
 ## Files in this folder
 

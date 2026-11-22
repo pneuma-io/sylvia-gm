@@ -48,11 +48,23 @@ name = "dictation_transcribe"
 harness = false
 required-features = ["dictation"]
 
+# The device-id migration on this machine's own devices (Windows, `dictation`).
+[[test]]
+name = "dictation_devices"
+harness = false
+required-features = ["dictation"]
+
+# A whole dictation through the worker's recording path (Windows, `dictation`).
+[[test]]
+name = "dictation_recording"
+harness = false
+required-features = ["dictation"]
+
 [features]
 # faster-whisper dictation on its native libraries (CTranslate2, ONNX Runtime, NumPy's OpenBLAS,
 # the LGPL libswresample), Windows only. Off by default: the normal build and check.sh never
 # build or load them.
-dictation = ["dep:ct2rs", "dep:ort", "dep:tokenizers", "dep:flate2"]
+dictation = ["dep:ct2rs", "dep:ort", "dep:tokenizers", "dep:flate2", "dep:cpal"]
 
 [dependencies]
 sylvia-base.workspace = true
@@ -84,6 +96,7 @@ tokio-rustls.workspace = true
 ct2rs = { workspace = true, optional = true }
 ort = { workspace = true, optional = true }
 tokenizers = { workspace = true, optional = true }
+cpal = { workspace = true, optional = true }
 # The compression ratio's zlib (`zlib.compress`), as the dev dependency below.
 flate2 = { workspace = true, optional = true }
 windows-version.workspace = true

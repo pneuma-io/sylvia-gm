@@ -139,6 +139,12 @@ ct2rs = { version = "=0.10.2", default-features = false, features = ["system"] }
 # downloads and links nothing). Pinned: a bump must keep `api-31` within the shipped runtime's
 # API version.
 ort = { version = "=2.0.0-rc.15", default-features = false, features = ["load-dynamic", "std", "api-31"] }
+# Dictation's microphone capture (lane 5, `dictation` feature, Windows): cpal's WASAPI host in
+# place of PortAudio. No default features (no ASIO or JACK). Pinned: device names and the
+# shared-mode formats it opens decide the device list and ids (difference row 30), so a bump
+# rechecks `dictation::capture`'s tests and the device check in docs/rust-port/README.md. It
+# brings the `windows` 0.62 crate, beside the workspace's windows-sys.
+cpal = { version = "=0.18.2", default-features = false }
 # Dictation's tokenizer (lane 5): the model's `tokenizer.json` through the Rust crate the Python
 # `tokenizers` wheel wraps. The lock has the 0.23.3 wheel; 0.23.2 is the newest crate of that
 # line on crates.io, and the transcript vectors check every token the clips decode and encode.
