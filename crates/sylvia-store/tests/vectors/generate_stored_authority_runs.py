@@ -128,6 +128,67 @@ def lifecycle_base(folder: Path, name: str, kinds: tuple[str, ...]) -> bytes:
     return path.read_bytes()
 
 
+def failed_base(folder: Path) -> bytes:
+    """The story profile plus a failed action whose one consequence is the owner's player-action
+    marker, committed by Python's store (written as `stored_authority/failed.sqlite3.gz`)."""
+    from sylvia_gm.application.player_actions import PLAYER_ACTION_ORIGIN, player_control_origin
+    from sylvia_gm.domain.authority import ActionStatus, MechanicOutcome, WriterRole
+
+    path = folder / "failed" / "authority.sqlite3"
+    path.parent.mkdir()
+    path.write_bytes(gzip.decompress(BASES["story"].read_bytes()))
+    store = a._open_for_application_owner(path)
+    try:
+        connection = store._connect()
+        try:
+            package_id, version, sha256 = connection.execute(
+                "SELECT package_id, package_version, package_sha256 FROM actions WHERE action_id = 'action-1'"
+            ).fetchone()
+        finally:
+            connection.close()
+        revision = store.snapshot("campaign-story").revision
+        parameters = {"ability": "strength", "dc": 18}
+        origin = player_control_origin(
+            {"kind": "result_card", "action_id": "action-1", "button_index": 0},
+            expected_revision=revision, selection={}, session_id=None)
+        marker = {"kind": PLAYER_ACTION_ORIGIN,
+                  "origin": {**origin, "policy": {"confirmation": "none", "response": "on_request"}}}
+        payload_hash = a._stored_action_hash(
+            campaign_id="campaign-story", action_id="action-2", writer="dm", expected_revision=revision,
+            turn_id="turn-2", package_id=package_id, package_version=version, package_sha256=sha256,
+            tool_name="roll_check", parameters=parameters)
+        store.commit_action(
+            campaign_id="campaign-story", action_id="action-2", idempotency_key="key-2", payload_hash=payload_hash,
+            expected_revision=revision, writer=WriterRole.DM, turn_id="turn-2", package_id=package_id,
+            package_version=version, package_sha256=sha256, tool_name="roll_check", parameters=parameters,
+            outcome=MechanicOutcome(result={"success": False}, mutations=(), consequences=(marker,)),
+            status=ActionStatus.FAILED)
+    finally:
+        store.close()
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    connection.close()
+    return path.read_bytes()
+
+
+def marker_sql(connection: sqlite3.Connection, change) -> list[str]:  # noqa: ANN001
+    """SQL changing the failed action's marker in both places it is stored: its consequence row
+    and its canonical consequence event."""
+    row = connection.execute(
+        "SELECT payload_json FROM consequences WHERE action_id = 'action-2'").fetchone()
+    text = a._dump(change(json.loads(row[0]))).replace("'", "''")
+    return [
+        f"UPDATE consequences SET payload_json = '{text}' WHERE action_id = 'action-2'",
+        f"UPDATE canonical_events SET safe_payload_json = '{text}' "
+        "WHERE action_id = 'action-2' AND event_type = 'consequence'",
+    ]
+
+
+def origin(**changes: object):  # noqa: ANN201
+    """A change to the marker's `origin`."""
+    return lambda marker: edited(marker, origin=edited(marker["origin"], **changes))
+
+
 LIFECYCLE_BASES = {"archived": ("archive_campaign",), "trashed": ("archive_campaign", "trash_campaign")}
 PRIMARY = "pneuma.riichi-mahjong"
 # The story campaign's events: 1 and 2 are TALK prose (attempts att-1, att-2), 3 to 8 are action-1.
@@ -535,6 +596,33 @@ CASES: list[dict[str, object]] = [
         ("life-0", "result", lambda r: edited(r, note="x"))]},
     {"name": "archived_operation_basis_other", "base": "archived", "sql": [
         "UPDATE campaign_operations SET basis_revision = 7 WHERE operation_id = 'life-0'"]},
+    # A failed action's one consequence must be the owner's player-action marker.
+    {"name": "failed_untouched", "base": "failed", "sql": []},
+    {"name": "failed_marker_revision_other", "base": "failed", "sql": [], "markers": [origin(expected_revision=7)]},
+    {"name": "failed_marker_revision_true", "base": "failed", "sql": [], "markers": [origin(expected_revision=True)]},
+    {"name": "failed_marker_revision_float", "base": "failed", "sql": [], "markers": [origin(expected_revision=8.0)]},
+    {"name": "failed_marker_policy_unknown", "base": "failed", "sql": [], "markers": [
+        origin(policy={"confirmation": "none", "response": "never"})]},
+    {"name": "failed_marker_policy_extra", "base": "failed", "sql": [], "markers": [
+        origin(policy={"confirmation": "required", "response": "automatic", "note": "x"})]},
+    {"name": "failed_marker_policy_required", "base": "failed", "sql": [], "markers": [
+        origin(policy={"confirmation": "required", "response": "automatic"})]},
+    {"name": "failed_marker_button_out_of_range", "base": "failed", "sql": [], "markers": [origin(button_index=9)]},
+    {"name": "failed_marker_session_padded", "base": "failed", "sql": [], "markers": [origin(session_id=" dm-1")]},
+    {"name": "failed_marker_session_named", "base": "failed", "sql": [], "markers": [origin(session_id="dm-1")]},
+    {"name": "failed_marker_selection_list", "base": "failed", "sql": [], "markers": [origin(selection=[])]},
+    {"name": "failed_marker_extra_member", "base": "failed", "sql": [], "markers": [origin(note="x")]},
+    {"name": "failed_marker_panel_control", "base": "failed", "sql": [], "markers": [
+        origin(control="panel", surface_id="surface-1", panel_action_id="act-1",
+               source_action_id=DROP, button_index=DROP)]},
+    {"name": "failed_marker_kind_other", "base": "failed", "sql": [], "markers": [
+        lambda marker: edited(marker, kind="check_failed")]},
+    {"name": "failed_marker_without_origin", "base": "failed", "sql": [], "markers": [
+        lambda marker: edited(marker, origin=DROP)]},
+    {"name": "failed_marker_replaced", "base": "failed", "sql": [], "markers": [
+        lambda marker: {"kind": "check_rolled", "total": 3}]},
+    {"name": "failed_marker_origin_list", "base": "failed", "sql": [], "markers": [
+        lambda marker: edited(marker, origin=[])]},
 ]
 
 
@@ -556,6 +644,8 @@ def main() -> None:
         bases = {name: gzip.decompress(path.read_bytes()) for name, path in BASES.items()}
         bases["children"] = children_base(Path(scratch))
         (OUT / "children.sqlite3.gz").write_bytes(gzip.compress(bases["children"], mtime=0))
+        bases["failed"] = failed_base(Path(scratch))
+        (OUT / "failed.sqlite3.gz").write_bytes(gzip.compress(bases["failed"], mtime=0))
         for name, kinds in LIFECYCLE_BASES.items():
             bases[name] = lifecycle_base(Path(scratch), name, kinds)
             (OUT / f"{name}.sqlite3.gz").write_bytes(gzip.compress(bases[name], mtime=0))
@@ -583,6 +673,10 @@ def main() -> None:
                 for edit in case.pop("edits", ()):  # type: ignore[attr-defined]
                     statements.append(payload_edit(connection, *edit))
                     connection.execute(statements[-1])
+                for change in case.pop("markers", ()):  # type: ignore[attr-defined]
+                    for statement in marker_sql(connection, change):
+                        statements.append(statement)
+                        connection.execute(statement)
             finally:
                 connection.close()
             results.append({**case, "sql": statements, "outcome": outcome(path)})

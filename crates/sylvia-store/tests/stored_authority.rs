@@ -17,6 +17,7 @@ fn base(name: &str) -> Vec<u8> {
         "children" => "tests/vectors/stored_authority/children.sqlite3.gz",
         "archived" => "tests/vectors/stored_authority/archived.sqlite3.gz",
         "trashed" => "tests/vectors/stored_authority/trashed.sqlite3.gz",
+        "failed" => "tests/vectors/stored_authority/failed.sqlite3.gz",
         other => panic!("unknown base {other}"),
     };
     let mut bytes = Vec::new();
