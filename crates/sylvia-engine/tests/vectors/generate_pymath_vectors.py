@@ -70,7 +70,21 @@ def main() -> int:
         other = random_point(rng, size)
         dist_cases.append({"p": [bits(x) for x in point], "q": [bits(x) for x in other],
                            "result": bits(math.dist(point, other))})
-    OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "hypot": hypot_cases, "dist": dist_cases},
+    # round(x, 12): ties on the exact binary value (k / 2**13 has 13 decimals), signs, tiny values.
+    round_inputs = [0.0, -0.0, 1.0, 0.5, 2.5e-12, 1 / 8192, 3 / 8192, -1 / 8192, 5 / 8192, 1e-13, -4e-13, 5e-13, -5e-13, 6e-13,
+                    1e6 + 1 / 8192, 123456.000000000049, 1e300, 5e-324, -2.2250738585072014e-308, 0.1 + 0.2,
+                    float("inf"), float("-inf"), float("nan")]
+    for _ in range(20000):
+        kind = rng.random()
+        if kind < 0.2:
+            round_inputs.append(rng.randint(-10**7, 10**7) / 2 ** rng.randint(1, 30))
+        elif kind < 0.4:
+            round_inputs.append(round(rng.uniform(-1e6, 1e6), rng.randint(10, 14)))
+        else:
+            round_inputs.append(rng.uniform(-1, 1) * rng.choice([1e-14, 1e-12, 1e-6, 1.0, 1e3, 1e6]))
+    round_cases = [{"input": bits(x), "result": bits(round(x, 12))} for x in round_inputs]
+    OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "hypot": hypot_cases, "dist": dist_cases,
+                                    "round12": round_cases},
                                    ensure_ascii=True) + "\n").encode("ascii"))
     print(f"{len(hypot_cases)} hypot cases, {len(dist_cases)} dist cases")
     return 0
