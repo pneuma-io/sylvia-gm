@@ -8,12 +8,17 @@ mod clearance;
 mod convex;
 mod engine;
 mod mutation;
+mod placement;
 mod query;
+mod result;
 mod scene;
+mod session;
 
 pub use mutation::{mutate_spatial_scene, AdmittedSpatialMutation};
 pub use query::{admit_spatial_query, AdmittedSpatialQuery};
+pub use result::{admit_spatial_result, AdmittedSpatialResult};
 pub use scene::{admit_spatial_scene, AdmittedSpatialScene};
+pub use session::SpatialEngine;
 
 use sylvia_domain::error::DomainError;
 
@@ -80,7 +85,7 @@ impl From<SpatialError> for DomainError {
     }
 }
 
-/// The engine's resolver for an admitted query (every kind but `placement`), before result
+/// The engine's resolver for an admitted query, before result
 /// admission and caching: `_engine._resolve_*(_compile(scene), query.as_payload())`.
 pub fn resolve_spatial_query(
     scene: &AdmittedSpatialScene,

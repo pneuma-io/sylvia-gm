@@ -549,7 +549,7 @@ fn hit_payload(hit: &RayHit) -> Json {
 }
 
 /// `_provenance(scene, kind)`.
-fn provenance(scene: &CompiledScene, kind: &str) -> JsonMap {
+pub(crate) fn provenance(scene: &CompiledScene, kind: &str) -> JsonMap {
     let Json::Object(map) = json!({
         "kind": kind, "map_id": scene.admitted.map_id, "snapshot_id": scene.admitted.snapshot_id,
         "geometry_revision": scene.admitted.geometry_revision, "algorithm_version": SPATIAL_ALGORITHM_VERSION,
@@ -559,7 +559,7 @@ fn provenance(scene: &CompiledScene, kind: &str) -> JsonMap {
     map
 }
 
-fn with(mut map: JsonMap, entries: Json) -> JsonMap {
+pub(crate) fn with(mut map: JsonMap, entries: Json) -> JsonMap {
     if let Json::Object(entries) = entries {
         for (key, value) in entries {
             map.insert(key, value);
@@ -658,7 +658,7 @@ fn crosses_shape_interior(shape: &Shape, origin: V3, destination: V3) -> bool {
 }
 
 /// `_matches_metadata(item, selector)`.
-fn matches_metadata(item: &SpatialObject, selector: Option<&Json>) -> bool {
+pub(crate) fn matches_metadata(item: &SpatialObject, selector: Option<&Json>) -> bool {
     let Some(selector) = selector else { return true };
     let key = selector["key"].as_str().unwrap_or_default();
     if key.is_empty() {
@@ -1764,7 +1764,7 @@ fn resolve_circle_route(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
     outcome(json!({}))
 }
 
-/// The resolver for an admitted query's kind, except placement.
+/// The resolver for an admitted query's kind.
 pub(crate) fn resolve(scene: &CompiledScene, query: &JsonMap) -> Resolved {
     Ok(match query["kind"].as_str().unwrap_or_default() {
         "ray" => resolve_ray(scene, query),
@@ -1776,6 +1776,7 @@ pub(crate) fn resolve(scene: &CompiledScene, query: &JsonMap) -> Resolved {
         "circle_overlap" => resolve_circle_overlap(scene, query),
         "sweep" => resolve_sweep(scene, query),
         "circle_route" => resolve_circle_route(scene, query),
+        "placement" => super::placement::resolve_placement(scene, query),
         other => unreachable!("no resolver for {other}"),
     })
 }

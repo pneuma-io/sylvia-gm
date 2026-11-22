@@ -78,6 +78,12 @@ aes-gcm = "0.10"
 regex = "1"
 # Ordered maps for Python dicts in the expression evaluator (already locked through serde_json).
 indexmap = "2"
+# Lane 2: exact rationals for the spatial engine's placement query, the one place Python keeps
+# `Fraction(str(v))` arithmetic (`spatial/_engine.py` `_placement_box`, `_resolve_placement`).
+# num-bigint and num-traits come with it (already locked through another crate's tree).
+num-rational = { version = "=0.4.2", default-features = false, features = ["num-bigint", "std"] }
+num-bigint = { version = "=0.4.8", default-features = false, features = ["std"] }
+num-traits = { version = "=0.2.19", default-features = false, features = ["std"] }
 # Backtracking regular expressions: lookahead and lookbehind in Python patterns the `regex` crate
 # rejects (content schema patterns, docs/rust-port/sites/regex-sites.md). Added by lane 1.
 fancy-regex = "0.14"
