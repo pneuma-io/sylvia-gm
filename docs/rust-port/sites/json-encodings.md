@@ -147,7 +147,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/claude_settings.py:289` | `main` | Dump::INDENT2 | `print(json.dumps(result, indent=2))` | |
 | `config/loader.py:234` | `load_config` | Dump::DEFAULT | `provider["credential_overrides"] = SecretStr(json.dumps(overrides))` | |
 | `config/loader.py:242` | `load_config` | Dump::DEFAULT | `provider["protected_credentials"] = SecretStr(json.dumps(envelope))` | |
-| `provider/_admin_audit.py:83` | `_serialization_projection` | Dump::CANONICAL + allow_nan= | `encoded = json.dumps( _plain(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
+| `provider/_admin_audit.py:83` | `_serialization_projection` | Dump::CANONICAL + allow_nan= | `encoded = json.dumps( _plain(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-provider` admin_audit_vectors |
 | `provider/_anthropic.py:388` | `AnthropicMessagesTransport.parse_response` | Dump::DEFAULT | `arguments=json.dumps( block.get("input", {}) if isinstance(block, dict) else getattr(block, "input", {}) ),` | `sylvia-provider` anthropic_vectors |
 | `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | `sylvia-provider` anthropic_vectors |
 | `provider/_chatgpt.py:319` | `_in_place_answer` | Dump::DEFAULT.ascii(false) | `result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)` | |

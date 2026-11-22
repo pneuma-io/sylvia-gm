@@ -67,6 +67,14 @@ class Traced:
     def __getattr__(self, name: str) -> object:
         target = object.__getattribute__(self, "_target")
         label = object.__getattribute__(self, "_prefix") + name
+        # Full Audit is forced on for the trace, and its records are captured, not stored.
+        if label == "admin_full_audit_enabled":
+            def enabled() -> bool:
+                log({"event": "call", "name": label, "args": [], "kwargs": {}, "result": True})
+                return True
+            return enabled
+        if label == "record_admin_full_audit":
+            return lambda payload: log({"event": "audit", "record": plain(payload)})
         try:
             value = getattr(target, name)
         except AttributeError:
@@ -99,7 +107,18 @@ original = campaigns._preflight_guided_start
 
 
 def traced(*args: object, application_owner: object, bus: object, **kwargs: object) -> None:
-    log({"event": "preflight_start", "kwargs": sorted(kwargs)})
+    log({"event": "preflight_start",
+         "kwargs": plain({k: v for k, v in kwargs.items() if k != "provider_resolver"})})
+    resolver = kwargs["provider_resolver"]
+
+    def traced_resolver(session: object) -> object:
+        provider = resolver(session)
+        log({"event": "resolved", "session": plain(session), "class": type(provider).__name__,
+             "model": plain(getattr(provider, "model_info", None)),
+             "base_url": getattr(provider, "_base_url", None)})
+        return provider
+
+    kwargs["provider_resolver"] = traced_resolver
     DEPTH["value"] += 1
     try:
         result = original(*args, application_owner=Traced(application_owner),
@@ -159,6 +178,24 @@ def traced_messages(self, provider_input, **kwargs):
 
 
 _provider_session.ProviderSessionAdapter._messages = traced_messages
+
+from sylvia_gm.provider import _context_fit  # noqa: E402
+
+original_admit = _context_fit.ContextFittingProvider.admit_request
+
+
+def traced_admit(self, messages, tools=None, **options):
+    try:
+        measured = original_admit(self, messages, tools, **options)
+    except BaseException as error:
+        log({"event": "admit", "options": plain(options),
+             "raised": {"class": type(error).__name__, "message": str(error)}})
+        raise
+    log({"event": "admit", "options": plain(options), "measurement": measured.projection()})
+    return measured
+
+
+_context_fit.ContextFittingProvider.admit_request = traced_admit
 
 if __name__ == "__main__":
     raise SystemExit(owner_process.main())

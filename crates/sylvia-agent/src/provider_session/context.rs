@@ -4,7 +4,7 @@
 //! the module helpers they use).
 
 use super::reads::OpeningReads;
-use crate::campaign_memory::{self, KnowledgeReference};
+use crate::campaign_memory::{self, RankReferences};
 use crate::stateless_mcp::ModelMechanicsTool;
 use serde_json::{json, Value as Json};
 use std::collections::HashMap;
@@ -113,6 +113,11 @@ impl ProviderSessionAdapter {
             campaign_knowledge,
             context_mode,
         })
+    }
+
+    /// The request assembly this adapter's route uses (`self._context_mode`).
+    pub fn context_mode(&self) -> &str {
+        &self.context_mode
     }
 
     /// `_ledger_active(provider_input)`: GM play on a ledger-mode route.
@@ -486,7 +491,7 @@ impl ProviderSessionAdapter {
         &self,
         input: &SessionProviderInput,
         include_opening_direction: bool,
-        rank: &(dyn Fn(&str, &[KnowledgeReference]) -> Vec<JsonMap> + Sync),
+        rank: &RankReferences,
     ) -> CodedResult<JsonMap> {
         let Some(campaign_id) = input.session.campaign_id() else {
             return Err(rejected("DM campaign context requires campaign authority"));
@@ -610,7 +615,7 @@ impl ProviderSessionAdapter {
             truthy_str(current_scene.get("summary")),
         ];
         let (current_facts, memory_selection) =
-            campaign_memory::select_with(&continuity.facts, &queries, rank);
+            campaign_memory::select_with(&continuity.facts, &queries, rank)?;
         let mut player_known = Vec::new();
         let mut gm_private_facts = Vec::new();
         let mut character_knowledge: JsonMap = JsonMap::new();
@@ -856,7 +861,7 @@ impl ProviderSessionAdapter {
         &self,
         input: &SessionProviderInput,
         include_opening_direction: bool,
-        rank: &(dyn Fn(&str, &[KnowledgeReference]) -> Vec<JsonMap> + Sync),
+        rank: &RankReferences,
     ) -> CodedResult<(JsonMap, JsonMap)> {
         let payload = self.current_campaign_context_payload(input, include_opening_direction, rank).await?;
         let empty = JsonMap::new();

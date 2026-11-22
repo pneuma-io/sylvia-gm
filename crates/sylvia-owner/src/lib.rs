@@ -21,6 +21,7 @@ pub mod dictation;
 pub mod dispatch;
 pub mod display_reads;
 pub mod owner_reads;
+pub mod preflight;
 pub mod preinstall;
 pub mod protocol;
 pub mod providers;

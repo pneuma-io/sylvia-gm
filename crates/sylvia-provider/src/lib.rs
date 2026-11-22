@@ -20,11 +20,13 @@
 //! - [`pyfmt`] holds Python's `:g` number formatting.
 //! - [`catalog`] holds `provider/_models.py` and `provider/_output_policy.py`.
 //! - [`reasoning`] and [`speed`] hold `provider/_reasoning.py` and `provider/_speed.py`.
+//! - [`admin_audit`] holds `provider/_admin_audit.py` (Admin Full Audit).
 //! - [`context_mode`] holds the request-assembly mode from `agent/_context_ledger.py` that providers read.
 //! - [`context_fit`] holds `provider/_context_fit.py`, and [`token_estimate`] `provider/_token_estimate.py`.
 //! - [`request_metadata`] holds `provider/_request_metadata.py`.
 //! - [`registry`] holds `provider/_registry.py`'s `ProviderRegistry`.
 
+pub mod admin_audit;
 pub mod anthropic;
 pub mod catalog;
 pub mod chat;

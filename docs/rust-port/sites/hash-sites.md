@@ -236,7 +236,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_chat.py:398` | `create_chat` | hashlib.sha256 | `chat_id = "character-chat-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
 | `application/character_chat.py:636` | `send_message` | hashlib.sha256 | `operation = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()` | |
 | `config/provider_settings.py:424` | `_provider_profile_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{display_name.casefold()}\n{base_url}".encode()).hexdigest()[:16]` | |
-| `provider/_admin_audit.py:94` | `_serialization_projection` | hashlib.sha256 | `"sha256": hashlib.sha256(encoded).hexdigest(),` | |
+| `provider/_admin_audit.py:94` | `_serialization_projection` | hashlib.sha256 | `"sha256": hashlib.sha256(encoded).hexdigest(),` | `sylvia-provider` admin_audit_vectors |
 | `provider/_claude_install.py:350` | `ClaudeInstaller._install` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-provider` install_vectors |
 | `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | `sylvia-provider` context_fit_vectors |
 | `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | `sylvia-provider` context_fit_vectors |

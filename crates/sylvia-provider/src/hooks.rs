@@ -3,8 +3,7 @@
 //!
 //! Hooks fire in registration order; a failing hook is logged and never stops the others or
 //! the request. Python's built-in hooks (logging, metrics, dump, usage tracking, diagnostics)
-//! and task-scoped hooks (`HookManager.scoped`, used by the admin audit) are ported with their
-//! consumers.
+//! are ported with their consumers; task-scoped hooks are [`HookManager::scoped`].
 
 use crate::error::ProviderError;
 use crate::provider::BoxFuture;
@@ -61,12 +60,58 @@ pub trait ProviderHook: Send + Sync {
     fn on_error<'a>(&'a self, _context: &'a HookContext) -> BoxFuture<'a, Result<(), String>> {
         Box::pin(async { Ok(()) })
     }
+
+    /// `late_usage_listener(provider_key, exchange_id)`: a callback crediting usage that a
+    /// provider learns after the call returned. `None` for hooks without one.
+    fn late_usage_listener(&self, _provider_key: &str, _exchange_id: &str) -> Option<LateUsageListener> {
+        None
+    }
 }
 
-/// `HookManager` (with its `HookRegistry`): the ordered hooks of one provider.
-#[derive(Default)]
+/// A late-usage callback ([`ProviderHook::late_usage_listener`]).
+pub type LateUsageListener = Arc<dyn Fn(&ProviderResponse) + Send + Sync>;
+
+tokio::task_local! {
+    /// `HookManager._scoped_hooks`: each manager's task-local hooks, by manager identity. A
+    /// Python `ContextVar` per manager; one task-local list here, keyed by [`HookManager`] id.
+    static SCOPED_HOOKS: Vec<(u64, Arc<dyn ProviderHook>)>;
+}
+
+/// A stream polled inside a manager's hook scope ([`HookManager::scoped_stream`]).
+pub struct ScopedStream<S> {
+    inner: S,
+    scoped: Vec<(u64, Arc<dyn ProviderHook>)>,
+}
+
+impl<S: futures_util::Stream + Unpin> futures_util::Stream for ScopedStream<S> {
+    type Item = S::Item;
+
+    fn poll_next(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Option<Self::Item>> {
+        let scoped = self.scoped.clone();
+        let inner = &mut self.inner;
+        SCOPED_HOOKS.sync_scope(scoped, || std::pin::Pin::new(inner).poll_next(cx))
+    }
+}
+
+fn next_manager_id() -> u64 {
+    static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+    NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+}
+
+/// `HookManager` (with its `HookRegistry`): the ordered hooks of one provider, and the hooks
+/// scoped to the current task ([`HookManager::scoped`]).
 pub struct HookManager {
     hooks: Mutex<Vec<Arc<dyn ProviderHook>>>,
+    id: u64,
+}
+
+impl Default for HookManager {
+    fn default() -> Self {
+        Self { hooks: Mutex::new(Vec::new()), id: next_manager_id() }
+    }
 }
 
 impl std::fmt::Debug for HookManager {
@@ -117,8 +162,54 @@ impl HookManager {
         self.hooks.lock().expect("hook lock").clone()
     }
 
+    /// This manager's task-scoped hooks that are not also registered, in scope order.
+    fn scoped_hooks(&self) -> Vec<Arc<dyn ProviderHook>> {
+        let registered = self.hooks();
+        SCOPED_HOOKS
+            .try_with(|scoped| {
+                scoped
+                    .iter()
+                    .filter(|(id, hook)| {
+                        *id == self.id && !registered.iter().any(|existing| Arc::ptr_eq(existing, hook))
+                    })
+                    .map(|(_, hook)| Arc::clone(hook))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    /// `with hooks.scoped(hook):`: run `future` with `hook` observing this manager's calls made
+    /// from the current task (Python's `ContextVar`; a task spawned inside does not inherit it).
+    pub async fn scoped<F: std::future::Future>(&self, hook: Arc<dyn ProviderHook>, future: F) -> F::Output {
+        let mut scoped = SCOPED_HOOKS.try_with(Clone::clone).unwrap_or_default();
+        scoped.push((self.id, hook));
+        SCOPED_HOOKS.scope(scoped, future).await
+    }
+
+    /// `scoped` for a stream: every poll of `stream` runs with `hook` in this manager's scope,
+    /// as an async generator's body runs in its consumer's context.
+    pub fn scoped_stream<'a, S>(&self, hook: Arc<dyn ProviderHook>, stream: S) -> ScopedStream<S>
+    where
+        S: futures_util::Stream + Unpin + Send + 'a,
+    {
+        let mut scoped = SCOPED_HOOKS.try_with(Clone::clone).unwrap_or_default();
+        scoped.push((self.id, hook));
+        ScopedStream { inner: stream, scoped }
+    }
+
+    /// `late_usage_listeners(provider_key, exchange_id)`: the registered hooks' late-usage
+    /// callbacks, then the task-scoped ones', bound before the scope is released.
+    pub fn late_usage_listeners(&self, provider_key: &str, exchange_id: &str) -> Vec<LateUsageListener> {
+        let mut hooks = self.hooks();
+        hooks.extend(self.scoped_hooks());
+        hooks.iter().filter_map(|hook| hook.late_usage_listener(provider_key, exchange_id)).collect()
+    }
+
     async fn fire(&self, callback: Callback, context: &HookContext) {
-        for hook in self.hooks() {
+        // Registered hooks first, then the task's scoped ones (`_fire_scoped`).
+        let mut hooks = self.hooks();
+        hooks.extend(self.scoped_hooks());
+        for hook in hooks {
             let outcome = match callback {
                 Callback::Request => hook.on_request(context).await,
                 Callback::Response => hook.on_response(context).await,

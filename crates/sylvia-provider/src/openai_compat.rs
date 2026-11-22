@@ -853,6 +853,10 @@ impl Provider for OpenAICompatProvider {
         Some(&self.hooks)
     }
 
+    fn base_url(&self) -> Option<&str> {
+        Some(&self.base_url)
+    }
+
     fn request_representation(
         &self,
         messages: &[Json],

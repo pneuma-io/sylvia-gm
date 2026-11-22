@@ -336,9 +336,9 @@ fn model(value: &J) -> ModelInfo {
 }
 
 /// The openings have no facts, so the ranking only ever sees an empty reference list.
-fn no_facts(_query: &str, references: &[KnowledgeReference]) -> Vec<JsonMap> {
+fn no_facts(_query: &str, references: &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> {
     assert!(references.is_empty(), "the recorded openings have no campaign facts");
-    Vec::new()
+    Ok(Vec::new())
 }
 
 #[test]
