@@ -148,12 +148,12 @@ fn inject_flags(ctx: &mut ExecutionContext<'_>) {
 /// `combat_state or {}`: an empty combat dict is replaced by a new one.
 fn combat_or_new(combat: &Combat, bridge: Option<&dyn StateBridge>) -> (Combat, bool) {
     let current = match (combat, bridge) {
-        (Combat::Own(map), _) => map.clone(),
+        (Combat::Own(map), _) => map.lock().unwrap_or_else(std::sync::PoisonError::into_inner).clone(),
         (Combat::Bridge, Some(bridge)) => bridge.combat().clone(),
         (Combat::Bridge, None) => Dict::new(),
     };
     if current.is_empty() {
-        (Combat::Own(Dict::new()), false)
+        (Combat::own(Dict::new()), false)
     } else {
         (combat.clone(), true)
     }

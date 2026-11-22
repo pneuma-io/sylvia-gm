@@ -3,7 +3,7 @@
 //! flag store, initiative-trigger manager or scene manager is ever present there (those modules
 //! are retired), so each handler takes Python's "manager absent" branch.
 
-use super::context::{Combat, ExecutionContext, NestedMode};
+use super::context::ExecutionContext;
 use super::effects::{resolve_value, to_int};
 use super::error::ExecError;
 use super::handlers::{resolve_collection, sort_by_key};
@@ -111,8 +111,9 @@ const TIME_UNITS: [(&str, i64); 12] = [
     ("days", 14400), ("month", 432_000), ("months", 432_000), ("year", 5_184_000), ("years", 5_184_000),
 ];
 
-/// `parse_duration(duration_str)`: `^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$` (Unicode classes; `$` also
-/// before a final newline), the amount as `float`, the rounds as `int(amount * multiplier)`.
+/// `parse_duration(duration_str)`: `^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$` with Python's Unicode
+/// classes (`$` also matches before a final newline, which `\s*` covers), the amount read by
+/// `float()`, the rounds `int(amount * multiplier)`.
 fn parse_duration(duration: &str) -> Result<i64, ExecError> {
     let invalid = || {
         ExecError::value_error(format!(
@@ -120,39 +121,31 @@ fn parse_duration(duration: &str) -> Result<i64, ExecError> {
             Value::str(duration).repr()
         ))
     };
+    let is_digit = |c: char| sylvia_base::pystr::decimal(c).is_some();
+    let is_word = |c: char| c == '_' || crate::ruleset::pydata::is_alnum(c);
     let body = duration.trim_start_matches(sylvia_base::pystr::is_space);
-    let number_end = body.find(|c: char| !c.is_numeric()).unwrap_or(body.len());
-    if number_end == 0 || !body[..number_end].chars().all(|c| c.to_digit(10).is_some() || char_is_decimal(c)) {
+    let whole = body.find(|c: char| !is_digit(c)).unwrap_or(body.len());
+    if whole == 0 {
         return Err(invalid());
     }
-    let mut rest = &body[number_end..];
-    let mut number_text = body[..number_end].to_owned();
-    if let Some(after_dot) = rest.strip_prefix('.') {
-        let fraction_end = after_dot.find(|c: char| !char_is_decimal(c)).unwrap_or(after_dot.len());
-        if fraction_end > 0 {
-            number_text.push('.');
-            number_text.push_str(&after_dot[..fraction_end]);
-            rest = &after_dot[fraction_end..];
+    let mut number_end = whole;
+    if let Some(after_dot) = body[whole..].strip_prefix('.') {
+        let fraction = after_dot.find(|c: char| !is_digit(c)).unwrap_or(after_dot.len());
+        if fraction > 0 {
+            number_end = whole + 1 + fraction;
         }
     }
-    let after_space = rest.trim_start_matches(sylvia_base::pystr::is_space);
-    if after_space.len() == rest.len() {
+    let rest = &body[number_end..];
+    let unit_start = rest.trim_start_matches(sylvia_base::pystr::is_space);
+    if unit_start.len() == rest.len() {
         return Err(invalid());
     }
-    let unit_end = after_space.find(|c: char| !(c.is_alphanumeric() || c == '_')).unwrap_or(after_space.len());
-    if unit_end == 0 {
+    let unit_end = unit_start.find(|c: char| !is_word(c)).unwrap_or(unit_start.len());
+    if unit_end == 0 || !unit_start[unit_end..].chars().all(sylvia_base::pystr::is_space) {
         return Err(invalid());
     }
-    let unit = &after_space[..unit_end];
-    if !after_space[unit_end..].chars().all(sylvia_base::pystr::is_space) {
-        return Err(invalid());
-    }
-    let amount: f64 = number_text
-        .chars()
-        .map(|c| if char_is_decimal(c) { char::from_digit(decimal_value(c), 10).unwrap() } else { c })
-        .collect::<String>()
-        .parse()
-        .map_err(|_| invalid())?;
+    let unit = &unit_start[..unit_end];
+    let amount = sylvia_base::pystr::parse_float(&body[..number_end]).map_err(|_| invalid())?;
     let lowered = unit.to_lowercase();
     let Some((_, multiplier)) = TIME_UNITS.iter().find(|(name, _)| *name == lowered) else {
         let mut names: Vec<&str> = TIME_UNITS.iter().map(|(name, _)| *name).collect();
@@ -161,22 +154,6 @@ fn parse_duration(duration: &str) -> Result<i64, ExecError> {
         return Err(ExecError::value_error(format!("Unknown time unit: {}. Valid units: [{listed}]", Value::str(unit).repr())));
     };
     super::error::float_to_int(amount * *multiplier as f64)
-}
-
-/// A Unicode decimal digit (`\d` in Python's `re`, which `float()` reads).
-fn char_is_decimal(c: char) -> bool {
-    c.is_numeric() && c.to_digit(10).is_some() || (c.is_numeric() && unicode_decimal(c).is_some())
-}
-
-fn unicode_decimal(c: char) -> Option<u32> {
-    // Decimal digits come in contiguous blocks of ten starting at a code point ending in 0.
-    let code = c as u32;
-    let zero = code - code % 16;
-    (0..10).find(|offset| zero + offset == code).filter(|_| char::from_u32(zero).is_some_and(|z| z.is_numeric()))
-}
-
-fn decimal_value(c: char) -> u32 {
-    c.to_digit(10).or_else(|| unicode_decimal(c)).unwrap_or(0)
 }
 
 /// `_handle_advance_time`: the combat round advances; the package bridge keeps no campaign
@@ -331,30 +308,66 @@ pub(crate) fn handle_initiative(body: &Value, effect: &Dict, ctx: &mut Execution
     Ok(())
 }
 
-/// `advance_turn(combat_state)`: the next combatant, read without moving `turn_index` (Python
-/// computes the new index locally and never stores it).
-fn advance_turn(combat: &Dict) -> Result<Value, ExecError> {
+/// `_initiative.advance_turn`: move the combat state's turn on, wrapping into a new round.
+fn advance_turn(ctx: &mut ExecutionContext<'_>) -> Result<Value, ExecError> {
+    let combat = ctx.combat_state();
     let order = match combat.get("order") {
         None => return Ok(Value::None),
         Some(order) if !order.truthy() => return Ok(Value::None),
-        Some(Value::List(items) | Value::Tuple(items)) => items.clone(),
-        Some(other) => return Err(ExecError::type_error(format!("object of type '{}' has no len()", other.type_name()))),
+        Some(order) => order.clone(),
     };
-    let index = match combat.get("turn_index").cloned().unwrap_or(Value::Int(-1)) {
+    let items = match &order {
+        Value::List(items) | Value::Tuple(items) => items.clone(),
+        other => return Err(ExecError::type_error(format!("object of type '{}' has no len()", other.type_name()))),
+    };
+    let index = combat.get("turn_index").cloned().unwrap_or(Value::Int(-1));
+    let last = Value::Int(items.len() as i64 - 1);
+    let at_end = match (&index, &last) {
+        (Value::Int(n), Value::Int(l)) => n >= l,
+        (Value::Bool(flag), Value::Int(l)) => i64::from(*flag) >= *l,
+        (Value::Float(n), Value::Int(l)) => *n >= *l as f64,
+        (other, _) => {
+            return Err(ExecError::type_error(format!(
+                "'>=' not supported between instances of '{}' and 'int'",
+                other.type_name()
+            )))
+        }
+    };
+    let index = if at_end {
+        let round = combat.get("round").cloned().unwrap_or(Value::Int(0));
+        ctx.set_combat("round", crate::expr::ops::add(&round, &Value::Int(1))?);
+        ctx.set_combat("turn_index", Value::Int(0));
+        ctx.set_combat("_round_advanced", Value::Bool(true));
+        Value::Int(0)
+    } else {
+        let next = crate::expr::ops::add(&index, &Value::Int(1))?;
+        ctx.set_combat("turn_index", next.clone());
+        ctx.set_combat("_round_advanced", Value::Bool(false));
+        next
+    };
+    let position = match index {
         Value::Int(n) => n,
         Value::Bool(flag) => i64::from(flag),
-        other => return Err(ExecError::type_error(format!("list indices must be integers or slices, not {}", other.type_name()))),
+        other => {
+            return Err(ExecError::type_error(format!(
+                "list indices must be integers or slices, not {}",
+                other.type_name()
+            )))
+        }
     };
-    let length = order.len() as i64;
-    let index = if index >= length - 1 { 0 } else { index + 1 };
-    let position = if index < 0 { index + length } else { index };
-    let Some(current) = usize::try_from(position).ok().and_then(|p| order.get(p)) else {
+    let length = items.len() as i64;
+    let position = if position < 0 { position + length } else { position };
+    let Some(current) = usize::try_from(position).ok().and_then(|p| items.get(p)) else {
         return Err(ExecError::Python { class: "IndexError", message: "list index out of range".into() });
     };
-    Ok(match current {
-        Value::Dict(entry) => entry.get("entity_id").or_else(|| entry.get("id")).cloned().unwrap_or_else(|| text("")),
+    let current = match current {
+        Value::Dict(entry) => {
+            entry.get("entity_id").cloned().unwrap_or_else(|| entry.get("id").cloned().unwrap_or_else(|| text("")))
+        }
         other => Value::str(other.to_str()),
-    })
+    };
+    ctx.set_combat("current_actor", current.clone());
+    Ok(current)
 }
 
 /// `_handle_advance_initiative`.
@@ -373,7 +386,7 @@ pub(crate) fn handle_advance_initiative(body: &Value, effect: &Dict, ctx: &mut E
     };
     let mut selected = Value::None;
     for _ in 0..length {
-        let candidate = advance_turn(&ctx.combat_state())?;
+        let candidate = advance_turn(ctx)?;
         if candidate == Value::None {
             break;
         }
@@ -558,19 +571,11 @@ pub(crate) fn handle_clock_tick(body: &Value, ctx: &mut ExecutionContext<'_>) ->
     };
     let old = clock.get("filled_segments").cloned().unwrap_or(Value::Int(0));
     let maximum = clock.get("max_segments").cloned().unwrap_or(Value::Int(4));
-    let sum = crate::expr::ops::plus(&old, &Value::Int(segments))?;
+    let sum = crate::expr::ops::add(&old, &Value::Int(segments))?;
     let filled = if crate::expr::compare::py_order(crate::expr::compare::Order::Lt, &sum, &maximum)? { sum } else { maximum };
     let mut updated = (*clock).clone();
     updated.insert("filled_segments".into(), filled);
     let updated = ctx.replace_dict(&clock, updated);
     ctx.vars.insert(key, Value::Dict(updated));
     Ok(())
-}
-
-#[allow(dead_code)]
-fn combat_mode(mode: NestedMode) -> Combat {
-    match mode {
-        NestedMode::Package => Combat::Bridge,
-        NestedMode::Procedure => Combat::Own(Dict::new()),
-    }
 }

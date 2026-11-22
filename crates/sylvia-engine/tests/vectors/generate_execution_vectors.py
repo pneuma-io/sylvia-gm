@@ -38,7 +38,10 @@ from pathlib import Path
 import sylvia_gm.runtime._effect_executor as effect_executor
 from sylvia_gm.application.package_runtime import AuthorityMemoryStateBridge
 from sylvia_gm.dice import seeded_rolls
+import uuid
+
 from sylvia_gm.runtime._exceptions import MechanicsChoiceSuspended
+from sylvia_gm.runtime._procedure_executor import trigger_procedure
 from sylvia_gm.runtime._runtime import RulesetRuntime
 from sylvia_gm.runtime._tool_executor import execute_tool
 from sylvia_gm.runtime._types import ChoiceResolutionControl, RuntimeChoiceOption, RuntimeChoiceRequest
@@ -46,6 +49,21 @@ from sylvia_gm.runtime._types import ChoiceResolutionControl, RuntimeChoiceOptio
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "execution_vectors.json"
 HANDLERS_OUTPUT = HERE / "execution_handlers_vectors.json"
+PROCEDURES_OUTPUT = HERE / "execution_procedures_vectors.json"
+
+
+class _Counter:
+    """`uuid.uuid4()` for the vectors: `defer` names each call with a random id, which the Rust
+    test compares by shape (eight hex digits) instead of value."""
+
+    value = 0
+
+    def __call__(self):
+        _Counter.value += 1
+        return uuid.UUID(int=_Counter.value)
+
+
+uuid.uuid4 = _Counter()
 
 
 class _InOrder:
@@ -98,7 +116,7 @@ def choice_request(value: dict) -> RuntimeChoiceRequest:
 
 
 def run(document: dict, tool: str, params: dict, state=STATE, participants=PARTICIPANTS, seed=None,
-        choice=None) -> dict:
+        choice=None, procedures=False) -> dict:
     try:
         runtime = RulesetRuntime(None, copy.deepcopy(document))
     except Exception as error:  # noqa: BLE001
@@ -113,14 +131,24 @@ def run(document: dict, tool: str, params: dict, state=STATE, participants=PARTI
             prior_answers=tuple((choice_request(request), option) for request, option in choice["prior_answers"]))
     extras = {} if control is None else {"mechanics_choice_resolution": control}
 
+    def procedure(trigger_name, trigger_context, parent):
+        # As `materialize_package_mechanic`'s `procedure`.
+        return trigger_procedure(trigger_name, runtime.procedures, tools, bridge, runtime.ruleset_config,
+                                 runtime.definitions, context=trigger_context, combat_state=bridge.combat_state,
+                                 budget=parent.budget)
+
+    procedure_executor = procedure if procedures else None
+
     def nested(name, nested_params, parent):
         return execute_tool(name, nested_params, tools, bridge, runtime.ruleset_config, runtime.definitions,
-                            bridge.combat_state, tool_executor=nested, extras=extras, budget=parent.budget)
+                            bridge.combat_state, tool_executor=nested, extras=extras, budget=parent.budget,
+                            procedure_executor=procedure_executor)
 
     try:
         with seeded_rolls(seed):
             result = execute_tool(tool, copy.deepcopy(params), tools, bridge, runtime.ruleset_config,
-                                  runtime.definitions, bridge.combat_state, tool_executor=nested, extras=extras)
+                                  runtime.definitions, bridge.combat_state, tool_executor=nested, extras=extras,
+                                  procedure_executor=procedure_executor)
     except MechanicsChoiceSuspended as suspended:
         return {"raise": [type(suspended).__name__, str(suspended)], "request": plain(suspended.request),
                 **({} if control is None else {"control": [control.consumed, control.replayed_answers]})}
@@ -595,7 +623,195 @@ def shuffled_vars(document) -> list[str]:
     return names
 
 
+COMBAT_STATE = copy.deepcopy(ROLL_STATE)
+COMBAT_STATE[f"{NAMESPACE}.combat"] = {"round": 2, "turn_index": 0, "order": [
+    {"entity_id": "orc", "initiative_result": 15}, {"entity_id": "elf", "initiative_result": 9}, "box"]}
+COMBAT_STATE[f"{NAMESPACE}.entities"]["orc"]["init_mod"] = 2
+COMBAT_STATE[f"{NAMESPACE}.entities"]["elf"]["init_mod"] = 7
+COMBAT_STATE[f"{NAMESPACE}.entities"]["elf"]["down"] = True
+COMBAT_STATE[f"{NAMESPACE}.entities"]["_campaign"] = {"flags": {"lit": True, "off": 0}}
+COMBAT_STATE[f"{NAMESPACE}.state"]["party"] = ["orc", "elf", {"entity_id": "box"}, {"id": "ghost"}, 5]
+
+
+BARE_STATE = copy.deepcopy(ROLL_STATE)
+del BARE_STATE[f"{NAMESPACE}.combat"]
+STATES = {"combat": COMBAT_STATE, "bare": BARE_STATE}
+
+
+def procedure_tools(effects, procedures=None) -> dict:
+    choose = {"request_choice": {"choice_id": "c1", "prompt": "Choose for {target.name}", "options": CHOICE_OPTIONS},
+              "store_as": "_choice"}
+    document = handler_tools(effects, extra={
+        "ticker": {"parameters": [], "effects": [{"advance_time": "1 round"}, {"advance_initiative": {}, "store_as": "_a"}]},
+        "reader": {"parameters": [], "effects": [{"require": {"condition": "combat.round >= 3", "error": "reader saw a stale combat"}},
+                                                  {"trigger": "on_inner"}]},
+        "chooser": {"parameters": [{"name": "target", "type": "string", "resolve": "entity"}], "effects": [choose]}})
+    document["procedures"] = procedures if procedures is not None else {
+        "on_outer": {"trigger": "on_outer", "steps": [{"advance_time": "2 rounds"}, {"trigger": "on_inner"}, {"call": "reader"},
+                                                       {"log": {"message": "outer {combat}"}}]},
+        "on_inner": {"trigger": "on_inner", "steps": [{"require": {"condition": "combat.round >= 2", "error": "inner saw a stale combat"}},
+                                                       {"advance_time": "1 round"}, {"log": {"message": "inner {combat}"}}]},
+        "on_tick": {"trigger": "on_tick", "steps": [{"call": "ticker"}, {"advance_time": "1 round"}]},
+        "on_choose": {"trigger": "on_choose", "steps": [choose]},
+        "on_choose_call": {"trigger": "on_choose_call", "steps": [{"call": "chooser", "params": {"target": "{target}"}}]},
+        "on_flag": {"trigger": "on_flag", "condition": "_flag_lit", "steps": [{"log": {"message": "lit"}}]},
+        "on_flag_off": {"trigger": "on_flag", "condition": "_flag_off == true", "steps": [{"log": {"message": "off"}}]},
+        "on_hit": {"trigger": "on_hit", "steps": [{"log": {"message": "hit {target}"}}, {"set": {"field": "_seen", "value": "target"}},
+                                                   {"narrate": "proc narration"}, {"set": {"field": "_narrative_proc", "value": "'boom'"}}]},
+        "on_hit_second": {"trigger": "on_hit", "condition": "amount > 1", "steps": [{"log": {"message": "second"}}]},
+        "on_fail": {"trigger": "on_fail", "steps": [{"require": {"condition": "false", "error": "procedure refused"}}]},
+        "on_loop": {"trigger": "on_loop", "steps": [{"trigger": "on_loop"}]},
+        "on_call": {"trigger": "on_call", "steps": [{"call": "helper", "params": {"target": "{target}"}},
+                                                     {"set": {"field": "combat_note", "value": "'from procedure'"}}]},
+        "on_missing": {"trigger": "on_missing", "steps": [{"apply_damage": {"target": "ghost", "amount": 1}},
+                                                           {"log": {"message": "after missing"}}]},
+        "on_cond_error": {"trigger": "on_cond_error", "condition": "1 +", "steps": []},
+        "on_chain": {"trigger": "on_chain", "steps": [{"trigger": {"name": "on_hit", "context": {"target": "{target}", "amount": 3}}}]},
+    }
+    return document
+
+
+def procedure_targeted() -> list[dict]:
+    cases = []
+
+    def case(effects, params=None, procedures=None, state=None, choice=None):
+        item = {"document": procedure_tools(effects, procedures), "tool": "main",
+                "params": BASE_PARAMS if params is None else params}
+        if state is not None:
+            item["state"] = state
+        if choice is not None:
+            item["choice"] = choice
+        cases.append(item)
+
+    control = {"choice_id": "c1", "option_id": "flee", "expected_request": REQUEST, "prior_answers": []}
+    for state in (None, "combat", "bare"):
+        case([{"trigger": "on_outer", "store_as": "_r"}, {"set": {"field": "_combat", "value": "combat"}}], state=state)
+        case([{"trigger": "on_tick", "store_as": "_r"}, {"set": {"field": "_combat", "value": "combat"}}], state=state)
+    for name in ("on_tick", "on_choose", "on_choose_call", "on_flag"):
+        for state in (None, "combat"):
+            case([{"trigger": name, "context": {"target": "{_target_id}"}, "store_as": "_r"}], state=state)
+            if name.startswith("on_choose"):
+                case([{"trigger": name, "context": {"target": "{_target_id}"}}], state=state, choice=control)
+    case([{"request_choice": {"choice_id": "c1", "prompt": "Choose for {target.name}", "options": CHOICE_OPTIONS}, "store_as": "_c"},
+          {"trigger": "on_choose", "context": {"target": "{target}"}}], choice=control)
+    case([{"call": "chooser", "params": {"target": "{_target_id}"}}], choice=control)
+
+    for effect in ({"trigger": "on_hit", "context": {"target": "{target}"}, "store_as": "_r"},
+                   {"trigger": {"name": "on_hit", "context": {"target": "orc", "amount": "{amount}"}}, "store_as": "_r"},
+                   {"trigger": {"trigger": "on_hit"}}, {"trigger": "on_nothing", "store_as": "_r"}, {"trigger": "on_fail"},
+                   {"trigger": "on_loop"}, {"trigger": "on_call", "context": {"target": "orc"}}, {"trigger": "on_missing"},
+                   {"trigger": "on_cond_error"}, {"trigger": "on_chain", "context": {"target": "elf"}, "store_as": "_r"},
+                   {"trigger": ""}, {"trigger": 5}, {"trigger": {"name": "on_hit", "context": []}}, {"trigger": ["x"]}):
+        case([effect, {"set": {"field": "_after", "value": "1"}}])
+        case([effect, {"set": {"field": "_after", "value": "1"}}], state="combat")
+    for effect in ({"set_flag": "dragon_defeated"}, {"set_flag": "door", "value": False},
+                   {"set_flag": {"flag": "lit", "value": 3}}, {"set_flag": {"set_flag": "x"}}, {"set_flag": ""}, {"set_flag": 3}):
+        case([effect])
+    for body in ("1 round", "10 minutes", "2 hours", "1.5 hours", "1 day", " 3  rounds ", "1 fortnight", "x rounds", "rounds",
+                 "1round", "\u0663 rounds", "1 Rounds", {"duration": "2 rounds"}, {"advance_time": "1 minute"}, {}, 5):
+        case([{"advance_time": body}])
+        case([{"advance_time": body}], state="combat")
+    case([{"set": {"field": "round", "value": "'7'"}}, {"advance_time": "1 round"}])
+    case([{"set": {"field": "round", "value": "[1]"}}, {"advance_time": "1 round"}])
+    for body in ({"combatants": "_party"}, {"combatants": "_party", "expression": "d20 + 2"}, {"combatants": "_party", "roll": "5"},
+                 {"combatants": "_party", "modifier_field": "init_mod"}, {"combatants": "_party", "modifier_field": "missing"},
+                 {"combatants": "_party", "modifier_field": "init_mod", "modifier_minimum": 3},
+                 {"combatants": "_party", "modifier_field": "init_mod", "modifier_maximum": 5},
+                 {"combatants": "_party", "required_truthy_field": "down"}, {"combatants": "_party", "label_field": "name"},
+                 {"combatants": "_party", "modifier_field": " "}, {"combatants": "_party", "modifier_minimum": 1.5},
+                 {"combatants": "_party", "modifier_minimum": 5, "modifier_maximum": 2}, {"combatants": "_empty"}, "x"):
+        case([{"set": {"field": "_party", "value": ["orc", "elf"]}}, {"set": {"field": "_empty", "value": []}},
+              {"initiative": body, "store_as": "_order"}], state="combat")
+    case([{"set": {"field": "_party", "value": "state.party"}}, {"initiative": {"combatants": "_party"}}], state="combat")
+    for body in ({}, {"skip_field": "down", "skip_equals": True}, {"skip_field": "down", "skip_equals": "false"}, {"skip_field": " "},
+                 {"skip_field": "hp", "skip_equals": 5}, "x"):
+        case([{"advance_initiative": body, "store_as": "_actor"}], state="combat")
+        case([{"advance_initiative": body, "store_as": "_actor"}])
+    case([{"set": {"field": "order", "value": 3}}, {"advance_initiative": {}}])
+    case([{"set": {"field": "turn_index", "value": 5}}, {"advance_initiative": {}}], state="combat")
+    case([{"set": {"field": "turn_index", "value": -9}}, {"advance_initiative": {}}], state="combat")
+    for effect in ({"transition_scene": "tavern"}, {"transition_scene": {"scene": "road"}}, {"transition_scene": ""}, {"transition_scene": 1},
+                   {"defer": {"call": "helper", "params": {"target": "orc"}}}, {"defer": {"tool": "helper", "reason": "now", "priority": 1}, "store_as": "_d"},
+                   {"defer": {"params": {}}}, {"defer": "x"},
+                   {"register_initiative_trigger": {"trigger_id": "t1", "count": "3", "procedure": "on_hit"}},
+                   {"register_initiative_trigger": {"id": "t2", "count": "x", "procedure_name": "p", "repeats": 0, "source": 5}},
+                   {"register_initiative_trigger": {"procedure": "p"}}, {"register_initiative_trigger": {"trigger_id": "t"}},
+                   {"clock_create": {"clock_id": "doom", "max_segments": 6, "thresholds": {"3": "{target.name} stirs", "x": "no"},
+                                     "metadata": {"m": "{amount}", "n": 1}}},
+                   {"clock_create": {"id": "c2", "max_segments": "x"}}, {"clock_create": {}}):
+        case([effect, {"set": {"field": "_after", "value": "1"}}])
+    case([{"defer": {"call": "helper"}}, {"defer": {"call": "helper"}, "store_as": "_d2"}])
+    for effects in ([{"clock_create": {"clock_id": "doom", "max_segments": 4}}, {"clock_tick": "doom"}, {"clock_tick": {"clock_id": "doom", "segments": 9}}],
+                    [{"clock_create": {"clock_id": "doom"}}, {"set": {"field": "_alias", "value": "_clock_doom"}}, {"clock_tick": {"id": "doom", "segments": "2"}}],
+                    [{"clock_tick": "unknown"}], [{"set": {"field": "_clock_x", "value": 3}}, {"clock_tick": "x"}], [{"clock_tick": ""}],
+                    [{"clock_tick": {"clock_id": "doom", "segments": "x"}}], [{"clock_tick": 7}]):
+        case(effects)
+    return cases
+
+
+def random_procedure_effect(rng):
+    kind = rng.choice(["trigger", "trigger", "flag", "time", "init", "advance", "scene", "defer", "register", "clock", "tick", "set"])
+    if kind == "trigger":
+        return {"trigger": rng.choice(["on_hit", "on_call", "on_chain", "on_nothing", "on_fail"]),
+                "context": {"target": rng.choice(["{target}", "orc", "elf"]), "amount": rng.choice([1, 3])}, "store_as": "_r"}
+    if kind == "flag":
+        return {"set_flag": rng.choice(["a", "b"]), "value": rng.choice([True, False, 1])}
+    if kind == "time":
+        return {"advance_time": rng.choice(["1 round", "2 minutes", "1 hour", "x"])}
+    if kind == "init":
+        return {"initiative": {"combatants": "_party", **rng.choice([{}, {"modifier_field": "init_mod"}, {"label_field": "name"}])},
+                "store_as": "_order"}
+    if kind == "advance":
+        return {"advance_initiative": rng.choice([{}, {"skip_field": "down", "skip_equals": True}]), "store_as": "_actor"}
+    if kind == "scene":
+        return {"transition_scene": rng.choice(["a", "b"])}
+    if kind == "defer":
+        return {"defer": {"call": "helper", "params": {"target": "{target}"}}}
+    if kind == "register":
+        return {"register_initiative_trigger": {"trigger_id": rng.choice(["t", "u"]), "procedure": "on_hit", "count": rng.choice([1, "2"])}}
+    if kind == "clock":
+        return {"clock_create": {"clock_id": rng.choice(["c", "d"]), "max_segments": rng.choice([3, 4])}}
+    if kind == "tick":
+        return {"clock_tick": {"clock_id": rng.choice(["c", "d"]), "segments": rng.choice([1, 2])}}
+    return {"set": {"field": "_party", "value": rng.choice([["orc", "elf"], ["elf"], "state.party"])}}
+
+
+def random_procedure_cases(rng, count):
+    cases = []
+    for _ in range(count):
+        effects = [{"set": {"field": "_party", "value": ["orc", "elf"]}}] + [random_procedure_effect(rng)
+                                                                           for _ in range(rng.randint(1, 6))]
+        item = {"document": procedure_tools(effects), "tool": "main",
+                "params": {"target": rng.choice(["orc", "elf"]), "actor": "pc", "amount": rng.choice([1, 2, 3])}}
+        if rng.random() < 0.6:
+            item["state"] = "combat"
+        cases.append(item)
+    return cases
+
+
+def deferred_vars(document) -> list[str]:
+    names = []
+    for effect in document["tools"]["main"]["effects"]:
+        if isinstance(effect, dict) and "defer" in effect:
+            names.append(effect.get("store_as", "_deferred_id") if isinstance(effect.get("store_as", ""), str) else "_deferred_id")
+    return names
+
+
 def main() -> int:
+    procedure_cases = procedure_targeted() + random_procedure_cases(random.Random(6262), 2000)
+    for index, item in enumerate(procedure_cases):
+        item["seed"] = index
+        state = STATES.get(item.get("state"), ROLL_STATE)
+        item.update(run(item["document"], item["tool"], item["params"], state=state, seed=index, procedures=True,
+                        choice=item.get("choice")))
+        if deferred_vars(item["document"]):
+            item["deferred"] = deferred_vars(item["document"])
+        if wide({key: item[key] for key in ("result", "mutations") if key in item}):
+            item["wide_int"] = True
+    PROCEDURES_OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "namespace": NAMESPACE, "state": ROLL_STATE,
+                                               "states": STATES, "participants": PARTICIPANTS, "procedures": True,
+                                               "cases": procedure_cases}, ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
+    print(f"{len(procedure_cases)} procedure cases")
     handler_cases = handler_targeted() + random_handler_cases(random.Random(5151), 2500)
     for index, item in enumerate(handler_cases):
         item["seed"] = index

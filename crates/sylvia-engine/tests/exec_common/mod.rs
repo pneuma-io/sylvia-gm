@@ -7,7 +7,8 @@ use std::cell::Cell;
 use sylvia_base::pyyaml::{self, Data};
 use sylvia_domain::authority::{MechanicsChoiceOption, MechanicsChoiceRequest};
 use sylvia_engine::dice::Dice;
-use sylvia_engine::exec::context::ChoiceControl;
+use sylvia_engine::exec::context::{ChoiceControl, NestedMode, ProcedureExecutor};
+use sylvia_engine::exec::procedures::ExecProcedure;
 use sylvia_engine::exec::tool::data_value;
 use sylvia_engine::exec::{execute_tool, Combat, ExecError, ExecTool, MemoryStateBridge, ToolHost};
 use sylvia_engine::expr::value::{float_text, Dict, Value};
@@ -17,6 +18,7 @@ pub struct Host {
     tools: IndexMap<String, ExecTool>,
     ruleset_config: Value,
     definitions: Value,
+    procedures: Vec<ExecProcedure>,
 }
 
 impl ToolHost for Host {
@@ -28,6 +30,9 @@ impl ToolHost for Host {
     }
     fn definitions(&self) -> &Value {
         &self.definitions
+    }
+    fn procedures(&self) -> &[ExecProcedure] {
+        &self.procedures
     }
 }
 
@@ -94,7 +99,7 @@ fn section(ruleset: &[(Data, Data)], key: &str) -> Value {
 }
 
 /// One case's record, in the generator's shape.
-pub fn outcome(case: &Json, namespace: &str, state: &Dict, participants: &Dict) -> Json {
+pub fn outcome(case: &Json, namespace: &str, state: &Dict, participants: &Dict, procedures: bool) -> Json {
     let text = serde_json::to_string(&case["document"]).unwrap();
     let data =
         pyyaml::load(&text, pyyaml::Loader::C, pyyaml::Hooks::default()).unwrap().to_data().unwrap().unwrap();
@@ -113,7 +118,17 @@ pub fn outcome(case: &Json, namespace: &str, state: &Dict, participants: &Dict) 
             .collect(),
         ruleset_config: section(&tables.ruleset, "features"),
         definitions: section(&tables.ruleset, "definitions"),
+        procedures: tables
+            .procedures
+            .iter()
+            .filter_map(|(name, procedure)| match name {
+                Data::Str(name) => Some(ExecProcedure::from_def(name, procedure)),
+                _ => None,
+            })
+            .collect(),
     };
+    // As the generator's `run(..., procedures=True)`: the package's procedure executor.
+    let procedure = procedures.then_some(ProcedureExecutor { depth: 0, combat: Combat::Bridge });
     let mut bridge = MemoryStateBridge::new(namespace, state, Some(participants)).unwrap();
     let params = dict(&case["params"]);
     let tool = case["tool"].as_str().unwrap();
@@ -133,7 +148,18 @@ pub fn outcome(case: &Json, namespace: &str, state: &Dict, participants: &Dict) 
     let mut dice = Dice::new();
     let seed = case.get("seed").and_then(Json::as_i64).map(i128::from);
     let result = dice.seeded_rolls(seed, |dice| {
-        execute_tool(tool, &params, &host, Some(&mut bridge), Combat::Bridge, None, dice, control.as_ref())
+        execute_tool(
+            tool,
+            &params,
+            &host,
+            Some(&mut bridge),
+            Combat::Bridge,
+            None,
+            dice,
+            control.as_ref(),
+            procedure.clone(),
+            NestedMode::Package,
+        )
     });
     let control_record = control.as_ref().map(|c| json!([c.consumed.get(), c.replayed_answers.get()]));
     let result = match result {
@@ -172,12 +198,19 @@ pub fn outcome(case: &Json, namespace: &str, state: &Dict, participants: &Dict) 
 pub fn check_all(vectors: &Json, minimum: usize) {
     let namespace = vectors["namespace"].as_str().unwrap();
     let state = dict(&vectors["state"]);
+    let states: IndexMap<String, Dict> = vectors
+        .get("states")
+        .and_then(Json::as_object)
+        .map(|states| states.iter().map(|(name, state)| (name.clone(), dict(state))).collect())
+        .unwrap_or_default();
+    let procedures = vectors.get("procedures") == Some(&json!(true));
     let participants = dict(&vectors["participants"]);
     let cases = vectors["cases"].as_array().unwrap();
     assert!(cases.len() > minimum);
     let mut failures = Vec::new();
     for (index, case) in cases.iter().enumerate() {
-        let mut actual = outcome(case, namespace, &state, &participants);
+        let case_state = case.get("state").and_then(Json::as_str).map_or(&state, |name| &states[name]);
+        let mut actual = outcome(case, namespace, case_state, &participants, procedures);
         if case.get("wide_int") == Some(&json!(true)) {
             let error = actual["result"]["error"].as_str().unwrap_or_default();
             if !(actual["result"]["success"] == json!(false)
@@ -188,7 +221,7 @@ pub fn check_all(vectors: &Json, minimum: usize) {
             continue;
         }
         let mut wanted = case.clone();
-        for key in ["document", "tool", "params", "seed", "choice", "shuffled"] {
+        for key in ["document", "tool", "params", "seed", "choice", "shuffled", "state", "deferred"] {
             wanted.as_object_mut().unwrap().remove(key);
         }
         if let Some(names) = case.get("shuffled").and_then(Json::as_array) {
@@ -196,6 +229,20 @@ pub fn check_all(vectors: &Json, minimum: usize) {
                 for record in [&mut actual, &mut wanted] {
                     if let Some(Json::Array(items)) = record.pointer_mut(&format!("/result/context/{name}")) {
                         items.sort_by_key(|item| item.to_string());
+                    }
+                }
+            }
+        }
+        if let Some(names) = case.get("deferred").and_then(Json::as_array) {
+            // `defer` names each call with `uuid4()[:8]`; the generator pins it to zeros.
+            let mut ids: Vec<String> = names.iter().filter_map(Json::as_str).map(|n| format!("/result/context/{n}")).collect();
+            if let Some(Json::Array(calls)) = actual.pointer("/result/context/_deferred_calls") {
+                ids.extend((0..calls.len()).map(|i| format!("/result/context/_deferred_calls/{i}/call_id")));
+            }
+            for id in ids {
+                if let Some(slot) = actual.pointer_mut(&id) {
+                    if slot.as_str().is_some_and(|t| t.len() == 8 && t.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))) {
+                        *slot = json!("00000000");
                     }
                 }
             }

@@ -581,7 +581,7 @@ fn handle_nested_call(
     // The package's nested executor passes the bridge's combat state; a procedure's passes a copy.
     let combat = match (ctx.nested_mode, &ctx.combat) {
         (NestedMode::Package, Combat::Bridge) => Combat::Bridge,
-        (_, _) => Combat::Own(ctx.combat_state()),
+        (_, _) => Combat::own(ctx.combat_state()),
     };
     let budget = ctx.budget;
     let choice = if ctx.nested_mode == NestedMode::Package { ctx.choice } else { None };
