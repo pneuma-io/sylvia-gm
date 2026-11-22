@@ -52,6 +52,34 @@ async fn run(handle: &StoreHandle, op: &Json) -> StoreResult<Json> {
     }
 }
 
+/// The same read through the synchronous `AuthorityStore` methods lane 1's library sources call.
+fn run_sync(store: &AuthorityStore, op: &Json) -> StoreResult<Json> {
+    let text = |key: &str| op[key].as_str().unwrap().to_owned();
+    let (package_id, version, sha256) = (text("package_id"), text("version"), text("sha256"));
+    match op["op"].as_str().unwrap() {
+        "package_file_paths" => {
+            let limit = op["maximum_files"].as_i64().unwrap_or(DEFAULT_MAXIMUM_FILES);
+            Ok(json!(store.package_file_paths(&package_id, &version, &sha256, limit)?))
+        }
+        "package_text_file" => {
+            let limit = op["maximum_bytes"].as_i64().unwrap_or(DEFAULT_MAXIMUM_BYTES);
+            Ok(digest(&store.package_text_file(
+                &package_id,
+                &version,
+                &sha256,
+                &text("portable_path"),
+                limit,
+            )?))
+        }
+        "package_record" => {
+            let record = store.package_record(&package_id, &version, &sha256)?;
+            Ok(digest(&dumps(&Json::Object(record), Dump::CANONICAL)))
+        }
+        "package_label" => Ok(json!(store.package_label(&package_id, &version, &sha256)?)),
+        other => panic!("unknown operation {other}"),
+    }
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn package_reads_match_python() {
     let record = common::read_json("tests/vectors/package_reads/package_read_runs.json");
@@ -66,6 +94,9 @@ async fn package_reads_match_python() {
         record["operations"].as_array().unwrap().iter().zip(record["outcomes"].as_array().unwrap())
     {
         let got = run(&handle, op).await;
+        let owned = op.clone();
+        let sync = handle.call(move |store| Ok(run_sync(store, &owned))).await.unwrap();
+        assert_eq!(format!("{sync:?}"), format!("{got:?}"), "sync and async reads differ for {op}");
         let agrees = match (&got, want.get("error")) {
             (Ok(value), None) => value == &want["ok"],
             (Err(error), Some(kind)) => error.rejection().is_some_and(|coded| {
