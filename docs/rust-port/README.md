@@ -212,6 +212,17 @@ target/debug/sylvia-compare check --session crates/sylvia-compare/sessions/<name
 and prints where. Report the count of remaining differences per session in the pull request;
 it should only go down.
 
+**Large package archives (release build).** `cargo test --workspace` installs only two of the
+26 repository archives that carry an SRD Lite runtime. Each takes about 40 s to validate in a
+debug build. An ignored test installs the other 24 against Python's outcomes. Run it before any
+pull request that touches package admission (`sylvia-domain::package_archive`,
+`sylvia-app::package_library`) or the runtime validator (`sylvia-app::package_runtime`), and
+state the result in the pull request:
+
+```
+cargo test --release -p sylvia-app --test package_library_vectors -- --ignored
+```
+
 No GitHub Actions run for this branch. State in the pull request what you ran and where.
 
 **Dictation (Windows, the `dictation` feature).** `check.sh` never builds the `dictation`

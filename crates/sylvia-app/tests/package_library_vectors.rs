@@ -361,3 +361,25 @@ fn package_library_matches_python() {
 
     assert!(failures.is_empty(), "{} differ: {:#?}", failures.len(), &failures[..failures.len().min(8)]);
 }
+
+/// The 24 large repository archives the normal test leaves out. Each carries an SRD Lite runtime
+/// that takes about 40 s to validate in a debug build. Run before any PR that touches package
+/// admission or the runtime validator:
+/// `cargo test --release -p sylvia-app --test package_library_vectors -- --ignored`.
+#[test]
+#[ignore = "slow in debug: run with --release -- --ignored"]
+fn large_package_archives_match_python() {
+    let vectors = pyjson::loads(VECTORS).unwrap();
+    let cases = vectors["large_installs"].as_array().unwrap();
+    assert_eq!(cases.len(), 24);
+    let mut failures = Vec::new();
+    for case in cases {
+        let path = case["repository"].as_str().unwrap();
+        let archive = std::fs::read(repository().join(path)).unwrap();
+        let actual = install_outcome(&archive);
+        if actual != case["outcome"] {
+            failures.push(format!("install {path}: python {}, rust {actual}", case["outcome"]));
+        }
+    }
+    assert!(failures.is_empty(), "{} differ: {:#?}", failures.len(), &failures[..failures.len().min(8)]);
+}
