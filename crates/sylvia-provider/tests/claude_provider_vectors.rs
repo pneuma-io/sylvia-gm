@@ -359,7 +359,7 @@ async fn run_case(case: &Value, now: &str) {
     let _ = std::fs::remove_dir_all(home.parent().unwrap());
 }
 
-/// Rust's side of differences row NEXT: a step dropped after its first chunk (Stop) closes its
+/// Rust's side of differences row 45: a step dropped after its first chunk (Stop) closes its
 /// process and removes its files from the drop guard.
 async fn dropped_step(case: &Value, now: &str) {
     let home = python_resolve(&folder("dropped")).join("claude-runtime");
