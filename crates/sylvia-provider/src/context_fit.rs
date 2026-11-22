@@ -190,8 +190,10 @@ impl ContextFittingProvider {
         let Some(model) = self.provider.model_info() else { return Ok(Self::unselected()) };
         let runtime_managed = self.runtime_managed();
         let output_limit = output_allowance(model, false).unwrap_or(0);
-        let valid_context_window = model.context_window.filter(|&window| window > 0);
-        let valid_runtime_context_window = model.runtime_context_window.filter(|&window| window > 0);
+        // One snapshot of the figures an account runtime may have observed since construction.
+        let figures = model.context_figures();
+        let valid_context_window = figures.context_window.filter(|&window| window > 0);
+        let valid_runtime_context_window = figures.runtime_context_window.filter(|&window| window > 0);
         let minimum_context_satisfied = self.minimum_context_window.is_none_or(|minimum| {
             valid_runtime_context_window.is_some_and(|window| window >= minimum)
                 && valid_context_window.is_some_and(|window| window >= minimum)
@@ -256,7 +258,7 @@ impl ContextFittingProvider {
             required_tokens: None,
             required_token_bound: Some(required_bound),
             effective_context_capacity: valid_context_window,
-            capacity_source: model.context_window_source.clone(),
+            capacity_source: figures.context_window_source.clone(),
             admission_decision: decision,
             provider_transformation_overhead: overhead,
             output_budget_mode: if runtime_managed { "runtime_managed" } else { "enforced" },
@@ -264,13 +266,13 @@ impl ContextFittingProvider {
         let mut report = measurement.projection();
         report.insert("declared_context_window".into(), number(model.declared_context_window));
         report.insert("declared_context_source".into(), model.declared_context_source.clone().into());
-        report.insert("runtime_context_window".into(), number(model.runtime_context_window));
-        report.insert("runtime_context_source".into(), model.runtime_context_source.clone().into());
+        report.insert("runtime_context_window".into(), number(figures.runtime_context_window));
+        report.insert("runtime_context_source".into(), figures.runtime_context_source.clone().into());
         report.insert("configured_context_window".into(), number(model.configured_context_window));
         report.insert("declared_context_observed_at".into(), text(&model.declared_context_observed_at));
-        report.insert("runtime_context_observed_at".into(), text(&model.runtime_context_observed_at));
+        report.insert("runtime_context_observed_at".into(), text(&figures.runtime_context_observed_at));
         report.insert("configured_context_observed_at".into(), text(&model.configured_context_observed_at));
-        report.insert("context_observed_at".into(), text(&model.context_observed_at));
+        report.insert("context_observed_at".into(), text(&figures.context_observed_at));
         report.insert("minimum_context_window".into(), number(self.minimum_context_window));
         report.insert("minimum_context_satisfied".into(), minimum_context_satisfied.into());
         let audit = std::mem::take(&mut *self.audit_context.lock().expect("audit context lock"));

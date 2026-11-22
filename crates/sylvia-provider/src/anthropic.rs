@@ -1886,6 +1886,11 @@ impl Provider for AnthropicProvider {
         Some(&self.hooks)
     }
 
+    /// `_base_url`, as configured.
+    fn base_url(&self) -> Option<&str> {
+        Some(&self.base_url)
+    }
+
     fn request_representation(
         &self,
         messages: &[Json],

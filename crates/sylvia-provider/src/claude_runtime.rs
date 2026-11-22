@@ -362,7 +362,8 @@ pub enum RuntimeEvent {
 }
 
 /// `ClaudeConnection`: exactly one native process, with every stdio frame and pending reader
-/// bounded.
+/// bounded. A clone is a handle to the same process.
+#[derive(Clone)]
 pub struct ClaudeConnection {
     inner: Arc<Inner>,
 }

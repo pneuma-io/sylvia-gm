@@ -43,6 +43,11 @@ fn main() {
         .build()
         .expect("the owner runtime starts");
     let code = runtime.block_on(sylvia_owner::run(BufReader::new(stdin()), stdout()));
+    // Python's `atexit` hooks, last registered first: a pending Claude sign-in is cancelled
+    // (registered when it started), then the kept Claude Code processes close (registered at
+    // import), each removing its private files.
+    sylvia_provider::config::claude_settings::cancel_all();
+    sylvia_provider::claude_kept::close_all();
     // The stdin reader thread may still be blocked in a read; exit without waiting for it.
     std::process::exit(code);
 }

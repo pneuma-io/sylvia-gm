@@ -44,5 +44,11 @@ harness = false
 name = "kept_vectors"
 harness = false
 
+# ClaudeProvider. It is also the scripted stand-in Claude Code its cases run against, which must
+# answer before a test harness reads its arguments.
+[[test]]
+name = "claude_provider_vectors"
+harness = false
+
 [lints]
 workspace = true
