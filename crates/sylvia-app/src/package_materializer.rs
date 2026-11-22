@@ -79,7 +79,7 @@ fn os_error(error: &std::io::Error, path: &Path) -> DomainError {
 }
 
 /// `Path.resolve()` (non-strict).
-fn resolve(path: &Path) -> PathBuf {
+pub(crate) fn resolve(path: &Path) -> PathBuf {
     let text = path.to_string_lossy();
     let absolute = if platform::is_absolute(&text) {
         text.into_owned()
@@ -92,7 +92,7 @@ fn resolve(path: &Path) -> PathBuf {
 // ── Descriptor ─────────────────────────────────────────────────────────────────────────────
 
 /// `_bounded_json_shape(value)`.
-fn bounded_json_shape(value: &Json) -> DomainResult<()> {
+pub(crate) fn bounded_json_shape(value: &Json) -> DomainResult<()> {
     let mut stack = vec![(value, 1usize)];
     let mut nodes = 0usize;
     while let Some((item, depth)) = stack.pop() {
@@ -171,7 +171,7 @@ fn reparse_attribute(_metadata: &std::fs::Metadata) -> bool {
 }
 
 /// `_reject_reparse_chain(root, path)`: no link on the way from `path` up to `root`.
-fn reject_reparse_chain(root: &Path, path: &Path) -> DomainResult<()> {
+pub(crate) fn reject_reparse_chain(root: &Path, path: &Path) -> DomainResult<()> {
     let mut current = path.to_path_buf();
     loop {
         if is_reparse_point(&current)? {

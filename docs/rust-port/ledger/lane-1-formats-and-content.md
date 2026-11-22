@@ -54,7 +54,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_interview_extractor.py` | 347 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_interview_manifest.py` | 57 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::package_materializer` | ported | `package_materializer_vectors` (one file for Windows and Linux: compact sources, descriptor drafts, links, limits, export) |
-| `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::package_record_edits` | ported | `package_record_edit_vectors` (one file for Windows and Linux) |
 | `src/sylvia_gm/builder/_package_snapshots.py` | 222 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_draft_check.py` | 101 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_snapshot_materializer.py` | 292 | `sylvia-app::builder` | pending | |
