@@ -56,8 +56,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:6501` | `AuthorityOwner.read_campaign_reference` | .casefold() | `selected_heading.casefold().rstrip("s") if selected_heading is not None else ""` | |
 | `application/knowledge_search.py:101` | `knowledge_terms` | .casefold() | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | |
 | `infrastructure/builder_source_ingestion.py:143` | `_extract_source` | .casefold() | `extension = path.suffix.casefold()` | |
-| `infrastructure/campaign_archive.py:2587` | `validate_campaign_archive` | .casefold() | `casefold_aliases = [name.casefold() for name in names]` | |
-| `infrastructure/campaign_archive.py:2588` | `validate_campaign_archive` | unicodedata.normalize | `nfc_aliases = [unicodedata.normalize("NFC", name).casefold() for name in names]` | |
+| `infrastructure/campaign_archive.py:2587` | `validate_campaign_archive` | .casefold() | `casefold_aliases = [name.casefold() for name in names]` | `sylvia-store` archive_validation (`alias_case`, `alias_sharp_s`, `alias_long_s`) |
+| `infrastructure/campaign_archive.py:2588` | `validate_campaign_archive` | unicodedata.normalize | `nfc_aliases = [unicodedata.normalize("NFC", name).casefold() for name in names]` | `sylvia-store` archive_validation (`alias_nfc`, `no_alias_distinct`) |
 | `infrastructure/package_archive.py:146` | `_normalized_name` | unicodedata.normalize | `normalized = unicodedata.normalize("NFC", name)` | `sylvia-domain` archive_vectors |
 | `infrastructure/package_archive.py:149` | `_normalized_name` | .casefold() | `return normalized.casefold()` | `sylvia-domain` archive_vectors |
 

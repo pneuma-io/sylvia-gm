@@ -137,16 +137,16 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/builder_source_ingestion.py:225` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256(batch_id.encode("utf-8")).hexdigest()[:24]` | |
 | `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | `sylvia-app` purge |
 | `infrastructure/campaign_archive.py:724` | `source_authority_schema_claim_sha256` | hashlib.sha256 | `return hashlib.sha256(_json_bytes(preimage)).hexdigest()` | `sylvia-store` campaign_archive |
-| `infrastructure/campaign_archive.py:1550` | `_validate_manifest_derived_package_graph.closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
-| `infrastructure/campaign_archive.py:1696` | `_stream_member_digest` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/campaign_archive.py:1830` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | |
-| `infrastructure/campaign_archive.py:1833` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | |
-| `infrastructure/campaign_archive.py:2050` | `_record_manifest_summary` | hashlib.sha256 | `canonical_sha256=hashlib.sha256(canonical.encode("utf-8")).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2224` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2267` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(package_record)).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2272` | `_record_authority_summary` | hashlib.sha256 | `report_sha256=hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2325` | `_scan_authority_member` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/campaign_archive.py:2471` | `_validate_streamed_authority.streamed_closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
+| `infrastructure/campaign_archive.py:1550` | `_validate_manifest_derived_package_graph.closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | not needed: `_validate_manifest_derived_package_graph` has no product caller (retired) |
+| `infrastructure/campaign_archive.py:1696` | `_stream_member_digest` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:1830` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:1833` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2050` | `_record_manifest_summary` | hashlib.sha256 | `canonical_sha256=hashlib.sha256(canonical.encode("utf-8")).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2224` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2267` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(package_record)).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2272` | `_record_authority_summary` | hashlib.sha256 | `report_sha256=hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2325` | `_scan_authority_member` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2471` | `_validate_streamed_authority.streamed_closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | `sylvia-store` archive_validation |
 | `infrastructure/campaign_archive.py:3095` | `stage_campaign_archive` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `infrastructure/launch_handshake.py:84` | `LaunchHandshake.issue` | hmac.new | `response = hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | yes |
 | `infrastructure/launch_handshake.py:107` | `LaunchHandshake.verify` | hmac.compare_digest | `if not hmac.compare_digest( hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(), response_hex, ):` | yes |
@@ -227,7 +227,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_context_ledger.py:436` | `host_seal` | hashlib.sha256 | `digest = hashlib.sha256(b"sylvia-gm-host-record-seal/v1\x00" + session_id.encode("utf-8"))` | |
 | `agent/_context_ledger.py:491` | `_sha` | hashlib.sha256 | `return hashlib.sha256(text.encode("utf-8")).hexdigest()` | |
 | `agent/_inference_identity.py:18` | `inference_context_id` | hashlib.sha256 | `return "sylvia-" + hashlib.sha256(encoded).hexdigest()` | |
-| `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | |
+| `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_turn_phases.py:387` | `retry_repeated_response` | hashlib.sha256 | `"response_sha256": hashlib.sha256(state.narration.encode("utf-8")).hexdigest(),` | |
 | `agent/_stateless_mcp.py:2359` | `StatelessMcpMechanics.commit_campaign_file` | hashlib.sha256 | `update_id = f"campaign-file-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |
 | `agent/_stateless_mcp.py:2497` | `StatelessMcpMechanics.commit_narrative_state` | hashlib.sha256 | `update_id = f"narrative-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |

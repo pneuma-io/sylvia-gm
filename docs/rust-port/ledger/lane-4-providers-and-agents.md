@@ -14,7 +14,7 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/agent/__init__.py` | 49 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_activity.py` | 114 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_actor_decisions.py` | 318 | `sylvia-agent` | pending | |
-| `src/sylvia_gm/agent/_argument_contracts.py` | 258 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_argument_contracts.py` | 258 | `sylvia-agent` | in progress | `argument_contracts` (P2): `CONTRACT_KEY`, `ARGUMENTS_TOOL_NAME`, `ArgumentContract` (`canonical`, `selected`), `argument_contract`, `envelope_schema` and `ARGUMENTS_TOOL` (exported to `provider_session/tool_guidance.json`). Remaining, with the turn loop: `selected_schema`, `unwrap_arguments` (needs a Draft 2020-12 validator) and `read_tool_arguments`. Vectors: `tests/tool_projection_vectors.rs`. |
 | `src/sylvia_gm/agent/_builder_question_answers.py` | 127 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_builder_reference_copy_tool.py` | 98 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_builder_session.py` | 2,709 | `sylvia-agent` | pending | |
@@ -38,7 +38,7 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/agent/_plan_draft_check_tool.py` | 50 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_provider_resolver.py` | 636 | `sylvia-agent` | ported | `provider_resolver`: `_configured_provider_models`, `ConfiguredProviderResolver` (`model_choices`, `__call__`). The ChatGPT saved-model refresh and local discovery are injected `RuntimeHooks`, and providers come from the registry's `ProviderFactory`; the owner passes pending ones until those services are ported. Vectors: `tests/resolver_vectors.rs` |
 | `src/sylvia_gm/agent/_provider_runtime.py` | 38 | `sylvia-agent` | pending | |
-| `src/sylvia_gm/agent/_provider_session.py` | 4,258 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_provider_session.py` | 4,258 | `sylvia-agent` | in progress | `provider_session::tools` (P2): `_tool_alias`, `_package_tool_alias`, `_resolve_provider_tool_alias`, `_tool_description`, `_model_tool_schema` and `_provider_tools`; the two long provider-only argument schemas are exported to `tool_guidance.json` by `generate_tool_guidance.py`. Vectors: `tests/tool_projection_vectors.rs` (every SRD Lite tool through the catalog's model projection, the application tools, synthetic refusals). Next: the opening preflight (P1, P3, P4). |
 | `src/sylvia_gm/agent/_provider_turn_decisions.py` | 250 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_provider_turn_phases.py` | 3,156 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_provider_turn_state.py` | 185 | `sylvia-agent` | pending | |
@@ -51,7 +51,7 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/agent/_runner.py` | 2,549 | `sylvia-agent` | pending | Port without the `store` (`StateAPI`) and `reveal_guard` parameters and every `DM_SESSION` branch: no live caller in the 0.4.1 snapshot. The constructor refuses `DM_SESSION` before any of that code runs, and its two callers (`agent/_builder_session.py`) pass `BUILDER_FREEFORM`. If the Rust mode type can still hold `DM_SESSION`, construction refuses it with Python's `ValueError` text; if it cannot, this row will say the mode is not representable. |
 | `src/sylvia_gm/agent/_session_loop.py` | 1,953 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_skills.py` | 59 | `sylvia-agent` | pending | |
-| `src/sylvia_gm/agent/_stateless_mcp.py` | 2,828 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_stateless_mcp.py` | 2,828 | `sylvia-agent` | in progress | `stateless_mcp::ModelMechanicsTool` (P2), for lane 3's catalog work. The rest (the MCP listing and calls, `_model_input_schema`, the action-sequence and Campaign File tools) is pending. |
 | `src/sylvia_gm/agent/_tool_exposure.py` | 209 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_tool_loader.py` | 464 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_working_context.py` | 766 | `sylvia-agent` | pending | |

@@ -521,6 +521,50 @@ struct Registry {
 #[derive(Default)]
 pub(crate) struct Dictation(Mutex<Registry>, PathBuf);
 
+/// Under the development Rust owner switch (`SYLVIA_GM_RUST_OWNER=1`, development builds only)
+/// the speech worker is that owner's `--dictation-worker` too. A release build never has it.
+#[cfg(debug_assertions)]
+fn development_rust_worker() -> Option<PathBuf> {
+    crate::development_rust_owner_selected().then(crate::development_rust_owner).and_then(Result::ok)
+}
+
+#[cfg(not(debug_assertions))]
+fn development_rust_worker() -> Option<PathBuf> {
+    None
+}
+
+/// The Rust worker's native libraries for a development owner (`dictation::speech` in the
+/// Rust owner): passed through only to the Rust worker, which otherwise looks beside itself.
+const RUST_WORKER_NATIVES: &str = "SYLVIA_DICTATION_NATIVE_DIR";
+
+/// The worker program and its first argument: a packaged or given owner, the development Rust
+/// owner, the checkout's Python module, or the owner beside the desktop executable.
+fn worker_program(
+    given: Option<std::ffi::OsString>,
+    rust: Option<PathBuf>,
+    adjacent: PathBuf,
+    python: Option<PathBuf>,
+) -> (Command, bool) {
+    if let Some(executable) = given {
+        let mut command = Command::new(executable);
+        command.arg("--dictation-worker");
+        return (command, false);
+    }
+    if let Some(owner) = rust {
+        let mut command = Command::new(owner);
+        command.arg("--dictation-worker");
+        return (command, true);
+    }
+    if let Some(python) = python {
+        let mut command = Command::new(python);
+        command.args(["-m", "sylvia_gm.local_dictation_process"]);
+        return (command, false);
+    }
+    let mut command = Command::new(adjacent);
+    command.arg("--dictation-worker");
+    (command, false)
+}
+
 // Only fixed entry points and cache paths enter argv; recording options travel over bounded stdin.
 fn command(cache: &Path) -> Result<Command, String> {
     #[cfg(windows)]
@@ -531,24 +575,24 @@ fn command(cache: &Path) -> Result<Command, String> {
             .parent()
             .ok_or("unavailable")?
             .join("sylvia-gm-owner.exe");
-        let mut command = if let Some(executable) = std::env::var_os("SYLVIA_GM_OWNER_EXECUTABLE") {
-            let mut command = Command::new(executable);
-            command.arg("--dictation-worker");
-            command
-        } else if cfg!(debug_assertions) && !adjacent.is_file() {
-            let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .parent()
-                .ok_or("unavailable")?
-                .join(".venv/Scripts/python.exe");
-            let mut command = Command::new(python);
-            command.args(["-m", "sylvia_gm.local_dictation_process"]);
-            command
+        let python = if cfg!(debug_assertions) && !adjacent.is_file() {
+            Some(
+                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                    .parent()
+                    .ok_or("unavailable")?
+                    .join(".venv/Scripts/python.exe"),
+            )
         } else {
-            let mut command = Command::new(adjacent);
-            command.arg("--dictation-worker");
-            command
+            None
         };
+        let (mut command, rust) =
+            worker_program(std::env::var_os("SYLVIA_GM_OWNER_EXECUTABLE"), development_rust_worker(), adjacent, python);
         command.arg(cache).env_clear();
+        if rust {
+            if let Some(natives) = std::env::var_os(RUST_WORKER_NATIVES) {
+                command.env(RUST_WORKER_NATIVES, natives);
+            }
+        }
         for key in [
             "SystemRoot",
             "WINDIR",
@@ -966,6 +1010,35 @@ impl Dictation {
 #[cfg(all(test, windows))]
 mod tests {
     use super::*;
+
+    fn program(given: Option<&str>, rust: Option<&str>, python: Option<&str>) -> (Vec<String>, bool) {
+        let (command, is_rust) = worker_program(
+            given.map(std::ffi::OsString::from),
+            rust.map(PathBuf::from),
+            PathBuf::from("beside/sylvia-gm-owner.exe"),
+            python.map(PathBuf::from),
+        );
+        let mut argv = vec![command.get_program().to_string_lossy().into_owned()];
+        argv.extend(command.get_args().map(|argument| argument.to_string_lossy().into_owned()));
+        (argv, is_rust)
+    }
+
+    #[test]
+    fn the_rust_owner_switch_selects_its_dictation_worker_and_nothing_else_changes() {
+        // The switch: the development Rust owner's worker, ahead of the checkout's Python module.
+        assert_eq!(program(None, Some("target/debug/sylvia-gm-owner.exe"), Some("venv/python.exe")),
+            (vec!["target/debug/sylvia-gm-owner.exe".into(), "--dictation-worker".into()], true));
+        // A given owner executable still wins.
+        assert_eq!(program(Some("given.exe"), Some("target/debug/sylvia-gm-owner.exe"), None),
+            (vec!["given.exe".into(), "--dictation-worker".into()], false));
+        // Without the switch: the Python module in a development checkout, else the owner beside
+        // the desktop, as before.
+        assert_eq!(program(None, None, Some("venv/python.exe")),
+            (vec!["venv/python.exe".into(), "-m".into(), "sylvia_gm.local_dictation_process".into()], false));
+        assert_eq!(program(None, None, None),
+            (vec!["beside/sylvia-gm-owner.exe".into(), "--dictation-worker".into()], false));
+    }
+
     fn fixture(body: &str) -> Command {
         use std::os::windows::process::CommandExt;
         let mut command = Command::new("powershell.exe");
