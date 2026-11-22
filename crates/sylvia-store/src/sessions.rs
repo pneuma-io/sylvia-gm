@@ -136,7 +136,7 @@ fn message_table(session: &SessionRecord) -> &'static str {
 
 /// `sqlite_session.read_messages`. Python's decoded-message cache only saves work; every read
 /// still decodes exactly the saved rows, as here.
-fn read_messages(connection: &Connection, session_id: &str) -> StoreResult<Vec<SessionMessage>> {
+pub(crate) fn read_messages(connection: &Connection, session_id: &str) -> StoreResult<Vec<SessionMessage>> {
     let session = read_session(connection, session_id)?;
     let (columns, rows) = named_rows(
         connection,
@@ -171,7 +171,7 @@ pub(crate) fn py_eq(left: &Json, right: &Json) -> bool {
 }
 
 /// `sqlite_session.append_message`.
-fn append_message(
+pub(crate) fn append_message(
     connection: &Connection,
     session_id: &str,
     message_id: &str,
@@ -485,7 +485,7 @@ fn rename_builder_chat(
 }
 
 /// `sqlite_session.insert_session`.
-fn insert_session(connection: &Connection, record: &SessionRecord) -> StoreResult<SessionRecord> {
+pub(crate) fn insert_session(connection: &Connection, record: &SessionRecord) -> StoreResult<SessionRecord> {
     let fields = record.fields();
     let Some(campaign_id) = fields.campaign_id.as_deref() else {
         return Err(value_error("Standalone Builder chats use insert_builder_chat"));

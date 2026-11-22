@@ -19,7 +19,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/bundled_packages.py:147` | `_package_payload` | .casefold() | `if path.suffix.casefold() in _TEXT_PACKAGE_SUFFIXES:` |  `sylvia-app` bundled_vectors |
 | `application/bundled_packages.py:476` | `bundled_rift_source_catalog` | .casefold() | `return tuple(path for path in values if not needle or needle in path.casefold())[:512]` |  `sylvia-app` bundled_vectors |
 | `application/character_card_import.py:154` | `_asset_uri` | .isspace() | `if len(uri) > 4096 or "\x00" in uri or any(c.isspace() for c in uri):` | |
-| `application/character_profiles.py:134` | `validate_character_profile` | .isspace() | `if any(character.isspace() for character in uri):` | |
+| `application/character_profiles.py:134` | `validate_character_profile` | .isspace() | `if any(character.isspace() for character in uri):` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:132` | `_folded_portable_name` | unicodedata.normalize | `if unicodedata.normalize("NFC", name) != name:` | |
 | `application/import_repair.py:134` | `_folded_portable_name` | .casefold() | `return name.casefold()` | |
 | `application/library_sources.py:41` | `LibrarySourceReader.candidates` | .casefold() | `folded = query.casefold()` | |
@@ -119,7 +119,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/owner_process.py:1176` | `_selection_from_reference` | .casefold() | `folded = reference.casefold()` | |
 | `interfaces/owner_process.py:1188` | `_selection_from_reference` | .casefold() | `candidates = {model_id.casefold(), upstream_id.casefold()}` | |
 | `interfaces/owner_process.py:1190` | `_selection_from_reference` | .casefold() | `candidates.add(model_name.casefold())` | |
-| `local_dictation_process.py:122` | `serve_session` | .isalnum() | `c.isascii() and (c.isalnum() or c == "-") for c in identity` | |
+| `local_dictation_process.py:122` | `serve_session` | .isalnum() | `c.isascii() and (c.isalnum() or c == "-") for c in identity` | `dictation_vectors` (non-ASCII letters, a space, `-`) |
 | `release_artifact.py:336` | `_validated_artifacts` | .casefold() | `if source.suffix.casefold() != expected_suffix:` | |
 | `release_artifact.py:338` | `_validated_artifacts` | .casefold() | `folded = name.casefold()` | |
 | `release_artifact.py:348` | `_validated_artifacts` | .casefold() | `return tuple(sorted(validated, key=lambda item: item.source.name.casefold()))` | |

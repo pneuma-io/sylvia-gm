@@ -26,11 +26,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_card_import.py:461` | `load_import_original` | len() against a limit | `or len(source) > MAX_CARD_BYTES` | |
 | `application/character_card_import.py:524` | `_read_pending_preview` | len() against a limit | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
 | `application/character_card_import.py:590` | `stage_card_preview` | len() against a limit | `if len(tuple(root.iterdir())) >= MAX_PENDING_PREVIEWS:` | |
-| `application/character_profiles.py:70` | `_parse` | len() against a limit | `if not data or len(data) > MAX_PROFILE_BYTES:` | |
-| `application/character_profiles.py:170` | `validate_character_profile` | len() against a limit | `if len(canonical_json_bytes(value)) > MAX_PROFILE_BYTES:` | |
-| `application/character_profiles.py:254` | `validate_source_profile` | len() against a limit | `or len(name) > 160` | |
-| `application/character_profiles.py:344` | `save_character_profile` | len() against a limit | `if len(tuple(root.iterdir())) >= 256:` | |
-| `application/character_profiles.py:383` | `character_profile_catalog` | len() against a limit | `if len(paths) > 256:` | |
+| `application/character_profiles.py:70` | `_parse` | len() against a limit | `if not data or len(data) > MAX_PROFILE_BYTES:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:170` | `validate_character_profile` | len() against a limit | `if len(canonical_json_bytes(value)) > MAX_PROFILE_BYTES:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:254` | `validate_source_profile` | len() against a limit | `or len(name) > 160` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:344` | `save_character_profile` | len() against a limit | `if len(tuple(root.iterdir())) >= 256:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:383` | `character_profile_catalog` | len() against a limit | `if len(paths) > 256:` |  `sylvia-app` character_profile_vectors |
 | `application/character_rules.py:42` | `validate_character_rules` | len() against a limit | `if (not isinstance(value["description"], str) or not 1 <= len(value["description"]) <= 2000` |  `sylvia-app` character_rules_vectors |
 | `application/import_repair.py:119` | `_read_selected_source` | len() against a limit | `if len(value) > _SOURCE_BYTE_LIMIT:` | |
 | `application/import_repair.py:148` | `_read_safe_zip` | len() against a limit | `if not infos or len(infos) > _MEMBER_COUNT_LIMIT:` | |
@@ -393,8 +393,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/webui.py:642` | `LocalWebUI.export` | len() against a limit | `if len(self.downloads) >= 128:` | not driven: it needs 128 exports; `export` keeps the bound (`webui_file_vectors` makes five) |
 | `interfaces/webui.py:718` | `LocalWebUI.upload` | len() against a limit | `if len(text) > MAX_UPLOAD_PARAMS_BYTES:` | `webui-guard` (upload parameters over 16 KiB: `Maximum request body size 16384 exceeded.`) |
 | `interfaces/webui.py:736` | `LocalWebUI.upload` | len() against a limit | `or len(name) > 180` | `webui-guard` (upload names), `webui::tests::upload_names_are_checked_like_python` |
-| `local_dictation.py:172` | `transcribe` | len() against a limit | `if len(result.encode("utf-8")) > 128_000:` | |
-| `local_dictation_process.py:63` | `serve` | len() against a limit | `if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:` | |
-| `local_dictation_process.py:117` | `serve_session` | len() against a limit | `if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:` | |
-| `local_dictation_process.py:121` | `serve_session` | len() against a limit | `if not isinstance(identity, str) or not 0 < len(identity) <= 64 or not all(` | |
+| `local_dictation.py:172` | `transcribe` | len() against a limit | `if len(result.encode("utf-8")) > 128_000:` | `dictation_vectors` (128,000 bytes accepted, one more refused) |
+| `local_dictation_process.py:63` | `serve` | len() against a limit | `if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:` | `dictation_vectors` (8,192 and 8,193 bytes, 8,193 characters, multibyte, no newline) |
+| `local_dictation_process.py:117` | `serve_session` | len() against a limit | `if not line.endswith("\n") or len(line.encode("utf-8")) > 8192:` | `dictation_vectors` (a session line too long, no newline) |
+| `local_dictation_process.py:121` | `serve_session` | len() against a limit | `if not isinstance(identity, str) or not 0 < len(identity) <= 64 or not all(` | `dictation_vectors` (empty, 64 and 65 characters) |
 | `release_artifact.py:302` | `_safe_leaf` | len() against a limit | `or len(name) > 180` | |

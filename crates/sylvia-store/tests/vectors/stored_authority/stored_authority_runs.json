@@ -2397,6 +2397,234 @@
     "code": "schema_identity_mismatch",
     "message": "Saved campaign construction records failed an integrity check"
    }
+  },
+  {
+   "name": "failed_untouched",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "failed_marker_revision_other",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":7,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":7,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_revision_true",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":true,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":true,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_revision_float",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8.0,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8.0,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_policy_unknown",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"never\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"never\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_policy_extra",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"required\",\"note\":\"x\",\"response\":\"automatic\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"required\",\"note\":\"x\",\"response\":\"automatic\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_policy_required",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"required\",\"response\":\"automatic\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"required\",\"response\":\"automatic\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "failed_marker_button_out_of_range",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":9,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":9,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_session_padded",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":\" dm-1\",\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":\" dm-1\",\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_session_named",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":\"dm-1\",\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":\"dm-1\",\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "failed_marker_selection_list",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":[],\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":[],\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_extra_member",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"note\":\"x\",\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"note\":\"x\",\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_panel_control",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"control\":\"panel\",\"expected_revision\":8,\"panel_action_id\":\"act-1\",\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"surface_id\":\"surface-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":{\"control\":\"panel\",\"expected_revision\":8,\"panel_action_id\":\"act-1\",\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"surface_id\":\"surface-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "failed_marker_kind_other",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"check_failed\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"check_failed\",\"origin\":{\"button_index\":0,\"control\":\"result_card\",\"expected_revision\":8,\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{},\"session_id\":null,\"source_action_id\":\"action-1\"}}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_without_origin",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\"}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\"}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_replaced",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"check_rolled\",\"total\":3}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"check_rolled\",\"total\":3}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
+  },
+  {
+   "name": "failed_marker_origin_list",
+   "base": "failed",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE consequences SET payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":[]}' WHERE action_id = 'action-2'",
+    "UPDATE canonical_events SET safe_payload_json = '{\"kind\":\"sylvia_player_action\",\"origin\":[]}' WHERE action_id = 'action-2' AND event_type = 'consequence'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
   }
  ]
 }

@@ -32,9 +32,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_card_import.py:524` | `_read_pending_preview` | hashlib.sha256 | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
 | `application/character_card_import.py:535` | `_confirmed_card_result` | hashlib.sha256 | `profile_digest = hashlib.sha256(canonical_json_bytes(preview.profile)).hexdigest()` | |
 | `application/character_card_import.py:536` | `_confirmed_card_result` | hashlib.sha256 | `operation_hash = hashlib.sha256(("desktop-card:" + digest).encode()).hexdigest()[:24]` | |
-| `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` | |
-| `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` | |
-| `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
+| `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` |  `sylvia-app` character_profile_vectors |
+| `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:124` | `_read_selected_source` | hashlib.sha256 | `return hashlib.sha256(data).hexdigest(), data` | |
 | `application/import_repair.py:237` | `inspect_repair_source` | hashlib.sha256 | `_read_safe_zip(snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest())` | |
 | `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | |
@@ -290,8 +290,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/webui.py:107` | `RemoteAccess.from_file` | hashlib.sha256 | `return cls(origin, hashlib.sha256(matched[1]).digest())` | `webui-remote` (the access-key file's digest, then a key sign-in) |
 | `interfaces/webui.py:442` | `LocalWebUI.login` | hashlib.sha256 | `hashlib.sha256(key.encode()).digest(), self.remote.key_digest` | `webui-remote` (right and wrong access keys) |
 | `interfaces/webui.py:525` | `LocalWebUI.command` | hashlib.sha256 | `digest = hashlib.sha256( json.dumps( [method, params], sort_keys=True, allow_nan=False, ).encode() ).hexdigest()` | `webui-guard` (a repeated request identity with other parameters: `idempotency_conflict`) |
-| `local_dictation.py:42` | `_verified` | hashlib.file_digest | `return hashlib.file_digest(stream, "sha256").hexdigest() == expected[1]` | |
-| `local_dictation.py:210` | `_device_id` | hashlib.sha256 | `identity = hashlib.sha256( f"{host}\n{row['name']}\n{row['default_samplerate']}".encode() ).hexdigest()[:16]` | |
+| `local_dictation.py:42` | `_verified` | hashlib.file_digest | `return hashlib.file_digest(stream, "sha256").hexdigest() == expected[1]` | `dictation_vectors` (capabilities and prepare with complete, missing and corrupt model files) |
+| `local_dictation.py:210` | `_device_id` | hashlib.sha256 | `identity = hashlib.sha256( f"{host}\n{row['name']}\n{row['default_samplerate']}".encode() ).hexdigest()[:16]` | `dictation_vectors` (`device_ids`: int and float rates, non-ASCII names; every capabilities scenario) |
 | `portable_artifact.py:80` | `_digest` | hashlib.sha256 | `return hashlib.sha256(raw).hexdigest()` | |
 | `release_artifact.py:124` | `_sha256_file` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `release_artifact.py:405` | `read_dependency_notices` | hashlib.sha256 | `if expected_sha256 is not None and hashlib.sha256(content).hexdigest() != expected_sha256:` | |

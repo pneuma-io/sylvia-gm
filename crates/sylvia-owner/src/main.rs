@@ -25,6 +25,11 @@ fn main() {
                 let written = output.write_all(line.as_bytes()).and_then(|()| output.flush());
                 std::process::exit(if written.is_ok() { 0 } else { 120 });
             }
+            // The speech worker takes the model folder; the runtime is the owner's own build.
+            Some("--dictation-worker") => {
+                let mut runtime = sylvia_owner::dictation::Absent::default();
+                std::process::exit(sylvia_owner::dictation::worker::main(&arguments[2..], &mut runtime));
+            }
             _ => {}
         }
     }

@@ -36,6 +36,58 @@ fn development_python(environment: &Path) -> PathBuf {
     }
 }
 
+/// The Rust port's owner as the checkout's Cargo workspace builds it
+/// (`cargo build -p sylvia-owner` at the repository root). Development builds only: a release
+/// build never contains it, so the shipped desktop always starts its bundled owner.
+#[cfg(debug_assertions)]
+pub fn development_rust_owner() -> Result<PathBuf, String> {
+    Ok(PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?
+        .join("target")
+        .join("debug")
+        .join(OWNER_EXECUTABLE))
+}
+
+/// `SYLVIA_GM_RUST_OWNER=1`: a development build starts the Rust port's owner in place of the
+/// checkout's Python owner. Until cutover the Python owner stays the default.
+#[cfg(debug_assertions)]
+fn development_rust_owner_selected() -> bool {
+    std::env::var_os("SYLVIA_GM_RUST_OWNER").is_some_and(|value| value == "1")
+}
+
+#[cfg(test)]
+mod rust_owner_switch_tests {
+    use super::{development_rust_owner, OwnerBridge};
+    use serde_json::json;
+    use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+    #[test]
+    #[ignore = "needs the Rust owner: cargo build -p sylvia-owner at the repository root"]
+    fn the_development_switch_starts_the_rust_owner() {
+        assert!(development_rust_owner().unwrap().is_file(), "build the Rust owner first");
+        let nonce = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let root = std::env::temp_dir().join(format!("sylvia-rust-owner-switch-{}-{nonce}", std::process::id()));
+        std::fs::create_dir_all(&root).unwrap();
+        // The only test in this binary that reads the variable.
+        std::env::set_var("SYLVIA_GM_RUST_OWNER", "1");
+        let bridge = OwnerBridge::spawn_default(&root.join("authority.sqlite3"), false, None);
+        std::env::remove_var("SYLVIA_GM_RUST_OWNER");
+        let bridge = bridge.expect("the development build starts the Rust owner");
+        assert_eq!(bridge.request("campaign_index", json!({})).unwrap(), json!([]));
+        // Only the Rust owner, which does not answer it yet, refuses this command.
+        let refused = bridge.request("package_candidates", json!({})).unwrap_err();
+        assert!(refused.contains("The Rust owner does not answer package_candidates yet."), "{refused}");
+        let deadline = Instant::now() + Duration::from_secs(8);
+        while let Err(error) = bridge.shutdown() {
+            assert!(Instant::now() < deadline, "owner was not collected: {error}");
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        drop(bridge);
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+}
+
 type HmacSha256 = Hmac<Sha256>;
 
 struct DesktopUpdateLaunch {
@@ -90,6 +142,13 @@ impl OwnerBridge {
         Self::spawn_command(Command::new(executable), database, None, None)
     }
 
+    /// The Rust port's owner from the checkout's workspace build, through the same launch and
+    /// handshake as every other owner.
+    #[cfg(debug_assertions)]
+    pub fn spawn_rust(database: &Path) -> Result<Self, String> {
+        Self::spawn_packaged(&development_rust_owner()?, database)
+    }
+
     fn spawn_default(database: &Path, portable: bool, startup: Option<Value>) -> Result<Self, String> {
         if startup.is_some() && (
             !cfg!(all(windows, target_arch = "x86_64"))
@@ -104,6 +163,10 @@ impl OwnerBridge {
         }
 
         if cfg!(debug_assertions) && !portable {
+            #[cfg(debug_assertions)]
+            if development_rust_owner_selected() {
+                return Self::spawn_rust(database);
+            }
             let environment = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .parent()
                 .ok_or_else(|| "Sylvia GM repository root is unavailable".to_string())?

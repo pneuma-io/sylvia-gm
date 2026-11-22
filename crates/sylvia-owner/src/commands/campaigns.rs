@@ -23,6 +23,66 @@ pub(crate) fn store_error(error: sylvia_store::StoreError) -> sylvia_base::Coded
     error.rejection().unwrap_or_else(|| sylvia_base::CodedError::new("internal_error", error.to_string()))
 }
 
+/// `handle_create_guided_campaign_draft`: a new Guided Campaign Draft with its owner-assigned
+/// Builder session, whose effort and speed are settled before the Draft exists and saved only
+/// when this is not a replay.
+pub async fn handle_create_guided_campaign_draft(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> CodedResult<Json> {
+    if params.contains_key("builder_session_id") {
+        return Err(protocol("builder_session_id is owner-assigned"));
+    }
+    let operation_id = required(params, "operation_id")?;
+    let builder_session_id =
+        format!("session-guided-{}", &sylvia_base::hash::sha256_hex(operation_id.as_bytes())[..24]);
+    let provider_id = required(params, "provider_id")?;
+    let model_id = required(params, "model_id")?;
+    let start = crate::chat_start::chat_start_for(ctx, "builder", &provider_id, &model_id, params).await?;
+    let replayed = crate::chat_start::session_exists(ctx, &builder_session_id).await?;
+    let display_name = required(params, "display_name")?;
+    let draft = ctx
+        .store
+        .create_guided_campaign_draft(
+            &operation_id,
+            &display_name,
+            &builder_session_id,
+            &provider_id,
+            &model_id,
+        )
+        .await
+        .map_err(store_error)?;
+    if !replayed {
+        crate::chat_start::apply_chat_start(ctx, &draft.builder_session_id, &start).await?;
+    }
+    Ok(guided_draft_value(&draft))
+}
+
+/// The reply of the guided Draft commands: the Draft's fields Python's handler lists.
+fn guided_draft_value(draft: &sylvia_domain::authority::GuidedCampaignDraft) -> Json {
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), draft.campaign_id.as_str().into());
+    value.insert("builder_session_id".into(), draft.builder_session_id.as_str().into());
+    value.insert("current_step".into(), draft.current_step.as_str().into());
+    value.insert("construction_revision".into(), draft.construction_revision.into());
+    value.insert("resulting_revision".into(), draft.resulting_revision.into());
+    value.insert("answer_message_id".into(), draft.answer_message_id.clone().into());
+    Json::Object(value)
+}
+
+/// `_required_text(params, key)` as a handler's error.
+fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
+    crate::dispatch::required_text(params, key).map_err(|failure| match failure {
+        crate::dispatch::Failure::Rejected(error) => error,
+        _ => unreachable!("a missing parameter is a rejection"),
+    })
+}
+
+/// `OwnerProtocolError(message)`.
+fn protocol(message: &str) -> sylvia_base::CodedError {
+    sylvia_base::CodedError::rejected(message).with_error_type("OwnerProtocolError")
+}
+
 /// `_json_value(ModelGuidanceDecision)`: the dataclass fields in declaration order.
 fn model_guidance_value(decision: &sylvia_domain::model_capability::ModelGuidanceDecision) -> Json {
     let fields = decision.fields();

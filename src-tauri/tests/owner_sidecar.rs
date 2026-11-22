@@ -1,8 +1,7 @@
 use serde_json::json;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
-use support::await_clean_shutdown;
-use sylvia_gm::OwnerBridge;
+use support::{await_clean_shutdown, spawn_test_owner};
 
 mod support;
 
@@ -22,19 +21,9 @@ fn rust_host_handshakes_and_reopens_authority_child() {
     let root = test_directory();
     std::fs::create_dir_all(&root).expect("create test directory");
     let database = root.join("authority.sqlite3");
-    let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .expect("repository root")
-        .join(".venv");
-    let python = if cfg!(windows) {
-        python.join("Scripts").join("python.exe")
-    } else {
-        python.join("bin").join("python")
-    };
-
     {
-        let bridge = OwnerBridge::spawn_python(&python, &database)
-            .expect("Rust host launches verified Python owner");
+        let bridge = spawn_test_owner(&database)
+            .expect("Rust host launches verified owner");
         assert_eq!(
             bridge
                 .request("campaign_index", json!({}))
@@ -93,8 +82,8 @@ fn rust_host_handshakes_and_reopens_authority_child() {
     }
 
     {
-        let reopened = OwnerBridge::spawn_python(&python, &database)
-            .expect("Rust host reopens verified Python owner");
+        let reopened = spawn_test_owner(&database)
+            .expect("Rust host reopens verified owner");
         let index = reopened
             .request("campaign_index", json!({}))
             .expect("reopened campaign index");
