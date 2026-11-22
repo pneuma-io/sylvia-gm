@@ -136,6 +136,7 @@ fn transport(environment: Vec<(String, String)>) -> Arc<NetworkTransport> {
         timeouts: TimeoutConfig::default(),
         proxies: ProxySource { environment, windows: false, registry: None },
         trust: TrustSource::Bundled,
+        follow_redirects: true,
     };
     Arc::new(NetworkTransport::new(settings).expect("client builds"))
 }

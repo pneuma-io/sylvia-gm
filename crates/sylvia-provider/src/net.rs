@@ -7,7 +7,7 @@
 //! | `SSL_CERT_FILE`, else `SSL_CERT_DIR`, else certifi | that file, that folder's certificates, else the bundled webpki roots (both Mozilla's set) |
 //! | connect 15 s, read 120 s (each read) | `connect_timeout`, `read_timeout` from [`TimeoutConfig`] |
 //! | keep-alive expiry 5 s, 100 idle connections | `pool_idle_timeout(5 s)`, `pool_max_idle_per_host(100)` |
-//! | `follow_redirects=True`, at most 20 | `redirect::Policy::limited(20)` |
+//! | `follow_redirects=True`, at most 20 (Sylvia's own discovery clients: none) | `redirect::Policy::limited(20)` (or `none`) |
 //! | a cookie jar per client | `cookie_store(true)` |
 //! | header values decoded as ASCII, else UTF-8, else Latin-1 (one choice for all headers) | [`decode_headers`] |
 //!
@@ -56,12 +56,33 @@ pub struct ClientSettings {
     pub timeouts: TimeoutConfig,
     pub proxies: ProxySource,
     pub trust: TrustSource,
+    /// httpx's `follow_redirects`: the SDK's client follows up to 20; Sylvia's own discovery
+    /// clients (`httpx.Client(follow_redirects=False)`) follow none.
+    pub follow_redirects: bool,
 }
 
 impl ClientSettings {
     /// The process's environment, as the SDK reads it when it builds its client.
     pub fn from_system(timeouts: TimeoutConfig) -> Self {
-        Self { timeouts, proxies: ProxySource::from_system(), trust: TrustSource::from_environment() }
+        Self {
+            timeouts,
+            proxies: ProxySource::from_system(),
+            trust: TrustSource::from_environment(),
+            follow_redirects: true,
+        }
+    }
+
+    /// A plain `httpx.Client(timeout=seconds, follow_redirects=False)` with the process
+    /// environment: one timeout for every phase, no redirects.
+    pub fn plain(seconds: f64) -> Self {
+        let timeouts = TimeoutConfig {
+            connect: seconds,
+            read: seconds,
+            write: seconds,
+            pool: seconds,
+            ..TimeoutConfig::default()
+        };
+        Self { follow_redirects: false, ..Self::from_system(timeouts) }
     }
 }
 
@@ -118,7 +139,11 @@ fn build_client(settings: &ClientSettings) -> Result<reqwest::Client, ProxyError
         .read_timeout(seconds(settings.timeouts.read))
         .pool_idle_timeout(Duration::from_secs(5))
         .pool_max_idle_per_host(100)
-        .redirect(reqwest::redirect::Policy::limited(20))
+        .redirect(if settings.follow_redirects {
+            reqwest::redirect::Policy::limited(20)
+        } else {
+            reqwest::redirect::Policy::none()
+        })
         .cookie_store(true);
     if let Some(certificates) = certificates(&settings.trust)? {
         builder = builder.tls_built_in_root_certs(false);

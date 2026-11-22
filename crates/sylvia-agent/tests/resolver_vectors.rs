@@ -4,6 +4,7 @@
 //! Credentials are disposable test values under a deterministic fake seal; nothing reads a real
 //! settings file or credential.
 
+use futures_util::FutureExt;
 use serde_json::{json, Value as J};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
@@ -16,6 +17,7 @@ use sylvia_domain::session::{SessionRecord, SessionRecordFields};
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::config::protection::{self, Seal};
 use sylvia_provider::config::{data_from_json, ConfigFailure, Data};
+use sylvia_provider::provider::BoxFuture;
 use sylvia_provider::provider::{FakeProvider, Provider};
 use sylvia_provider::registry::ProviderFactory;
 use sylvia_provider::request_metadata::opencode_request_headers;
@@ -111,7 +113,10 @@ impl RuntimeHooks for Hooks {
         self.refresh
     }
 
-    fn discover_local_models(&self, request: &LocalDiscovery<'_>) -> Result<Data, ConfigFailure> {
+    fn discover_local_models<'a>(
+        &'a self,
+        request: LocalDiscovery<'a>,
+    ) -> BoxFuture<'a, Result<Data, ConfigFailure>> {
         self.discovery_calls.lock().unwrap().push(json!({
             "base_url": request.base_url,
             "limit": request.limit,
@@ -119,11 +124,12 @@ impl RuntimeHooks for Hooks {
             "provider_id": request.provider_id,
             "query": request.query,
         }));
-        match &self.discovery {
+        let answer = match &self.discovery {
             J::String(message) => Err(ConfigFailure::Config(message.clone())),
             J::Null => Ok(data_from_json(&json!({"models": []})).unwrap()),
             reply => Ok(data_from_json(reply).unwrap()),
-        }
+        };
+        Box::pin(std::future::ready(answer))
     }
 }
 
@@ -223,7 +229,8 @@ fn run_case(case: &J, sources: &ResolverSources, path: &Path) -> J {
     let mut outcomes = Vec::new();
     for spec in case["sessions"].as_array().unwrap() {
         let before = factory.built.lock().unwrap().len();
-        let provider = match resolver.resolve(&session(spec)) {
+        // The hooks answer at once, so the future is ready when first polled.
+        let provider = match resolver.resolve(&session(spec)).now_or_never().expect("ready") {
             Ok(provider) => provider,
             Err(error) => {
                 outcomes.push(failure(error));
