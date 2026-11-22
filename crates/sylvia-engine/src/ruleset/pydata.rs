@@ -10,10 +10,8 @@ use sylvia_base::pyjson::float_repr;
 use sylvia_base::pystr::repr as str_repr;
 use sylvia_base::pyyaml::{data_key_eq, Data, Date, DateTime};
 
-// Generated; kept exactly as the generator writes it.
-#[rustfmt::skip]
-#[path = "alnum_table.rs"]
-mod alnum;
+/// `c.isalnum()`, on CPython's table (moved to `sylvia_base::pystr` for the domain's use).
+pub use sylvia_base::pystr::is_alnum;
 
 /// `type(value).__name__`.
 pub fn type_name(value: &Data) -> &'static str {
@@ -261,13 +259,6 @@ pub fn is_sequence(value: &Data) -> bool {
     matches!(value, Data::List(_) | Data::Tuple(_))
 }
 
-/// `c.isalnum()`.
-pub fn is_alnum(c: char) -> bool {
-    let code = u32::from(c);
-    let index = alnum::ALNUM.partition_point(|(start, _)| *start <= code);
-    index > 0 && code <= alnum::ALNUM[index - 1].1
-}
-
 /// `text.isalnum()`: nonempty and every character alphanumeric.
 pub fn str_is_alnum(text: &str) -> bool {
     !text.is_empty() && text.chars().all(is_alnum)
@@ -445,7 +436,6 @@ mod tests {
         assert_eq!(timezone_repr(-19_800), "datetime.timezone(datetime.timedelta(days=-1, seconds=66600))");
         assert_eq!(repr(&Data::Set(Vec::new())), "set()");
         assert_eq!(repr(&Data::Tuple(vec![Data::Int(1)])), "(1,)");
-        assert!(alnum::ALNUM.len() > 100);
     }
 
     #[test]
