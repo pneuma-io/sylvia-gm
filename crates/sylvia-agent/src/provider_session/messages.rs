@@ -14,7 +14,7 @@ use super::texts::{
     gm_system_contract_version, model_gm_narration_block, player_turn_text, response_format_contract_message,
     system,
 };
-use crate::campaign_memory::KnowledgeReference;
+use crate::campaign_memory::RankReferences;
 use serde_json::{json, Value as Json};
 use std::collections::{HashMap, HashSet};
 use sylvia_base::pyjson::{self, Dump};
@@ -122,7 +122,7 @@ impl ProviderSessionAdapter {
     pub async fn messages(
         &self,
         input: &SessionProviderInput,
-        rank: &(dyn Fn(&str, &[KnowledgeReference]) -> Vec<JsonMap> + Sync),
+        rank: &RankReferences,
     ) -> CodedResult<Vec<JsonMap>> {
         let reads = self.reads.as_ref();
         let mut selected: Vec<&SessionMessage> = input.history.messages.iter().collect();

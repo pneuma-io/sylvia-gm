@@ -26,8 +26,8 @@
 //! - [`request_metadata`] holds `provider/_request_metadata.py`.
 //! - [`registry`] holds `provider/_registry.py`'s `ProviderRegistry`.
 
-pub mod anthropic;
 pub mod admin_audit;
+pub mod anthropic;
 pub mod catalog;
 pub mod chat;
 pub mod claude_runtime;

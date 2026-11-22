@@ -174,7 +174,8 @@ impl ProviderHook for Observer {
             *self.retry_attempt.lock().expect("observer lock") = context.retry_attempt;
             if let Some(request_json) = &context.request_json {
                 let request = Json::Object(request_json.clone());
-                let runtime = matches!(context.provider_key.as_str(), "chatgpt_subscription" | "claude_runtime");
+                let runtime =
+                    matches!(context.provider_key.as_str(), "chatgpt_subscription" | "claude_runtime");
                 let runtime_layer = if context.provider_key == "claude_runtime" {
                     "claude_code_boundary"
                 } else {
@@ -218,7 +219,9 @@ impl ProviderHook for Observer {
         let sink = Arc::clone(&self.sink);
         let exchange_id = exchange_id.to_owned();
         Some(Arc::new(move |response: &ProviderResponse| {
-            sink(json!({"kind": "provider_late_usage", "exchange_id": exchange_id, "usage": usage_projection(Some(response))}));
+            sink(
+                json!({"kind": "provider_late_usage", "exchange_id": exchange_id, "usage": usage_projection(Some(response))}),
+            );
         }))
     }
 }
@@ -460,8 +463,12 @@ impl Provider for AdminAuditedProvider {
             let observer = self.observer(&exchange_id);
             let options = call_options(request.stream, request.timeout, &request.options);
             let started = self.record_request(&exchange_id, &request, &options);
-            let mut guard =
-                GenerateGuard { sink: Arc::clone(&self.sink), exchange_id: exchange_id.clone(), started, finished: false };
+            let mut guard = GenerateGuard {
+                sink: Arc::clone(&self.sink),
+                exchange_id: exchange_id.clone(),
+                started,
+                finished: false,
+            };
             let call = self.provider.generate(request);
             let outcome = match self.provider.hooks() {
                 Some(hooks) => hooks.scoped(observer, call).await,
@@ -495,7 +502,9 @@ impl Provider for AdminAuditedProvider {
         let started = self.record_request(&exchange_id, &request, &options);
         let inner = self.provider.generate_stream(request);
         let inner: ChunkStream<'_> = match self.provider.hooks() {
-            Some(hooks) => Box::pin(hooks.scoped_stream(Arc::clone(&observer) as Arc<dyn ProviderHook>, inner)),
+            Some(hooks) => {
+                Box::pin(hooks.scoped_stream(Arc::clone(&observer) as Arc<dyn ProviderHook>, inner))
+            }
             None => inner,
         };
         let record = StreamRecord {

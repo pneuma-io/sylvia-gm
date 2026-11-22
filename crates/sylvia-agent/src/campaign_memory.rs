@@ -8,7 +8,10 @@
 
 use serde_json::{json, Value as Json};
 use std::collections::HashSet;
-use sylvia_base::{pyjson, pystr, JsonMap};
+use sylvia_base::{pyjson, pystr, CodedResult, JsonMap};
+
+/// `rank_references(query, references)`: the matched references' `result`s in rank order.
+pub type RankReferences = dyn Fn(&str, &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> + Sync;
 
 const MAX_MEMORY_RECORDS: usize = 128;
 const MAX_MEMORY_BYTES: usize = 48 * 1024;
@@ -54,8 +57,8 @@ fn interleave(groups: &[Vec<usize>]) -> Vec<usize> {
 pub fn select_with(
     facts: &[JsonMap],
     queries: &[String],
-    rank: impl Fn(&str, &[KnowledgeReference]) -> Vec<JsonMap>,
-) -> (Vec<JsonMap>, JsonMap) {
+    rank: &RankReferences,
+) -> CodedResult<(Vec<JsonMap>, JsonMap)> {
     let records: Vec<JsonMap> = facts.to_vec();
     let references: Vec<KnowledgeReference> = records
         .iter()
@@ -77,17 +80,16 @@ pub fn select_with(
             }
         })
         .collect();
-    let rankings: Vec<Vec<usize>> = queries
-        .iter()
-        .filter(|query| !pystr::strip(query).is_empty())
-        .map(|query| {
-            let bounded: String = query.chars().take(2000).collect();
-            rank(&bounded, &references)
+    let mut rankings: Vec<Vec<usize>> = Vec::new();
+    for query in queries.iter().filter(|query| !pystr::strip(query).is_empty()) {
+        let bounded: String = query.chars().take(2000).collect();
+        rankings.push(
+            rank(&bounded, &references)?
                 .iter()
                 .filter_map(|item| item.get("index").and_then(Json::as_u64).map(|index| index as usize))
-                .collect()
-        })
-        .collect();
+                .collect(),
+        );
+    }
     let mut seen_relevant = HashSet::new();
     let relevant: Vec<usize> =
         interleave(&rankings).into_iter().filter(|index| seen_relevant.insert(*index)).collect();
@@ -130,5 +132,5 @@ pub fn select_with(
         ),
     });
     let Json::Object(summary) = summary else { unreachable!() };
-    (selected, summary)
+    Ok((selected, summary))
 }

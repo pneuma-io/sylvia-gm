@@ -169,7 +169,9 @@ impl HookManager {
             .try_with(|scoped| {
                 scoped
                     .iter()
-                    .filter(|(id, hook)| *id == self.id && !registered.iter().any(|existing| Arc::ptr_eq(existing, hook)))
+                    .filter(|(id, hook)| {
+                        *id == self.id && !registered.iter().any(|existing| Arc::ptr_eq(existing, hook))
+                    })
                     .map(|(_, hook)| Arc::clone(hook))
                     .collect()
             })
