@@ -10,7 +10,7 @@
 //! anything else (an `AttributeError` from a document of the wrong shape, an error while the
 //! request is built) escapes as it is, which is Rust's `Internal`.
 //!
-//! Where this differs from Python (differences row NEXT, Gemini): the stream chunk's `content`
+//! Where this differs from Python (differences row 43, Gemini): the stream chunk's `content`
 //! and `reasoning_content` are text, so Python's `None` there is `""`; stored `gemini_parts`
 //! must be a list; httpx's per-operation timeouts are the provider's own per-step timeouts; and
 //! `alt=sse` is appended to a base URL's query rather than merged into it.
@@ -31,7 +31,7 @@ use std::time::Duration;
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{Json, JsonMap};
 
-/// The refusal for stored `gemini_parts` that are not a list (differences row NEXT).
+/// The refusal for stored `gemini_parts` that are not a list (differences row 43).
 pub const NON_LIST_PARTS: &str = "Gemini parts are not a list";
 
 /// The message of `ProviderContinuationRequiredError` for a `CONTINUATION` finish.

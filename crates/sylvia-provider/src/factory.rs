@@ -90,7 +90,7 @@ pub enum BuiltProvider {
 
 /// The client timeouts for a Gemini provider. Python's `httpx.AsyncClient` applies each call's
 /// `timeout` to every phase; the provider enforces that itself, so the client's own are only a
-/// backstop (differences row NEXT, Gemini).
+/// backstop (differences row 43, Gemini).
 pub const GEMINI_CLIENT_TIMEOUTS: TimeoutConfig =
     TimeoutConfig { connect: 600.0, read: 600.0, write: 600.0, pool: 600.0, stream_health_interval: 600.0 };
 
