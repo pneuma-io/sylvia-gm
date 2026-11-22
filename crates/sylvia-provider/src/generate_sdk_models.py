@@ -1,16 +1,15 @@
-"""Write the Responses output-item model table Rust copies from the locked OpenAI SDK.
+"""Write the model tables Rust copies from the locked Stainless SDKs (OpenAI's and Anthropic's).
 
 Run with the snapshot's own interpreter, from the repository root:
 
-    .venv/Scripts/python.exe -I crates/sylvia-provider/src/generate_responses_models.py
+    .venv/Scripts/python.exe -I crates/sylvia-provider/src/generate_sdk_models.py
 
-`native_output` keeps each Responses output item as `item.model_dump(mode="json",
-exclude_none=True)` of the model the SDK constructed from the response JSON. That dump depends on
-the SDK's model classes, and so do the attributes the transport reads (a declared field the JSON
-lacks reads as `None`; an undeclared one falls back to `getattr`'s default): declared fields first, in declaration order, then the extra fields the
-JSON carried; nested values dumped by their declared types; an integer in a `float` field
-written as a float. This writes `responses_models.json`: for every model reachable from
-`ResponseOutputItem`, `Response` and `ResponseStreamEvent` (the three roots), its declared fields in order, each with the shape of its declared type:
+The transports read responses the way the SDKs built them (`sdk_models.rs`): a declared field the
+JSON lacks reads as `None`, an undeclared name falls back to `getattr`'s default, and a retained
+native item is `model_dump(mode="json", exclude_none=True)` of its model (declared fields first,
+in declaration order, then the extra fields the JSON carried; an integer in a `float` field
+written as a float). That depends on the SDKs' model classes, so this writes, for every model
+reachable from each table's roots, its declared fields in order, each with the shape of its type:
 
 - `{"model": name}`, `{"list": shape}`, `{"dict": shape}`;
 - `{"union": {type value: model, ...}, "first": model}`: a union of models told apart by their
@@ -19,7 +18,12 @@ written as a float. This writes `responses_models.json`: for every model reachab
 - `"float"`, or `"any"` for everything else.
 
 Each field is `[name, JSON key (its alias), shape, default]`; the default is recorded only when it
-is not `None` (an attribute the JSON lacks reads as it). Reference tooling only; retired with the Python source.
+is not `None`. The tables:
+
+- `responses_models.json` (openai): `ResponseOutputItem`, `Response`, `ResponseStreamEvent`;
+- `anthropic_models.json` (anthropic): `Message`, `RawMessageStreamEvent`, `ContentBlock`.
+
+Reference tooling only; retired with the Python source.
 """
 
 from __future__ import annotations
@@ -29,13 +33,15 @@ import sys
 import typing
 from pathlib import Path
 
+import anthropic
 import openai
 import pydantic
+from anthropic.types import ContentBlock, Message, RawMessageStreamEvent
 from openai.types.responses.response import Response
 from openai.types.responses.response_output_item import ResponseOutputItem
 from openai.types.responses.response_stream_event import ResponseStreamEvent
 
-OUTPUT = Path(__file__).with_name("responses_models.json")
+HERE = Path(__file__).parent
 
 
 def unwrap(annotation):
@@ -85,11 +91,10 @@ def shape(annotation, models: dict, queue: list):
     return "any"
 
 
-def main() -> None:
+def write(output: Path, package: str, version: str, roots: dict) -> None:
     models: dict = {}
     queue: list = []
-    roots = {"output_item": shape(ResponseOutputItem, models, queue), "response": shape(Response, models, queue),
-             "stream_event": shape(ResponseStreamEvent, models, queue)}
+    shapes = {name: shape(root, models, queue) for name, root in roots.items()}
     while queue:
         model = queue.pop(0)
         if key(model) in models:
@@ -102,10 +107,17 @@ def main() -> None:
                 default = json.loads(json.dumps(default))
             # [field name, the JSON key it is read from, its shape, its default when not None]
             fields.append([name, field.alias or name, shape(field.annotation, models, queue), default])
-    record = {"openai": openai.__version__, "pydantic": pydantic.VERSION, "python": sys.version.split()[0],
-              **roots,
+    record = {package: version, "pydantic": pydantic.VERSION, "python": sys.version.split()[0],
+              **shapes,
               "models": {name: entry["fields"] for name, entry in sorted(models.items())}}
-    OUTPUT.write_text(json.dumps(record, indent=1, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
+    output.write_text(json.dumps(record, indent=1, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
+
+
+def main() -> None:
+    write(HERE / "responses_models.json", "openai", openai.__version__,
+          {"output_item": ResponseOutputItem, "response": Response, "stream_event": ResponseStreamEvent})
+    write(HERE / "anthropic_models.json", "anthropic", anthropic.__version__,
+          {"message": Message, "stream_event": RawMessageStreamEvent, "content_block": ContentBlock})
 
 
 if __name__ == "__main__":

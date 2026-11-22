@@ -24,6 +24,7 @@
 //! - [`request_metadata`] holds `provider/_request_metadata.py`.
 //! - [`registry`] holds `provider/_registry.py`'s `ProviderRegistry`.
 
+pub mod anthropic;
 pub mod catalog;
 pub mod chat;
 pub mod config;
@@ -51,6 +52,7 @@ pub mod reply;
 pub mod responses;
 pub mod retry;
 pub mod routes;
+mod sdk_models;
 pub mod speed;
 pub mod sse;
 pub mod stream_health;
