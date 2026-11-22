@@ -98,9 +98,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/package_runtime.py:504` | `AuthorityMemoryStateBridge.spatial_query` | hashlib.sha256 | `identity = 'circle_overlap:' + hashlib.sha256(canonical_json_bytes(facts)).hexdigest()` | |
 | `application/package_runtime.py:1503` | `materialize_package_mechanic.mechanic` | hashlib.sha256 | `seed = int.from_bytes(hashlib.sha256(seed_basis).digest()[:8], "big")` | |
 | `spatial/_interface.py:913` | `admit_spatial_scene` | hashlib.sha256 | `snapshot_id = hashlib.sha256( canonical_json_bytes({"algorithm_version": SPATIAL_ALGORITHM_VERSION, "scene": payload}) ).hexdigest()` |  `sylvia-engine` spatial_scene_vectors |
-| `spatial/_interface.py:925` | `_scene_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(scene.as_payload())).hexdigest()` | |
-| `spatial/_interface.py:1002` | `mutate_spatial_scene` | hashlib.sha256 | `"target_sha256": hashlib.sha256(canonical_json_bytes(before_target)).hexdigest(),` | |
-| `spatial/_interface.py:1008` | `mutate_spatial_scene` | hashlib.sha256 | `"target_sha256": hashlib.sha256(canonical_json_bytes(after_target)).hexdigest(),` | |
+| `spatial/_interface.py:925` | `_scene_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(scene.as_payload())).hexdigest()` |  `sylvia-engine` spatial_mutation_vectors |
+| `spatial/_interface.py:1002` | `mutate_spatial_scene` | hashlib.sha256 | `"target_sha256": hashlib.sha256(canonical_json_bytes(before_target)).hexdigest(),` |  `sylvia-engine` spatial_mutation_vectors |
+| `spatial/_interface.py:1008` | `mutate_spatial_scene` | hashlib.sha256 | `"target_sha256": hashlib.sha256(canonical_json_bytes(after_target)).hexdigest(),` |  `sylvia-engine` spatial_mutation_vectors |
 
 ## Lane 3: Storage and authority
 

@@ -353,6 +353,8 @@ GEOMETRY_PATCHES = [
     {"metadata": []}, {"metadata": {"a": "x" * 16377}}, {"id": "new"}, {"map_id": "keep"}, {"destroyed": {}}, {}, [],
     {"active": False, "colour": "red"}, None, "active", {"metadata": {"deep": deep(21)}}, {"metadata": {"deep": deep(22)}},
     {"metadata": {"deep": deep(25)}},
+    # Admission rebuilds the patched value in its own key order, and the evidence echoes that.
+    {"volume": {"max": [3, 8, 4], "min": [2, 2, 0], "kind": "box"}},
 ]
 ENTITY_PATCHES = [
     {"position": [6.5, 6.5, 0]}, {"position": [6.5, 6.5]}, {"position": [0.1, 6.5, 0]}, {"facing": [0, 1]}, {"facing": [0, 0]},
@@ -360,6 +362,7 @@ ENTITY_PATCHES = [
     {"footprint": {"kind": "circle", "radius": 6}}, {"height": 3.5}, {"height": 0}, {"active": False, "movement": "passable"},
     {"visibility": "opaque"}, {"metadata": {"name": "Orc chief"}}, {"volume": {"kind": "box", "min": [1, 1, 0], "max": [2, 2, 1]}},
     {"occupies_cells": True}, {"id": "orc2"},
+    {"footprint": {"radius": 0.25, "kind": "circle"}}, {"footprint": {"half_extents": [0.5, 0.25], "kind": "box"}},
 ]
 
 
