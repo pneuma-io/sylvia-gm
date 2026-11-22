@@ -199,7 +199,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:44` | `<module>` | re.compile; NEEDS fancy-regex: atomic/possessive | `_HEADER_NAME = re.compile(r"^[A-Za-z0-9!#$%&'*+.^_'\|~-]{1,80}$")` | |
 | `config/provider_settings.py:45` | `<module>` | re.compile; plain | `_PROFILE_ID = re.compile(r"^[a-z][a-z0-9_]{0,63}$")` | |
 | `config/provider_settings.py:47` | `<module>` | re.compile; plain | `_NATIVE_SETTING = re.compile(r"[a-z][a-z0-9_-]{0,31}")` | |
-| `provider/_claude.py:118` | `prepare_request` | re.fullmatch; plain | `if not isinstance(name, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) is None:` | |
+| `provider/_claude.py:118` | `prepare_request` | re.fullmatch; plain | `if not isinstance(name, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) is None:` | `sylvia-provider` claude_vectors |
 | `provider/_claude_install.py:188` | `_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", text.strip())` | `sylvia-provider` install_vectors |
 | `provider/_claude_install.py:334` | `ClaudeInstaller._install` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", checksum) is None` | `sylvia-provider` install_vectors |
 | `provider/_claude_native.py:38` | `<module>` | re.compile; plain | `_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)` | `sylvia-provider` kept_vectors |
