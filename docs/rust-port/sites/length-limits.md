@@ -56,9 +56,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/reusable_participants.py:455` | `validate_reusable_participant_draft` | len() against a limit | `if not isinstance(name, str) or name != name.strip() or not name or len(name) > 160:` | |
 | `application/reusable_participants.py:736` | `load_reusable_participant` | len() against a limit | `or len(str(record["summary"])) > 500` | |
 | `application/reusable_participants.py:777` | `compatible_reusable_participants` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PARTICIPANTS:` | |
-| `application/reusable_plans.py:310` | `save_reusable_rift_plan` | len() against a limit | `or len(title) > 160` | |
-| `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` | |
-| `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` | |
+| `application/reusable_plans.py:310` | `save_reusable_rift_plan` | len() against a limit | `or len(title) > 160` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` |  `sylvia-app` reusable_plan_vectors |
 | `application/schema_admission.py:86` | `validate_json_schema` | len() against a limit | `or not 1 <= len(branches) <= 256` | `sylvia-domain` schema_admission_vectors |
 | `application/setting_character_requirements.py:76` | `parse_setting_character_requirements` | len() against a limit | `if not encoded or len(encoded) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
 | `application/setting_character_requirements.py:145` | `validate_setting_character_data` | len() against a limit | `if len(canonical_json_bytes(captured)) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
