@@ -148,8 +148,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/loader.py:234` | `load_config` | Dump::DEFAULT | `provider["credential_overrides"] = SecretStr(json.dumps(overrides))` | |
 | `config/loader.py:242` | `load_config` | Dump::DEFAULT | `provider["protected_credentials"] = SecretStr(json.dumps(envelope))` | |
 | `provider/_admin_audit.py:83` | `_serialization_projection` | Dump::CANONICAL + allow_nan= | `encoded = json.dumps( _plain(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
-| `provider/_anthropic.py:388` | `AnthropicMessagesTransport.parse_response` | Dump::DEFAULT | `arguments=json.dumps( block.get("input", {}) if isinstance(block, dict) else getattr(block, "input", {}) ),` | |
-| `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | |
+| `provider/_anthropic.py:388` | `AnthropicMessagesTransport.parse_response` | Dump::DEFAULT | `arguments=json.dumps( block.get("input", {}) if isinstance(block, dict) else getattr(block, "input", {}) ),` | `sylvia-provider` anthropic_vectors |
+| `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | `sylvia-provider` anthropic_vectors |
 | `provider/_chatgpt.py:319` | `_in_place_answer` | Dump::DEFAULT.ascii(false) | `result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)` | |
 | `provider/_chatgpt.py:1313` | `ChatGPTProvider._attempt` | Dump::DEFAULT + allow_nan= | `arguments = json.dumps( params.get("arguments"), ensure_ascii=True, allow_nan=False )` | |
 | `provider/_claude.py:131` | `prepare_request` | Dump::DEFAULT + allow_nan= | `history = json.loads(json.dumps(request["messages"], allow_nan=False))` | |
@@ -167,7 +167,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_codex_rpc.py:294` | `CodexConnection._write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | |
 | `provider/_context_fit.py:85` | `_canonical_request_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( {"messages": messages, "tools": tools or [], "options": dict(options)}, sort_keys=True, separators=(",", ":"), ensure_ascii=Fals...` | `sylvia-provider` context_fit_vectors |
 | `provider/_context_fit.py:97` | `_canonical_value_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-provider` context_fit_vectors |
-| `provider/_gemini.py:228` | `GeminiProvider._parse` | Dump::DEFAULT | `arguments=json.dumps(fn.get("args", {})),` | |
+| `provider/_gemini.py:228` | `GeminiProvider._parse` | Dump::DEFAULT | `arguments=json.dumps(fn.get("args", {})),` | `sylvia-provider` gemini_vectors |
 | `provider/_hooks.py:443` | `DumpHook._atomic_write` | Dump::INDENT2 + default= | `tmp_path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")` | |
 | `provider/_token_estimate.py:13` | `_size` | Dump::CANONICAL | `return len(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))` | `sylvia-provider` context_fit_vectors |
 | `session/_prompt_assembler.py:451` | `PromptAssembler.build_character` | Dump::DEFAULT.sorted(true) + default= | `state_payload = json.dumps( {"characters": characters_dict, "scene_tags": sorted(tags)}, sort_keys=True, default=str, )` | |

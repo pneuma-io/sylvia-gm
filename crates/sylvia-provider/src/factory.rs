@@ -1,12 +1,13 @@
 //! `provider/_factory.py`: `ProviderFactory.create(config)`, the provider for one model.
 //!
-//! Chat Completions and Responses build an [`OpenAICompatProvider`], and Anthropic Messages an
-//! [`AnthropicProvider`] (lane 5), each over its own HTTP client, as each Python provider builds
-//! its own SDK client (its own connection pool and cookie jar). The other transports (Gemini,
-//! and the Claude and ChatGPT runtimes) pass Python's checks and then answer `rust_port_pending`
-//! until their adapters are ported.
+//! Chat Completions and Responses build an [`OpenAICompatProvider`], Anthropic Messages an
+//! [`AnthropicProvider`] and Gemini a [`GeminiProvider`] (lane 5), each over its own HTTP client,
+//! as each Python provider builds its own client (its own connection pool and cookie jar). The
+//! Claude and ChatGPT runtimes pass Python's checks and then answer `rust_port_pending` until
+//! their adapters are ported.
 
 use crate::anthropic::{AnthropicEnvironment, AnthropicProvider};
+use crate::gemini::GeminiProvider;
 use crate::http::HttpTransport;
 use crate::openai_compat::{BuildError, OpenAICompatProvider, SdkEnvironment};
 use crate::provider::Provider;
@@ -72,6 +73,7 @@ impl ProviderFactory for DefaultProviderFactory {
         Ok(match self.build(config)? {
             BuiltProvider::OpenAICompat(provider) => Arc::new(provider),
             BuiltProvider::Anthropic(provider) => Arc::new(provider),
+            BuiltProvider::Gemini(provider) => Arc::new(provider),
         })
     }
 }
@@ -82,49 +84,15 @@ pub enum BuiltProvider {
     OpenAICompat(OpenAICompatProvider),
     /// Anthropic Messages.
     Anthropic(AnthropicProvider),
+    /// Gemini GenerateContent.
+    Gemini(GeminiProvider),
 }
 
-impl BuiltProvider {
-    /// `model_info`.
-    pub fn model(&self) -> &ModelInfo {
-        match self {
-            Self::OpenAICompat(provider) => provider.model(),
-            Self::Anthropic(provider) => provider.model(),
-        }
-    }
-
-    /// The configured base URL.
-    pub fn base_url(&self) -> &str {
-        match self {
-            Self::OpenAICompat(provider) => provider.base_url(),
-            Self::Anthropic(provider) => provider.base_url(),
-        }
-    }
-
-    /// `_retry_config`.
-    pub fn retry_config(&self) -> &RetryConfig {
-        match self {
-            Self::OpenAICompat(provider) => provider.retry_config(),
-            Self::Anthropic(provider) => provider.retry_config(),
-        }
-    }
-
-    /// The timeouts the HTTP client was built with.
-    pub fn timeout_config(&self) -> &TimeoutConfig {
-        match self {
-            Self::OpenAICompat(provider) => provider.timeout_config(),
-            Self::Anthropic(provider) => provider.timeout_config(),
-        }
-    }
-
-    /// `_default_headers`, in their configured order.
-    pub fn default_headers(&self) -> &[(String, String)] {
-        match self {
-            Self::OpenAICompat(provider) => provider.default_headers(),
-            Self::Anthropic(provider) => provider.default_headers(),
-        }
-    }
-}
+/// The client timeouts for a Gemini provider. Python's `httpx.AsyncClient` applies each call's
+/// `timeout` to every phase; the provider enforces that itself, so the client's own are only a
+/// backstop (differences row NEXT, Gemini).
+pub const GEMINI_CLIENT_TIMEOUTS: TimeoutConfig =
+    TimeoutConfig { connect: 600.0, read: 600.0, write: 600.0, pool: 600.0, stream_health_interval: 600.0 };
 
 impl DefaultProviderFactory {
     /// `ProviderFactory.create(config)` with the built provider's own type.
@@ -208,7 +176,19 @@ impl DefaultProviderFactory {
                 })?;
                 Ok(BuiltProvider::Anthropic(provider))
             }
-            transport::GEMINI_GENERATE_CONTENT => Err(pending(wire)),
+            transport::GEMINI_GENERATE_CONTENT => {
+                let client = (self.client)(&GEMINI_CLIENT_TIMEOUTS).map_err(|error| match error {
+                    ProxyError::Value(message) => value_error(message),
+                    ProxyError::Internal(message) => internal("InvalidURL", message),
+                })?;
+                Ok(BuiltProvider::Gemini(GeminiProvider::new(
+                    &base_url,
+                    &config.api_key,
+                    model_info,
+                    config.default_headers.clone(),
+                    client,
+                )))
+            }
             other => Err(value_error(format!(
                 "Unknown transport '{other}'. Supported: chat_completions, responses, anthropic_messages"
             ))),

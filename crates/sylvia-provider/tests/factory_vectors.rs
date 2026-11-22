@@ -90,10 +90,11 @@ fn the_factory_builds_what_python_builds() {
     for case in vectors()["cases"].as_array().unwrap() {
         let built = factory.build(config(&case["config"]));
         let actual = match (&built, case.get("value")) {
-            // Python's stand-in records only the kind of an Anthropic provider; its own vectors
-            // (`anthropic_vectors.rs`) check what it sends.
+            // Python's stand-in records only the kind of an Anthropic or Gemini provider; their own
+            // vectors (`anthropic_vectors.rs`, `gemini_vectors.rs`) check what they send.
             (Ok(BuiltProvider::Anthropic(_)), Some(_)) => json!({"value": {"kind": "AnthropicProvider"}}),
-            (Ok(provider), Some(expected)) => {
+            (Ok(BuiltProvider::Gemini(_)), Some(_)) => json!({"value": {"kind": "GeminiProvider"}}),
+            (Ok(BuiltProvider::OpenAICompat(provider)), Some(expected)) => {
                 let model = provider.model();
                 json!({"value": {
                     "kind": "OpenAICompatProvider",
@@ -107,9 +108,9 @@ fn the_factory_builds_what_python_builds() {
                 }})
             }
             // A transport whose adapter is not ported answers `rust_port_pending` where Python
-            // built its provider: one of the native providers (Responses and Anthropic are ported).
+            // built its provider: one of the runtime providers.
             (Err(error), Some(expected)) if error.code == PORT_PENDING => {
-                let native = ["ClaudeProvider", "ChatGPTProvider", "GeminiProvider"];
+                let native = ["ClaudeProvider", "ChatGPTProvider"];
                 if native.contains(&expected["kind"].as_str().unwrap_or("")) {
                     json!({"value": expected})
                 } else {
