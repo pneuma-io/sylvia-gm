@@ -52,7 +52,7 @@ pub fn development_rust_owner() -> Result<PathBuf, String> {
 /// `SYLVIA_GM_RUST_OWNER=1`: a development build starts the Rust port's owner in place of the
 /// checkout's Python owner. Until cutover the Python owner stays the default.
 #[cfg(debug_assertions)]
-fn development_rust_owner_selected() -> bool {
+pub(crate) fn development_rust_owner_selected() -> bool {
     std::env::var_os("SYLVIA_GM_RUST_OWNER").is_some_and(|value| value == "1")
 }
 

@@ -153,6 +153,16 @@ pub struct Worker<'a> {
     pub spec: &'a ModelSpec,
 }
 
+/// One `capabilities` device: Python's `{"id", "label"}`, and `previous` (the identity hashes a
+/// saved PortAudio-era id of it may carry, difference row 38) when the audio library gives any.
+fn device_json(device: &Device) -> Json {
+    let mut value = json!({"id": device.id, "label": device.label});
+    if !device.previous.is_empty() {
+        value["previous"] = json!(device.previous);
+    }
+    value
+}
+
 /// `capabilities(directory)`.
 pub fn capabilities(worker: &Worker<'_>, runtime: &mut dyn Runtime) -> Outcome<Json> {
     let languages = runtime.languages();
@@ -167,7 +177,7 @@ pub fn capabilities(worker: &Worker<'_>, runtime: &mut dyn Runtime) -> Outcome<J
         .extend(languages.iter().take(99).map(|code| json!({"id": code, "language": code, "label": code})));
     Ok(json!({
         "engines": engines,
-        "devices": devices.iter().map(|device| json!({"id": device.id, "label": device.label})).collect::<Vec<_>>(),
+        "devices": devices.iter().map(device_json).collect::<Vec<_>>(),
         "ready": model_ready(worker.directory, worker.spec),
         "model": {
             "id": super::MODEL_ID,
