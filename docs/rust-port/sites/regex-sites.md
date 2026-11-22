@@ -138,7 +138,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_template_resolver.py:19` | `<module>` | re.compile; plain | `_TEMPLATE_RE: re.Pattern[str] = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}")  # noqa: E501` |  `sylvia-engine` execution_vectors |
 | `runtime/_template_resolver.py:67` | `resolve_params` | re.fullmatch; plain | `match = re.fullmatch(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}", value)  # noqa: E501` |  `sylvia-engine` execution_vectors |
 | `runtime/_time_manager.py:55` | `<module>` | re.compile; plain | `_DURATION_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$")` | |
-| `spatial/_interface.py:17` | `<module>` | re.compile; plain | `_IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")` | |
+| `spatial/_interface.py:17` | `<module>` | re.compile; plain | `_IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")` |  `sylvia-engine` spatial_scene_vectors |
 
 ## Lane 3: Storage and authority
 

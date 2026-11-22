@@ -143,8 +143,8 @@ def targeted() -> list:
     wall = ["geometry", 0]
     for field, value in (("id", "orc"), ("id", "pillar"), ("id", "x" * 129), ("map_id", "other"), ("map_id", None),
                          ("active", 1), ("active", None), ("movement", "solid"), ("movement", "Blocking"), ("occupies_cells", 0),
-                         ("visibility", "dark"), ("metadata", []), ("metadata", None), ("metadata", {"a": "x" * 16370}),
-                         ("metadata", {"a": "x" * 16371}), ("metadata", {"a": "x" * 16372}), ("metadata", {"é": "ü" * 3000}),
+                         ("visibility", "dark"), ("metadata", []), ("metadata", None), ("metadata", {"a": "x" * 16375}),
+                         ("metadata", {"a": "x" * 16376}), ("metadata", {"a": "x" * 16377}), ("metadata", {"é": "ü" * 3000}),
                          ("destroyed", {"active": True, "movement": "passable"}), ("destroyed", {"active": "no", "movement": "passable", "visibility": "clear"}),
                          ("destroyed", {"active": True, "movement": "x", "visibility": "clear"}),
                          ("destroyed", {"active": True, "movement": "passable", "visibility": "x"}), ("destroyed", None),
@@ -174,6 +174,9 @@ def targeted() -> list:
                          ("facing", [1e-300, 0]), ("facing", [0, 0, 1]), ("active", "true"), ("movement", None), ("visibility", "clear ")):
         cases.append(edited(orc + [field], value))
     cases.append(edited(orc + ["facing"], delete=True))
+    # The cart's box footprint is 1 wide and 0.5 deep: its y edge is position y + 0.5.
+    for position in ([8, 15, 0], [8, 15.1, 0], [19, 9, 0], [19.1, 9, 0], [1, 0.5, 0], [1, 0.4, 0]):
+        cases.append(edited(["entities", 1, "position"], position))
     # Depth: the root is depth 1, so metadata's 21-deep list reaches 24 and 22 deep reaches 25.
     for depth in (19, 20, 21, 22, 30):
         nested: object = 1

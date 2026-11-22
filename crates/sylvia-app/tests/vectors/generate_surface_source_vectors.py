@@ -80,6 +80,7 @@ TARGETED = [
     {"kind": "keyed_values", "entries": [{"key": state("pkg", "map.deep.a.b"), "value": state("pkg", "map")}, "x", None,
                                           {"value": state("pkg", "map")}, {"key": state("pkg", "map.scene")}]},
     {"kind": "keyed_values", "entries": "x"}, {"kind": "keyed_values"},
+    {"kind": "keyed_values", "entries": [7, {"key": state("pkg", "map.scene"), "value": state("pkg", "map.grid")}]},
     {"kind": "keyed_values", "entries": [{"key": {"kind": "object", "fields": {}}, "value": state("pkg", "map")}]},
     {"kind": "object", "fields": {"scene": state("pkg", "map.scene"), "none": None, "lit": {"kind": "literal", "value": {"z": 1}},
                                   "nested": {"kind": "object", "fields": {"p": {"kind": "participants", "kinds": ["npc"]}}}}},
