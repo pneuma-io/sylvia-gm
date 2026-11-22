@@ -1,6 +1,6 @@
 # Lane 5 ledger: Owner, clients and release
 
-Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 53 files, 18,055 lines.
+Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 56 files, 19,705 lines (three provider files moved from lane 4, 22 Nov 2026).
 
 One row per Python file this lane retires. Status is `pending`, `in progress`,
 `ported` (Rust replacement merged and its comparison checks pass) or `retired`
@@ -61,6 +61,9 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/local_dictation_process.py` | 195 | `sylvia-owner::dictation::worker` | in progress | `dictation_vectors`: `serve`, `serve_session`, `capabilities` and `main` with `sys.stdin`/`sys.stdout` newline handling as on Windows (universal newlines in, `\r\n` out); `processes` runs `sylvia-gm-owner --dictation-worker` against the real Python worker. A build without the speech runtime answers as Python's excluded build (`runtime`, `provider`). Pending with `local_dictation.py`'s engine |
 | `src/sylvia_gm/main.py` | 67 | `sylvia-owner` (`sylvia-gm` binary) | in progress | The CLI: `--version`, `--webui` and its options. It starts `sylvia-gm-owner` from its own folder; packaging decides the final layout |
 | `src/sylvia_gm/portable_artifact.py` | 219 | `sylvia-owner` | pending | |
+| `src/sylvia_gm/provider/_anthropic.py` | 1,145 | `sylvia-provider` | pending | Moved from lane 4 (lane 4's split, approved 22 Nov 2026): `anthropic` |
+| `src/sylvia_gm/provider/_gemini.py` | 418 | `sylvia-provider` | pending | Moved from lane 4 (lane 4's split): `gemini` |
+| `src/sylvia_gm/provider/_native_output.py` | 87 | `sylvia-provider` | ported | Moved from lane 4 (lane 4's split). Lane 4: `chat::split_chat_content` and `sse::DoneTracker` (`tests/chat_vectors.rs`). Lane 5: `native_output` and `responses_finish` in `responses`; the retained items are dumped as the SDK's `model_dump(mode="json", exclude_none=True)` from its model table (`responses_models.json`, `generate_responses_models.py`), proven by `tests/responses_vectors.rs` |
 | `src/sylvia_gm/release_artifact.py` | 826 | `sylvia-owner` | pending | |
 
 Packaging to remember: the update helper's progress dialog (`TaskDialogIndirect`) needs a common-controls v6 manifest in the helper executable (`sylvia-gm-owner`). Python's PyInstaller executable has one; the Rust helper gets it in the packaging assignment. Until then only the test binaries carry one (`crates/sylvia-owner/build.rs`, `tests/common-controls-6.manifest`); without it the helper's status window is refused with `progress_unavailable`, so an update cannot start.

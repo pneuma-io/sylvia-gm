@@ -65,7 +65,7 @@ impl ProviderFactory for DefaultProviderFactory {
 
 impl DefaultProviderFactory {
     /// `ProviderFactory.create(config)` with the built provider's own type. Every transport
-    /// whose adapter is ported builds an [`OpenAICompatProvider`] (Chat Completions, so far).
+    /// whose adapter is ported builds an [`OpenAICompatProvider`] (Chat Completions and Responses, so far).
     pub fn build(&self, config: ProviderConfig) -> Result<OpenAICompatProvider, CodedError> {
         let model_info = config.models.first().cloned().unwrap_or_else(|| {
             let id = if config.default_model.is_empty() { "unknown" } else { &config.default_model };
@@ -97,7 +97,9 @@ impl DefaultProviderFactory {
         let retry_config =
             config.retry_config.clone().or_else(|| RetryConfig::provider_default(&config.provider_key));
         match wire {
-            transport::CHAT_COMPLETIONS => {
+            // `transport in {"chat_completions", "responses"}`: one provider, the transport chosen
+            // inside it (Responses ported by lane 5).
+            transport::CHAT_COMPLETIONS | transport::RESPONSES => {
                 let timeouts = TimeoutConfig::default();
                 let client = (self.client)(&timeouts).map_err(|error| match error {
                     ProxyError::Value(message) => value_error(message),
@@ -119,9 +121,7 @@ impl DefaultProviderFactory {
                 })?;
                 Ok(provider)
             }
-            transport::RESPONSES | transport::GEMINI_GENERATE_CONTENT | transport::ANTHROPIC_MESSAGES => {
-                Err(pending(wire))
-            }
+            transport::GEMINI_GENERATE_CONTENT | transport::ANTHROPIC_MESSAGES => Err(pending(wire)),
             other => Err(value_error(format!(
                 "Unknown transport '{other}'. Supported: chat_completions, responses, anthropic_messages"
             ))),

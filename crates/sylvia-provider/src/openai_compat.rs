@@ -1,5 +1,6 @@
 //! `OpenAICompatProvider` (`provider/_openai_compat.py`): any OpenAI-compatible Chat Completions
-//! endpoint, over an [`HttpTransport`].
+//! endpoint, or a Responses one (`transport == "responses"`, [`crate::responses`], lane 5), over
+//! an [`HttpTransport`].
 //!
 //! The OpenAI SDK's part of each request is reproduced here: the URL (`httpx.URL` with the
 //! SDK's trailing-slash join), the body (`chat::sdk_request`), and the headers Sylvia or the
@@ -17,6 +18,7 @@ use crate::http::{HttpRequest, HttpResponse, HttpTransport, TransportError};
 use crate::httpx_url::HttpxUrl;
 use crate::provider::{BoxFuture, ChunkStream, Provider, ProviderRequest};
 use crate::pyobj::Incidental;
+use crate::responses::{self, ResponsesStreamState};
 use crate::sse::{stream_item, DoneTracker, ServerSentEvent, SseDecoder, StreamItem};
 use crate::types::{
     ModelInfo, ProviderResponse, ProviderStreamChunk, RetryConfig, TimeoutConfig, TokenUsage,
@@ -224,6 +226,41 @@ impl OpenAICompatProvider {
         }
     }
 
+    /// Whether this provider speaks the Responses API.
+    fn is_responses(&self) -> bool {
+        self.model_info.transport == crate::types::transport::RESPONSES
+    }
+
+    /// `self._transport.format_request(...)`. Chat Completions cannot fail; the Responses
+    /// conversion raises Python's provider errors, or an incidental exception, which escape
+    /// before any hook (here an `Internal` error, as the owner reports an escaped exception).
+    fn format(
+        &self,
+        messages: &[Json],
+        tools: Option<&[Json]>,
+        stream: bool,
+        options: &JsonMap,
+    ) -> ProviderResult<JsonMap> {
+        let messages = self.wire_messages(messages);
+        if !self.is_responses() {
+            return Ok(chat::format_request(
+                self.model_info.wire_model_id(),
+                &messages,
+                tools,
+                stream,
+                options,
+            ));
+        }
+        responses::format_request(self.model_info.wire_model_id(), &messages, tools, stream, options).map_err(
+            |error| match error {
+                ChatError::Provider(error) => error,
+                ChatError::Incidental(Incidental(message)) => {
+                    ProviderError::new(ErrorKind::Internal, message)
+                }
+            },
+        )
+    }
+
     /// `provider_request_representation(messages, tools, options)`: the exact provider-client
     /// request object, without sending it.
     pub fn provider_request_representation(
@@ -231,34 +268,22 @@ impl OpenAICompatProvider {
         messages: &[Json],
         tools: Option<&[Json]>,
         options: &JsonMap,
-    ) -> JsonMap {
+    ) -> ProviderResult<JsonMap> {
         let mut options = options.clone();
         let stream = options.shift_remove("stream").is_some_and(|value| crate::pyobj::truthy(&value));
         options.shift_remove("timeout");
         options.shift_remove("_retry_attempt");
         self.response_continuation_options(&mut options);
-        chat::format_request(
-            self.model_info.wire_model_id(),
-            &self.wire_messages(messages),
-            tools,
-            stream,
-            &options,
-        )
+        self.format(messages, tools, stream, &options)
     }
 
-    fn prepare(&self, request: &ProviderRequest, stream: bool) -> (JsonMap, HookContext) {
+    fn prepare(&self, request: &ProviderRequest, stream: bool) -> ProviderResult<(JsonMap, HookContext)> {
         let mut options = request.options.clone();
         let retry_attempt =
             options.shift_remove("_retry_attempt").and_then(|value| value.as_i64()).unwrap_or(0);
         self.response_continuation_options(&mut options);
         let tools = request.tools.as_deref();
-        let request_json = chat::format_request(
-            self.model_info.wire_model_id(),
-            &self.wire_messages(&request.messages),
-            tools,
-            stream,
-            &options,
-        );
+        let request_json = self.format(&request.messages, tools, stream, &options)?;
         let context = HookContext {
             provider_key: self.model_info.provider_key.clone(),
             model_id: self.model_info.id.clone(),
@@ -270,7 +295,7 @@ impl OpenAICompatProvider {
             stream,
             ..HookContext::default()
         };
-        (request_json, context)
+        Ok((request_json, context))
     }
 
     /// The headers the SDK sends that Sylvia or the protocol sets, in the SDK's order:
@@ -318,7 +343,11 @@ impl OpenAICompatProvider {
     }
 
     fn http_request(&self, request_json: &JsonMap) -> Result<HttpRequest, Incidental> {
-        let sdk = chat::sdk_request(request_json)?;
+        let sdk = if self.is_responses() {
+            responses::sdk_request(request_json)?
+        } else {
+            chat::sdk_request(request_json)?
+        };
         if sdk.extra_query.as_ref().is_some_and(|query| !query.is_null()) {
             // Sylvia never passes one; the SDK would merge it into the URL.
             return Err(Incidental("extra_query is not supported by the Rust provider".into()));
@@ -386,15 +415,19 @@ impl OpenAICompatProvider {
             }
             Ok(result) => result?,
         };
-        chat::parse_completion(&data, &self.model_info.id, self.preserve_reasoning, self.preserve_content)
-            .map_err(|error| match error {
-                ChatError::Provider(error) => CallFailure::Provider(error),
-                ChatError::Incidental(incidental) => CallFailure::Incidental(incidental),
-            })
+        let parsed = if self.is_responses() {
+            responses::parse_response(&data, &self.model_info.id)
+        } else {
+            chat::parse_completion(&data, &self.model_info.id, self.preserve_reasoning, self.preserve_content)
+        };
+        parsed.map_err(|error| match error {
+            ChatError::Provider(error) => CallFailure::Provider(error),
+            ChatError::Incidental(incidental) => CallFailure::Incidental(incidental),
+        })
     }
 
     async fn generate_inner(&self, request: ProviderRequest) -> ProviderResult<ProviderResponse> {
-        let (request_json, context) = self.prepare(&request, false);
+        let (request_json, context) = self.prepare(&request, false)?;
         self.hooks.fire_on_request(&context).await;
         let started = Instant::now();
         // Failures that are not provider errors stop the retry loop and are handled after it.
@@ -486,6 +519,54 @@ enum StreamFailure {
     Transport(TransportError),
 }
 
+/// The per-stream state of the provider's transport.
+enum StreamState {
+    Chat(ChatStreamState),
+    Responses(ResponsesStreamState),
+}
+
+impl StreamState {
+    fn on_chunk(&mut self, raw: &Json) -> Result<Vec<ProviderStreamChunk>, ChatError> {
+        match self {
+            Self::Chat(state) => state.on_chunk(raw),
+            Self::Responses(state) => state.on_chunk(raw),
+        }
+    }
+
+    /// The terminal check: Chat Completions also needs `[DONE]`; Responses only its terminal
+    /// event (`not terminal_seen or (transport != "responses" and not tracker.done)`).
+    fn check_terminal(&self, done_seen: bool) -> Result<(), ChatError> {
+        match self {
+            Self::Chat(state) => state.check_terminal(done_seen),
+            Self::Responses(state) => state.check_terminal(),
+        }
+    }
+
+    /// The private continuation chunk after the stream: Chat's collected metadata; Responses
+    /// events carry no `choices`, so there is none.
+    fn final_metadata(&self) -> Result<Option<ProviderStreamChunk>, ChatError> {
+        match self {
+            Self::Chat(state) => state.final_metadata(),
+            Self::Responses(_) => Ok(None),
+        }
+    }
+
+    fn usage(&self) -> &Option<(TokenUsage, crate::types::CacheUsage)> {
+        match self {
+            Self::Chat(state) => &state.usage,
+            Self::Responses(state) => &state.usage,
+        }
+    }
+
+    /// The reasoning effort and service tier the stream reported.
+    fn reported(&self) -> (Option<String>, Option<String>) {
+        match self {
+            Self::Chat(_) => (None, None),
+            Self::Responses(state) => (state.reported_effort.clone(), state.reported_tier.clone()),
+        }
+    }
+}
+
 enum Phase {
     NotStarted,
     Reading,
@@ -505,7 +586,7 @@ struct StreamRun<'a> {
     events: VecDeque<ServerSentEvent>,
     body_ended: bool,
     sdk_done: bool,
-    state: ChatStreamState,
+    state: StreamState,
     out: VecDeque<ProviderStreamChunk>,
 }
 
@@ -523,7 +604,14 @@ impl<'a> StreamRun<'a> {
             events: VecDeque::new(),
             body_ended: false,
             sdk_done: false,
-            state: ChatStreamState::new(provider.preserve_reasoning, provider.preserve_content),
+            state: if provider.is_responses() {
+                StreamState::Responses(ResponsesStreamState::new())
+            } else {
+                StreamState::Chat(ChatStreamState::new(
+                    provider.preserve_reasoning,
+                    provider.preserve_content,
+                ))
+            },
             out: VecDeque::new(),
         }
     }
@@ -554,14 +642,17 @@ impl<'a> StreamRun<'a> {
                 }
                 Phase::Completing => {
                     self.phase = Phase::Finished;
-                    let (usage, cache) = match &self.state.usage {
+                    let (usage, cache) = match self.state.usage() {
                         Some((usage, cache)) => (usage.clone(), cache.clone()),
                         None => (TokenUsage::default(), Default::default()),
                     };
+                    let (reported_effort, reported_tier) = self.state.reported();
                     let response = ProviderResponse {
                         usage,
-                        usage_reported: Some(self.state.usage.is_some()),
+                        usage_reported: Some(self.state.usage().is_some()),
                         cache_usage: cache,
+                        provider_reported_reasoning_effort: reported_effort,
+                        provider_reported_service_tier: reported_tier,
                         ..ProviderResponse::default()
                     };
                     let finished = HookContext {
@@ -580,7 +671,7 @@ impl<'a> StreamRun<'a> {
 
     /// Everything up to the response headers: hooks, the request, and the initial failures.
     async fn start(&mut self) -> ProviderResult<()> {
-        let (request_json, context) = self.provider.prepare(&self.request, true);
+        let (request_json, context) = self.provider.prepare(&self.request, true)?;
         self.context = context;
         self.provider.hooks.fire_on_request(&self.context).await;
         self.started = Instant::now();
@@ -680,7 +771,7 @@ impl<'a> StreamRun<'a> {
                     ) => ProviderError::connection(message, None),
                 };
                 let mut context = OpenAICompatProvider::error_context(&self.context, &error, self.started);
-                if let Some((usage, cache)) = &self.state.usage {
+                if let Some((usage, cache)) = self.state.usage() {
                     context.response = Some(ProviderResponse {
                         usage: usage.clone(),
                         usage_reported: Some(true),
