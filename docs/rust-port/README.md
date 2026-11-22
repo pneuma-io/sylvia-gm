@@ -13,7 +13,9 @@ everyone doing that port: who owns what, the rules, and how a change is checked.
   3.12.3 (what `scripts/setup_linux_dev.sh` and the Linux release build use), SQLite 3.45.1.
   Both are Unicode 15.0. The Rust build bundles SQLite 3.49.1 on both platforms; lane 3 showed
   that every schema identity, migration digest and open/upgrade outcome is the same under
-  3.45.1, and Rust opens databases written by either.
+  3.45.1, and Rust opens databases written by either. The Windows reference environment is
+  `uv sync --extra dev --extra dictation --python 3.12`: the `dictation` extra (faster-whisper,
+  CTranslate2, sounddevice, ONNX Runtime, PyAV) is what the dictation vector generators read.
 - **Release fixes merged in so far:** `rust-rewrite` branched from `0da1010`. The release
   commit then moved to `c19eee4` for issue #240, which changed only the frontend (owner
   refusals shown without the desktop host's code) and two frontend tests; it was merged into
@@ -118,6 +120,18 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    ctypes calls; and `sylvia-base/src/winreg.rs` (`RegOpenKeyExW`, `RegQueryValueExW`,
    `RegCloseKey`; read-only, HKCU, closed on drop), CPython's `winreg.QueryValueEx` with
    `Reg2Py`'s string rules, shared by the desktop update and the HTTP client's proxy read.
+   Native libraries the Python build ships, loaded so that results are theirs (each behind
+   sylvia-owner's `dictation` feature, Windows only, loaded by full path with
+   `LoadLibraryExW(..., LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32)`,
+   never freed, each `GetProcAddress` cast to its typed function pointer beside its lookup with
+   the C prototype quoted; listed with file hashes in `third-party-ports.md`):
+   `sylvia-owner/src/dictation/swresample/windows.rs` (libswresample 6.x as PyAV uses it:
+   `swresample_version` gate, `swr_alloc_set_opts2`, `swr_init`, `swr_get_out_samples`,
+   `swr_convert`, `swr_free` on an owned context, a `#[repr(C)]` `AVChannelLayout` with size and
+   alignment assertions) and `sylvia-owner/src/dictation/openblas/windows.rs` (NumPy's
+   scipy-openblas: `scipy_openblas_get_config64_` version gate, `scipy_cblas_sgemm64_`,
+   `scipy_cblas_sgemv64_`; no thread-count call, the library reads `OMP_NUM_THREADS` itself
+   as it does under Python).
 
 ## Concurrency
 
@@ -193,6 +207,24 @@ and prints where. Report the count of remaining differences per session in the p
 it should only go down.
 
 No GitHub Actions run for this branch. State in the pull request what you ran and where.
+
+**Dictation (Windows, the `dictation` feature).** `check.sh` never builds the `dictation`
+feature or loads its native libraries. Changes to `sylvia-owner/src/dictation` are checked
+separately on Windows. Stage the libraries the product ships once, then run the dictation tests
+with an absolute path:
+
+```
+bash docs/rust-port/tools/stage_dictation_natives.sh <empty folder outside the checkout>
+SYLVIA_DICTATION_NATIVE_DIR=<that folder>/native cargo test -p sylvia-owner --features dictation \
+    --test dictation_native
+SYLVIA_DICTATION_NATIVE_DIR=<that folder>/native cargo test -p sylvia-owner --features dictation \
+    --lib dictation -- --include-ignored
+cargo clippy -p sylvia-owner --features dictation --all-targets -- -D warnings
+```
+
+`dictation_native` runs itself again under `OMP_NUM_THREADS=2` (the desktop's setting for the
+speech worker) and `OMP_NUM_THREADS=1`. OpenBLAS reads the variable when it loads and its
+threads decide the bits, so do not set `OPENBLAS_NUM_THREADS` in the shell.
 
 ## Files in this folder
 

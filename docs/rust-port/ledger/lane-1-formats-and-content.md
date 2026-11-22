@@ -28,7 +28,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/import_repair.py` | 621 | `sylvia-app::import_repair` | pending | |
 | `src/sylvia_gm/application/import_repair_sessions.py` | 147 | `sylvia-app::import_repair_sessions` | pending | |
 | `src/sylvia_gm/application/initial_character_state.py` | 532 | `sylvia-app::initial_character_state` | pending | |
-| `src/sylvia_gm/application/interview_content.py` | 152 | `sylvia-app::interview_content` | pending | |
+| `src/sylvia_gm/application/interview_content.py` | 152 | `sylvia-app::interview_content` | in progress | `resolve_interview_content`: the Ruleset-only and installed-Setting paths are exact (`interview_content_vectors`). These branches answer `rust_port_pending`: a Plan selection stops at `bundled_campaign_plans.bundled_plan` (waits on `plan_snapshot`, that is lane 2's `tactical_grid`); installing the bundled Rift closure stops at `install_package_archive` (waits on lane 2's `package_runtime`); a bundled Setting stops at `bundled_campaign_plans.bundled_setting_snapshot` (waits on `plan_snapshot`). The owner reads are the `InterviewOwner` trait, for lane 3's store to implement |
 | `src/sylvia_gm/application/library_sources.py` | 223 | `sylvia-app::library_sources` | pending | |
 | `src/sylvia_gm/application/network_graph.py` | 433 | `sylvia-app::network_graph` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | pending | |
@@ -48,21 +48,21 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/setting_character_requirements.py` | 198 | `sylvia-app::setting_character_requirements` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | ported | `srd_lite_compat_vectors` (the bundled player declaration stands in for the lost 0.3.0 one) |
 | `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | ported | `app_leaves_vectors` |
-| `src/sylvia_gm/builder/__init__.py` | 46 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/__init__.py` | 46 | - | ported | Re-exports only: `PathGuardrail` and `GuardrailBlockedError` are `sylvia-app::path_guardrail`, `build_builder_system_prompt` is `sylvia-app::builder_prompts`; `BuilderLoopError`, `BuilderRunner` and `BuilderTurnResult` are lazy re-exports of lane 4's `agent/_runner.py`; the interview extractor re-exports are dropped with the retired files |
 | `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::path_guardrail` | ported | `guardrail_vectors`, one file per platform (`Path.resolve` differs); Windows and Linux vectors both checked |
 | `src/sylvia_gm/builder/_interview_extractor.py` | 347 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_interview_manifest.py` | 57 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
-| `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::package_materializer` | ported | `package_materializer_vectors` (one file for Windows and Linux: compact sources, descriptor drafts, links, limits, export) |
+| `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::package_record_edits` | ported | `package_record_edit_vectors` (one file for Windows and Linux) |
 | `src/sylvia_gm/builder/_package_snapshots.py` | 222 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_draft_check.py` | 101 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_snapshot_materializer.py` | 292 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_prompts.py` | 248 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_prompts.py` | 248 | `sylvia-app::builder_prompts` | ported | `builder_prompt_vectors`. The model-read text is `builder_prompt_text.rs`, generated from the Python source by `generate_builder_prompt_text.py` |
+| `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::ruleset_source` | ported | `ruleset_source_vectors` (the shipped Riichi source, edits, and YAML whose aliases reach the dumped runtime as anchors); Python's object graph and `deepcopy` sharing are kept for `yaml.safe_dump` |
 | `src/sylvia_gm/builder/_setting_draft_check.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_setting_materializer.py` | 150 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder_tools` | ported | Data: `builder_tools.json`, exported from the Python values by `generate_builder_tools.py` (model-read text copied, not retyped); unit test pins the nine definitions and their tool names |
 | `src/sylvia_gm/builder/_workspace_files.py` | 114 | `sylvia-app::workspace_files` | ported | Unit test: stale versions, unique and overlapping literals, atomic replace with no leftover temporary file |
 | `src/sylvia_gm/campaign/__init__.py` | 10 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/campaign/_folder.py` | 600 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
@@ -90,7 +90,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/campaign_sequel.py` | 123 | `sylvia-domain::campaign_sequel` | ported | `domain_records_vectors` |
 | `src/sylvia_gm/domain/content_definitions.py` | 313 | `sylvia-domain::content::catalog` | ported | `list_content_definitions`, `get_content_definition` |
 | `src/sylvia_gm/domain/content_validation.py` | 143 | `sylvia-domain::content::validation` | ported | `validate_content_shape`, `ContentShapeError`; the engine (`content::schema`) also serves lanes 2 and 4 and `state/_schema.py`, with jsonschema 4.26 messages |
-| `src/sylvia_gm/domain/errors.py` | 173 | `sylvia-domain::error` | ported | `RulesetDiagnostic`, `MechanicsValidationIssue`; the `AuthorityError` classes are `DomainError::Rejected` with their codes |
+| `src/sylvia_gm/domain/errors.py` | 188 | `sylvia-domain::error` | ported | `RulesetDiagnostic`, `MechanicsValidationIssue`; the `AuthorityError` classes are `DomainError::Rejected` with their codes. 0.4.1 follow-up: `RulesetPreconditionRejected` fills `field_paths` from `_NAMED_INPUT` (`error::named_inputs`, Python's `\b` on `pystr::is_alnum`; `schema_admission_vectors`, every code point checked) |
 | `src/sylvia_gm/domain/interview_contribution.py` | 150 | `sylvia-domain::interview_contribution` | ported | `domain_records_vectors` |
 | `src/sylvia_gm/domain/inventory.py` | 240 | `sylvia-domain::inventory` | ported | Shared schemas as data (`generate_inventory_schema.py`); `validate_holdings`, `transfer_holding` and `player_inventory` in `inventory/holdings.rs`; `domain_records_vectors` |
 | `src/sylvia_gm/domain/mechanics_choices.py` | 89 | `sylvia-domain::mechanics_choices` | ported | `domain_records_vectors` |

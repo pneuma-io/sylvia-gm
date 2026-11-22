@@ -157,6 +157,21 @@ impl OpenAICompatProvider {
         &self.timeout_config
     }
 
+    /// `_retry_config`.
+    pub fn retry_config(&self) -> &RetryConfig {
+        &self.retry_config
+    }
+
+    /// `_default_headers`, in their configured order.
+    pub fn default_headers(&self) -> &[(String, String)] {
+        &self.default_headers
+    }
+
+    /// `model_info`.
+    pub fn model(&self) -> &ModelInfo {
+        &self.model_info
+    }
+
     /// `_wire_messages`: Groq does not accept `name` on messages.
     fn wire_messages(&self, messages: &[Json]) -> Vec<Json> {
         if self.hostname.as_deref() == Some("api.groq.com") || self.model_info.provider_key == "groq" {

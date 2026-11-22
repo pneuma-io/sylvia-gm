@@ -18,6 +18,7 @@ futures-util.workspace = true
 getrandom.workspace = true
 sha2.workspace = true
 hex.workspace = true
+reqwest.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-sys.workspace = true

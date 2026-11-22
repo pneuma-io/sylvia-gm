@@ -6,6 +6,9 @@
 //! needed, and a failed build is tried again on the next call. A reload builds the replacement
 //! first and swaps it in only when that succeeds.
 //!
+//! Providers come from the real [`DefaultProviderFactory`]; the account runtimes and local
+//! discovery still answer as not ported ([`PendingRuntimes`]).
+//!
 //! `_release_unoffered_model_threads` (after a reload) belongs to the account runtimes, which
 //! are not ported yet.
 
@@ -16,29 +19,14 @@ use std::sync::{Arc, Mutex};
 use sylvia_agent::provider_resolver::{
     ConfiguredProviderResolver, LocalDiscovery, ResolverSources, RuntimeHooks,
 };
-use sylvia_base::{CodedError, CodedResult, Json};
+use sylvia_base::{CodedResult, Json};
 use sylvia_domain::session::SessionRecord;
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::config::protection::PlatformSeal;
 use sylvia_provider::config::{default_config_path, ConfigFailure, Data};
+use sylvia_provider::factory::DefaultProviderFactory;
 use sylvia_provider::provider::Provider;
 use sylvia_provider::registry::ProviderFactory;
-use sylvia_provider::types::ProviderConfig;
-
-/// The code an unported piece answers with (see [`crate::dispatch::PORT_PENDING`]).
-fn pending(message: String) -> CodedError {
-    CodedError::new(crate::dispatch::PORT_PENDING, message)
-}
-
-/// Provider construction until the HTTP client and the protocol adapters are ported: every
-/// build answers `rust_port_pending`.
-pub struct PendingFactory;
-
-impl ProviderFactory for PendingFactory {
-    fn create(&self, config: ProviderConfig) -> Result<Arc<dyn Provider>, CodedError> {
-        Err(pending(format!("The Rust owner cannot build {} providers yet.", config.transport)))
-    }
-}
 
 /// The account runtime and local discovery until they are ported.
 pub struct PendingRuntimes;
@@ -77,7 +65,7 @@ impl OwnerProviders {
         Self::with(
             storage_root.join("config.yaml"),
             sources,
-            Arc::new(PendingFactory),
+            Arc::new(DefaultProviderFactory::network()),
             Arc::new(PendingRuntimes),
         )
     }

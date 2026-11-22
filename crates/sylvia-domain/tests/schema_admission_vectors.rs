@@ -170,3 +170,35 @@ fn rejection_constructors_match_python() {
         assert_eq!(actual, case["outcome"], "{case}");
     }
 }
+
+#[test]
+fn named_inputs_match_python_findall() {
+    let vectors = vectors();
+    for case in vectors["named_inputs"].as_array().unwrap() {
+        let actual = sylvia_domain::error::named_inputs(case[0].as_str().unwrap());
+        assert_eq!(Json::from(actual), case[1], "{case}");
+    }
+    // Every code point before "input 'x'": Python's `\b` blocks the match exactly after a word
+    // character (`str.isalnum()` or `_`). Surrogates are not characters in Rust.
+    let blockers: Vec<(u32, u32)> = vectors["named_input_blockers"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|range| (range[0].as_u64().unwrap() as u32, range[1].as_u64().unwrap() as u32))
+        .collect();
+    let mut differ = Vec::new();
+    for code in 0..=0x10FFFFu32 {
+        let Some(c) = char::from_u32(code) else { continue };
+        let expected = blockers.iter().any(|(start, end)| (*start..=*end).contains(&code));
+        let blocked = sylvia_domain::error::named_inputs(&format!("{c}input 'x'")).is_empty();
+        if blocked != expected {
+            differ.push(code);
+        }
+    }
+    assert!(
+        differ.is_empty(),
+        "{} code points differ, first {:x?}",
+        differ.len(),
+        &differ[..differ.len().min(8)]
+    );
+}

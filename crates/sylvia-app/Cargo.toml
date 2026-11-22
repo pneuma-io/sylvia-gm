@@ -12,7 +12,13 @@ publish.workspace = true
 sylvia-base.workspace = true
 sylvia-domain.workspace = true
 sylvia-engine.workspace = true
+sylvia-store.workspace = true
 serde_json.workspace = true
+
+[dev-dependencies]
+sylvia-compare = { path = "../sylvia-compare" }
+flate2.workspace = true
+tokio.workspace = true
 
 [lints]
 workspace = true
