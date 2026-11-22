@@ -53,13 +53,13 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::path_guardrail` | ported | `guardrail_vectors`, one file per platform (`Path.resolve` differs); Windows and Linux vectors both checked |
 | `src/sylvia_gm/builder/_interview_extractor.py` | 347 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_interview_manifest.py` | 57 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
-| `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_package_materializer.py` | 341 | `sylvia-app::package_materializer` | ported | `package_materializer_vectors` (one file for Windows and Linux: compact sources, descriptor drafts, links, limits, export) |
+| `src/sylvia_gm/builder/_package_record_edits.py` | 226 | `sylvia-app::package_record_edits` | ported | `package_record_edit_vectors` (one file for Windows and Linux) |
 | `src/sylvia_gm/builder/_package_snapshots.py` | 222 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_draft_check.py` | 101 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_snapshot_materializer.py` | 292 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_prompts.py` | 248 | `sylvia-app::builder_prompts` | ported | `builder_prompt_vectors`. The model-read text is `builder_prompt_text.rs`, generated from the Python source by `generate_builder_prompt_text.py` |
-| `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::ruleset_source` | ported | `ruleset_source_vectors` (the shipped Riichi source, edits, and YAML whose aliases reach the dumped runtime as anchors); Python's object graph and `deepcopy` sharing are kept for `yaml.safe_dump` |
 | `src/sylvia_gm/builder/_setting_draft_check.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_setting_materializer.py` | 150 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder` | pending | |

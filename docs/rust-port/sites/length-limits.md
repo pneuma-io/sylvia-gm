@@ -63,13 +63,13 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/setting_character_requirements.py:76` | `parse_setting_character_requirements` | len() against a limit | `if not encoded or len(encoded) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
 | `application/setting_character_requirements.py:145` | `validate_setting_character_data` | len() against a limit | `if len(canonical_json_bytes(captured)) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
 | `builder/_campaign_plan_materializer.py:54` | `_bounded_text` | len() against a limit | `if len(value) > CAMPAIGN_PLAN_BYTE_LIMIT:` | |
-| `builder/_package_materializer.py:101` | `_read_descriptor` | len() against a limit | `if len(raw) > _DESCRIPTOR_BYTE_LIMIT:` | |
-| `builder/_package_materializer.py:159` | `_read_payloads` | len() against a limit | `if len(retained_entries) >= _PAYLOAD_ENTRY_LIMIT:` | |
-| `builder/_package_materializer.py:174` | `_read_payloads` | len() against a limit | `if len(Path(relative).parts) > _PAYLOAD_PATH_DEPTH_LIMIT:` | |
-| `builder/_package_materializer.py:180` | `_read_payloads` | len() against a limit | `if len(payloads) >= _PAYLOAD_FILE_LIMIT:` | |
-| `builder/_package_materializer.py:185` | `_read_payloads` | len() against a limit | `if len(value) > _PAYLOAD_BYTE_LIMIT or total_bytes > _PAYLOAD_BYTE_LIMIT:` | |
-| `builder/_package_materializer.py:227` | `materialize_ruleset_draft` | len() against a limit | `if len(source_bytes) > _DESCRIPTOR_BYTE_LIMIT:` | |
-| `builder/_package_record_edits.py:34` | `_read_record` | len() against a limit | `if len(raw) > _RECORD_BYTE_LIMIT:` | |
+| `builder/_package_materializer.py:101` | `_read_descriptor` | len() against a limit | `if len(raw) > _DESCRIPTOR_BYTE_LIMIT:` |  `sylvia-app` package_materializer_vectors |
+| `builder/_package_materializer.py:159` | `_read_payloads` | len() against a limit | `if len(retained_entries) >= _PAYLOAD_ENTRY_LIMIT:` |  `sylvia-app` package_materializer_vectors |
+| `builder/_package_materializer.py:174` | `_read_payloads` | len() against a limit | `if len(Path(relative).parts) > _PAYLOAD_PATH_DEPTH_LIMIT:` |  `sylvia-app` package_materializer_vectors |
+| `builder/_package_materializer.py:180` | `_read_payloads` | len() against a limit | `if len(payloads) >= _PAYLOAD_FILE_LIMIT:` |  `sylvia-app` package_materializer_vectors |
+| `builder/_package_materializer.py:185` | `_read_payloads` | len() against a limit | `if len(value) > _PAYLOAD_BYTE_LIMIT or total_bytes > _PAYLOAD_BYTE_LIMIT:` |  `sylvia-app` package_materializer_vectors |
+| `builder/_package_materializer.py:227` | `materialize_ruleset_draft` | len() against a limit | `if len(source_bytes) > _DESCRIPTOR_BYTE_LIMIT:` |  `sylvia-app` package_materializer_vectors |
+| `builder/_package_record_edits.py:34` | `_read_record` | len() against a limit | `if len(raw) > _RECORD_BYTE_LIMIT:` |  `sylvia-app` package_record_edit_vectors |
 | `builder/_package_snapshots.py:101` | `_source_selection` | len() against a limit | `if len(raw) > 65536:` | |
 | `builder/_plan_snapshot_materializer.py:168` | `_removed_paths` | len() against a limit | `or len(value) > _REMOVAL_COUNT_LIMIT` | |
 | `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` | |
