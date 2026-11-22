@@ -201,7 +201,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_schema_validator.py:1635` | `_validate_request_choice_effect` | len() against a limit | `if not isinstance(label, str) or not label or len(label.encode("utf-8")) > 1024:` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_tool_executor.py:211` | `prepare_tool_context` | len() against a limit | `if error_msg not in failures and len(failures) < 64:` |  `sylvia-engine` execution_vectors |
 | `runtime/_tool_executor.py:218` | `prepare_tool_context` | len() against a limit | `if evaluation_error is not None and len(failures) < 64:` |  `sylvia-engine` execution_vectors |
-| `spatial/_engine.py:1496` | `_resolve_circle_route` | len() against a limit | `if len(blocking) > 16:` | |
+| `spatial/_engine.py:1496` | `_resolve_circle_route` | len() against a limit | `if len(blocking) > 16:` |  `sylvia-engine` spatial_engine_vectors |
 | `spatial/_engine.py:1825` | `SpatialEngine.replace_scene` | len() against a limit | `while len(self._compiled) > _CACHE_LIMIT:` | |
 | `spatial/_engine.py:1863` | `SpatialEngine.query` | len() against a limit | `while len(self._cache) > _CACHE_LIMIT:` | |
 | `spatial/_interface.py:457` | `_metadata` | len() against a limit | `if len(canonical_json_bytes(payload)) > _MAX_METADATA_BYTES:` |  `sylvia-engine` spatial_scene_vectors |
