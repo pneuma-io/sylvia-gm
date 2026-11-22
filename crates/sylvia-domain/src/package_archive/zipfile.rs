@@ -408,7 +408,8 @@ impl<'a> ZipArchive<'a> {
         Self::open_source(Box::new(FileSource { file, len }))
     }
 
-    fn open_source(source: Box<dyn ZipSource + 'a>) -> ZipResult<Self> {
+    /// `ZipFile(fp, "r")` on any [`ZipSource`] (tests read archives written at a bias this way).
+    pub fn open_source(source: Box<dyn ZipSource + 'a>) -> ZipResult<Self> {
         let mut spool = Spool::new(source.as_ref());
         let record = end_record(&mut spool)?.ok_or_else(|| bad("File is not a zip file"))?;
         let mut concat = record.location - record.size as i64 - record.offset as i64;

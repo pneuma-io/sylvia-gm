@@ -19,6 +19,7 @@ pub mod campaigns;
 pub mod continuity;
 pub mod error;
 pub mod export;
+pub mod export_writer;
 pub mod f5;
 pub mod guided;
 pub mod guided_advance;

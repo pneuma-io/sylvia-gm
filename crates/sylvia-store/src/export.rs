@@ -1,8 +1,8 @@
 //! Capturing one campaign for portable export, in the store: `SQLiteAuthorityStore.
 //! _capture_campaign_export` with `_assert_export_source_schema`, `_export_relation_predicates`,
 //! `_preflight_export_relations` and `_read_export_rows`, and the `_ExportFailure` model
-//! (`_as_export_failure`, `_run_export_stage`). Writing the archive (`export_campaign`) comes
-//! with the export writer PR.
+//! (`_as_export_failure`, `_run_export_stage`). Writing the archive (`export_campaign`) is
+//! [`crate::export_writer`].
 //!
 //! The fault seam `_export_failure_stage(stage)` is [`crate::store::Faults::export_stage`].
 //!
@@ -416,7 +416,7 @@ impl AuthorityStore {
     }
 
     /// `_run_export_stage(stage)`.
-    fn run_export_stage(&self, stage: &str) -> Result<(), ExportFailure> {
+    pub(crate) fn run_export_stage(&self, stage: &str) -> Result<(), ExportFailure> {
         self.export_stage(stage).map_err(|error| match error.rejection() {
             Some(coded) if coded.error_type == Some("_ExportFailure") => ExportFailure::new(coded.code),
             _ => ExportFailure::new(format!("portable_export_{stage}_failed")),

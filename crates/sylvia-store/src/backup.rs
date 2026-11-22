@@ -44,7 +44,7 @@ pub struct BackupFailure {
 }
 
 impl BackupFailure {
-    fn new(phase: &str, reason: &str) -> Self {
+    pub(crate) fn new(phase: &str, reason: &str) -> Self {
         Self { phase: phase.to_owned(), reason: reason.to_owned(), supplemental_codes: Vec::new() }
     }
 
@@ -70,7 +70,7 @@ impl From<BackupFailure> for StoreError {
     }
 }
 
-type Step<T> = Result<T, BackupFailure>;
+pub(crate) type Step<T> = Result<T, BackupFailure>;
 
 fn fail<T>(phase: &str, reason: &str) -> Step<T> {
     Err(BackupFailure::new(phase, reason))
@@ -78,35 +78,35 @@ fn fail<T>(phase: &str, reason: &str) -> Step<T> {
 
 /// `_BackupEnvelope`.
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct Envelope {
-    target: PathBuf,
-    parent_identity: Identity,
-    target_identity: Option<Identity>,
-    source_identity: Identity,
-    volume_root: String,
+pub(crate) struct Envelope {
+    pub(crate) target: PathBuf,
+    pub(crate) parent_identity: Identity,
+    pub(crate) target_identity: Option<Identity>,
+    pub(crate) source_identity: Identity,
+    pub(crate) volume_root: String,
 }
 
 /// `_ClaimedBackupTemporary`.
-struct Claimed {
-    path: PathBuf,
-    identity: Identity,
-    parent_identity: Identity,
-    volume_root: String,
-    attributes: u32,
+pub(crate) struct Claimed {
+    pub(crate) path: PathBuf,
+    pub(crate) identity: Identity,
+    pub(crate) parent_identity: Identity,
+    pub(crate) volume_root: String,
+    pub(crate) attributes: u32,
 }
 
 /// `os.path.samefile`.
-fn samefile(left: &Path, right: &Path) -> std::io::Result<bool> {
+pub(crate) fn samefile(left: &Path, right: &Path) -> std::io::Result<bool> {
     Ok(stat_identity(left)? == stat_identity(right)?)
 }
 
 /// `os.path.lexists`.
-fn lexists(path: &Path) -> bool {
+pub(crate) fn lexists(path: &Path) -> bool {
     std::fs::symlink_metadata(path).is_ok()
 }
 
 /// `os.path.normcase(os.path.abspath(path))`.
-fn path_key(path: &Path) -> String {
+pub(crate) fn path_key(path: &Path) -> String {
     let absolute = safe_file::abspath(path).to_string_lossy().into_owned();
     if cfg!(windows) {
         absolute.replace('/', "\\").to_lowercase()
@@ -116,7 +116,7 @@ fn path_key(path: &Path) -> String {
 }
 
 /// `Path(...).anchor`.
-fn anchor(path: &Path) -> PathBuf {
+pub(crate) fn anchor(path: &Path) -> PathBuf {
     let mut out = PathBuf::new();
     for component in path.components() {
         match component {
@@ -165,7 +165,7 @@ impl<'a> Backup<'a> {
     }
 
     /// `_protected_backup_source_paths`.
-    fn protected_source_paths(&self) -> [PathBuf; 6] {
+    pub(crate) fn protected_source_paths(&self) -> [PathBuf; 6] {
         let source = self.database_path;
         [
             source.to_path_buf(),
@@ -340,7 +340,7 @@ impl<'a> Backup<'a> {
     }
 
     /// `_claim_backup_temporary`.
-    fn claim_temporary(&self, envelope: &Envelope) -> Step<(Claimed, File)> {
+    pub(crate) fn claim_temporary(&self, envelope: &Envelope) -> Step<(Claimed, File)> {
         for _ in 0..TEMP_ATTEMPTS {
             let candidate = temp_candidate(&envelope.target)?;
             let descriptor = match safe_file::create_exclusive(&candidate) {
@@ -488,7 +488,7 @@ impl<'a> Backup<'a> {
     }
 
     /// `_validate_claimed_backup_temporary`.
-    fn validate_claimed(&self, claimed: &Claimed, seal: &File, envelope: &Envelope) -> Step<()> {
+    pub(crate) fn validate_claimed(&self, claimed: &Claimed, seal: &File, envelope: &Envelope) -> Step<()> {
         let validation = |_| BackupFailure::new("final_envelope", "temporary_validation_failed");
         let seal_identity = safe_file::handle_identity(seal).map_err(validation)?;
         if seal_identity != claimed.identity {
@@ -533,13 +533,13 @@ impl<'a> Backup<'a> {
 /// `os.lstat` identity of an entry that is known to be a regular file: the metadata already
 /// read on Linux, the same handle identity as `stat` elsewhere (a regular file is no link).
 #[cfg(target_os = "linux")]
-fn lstat_identity(_path: &Path, metadata: &std::fs::Metadata) -> std::io::Result<Identity> {
+pub(crate) fn lstat_identity(_path: &Path, metadata: &std::fs::Metadata) -> std::io::Result<Identity> {
     use std::os::unix::fs::MetadataExt;
     Ok((metadata.dev(), metadata.ino()))
 }
 
 #[cfg(not(target_os = "linux"))]
-fn lstat_identity(path: &Path, _metadata: &std::fs::Metadata) -> std::io::Result<Identity> {
+pub(crate) fn lstat_identity(path: &Path, _metadata: &std::fs::Metadata) -> std::io::Result<Identity> {
     stat_identity(path)
 }
 
@@ -565,7 +565,7 @@ fn hex(bytes: &[u8]) -> String {
 }
 
 /// `_acquire_backup_content_seal`.
-fn acquire_content_seal(claimed: &Claimed) -> Step<File> {
+pub(crate) fn acquire_content_seal(claimed: &Claimed) -> Step<File> {
     let seal = safe_file::open_content_seal(&claimed.path)
         .map_err(|_| BackupFailure::new("content_seal_open", "failed"))?;
     let result = match safe_file::handle_identity(&seal) {
@@ -605,7 +605,7 @@ fn require_absent(artifacts: &[(PathBuf, &'static str)], phase: &str) -> Step<()
 }
 
 /// `_cleanup_owned_backup`: sidecars in reverse order, then the claimed main file.
-fn cleanup_owned(claimed: &Claimed) -> Vec<String> {
+pub(crate) fn cleanup_owned(claimed: &Claimed) -> Vec<String> {
     let mut codes = Vec::new();
     for (path, role) in owned_artifacts(&claimed.path)[1..].iter().rev() {
         if lexists(path) && std::fs::remove_file(path).is_err() {
