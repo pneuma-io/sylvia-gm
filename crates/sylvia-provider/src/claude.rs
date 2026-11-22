@@ -38,7 +38,7 @@ pub struct RecordIds<'a> {
 
 impl RecordIds<'_> {
     /// `str(uuid.uuid4())`.
-    fn text(&mut self) -> String {
+    pub(crate) fn text(&mut self) -> String {
         let hex = self.hex();
         format!("{}-{}-{}-{}-{}", &hex[..8], &hex[8..12], &hex[12..16], &hex[16..20], &hex[20..])
     }

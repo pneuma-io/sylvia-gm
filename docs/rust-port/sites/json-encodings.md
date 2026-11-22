@@ -155,9 +155,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude.py:131` | `prepare_request` | Dump::DEFAULT + allow_nan= | `history = json.loads(json.dumps(request["messages"], allow_nan=False))` | `sylvia-provider` claude_vectors |
 | `provider/_claude.py:203` | `_replay_record` | Dump::DEFAULT | `add(str(saved["type"]), {"message": json.loads(json.dumps(saved["message"]))})` | `sylvia-provider` claude_vectors |
 | `provider/_claude.py:322` | `_native_projection` | Dump::DEFAULT | `add("user", {"message": json.loads(json.dumps(answer))})` | `sylvia-provider` claude_vectors |
-| `provider/_claude.py:608` | `ClaudeProvider._keep_plan` | Dump::DEFAULT.sorted(true) | `tools_key=json.dumps(native_tools, sort_keys=True), history=history,` | |
-| `provider/_claude.py:796` | `ClaudeProvider._fresh` | Dump::DEFAULT | `transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)` | |
-| `provider/_claude.py:1033` | `ClaudeProvider._run_events` | Dump::DEFAULT + allow_nan= | `json.dumps(candidate["input"], allow_nan=False),` | |
+| `provider/_claude.py:608` | `ClaudeProvider._keep_plan` | Dump::DEFAULT.sorted(true) | `tools_key=json.dumps(native_tools, sort_keys=True), history=history,` | `sylvia-provider` claude_provider_vectors |
+| `provider/_claude.py:796` | `ClaudeProvider._fresh` | Dump::DEFAULT | `transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)` | `sylvia-provider` claude_provider_vectors |
+| `provider/_claude.py:1033` | `ClaudeProvider._run_events` | Dump::DEFAULT + allow_nan= | `json.dumps(candidate["input"], allow_nan=False),` | `sylvia-provider` claude_provider_vectors |
 | `provider/_claude_kept.py:265` | `_same` | Dump::DEFAULT.ascii(false).sorted(true) | `return json.dumps(_plain(a), sort_keys=True, ensure_ascii=False) == json.dumps(` | `sylvia-provider` kept_vectors |
 | `provider/_claude_kept.py:265` | `_same` | Dump::DEFAULT.ascii(false).sorted(true) | `return json.dumps(_plain(a), sort_keys=True, ensure_ascii=False) == json.dumps( _plain(b), sort_keys=True, ensure_ascii=False)` | `sylvia-provider` kept_vectors |
 | `provider/_claude_native.py:297` | `_round_row` | Dump::DEFAULT | `return {"type": "assistant", "message": json.loads(json.dumps(message))}` | `sylvia-provider` kept_vectors |

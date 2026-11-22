@@ -1020,6 +1020,11 @@ impl Provider for GeminiProvider {
         Some(&self.model_info)
     }
 
+    /// `_base_url`, without trailing slashes.
+    fn base_url(&self) -> Option<&str> {
+        Some(&self.base_url)
+    }
+
     fn generate(&self, request: ProviderRequest) -> BoxFuture<'_, ProviderResult<ProviderResponse>> {
         Box::pin(self.generate_once(request))
     }
