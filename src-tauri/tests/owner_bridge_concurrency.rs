@@ -1,9 +1,7 @@
 use serde_json::json;
-use std::path::PathBuf;
 use std::sync::{Arc, Barrier};
 use std::time::{SystemTime, UNIX_EPOCH};
-use support::await_clean_shutdown;
-use sylvia_gm::OwnerBridge;
+use support::{await_clean_shutdown, spawn_test_owner};
 
 mod support;
 
@@ -21,19 +19,9 @@ fn rust_bridge_demultiplexes_concurrent_owner_replies() {
     let database = root.join("authority.sqlite3");
     let retained = root.join("retained-synthetic-data.txt");
     std::fs::write(&retained, "keep this synthetic data").expect("write retained data");
-    let python = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .expect("repository root")
-        .join(".venv");
-    let python = if cfg!(windows) {
-        python.join("Scripts").join("python.exe")
-    } else {
-        python.join("bin").join("python")
-    };
-
     let bridge = Arc::new(
-        OwnerBridge::spawn_python(&python, &database)
-            .expect("Rust host launches verified Python owner"),
+        spawn_test_owner(&database)
+            .expect("Rust host launches verified owner"),
     );
     let packages = bridge
         .request("package_candidates", json!({}))
@@ -59,7 +47,7 @@ fn rust_bridge_demultiplexes_concurrent_owner_replies() {
     bridge.shutdown().expect("clean concurrent bridge shutdown");
     drop(bridge);
 
-    let reopened = OwnerBridge::spawn_python(&python, &database)
+    let reopened = spawn_test_owner(&database)
         .expect("collected owner releases the same database for reopening");
     assert_eq!(
         reopened.request("campaign_index", json!({})).unwrap(),
