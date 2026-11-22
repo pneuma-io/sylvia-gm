@@ -135,6 +135,10 @@ impl Provider for SessionBoundRequestMetadataProvider {
         Some(self.provider.as_ref())
     }
 
+    fn base_url(&self) -> Option<&str> {
+        self.provider.base_url()
+    }
+
     /// `provider_request_representation`: the wrapped provider's, with the same per-request
     /// headers, or the neutral `{"messages", "tools", "options"}` when it has none (one level,
     /// as Python's `getattr`).

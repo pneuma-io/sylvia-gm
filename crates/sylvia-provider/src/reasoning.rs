@@ -435,6 +435,10 @@ impl Provider for TurnReasoningProvider {
         Some(self.provider.as_ref())
     }
 
+    fn base_url(&self) -> Option<&str> {
+        self.provider.base_url()
+    }
+
     /// `provider_request_representation`: the first wrapped provider down the chain that has
     /// one, given this turn's options; otherwise the neutral request with them.
     fn request_representation(

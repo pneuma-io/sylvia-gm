@@ -99,6 +99,12 @@ pub trait Provider: Send + Sync {
     fn set_audit_context(&self, _context: &JsonMap) -> bool {
         false
     }
+
+    /// `provider._base_url`, read for Admin Full Audit's endpoint. A transport has its own;
+    /// Sylvia's OpenCode and reasoning wrappers copy their wrapped provider's; others have none.
+    fn base_url(&self) -> Option<&str> {
+        None
+    }
 }
 
 /// `_provider_capability(provider, name)`: the first provider in the wrapper chain, from
