@@ -95,3 +95,46 @@ pub fn dist(p: &[f64], q: &[f64]) -> f64 {
     let max = values.iter().fold(0.0f64, |max, x| if *x > max { *x } else { max });
     vector_norm(&mut values, max, found_nan)
 }
+
+/// `round(x, digits)` for a float and `0 <= digits <= 22`: the exact binary value rounded half
+/// to even at that decimal place, then read back (CPython's `double_round`, which formats with
+/// `_Py_dg_dtoa` mode 3 and parses the digits).
+pub fn round_digits(x: f64, digits: u32) -> f64 {
+    assert!(digits <= 22, "the decimal scale must fit u128 arithmetic");
+    if !x.is_finite() || x == 0.0 {
+        return x;
+    }
+    let bits = x.abs().to_bits();
+    let biased = ((bits >> 52) & 0x7ff) as i64;
+    let fraction = bits & ((1u64 << 52) - 1);
+    let (mantissa, exponent) =
+        if biased == 0 { (fraction, -1074) } else { (fraction | (1u64 << 52), biased - 1075) };
+    if exponent >= 0 {
+        // An integer: no digits to round.
+        return x;
+    }
+    let scaled = u128::from(mantissa) * 10u128.pow(digits);
+    let shift = (-exponent) as u32;
+    let rounded = if shift >= 128 {
+        0
+    } else {
+        let quotient = scaled >> shift;
+        let remainder = scaled & ((1u128 << shift) - 1);
+        let half = 1u128 << (shift - 1);
+        match remainder.cmp(&half) {
+            std::cmp::Ordering::Greater => quotient + 1,
+            std::cmp::Ordering::Less => quotient,
+            std::cmp::Ordering::Equal => quotient + (quotient & 1),
+        }
+    };
+    let magnitude: f64 = format!("{rounded}e-{digits}").parse().expect("a decimal literal");
+    magnitude.copysign(x)
+}
+
+/// `sum(values)` over floats (CPython 3.12's compensated float path).
+pub fn sum_floats(values: impl IntoIterator<Item = f64>) -> f64 {
+    match crate::pynum::py_sum_numbers(values.into_iter().map(crate::pynum::PyNumber::Float)) {
+        crate::pynum::PyNumber::Float(total) => total,
+        crate::pynum::PyNumber::Int(total) => total as f64,
+    }
+}
