@@ -26,6 +26,8 @@ only from observation (vectors), without reading or following the source, does n
 | `sylvia-base/src/pyyaml/scanner_c.rs`, `parser_c.rs` (`Loader::C`) | libyaml's reader, scanner and parser (`src/reader.c`, `src/scanner.c`, `src/parser.c`) | libyaml 0.2.5 | MIT | lane 4 |
 | `sylvia-provider/src/sse.rs`, `openai_compat.rs`, `pyobj.rs`, `chat.rs` | The OpenAI Python SDK's SSE decoder (`_streaming.py`), request assembly (`_base_client.py`, `_utils/_json.py`) and `construct` model reading (`_models.py`) | openai 2.53.0 | Apache-2.0 | lane 4 |
 | `sylvia-provider/src/httpx_url.rs` | `httpx.URL` parsing and normalisation (`httpx/_urlparse.py`, `httpx/_urls.py`) | httpx 0.28.1 | BSD-3-Clause | lane 4 |
+| `sylvia-provider/src/proxy.rs` | `urllib.request.getproxies_environment` and the registry parsing of `getproxies_registry` (`Lib/urllib/request.py`); httpx's `get_environment_proxies`, `URLPattern` and its priority order (`httpx/_utils.py`) | CPython 3.12.11; httpx 0.28.1 | PSF License Version 2; BSD-3-Clause | lane 4 |
+| `sylvia-provider/src/net.rs` | httpx's response header decoding (`httpx/_models.py`, `Headers`) and its client timing defaults | httpx 0.28.1 | BSD-3-Clause | lane 4 |
 | `sylvia-base/src/pyurl.rs` | CPython's `urllib.parse`: `urlsplit` with `_splitnetloc`, `_check_bracketed_netloc`, `_check_bracketed_host` and `_checknetloc`, `urlunsplit`, the `hostname`, `port`, `username` and `password` properties, `unquote` and `_unquote_impl` (`Lib/urllib/parse.py`); `ipaddress`'s address parsing (`Lib/ipaddress.py`). Lane 5's port (`desktop_update/url.rs`, PR 289) merged with lane 4's | CPython 3.12.11 | PSF License Version 2 | lanes 4 and 5 |
 | `sylvia-provider/src/config/host_browser/mod.rs` (`posix_normpath`) | CPython's `posixpath.normpath` (`Lib/posixpath.py`, `_path_normpath` in `Python/fileutils.c`) | CPython 3.12.11 | PSF License Version 2 | lane 4 |
 | `sylvia-store/src/launch.rs` (`py_fromhex`) | CPython's `bytes.fromhex` (`Objects/bytesobject.c`, `_PyBytes_FromHex`): whitespace skipped before each pair | CPython 3.12.11 | PSF License Version 2 | lane 3 |
@@ -40,3 +42,5 @@ only from observation (vectors), without reading or following the source, does n
 
 Rows for code not yet merged are listed so that the licence is not forgotten when it lands;
 the lane confirms the row and the version in its pull request.
+
+Not a translation, but a notice the release needs: the TLS trust roots of the provider HTTP client are the `webpki-roots` crate (1.0, CDLA-Permissive-2.0), Mozilla's CA bundle, as httpx uses `certifi`'s copy of the same bundle. `SSL_CERT_FILE` and `SSL_CERT_DIR` replace it, as they do for httpx.

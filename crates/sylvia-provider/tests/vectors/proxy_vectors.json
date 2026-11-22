@@ -1,0 +1,1556 @@
+{
+ "python": "3.12.11",
+ "httpx": "0.28.1",
+ "targets": [
+  "http://127.0.0.1:1234/v1/chat/completions",
+  "http://localhost:11434/v1/chat/completions",
+  "https://openrouter.ai/api/v1/chat/completions",
+  "https://api.openai.com/v1/responses",
+  "http://192.168.1.20:8080/v1/chat/completions",
+  "http://[::1]:1234/v1/chat/completions",
+  "https://sub.example.com/v1/x",
+  "https://example.com/v1/x",
+  "https://notexample.com/v1/x",
+  "http://example.com:8080/x",
+  "https://LOCALHOST:443/x"
+ ],
+ "scenarios": [
+  {
+   "platform": "linux",
+   "environment": {},
+   "registry": null,
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "ALL_PROXY": "http://all.proxy:1080"
+   },
+   "registry": null,
+   "proxies": {
+    "all": "http://all.proxy:1080"
+   },
+   "mounts": {
+    "all://": "http://all.proxy:1080"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://all.proxy:1080/",
+    "http://localhost:11434/v1/chat/completions": "http://all.proxy:1080/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://all.proxy:1080/",
+    "https://api.openai.com/v1/responses": "http://all.proxy:1080/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://all.proxy:1080/",
+    "http://[::1]:1234/v1/chat/completions": "http://all.proxy:1080/",
+    "https://sub.example.com/v1/x": "http://all.proxy:1080/",
+    "https://example.com/v1/x": "http://all.proxy:1080/",
+    "https://notexample.com/v1/x": "http://all.proxy:1080/",
+    "http://example.com:8080/x": "http://all.proxy:1080/",
+    "https://LOCALHOST:443/x": "http://all.proxy:1080/"
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "ALL_PROXY": "http://all.proxy:1080",
+    "HTTPS_PROXY": "https://tls.proxy:443"
+   },
+   "registry": null,
+   "proxies": {
+    "all": "http://all.proxy:1080",
+    "https": "https://tls.proxy:443"
+   },
+   "mounts": {
+    "https://": "https://tls.proxy:443",
+    "all://": "http://all.proxy:1080"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://all.proxy:1080/",
+    "http://localhost:11434/v1/chat/completions": "http://all.proxy:1080/",
+    "https://openrouter.ai/api/v1/chat/completions": "https://tls.proxy/",
+    "https://api.openai.com/v1/responses": "https://tls.proxy/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://all.proxy:1080/",
+    "http://[::1]:1234/v1/chat/completions": "http://all.proxy:1080/",
+    "https://sub.example.com/v1/x": "https://tls.proxy/",
+    "https://example.com/v1/x": "https://tls.proxy/",
+    "https://notexample.com/v1/x": "https://tls.proxy/",
+    "http://example.com:8080/x": "http://all.proxy:1080/",
+    "https://LOCALHOST:443/x": "https://tls.proxy/"
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTP_PROXY": "http://p:1",
+    "HTTPS_PROXY": "http://p:1",
+    "NO_PROXY": "localhost,127.0.0.1"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "http://p:1",
+    "https": "http://p:1",
+    "no": "localhost,127.0.0.1"
+   },
+   "mounts": {
+    "http://": "http://p:1",
+    "https://": "http://p:1",
+    "all://localhost": null,
+    "all://127.0.0.1": null
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": "http://p:1/",
+    "https://api.openai.com/v1/responses": "http://p:1/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://p:1/",
+    "http://[::1]:1234/v1/chat/completions": "http://p:1/",
+    "https://sub.example.com/v1/x": "http://p:1/",
+    "https://example.com/v1/x": "http://p:1/",
+    "https://notexample.com/v1/x": "http://p:1/",
+    "http://example.com:8080/x": "http://p:1/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTPS_PROXY": "http://p:1",
+    "NO_PROXY": "example.com"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "http://p:1",
+    "no": "example.com"
+   },
+   "mounts": {
+    "https://": "http://p:1",
+    "all://*example.com": null
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": "http://p:1/",
+    "https://api.openai.com/v1/responses": "http://p:1/",
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": "http://p:1/",
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": "http://p:1/"
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTPS_PROXY": "http://p:1",
+    "NO_PROXY": ".example.com"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "http://p:1",
+    "no": ".example.com"
+   },
+   "mounts": {
+    "https://": "http://p:1",
+    "all://*.example.com": null
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": "http://p:1/",
+    "https://api.openai.com/v1/responses": "http://p:1/",
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": "http://p:1/",
+    "https://notexample.com/v1/x": "http://p:1/",
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": "http://p:1/"
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTPS_PROXY": "http://p:1",
+    "NO_PROXY": "*"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "http://p:1",
+    "no": "*"
+   },
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTP_PROXY": "http://p:1",
+    "NO_PROXY": " 192.168.0.0/16 , ::1 ,, http://example.com:8080"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "http://p:1",
+    "no": " 192.168.0.0/16 , ::1 ,, http://example.com:8080"
+   },
+   "mounts": {
+    "http://": "http://p:1",
+    "all://192.168.0.0/16": null,
+    "all://[::1]": null,
+    "http://example.com:8080": null
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://p:1/",
+    "http://localhost:11434/v1/chat/completions": "http://p:1/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://p:1/",
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTP_PROXY": "http://user:secret@p:1"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "http://user:secret@p:1"
+   },
+   "mounts": {
+    "http://": "http://user:secret@p:1"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://p:1/",
+    "http://localhost:11434/v1/chat/completions": "http://p:1/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://p:1/",
+    "http://[::1]:1234/v1/chat/completions": "http://p:1/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://p:1/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "http_proxy": "http://lower:1",
+    "HTTP_PROXY": "http://upper:1"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "http://lower:1"
+   },
+   "mounts": {
+    "http://": "http://lower:1"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://lower:1/",
+    "http://localhost:11434/v1/chat/completions": "http://lower:1/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://lower:1/",
+    "http://[::1]:1234/v1/chat/completions": "http://lower:1/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://lower:1/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "http_proxy": "",
+    "HTTP_PROXY": "http://upper:1"
+   },
+   "registry": null,
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTP_PROXY": "http://p:1",
+    "REQUEST_METHOD": "GET"
+   },
+   "registry": null,
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "FTP_PROXY": "http://ftp.proxy:21",
+    "no_proxy": "localhost"
+   },
+   "registry": null,
+   "proxies": {
+    "ftp": "http://ftp.proxy:21",
+    "no": "localhost"
+   },
+   "mounts": {
+    "all://localhost": null
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTPS_PROXY": "socks5://s:1080"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "socks5://s:1080"
+   },
+   "mounts": {
+    "https://": "socks5://s:1080"
+   },
+   "error": "ImportError: Using SOCKS proxy, but the 'socksio' package is not installed. Make sure to install httpx using `pip install httpx[socks]`."
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTPS_PROXY": "ftp://weird:1"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "ftp://weird:1"
+   },
+   "mounts": {
+    "https://": "ftp://weird:1"
+   },
+   "error": "ValueError: Unknown scheme for proxy URL URL('ftp://weird:1')"
+  },
+  {
+   "platform": "linux",
+   "environment": {
+    "HTTP_PROXY": "http://p:1",
+    "NO_PROXY": "LOCALHOST"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "http://p:1",
+    "no": "LOCALHOST"
+   },
+   "mounts": {
+    "http://": "http://p:1",
+    "all://LOCALHOST": null
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://p:1/",
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://p:1/",
+    "http://[::1]:1234/v1/chat/completions": "http://p:1/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://p:1/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": null,
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    0,
+    "corp.proxy:8080"
+   ],
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "corp.proxy:8080"
+   ],
+   "proxies": {
+    "http": "http://corp.proxy:8080",
+    "https": "http://corp.proxy:8080",
+    "ftp": "http://corp.proxy:8080"
+   },
+   "mounts": {
+    "http://": "http://corp.proxy:8080",
+    "https://": "http://corp.proxy:8080"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://corp.proxy:8080/",
+    "http://localhost:11434/v1/chat/completions": "http://corp.proxy:8080/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://corp.proxy:8080/",
+    "https://api.openai.com/v1/responses": "http://corp.proxy:8080/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://corp.proxy:8080/",
+    "http://[::1]:1234/v1/chat/completions": "http://corp.proxy:8080/",
+    "https://sub.example.com/v1/x": "http://corp.proxy:8080/",
+    "https://example.com/v1/x": "http://corp.proxy:8080/",
+    "https://notexample.com/v1/x": "http://corp.proxy:8080/",
+    "http://example.com:8080/x": "http://corp.proxy:8080/",
+    "https://LOCALHOST:443/x": "http://corp.proxy:8080/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "http=web.proxy:80;https=tls.proxy:443"
+   ],
+   "proxies": {
+    "http": "http://web.proxy:80",
+    "https": "http://tls.proxy:443"
+   },
+   "mounts": {
+    "http://": "http://web.proxy:80",
+    "https://": "http://tls.proxy:443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://web.proxy/",
+    "http://localhost:11434/v1/chat/completions": "http://web.proxy/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://tls.proxy:443/",
+    "https://api.openai.com/v1/responses": "http://tls.proxy:443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://web.proxy/",
+    "http://[::1]:1234/v1/chat/completions": "http://web.proxy/",
+    "https://sub.example.com/v1/x": "http://tls.proxy:443/",
+    "https://example.com/v1/x": "http://tls.proxy:443/",
+    "https://notexample.com/v1/x": "http://tls.proxy:443/",
+    "http://example.com:8080/x": "http://web.proxy/",
+    "https://LOCALHOST:443/x": "http://tls.proxy:443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "https=https://tls.proxy:443;ftp=ftp.proxy:21"
+   ],
+   "proxies": {
+    "https": "https://tls.proxy:443",
+    "ftp": "http://ftp.proxy:21"
+   },
+   "mounts": {
+    "https://": "https://tls.proxy:443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": "https://tls.proxy/",
+    "https://api.openai.com/v1/responses": "https://tls.proxy/",
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": "https://tls.proxy/",
+    "https://example.com/v1/x": "https://tls.proxy/",
+    "https://notexample.com/v1/x": "https://tls.proxy/",
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": "https://tls.proxy/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "socks": "socks://sock.proxy:1080",
+    "http": "socks4://sock.proxy:1080",
+    "https": "socks4://sock.proxy:1080"
+   },
+   "mounts": {
+    "http://": "socks4://sock.proxy:1080",
+    "https://": "socks4://sock.proxy:1080"
+   },
+   "error": "ValueError: Unknown scheme for proxy URL URL('socks4://sock.proxy:1080')"
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "http=web.proxy:80;socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "http": "http://web.proxy:80",
+    "socks": "socks://sock.proxy:1080",
+    "https": "socks4://sock.proxy:1080"
+   },
+   "mounts": {
+    "http://": "http://web.proxy:80",
+    "https://": "socks4://sock.proxy:1080"
+   },
+   "error": "ValueError: Unknown scheme for proxy URL URL('socks4://sock.proxy:1080')"
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "broken"
+   ],
+   "proxies": {
+    "http": "http://broken",
+    "https": "http://broken",
+    "ftp": "http://broken"
+   },
+   "mounts": {
+    "http://": "http://broken",
+    "https://": "http://broken"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://broken/",
+    "http://localhost:11434/v1/chat/completions": "http://broken/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://broken/",
+    "https://api.openai.com/v1/responses": "http://broken/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://broken/",
+    "http://[::1]:1234/v1/chat/completions": "http://broken/",
+    "https://sub.example.com/v1/x": "http://broken/",
+    "https://example.com/v1/x": "http://broken/",
+    "https://notexample.com/v1/x": "http://broken/",
+    "http://example.com:8080/x": "http://broken/",
+    "https://LOCALHOST:443/x": "http://broken/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "http=a:1;bad"
+   ],
+   "proxies": {
+    "http": "http://a:1"
+   },
+   "mounts": {
+    "http://": "http://a:1"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://a:1/",
+    "http://localhost:11434/v1/chat/completions": "http://a:1/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://a:1/",
+    "http://[::1]:1234/v1/chat/completions": "http://a:1/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://a:1/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": null,
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    0,
+    "corp.proxy:8080"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "corp.proxy:8080"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "http=web.proxy:80;https=tls.proxy:443"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "https=https://tls.proxy:443;ftp=ftp.proxy:21"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "http=web.proxy:80;socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "broken"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTP_PROXY": "proxy.local:3128"
+   },
+   "registry": [
+    1,
+    "http=a:1;bad"
+   ],
+   "proxies": {
+    "http": "proxy.local:3128"
+   },
+   "mounts": {
+    "http://": "http://proxy.local:3128"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://proxy.local:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://proxy.local:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://proxy.local:3128/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://proxy.local:3128/",
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": null,
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    0,
+    "corp.proxy:8080"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "corp.proxy:8080"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "http=web.proxy:80;https=tls.proxy:443"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "https=https://tls.proxy:443;ftp=ftp.proxy:21"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "http=web.proxy:80;socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "broken"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {
+    "HTTPS_PROXY": "http://secure.proxy:8443",
+    "HTTP_PROXY": "http://plain.proxy:3128"
+   },
+   "registry": [
+    1,
+    "http=a:1;bad"
+   ],
+   "proxies": {
+    "https": "http://secure.proxy:8443",
+    "http": "http://plain.proxy:3128"
+   },
+   "mounts": {
+    "http://": "http://plain.proxy:3128",
+    "https://": "http://secure.proxy:8443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://localhost:11434/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://secure.proxy:8443/",
+    "https://api.openai.com/v1/responses": "http://secure.proxy:8443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://plain.proxy:3128/",
+    "http://[::1]:1234/v1/chat/completions": "http://plain.proxy:3128/",
+    "https://sub.example.com/v1/x": "http://secure.proxy:8443/",
+    "https://example.com/v1/x": "http://secure.proxy:8443/",
+    "https://notexample.com/v1/x": "http://secure.proxy:8443/",
+    "http://example.com:8080/x": "http://plain.proxy:3128/",
+    "https://LOCALHOST:443/x": "http://secure.proxy:8443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": null,
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    0,
+    "corp.proxy:8080"
+   ],
+   "proxies": {},
+   "mounts": {},
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": null
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "corp.proxy:8080"
+   ],
+   "proxies": {
+    "http": "http://corp.proxy:8080",
+    "https": "http://corp.proxy:8080",
+    "ftp": "http://corp.proxy:8080"
+   },
+   "mounts": {
+    "http://": "http://corp.proxy:8080",
+    "https://": "http://corp.proxy:8080"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://corp.proxy:8080/",
+    "http://localhost:11434/v1/chat/completions": "http://corp.proxy:8080/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://corp.proxy:8080/",
+    "https://api.openai.com/v1/responses": "http://corp.proxy:8080/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://corp.proxy:8080/",
+    "http://[::1]:1234/v1/chat/completions": "http://corp.proxy:8080/",
+    "https://sub.example.com/v1/x": "http://corp.proxy:8080/",
+    "https://example.com/v1/x": "http://corp.proxy:8080/",
+    "https://notexample.com/v1/x": "http://corp.proxy:8080/",
+    "http://example.com:8080/x": "http://corp.proxy:8080/",
+    "https://LOCALHOST:443/x": "http://corp.proxy:8080/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "http=web.proxy:80;https=tls.proxy:443"
+   ],
+   "proxies": {
+    "http": "http://web.proxy:80",
+    "https": "http://tls.proxy:443"
+   },
+   "mounts": {
+    "http://": "http://web.proxy:80",
+    "https://": "http://tls.proxy:443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://web.proxy/",
+    "http://localhost:11434/v1/chat/completions": "http://web.proxy/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://tls.proxy:443/",
+    "https://api.openai.com/v1/responses": "http://tls.proxy:443/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://web.proxy/",
+    "http://[::1]:1234/v1/chat/completions": "http://web.proxy/",
+    "https://sub.example.com/v1/x": "http://tls.proxy:443/",
+    "https://example.com/v1/x": "http://tls.proxy:443/",
+    "https://notexample.com/v1/x": "http://tls.proxy:443/",
+    "http://example.com:8080/x": "http://web.proxy/",
+    "https://LOCALHOST:443/x": "http://tls.proxy:443/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "https=https://tls.proxy:443;ftp=ftp.proxy:21"
+   ],
+   "proxies": {
+    "https": "https://tls.proxy:443",
+    "ftp": "http://ftp.proxy:21"
+   },
+   "mounts": {
+    "https://": "https://tls.proxy:443"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": null,
+    "http://localhost:11434/v1/chat/completions": null,
+    "https://openrouter.ai/api/v1/chat/completions": "https://tls.proxy/",
+    "https://api.openai.com/v1/responses": "https://tls.proxy/",
+    "http://192.168.1.20:8080/v1/chat/completions": null,
+    "http://[::1]:1234/v1/chat/completions": null,
+    "https://sub.example.com/v1/x": "https://tls.proxy/",
+    "https://example.com/v1/x": "https://tls.proxy/",
+    "https://notexample.com/v1/x": "https://tls.proxy/",
+    "http://example.com:8080/x": null,
+    "https://LOCALHOST:443/x": "https://tls.proxy/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "socks": "socks://sock.proxy:1080",
+    "http": "socks4://sock.proxy:1080",
+    "https": "socks4://sock.proxy:1080"
+   },
+   "mounts": {
+    "http://": "socks4://sock.proxy:1080",
+    "https://": "socks4://sock.proxy:1080"
+   },
+   "error": "ValueError: Unknown scheme for proxy URL URL('socks4://sock.proxy:1080')"
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "http=web.proxy:80;socks=sock.proxy:1080"
+   ],
+   "proxies": {
+    "http": "http://web.proxy:80",
+    "socks": "socks://sock.proxy:1080",
+    "https": "socks4://sock.proxy:1080"
+   },
+   "mounts": {
+    "http://": "http://web.proxy:80",
+    "https://": "socks4://sock.proxy:1080"
+   },
+   "error": "ValueError: Unknown scheme for proxy URL URL('socks4://sock.proxy:1080')"
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "broken"
+   ],
+   "proxies": {
+    "http": "http://broken",
+    "https": "http://broken",
+    "ftp": "http://broken"
+   },
+   "mounts": {
+    "http://": "http://broken",
+    "https://": "http://broken"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://broken/",
+    "http://localhost:11434/v1/chat/completions": "http://broken/",
+    "https://openrouter.ai/api/v1/chat/completions": "http://broken/",
+    "https://api.openai.com/v1/responses": "http://broken/",
+    "http://192.168.1.20:8080/v1/chat/completions": "http://broken/",
+    "http://[::1]:1234/v1/chat/completions": "http://broken/",
+    "https://sub.example.com/v1/x": "http://broken/",
+    "https://example.com/v1/x": "http://broken/",
+    "https://notexample.com/v1/x": "http://broken/",
+    "http://example.com:8080/x": "http://broken/",
+    "https://LOCALHOST:443/x": "http://broken/"
+   }
+  },
+  {
+   "platform": "windows",
+   "environment": {},
+   "registry": [
+    1,
+    "http=a:1;bad"
+   ],
+   "proxies": {
+    "http": "http://a:1"
+   },
+   "mounts": {
+    "http://": "http://a:1"
+   },
+   "chosen": {
+    "http://127.0.0.1:1234/v1/chat/completions": "http://a:1/",
+    "http://localhost:11434/v1/chat/completions": "http://a:1/",
+    "https://openrouter.ai/api/v1/chat/completions": null,
+    "https://api.openai.com/v1/responses": null,
+    "http://192.168.1.20:8080/v1/chat/completions": "http://a:1/",
+    "http://[::1]:1234/v1/chat/completions": "http://a:1/",
+    "https://sub.example.com/v1/x": null,
+    "https://example.com/v1/x": null,
+    "https://notexample.com/v1/x": null,
+    "http://example.com:8080/x": "http://a:1/",
+    "https://LOCALHOST:443/x": null
+   }
+  }
+ ],
+ "headers": [
+  {
+   "raw": [
+    [
+     "72657472792d6166746572",
+     "35"
+    ]
+   ],
+   "encoding": "ascii",
+   "decoded": [
+    [
+     "retry-after",
+     "5"
+    ]
+   ]
+  },
+  {
+   "raw": [
+    [
+     "72657472792d6166746572",
+     "d9a5"
+    ],
+    [
+     "78",
+     "706c61696e"
+    ]
+   ],
+   "encoding": "utf-8",
+   "decoded": [
+    [
+     "retry-after",
+     "\u0665"
+    ],
+    [
+     "x",
+     "plain"
+    ]
+   ]
+  },
+  {
+   "raw": [
+    [
+     "78",
+     "a06c6174696e"
+    ],
+    [
+     "72657472792d6166746572",
+     "37"
+    ]
+   ],
+   "encoding": "iso-8859-1",
+   "decoded": [
+    [
+     "x",
+     "\u00a0latin"
+    ],
+    [
+     "retry-after",
+     "7"
+    ]
+   ]
+  },
+  {
+   "raw": [
+    [
+     "78",
+     "636166c3a9"
+    ],
+    [
+     "79",
+     "ff"
+    ]
+   ],
+   "encoding": "iso-8859-1",
+   "decoded": [
+    [
+     "x",
+     "caf\u00c3\u00a9"
+    ],
+    [
+     "y",
+     "\u00ff"
+    ]
+   ]
+  }
+ ]
+}
