@@ -1,0 +1,21 @@
+{
+ "python": "3.12.11",
+ "profiles": {
+  "character-open": {
+   "sha256": "2dfbf3ae2cc98ec3111a66494a590e10db124efa1fffafef7f0aad5dc3e92dcc",
+   "legacy_builder_contexts": [
+    "old-character"
+   ]
+  },
+  "character-returned": {
+   "sha256": "481a514e04b87e8b0c1d0395ec1cd12296f6b7c16fb574ca4f7b63b191f8c0be",
+   "legacy_builder_contexts": [
+    "old-character"
+   ]
+  },
+  "customization": {
+   "sha256": "d02f911943c504218c8614ec58f731cbff9f482632b802d5d23f389ea2da03a0",
+   "legacy_builder_contexts": []
+  }
+ }
+}

@@ -91,7 +91,7 @@ pub const REGISTRY: &[Command] = &[
     pending("set_admin_full_audit", "providers", true, true),
     ported("detect_local_providers", "providers", true, true),
     ported("discover_provider_models", "providers", true, true),
-    pending("validate_provider_model", "providers", true, true),
+    ported("validate_provider_model", "providers", true, true),
     ported("save_provider_settings", "providers", true, true),
     ported("remove_provider_settings", "providers", true, true),
     ported("set_default_model", "providers", true, true),

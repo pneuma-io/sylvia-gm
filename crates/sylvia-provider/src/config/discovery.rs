@@ -55,15 +55,15 @@ pub fn network_clients() -> Arc<ClientFor> {
 
 /// What failed below a status code: httpx's `HTTPError` (a transport failure) or `ValueError`
 /// (a body that is not JSON).
-enum Fetch {
+pub(super) enum Fetch {
     Http,
     Value,
 }
 
 /// One response: the status and the whole body (httpx reads it before `.content`).
-struct Reply {
-    status: u16,
-    content: Vec<u8>,
+pub(super) struct Reply {
+    pub(super) status: u16,
+    pub(super) content: Vec<u8>,
 }
 
 fn config(message: impl Into<String>) -> ConfigFailure {
@@ -84,7 +84,7 @@ fn quote_plus(value: &str) -> String {
 }
 
 /// `client.get/post(url, params=...)`: httpx's URL with the parameters merged into its query.
-fn request_url(url: &str, params: &[(&str, String)]) -> Result<String, ConfigFailure> {
+pub(super) fn request_url(url: &str, params: &[(&str, String)]) -> Result<String, ConfigFailure> {
     let query = if params.is_empty() {
         String::new()
     } else {
@@ -98,7 +98,7 @@ fn request_url(url: &str, params: &[(&str, String)]) -> Result<String, ConfigFai
 }
 
 /// Send one request and read the whole body.
-async fn fetch(
+pub(super) async fn fetch(
     client: &Arc<dyn HttpTransport>,
     method: &str,
     url: String,
@@ -127,7 +127,7 @@ async fn fetch(
 
 /// `json.loads(content)` for bytes: `detect_encoding`, then a decode with `surrogatepass`. A
 /// lone surrogate cannot be held (differences row 3), so it fails as a decoding error would.
-fn json_document(content: &[u8]) -> Result<Data, Fetch> {
+pub(super) fn json_document(content: &[u8]) -> Result<Data, Fetch> {
     let decoded = decode_json_bytes(content).ok_or(Fetch::Value)?;
     let value: Json = sylvia_base::pyjson::loads(&decoded).map_err(|_| Fetch::Value)?;
     from_json(&value).map_err(|_| Fetch::Value)
@@ -208,7 +208,7 @@ fn native_endpoint(endpoint: &str, suffix: &str) -> String {
 }
 
 /// A Python `int` that is not a `bool`.
-fn int(value: Option<&Data>) -> Option<i64> {
+pub(super) fn int(value: Option<&Data>) -> Option<i64> {
     match value {
         Some(Data::Int(number)) => Some(*number),
         _ => None,
@@ -241,16 +241,16 @@ fn capacity_pairs(capacity: &ResolvedContextCapacity) -> Vec<(&'static str, Data
 }
 
 /// An enabled saved connection: Python's `(base_url, credential, headers, preset_id)`.
-struct Existing {
-    base_url: String,
-    credential: String,
-    headers: Vec<(String, String)>,
-    preset_id: &'static str,
+pub(super) struct Existing {
+    pub(super) base_url: String,
+    pub(super) credential: String,
+    pub(super) headers: Vec<(String, String)>,
+    pub(super) preset_id: &'static str,
 }
 
 /// `_existing_connection(config_path, provider_id, replacing_secrets=...)`: an enabled saved
 /// connection's endpoint, unlocked credential, headers and preset.
-fn existing_connection(
+pub(super) fn existing_connection(
     sources: ConfigSources<'_>,
     config_path: &Path,
     provider_id: &str,

@@ -24,6 +24,7 @@ pub mod provider_writes;
 pub(crate) mod pyvalue;
 pub mod resolver;
 pub mod user_settings;
+pub mod validation;
 
 pub use loader::{
     default_config_path, load_config, provider_credentials, ProviderDef, Secret, SylviaGMConfig,

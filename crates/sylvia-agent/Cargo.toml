@@ -13,7 +13,6 @@ sylvia-base.workspace = true
 sylvia-domain.workspace = true
 sylvia-engine.workspace = true
 sylvia-store.workspace = true
-sylvia-app.workspace = true
 sylvia-provider.workspace = true
 indexmap.workspace = true
 serde.workspace = true
