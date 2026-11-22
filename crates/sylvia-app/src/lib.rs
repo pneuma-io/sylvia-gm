@@ -21,6 +21,7 @@
 //! - [`player_actions`]: the Ruleset's direct-control policy (`parse_player_controls`).
 //! - [`result_card_admission`]: authoring-time result-card and activity-label checks.
 
+pub mod action_sequences;
 pub mod authority;
 pub mod builder_prompts;
 pub mod builder_tools;

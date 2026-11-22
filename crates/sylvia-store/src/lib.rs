@@ -34,6 +34,7 @@ mod owner_sessions;
 pub mod package_reads;
 pub mod packages;
 mod participant_history;
+mod player_reads;
 pub mod private_records;
 pub mod purge;
 pub mod pytext;

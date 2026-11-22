@@ -395,3 +395,42 @@ pub struct ModelDecisionBoundary {
     pub eligible_actors: Vec<ModelDecisionActor>,
     pub preparation: Option<JsonMap>,
 }
+
+/// One persistent top-level agent chat shown within a campaign (`CampaignSessionIndexEntry`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CampaignSessionIndexEntry {
+    pub session_id: String,
+    pub role: String,
+    pub status: String,
+    pub provider_id: String,
+    pub model_id: String,
+    pub selected_skill: Option<String>,
+    pub model_guidance: Option<crate::model_capability::ModelGuidanceDecision>,
+}
+
+/// The product-safe campaign rail projection (`CampaignIndexEntry`), in Python's field order.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CampaignIndexEntry {
+    pub campaign_id: String,
+    pub display_name: String,
+    pub lifecycle: String,
+    pub writer: String,
+    pub revision: i64,
+    pub ruleset_summary: String,
+    pub package_summary: String,
+    pub package_count: i64,
+    pub playable: bool,
+    pub availability: String,
+    pub ruleset_id: Option<String>,
+    pub ruleset_label: String,
+    pub campaign_setting_id: Option<String>,
+    pub campaign_setting_label: String,
+    pub session_activity_ordinal: i64,
+    pub turn_id: Option<String>,
+    pub turn_status: Option<String>,
+    pub session_id: Option<String>,
+    pub session_status: Option<String>,
+    pub provider_id: Option<String>,
+    pub model_id: Option<String>,
+    pub sessions: Vec<CampaignSessionIndexEntry>,
+}
