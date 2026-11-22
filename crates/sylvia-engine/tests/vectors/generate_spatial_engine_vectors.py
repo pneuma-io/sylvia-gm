@@ -148,6 +148,10 @@ def boundary_values(scene: dict) -> list[list[float]]:
             for i in range(2):
                 axes[i].update((shape["center"][i], shape["center"][i] - shape["radius"], shape["center"][i] + shape["radius"]))
             axes[2].update((shape["center"][2], shape["center"][2] + shape["height"]))
+    radii = sorted({item["footprint"]["radius"] for item in scene["entities"] if "radius" in item["footprint"]})
+    for i in range(2):
+        faces = [value for item in scene["geometry"] for value in (item["volume"]["min"][i], item["volume"]["max"][i])]
+        axes[i].update(face + sign * radius for face in faces for radius in radii for sign in (-1, 1))
     return [sorted(float(value) for value in axis) for axis in axes]
 
 
@@ -240,6 +244,8 @@ def random_query(rng: random.Random, scene: dict) -> dict:
     moving = rng.choice(active)
     fixed = rng.choice([value for value in active if value != moving] or active)
     destination = point(rng, bounds, rng.choice([floor, floor, floor + 0.5]))
+    mover_position = next(row for row in scene["entities"] if row["id"] == moving)["position"]
+    destination = aligned(rng, mover_position, destination)
     if kind == "body_proximity":
         return {"kind": "body_proximity", "map_id": map_id, "moving_entity_id": moving, "fixed_entity_id": fixed,
                 "destination": destination, "radius": rng.choice([0, 0.5, 1, 3])}
@@ -310,6 +316,24 @@ def targeted_engine(scenes: list[dict]) -> list[tuple[int, dict]]:
         cases.append((0, {"kind": "area", "map_id": "keep", "shape": {"kind": "prism", "origin": [3, 5.5, 0], "direction": [1, 0, 0],
                                                                        "up": [0, 0, 1], "length": 2 - gap, "width": 1, "height": 1},
                           "include": ["entities"], "max_results": 4}))
+    # A target inside the opaque body the observer also stands in: the segment ends inside it.
+    cage = scenes.index(CAGE)
+    for observer in ([11, 9, 1], [12.5, 10.5, 0.5], [9.5, 8.5, 2]):
+        cases.append((cage, {"kind": "exposure", "map_id": "keep", "observer": {"point": observer}, "target": {"entity_id": "elf"},
+                             "samples": {"horizontal": 3, "vertical": 3}, "include": ["geometry"]}))
+    # A disk near an upright prism's corner, across the exact-contact and the GJK tolerances.
+    corner = scenes.index(CORNER)
+    for name in CORNER_DISKS:
+        cases.append((corner, {"kind": "area", "map_id": "keep", "shape": {"kind": "prism", "origin": [3, 5.5, 0], "direction": [1, 0, 0],
+                                                                            "up": [0, 0, 1], "length": 2, "width": 1, "height": 1},
+                               "include": ["entities"], "max_results": 16}))
+        break
+    # A nearly vertical circle move: horizontal travel squared between 1e-24 and 1e-12.
+    for step in (1e-13, 1e-9, 1e-7, 1e-6, 2e-6):
+        cases.append((0, {"kind": "circle_overlap", "map_id": "keep", "moving_entity_id": "orc", "fixed_entity_id": "elf",
+                          "destination": [5.5 + step, 5.5, 0], "origin": [12, 10.3, 0], "moving_radius": 0.5, "fixed_radius": 1}))
+        cases.append((0, {"kind": "circle_overlap", "map_id": "keep", "moving_entity_id": "orc", "fixed_entity_id": "elf",
+                          "destination": [12 + step, 10, 1], "origin": [12, 10, 0], "moving_radius": 0.5, "fixed_radius": 1}))
     # Circle routes: sixteen and seventeen blocking circles; an angle that wraps.
     yard_scene = scenes[yard]
     others = [row["id"] for row in yard_scene["entities"] if row["id"] != "p.mover"]
@@ -324,9 +348,37 @@ def targeted_engine(scenes: list[dict]) -> list[tuple[int, dict]]:
     return cases
 
 
+def cage_scene() -> dict:
+    """An opaque box around the elf, so an observer inside it samples the elf from within."""
+    scene = copy.deepcopy(QUERY_FIXTURE)
+    scene["geometry"].append({"id": "w.cage", "map_id": "keep", "volume": {"kind": "box", "min": [9, 8, 0], "max": [14, 12, 5]},
+                              "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {},
+                              "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}})
+    return scene
+
+
+CORNER_DISKS = {}
+
+
+def corner_scene() -> dict:
+    """Disks at distance 0.5 + gap from the prism corner (5, 6), along the diagonal."""
+    scene = copy.deepcopy(QUERY_FIXTURE)
+    for index, gap in enumerate((-1e-13, 0, 5e-13, 2e-12, 1e-11, 2e-10, 1e-9, 1e-8)):
+        offset = (0.5 + gap) / math.sqrt(2)
+        name = f"c.disk{index}"
+        CORNER_DISKS[name] = gap
+        scene["entities"].append({"id": name, "map_id": "keep", "position": [5 + offset, 6 + offset, 0],
+                                  "footprint": {"kind": "circle", "radius": 0.5}, "height": 1, "facing": [1, 0], "active": True,
+                                  "movement": "blocking", "visibility": "clear", "metadata": {}})
+    return scene
+
+
 NO_FILTER = {"key": "", "value": "", "missing_matches": False}
+QUERY_FIXTURE = fixtures.QUERY_SCENE
 ROW = row_scene()
 TIE = tie_scene()
+CAGE = cage_scene()
+CORNER = corner_scene()
 
 
 def exhausted_paths(rng, scenes, cases):
@@ -354,7 +406,7 @@ def exhausted_paths(rng, scenes, cases):
 def main() -> int:
     global SNAPS
     rng = random.Random(4807)
-    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2)), ROW, TIE]
+    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2)), ROW, TIE, CAGE, CORNER]
     snaps = [boundary_values(scene) for scene in scenes]
     cases = []
     for query in fixtures.query_targeted():
