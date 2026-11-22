@@ -28,7 +28,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/import_repair.py` | 621 | `sylvia-app::import_repair` | pending | |
 | `src/sylvia_gm/application/import_repair_sessions.py` | 147 | `sylvia-app::import_repair_sessions` | pending | |
 | `src/sylvia_gm/application/initial_character_state.py` | 532 | `sylvia-app::initial_character_state` | pending | |
-| `src/sylvia_gm/application/interview_content.py` | 152 | `sylvia-app::interview_content` | pending | |
+| `src/sylvia_gm/application/interview_content.py` | 152 | `sylvia-app::interview_content` | in progress | `resolve_interview_content`: the Ruleset-only and installed-Setting paths are exact (`interview_content_vectors`). These branches answer `rust_port_pending`: a Plan selection stops at `bundled_campaign_plans.bundled_plan` (waits on `plan_snapshot`, that is lane 2's `tactical_grid`); installing the bundled Rift closure stops at `install_package_archive` (waits on lane 2's `package_runtime`); a bundled Setting stops at `bundled_campaign_plans.bundled_setting_snapshot` (waits on `plan_snapshot`). The owner reads are the `InterviewOwner` trait, for lane 3's store to implement |
 | `src/sylvia_gm/application/library_sources.py` | 223 | `sylvia-app::library_sources` | pending | |
 | `src/sylvia_gm/application/network_graph.py` | 433 | `sylvia-app::network_graph` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | pending | |
