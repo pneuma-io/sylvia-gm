@@ -12,6 +12,7 @@
 //!
 //! Documents are [`Data`] trees, the values `yaml.safe_load` returns.
 
+pub mod chatgpt_settings;
 pub mod claude_settings;
 pub mod discovery;
 pub mod env;
