@@ -328,7 +328,7 @@ pub(crate) fn lock_representation(package_lock: &PackageLock) -> String {
 }
 
 /// `_read_lock`: an unbound draft has the empty lock; any other campaign its current one.
-fn read_lock(connection: &Connection, campaign_id: &str) -> StoreResult<PackageLock> {
+pub(crate) fn read_lock(connection: &Connection, campaign_id: &str) -> StoreResult<PackageLock> {
     let row: Option<(Value, Value)> = connection
         .query_row(
             "SELECT current_lock_id, lock_hash FROM campaigns WHERE campaign_id = ?",

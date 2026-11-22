@@ -42,6 +42,7 @@ pub mod safe_file;
 pub mod schema;
 pub mod sequel;
 pub mod sessions;
+pub mod snapshots;
 pub mod sql;
 pub mod store;
 pub mod stored;
