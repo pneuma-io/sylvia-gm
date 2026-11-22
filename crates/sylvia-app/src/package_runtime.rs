@@ -740,7 +740,8 @@ pub fn validate_package_runtime(
 fn parse_runtime(package_id: &str, runtime_bytes: &[u8]) -> Outcome<std::sync::Arc<RuntimeTables>> {
     use std::sync::{Arc, Mutex, OnceLock};
     type Key = (String, [u8; 32]);
-    static PARSED: OnceLock<Mutex<Vec<(Key, Arc<RuntimeTables>)>>> = OnceLock::new();
+    type Entries = Vec<(Key, Arc<RuntimeTables>)>;
+    static PARSED: OnceLock<Mutex<Entries>> = OnceLock::new();
     let parsed = PARSED.get_or_init(|| Mutex::new(Vec::new()));
     let key = (package_id.to_owned(), sylvia_base::hash::sha256(runtime_bytes));
     {
