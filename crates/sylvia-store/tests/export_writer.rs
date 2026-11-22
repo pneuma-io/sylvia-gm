@@ -237,7 +237,7 @@ fn exports_match_python() {
             .iter()
             .filter_map(|step| step["link"].as_str().map(str::to_owned))
             .collect();
-        let linked = links.iter().any(|link| Json::from(link.as_str()) == case["target"]);
+        let linked = links.iter().any(|link| case["target"] == link.as_str());
         let in_exports = target.parent().and_then(Path::file_name).is_some_and(|name| name == "exports");
         let published =
             (target.is_file() && in_exports && !linked).then(|| sha256_hex(std::fs::read(&target).unwrap()));
