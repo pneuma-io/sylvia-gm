@@ -4,7 +4,6 @@
 use crate::package_materialization::{
     materialize_package_archive, MaterializedPackageArchive, NormalizedPackageDraft, Payloads,
 };
-use crate::path_guardrail::platform;
 use crate::ruleset_source::{compile_ruleset_source, COMPACT_RULESET_SOURCE};
 use std::collections::HashSet;
 use std::io::{Read, Write};
@@ -78,15 +77,9 @@ fn os_error(error: &std::io::Error, path: &Path) -> DomainError {
     crate::workspace_files::os_error(error, path)
 }
 
-/// `Path.resolve()` (non-strict).
+/// `Path.resolve()` (non-strict), as a path.
 pub(crate) fn resolve(path: &Path) -> PathBuf {
-    let text = path.to_string_lossy();
-    let absolute = if platform::is_absolute(&text) {
-        text.into_owned()
-    } else {
-        platform::join(&platform::cwd(), &text)
-    };
-    PathBuf::from(platform::resolve(&absolute))
+    PathBuf::from(crate::reusable_library_deletion::resolve(path))
 }
 
 // ── Descriptor ─────────────────────────────────────────────────────────────────────────────
