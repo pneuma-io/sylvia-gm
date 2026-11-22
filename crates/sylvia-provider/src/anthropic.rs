@@ -787,7 +787,7 @@ fn parse_stream_chunk(event: &Node) -> AnthropicResult<Option<ProviderStreamChun
     }
 }
 
-/// A block index as a dict key: integers only (differences row NEXT).
+/// A block index as a dict key: integers only (differences row 42).
 fn block_index(value: &Json) -> Result<i64, Incidental> {
     int_like(value).unwrap_or_else(|| Err(Incidental(NON_INTEGER_INDEX.into())))
 }
