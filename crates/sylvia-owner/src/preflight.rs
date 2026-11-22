@@ -204,7 +204,12 @@ pub async fn preflight_guided_start(
         recovery_kind: None,
         has_reference_reader: false,
     };
-    let messages: Vec<Json> = adapter.messages(&input, rank).await?.into_iter().map(Json::Object).collect();
+    let messages: Vec<Json> = adapter
+        .messages(&input, rank)
+        .await?
+        .into_iter()
+        .map(|tagged| Json::Object(tagged.message))
+        .collect();
     let (tools, _) = provider_tools(&catalog)?;
     // `max_tokens=getattr(preflight_provider.model_info, "max_output_tokens", 4096)`.
     let max_tokens = match preflight_provider.model_info() {

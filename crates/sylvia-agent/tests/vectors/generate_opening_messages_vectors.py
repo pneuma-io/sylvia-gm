@@ -13,14 +13,16 @@ stand-in model, and traces the opening preflight (`trace_opening_preflight.py`):
 
 Each vector holds the adapter's inputs, the `SessionProviderInput`, every owner read the
 request assembly made with its arguments and full result, and the messages `_messages`
-returned. The Rust test answers the reads from these results, so the messages must come out
-equal. Times are replaced by one fixed value everywhere, so a rerun differs only where the
+returned with each one's ledger tags. A second assembly of the same request with the ledger
+mode forced (`ledger`) holds its own reads, messages and tags. The Rust test answers the reads
+from these results, so the messages and tags must come out equal. Times are replaced by one fixed value everywhere, so a rerun differs only where the
 owner's identities do. Reference tooling only; retired with the Python source.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -51,7 +53,7 @@ def record(name: str, session: Path, compare: Path) -> dict[str, object]:
         subprocess.run(
             [str(compare), "record", "--session", str(session), "--out", str(Path(folder) / "out"),
              "--owner", str(python), "--arg", "-B", "--arg", str(HERE / "trace_opening_preflight.py")],
-            check=True, cwd=ROOT,
+            check=True, cwd=ROOT, env={**os.environ, "SYLVIA_TRACE_LEDGER_MESSAGES": "1"},
         )
     rows = [json.loads(line) for line in TRACE.read_text(encoding="utf-8").splitlines()]
     TRACE.unlink()
@@ -60,17 +62,29 @@ def record(name: str, session: Path, compare: Path) -> dict[str, object]:
     # Only the reads made while the messages were assembled: those after the adapter was built.
     start = rows.index(adapter)
     end = rows.index(messages)
-    reads = [
-        {"name": row["name"], "args": row["args"], "kwargs": row["kwargs"], "result": row["result"]}
-        for row in rows[start:end] if row["event"] == "call" and row["name"] in READS
-    ]
+    ledger = next(row for row in rows if row["event"] == "ledger_messages")
+    ledger_end = rows.index(ledger)
+
+    def reads(window: list[dict[str, object]]) -> list[dict[str, object]]:
+        return [
+            {"name": row["name"], "args": row["args"], "kwargs": row["kwargs"], "result": row["result"]}
+            for row in window if row["event"] == "call" and row["name"] in READS
+        ]
+
     return {
         "name": name,
         "adapter": adapter["kwargs"],
         "model": adapter["model"],
+        "context_mode": messages["context_mode"],
         "input": messages["input"],
-        "reads": reads,
+        "reads": reads(rows[start:end]),
         "messages": messages["result"],
+        "tags": messages["tags"],
+        "ledger": {
+            "reads": reads(rows[end:ledger_end]),
+            "messages": ledger["result"],
+            "tags": ledger["tags"],
+        },
     }
 
 

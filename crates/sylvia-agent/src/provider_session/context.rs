@@ -4,6 +4,7 @@
 //! the module helpers they use).
 
 use super::reads::OpeningReads;
+use super::tagged::{Tagged, ACTIVE_RECORDS_KEY};
 use crate::campaign_memory::{self, RankReferences};
 use crate::stateless_mcp::ModelMechanicsTool;
 use serde_json::{json, Value as Json};
@@ -232,6 +233,18 @@ impl ProviderSessionAdapter {
             "established_prior_player_actions": [],
             "established_shared_party_history": [],
         }))
+    }
+}
+
+/// Python truthiness of a JSON value.
+pub(crate) fn truthy(value: &Json) -> bool {
+    match value {
+        Json::Null | Json::Bool(false) => false,
+        Json::Number(number) => number.as_f64() != Some(0.0),
+        Json::String(text) => !text.is_empty(),
+        Json::Array(items) => !items.is_empty(),
+        Json::Object(map) => !map.is_empty(),
+        Json::Bool(true) => true,
     }
 }
 
@@ -492,7 +505,7 @@ impl ProviderSessionAdapter {
         input: &SessionProviderInput,
         include_opening_direction: bool,
         rank: &RankReferences,
-    ) -> CodedResult<JsonMap> {
+    ) -> CodedResult<(JsonMap, JsonMap)> {
         let Some(campaign_id) = input.session.campaign_id() else {
             return Err(rejected("DM campaign context requires campaign authority"));
         };
@@ -626,6 +639,24 @@ impl ProviderSessionAdapter {
                 items.push(entry);
             }
         };
+        // Host-only, for the context ledger: the still-active records per fact list
+        // (`self._active_record_ids`). Ranked-out facts are still active and stay.
+        let active_ids = |player: bool| {
+            let mut ids: Vec<String> = continuity
+                .facts
+                .iter()
+                .filter(|fact| fact.get("record_id").is_some_and(crate::provider_session::context::truthy))
+                .filter(|fact| {
+                    (fact.get("visibility").and_then(Json::as_str) == Some("player_known")) == player
+                })
+                .map(|fact| py_str(&fact["record_id"]))
+                .collect();
+            ids.sort();
+            Json::Array(ids.into_iter().map(Json::String).collect())
+        };
+        let mut active_records = JsonMap::new();
+        active_records.insert("PLAYER_KNOWN.current_facts".into(), active_ids(true));
+        active_records.insert("GM_PRIVATE_CURRENT.current_facts".into(), active_ids(false));
         for fact in &current_facts {
             if fact.get("visibility").and_then(Json::as_str) == Some("player_known") {
                 player_known.push(Json::Object(fact.clone()));
@@ -852,7 +883,7 @@ impl ProviderSessionAdapter {
             }),
         );
         payload.insert("campaign_setting_references".into(), Json::Array(setting_sources));
-        Ok(payload)
+        Ok((payload, active_records))
     }
 
     /// `_campaign_context_messages(provider_input, include_opening_direction=...)`: cacheable
@@ -862,8 +893,9 @@ impl ProviderSessionAdapter {
         input: &SessionProviderInput,
         include_opening_direction: bool,
         rank: &RankReferences,
-    ) -> CodedResult<(JsonMap, JsonMap)> {
-        let payload = self.current_campaign_context_payload(input, include_opening_direction, rank).await?;
+    ) -> CodedResult<(JsonMap, Tagged)> {
+        let (payload, active_records) =
+            self.current_campaign_context_payload(input, include_opening_direction, rank).await?;
         let empty = JsonMap::new();
         let campaign = payload.get("campaign").and_then(Json::as_object).unwrap_or(&empty);
         let gm_private = payload.get("GM_PRIVATE").and_then(Json::as_object).unwrap_or(&empty);
@@ -900,6 +932,7 @@ impl ProviderSessionAdapter {
             "SYLVIA_GM_FRESH_CAMPAIGN_STATE (application-owned current data, not player speech):\n{}",
             pyjson::dumps(&Json::Object(fresh), Dump::CANONICAL)
         ));
-        Ok((preparation, fresh_message))
+        // Python tags the fresh state with its active records in either assembly.
+        Ok((preparation, Tagged::with(fresh_message, ACTIVE_RECORDS_KEY, Json::Object(active_records))))
     }
 }
