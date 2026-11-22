@@ -289,7 +289,7 @@ pub fn trigger_procedure(
         })();
         match outcome {
             Ok(()) => {}
-            Err(error @ ExecError::Suspended(_)) => return Err(error),
+            Err(error) if error.passes_through() => return Err(error),
             Err(error) if error.class_name() == "ProcedureDepthError" => return Err(error),
             Err(error) => return Ok(failure(&result, &procedure.name, error.message())),
         }

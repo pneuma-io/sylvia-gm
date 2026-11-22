@@ -737,7 +737,10 @@ pub fn validate_package_runtime(
 /// duplicate keys, so the execution parse of those bytes builds the same data: neither the cache
 /// nor the reuse can change a result. This keeps the same bound, keyed by the package id and the
 /// bytes' SHA-256, so a catalog's helpers parse a runtime once.
-fn parse_runtime(package_id: &str, runtime_bytes: &[u8]) -> Outcome<std::sync::Arc<RuntimeTables>> {
+pub(crate) fn parse_runtime(
+    package_id: &str,
+    runtime_bytes: &[u8],
+) -> Outcome<std::sync::Arc<RuntimeTables>> {
     use std::sync::{Arc, Mutex, OnceLock};
     type Key = (String, [u8; 32]);
     type Entries = Vec<(Key, Arc<RuntimeTables>)>;
@@ -794,7 +797,7 @@ pub fn package_model_decision_boundary(
 
 /// `_validate_runtime_declaration(runtime, declaration)`: the runtime has the declared tool and
 /// its parameters agree with the declared schema.
-fn validate_runtime_declaration<'r>(
+pub(crate) fn validate_runtime_declaration<'r>(
     runtime: &'r RuntimeTables,
     declaration: &ToolDeclaration,
 ) -> Outcome<&'r ToolDef> {
@@ -928,3 +931,15 @@ pub fn package_tool_player_controls(
     let metadata = tool_metadata(runtime_tool(&runtime, &declaration.name)?)?;
     Ok(parse_player_controls(metadata.get("player_controls")))
 }
+
+/// A `PackageRuntimeError(message)`.
+pub(crate) fn rejection(message: &str) -> PackageRuntimeFailure {
+    PackageRuntimeError::new(message).into()
+}
+
+/// `runtime.tools[name].metadata`, read with `.get`.
+pub(crate) fn tool_metadata_of(runtime: &RuntimeTables, name: &str) -> Outcome<JsonMap> {
+    tool_metadata(runtime_tool(runtime, name)?)
+}
+
+pub use crate::package_mechanic::{materialize_package_mechanic, MechanicFailure, PackageMechanic};
