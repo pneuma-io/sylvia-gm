@@ -62,7 +62,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_setting_draft_check.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_setting_materializer.py` | 150 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder_tools` | ported | Data: `builder_tools.json`, exported from the Python values by `generate_builder_tools.py` (model-read text copied, not retyped); unit test pins the nine definitions and their tool names |
 | `src/sylvia_gm/builder/_workspace_files.py` | 114 | `sylvia-app::workspace_files` | ported | Unit test: stale versions, unique and overlapping literals, atomic replace with no leftover temporary file |
 | `src/sylvia_gm/campaign/__init__.py` | 10 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/campaign/_folder.py` | 600 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |

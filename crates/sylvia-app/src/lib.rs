@@ -22,6 +22,7 @@
 //! - [`result_card_admission`]: authoring-time result-card and activity-label checks.
 
 pub mod builder_prompts;
+pub mod builder_tools;
 pub mod bundled_packages;
 pub mod campaign_starting_world;
 pub mod character_profiles;
