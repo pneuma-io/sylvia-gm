@@ -233,11 +233,11 @@ fn object(kind: &'static str, value: &Json, shape: Shape) -> SpatialObject {
         kind,
         id: value["id"].as_str().expect("an admitted identity").to_owned(),
         shape,
-        active: value.get("active").map_or(true, |flag| flag == &json!(true)),
+        active: value.get("active").is_none_or(|flag| flag == &json!(true)),
         movement: value.get("movement").and_then(Json::as_str).unwrap_or("passable").to_owned(),
         visibility: value.get("visibility").and_then(Json::as_str).unwrap_or("clear").to_owned(),
         metadata: value["metadata"].clone(),
-        occupies_cells: value.get("occupies_cells").map_or(true, |flag| flag == &json!(true)),
+        occupies_cells: value.get("occupies_cells").is_none_or(|flag| flag == &json!(true)),
     }
 }
 
