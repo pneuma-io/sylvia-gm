@@ -70,6 +70,8 @@ pub struct BundledSources {
     pub riichi_archive: PathBuf,
     /// `sylvia_gm/campaign/the-rift-awakening.json`, the shipped Rift party template.
     pub rift_party_template: PathBuf,
+    /// `campaign-plans`, the bundled Campaign Plan collection (`bundled_plans_root()`).
+    pub campaign_plans_root: PathBuf,
 }
 
 impl BundledSources {
@@ -88,6 +90,7 @@ impl BundledSources {
                 .join("sylvia_gm")
                 .join("campaign")
                 .join("the-rift-awakening.json"),
+            campaign_plans_root: root.join("campaign-plans"),
         }
     }
 }
@@ -234,16 +237,24 @@ fn payload<'a>(draft: &'a NormalizedPackageDraft, path: &str) -> Option<&'a Vec<
 
 /// The bundled packages from one set of sources.
 pub struct BundledPackages {
-    sources: BundledSources,
+    pub(crate) sources: BundledSources,
     srd: OnceLock<MaterializedPackageArchive>,
     rift: OnceLock<MaterializedPackageArchive>,
     authority: OnceLock<BundledRiftAuthority>,
+    /// `bundled_campaign_plans`' caches (Python's `lru_cache`s).
+    pub(crate) plan_caches: crate::bundled_campaign_plans::PlanCaches,
 }
 
 impl BundledPackages {
     /// The bundled packages at `sources`. Nothing is read until a function needs it.
     pub fn new(sources: BundledSources) -> Self {
-        Self { sources, srd: OnceLock::new(), rift: OnceLock::new(), authority: OnceLock::new() }
+        Self {
+            sources,
+            srd: OnceLock::new(),
+            rift: OnceLock::new(),
+            authority: OnceLock::new(),
+            plan_caches: Default::default(),
+        }
     }
 
     fn srd_root(&self) -> DomainResult<&Path> {
@@ -339,7 +350,7 @@ impl BundledPackages {
     }
 
     /// `_rift_drafts()`: the trusted Rift Setting with its contained Ruleset snapshot.
-    fn rift_drafts(
+    pub(crate) fn rift_drafts(
         &self,
     ) -> DomainResult<(NormalizedPackageDraft, NormalizedPackageDraft, NormalizedPackageDraft)> {
         let (ruleset, reference) = self.srd_drafts()?;
