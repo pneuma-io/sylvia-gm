@@ -1,0 +1,1576 @@
+{
+ "python": "3.12.11",
+ "steps": [
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_request",
+    "exchange_id": "x-0",
+    "model": "m",
+    "body": {
+     "messages": [
+      1,
+      2
+     ]
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": false,
+   "traces": [],
+   "pending": {}
+  },
+  {
+   "op": "enabled",
+   "value": null,
+   "outcome": {
+    "ok": false
+   },
+   "enabled": false,
+   "traces": [],
+   "pending": {}
+  },
+  {
+   "op": "set",
+   "value": true,
+   "outcome": {
+    "ok": {
+     "enabled": true,
+     "trace_count": 0
+    }
+   },
+   "enabled": true,
+   "traces": [],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_request",
+    "exchange_id": "x-1",
+    "model": "m",
+    "body": {
+     "messages": [
+      1,
+      2
+     ]
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-1",
+    "usage": {
+     "input_tokens": 10
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {
+    "x-1": {
+     "input_tokens": 10
+    }
+   }
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_response",
+    "exchange_id": "x-1",
+    "status": 200,
+    "text": "done"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_request",
+    "exchange_id": "x-2",
+    "model": "m",
+    "body": {
+     "messages": [
+      1,
+      2
+     ]
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_response",
+    "exchange_id": "x-2",
+    "status": 200,
+    "usage": {
+     "input_tokens": 1
+    },
+    "text": "done"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 1
+     },
+     "text": "done"
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-2",
+    "usage": {
+     "input_tokens": 20,
+     "output_tokens": 5
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_request",
+    "exchange_id": "x-3",
+    "model": "m",
+    "body": {
+     "messages": [
+      1,
+      2
+     ]
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-3",
+    "usage": {
+     "input_tokens": 1
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {
+    "x-3": {
+     "input_tokens": 1
+    }
+   }
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-3",
+    "usage": {
+     "input_tokens": 2
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {
+    "x-3": {
+     "input_tokens": 2
+    }
+   }
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_stream_response",
+    "exchange_id": "x-3",
+    "status": 200,
+    "text": "done"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-unknown",
+    "usage": {
+     "input_tokens": 3
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "defect",
+    "detail": "no exchange"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_response",
+    "exchange_id": 7
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": [
+    "not",
+    "a",
+    "mapping"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ]
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": "text",
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ],
+    "text"
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-1"
+   },
+   "outcome": {
+    "error": "KeyError",
+    "message": "'usage'"
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ],
+    "text"
+   ],
+   "pending": {}
+  },
+  {
+   "op": "set",
+   "value": true,
+   "outcome": {
+    "ok": {
+     "enabled": true,
+     "trace_count": 10
+    }
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ],
+    "text"
+   ],
+   "pending": {}
+  },
+  {
+   "op": "enabled",
+   "value": null,
+   "outcome": {
+    "ok": true
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ],
+    "text"
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_request",
+    "exchange_id": "x-4",
+    "model": "m",
+    "body": {
+     "messages": [
+      1,
+      2
+     ]
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ],
+    "text",
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-4",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_late_usage",
+    "exchange_id": "x-4",
+    "usage": {
+     "input_tokens": 4
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-1",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-1",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 10
+     }
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-2",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-2",
+     "status": 200,
+     "usage": {
+      "input_tokens": 20,
+      "output_tokens": 5
+     },
+     "text": "done"
+    },
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-3",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "x-3",
+     "status": 200,
+     "text": "done",
+     "usage": {
+      "input_tokens": 2
+     }
+    },
+    {
+     "kind": "defect",
+     "detail": "no exchange"
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": 7
+    },
+    [
+     "not",
+     "a",
+     "mapping"
+    ],
+    "text",
+    {
+     "kind": "provider_request",
+     "exchange_id": "x-4",
+     "model": "m",
+     "body": {
+      "messages": [
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "pending": {
+    "x-4": {
+     "input_tokens": 4
+    }
+   }
+  },
+  {
+   "op": "set",
+   "value": false,
+   "outcome": {
+    "ok": {
+     "enabled": false,
+     "trace_count": 0
+    }
+   },
+   "enabled": false,
+   "traces": [],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_request",
+    "exchange_id": "x-5",
+    "model": "m",
+    "body": {
+     "messages": [
+      1,
+      2
+     ]
+    }
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": false,
+   "traces": [],
+   "pending": {}
+  },
+  {
+   "op": "set",
+   "value": true,
+   "outcome": {
+    "ok": {
+     "enabled": true,
+     "trace_count": 0
+    }
+   },
+   "enabled": true,
+   "traces": [],
+   "pending": {}
+  },
+  {
+   "op": "record",
+   "value": {
+    "kind": "provider_response",
+    "exchange_id": "x-4",
+    "status": 200,
+    "text": "done"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "enabled": true,
+   "traces": [
+    {
+     "kind": "provider_response",
+     "exchange_id": "x-4",
+     "status": 200,
+     "text": "done"
+    }
+   ],
+   "pending": {}
+  }
+ ]
+}
