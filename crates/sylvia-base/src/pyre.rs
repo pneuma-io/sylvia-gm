@@ -3,8 +3,15 @@
 //!
 //! `re.sub(pattern, repl, text)` parses a `str` template before it searches, so a bad template
 //! fails even when nothing matches.
+//!
+//! Also [`ignorecase_search`]: a literal pattern searched with `re.IGNORECASE`, on Python's own
+//! case tables (`pyre/ignorecase.rs`).
 
 use crate::pystr;
+
+mod ignorecase;
+mod ignorecase_table;
+pub use ignorecase::{ignorecase_search, unicode_iscased, unicode_tolower};
 
 /// `_sre.MAXGROUPS` on a 64-bit build.
 const MAXGROUPS: u64 = 1_073_741_823;

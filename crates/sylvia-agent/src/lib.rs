@@ -13,6 +13,8 @@
 //! - [`provider_turn`] holds `agent/_provider_turn_state.py` and `agent/_provider_turn_decisions.py`.
 //! - [`session_loop`] holds parts of `agent/_session_loop.py`.
 //! - [`activity`] holds `agent/_activity.py`.
+//! - [`working_context`] holds `agent/_working_context.py`.
+//! - [`request_data`] holds `agent/_request_data.py`.
 
 pub mod activity;
 pub mod argument_contracts;
@@ -20,5 +22,7 @@ pub mod campaign_memory;
 pub mod provider_resolver;
 pub mod provider_session;
 pub mod provider_turn;
+pub mod request_data;
 pub mod session_loop;
 pub mod stateless_mcp;
+pub mod working_context;

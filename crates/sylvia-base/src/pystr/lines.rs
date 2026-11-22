@@ -30,9 +30,43 @@ pub fn splitlines(text: &str) -> Vec<&str> {
     lines
 }
 
+/// `text.splitlines(keepends=True)`: each line with its boundary; the pieces join back to
+/// `text`.
+pub fn splitlines_keepends(text: &str) -> Vec<&str> {
+    let mut lines = Vec::new();
+    let mut start = 0;
+    let mut chars = text.char_indices().peekable();
+    while let Some((index, c)) = chars.next() {
+        if !is_boundary(c) {
+            continue;
+        }
+        let mut end = index + c.len_utf8();
+        if c == '\r' && chars.peek().is_some_and(|(_, next)| *next == '\n') {
+            chars.next();
+            end += 1;
+        }
+        lines.push(&text[start..end]);
+        start = end;
+    }
+    if start < text.len() {
+        lines.push(&text[start..]);
+    }
+    lines
+}
+
 #[cfg(test)]
 mod tests {
-    use super::splitlines;
+    use super::{splitlines, splitlines_keepends};
+
+    #[test]
+    fn python_boundaries_kept() {
+        assert_eq!(splitlines_keepends(""), Vec::<&str>::new());
+        assert_eq!(
+            splitlines_keepends("a\r\nb\rc\nd\u{2028}e\u{1c}f"),
+            ["a\r\n", "b\r", "c\n", "d\u{2028}", "e\u{1c}", "f"]
+        );
+        assert_eq!(splitlines_keepends("a\n\nb\n"), ["a\n", "\n", "b\n"]);
+    }
 
     #[test]
     fn python_boundaries() {
