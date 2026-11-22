@@ -27,6 +27,7 @@ pub mod bundled_packages;
 pub mod campaign_starting_world;
 pub mod character_profiles;
 pub mod character_rules;
+pub mod interview_content;
 pub mod network_graph;
 pub mod package_materialization;
 pub mod package_materializer;

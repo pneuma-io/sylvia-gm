@@ -34,7 +34,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/desktop_update/startup.py` | 221 | `sylvia-owner::desktop_update::startup` | ported | `desktop-update` (an ordinary start and its refusals), `preparation_vectors` (an update restart authorized and refused for a wrong version or nonce, and `AuthorizedStartup.confirm` before and after the helper's final confirmation). A recovery restart (`recovery: true`) is proven with recovery |
 | `src/sylvia_gm/application/desktop_update/storage.py` | 404 | `sylvia-owner::desktop_update::storage` | ported | `controller_vectors`, `update_vectors`, `desktop-update`, `local-services`; `UPDATE_MOVES` kept as data, as Python's tests use it |
 | `src/sylvia_gm/application/desktop_update/transport.py` | 374 | `sylvia-owner::desktop_update::transport` | in progress | `update_vectors`: `official_request`, the redirect and final-location rules, `content_length`, `metadata_bytes`, `download_artifact` over a `Transport` trait. Pending: `HttpsTransport` (the client, its cancellation and error mapping), with the controller |
-| `src/sylvia_gm/application/launch_compatibility.py` | 31 | `sylvia-app::launch_compatibility` | pending | |
+| `src/sylvia_gm/application/launch_compatibility.py` | 31 | `sylvia-app::launch_compatibility` | in progress | `ARCHIVED_RULESET_IDS` and `require_active_ruleset` are ported in `sylvia-app::interview_content` (lane 1, which needed them); `player_ui_surfaces` is pending |
 | `src/sylvia_gm/build_workspace.py` | 67 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/core/__init__.py` | 1 | `sylvia-owner` | pending | |
 | `src/sylvia_gm/covered_source_delivery.py` | 116 | `sylvia-owner` | pending | |
