@@ -106,7 +106,15 @@ fn records(rows: Vec<JsonMap>) -> Json {
 async fn open(name: &str) -> (StoreHandle, sylvia_store::StoreThread) {
     let folder =
         Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join(format!("player-reads-{name}"));
-    let _ = std::fs::remove_dir_all(&folder);
+    // A folder left by an earlier run must go, or its files would look like this run's.
+    if let Err(error) = std::fs::remove_dir_all(&folder) {
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::NotFound,
+            "cannot clear the old work folder {}: {error}",
+            folder.display()
+        );
+    }
     std::fs::create_dir_all(&folder).unwrap();
     let database = folder.join("authority.sqlite3");
     let mut bytes = Vec::new();
