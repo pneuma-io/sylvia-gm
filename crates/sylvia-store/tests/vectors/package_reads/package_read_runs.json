@@ -1,0 +1,402 @@
+{
+ "python": "3.12.11",
+ "operations": [
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-club",
+   "version": "0.1.1",
+   "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "maximum_files": 4
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "maximum_files": 3
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "maximum_files": 1
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "maximum_files": 0
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.unknown",
+   "version": "0.1.0",
+   "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "content/content-declarations.json"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-club",
+   "version": "0.1.1",
+   "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+   "portable_path": "world.md"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "runtime/ruleset.yaml"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "runtime/ruleset.yaml",
+   "maximum_bytes": 200000
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "support/gameplay-resolution.json",
+   "maximum_bytes": 421
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "support/gameplay-resolution.json",
+   "maximum_bytes": 420
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "support/gameplay-resolution.json",
+   "maximum_bytes": 0
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "support/gameplay-resolution.json",
+   "maximum_bytes": -1
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "missing.md"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+   "portable_path": "World.md"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.riichi-club",
+   "version": "0.1.1",
+   "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+   "portable_path": "world.md",
+   "maximum_bytes": -1
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "pneuma.unknown",
+   "version": "0.1.0",
+   "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+   "portable_path": "world.md"
+  },
+  {
+   "op": "package_file_paths",
+   "package_id": "synthetic.package-reads",
+   "version": "1.0.0",
+   "sha256": "52644616118855c49168796696a47c97285db5d747d6f1a87a838189db9fdfb5"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "synthetic.package-reads",
+   "version": "1.0.0",
+   "sha256": "52644616118855c49168796696a47c97285db5d747d6f1a87a838189db9fdfb5",
+   "portable_path": "notes/broken.txt"
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "synthetic.package-reads",
+   "version": "1.0.0",
+   "sha256": "52644616118855c49168796696a47c97285db5d747d6f1a87a838189db9fdfb5",
+   "portable_path": "notes/broken.txt",
+   "maximum_bytes": 3
+  },
+  {
+   "op": "package_text_file",
+   "package_id": "synthetic.package-reads",
+   "version": "1.0.0",
+   "sha256": "52644616118855c49168796696a47c97285db5d747d6f1a87a838189db9fdfb5",
+   "portable_path": "notes/glossary.txt"
+  },
+  {
+   "op": "package_label",
+   "package_id": "synthetic.package-reads",
+   "version": "1.0.0",
+   "sha256": "52644616118855c49168796696a47c97285db5d747d6f1a87a838189db9fdfb5"
+  },
+  {
+   "op": "package_record",
+   "package_id": "synthetic.package-reads",
+   "version": "1.0.0",
+   "sha256": "52644616118855c49168796696a47c97285db5d747d6f1a87a838189db9fdfb5"
+  },
+  {
+   "op": "package_record",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+  },
+  {
+   "op": "package_record",
+   "package_id": "pneuma.riichi-club",
+   "version": "0.1.1",
+   "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+  },
+  {
+   "op": "package_record",
+   "package_id": "pneuma.unknown",
+   "version": "0.1.0",
+   "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+   "op": "package_record",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  {
+   "op": "package_label",
+   "package_id": "pneuma.riichi-mahjong",
+   "version": "0.1.1",
+   "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+  },
+  {
+   "op": "package_label",
+   "package_id": "pneuma.riichi-club",
+   "version": "0.1.1",
+   "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+  },
+  {
+   "op": "package_label",
+   "package_id": "pneuma.unknown",
+   "version": "0.1.0",
+   "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+ ],
+ "outcomes": [
+  {
+   "ok": [
+    "content/content-declarations.json",
+    "prompts/gm-operating-guide.md",
+    "runtime/ruleset.yaml",
+    "support/gameplay-resolution.json"
+   ]
+  },
+  {
+   "ok": [
+    "content/content-declarations.json",
+    "world.md"
+   ]
+  },
+  {
+   "ok": [
+    "content/content-declarations.json",
+    "prompts/gm-operating-guide.md",
+    "runtime/ruleset.yaml",
+    "support/gameplay-resolution.json"
+   ]
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_file_catalog_oversized",
+   "message": "Package has too many files for this consumer"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_file_catalog_oversized",
+   "message": "Package has too many files for this consumer"
+  },
+  {
+   "error": "ValueError",
+   "code": null,
+   "message": "Package file limit must be positive"
+  },
+  {
+   "ok": []
+  },
+  {
+   "ok": []
+  },
+  {
+   "ok": {
+    "length": 1142,
+    "sha256": "92f09c5dddffc18fa0a271653e4c19b71e8db8e173be156da4bf47c369d1d355"
+   }
+  },
+  {
+   "ok": {
+    "length": 1539,
+    "sha256": "b030067e9b22ff2d18ea46ba797d6e839762f1157fbc153a9ad837c42ffe3de4"
+   }
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_file_oversized",
+   "message": "Package file exceeds its consumer byte limit"
+  },
+  {
+   "ok": {
+    "length": 173499,
+    "sha256": "3752141ff5e613d83818ccc0b40de0a406b6003e55656cf96024df346176db46"
+   }
+  },
+  {
+   "ok": {
+    "length": 421,
+    "sha256": "3a37a5008691f5d9e3f67ac4124d86fe51b9e282b272b91cee3b2c46a4d763c9"
+   }
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_file_oversized",
+   "message": "Package file exceeds its consumer byte limit"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_file_oversized",
+   "message": "Package file exceeds its consumer byte limit"
+  },
+  {
+   "error": "ValueError",
+   "code": null,
+   "message": "Package file byte limit cannot be negative"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "command_rejected",
+   "message": "Package source path is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "command_rejected",
+   "message": "Package source path is unavailable"
+  },
+  {
+   "error": "ValueError",
+   "code": null,
+   "message": "Package file byte limit cannot be negative"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "command_rejected",
+   "message": "Package source path is unavailable"
+  },
+  {
+   "ok": [
+    "notes/broken.txt",
+    "notes/glossary.txt"
+   ]
+  },
+  {
+   "error": "CommandRejected",
+   "code": "command_rejected",
+   "message": "Package source is not valid UTF-8"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_file_oversized",
+   "message": "Package file exceeds its consumer byte limit"
+  },
+  {
+   "ok": {
+    "length": 23,
+    "sha256": "3eba482048a07b10222fe45e7b14c46e47a3ad1ad46ea8ba6200eb654c7344f2"
+   }
+  },
+  {
+   "ok": "Synthetic package reads"
+  },
+  {
+   "ok": {
+    "length": 783,
+    "sha256": "ae4e28b565130a7f8bd5f34b6d5596effb348f29c4026fb5f5e70de79fccef47"
+   }
+  },
+  {
+   "ok": {
+    "length": 3254,
+    "sha256": "2a20afc6442a2931177e8b4b1fb6877dc2905390ae434b1c7ea036101f24f5a5"
+   }
+  },
+  {
+   "ok": {
+    "length": 1088,
+    "sha256": "36b60533fec94c14800a84eae08223d89274d7fab7c7981bb0335b855dfa4114"
+   }
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_unavailable",
+   "message": "Exact package manifest is unavailable"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_unavailable",
+   "message": "Exact package manifest is unavailable"
+  },
+  {
+   "ok": "Riichi Mahjong"
+  },
+  {
+   "ok": "The Lantern Table"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "package_unavailable",
+   "message": "Exact package manifest is unavailable"
+  }
+ ]
+}
