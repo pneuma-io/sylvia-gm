@@ -28,6 +28,7 @@ pub mod builder_prompts;
 pub mod builder_tools;
 pub mod bundled_campaign_plans;
 pub mod bundled_packages;
+pub mod campaign_library_selection;
 pub mod campaign_plan_materializer;
 pub mod campaign_plan_sources;
 pub mod campaign_starting_world;
