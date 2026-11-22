@@ -2862,6 +2862,7 @@ dependencies = [
  "sylvia-domain",
  "thiserror 2.0.21",
  "tokio",
+ "unicode-normalization",
  "winapi-util",
  "windows-sys 0.61.2",
 ]

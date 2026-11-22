@@ -1,0 +1,827 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "name": "story_exported",
+   "offset": 0,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "ok": "52817b6c2ce78a938cf681e4c1d28bafb3b442bc46f7ecc982cf539c1eba73b9"
+   }
+  },
+  {
+   "name": "clockwork_exported",
+   "offset": 33545,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "ok": "d8f31b1381402d635b19ea076ea980199db8f265dfd32fef86712f8330c11db5"
+   }
+  },
+  {
+   "name": "plain_exported",
+   "offset": 44318,
+   "length": 5696,
+   "expected_campaign_id": "campaign-b",
+   "verdict": {
+    "ok": "fbc74ead02c02095a89e56583e8b9b94cbeac1a7a027ca005373587f26758960"
+   }
+  },
+  {
+   "name": "workshop_exported",
+   "offset": 50014,
+   "length": 202022,
+   "expected_campaign_id": "campaign-workshop",
+   "verdict": {
+    "ok": "a885fa0104815f1f7d5d3270c667168090e4fbd43b0703a24633b49be9693742"
+   }
+  },
+  {
+   "name": "rebuilt",
+   "offset": 252036,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "ok": "d8f31b1381402d635b19ea076ea980199db8f265dfd32fef86712f8330c11db5"
+   }
+  },
+  {
+   "name": "truncated",
+   "offset": 262809,
+   "length": 100,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "not_zip",
+   "offset": 262909,
+   "length": 17,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "archive_comment",
+   "offset": 262926,
+   "length": 10774,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_comment",
+   "offset": 273700,
+   "length": 10774,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_extra",
+   "offset": 284474,
+   "length": 10781,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_date",
+   "offset": 295255,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_deflated",
+   "offset": 306028,
+   "length": 7876,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_mode",
+   "offset": 313904,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_create_system",
+   "offset": 324677,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "member_internal_attr",
+   "offset": 335450,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_zip_metadata",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "duplicate_member",
+   "offset": 346223,
+   "length": 16388,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_duplicate_member",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "alias_case",
+   "offset": 362611,
+   "length": 10880,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_alias",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "alias_nfc",
+   "offset": 373491,
+   "length": 10965,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_alias",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "alias_sharp_s",
+   "offset": 384456,
+   "length": 10971,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_alias",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "alias_long_s",
+   "offset": 395427,
+   "length": 10949,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_alias",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "no_alias_distinct",
+   "offset": 406376,
+   "length": 10961,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "path_parent",
+   "offset": 417337,
+   "length": 10870,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_path",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "path_drive",
+   "offset": 428207,
+   "length": 10856,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_path",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "path_absolute",
+   "offset": 439063,
+   "length": 10854,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_path",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "path_dot",
+   "offset": 449917,
+   "length": 10856,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_undeclared_member",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "order_manifest_first",
+   "offset": 460773,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "order_authority_last",
+   "offset": 471546,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "undeclared_member",
+   "offset": 482319,
+   "length": 10868,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_undeclared_member",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_not_json",
+   "offset": 493187,
+   "length": 5988,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_bom",
+   "offset": 499175,
+   "length": 10776,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_spaced",
+   "offset": 509951,
+   "length": 11542,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest_canonical_bytes",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_missing_member",
+   "offset": 521493,
+   "length": 10758,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_format_version",
+   "offset": 532251,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_format_version_true",
+   "offset": 543024,
+   "length": 10776,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "ok": "4142c81fca72d09785e1cee0ac56b3edb1cf5ea7e72b7880f07013647b22d117"
+   }
+  },
+  {
+   "name": "manifest_captured_revision",
+   "offset": 553800,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_table_count",
+   "offset": 564573,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_closure_index",
+   "offset": 575346,
+   "length": 10784,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_member_hash",
+   "offset": 586130,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_hash",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_member_size",
+   "offset": 596903,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_size",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_member_size_text",
+   "offset": 607676,
+   "length": 10775,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "ok": "3519afb8d7106aa12d33e388f062cfb357bb3ebfe5dc9d4573027d5bc2e753b5"
+   }
+  },
+  {
+   "name": "manifest_blob_count",
+   "offset": 618451,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_blob_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_schema_claim",
+   "offset": 629224,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_source_schema",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "manifest_product",
+   "offset": 639997,
+   "length": 10772,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_cr",
+   "offset": 650769,
+   "length": 10774,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_framing",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_unknown_table",
+   "offset": 661543,
+   "length": 10768,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_schema",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_spaced",
+   "offset": 672311,
+   "length": 10789,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_canonical_bytes",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_order",
+   "offset": 683100,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_empty_line",
+   "offset": 693873,
+   "length": 10774,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_framing",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_no_final_newline",
+   "offset": 704647,
+   "length": 10772,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_framing",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_duplicate_row",
+   "offset": 715419,
+   "length": 11171,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_extra_column",
+   "offset": 726590,
+   "length": 10783,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_schema",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "authority_other_campaign",
+   "offset": 737373,
+   "length": 10769,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "crc_damage",
+   "offset": 748142,
+   "length": 10773,
+   "expected_campaign_id": "campaign-clockwork",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_archive",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "expected_other",
+   "offset": 758915,
+   "length": 10773,
+   "expected_campaign_id": "campaign-other",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "private_misplaced",
+   "offset": 769688,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "private_bad_line",
+   "offset": 803233,
+   "length": 32986,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_private_records",
+    "message": "Invalid private provider archive member"
+   }
+  },
+  {
+   "name": "private_foreign_session",
+   "offset": 836219,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_private_records",
+    "message": "Invalid private provider archive member"
+   }
+  },
+  {
+   "name": "private_without_format",
+   "offset": 869764,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_manifest",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "blobs_unsorted",
+   "offset": 903309,
+   "length": 202022,
+   "expected_campaign_id": "campaign-workshop",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_member_order",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "blob_removed",
+   "offset": 1105331,
+   "length": 200751,
+   "expected_campaign_id": "campaign-workshop",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_blob_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "blob_altered",
+   "offset": 1306082,
+   "length": 202022,
+   "expected_campaign_id": "campaign-workshop",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_blob_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "plain_as_story",
+   "offset": 1508104,
+   "length": 5696,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "closure_missing_parent",
+   "offset": 1513800,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "closure_revision_ahead",
+   "offset": 1547345,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "closure_current_lock_unknown",
+   "offset": 1580890,
+   "length": 33506,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "closure_namespace_owner",
+   "offset": 1614396,
+   "length": 33541,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "closure_adaptation",
+   "offset": 1647937,
+   "length": 202027,
+   "expected_campaign_id": "campaign-workshop",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_authority_closure",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_package_digest",
+   "offset": 1849964,
+   "length": 33534,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_manifest_noncanonical",
+   "offset": 1883498,
+   "length": 33546,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_lock_closure",
+   "offset": 1917044,
+   "length": 33545,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_lock_role",
+   "offset": 1950589,
+   "length": 33548,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_staging_status",
+   "offset": 1984137,
+   "length": 33543,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_candidate_report",
+   "offset": 2017680,
+   "length": 33546,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_action_tool",
+   "offset": 2051226,
+   "length": 33547,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_participant_schema",
+   "offset": 2084773,
+   "length": 202022,
+   "expected_campaign_id": "campaign-workshop",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  },
+  {
+   "name": "graph_handoff_candidate",
+   "offset": 2286795,
+   "length": 33524,
+   "expected_campaign_id": "campaign-story",
+   "verdict": {
+    "error": "CommandRejected",
+    "code": "portable_export_invalid_package_graph",
+    "message": "Portable campaign export is invalid"
+   }
+  }
+ ]
+}

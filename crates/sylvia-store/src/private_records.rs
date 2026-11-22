@@ -1,5 +1,5 @@
 //! The optional private provider member of a portable archive, from `private_records_archive.py`:
-//! `validate_rows` and `encode` (the export's half; `decode` comes with recovery).
+//! `validate_rows`, `encode` (the export's) and `decode` (archive validation's and recovery's).
 //!
 //! Declared difference: a continuation payload holding an integer past 64 bits, which Python
 //! reads, is refused here as an invalid member (`docs/rust-port/differences.md`).
@@ -41,36 +41,42 @@ pub fn reject() -> StoreError {
     )
 }
 
-/// `validate_rows(rows, session_ids=...)` for rows read from `provider_private_records`, each in
-/// [`FIELDS`] order: foreign sessions, ambiguous identities and inconsistent attempt status are
-/// refused.
-pub fn validate_rows(rows: &[Vec<Value>], session_ids: &HashSet<String>) -> StoreResult<Vec<JsonMap>> {
+/// `validate_rows(rows, session_ids=...)`: every row an object with exactly [`FIELDS`], its
+/// texts non-empty, its `source_order` a non-negative integer, its session in `session_ids`,
+/// its identity unique and its attempt's status consistent; each row comes back in [`FIELDS`]
+/// order.
+pub fn validate_rows(rows: &[Json], session_ids: &HashSet<String>) -> StoreResult<Vec<JsonMap>> {
     let mut result = Vec::new();
     let mut identities: HashSet<(String, String, i64)> = HashSet::new();
     let mut attempts: HashMap<(String, String), String> = HashMap::new();
     for row in rows {
-        if result.len() >= MAX_ROWS || row.len() != FIELDS.len() {
+        let Json::Object(row) = row else { return Err(reject()) };
+        if result.len() >= MAX_ROWS
+            || row.len() != FIELDS.len()
+            || FIELDS.iter().any(|field| !row.contains_key(*field))
+        {
             return Err(reject());
         }
-        let text = |index: usize| match &row[index] {
-            Value::Text(text) if !text.is_empty() => Some(text.clone()),
+        let text = |field: &str| match &row[field] {
+            Json::String(text) if !text.is_empty() => Some(text.clone()),
             _ => None,
         };
-        let mut values = JsonMap::new();
-        for (index, field) in FIELDS.iter().enumerate() {
-            if *field == "source_order" {
-                continue;
-            }
-            let Some(value) = text(index) else { return Err(reject()) };
-            values.insert((*field).to_owned(), Json::String(value));
-        }
-        let (session_id, attempt_id) = (text(0).unwrap_or_default(), text(1).unwrap_or_default());
-        let Value::Integer(order) = row[5] else { return Err(reject()) };
-        if !session_ids.contains(&session_id) || order < 0 {
+        if FIELDS.iter().any(|field| *field != "source_order" && text(field).is_none()) {
             return Err(reject());
         }
-        let kind = text(8).unwrap_or_default();
-        let status = text(10).unwrap_or_default();
+        let (session_id, attempt_id) =
+            (text("session_id").unwrap_or_default(), text("attempt_id").unwrap_or_default());
+        // `type(order) is not int or order < 0`.
+        let order = match &row["source_order"] {
+            Json::Number(number) if number.is_i64() || number.is_u64() => number.as_i64(),
+            _ => None,
+        };
+        let Some(order) = order.filter(|order| *order >= 0) else { return Err(reject()) };
+        if !session_ids.contains(&session_id) {
+            return Err(reject());
+        }
+        let kind = text("kind").unwrap_or_default();
+        let status = text("status").unwrap_or_default();
         if !matches!(kind.as_str(), "thinking" | "continuation")
             || !matches!(status.as_str(), "partial" | "completed" | "interrupted")
         {
@@ -86,25 +92,42 @@ pub fn validate_rows(rows: &[Vec<Value>], session_ids: &HashSet<String>) -> Stor
             // `json.loads(payload, object_pairs_hook=_unique_object)`: duplicate members are
             // refused, `NaN` and `Infinity` are read.
             let policy = HookPolicy { refuse_duplicates: true, refuse_constants: false };
-            match pyjson::loads_hooked(&text(9).unwrap_or_default(), policy) {
+            match pyjson::loads_hooked(&text("payload").unwrap_or_default(), policy) {
                 Ok(read) if matches!(read.value, Json::Object(_)) => {}
                 _ => return Err(reject()),
             }
         }
-        let mut ordered = JsonMap::new();
-        for field in FIELDS {
-            let value = if field == "source_order" { Json::from(order) } else { values[field].clone() };
-            ordered.insert(field.to_owned(), value);
-        }
-        result.push(ordered);
+        result.push(FIELDS.iter().map(|field| ((*field).to_owned(), row[*field].clone())).collect());
     }
     Ok(result)
 }
 
-/// `encode(rows, session_ids=...)`: the member's JSONL bytes.
+/// A row of `provider_private_records` in [`FIELDS`] order as the values Python's `sqlite3`
+/// gives `validate_rows`: a value that is neither text nor an integer is refused there whatever
+/// it holds, so it stands as `null`.
+fn row_json(row: &[Value]) -> Json {
+    Json::Object(
+        FIELDS
+            .iter()
+            .zip(row)
+            .map(|(field, value)| {
+                let value = match value {
+                    Value::Text(text) => Json::String(text.clone()),
+                    Value::Integer(number) => Json::from(*number),
+                    _ => Json::Null,
+                };
+                ((*field).to_owned(), value)
+            })
+            .collect(),
+    )
+}
+
+/// `encode(rows, session_ids=...)`: the member's JSONL bytes, for rows read from
+/// `provider_private_records` in [`FIELDS`] order.
 pub fn encode(rows: &[Vec<Value>], session_ids: &HashSet<String>) -> StoreResult<Vec<u8>> {
+    let rows: Vec<Json> = rows.iter().map(|row| row_json(row)).collect();
     let mut output = Vec::new();
-    for row in validate_rows(rows, session_ids)? {
+    for row in validate_rows(&rows, session_ids)? {
         let mut line = pyjson::dump_bytes(&Json::Object(row), Dump::CANONICAL.sorted(false));
         line.push(b'\n');
         if line.len() > MAX_ROW_BYTES || output.len() + line.len() > MAX_BYTES {
@@ -113,4 +136,53 @@ pub fn encode(rows: &[Vec<Value>], session_ids: &HashSet<String>) -> StoreResult
         output.extend(line);
     }
     Ok(output)
+}
+
+/// `decode(data, session_ids=...)`: the member's rows, read back as `json.loads` reads each
+/// `bytes` line. A UTF-8 byte order mark is skipped, as `json.loads(bytes)` does; a line in
+/// UTF-16 or UTF-32, which `json.loads(bytes)` would also detect, is refused here
+/// (`docs/rust-port/differences.md`).
+pub fn decode(data: &[u8], session_ids: &HashSet<String>) -> StoreResult<Vec<JsonMap>> {
+    if data.len() > MAX_BYTES || !data.ends_with(b"\n") {
+        return Err(reject());
+    }
+    let mut rows = Vec::new();
+    for line in split_lines_keep_ends(data) {
+        if line.len() > MAX_ROW_BYTES || rows.len() >= MAX_ROWS {
+            return Err(reject());
+        }
+        let line = line.strip_prefix(b"\xef\xbb\xbf".as_slice()).unwrap_or(line);
+        let Ok(text) = std::str::from_utf8(line) else { return Err(reject()) };
+        let policy = HookPolicy { refuse_duplicates: true, refuse_constants: false };
+        match pyjson::loads_hooked(text, policy) {
+            Ok(read) if matches!(read.value, Json::Object(_)) => rows.push(read.value),
+            _ => return Err(reject()),
+        }
+    }
+    validate_rows(&rows, session_ids)
+}
+
+/// `bytes.splitlines(keepends=True)`: lines end at `\n`, `\r` or `\r\n`.
+fn split_lines_keep_ends(data: &[u8]) -> Vec<&[u8]> {
+    let mut lines = Vec::new();
+    let mut start = 0;
+    let mut index = 0;
+    while index < data.len() {
+        let end = match data[index] {
+            b'\n' => index + 1,
+            b'\r' if data.get(index + 1) == Some(&b'\n') => index + 2,
+            b'\r' => index + 1,
+            _ => {
+                index += 1;
+                continue;
+            }
+        };
+        lines.push(&data[start..end]);
+        start = end;
+        index = end;
+    }
+    if start < data.len() {
+        lines.push(&data[start..]);
+    }
+    lines
 }

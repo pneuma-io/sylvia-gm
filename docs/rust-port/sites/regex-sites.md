@@ -165,8 +165,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/ruleless_play.py:158` | `<module>` | re.compile; plain | `_NEGATION = re.compile(r"\b(?:no\|not\|never\|without\|nor\|instead\s+of)\b\|n't\b", re.IGNORECASE)` | |
 | `infrastructure/campaign_archive.py:815` | `_valid_provenance_name` | re.fullmatch; plain | `return isinstance(value, str) and re.fullmatch(r"[a-z0-9][a-z0-9_]{0,127}", value) is not None` | `sylvia-store` campaign_archive |
 | `infrastructure/campaign_archive.py:819` | `_valid_sha256` | re.fullmatch; plain | `return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None` | `sylvia-store` campaign_archive |
-| `infrastructure/campaign_archive.py:1001` | `_safe_member_name` | re.match; plain | `return not bool(re.match(r"^[A-Za-z]:", name))` | |
-| `infrastructure/campaign_archive.py:2610` | `validate_campaign_archive` | re.fullmatch; plain | `if any(not re.fullmatch(r"blobs/[0-9a-f]{64}", name) for name in blob_names):` | |
+| `infrastructure/campaign_archive.py:1001` | `_safe_member_name` | re.match; plain | `return not bool(re.match(r"^[A-Za-z]:", name))` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2610` | `validate_campaign_archive` | re.fullmatch; plain | `if any(not re.fullmatch(r"blobs/[0-9a-f]{64}", name) for name in blob_names):` | `sylvia-store` archive_validation |
 | `infrastructure/safe_file.py:95` | `<module>` | re.compile; plain | `_MOUNTINFO_ESCAPE = re.compile(r"\\([0-7]{3})")` | |
 
 ## Lane 4: Providers and agents
