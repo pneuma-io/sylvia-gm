@@ -16,6 +16,7 @@
 //! - [`workspace_files`]: Builder file writes that refuse a stale version.
 //! - [`srd_lite_weapon_set_migration`]: the SRD Lite 0.2 to 0.3 saved weapon-set migration.
 
+pub mod builder_prompts;
 pub mod bundled_packages;
 pub mod campaign_starting_world;
 pub mod character_profiles;
