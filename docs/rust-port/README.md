@@ -132,6 +132,13 @@ packaging off PyInstaller. The release scripts pin its own lock file and target 
    scipy-openblas: `scipy_openblas_get_config64_` version gate, `scipy_cblas_sgemm64_`,
    `scipy_cblas_sgemv64_`; no thread-count call, the library reads `OMP_NUM_THREADS` itself
    as it does under Python).
+   `sylvia-provider/src/runtime_process/linux.rs`: one `CommandExt::pre_exec` closure for the
+   account runtimes' children (Claude Code, Codex), mirroring `_dies_with_owner`'s
+   `prctl(PR_SET_PDEATHSIG, SIGKILL)` through rustix's safe
+   `process::set_parent_process_death_signal`, then Python's `os.getppid() != owner` race check
+   (the child ends before exec). The closure allocates nothing and is async-signal-safe. Every
+   such child is started from one long-lived spawner thread, because the signal follows the
+   starting thread.
 
 ## Concurrency
 

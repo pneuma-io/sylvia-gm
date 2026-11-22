@@ -32,5 +32,11 @@ tokio = { workspace = true, features = ["test-util"] }
 futures-util.workspace = true
 serde_json.workspace = true
 
+# The account runtimes' process layer. It is also its own stand-in runtime (started with
+# --fake-runtime or app-server), which must answer before a test harness reads its arguments.
+[[test]]
+name = "runtime_process"
+harness = false
+
 [lints]
 workspace = true

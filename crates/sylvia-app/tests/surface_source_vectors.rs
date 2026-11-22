@@ -38,6 +38,7 @@ fn class(error: &DomainError) -> &'static str {
         DomainError::Value(_) => "ValueError",
         DomainError::Type(_) => "TypeError",
         DomainError::Diagnosed { error_type, .. }
+        | DomainError::Issues { error_type, .. }
         | DomainError::Rejected { error_type, .. }
         | DomainError::Uncaught { error_type, .. } => error_type,
     }

@@ -16,7 +16,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/bundled_campaign_plans.py:120` | `read_plan_catalogue` | re.fullmatch; plain | `if not isinstance(row, dict) or not isinstance(row.get("id"), str) or re.fullmatch( r"[a-z0-9]+(?:-[a-z0-9]+)*", row["id"], ) is None or row["id"] ...` | |
+| `application/bundled_campaign_plans.py:120` | `read_plan_catalogue` | re.fullmatch; plain | `if not isinstance(row, dict) or not isinstance(row.get("id"), str) or re.fullmatch( r"[a-z0-9]+(?:-[a-z0-9]+)*", row["id"], ) is None or row["id"] ...` |  `sylvia-app` plan_catalogue_vectors |
 | `application/character_card_import.py:435` | `_original_path` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
 | `application/character_card_import.py:558` | `_retire_completed_previews` | re.fullmatch; plain | `if re.fullmatch("[0-9a-f]{64}", target.name) is None:` | |
 | `application/character_card_import.py:611` | `confirm_card_preview` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
@@ -29,8 +29,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/import_repair_sessions.py:91` | `start_import_repair_chat` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", repair_id) is None:` | |
 | `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` |  `sylvia-app` package_library_vectors |
 | `application/plan_bundle.py:119` | `_read_bundle` | re.fullmatch; plain | `or re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", identity) is None` | |
-| `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` | |
-| `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` | |
+| `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` |  `sylvia-app` reusable_participant_vectors |
 | `application/reusable_plans.py:94` | `_strip_section` | re.compile; pattern built at run time, check by hand | `pattern = re.compile( rf"\n+## {re.escape(heading)}\s*\n.*?(?=\n## \|\Z)", flags=re.DOTALL, )` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:325` | `save_reusable_rift_plan` | re.sub; plain | `markdown = re.sub(r"^# .*?$", f"# {title}", markdown, count=1, flags=re.MULTILINE)` |  `sylvia-app` reusable_plan_vectors |
 | `application/reusable_plans.py:355` | `load_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", artifact_id) is None:` |  `sylvia-app` reusable_plan_vectors |
@@ -203,8 +203,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude_install.py:188` | `_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", text.strip())` | |
 | `provider/_claude_install.py:334` | `ClaudeInstaller._install` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", checksum) is None` | |
 | `provider/_claude_native.py:38` | `<module>` | re.compile; plain | `_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)` | |
-| `provider/_claude_runtime.py:238` | `find_runtime` | re.fullmatch; plain | `if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():` | |
-| `provider/_claude_runtime.py:260` | `runtime_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)` | |
+| `provider/_claude_runtime.py:238` | `find_runtime` | re.fullmatch; plain | `if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():` | `sylvia-provider` runtime_process |
+| `provider/_claude_runtime.py:260` | `runtime_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)` | `sylvia-provider` runtime_process |
 | `provider/_model_facts.py:145` | `claude_model_id` | re.sub; plain | `bare = re.sub(r"[-@]\d{8}$", "", model_id.strip().casefold().rsplit("/", 1)[-1])` | |
 | `provider/_reasoning.py:43` | `reasoning_values` | re.fullmatch; plain | `not isinstance(value, str) or not re.fullmatch(r"[a-z][a-z0-9_-]{0,31}", value)` | |
 | `provider/_speed.py:22` | `<module>` | re.compile; plain | `_TIER_ID = re.compile(r"[a-z][a-z0-9_-]{0,31}")` | |

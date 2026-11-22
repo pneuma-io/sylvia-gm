@@ -21,12 +21,15 @@
 //! - [`player_actions`]: the Ruleset's direct-control policy (`parse_player_controls`).
 //! - [`result_card_admission`]: authoring-time result-card and activity-label checks.
 
+pub mod action_sequences;
 pub mod actor_decisions;
 pub mod authority;
 pub mod builder_prompts;
 pub mod builder_tools;
+pub mod bundled_campaign_plans;
 pub mod bundled_packages;
 pub mod campaign_plan_materializer;
+pub mod campaign_plan_sources;
 pub mod campaign_starting_world;
 pub mod character_profiles;
 pub mod character_rules;
@@ -48,6 +51,7 @@ pub mod plan_state_admission;
 pub mod player_actions;
 pub mod result_card_admission;
 pub mod reusable_library_deletion;
+pub mod reusable_participants;
 pub mod reusable_plans;
 pub mod ruleset_source;
 pub mod setting_character_requirements;

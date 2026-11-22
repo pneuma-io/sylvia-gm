@@ -1,7 +1,8 @@
 //! `application/authority.py` operations on top of the store, one by one.
 //!
 //! So far: `AuthorityOwner.campaign_index` with `_campaign_index_entry`, and the
-//! `CampaignIndexEntry` and `CampaignSessionIndexEntry` it returns. The owner's reply field order
+//! `CampaignIndexEntry` and `CampaignSessionIndexEntry` it returns (`sylvia_domain::authority`,
+//! where lane 4's opening reads take them; re-exported here). The owner's reply field order
 //! (`_json_value`) is lane 5's handler.
 //!
 //! `rename_builder_chat` and `delete_builder_chat` are [`StoreHandle`](crate::StoreHandle)
@@ -11,48 +12,10 @@ use crate::campaigns::CampaignIndexRecord;
 use crate::error::StoreResult;
 use crate::store::AuthorityStore;
 use sylvia_domain::authority::{LifecycleState, PackageRole, TurnStatus, WriterRole};
-use sylvia_domain::model_capability::ModelGuidanceDecision;
 use sylvia_domain::package_library::campaign_setting_entries;
 use sylvia_domain::session::SessionStatus;
 
-/// One persistent top-level agent chat shown within a campaign (`CampaignSessionIndexEntry`).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CampaignSessionIndexEntry {
-    pub session_id: String,
-    pub role: String,
-    pub status: String,
-    pub provider_id: String,
-    pub model_id: String,
-    pub selected_skill: Option<String>,
-    pub model_guidance: Option<ModelGuidanceDecision>,
-}
-
-/// The product-safe campaign rail projection (`CampaignIndexEntry`), in Python's field order.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CampaignIndexEntry {
-    pub campaign_id: String,
-    pub display_name: String,
-    pub lifecycle: String,
-    pub writer: String,
-    pub revision: i64,
-    pub ruleset_summary: String,
-    pub package_summary: String,
-    pub package_count: i64,
-    pub playable: bool,
-    pub availability: String,
-    pub ruleset_id: Option<String>,
-    pub ruleset_label: String,
-    pub campaign_setting_id: Option<String>,
-    pub campaign_setting_label: String,
-    pub session_activity_ordinal: i64,
-    pub turn_id: Option<String>,
-    pub turn_status: Option<String>,
-    pub session_id: Option<String>,
-    pub session_status: Option<String>,
-    pub provider_id: Option<String>,
-    pub model_id: Option<String>,
-    pub sessions: Vec<CampaignSessionIndexEntry>,
-}
+pub use sylvia_domain::authority::{CampaignIndexEntry, CampaignSessionIndexEntry};
 
 impl AuthorityStore {
     /// `AuthorityOwner.campaign_index`: the store's index projected through

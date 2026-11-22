@@ -364,8 +364,11 @@ async fn requests_sent_through_the_provider_match_python() {
         check_error(error.as_ref(), &case["provider_error"], name);
         check_requests(&run, case, name);
         check_hooks(&run, case, name);
-        // The representation is the request the hooks saw.
-        let representation = run.provider.provider_request_representation(
+        // The representation (through the trait, as the context fit reads it) is the request
+        // the hooks saw, and the hooks are the provider's own.
+        assert!(Provider::hooks(&run.provider).is_some_and(|hooks| std::ptr::eq(hooks, &run.provider.hooks)));
+        let representation = Provider::request_representation(
+            &run.provider,
             case["messages"].as_array().unwrap(),
             Some(&array(&case["tools"])),
             &{
@@ -373,7 +376,8 @@ async fn requests_sent_through_the_provider_match_python() {
                 options.insert("stream".into(), Json::Bool(stream));
                 options
             },
-        );
+        )
+        .expect("the provider has provider_request_representation");
         match (representation, case.get("format_request")) {
             (Ok(request), Some(expected)) => {
                 assert_eq!(dumps(&Json::Object(request)), dumps(expected), "representation of {name}")

@@ -20,6 +20,7 @@
 //! - [`pyfmt`] holds Python's `:g` number formatting.
 //! - [`catalog`] holds `provider/_models.py` and `provider/_output_policy.py`.
 //! - [`reasoning`] and [`speed`] hold `provider/_reasoning.py` and `provider/_speed.py`.
+//! - [`context_mode`] holds the request-assembly mode from `agent/_context_ledger.py` that providers read.
 //! - [`context_fit`] holds `provider/_context_fit.py`, and [`token_estimate`] `provider/_token_estimate.py`.
 //! - [`request_metadata`] holds `provider/_request_metadata.py`.
 //! - [`registry`] holds `provider/_registry.py`'s `ProviderRegistry`.
@@ -27,13 +28,18 @@
 pub mod anthropic;
 pub mod catalog;
 pub mod chat;
+pub mod claude_runtime;
+pub mod codex_rpc;
 pub mod config;
 pub mod context_capacity;
 pub mod context_fit;
+pub mod context_mode;
 pub mod error;
 pub mod factory;
+pub mod gemini;
 pub mod hooks;
 pub mod http;
+mod httpx_text;
 pub mod httpx_url;
 mod log;
 pub mod model_facts;
@@ -52,6 +58,7 @@ pub mod reply;
 pub mod responses;
 pub mod retry;
 pub mod routes;
+pub mod runtime_process;
 mod sdk_models;
 pub mod speed;
 pub mod sse;

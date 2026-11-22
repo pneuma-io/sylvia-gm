@@ -134,6 +134,17 @@ pub enum DomainError {
         /// `error.diagnostics`.
         diagnostics: Vec<RulesetDiagnostic>,
     },
+    /// A `ValueError` subclass that carries field-level validation issues, such as
+    /// `ParticipantValidationError.issues`. The owner reports it as any `ValueError`.
+    #[error("{message}")]
+    Issues {
+        /// `type(error).__name__`.
+        error_type: &'static str,
+        /// `str(error)`.
+        message: String,
+        /// `error.issues`.
+        issues: Vec<MechanicsValidationIssue>,
+    },
     /// An `AuthorityError` (a `RuntimeError` in Python): `CommandRejected`, `MechanicsRejected`,
     /// `StaleRevision` and the rest, with the stable `code` the owner replies with.
     #[error("{message}")]
@@ -336,8 +347,17 @@ impl DomainError {
             Self::Value(message)
             | Self::Type(message)
             | Self::Diagnosed { message, .. }
+            | Self::Issues { message, .. }
             | Self::Rejected { message, .. }
             | Self::Uncaught { message, .. } => message,
+        }
+    }
+
+    /// `error.issues` of an [`DomainError::Issues`] error, else empty.
+    pub fn issues(&self) -> &[MechanicsValidationIssue] {
+        match self {
+            Self::Issues { issues, .. } => issues,
+            _ => &[],
         }
     }
 
@@ -371,6 +391,7 @@ impl DomainError {
             Self::Value(_) => "ValueError",
             Self::Type(_) => "TypeError",
             Self::Diagnosed { error_type, .. }
+            | Self::Issues { error_type, .. }
             | Self::Rejected { error_type, .. }
             | Self::Uncaught { error_type, .. } => error_type,
         }
@@ -379,7 +400,7 @@ impl DomainError {
     /// Whether Python would have raised a `ValueError` (or a subclass). An `AuthorityError`
     /// is a `RuntimeError`, not a `ValueError`.
     pub fn is_value_error(&self) -> bool {
-        matches!(self, Self::Value(_) | Self::Diagnosed { .. })
+        matches!(self, Self::Value(_) | Self::Diagnosed { .. } | Self::Issues { .. })
     }
 
     /// The owner reply for this error if it reaches the owner uncaught.
