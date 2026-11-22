@@ -8,10 +8,10 @@ Run with the snapshot's own interpreter, from the repository root, after
 Each case copies one base into a fresh folder, opens it with `_open_for_application_owner` and
 calls `SQLiteAuthorityStore.export_campaign(campaign_id, target, include_thinking=...)`, with
 the `_export_failure_stage` seam recording every stage it is called at and acting at the named
-ones: raising, raising an `_ExportFailure` of its own, creating or recreating the target,
-blocking the temporary's journal sidecar (a directory where the cleanup expects a file), or
-damaging package blob rows through a connection of its own (the store verifies every blob when
-it opens, so they are damaged after the capture, at `metadata_spool`).
+ones: raising, raising an `_ExportFailure` of its own, creating the target or replacing it with
+a new file, blocking the temporary's journal sidecar (a directory where the cleanup expects a
+file), or damaging package blob rows through a connection of its own (the store verifies every
+blob when it opens, so they are damaged after the capture, at `metadata_spool`).
 
 The bases are the story profile with private provider records, the campaign-reads profile
 (the clockwork campaign with one blob and a campaign without blobs) and the participant profile
@@ -193,8 +193,11 @@ def run(folder: Path, spec: dict[str, object]) -> dict[str, object]:
             if action == "create_target":
                 target.write_bytes(b"an intruder")
             elif action == "recreate_target":
-                target.unlink()
-                target.write_bytes(b"an intruder")
+                # Written beside it, then renamed over it: a new file identity on every platform
+                # (an unlink and a new file can reuse the freed inode on ext4).
+                replacement = target.with_name(f"{target.name}.new")
+                replacement.write_bytes(b"an intruder")
+                os.replace(replacement, target)
             elif action == "damage":
                 damage(folder / "authority.sqlite3", spec["sql"])  # type: ignore[arg-type]
             elif action == "block_journal":

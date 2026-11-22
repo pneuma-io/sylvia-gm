@@ -145,8 +145,10 @@ fn seam(folder: &Path, case: &Json, stages: Arc<Mutex<Vec<String>>>) -> Faults {
                     }
                     "create_target" => std::fs::write(&target, b"an intruder").unwrap(),
                     "recreate_target" => {
-                        std::fs::remove_file(&target).unwrap();
-                        std::fs::write(&target, b"an intruder").unwrap();
+                        let mut replacement = target.as_os_str().to_os_string();
+                        replacement.push(".new");
+                        std::fs::write(&replacement, b"an intruder").unwrap();
+                        std::fs::rename(&replacement, &target).unwrap();
                     }
                     "damage" => {
                         let connection = rusqlite::Connection::open(&database).unwrap();
