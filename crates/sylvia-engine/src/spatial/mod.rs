@@ -4,8 +4,10 @@
 //! written (an integer stays an integer, a float a float), and every bound is checked on their
 //! `float(...)` values.
 
+mod mutation;
 mod scene;
 
+pub use mutation::{mutate_spatial_scene, AdmittedSpatialMutation};
 pub use scene::{admit_spatial_scene, AdmittedSpatialScene};
 
 use sylvia_domain::error::DomainError;
