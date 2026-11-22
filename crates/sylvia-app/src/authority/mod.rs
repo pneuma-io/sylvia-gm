@@ -3,3 +3,4 @@
 pub mod guided;
 pub mod lifecycle;
 pub mod portable;
+pub mod snapshots;

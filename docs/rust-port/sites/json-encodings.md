@@ -63,7 +63,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:6318` | `SQLiteAuthorityStore.campaign_session_contexts` | Dump::DEFAULT | `(row["session_id"], json.dumps(evidence_kinds)),` | |
 | `infrastructure/sqlite_authority.py:10900` | `SQLiteAuthorityStore.response_window_actions` | Dump::DEFAULT | `"attempts": json.dumps(sorted(response_attempts or ()))},` | |
 | `infrastructure/sqlite_authority.py:10925` | `SQLiteAuthorityStore.player_action_markers` | Dump::DEFAULT | `(marker_kind, campaign_id, json.dumps(action_ids)),` | |
-| `infrastructure/sqlite_authority.py:12307` | `SQLiteAuthorityStore._read_snapshot` | Dump::DEFAULT | `json.dumps(display_action_ids),` | |
+| `infrastructure/sqlite_authority.py:12307` | `SQLiteAuthorityStore._read_snapshot` | Dump::DEFAULT | `json.dumps(display_action_ids),` | `sylvia-store` snapshots |
 | `infrastructure/sqlite_continuity.py:49` | `_dump` | Dump::CANONICAL | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
 | `infrastructure/sqlite_recovery.py:258` | `result_json` | Dump::WIRE.ascii(false) + allow_nan= | `return json.dumps( { "campaign_id": result.campaign_id, "captured_revision": result.captured_revision, "archive_sha256": result.archive_sha256, "by...` | `sylvia-store` stored_authority (`recovered`) |
 | `infrastructure/sqlite_session.py:306` | `_dump` | Dump::CANONICAL + allow_nan= | `return json.dumps( thaw_json_value(value), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, )` | |
