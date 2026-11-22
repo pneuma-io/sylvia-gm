@@ -8,6 +8,7 @@ use sylvia_domain::error::DomainError;
 use sylvia_domain::package_library::{
     campaign_setting_entries, canonical_json_bytes, CandidateStatus, PackageCandidate,
 };
+use sylvia_store::{AuthorityStore, StoreError};
 
 const MAX_CANDIDATES: usize = 100;
 const MAX_PACKAGES: usize = 64;
@@ -45,6 +46,48 @@ pub trait LibraryOwner {
     fn package_record(&self, package_id: &str, version: &str, sha256: &str) -> Result<JsonMap, Self::Error>;
     /// `package_label(package_id, version, sha256)`.
     fn package_label(&self, package_id: &str, version: &str, sha256: &str) -> Result<String, Self::Error>;
+}
+
+/// The installed packages, through lane 3's synchronous reads.
+impl LibraryOwner for AuthorityStore {
+    type Error = StoreError;
+
+    fn package_candidates(&self) -> Result<Vec<PackageCandidate>, StoreError> {
+        AuthorityStore::package_candidates(self)
+    }
+
+    fn package_candidate(&self, candidate_id: &str) -> Result<PackageCandidate, StoreError> {
+        AuthorityStore::package_candidate(self, candidate_id)
+    }
+
+    fn package_file_paths(
+        &self,
+        package_id: &str,
+        version: &str,
+        sha256: &str,
+        maximum_files: i64,
+    ) -> Result<Vec<String>, StoreError> {
+        AuthorityStore::package_file_paths(self, package_id, version, sha256, maximum_files)
+    }
+
+    fn package_text_file(
+        &self,
+        package_id: &str,
+        version: &str,
+        sha256: &str,
+        path: &str,
+        maximum_bytes: i64,
+    ) -> Result<String, StoreError> {
+        AuthorityStore::package_text_file(self, package_id, version, sha256, path, maximum_bytes)
+    }
+
+    fn package_record(&self, package_id: &str, version: &str, sha256: &str) -> Result<JsonMap, StoreError> {
+        AuthorityStore::package_record(self, package_id, version, sha256)
+    }
+
+    fn package_label(&self, package_id: &str, version: &str, sha256: &str) -> Result<String, StoreError> {
+        AuthorityStore::package_label(self, package_id, version, sha256)
+    }
 }
 
 fn rejected<E: From<DomainError>>(message: &str) -> E {
