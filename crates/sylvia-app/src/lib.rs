@@ -39,6 +39,7 @@ pub mod package_record_edits;
 pub mod package_runtime;
 pub mod path_guardrail;
 pub mod plan_network_admission;
+pub mod plan_snapshot;
 pub mod plan_spatial_admission;
 pub mod plan_state_admission;
 pub mod player_actions;
