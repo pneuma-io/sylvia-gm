@@ -150,7 +150,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:6262` | `AuthorityOwner.read_campaign_reference` | re.fullmatch; plain | `match = re.fullmatch(r"adventures/([1-9][0-9]*)/(structured(?:/.*)?\|markdown)", path)` | |
 | `application/authority.py:6313` | `AuthorityOwner.read_campaign_reference` | re.fullmatch; plain | `if not isinstance(readable, str) or not re.fullmatch(r"[0-9]{1,10}", page):` | |
 | `application/authority.py:6443` | `AuthorityOwner.read_campaign_reference` | re.fullmatch; plain | `if re.fullmatch(r"text/(0\|[1-9][0-9]{0,9})", fragment) is None:` | |
-| `application/knowledge_search.py:101` | `knowledge_terms` | re.findall; plain | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | |
+| `application/knowledge_search.py:101` | `knowledge_terms` | re.findall; plain | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | `sylvia-app` knowledge_search (`knowledge_terms`: `str.isalnum` runs) |
 | `application/ruleless_play.py:83` | `<module>` | re.compile; NEEDS fancy-regex: lookahead, lookbehind | `re.compile(r"(?<![\w-])\d{0,3}d(?:4\|6\|8\|10\|12\|20\|100)(?![\w-])", re.IGNORECASE),` | |
 | `application/ruleless_play.py:87` | `<module>` | re.compile; plain | `re.compile( r"\broll(?:ing)?\s+(?:for\b\|initiative\b\|to\s+(?:see\|hit\|save\|resist)\b" r"\|(?:a\|an\|your)\s+(?:[a-z]+\s+){0,2}(?:check\|save\|r...` | |
 | `application/ruleless_play.py:95` | `<module>` | re.compile; pattern built at run time, check by hand | `re.compile( r"\b(?:(?:" + _SKILL_WORDS + r")\s+(?:check\|save\|saving\s+throw\|test\|roll)s?" r"\|saving\s+throws?)\b", re.IGNORECASE, ),` | |
@@ -200,8 +200,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:45` | `<module>` | re.compile; plain | `_PROFILE_ID = re.compile(r"^[a-z][a-z0-9_]{0,63}$")` | |
 | `config/provider_settings.py:47` | `<module>` | re.compile; plain | `_NATIVE_SETTING = re.compile(r"[a-z][a-z0-9_-]{0,31}")` | |
 | `provider/_claude.py:118` | `prepare_request` | re.fullmatch; plain | `if not isinstance(name, str) or re.fullmatch(r"[A-Za-z0-9_-]{1,64}", name) is None:` | |
-| `provider/_claude_install.py:188` | `_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", text.strip())` | |
-| `provider/_claude_install.py:334` | `ClaudeInstaller._install` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", checksum) is None` | |
+| `provider/_claude_install.py:188` | `_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", text.strip())` | `sylvia-provider` install_vectors |
+| `provider/_claude_install.py:334` | `ClaudeInstaller._install` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", checksum) is None` | `sylvia-provider` install_vectors |
 | `provider/_claude_native.py:38` | `<module>` | re.compile; plain | `_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)` | |
 | `provider/_claude_runtime.py:238` | `find_runtime` | re.fullmatch; plain | `if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():` | `sylvia-provider` runtime_process |
 | `provider/_claude_runtime.py:260` | `runtime_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)` | `sylvia-provider` runtime_process |

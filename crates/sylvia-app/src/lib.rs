@@ -22,18 +22,22 @@
 //! - [`result_card_admission`]: authoring-time result-card and activity-label checks.
 
 pub mod action_sequences;
+pub mod actor_decisions;
 pub mod authority;
 pub mod builder_prompts;
 pub mod builder_tools;
 pub mod bundled_campaign_plans;
 pub mod bundled_packages;
+pub mod campaign_library_selection;
 pub mod campaign_plan_materializer;
 pub mod campaign_plan_sources;
 pub mod campaign_starting_world;
 pub mod character_profiles;
 pub mod character_rules;
+pub mod decision_scope;
 pub mod initial_character_state;
 pub mod interview_content;
+pub mod knowledge_search;
 pub mod library_sources;
 pub mod network_graph;
 pub mod package_library;
@@ -51,6 +55,7 @@ pub mod result_card_admission;
 pub mod reusable_library_deletion;
 pub mod reusable_participants;
 pub mod reusable_plans;
+pub mod ruleless_play;
 pub mod ruleset_source;
 pub mod setting_character_requirements;
 pub mod srd_lite_character_compatibility;

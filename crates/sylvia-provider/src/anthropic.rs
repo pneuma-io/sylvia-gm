@@ -1217,14 +1217,18 @@ impl AnthropicEnvironment {
         headers
     }
 
-    /// `context_mode(transport="anthropic_messages", provider_key="anthropic") == "ledger"`:
-    /// the variable decides when it names `ledger` or `legacy`; the route ships the ledger.
-    fn ledger(&self) -> bool {
-        let setting = self
-            .context_mode
-            .as_deref()
-            .map(|mode| sylvia_base::pystr::casefold(sylvia_base::pystr::strip(mode)));
-        setting.as_deref() != Some("legacy")
+    /// `context_mode(transport="anthropic_messages", provider_key=...) == LEDGER_MODE`, read
+    /// from this environment's `SYLVIA_GM_CONTEXT_MODE`.
+    fn ledger(&self, provider_key: &str) -> bool {
+        let environment = crate::config::env::Environment::from_vars(
+            vec![(crate::context_mode::MODE_ENV.to_owned(), self.context_mode.clone())],
+            cfg!(windows),
+        );
+        crate::context_mode::context_mode(
+            &environment,
+            Some(crate::types::transport::ANTHROPIC_MESSAGES),
+            Some(provider_key),
+        ) == crate::context_mode::LEDGER_MODE
     }
 }
 
@@ -1284,7 +1288,8 @@ impl AnthropicProvider {
         let endpoint = HttpxUrl::sdk_endpoint(sdk_base, "/v1/messages")
             .map_err(|error| BuildError::InvalidUrl(error.0))?
             .to_string();
-        let cache_breakpoints = model_info.provider_key == "anthropic" && environment.ledger();
+        let cache_breakpoints =
+            model_info.provider_key == "anthropic" && environment.ledger(&model_info.provider_key);
         Ok(Self {
             base_url: base_url.to_owned(),
             opencode: crate::routes::is_opencode_inference(base_url).map_err(|error| error.0),

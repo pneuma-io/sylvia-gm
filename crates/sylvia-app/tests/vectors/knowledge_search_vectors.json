@@ -1,0 +1,804 @@
+{
+ "python": "3.12.11",
+ "terms": [
+  {
+   "value": "",
+   "terms": []
+  },
+  {
+   "value": "The captain's log",
+   "terms": [
+    "captain",
+    "log"
+   ]
+  },
+  {
+   "value": "Mara\u2019s blade",
+   "terms": [
+    "mara",
+    "blade"
+   ]
+  },
+  {
+   "value": "it's",
+   "terms": [
+    "it"
+   ]
+  },
+  {
+   "value": "o'neill's",
+   "terms": [
+    "o'neill",
+    "s"
+   ]
+  },
+  {
+   "value": "rock'n'roll",
+   "terms": [
+    "rock'n",
+    "roll"
+   ]
+  },
+  {
+   "value": "snake_case words",
+   "terms": [
+    "snake",
+    "case",
+    "words"
+   ]
+  },
+  {
+   "value": "Stra\u00dfe STRASSE",
+   "terms": [
+    "strasse",
+    "strasse"
+   ]
+  },
+  {
+   "value": "\u01c5emal",
+   "terms": [
+    "\u01c6emal"
+   ]
+  },
+  {
+   "value": "na\u00efve cafe\u0301",
+   "terms": [
+    "na\u00efve",
+    "cafe"
+   ]
+  },
+  {
+   "value": "\u216b roman \u00bd",
+   "terms": [
+    "\u217b",
+    "roman",
+    "\u00bd"
+   ]
+  },
+  {
+   "value": "where is the harbour now?",
+   "terms": [
+    "harbour"
+   ]
+  },
+  {
+   "value": "a an the",
+   "terms": []
+  },
+  {
+   "value": "\u00dcnder-the-Bridge",
+   "terms": [
+    "\u00fcnder",
+    "bridge"
+   ]
+  },
+  {
+   "value": "x'",
+   "terms": [
+    "x"
+   ]
+  },
+  {
+   "value": "'quoted'",
+   "terms": [
+    "quoted"
+   ]
+  },
+  {
+   "value": "tab\tand\nnewline",
+   "terms": [
+    "tab",
+    "newline"
+   ]
+  },
+  {
+   "value": "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30b9\u30c8",
+   "terms": [
+    "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30b9\u30c8"
+   ]
+  },
+  {
+   "value": "\u0661\u0662\u0663 arabic digits",
+   "terms": [
+    "\u0661\u0662\u0663",
+    "arabic",
+    "digits"
+   ]
+  }
+ ],
+ "references": [
+  {
+   "result": {
+    "source": "campaign_state",
+    "path": "entity:mara",
+    "label": "Mara",
+    "kind": "entity"
+   },
+   "identity": "entity:mara",
+   "body": "Mara is a smuggler who knows the harbour tunnels."
+  },
+  {
+   "result": {
+    "source": "campaign_state",
+    "path": "entity:harbour-master",
+    "label": "Harbour Master",
+    "kind": "entity"
+   },
+   "identity": "entity:harbour-master",
+   "body": "The harbour master taxes every ship."
+  },
+  {
+   "result": {
+    "source": "participant",
+    "path": "participant:bo",
+    "label": "Bo"
+   },
+   "identity": "participant:bo",
+   "body": "Bo is a fisher; Bo's boat is old."
+  },
+  {
+   "result": {
+    "source": "campaign_plan",
+    "path": "plan#act-1",
+    "label": "Act One"
+   },
+   "identity": "plan#act-1",
+   "body": "The heist at the harbour begins at night."
+  },
+  {
+   "result": {
+    "source": "campaign_plan",
+    "path": "plan#act-2",
+    "label": "Act Two"
+   },
+   "identity": "plan#act-2",
+   "body": "The chase through the tunnels."
+  },
+  {
+   "result": {
+    "source": "campaign_setting",
+    "path": "setting/harbour.md#overview",
+    "label": "Overview"
+   },
+   "identity": "setting/harbour.md#overview",
+   "body": "The harbour city of Vell."
+  },
+  {
+   "result": {
+    "source": "campaign_setting",
+    "path": "setting/harbour.md#history",
+    "label": "History"
+   },
+   "identity": "setting/harbour.md#history",
+   "body": "Vell was founded by smugglers."
+  },
+  {
+   "result": {
+    "source": "campaign_setting",
+    "path": "setting/harbour.md#personality",
+    "label": "Personality"
+   },
+   "identity": "setting/harbour.md#personality",
+   "body": "Proud and suspicious people."
+  },
+  {
+   "result": {
+    "source": "campaign_setting",
+    "path": "setting/tunnels.md",
+    "label": "Tunnels"
+   },
+   "identity": "setting/tunnels.md",
+   "body": "Old smuggler tunnels run under the docks."
+  },
+  {
+   "result": {
+    "source": "ruleset",
+    "path": "rules/stealth.md#hiding",
+    "label": "Hiding"
+   },
+   "identity": "rules/stealth.md#hiding",
+   "body": "Hiding needs cover; smugglers hide well."
+  },
+  {
+   "result": {
+    "source": "ruleset",
+    "path": "rules/combat.md",
+    "label": "Combat"
+   },
+   "identity": "rules/combat.md",
+   "body": "Roll initiative. Attacks hit on a total of ten."
+  }
+ ],
+ "rankings": [
+  {
+   "query": "Mara",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:mara",
+     "label": "Mara",
+     "kind": "entity"
+    }
+   ]
+  },
+  {
+   "query": "mara's tunnels",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:mara",
+     "label": "Mara",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/tunnels.md",
+     "label": "Tunnels"
+    }
+   ]
+  },
+  {
+   "query": "harbour master",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:harbour-master",
+     "label": "Harbour Master",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#overview",
+     "label": "Overview"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#history",
+     "label": "History"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#personality",
+     "label": "Personality"
+    }
+   ]
+  },
+  {
+   "query": "the harbour",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:harbour-master",
+     "label": "Harbour Master",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#overview",
+     "label": "Overview"
+    },
+    {
+     "source": "campaign_plan",
+     "path": "plan#act-1",
+     "label": "Act One"
+    },
+    {
+     "source": "campaign_state",
+     "path": "entity:mara",
+     "label": "Mara",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#history",
+     "label": "History"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#personality",
+     "label": "Personality"
+    }
+   ]
+  },
+  {
+   "query": "harbour tunnels smuggler",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:harbour-master",
+     "label": "Harbour Master",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/tunnels.md",
+     "label": "Tunnels"
+    },
+    {
+     "source": "campaign_state",
+     "path": "entity:mara",
+     "label": "Mara",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#overview",
+     "label": "Overview"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#history",
+     "label": "History"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#personality",
+     "label": "Personality"
+    }
+   ]
+  },
+  {
+   "query": "tunnels",
+   "results": [
+    {
+     "source": "campaign_setting",
+     "path": "setting/tunnels.md",
+     "label": "Tunnels"
+    },
+    {
+     "source": "campaign_plan",
+     "path": "plan#act-2",
+     "label": "Act Two"
+    },
+    {
+     "source": "campaign_state",
+     "path": "entity:mara",
+     "label": "Mara",
+     "kind": "entity"
+    }
+   ]
+  },
+  {
+   "query": "personality",
+   "results": []
+  },
+  {
+   "query": "harbour overview",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:harbour-master",
+     "label": "Harbour Master",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#overview",
+     "label": "Overview"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#history",
+     "label": "History"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#personality",
+     "label": "Personality"
+    }
+   ]
+  },
+  {
+   "query": "roll initiative",
+   "results": [
+    {
+     "source": "ruleset",
+     "path": "rules/combat.md",
+     "label": "Combat"
+    }
+   ]
+  },
+  {
+   "query": "the",
+   "results": []
+  },
+  {
+   "query": "",
+   "results": []
+  },
+  {
+   "query": "Vell history",
+   "results": []
+  },
+  {
+   "query": "smugglers hide",
+   "results": [
+    {
+     "source": "ruleset",
+     "path": "rules/stealth.md#hiding",
+     "label": "Hiding"
+    }
+   ]
+  },
+  {
+   "query": "boat",
+   "results": [
+    {
+     "source": "participant",
+     "path": "participant:bo",
+     "label": "Bo"
+    }
+   ]
+  },
+  {
+   "query": "MARA",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:mara",
+     "label": "Mara",
+     "kind": "entity"
+    }
+   ]
+  },
+  {
+   "query": "unknown words only",
+   "results": []
+  },
+  {
+   "query": "harbour master taxes ships",
+   "results": [
+    {
+     "source": "campaign_state",
+     "path": "entity:harbour-master",
+     "label": "Harbour Master",
+     "kind": "entity"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#overview",
+     "label": "Overview"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#history",
+     "label": "History"
+    },
+    {
+     "source": "campaign_setting",
+     "path": "setting/harbour.md#personality",
+     "label": "Personality"
+    }
+   ]
+  }
+ ],
+ "empty_candidates": [],
+ "pages": [
+  {
+   "offset": 0,
+   "limit": 3,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 0,
+     "limit": 3,
+     "matches": [
+      {
+       "source": "campaign_state",
+       "path": "entity:harbour-master",
+       "label": "Harbour Master",
+       "kind": "entity"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/tunnels.md",
+       "label": "Tunnels"
+      },
+      {
+       "source": "campaign_state",
+       "path": "entity:mara",
+       "label": "Mara",
+       "kind": "entity"
+      }
+     ],
+     "truncated": true,
+     "next_offset": 3
+    }
+   }
+  },
+  {
+   "offset": 2,
+   "limit": 2,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 2,
+     "limit": 2,
+     "matches": [
+      {
+       "source": "campaign_state",
+       "path": "entity:mara",
+       "label": "Mara",
+       "kind": "entity"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#overview",
+       "label": "Overview"
+      }
+     ],
+     "truncated": true,
+     "next_offset": 4
+    }
+   }
+  },
+  {
+   "offset": 0,
+   "limit": 10,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 0,
+     "limit": 10,
+     "matches": [
+      {
+       "source": "campaign_state",
+       "path": "entity:harbour-master",
+       "label": "Harbour Master",
+       "kind": "entity"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/tunnels.md",
+       "label": "Tunnels"
+      },
+      {
+       "source": "campaign_state",
+       "path": "entity:mara",
+       "label": "Mara",
+       "kind": "entity"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#overview",
+       "label": "Overview"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#history",
+       "label": "History"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#personality",
+       "label": "Personality"
+      }
+     ],
+     "truncated": false,
+     "next_offset": null
+    }
+   }
+  },
+  {
+   "offset": 4,
+   "limit": 3,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 4,
+     "limit": 3,
+     "matches": [
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#history",
+       "label": "History"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#personality",
+       "label": "Personality"
+      }
+     ],
+     "truncated": false,
+     "next_offset": null
+    }
+   }
+  },
+  {
+   "offset": 0,
+   "limit": 3,
+   "maximum_bytes": 400,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 0,
+     "limit": 3,
+     "matches": [
+      {
+       "source": "campaign_state",
+       "path": "entity:harbour-master",
+       "label": "Harbour Master",
+       "kind": "entity"
+      },
+      {
+       "source": "campaign_setting",
+       "path": "setting/tunnels.md",
+       "label": "Tunnels"
+      },
+      {
+       "source": "campaign_state",
+       "path": "entity:mara",
+       "label": "Mara",
+       "kind": "entity"
+      }
+     ],
+     "truncated": true,
+     "next_offset": 3
+    }
+   }
+  },
+  {
+   "offset": 0,
+   "limit": 3,
+   "maximum_bytes": 60,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_knowledge_metadata_too_large",
+    "message": "Campaign knowledge search metadata exceeds the reply byte bound"
+   }
+  },
+  {
+   "offset": 0,
+   "limit": 3,
+   "maximum_bytes": 120,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_knowledge_result_too_large",
+    "message": "An exact campaign knowledge reference exceeds the reply byte bound"
+   }
+  },
+  {
+   "offset": 5,
+   "limit": 1,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 5,
+     "limit": 1,
+     "matches": [
+      {
+       "source": "campaign_setting",
+       "path": "setting/harbour.md#personality",
+       "label": "Personality"
+      }
+     ],
+     "truncated": false,
+     "next_offset": null
+    }
+   }
+  },
+  {
+   "offset": 6,
+   "limit": 1,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 6,
+     "limit": 1,
+     "matches": [],
+     "truncated": false,
+     "next_offset": null
+    }
+   }
+  },
+  {
+   "offset": -1,
+   "limit": 1,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_knowledge_offset_invalid",
+    "message": "Campaign knowledge parameter 'offset' is outside the current results"
+   }
+  },
+  {
+   "offset": 0,
+   "limit": 0,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 0,
+     "limit": 0,
+     "matches": [],
+     "truncated": true,
+     "next_offset": 0
+    }
+   }
+  },
+  {
+   "offset": 1,
+   "limit": -1,
+   "maximum_bytes": 10000,
+   "outcome": {
+    "ok": {
+     "query": "harbour",
+     "total": 6,
+     "offset": 1,
+     "limit": -1,
+     "matches": [],
+     "truncated": true,
+     "next_offset": 1
+    }
+   }
+  }
+ ],
+ "page_matches": [
+  {
+   "source": "campaign_state",
+   "path": "entity:harbour-master",
+   "label": "Harbour Master",
+   "kind": "entity"
+  },
+  {
+   "source": "campaign_setting",
+   "path": "setting/tunnels.md",
+   "label": "Tunnels"
+  },
+  {
+   "source": "campaign_state",
+   "path": "entity:mara",
+   "label": "Mara",
+   "kind": "entity"
+  },
+  {
+   "source": "campaign_setting",
+   "path": "setting/harbour.md#overview",
+   "label": "Overview"
+  },
+  {
+   "source": "campaign_setting",
+   "path": "setting/harbour.md#history",
+   "label": "History"
+  },
+  {
+   "source": "campaign_setting",
+   "path": "setting/harbour.md#personality",
+   "label": "Personality"
+  }
+ ]
+}
