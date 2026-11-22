@@ -6,14 +6,13 @@
 use super::reads::OpeningReads;
 use super::tagged::{Tagged, ACTIVE_RECORDS_KEY};
 use crate::campaign_memory::{self, RankReferences};
-use crate::stateless_mcp::ModelMechanicsTool;
 use serde_json::{json, Value as Json};
 use std::collections::HashMap;
 use std::sync::Arc;
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{pystr, CodedError, CodedResult, JsonMap};
 use sylvia_domain::authority::{CanonicalEventType, EventVisibility, Participant, WriterRole};
-use sylvia_domain::session::{SessionContext, SessionMessageKind, SessionRecord};
+use sylvia_domain::session::SessionMessageKind;
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::Provider;
 
@@ -26,18 +25,7 @@ pub const DEFAULT_MAXIMUM_BYTES: i64 = 64 * 1024;
 
 pub use sylvia_provider::context_mode::{context_mode, gm_route, LEDGER_MODE, LEGACY_MODE, MODE_ENV};
 
-/// `SessionProviderInput`: what one provider request is assembled from.
-#[derive(Clone)]
-pub struct SessionProviderInput {
-    pub session: SessionRecord,
-    pub history: SessionContext,
-    pub catalog: Vec<ModelMechanicsTool>,
-    pub basis_message_id: Option<String>,
-    pub recovery_kind: Option<String>,
-    /// `reference_reader` is present only on live GM turns; the request assembly does not use
-    /// it yet ([`super::messages`] refuses a request that has one until it is ported).
-    pub has_reference_reader: bool,
-}
+pub use crate::session_loop::SessionProviderInput;
 
 /// `ProviderSessionAdapter`: the parts the request assembly uses.
 pub struct ProviderSessionAdapter {

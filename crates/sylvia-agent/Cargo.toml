@@ -11,14 +11,19 @@ publish.workspace = true
 [dependencies]
 sylvia-base.workspace = true
 sylvia-domain.workspace = true
+# The GM agent sits above the application services (manager, 23 Nov 2026): sylvia-app must
+# never depend on sylvia-agent.
+sylvia-app.workspace = true
 sylvia-provider.workspace = true
 indexmap.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+tokio = { workspace = true, features = ["sync", "time"] }
 
 [dev-dependencies]
 futures-util.workspace = true
+tokio = { workspace = true, features = ["rt", "macros", "time", "sync"] }
 
 [lints]
 workspace = true

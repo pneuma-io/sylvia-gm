@@ -2704,10 +2704,12 @@ dependencies = [
  "indexmap",
  "serde",
  "serde_json",
+ "sylvia-app",
  "sylvia-base",
  "sylvia-domain",
  "sylvia-provider",
  "thiserror 2.0.21",
+ "tokio",
 ]
 
 [[package]]

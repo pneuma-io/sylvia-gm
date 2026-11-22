@@ -20,6 +20,7 @@ use sylvia_agent::campaign_memory::{KnowledgeReference, RankReferences};
 use sylvia_agent::provider_session::context::{ProviderSessionAdapter, SessionProviderInput, LEDGER_MODE};
 use sylvia_agent::provider_session::reads::OpeningReads;
 use sylvia_agent::provider_session::tools::provider_tools;
+use sylvia_agent::session_loop::ProviderControl;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
 use sylvia_app::knowledge_search;
 use sylvia_base::hash::sha256_hex;
@@ -196,14 +197,12 @@ pub async fn preflight_guided_start(
         )));
     }
     let catalog = reads.catalog(campaign_id).await?;
-    let input = SessionProviderInput {
-        session: preflight_session,
+    let input = SessionProviderInput::new(
+        preflight_session,
         history,
-        catalog: catalog.clone(),
-        basis_message_id: None,
-        recovery_kind: None,
-        has_reference_reader: false,
-    };
+        catalog.clone(),
+        Arc::new(ProviderControl::new()),
+    );
     let messages: Vec<Json> = adapter
         .messages(&input, rank)
         .await?
