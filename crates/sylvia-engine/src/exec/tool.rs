@@ -677,7 +677,8 @@ pub fn prepare_tool_context<'a>(
     Ok(Prepared::Context(Box::new(ctx)))
 }
 
-/// `execute_tool(...)`. A suspended choice is the only exception that leaves it.
+/// `execute_tool(...)`. A suspended choice is the only exception that leaves it, besides code
+/// not yet ported.
 // The arguments are Python's own (`execute_tool`'s and `prepare_tool_context`'s parameter lists).
 #[allow(clippy::too_many_arguments)]
 pub fn execute_tool(
@@ -703,7 +704,7 @@ pub fn execute_tool(
     let effects = host.tool(tool_name).expect("prepared tools exist").effects.clone();
     match execute_effects(&effects, &mut ctx, host) {
         Ok(()) => {}
-        Err(error @ ExecError::Suspended(_)) => return Err(error),
+        Err(error) if error.passes_through() => return Err(error),
         Err(ExecError::PreCondition { message, .. }) => {
             return Ok(ToolResult::failure(tool_name, message, "precondition"));
         }
