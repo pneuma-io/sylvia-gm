@@ -340,7 +340,7 @@ impl PackageMechanic {
             basis.insert(key.into(), Json::String(item.clone()));
         }
         basis.insert("parameters".into(), parameters_json.clone());
-        let digest = sylvia_base::hash::sha256(&canonical_json_bytes(&Json::Object(basis)));
+        let digest = sylvia_base::hash::sha256(canonical_json_bytes(&Json::Object(basis)));
         let seed = u64::from_be_bytes(digest[..8].try_into().expect("eight bytes"));
         let mut dice = Dice::new();
         let executed = dice.seeded_rolls(Some(i128::from(seed)), |dice| {
