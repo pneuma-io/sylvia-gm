@@ -42,7 +42,8 @@ fn closest_simplex(points: &[V3]) -> (V3, Vec<V3>) {
         for indices in combinations(points.len(), count) {
             let face: Vec<V3> = indices.iter().map(|&i| points[i]).collect();
             let origin = face[0];
-            let edges: Vec<V3> = face[1..].iter().map(|p| [p[0] - origin[0], p[1] - origin[1], p[2] - origin[2]]).collect();
+            let edges: Vec<V3> =
+                face[1..].iter().map(|p| [p[0] - origin[0], p[1] - origin[1], p[2] - origin[2]]).collect();
             let coefficients: Vec<f64> = match count {
                 2 => {
                     let denominator = dot(edges[0], edges[0]);

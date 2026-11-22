@@ -37,7 +37,10 @@ fn point_segment_distance_squared(point: Point, start: Point, end: Point) -> f64
     let fraction = if length_squared == 0.0 {
         0.0
     } else {
-        max_first([0.0, min_first([1.0, ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length_squared])])
+        max_first([
+            0.0,
+            min_first([1.0, ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length_squared]),
+        ])
     };
     let x = point[0] - start[0] - fraction * dx;
     let y = point[1] - start[1] - fraction * dy;

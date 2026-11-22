@@ -31,13 +31,16 @@ fn engine_resolves_as_python() {
         let query = admit_spatial_query(scene, &case["query"]).expect("an admissible query");
         let actual = match resolve_spatial_query(scene, &query) {
             Ok(result) => json!({"result": result}),
-            Err(error) => json!({"error": ["SpatialValidationError", error.to_string(), error.code, error.path]}),
+            Err(error) => {
+                json!({"error": ["SpatialValidationError", error.to_string(), error.code, error.path]})
+            }
         };
         let mut wanted = case.clone();
         let fields = wanted.as_object_mut().unwrap();
         fields.shift_remove("scene");
         fields.shift_remove("query");
-        let (actual, wanted) = (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
+        let (actual, wanted) =
+            (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
         if actual != wanted {
             failures.push(format!(
                 "case {index} ({}): {}\n  python {}\n  rust   {}",
@@ -48,5 +51,11 @@ fn engine_resolves_as_python() {
             ));
         }
     }
-    assert!(failures.is_empty(), "{} of {} differ, first: {:#?}", failures.len(), cases.len(), &failures[..failures.len().min(4)]);
+    assert!(
+        failures.is_empty(),
+        "{} of {} differ, first: {:#?}",
+        failures.len(),
+        cases.len(),
+        &failures[..failures.len().min(4)]
+    );
 }

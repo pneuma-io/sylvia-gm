@@ -48,7 +48,17 @@ pub(crate) struct Shape {
 
 impl Shape {
     fn bounds(kind: ShapeKind, lower: V3, upper: V3) -> Self {
-        Self { kind, lower, upper, center: None, radius: None, axis: None, length: None, basis: None, half_extents: None }
+        Self {
+            kind,
+            lower,
+            upper,
+            center: None,
+            radius: None,
+            axis: None,
+            length: None,
+            basis: None,
+            half_extents: None,
+        }
     }
     fn center(&self) -> V3 {
         self.center.expect("a centred shape")
@@ -120,7 +130,8 @@ pub(crate) fn shape_from_payload(value: &Json) -> Shape {
     match kind_of(value) {
         "box" => Shape::bounds(ShapeKind::Box, vec3(&value["min"]), vec3(&value["max"])),
         "prism" => {
-            let (origin, direction, up) = (vec3(&value["origin"]), vec3(&value["direction"]), vec3(&value["up"]));
+            let (origin, direction, up) =
+                (vec3(&value["origin"]), vec3(&value["direction"]), vec3(&value["up"]));
             let magnitude = hypot(&direction);
             let axis = direction.map(|component| component / magnitude);
             let side = [
@@ -143,7 +154,12 @@ pub(crate) fn shape_from_payload(value: &Json) -> Shape {
             let extent = [0, 1, 2].map(|i| sum_floats((0..3).map(|j| basis[j][i].abs() * half_extents[j])));
             let lower = [0, 1, 2].map(|i| center[i] - extent[i]);
             let upper = [0, 1, 2].map(|i| center[i] + extent[i]);
-            Shape { center: Some(center), basis: Some(basis), half_extents: Some(half_extents), ..Shape::bounds(ShapeKind::Prism, lower, upper) }
+            Shape {
+                center: Some(center),
+                basis: Some(basis),
+                half_extents: Some(half_extents),
+                ..Shape::bounds(ShapeKind::Prism, lower, upper)
+            }
         }
         "cone" => {
             let (apex, direction) = (vec3(&value["apex"]), vec3(&value["direction"]));
@@ -261,7 +277,18 @@ pub(crate) fn compile(scene: &AdmittedSpatialScene) -> CompiledScene {
         terrain.insert(cell, num(&value["cost"]));
         terrain_costs.push(num(&value["cost"]));
     }
-    CompiledScene { admitted: scene.clone(), lower, upper, origin, cell_size, cell_counts, objects, zones, terrain, terrain_costs }
+    CompiledScene {
+        admitted: scene.clone(),
+        lower,
+        upper,
+        origin,
+        cell_size,
+        cell_counts,
+        objects,
+        zones,
+        terrain,
+        terrain_costs,
+    }
 }
 
 /// `math.floor(x)` as an integer.
@@ -293,7 +320,15 @@ fn supercover(scene: &CompiledScene, origin: V3, destination: V3) -> Json {
     let mut retained = vec![current];
     let mut seen = HashSet::from([current]);
     let (delta_x, delta_y) = (destination[0] - origin[0], destination[1] - origin[1]);
-    let sign = |delta: f64| if delta > 0.0 { 1 } else if delta < 0.0 { -1 } else { 0 };
+    let sign = |delta: f64| {
+        if delta > 0.0 {
+            1
+        } else if delta < 0.0 {
+            -1
+        } else {
+            0
+        }
+    };
     let (step_x, step_y) = (sign(delta_x), sign(delta_y));
     let start = |step: i64, index: i64, axis: usize, delta: f64| {
         if step == 0 {
@@ -566,7 +601,8 @@ fn target_samples(shape: &Shape, observer: V3, horizontal_count: i64, vertical_c
     if shape.kind == ShapeKind::Cylinder {
         let radius = shape.radius();
         let distance = hypot(&[delta_x, delta_y]);
-        let (normal_x, normal_y) = if distance > 0.0 { (delta_x / distance, delta_y / distance) } else { (1.0, 0.0) };
+        let (normal_x, normal_y) =
+            if distance > 0.0 { (delta_x / distance, delta_y / distance) } else { (1.0, 0.0) };
         let mut half_width = radius;
         if distance > radius {
             let ratio = radius / distance;
@@ -575,7 +611,10 @@ fn target_samples(shape: &Shape, observer: V3, horizontal_count: i64, vertical_c
         for index in 0..horizontal_count {
             let lateral = half_width * (2.0 * (index as f64 + 0.5) / count - 1.0);
             let near = max_first([0.0, radius * radius - lateral * lateral]).sqrt();
-            horizontal.push([center_x - near * normal_x - lateral * normal_y, center_y - near * normal_y + lateral * normal_x]);
+            horizontal.push([
+                center_x - near * normal_x - lateral * normal_y,
+                center_y - near * normal_y + lateral * normal_x,
+            ]);
         }
     } else {
         for index in 0..horizontal_count {
@@ -608,7 +647,9 @@ fn crosses_shape_interior(shape: &Shape, origin: V3, destination: V3) -> bool {
     }
     let midpoint = point_at(origin, delta, (interval.0 + interval.1) / 2.0);
     if shape.kind == ShapeKind::Box {
-        return (0..3).all(|axis| shape.lower[axis] + EPSILON < midpoint[axis] && midpoint[axis] < shape.upper[axis] - EPSILON);
+        return (0..3).all(|axis| {
+            shape.lower[axis] + EPSILON < midpoint[axis] && midpoint[axis] < shape.upper[axis] - EPSILON
+        });
     }
     let (center, radius) = (shape.center(), shape.radius());
     shape.lower[2] + EPSILON < midpoint[2]
@@ -689,8 +730,10 @@ fn resolve_exposure(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
 fn cell_span(scene: &CompiledScene, shape: &Shape) -> ((i64, i64), (i64, i64)) {
     let minimum_x = 0.max(floor((shape.lower[0] - scene.origin[0]) / scene.cell_size));
     let minimum_y = 0.max(floor((shape.lower[1] - scene.origin[1]) / scene.cell_size));
-    let maximum_x = (scene.cell_counts[0] - 1).min(ceil((shape.upper[0] - scene.origin[0]) / scene.cell_size) - 1);
-    let maximum_y = (scene.cell_counts[1] - 1).min(ceil((shape.upper[1] - scene.origin[1]) / scene.cell_size) - 1);
+    let maximum_x =
+        (scene.cell_counts[0] - 1).min(ceil((shape.upper[0] - scene.origin[0]) / scene.cell_size) - 1);
+    let maximum_y =
+        (scene.cell_counts[1] - 1).min(ceil((shape.upper[1] - scene.origin[1]) / scene.cell_size) - 1);
     ((minimum_x, maximum_x), (minimum_y, maximum_y))
 }
 
@@ -700,7 +743,12 @@ fn span_cells(span: ((i64, i64), (i64, i64))) -> impl Iterator<Item = Cell> {
 }
 
 /// `_blocked_cells(scene, include_entities, moving_entity_id, metadata_filter)`.
-fn blocked_cells(scene: &CompiledScene, include_entities: bool, moving: Option<&str>, selector: Option<&Json>) -> HashSet<Cell> {
+fn blocked_cells(
+    scene: &CompiledScene,
+    include_entities: bool,
+    moving: Option<&str>,
+    selector: Option<&Json>,
+) -> HashSet<Cell> {
     let mut blocked = HashSet::new();
     for item in &scene.objects {
         if !item.active
@@ -760,7 +808,9 @@ impl<'s> Clearance<'s> {
                 continue;
             }
             if let Some(moving) = moving {
-                if item.shape.upper[2] <= moving.shape.lower[2] + EPSILON || item.shape.lower[2] >= moving.shape.upper[2] - EPSILON {
+                if item.shape.upper[2] <= moving.shape.lower[2] + EPSILON
+                    || item.shape.lower[2] >= moving.shape.upper[2] - EPSILON
+                {
                     continue;
                 }
             }
@@ -792,20 +842,33 @@ impl<'s> Clearance<'s> {
         let half = self.half;
         for value in [origin, destination] {
             for axis in 0..2 {
-                if value[axis] - half[axis] < scene.lower[axis] - EPSILON || value[axis] + half[axis] > scene.upper[axis] + EPSILON {
+                if value[axis] - half[axis] < scene.lower[axis] - EPSILON
+                    || value[axis] + half[axis] > scene.upper[axis] + EPSILON
+                {
                     return false;
                 }
             }
         }
         let swept = Shape::bounds(
             ShapeKind::Box,
-            [min_first([origin[0], destination[0]]) - half[0], min_first([origin[1], destination[1]]) - half[1], scene.lower[2]],
-            [max_first([origin[0], destination[0]]) + half[0], max_first([origin[1], destination[1]]) + half[1], scene.upper[2]],
+            [
+                min_first([origin[0], destination[0]]) - half[0],
+                min_first([origin[1], destination[1]]) - half[1],
+                scene.lower[2],
+            ],
+            [
+                max_first([origin[0], destination[0]]) + half[0],
+                max_first([origin[1], destination[1]]) + half[1],
+                scene.upper[2],
+            ],
         );
         let mut edges: Vec<usize> = Vec::new();
         for (x, y) in span_cells(cell_span(scene, &swept)) {
             if self.blocked.contains(&(x, y)) {
-                let lower = [scene.origin[0] + x as f64 * scene.cell_size, scene.origin[1] + y as f64 * scene.cell_size];
+                let lower = [
+                    scene.origin[0] + x as f64 * scene.cell_size,
+                    scene.origin[1] + y as f64 * scene.cell_size,
+                ];
                 let upper = [lower[0] + scene.cell_size, lower[1] + scene.cell_size];
                 if swept_footprint_hits_box(origin, destination, lower, upper, half, self.radius) {
                     return false;
@@ -873,7 +936,9 @@ fn resolve_path(scene: &CompiledScene, query: &JsonMap) -> Resolved {
     let moving_id = query.get("moving_entity_id").and_then(Json::as_str);
     let mut moving = None;
     if let Some(id) = moving_id {
-        let Some(entity) = scene.objects.iter().find(|item| item.kind == "entity" && item.id == id && item.active) else {
+        let Some(entity) =
+            scene.objects.iter().find(|item| item.kind == "entity" && item.id == id && item.active)
+        else {
             return Err(SpatialValidationError {
                 message: "Moving entity is unavailable",
                 code: "spatial_query_invalid",
@@ -892,7 +957,11 @@ fn resolve_path(scene: &CompiledScene, query: &JsonMap) -> Resolved {
     let selector = query.get("metadata_filter");
     let blocked = blocked_cells(scene, query["include_entities"] == json!(true), moving_id, selector);
     let clearance = Clearance::new(scene, &blocked, moving, start, selector);
-    if blocked.contains(&start) || blocked.contains(&goal) || !clearance.clear(start, start) || !clearance.clear(goal, goal) {
+    if blocked.contains(&start)
+        || blocked.contains(&goal)
+        || !clearance.clear(start, start)
+        || !clearance.clear(goal, goal)
+    {
         return Ok(path_not_found(scene, 0, false));
     }
     let mut directions: Vec<(i64, i64, f64)> = vec![(-1, 0, 1.0), (0, -1, 1.0), (1, 0, 1.0), (0, 1, 1.0)];
@@ -903,7 +972,12 @@ fn resolve_path(scene: &CompiledScene, query: &JsonMap) -> Resolved {
     let mut costs: HashMap<Cell, f64> = HashMap::from([(start, 0.0)]);
     let mut parents: HashMap<Cell, Cell> = HashMap::new();
     let mut frontier = BinaryHeap::new();
-    frontier.push(Reverse((Key(heuristic(start, goal, allow_diagonal, minimum_cost)), Key(0.0), start.1, start.0)));
+    frontier.push(Reverse((
+        Key(heuristic(start, goal, allow_diagonal, minimum_cost)),
+        Key(0.0),
+        start.1,
+        start.0,
+    )));
     let mut expanded = 0i64;
     let maximum = int(&query["max_steps"]);
     let mut found = false;
@@ -929,7 +1003,8 @@ fn resolve_path(scene: &CompiledScene, query: &JsonMap) -> Resolved {
             if delta_x != 0
                 && delta_y != 0
                 && forbid_cutting
-                && (blocked.contains(&(current.0 + delta_x, current.1)) || blocked.contains(&(current.0, current.1 + delta_y)))
+                && (blocked.contains(&(current.0 + delta_x, current.1))
+                    || blocked.contains(&(current.0, current.1 + delta_y)))
             {
                 continue;
             }
@@ -1004,7 +1079,8 @@ fn resolve_zones(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
             cumulative += length;
         }
     }
-    candidates.sort_by(|a, b| clean(a.0).partial_cmp(&clean(b.0)).expect("finite").then_with(|| a.1.cmp(&b.1)));
+    candidates
+        .sort_by(|a, b| clean(a.0).partial_cmp(&clean(b.0)).expect("finite").then_with(|| a.1.cmp(&b.1)));
     let maximum = int(&query["max_crossings"]) as usize;
     with(
         provenance(scene, "crossed_zones"),
@@ -1042,7 +1118,10 @@ fn sphere_overlap(sphere: &Shape, body: &Shape) -> bool {
         hypot(&[gaps[0], gaps[1], vertical])
     } else {
         let body_center = body.center();
-        let horizontal = max_first([hypot(&[center[0] - body_center[0], center[1] - body_center[1]]) - body.radius(), 0.0]);
+        let horizontal = max_first([
+            hypot(&[center[0] - body_center[0], center[1] - body_center[1]]) - body.radius(),
+            0.0,
+        ]);
         hypot(&[horizontal, vertical])
     };
     distance <= sphere.radius() + EPSILON
@@ -1071,7 +1150,14 @@ fn cone_overlap(cone: &Shape, body: &Shape) -> Result<bool, SpatialValidationErr
     }
     let (apex, axis) = (cone.center(), cone.axis.expect("a cone axis"));
     let (length, radius) = (cone.length.expect("a cone length"), cone.radius());
-    let scale = max_first([length, radius, body.upper[0] - body.lower[0], body.upper[1] - body.lower[1], body.upper[2] - body.lower[2], 1.0]);
+    let scale = max_first([
+        length,
+        radius,
+        body.upper[0] - body.lower[0],
+        body.upper[1] - body.lower[1],
+        body.upper[2] - body.lower[2],
+        1.0,
+    ]);
     let lower = [0, 1, 2].map(|i| (body.lower[i] - apex[i]) / scale);
     let upper = [0, 1, 2].map(|i| (body.upper[i] - apex[i]) / scale);
     let base = axis.map(|component| component * length / scale);
@@ -1079,14 +1165,19 @@ fn cone_overlap(cone: &Shape, body: &Shape) -> Result<bool, SpatialValidationErr
         let axial = sum_floats((0..3).map(|i| direction[i] * axis[i]));
         let radial = [0, 1, 2].map(|i| direction[i] - axial * axis[i]);
         let magnitude = hypot(&radial);
-        let point = [0, 1, 2].map(|i| base[i] + if magnitude != 0.0 { radius / scale * radial[i] / magnitude } else { 0.0 });
+        let point = [0, 1, 2]
+            .map(|i| base[i] + if magnitude != 0.0 { radius / scale * radial[i] / magnitude } else { 0.0 });
         if sum_floats((0..3).map(|i| point[i] * direction[i])) > 0.0 {
             point
         } else {
             [0.0; 3]
         }
     };
-    convex_overlap(cone_support, |direction| body_support(body, apex, scale, lower, upper, direction), max_first([1e-12, 1e-9 / scale]))
+    convex_overlap(
+        cone_support,
+        |direction| body_support(body, apex, scale, lower, upper, direction),
+        max_first([1e-12, 1e-9 / scale]),
+    )
 }
 
 /// `_prism_overlap(prism, body)`.
@@ -1127,7 +1218,11 @@ fn prism_overlap(prism: &Shape, body: &Shape) -> Result<bool, SpatialValidationE
         });
         [0, 1, 2].map(|i| sum_floats((0..3).map(|j| signed[j] * basis[j][i])))
     };
-    convex_overlap(prism_support, |direction| body_support(body, center, scale, lower, upper, direction), max_first([1e-12, 1e-9 / scale]))
+    convex_overlap(
+        prism_support,
+        |direction| body_support(body, center, scale, lower, upper, direction),
+        max_first([1e-12, 1e-9 / scale]),
+    )
 }
 
 /// `_overlap(first, second)`.
@@ -1158,7 +1253,11 @@ fn resolve_area(scene: &CompiledScene, query: &JsonMap) -> Resolved {
         if !include.contains(&plural(item.kind)) || !item.active || !overlap(&area, &item.shape)? {
             continue;
         }
-        retained.push((item.kind, item.id.clone(), json!({"kind": item.kind, "id": item.id, "metadata": item.metadata})));
+        retained.push((
+            item.kind,
+            item.id.clone(),
+            json!({"kind": item.kind, "id": item.id, "metadata": item.metadata}),
+        ));
     }
     retained.sort_by(|a, b| (a.0, &a.1).cmp(&(b.0, &b.1)));
     let maximum = int(&query["max_results"]) as usize;
@@ -1195,7 +1294,14 @@ fn segment_enters_solid_box(origin: V3, destination: V3, lower: V3, upper: V3) -
 }
 
 /// `_sweep_enters_solid(mover, solid, origin, destination, half, height)`.
-fn sweep_enters_solid(mover: &Shape, solid: &Shape, origin: V3, destination: V3, half: V2, height: f64) -> bool {
+fn sweep_enters_solid(
+    mover: &Shape,
+    solid: &Shape,
+    origin: V3,
+    destination: V3,
+    half: V2,
+    height: f64,
+) -> bool {
     let (lower_z, upper_z) = (solid.lower[2] - height, solid.upper[2]);
     if mover.kind == ShapeKind::Box && solid.kind == ShapeKind::Box {
         return segment_enters_solid_box(
@@ -1226,7 +1332,11 @@ fn sweep_enters_solid(mover: &Shape, solid: &Shape, origin: V3, destination: V3,
     } else {
         let center = solid.center();
         if mover.kind == ShapeKind::Box {
-            ([center[0] - half[0], center[1] - half[1]], [center[0] + half[0], center[1] + half[1]], solid.radius())
+            (
+                [center[0] - half[0], center[1] - half[1]],
+                [center[0] + half[0], center[1] + half[1]],
+                solid.radius(),
+            )
         } else {
             ([center[0], center[1]], [center[0], center[1]], solid.radius() + mover.radius())
         }
@@ -1247,7 +1357,8 @@ fn entity_row<'p>(scene: &'p CompiledScene, id: &str) -> &'p Json {
 fn resolve_body_proximity(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
     let moving = entity_row(scene, query["moving_entity_id"].as_str().unwrap());
     let fixed = entity_row(scene, query["fixed_entity_id"].as_str().unwrap());
-    let (origin, destination, center) = (vec3(&moving["position"]), vec3(&query["destination"]), vec3(&fixed["position"]));
+    let (origin, destination, center) =
+        (vec3(&moving["position"]), vec3(&query["destination"]), vec3(&fixed["position"]));
     let mut half = [0.0, 0.0];
     let mut rounding = 0.0;
     for row in [moving, fixed] {
@@ -1428,7 +1539,9 @@ fn sweep(scene: &CompiledScene, query: &SweepQuery<'_>, start: Option<V3>) -> Js
             item.active
                 && item.movement == "blocking"
                 && (item.kind != "entity"
-                    || (query.include_entities && item.id != query.moving && !query.excluded.contains(&item.id.as_str())))
+                    || (query.include_entities
+                        && item.id != query.moving
+                        && !query.excluded.contains(&item.id.as_str())))
                 && matches_metadata(item, Some(query.selector))
         })
         .collect();
@@ -1442,7 +1555,10 @@ fn sweep(scene: &CompiledScene, query: &SweepQuery<'_>, start: Option<V3>) -> Js
     let (offset_lower, offset_upper) = ([-half[0], -half[1], 0.0], [half[0], half[1], height]);
     let lower = [0, 1, 2].map(|i| scene.lower[i] - offset_lower[i]);
     let upper = [0, 1, 2].map(|i| scene.upper[i] - offset_upper[i]);
-    if [origin, destination].iter().any(|point| (0..3).any(|i| !(lower[i] <= point[i] && point[i] <= upper[i]))) {
+    if [origin, destination]
+        .iter()
+        .any(|point| (0..3).any(|i| !(lower[i] <= point[i] && point[i] <= upper[i])))
+    {
         return result;
     }
     let mut blockers: Vec<(&str, &str)> = selected
@@ -1543,7 +1659,9 @@ fn resolve_circle_route(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
         true
     };
     if clear(origin, destination) {
-        return outcome(json!({"found": true, "points": [origin, destination], "distance": clean(dist(&origin, &destination))}));
+        return outcome(
+            json!({"found": true, "points": [origin, destination], "distance": clean(dist(&origin, &destination))}),
+        );
     }
     let blocking: Vec<&Json> = circles.iter().filter(|circle| circle["blocking"] == json!(true)).collect();
     if blocking.len() > 16 {
@@ -1578,7 +1696,9 @@ fn resolve_circle_route(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
             }
         }
         let vertices: Vec<(f64, f64)> = if normals.len() == 16 {
-            (0..16).map(|index| (f64::from(index * 2 + 1) * pi / 16.0, occupied_radius / cos(pi / 16.0))).collect()
+            (0..16)
+                .map(|index| (f64::from(index * 2 + 1) * pi / 16.0, occupied_radius / cos(pi / 16.0)))
+                .collect()
         } else {
             normals.sort_by(|a, b| a.partial_cmp(b).expect("finite angles"));
             let mut following: Vec<f64> = normals[1..].to_vec();
@@ -1586,7 +1706,9 @@ fn resolve_circle_route(scene: &CompiledScene, query: &JsonMap) -> JsonMap {
             normals
                 .iter()
                 .zip(&following)
-                .map(|(first, second)| ((first + second) / 2.0, occupied_radius / cos((second - first) / 2.0)))
+                .map(|(first, second)| {
+                    ((first + second) / 2.0, occupied_radius / cos((second - first) / 2.0))
+                })
                 .collect()
         };
         for (angle, radius) in vertices {
