@@ -158,3 +158,111 @@ async fn guided_interview_answers_match_python() {
     let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
     assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
 }
+
+fn basis_json(basis: &sylvia_domain::authority::CampaignConstructionBasis) -> Json {
+    json!({
+        "campaign_id": basis.campaign_id, "display_name": basis.display_name, "lane": basis.lane,
+        "canonical_input": basis.canonical_input, "canonical_plan": basis.canonical_plan,
+        "authority_turn_id": basis.authority_turn_id, "package_lock_id": basis.package_lock_id,
+        "package_candidate_id": basis.package_candidate_id, "builder_session_id": basis.builder_session_id,
+        "begin_revision": basis.begin_revision, "completion_revision": basis.completion_revision,
+        "canonical_representation_sha256": basis.canonical_representation_sha256,
+    })
+}
+
+async fn start_step(
+    handle: &StoreHandle,
+    op: &Json,
+    campaigns: &mut std::collections::HashMap<String, String>,
+) -> StoreResult<Json> {
+    let key = op["campaign"].as_str().unwrap_or_default();
+    let campaign = campaigns.get(key).cloned().unwrap_or_else(|| key.to_owned());
+    match text(op, "op") {
+        "create_guided_campaign_draft" => {
+            let value = run(handle, op).await?;
+            campaigns.insert(
+                text(op, "operation_id").to_owned(),
+                value["campaign_id"].as_str().unwrap().to_owned(),
+            );
+            Ok(value)
+        }
+        "advance_guided_campaign_draft" => {
+            let mut step = op.clone();
+            step["campaign_id"] = Json::String(campaign);
+            advance(handle, &step, "").await
+        }
+        "append_agent_message" => {
+            let message = handle
+                .append_agent_message(
+                    text(op, "session_id"),
+                    text(op, "message_id"),
+                    sylvia_domain::session::SessionMessageKind::User,
+                    op["content"].as_object().unwrap(),
+                )
+                .await?;
+            Ok(json!({"message_id": message.message_id(), "sequence": message.sequence()}))
+        }
+        "bind_guided_campaign_basis" => {
+            let lock = sylvia_domain::authority::PackageLock::new(Vec::new()).unwrap();
+            let confirmation = handle
+                .bind_guided_campaign_basis(&sylvia_store::guided_start::BindRequest {
+                    operation_id: text(op, "operation_id"),
+                    campaign_id: &campaign,
+                    display_name: text(op, "display_name"),
+                    package_lock: &lock,
+                    turn_id: text(op, "turn_id"),
+                    builder_session_id: text(op, "builder_session_id"),
+                    package_candidate_id: None,
+                })
+                .await?;
+            Ok(
+                json!({"campaign_id": confirmation.campaign_id, "resulting_revision": confirmation.resulting_revision}),
+            )
+        }
+        "begin_campaign_construction" => {
+            let begun = handle
+                .begin_campaign_construction(
+                    text(op, "operation_id"),
+                    &campaign,
+                    text(op, "lane"),
+                    op["expected_revision"].as_i64().unwrap(),
+                    &op["canonical_input"],
+                )
+                .await?;
+            Ok(
+                json!({"campaign_id": begun.campaign_id, "lane": begun.lane, "resulting_revision": begun.resulting_revision}),
+            )
+        }
+        "campaign_construction_basis" => {
+            Ok(basis_json(&handle.campaign_construction_basis(&campaign).await?))
+        }
+        other => panic!("unknown operation {other}"),
+    }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn guided_start_matches_python() {
+    let record = common::read_json("tests/vectors/guided/start_runs.json");
+    let folder = common::work_folder("guided-start-runs");
+    let database = folder.join("authority.sqlite3");
+    std::fs::write(&database, gunzip("seed")).unwrap();
+    let path = database.clone();
+    let (handle, thread) =
+        StoreHandle::spawn(move || AuthorityStore::open_for_application_owner(&path, None)).unwrap();
+    let mut campaigns = std::collections::HashMap::new();
+    let operations = record["operations"].as_array().unwrap();
+    for (index, (op, want)) in operations.iter().zip(record["outcomes"].as_array().unwrap()).enumerate() {
+        let outcome = start_step(&handle, op, &mut campaigns).await;
+        check(&format!("#{index} {} {}", op["op"], op["operation_id"]), outcome, want);
+    }
+    drop(handle);
+    tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+    let rules = sylvia_compare::diff::Rules::defaults();
+    let python = folder.join("python.sqlite3");
+    std::fs::write(&python, gunzip("start_runs")).unwrap();
+    let dump = |path: &Path| {
+        sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
+    };
+    let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
+    assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
+}

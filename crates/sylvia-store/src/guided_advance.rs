@@ -292,7 +292,11 @@ pub struct AdvanceAnswer<'a> {
 impl StoreHandle {
     /// `AuthorityOwner._guided_answer_value(session_id, step)`: one accepted Interview answer from
     /// its canonical User message, as the latest Interview State names it.
-    async fn guided_answer_value(&self, session_id: &str, step: &str) -> StoreResult<Option<JsonMap>> {
+    pub(crate) async fn guided_answer_value(
+        &self,
+        session_id: &str,
+        step: &str,
+    ) -> StoreResult<Option<JsonMap>> {
         let session = session_id.to_owned();
         let context = self.call(move |store| store.session_context(&session)).await?;
         let Some(state) = context.messages.iter().rev().find(|message| {

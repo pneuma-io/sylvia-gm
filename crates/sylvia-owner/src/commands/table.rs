@@ -121,7 +121,7 @@ pub const REGISTRY: &[Command] = &[
     pending("confirm_character_card_import", "packages", true, true),
     pending("preview_character_card_file", "packages", false, true),
     pending("install_package_file", "packages", false, true),
-    pending("start_guided_campaign", "campaigns", true, true),
+    ported("start_guided_campaign", "campaigns", true, true),
     ported("create_guided_campaign_draft", "campaigns", true, true),
     pending("navigate_guided_campaign_draft", "campaigns", true, true),
     ported("advance_guided_campaign_draft", "campaigns", true, true),

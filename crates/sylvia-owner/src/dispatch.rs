@@ -142,6 +142,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "advance_guided_campaign_draft" => {
             commands::campaigns::handle_advance_guided_campaign_draft(context, params).await
         }
+        "start_guided_campaign" => commands::campaigns::handle_start_guided_campaign(context, params).await,
         "create_guided_campaign_draft" => {
             commands::campaigns::handle_create_guided_campaign_draft(context, params).await
         }
