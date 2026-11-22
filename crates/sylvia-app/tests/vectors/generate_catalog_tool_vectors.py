@@ -126,7 +126,7 @@ METADATA = [
     {"model_behavior": {"kind": "optional", "state_predicates": [{"namespace": "x"}]}},
     {"model_behavior": {"state_predicates": []}},
     {"result_card": {"title": "  Draw a tile  "}}, {"result_card": {"title": ""}}, {"result_card": {"title": "x" * 256}},
-    {"result_card": {"title": "é" * 257}}, {"result_card": {"title": 5}}, {"result_card": "Title"},
+    {"result_card": {"title": "é" * 256}}, {"result_card": {"title": "é" * 257}},{"result_card": {"title": 5}}, {"result_card": "Title"},
     {"player_controls": {"kind": "panel"}}, {"player_controls": None}, {"player_controls": "x"},
 ]
 
