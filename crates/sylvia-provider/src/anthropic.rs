@@ -427,7 +427,7 @@ static EMPTY: Json = Json::String(String::new());
 static NONE: Json = Json::Null;
 
 /// The refusal for a usage count Python would carry as a float or add as text (differences
-/// row NEXT, Anthropic values that are not integers or text).
+/// row 42, Anthropic values that are not integers or text).
 pub const NON_INTEGER_COUNT: &str = "Anthropic usage count is not an integer";
 /// The refusal for a streamed block index that is not an integer (the same row).
 pub const NON_INTEGER_INDEX: &str = "Anthropic stream block index is not an integer";
