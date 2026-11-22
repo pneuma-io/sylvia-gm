@@ -31,12 +31,12 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/plan_bundle.py:119` | `_read_bundle` | re.fullmatch; plain | `or re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", identity) is None` | |
 | `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` | |
 | `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` | |
-| `application/reusable_plans.py:94` | `_strip_section` | re.compile; pattern built at run time, check by hand | `pattern = re.compile( rf"\n+## {re.escape(heading)}\s*\n.*?(?=\n## \|\Z)", flags=re.DOTALL, )` | |
-| `application/reusable_plans.py:325` | `save_reusable_rift_plan` | re.sub; plain | `markdown = re.sub(r"^# .*?$", f"# {title}", markdown, count=1, flags=re.MULTILINE)` | |
-| `application/reusable_plans.py:355` | `load_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", artifact_id) is None:` | |
-| `application/reusable_plans.py:415` | `load_reusable_campaign_plan` | re.fullmatch; plain | `if not isinstance(raw_snapshot_sha256, str) or re.fullmatch( r"[0-9a-f]{64}", raw_snapshot_sha256 ) is None:` | |
-| `application/reusable_plans.py:542` | `delete_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", artifact_id) is None:` | |
-| `application/reusable_plans.py:544` | `delete_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` | |
+| `application/reusable_plans.py:94` | `_strip_section` | re.compile; pattern built at run time, check by hand | `pattern = re.compile( rf"\n+## {re.escape(heading)}\s*\n.*?(?=\n## \|\Z)", flags=re.DOTALL, )` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:325` | `save_reusable_rift_plan` | re.sub; plain | `markdown = re.sub(r"^# .*?$", f"# {title}", markdown, count=1, flags=re.MULTILINE)` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:355` | `load_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", artifact_id) is None:` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:415` | `load_reusable_campaign_plan` | re.fullmatch; plain | `if not isinstance(raw_snapshot_sha256, str) or re.fullmatch( r"[0-9a-f]{64}", raw_snapshot_sha256 ) is None:` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:542` | `delete_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", artifact_id) is None:` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:544` | `delete_reusable_campaign_plan` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` |  `sylvia-app` reusable_plan_vectors |
 | `builder/_interview_extractor.py:289` | `InterviewExtractor._parse_and_validate` | re.search; plain | `match = re.search(r''''(?:json)?\s*([\s\S]*?)\s*'''', content)` | |
 | `campaign/_folder.py:25` | `<module>` | re.compile; plain | `_CAMPAIGN_ID_RE = re.compile(r"^[a-z0-9]([a-z0-9-]*[a-z0-9])?$")` | |
 | `campaign/_folder.py:266` | `_derive_campaign_slug` | re.sub; plain | `slug = re.sub(r"[^a-z0-9]+", "-", slug)` | |
