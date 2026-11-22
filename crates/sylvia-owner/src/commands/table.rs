@@ -124,7 +124,7 @@ pub const REGISTRY: &[Command] = &[
     pending("start_guided_campaign", "campaigns", true, true),
     ported("create_guided_campaign_draft", "campaigns", true, true),
     pending("navigate_guided_campaign_draft", "campaigns", true, true),
-    pending("advance_guided_campaign_draft", "campaigns", true, true),
+    ported("advance_guided_campaign_draft", "campaigns", true, true),
     pending("guided_campaign_contribution", "campaigns", true, true),
     pending("save_reusable_campaign_plan", "campaigns", true, true),
     pending("start_guided_creation_subflow", "campaigns", true, true),

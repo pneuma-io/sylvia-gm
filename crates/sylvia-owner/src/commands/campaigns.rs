@@ -58,6 +58,53 @@ pub async fn handle_create_guided_campaign_draft(
     Ok(guided_draft_value(&draft))
 }
 
+/// `handle_advance_guided_campaign_draft`: one Campaign Interview answer, which must be an
+/// object, then the application's advance.
+pub async fn handle_advance_guided_campaign_draft(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> CodedResult<Json> {
+    let answer = match params.get("answer") {
+        Some(answer @ Json::Object(_)) => answer,
+        _ => return Err(protocol("answer must be an object")),
+    };
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let builder_session_id = required(params, "builder_session_id")?;
+    let expected_construction_revision = required_nonnegative_int(params, "expected_construction_revision")?;
+    let current_step = required(params, "current_step")?;
+    let visible_answer = required(params, "visible_answer")?;
+    let draft = ctx
+        .store
+        .advance_guided_campaign_draft(&sylvia_store::guided_advance::AdvanceAnswer {
+            operation_id: &operation_id,
+            campaign_id: &campaign_id,
+            builder_session_id: &builder_session_id,
+            expected_construction_revision,
+            current_step: &current_step,
+            visible_answer: &visible_answer,
+            answer,
+        })
+        .await
+        .map_err(store_error)?;
+    Ok(guided_draft_value(&draft))
+}
+
+/// `_required_nonnegative_int(payload, key)`: an integer, not a bool, at least zero. An integer
+/// beyond 64 bits, which Python would take, is refused as a declared limit.
+fn required_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<i64> {
+    match params.get(key) {
+        Some(Json::Number(number)) if number.as_i64().is_some_and(|value| value >= 0) => {
+            Ok(number.as_i64().unwrap_or_default())
+        }
+        Some(Json::Number(number)) if number.is_u64() => Err(sylvia_base::CodedError::new(
+            "internal_error",
+            format!("{key} is beyond the Rust owner's 64-bit integer limit"),
+        )),
+        _ => Err(protocol(&format!("{key} must be a nonnegative integer"))),
+    }
+}
+
 /// The reply of the guided Draft commands: the Draft's fields Python's handler lists.
 fn guided_draft_value(draft: &sylvia_domain::authority::GuidedCampaignDraft) -> Json {
     let mut value = JsonMap::new();
