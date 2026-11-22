@@ -113,7 +113,7 @@ fn row_one() -> Json {
 fn repository_archives_admit_like_python() {
     let vectors = vectors();
     let cases = vectors["repository"].as_array().unwrap();
-    assert_eq!(cases.len(), 30);
+    assert_eq!(cases.len(), 31);
     let mut failures = Vec::new();
     for case in cases {
         let path = case["path"].as_str().unwrap();
