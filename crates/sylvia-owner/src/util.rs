@@ -66,6 +66,13 @@ pub fn path_name(path: &Path) -> String {
     }
 }
 
+/// The source checkout the owner runs from: the repository root, two levels above this crate.
+/// The bundled package sources and other shipped files are found under it. Packaging replaces it
+/// with the installed resource root.
+pub fn source_root() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("..")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

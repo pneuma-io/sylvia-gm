@@ -1,10 +1,10 @@
-"""Run the four guided generators in their order: draft, advance, start, finalize.
+"""Run the guided generators in their order: draft, advance, start, finalize, ruleset.
 
 Run with the snapshot's own interpreter, from the repository root:
 
     .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_guided_all.py
 
-The draft generator writes the new profile (`guided/seed.sqlite3.gz`) the other three start from,
+The draft generator writes the new profile (`guided/seed.sqlite3.gz`) the others start from,
 so it runs first. Each runs in its own interpreter, with this one's flags, as when run alone.
 Reference tooling only.
 """
@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ORDER = ("draft", "advance", "start", "finalize")
+ORDER = ("draft", "advance", "start", "finalize", "ruleset")
 
 
 def main() -> int:

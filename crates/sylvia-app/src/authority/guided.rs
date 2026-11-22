@@ -8,16 +8,23 @@
 //! payload identities it computes, then the store operation in `sylvia-store` (`guided`,
 //! `guided_advance`, `guided_start`, `guided_finalize`) that commits them.
 //!
-//! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently:
-//! - the `plan` and `*_contribution` Interview steps, and binding an installed Ruleset, which need
-//!   lane 1's `interview_content` (`_guided_contribution_object`, `_validate_campaign_inputs`);
-//! - finalizing a construction that is not a guided Interview, and a Ruleset with required
-//!   starting state (lane 1's `plan_state_admission`).
+//! Interview Contributions are resolved with lane 1's `interview_content`
+//! (`resolve_interview_content`, on the store as its `InterviewOwner`) and required starting
+//! state is checked with its `plan_state_admission`. Lane 1 answers `rust_port_pending` for the
+//! Plan and bundled-snapshot branches it has not ported, and that answer passes through.
+//!
+//! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently: finalizing a
+//! construction that is not a guided Interview, and binding participants or initial state (only
+//! a saved-library Start supplies them).
 //!
 //! Python's owner never gives its `AuthorityOwner` a model capability registry, so guidance is
 //! assessed against the empty one (`EMPTY_MODEL_CAPABILITY_REGISTRY`).
 
+use crate::bundled_packages::BundledPackages;
+use crate::interview_content::{require_active_ruleset, resolve_interview_content, InterviewOwner};
+use crate::plan_state_admission::validate_plan_state;
 use std::collections::BTreeSet;
+use std::sync::Arc;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
@@ -28,9 +35,14 @@ use sylvia_domain::authority::{
 use sylvia_domain::campaign_plan::{
     validate_campaign_plan, CampaignPlanExpectations, CAMPAIGN_PLAN_FORMAT_VERSION,
 };
+use sylvia_domain::interview_contribution::{
+    parse_interview_contribution_bytes, validate_interview_contribution_answers, InterviewContribution,
+    INTERVIEW_CONTRIBUTION_BYTE_LIMIT, INTERVIEW_CONTRIBUTION_PATH,
+};
 use sylvia_domain::model_capability::{
     model_guidance_payload_sha256, ModelCapabilityRegistry, ModelGuidanceDecision,
 };
+use sylvia_domain::package_library::PackageCandidate;
 use sylvia_domain::package_library::{campaign_setting_entries, canonical_json_bytes, PackageLockRecord};
 use sylvia_domain::pyops::py_eq;
 use sylvia_domain::session::{
@@ -39,6 +51,7 @@ use sylvia_domain::session::{
     PlanAcceptanceStatus, PlanValidationOutcome, SessionMessageKind, SessionRecord, SessionRecordFields,
     SessionStatus,
 };
+use sylvia_domain::DomainError;
 use sylvia_store::campaigns::current_lock_record;
 use sylvia_store::guided_advance::AdvanceDraft;
 use sylvia_store::guided_finalize::GuidedStartCommit;
@@ -272,14 +285,15 @@ async fn guided_answer_value(
     })
 }
 
-/// `AuthorityOwner._next_guided_question`: No Ruleset skips the content steps; other steps
-/// follow in order. Steps that need an Interview Contribution are not ported yet.
+/// `AuthorityOwner._next_guided_question`: choose content first, then ask required questions
+/// from its saved copies. No Ruleset skips the content steps; other steps follow in order.
 async fn next_guided_question(
     store: &StoreHandle,
+    bundled: &Arc<BundledPackages>,
     session_id: &str,
     current_step: &str,
     answer: &JsonMap,
-) -> StoreResult<(&'static str, &'static str)> {
+) -> StoreResult<(&'static str, String)> {
     let ruleset_answer = if current_step == "ruleset" {
         Some(answer.clone())
     } else {
@@ -288,26 +302,225 @@ async fn next_guided_question(
     if let Some(ruleset) = &ruleset_answer {
         if matches!(ruleset.get("candidate_id"), None | Some(Json::Null)) {
             if current_step == "ruleset" {
-                return Ok(("name", guided_question("name")));
+                return Ok(("name", guided_question("name").to_owned()));
             }
             if current_step == "name" {
-                return Ok(("boundaries_preferences", guided_question("boundaries_preferences")));
+                return Ok(("boundaries_preferences", guided_question("boundaries_preferences").to_owned()));
             }
         }
     }
     if needs_contribution(current_step) {
-        return Err(StoreError::NotPorted(
-            "Campaign Interview Contribution steps (_guided_contribution_object)",
-        ));
+        let mut overrides = JsonMap::new();
+        overrides.insert(current_step.to_owned(), Json::Object(answer.clone()));
+        for required_step in ["ruleset", "setting", "plan"] {
+            if !overrides.contains_key(required_step)
+                && guided_answer_value(store, session_id, required_step).await?.is_none()
+            {
+                return Ok((required_step, guided_question(required_step).to_owned()));
+            }
+        }
+        for step in GUIDED_CONTRIBUTION_STEPS {
+            let Some(contribution) =
+                guided_contribution_object(store, bundled, session_id, step, Some(&overrides)).await?
+            else {
+                continue;
+            };
+            // Later answers are detached by this save, including on an exact retry.
+            let precedes_current = step_index(step) < step_index(current_step);
+            let previous = if step == current_step {
+                Some(answer.clone())
+            } else if precedes_current {
+                guided_answer_value(store, session_id, step).await?
+            } else {
+                None
+            };
+            let expected = canonical_sha256(&Json::Object(contribution.as_payload()));
+            if let Some(previous) = previous {
+                if previous.get("contribution_sha256") == Some(&Json::String(expected)) {
+                    let answers: JsonMap =
+                        previous.into_iter().filter(|(key, _)| key != "contribution_sha256").collect();
+                    if validate_interview_contribution_answers(&contribution, &Json::Object(answers)).is_ok()
+                    {
+                        continue;
+                    }
+                }
+            }
+            return Ok((step, contribution.question_text()));
+        }
+        return Ok(("name", guided_question("name").to_owned()));
     }
     let step = GUIDED_CAMPAIGN_STEPS[step_index(current_step) + 1];
-    Ok((step, guided_question(step)))
+    Ok((step, guided_question(step).to_owned()))
+}
+
+/// The store as lane 1's `InterviewOwner`: `AuthorityOwner.package_candidate` and
+/// `package_candidates`. A store failure keeps Python's class, code and message.
+struct StoreInterviewOwner<'a>(&'a sylvia_store::AuthorityStore);
+
+fn domain_error(error: StoreError) -> DomainError {
+    match error.rejection() {
+        Some(coded) if coded.error_type == Some("ValueError") => DomainError::value(coded.message),
+        Some(coded) if matches!(coded.error_type, None | Some("CommandRejected")) => {
+            DomainError::command_rejected_with(coded.message, coded.code, Vec::new())
+        }
+        Some(coded) => DomainError::uncaught(coded.error_type.unwrap_or("RuntimeError"), coded.message),
+        None => DomainError::uncaught("RuntimeError", error.to_string()),
+    }
+}
+
+impl InterviewOwner for StoreInterviewOwner<'_> {
+    fn package_candidate(&self, candidate_id: &str) -> sylvia_domain::DomainResult<PackageCandidate> {
+        self.0.package_candidate(candidate_id).map_err(domain_error)
+    }
+
+    fn package_candidates(&self) -> sylvia_domain::DomainResult<Vec<PackageCandidate>> {
+        self.0.package_candidates().map_err(domain_error)
+    }
+}
+
+/// `_GUIDED_CONTRIBUTION_STEPS[step][1]`: the owner kind a Contribution step reads.
+fn contribution_owner_kind(step: &str) -> &'static str {
+    match step {
+        "ruleset_contribution" => "ruleset",
+        "setting_contribution" => "campaign_setting",
+        _ => "campaign_plan",
+    }
+}
+
+fn is_candidate_unavailable(error: &StoreError) -> bool {
+    error.rejection().is_some_and(|coded| {
+        coded.error_type == Some("CommandRejected") && coded.code == "candidate_unavailable"
+    })
+}
+
+/// `AuthorityOwner._package_interview_contribution`: one hash-listed package sidecar, failing
+/// closed when it is malformed.
+async fn package_interview_contribution(
+    store: &StoreHandle,
+    candidate_id: &str,
+    owner_kind: &'static str,
+    package_id: Option<&str>,
+) -> StoreResult<Option<InterviewContribution>> {
+    let id = candidate_id.to_owned();
+    let candidate = match store.call(move |store| store.package_candidate(&id)).await {
+        Ok(candidate) => candidate,
+        Err(error) if is_candidate_unavailable(&error) => return Ok(None),
+        Err(error) => return Err(error),
+    };
+    let entries: Vec<_> = candidate
+        .package_lock()
+        .entries()
+        .iter()
+        .filter(|entry| {
+            (owner_kind == "ruleset" && entry.role() == PackageRole::Primary)
+                || (owner_kind == "campaign_setting" && Some(entry.package_id()) == package_id)
+        })
+        .collect();
+    let [entry] = entries.as_slice() else { return Ok(None) };
+    let (package, version, sha256) =
+        (entry.package_id().to_owned(), entry.version().to_owned(), entry.sha256().to_owned());
+    let paths = store.package_file_paths(&package, &version, &sha256, 4_096).await?;
+    if !paths.iter().any(|path| path == INTERVIEW_CONTRIBUTION_PATH) {
+        return Ok(None);
+    }
+    let raw = store
+        .call(move |store| {
+            store.package_file_bytes(
+                &package,
+                &version,
+                &sha256,
+                INTERVIEW_CONTRIBUTION_PATH,
+                INTERVIEW_CONTRIBUTION_BYTE_LIMIT as i64,
+            )
+        })
+        .await?;
+    let Some(raw) = raw else {
+        return Err(rejected(
+            "Selected artifact Interview Contribution is unavailable",
+            "interview_contribution_unavailable",
+        ));
+    };
+    match parse_interview_contribution_bytes(&raw, owner_kind) {
+        Ok(contribution) => Ok(Some(contribution)),
+        // Python catches `ValueError` here, `ContentShapeError` among them.
+        Err(error) if error.rejection().is_some_and(|coded| coded.error_type != Some("CommandRejected")) => {
+            Err(rejected(
+                &format!("Selected {} Interview Contribution is invalid", owner_kind.replace('_', " ")),
+                "invalid_interview_contribution",
+            ))
+        }
+        Err(error) => Err(error.into()),
+    }
+}
+
+/// `AuthorityOwner.guided_campaign_contribution`: the exact selected artifact's optional
+/// restricted question group, resolved by lane 1's `resolve_interview_content`.
+async fn guided_campaign_contribution(
+    store: &StoreHandle,
+    bundled: &Arc<BundledPackages>,
+    session_id: &str,
+    contribution_step: &str,
+    overrides: Option<&JsonMap>,
+) -> StoreResult<Option<Json>> {
+    if !GUIDED_CONTRIBUTION_STEPS.contains(&contribution_step) {
+        return Err(rejected("Campaign Interview Contribution step is unsupported", "command_rejected"));
+    }
+    let owner_kind = contribution_owner_kind(contribution_step);
+    let mut selections = JsonMap::new();
+    for step in ["ruleset", "setting", "plan"] {
+        if let Some(value) = guided_answer_value(store, session_id, step).await? {
+            selections.insert(step.to_owned(), Json::Object(value));
+        }
+    }
+    for (key, value) in overrides.into_iter().flatten() {
+        selections.insert(key.clone(), value.clone());
+    }
+    let bundled = Arc::clone(bundled);
+    let content = store
+        .call(move |store| {
+            // Python's owner has no content storage root (`local_owner` never passes one).
+            resolve_interview_content(&StoreInterviewOwner(store), &bundled, None, &Json::Object(selections))
+                .map_err(StoreError::from)
+        })
+        .await?;
+    if owner_kind == "campaign_plan" {
+        return Ok(content.plan_contribution);
+    }
+    let Some(candidate) = content.candidate else { return Ok(None) };
+    let contribution = package_interview_contribution(
+        store,
+        candidate.candidate_id(),
+        owner_kind,
+        content.setting_id.as_deref(),
+    )
+    .await?;
+    Ok(contribution.map(|contribution| Json::Object(contribution.as_payload())))
+}
+
+/// `AuthorityOwner._guided_contribution_object`: the contribution, parsed for its owner kind.
+async fn guided_contribution_object(
+    store: &StoreHandle,
+    bundled: &Arc<BundledPackages>,
+    session_id: &str,
+    contribution_step: &str,
+    overrides: Option<&JsonMap>,
+) -> StoreResult<Option<InterviewContribution>> {
+    let Some(payload) =
+        guided_campaign_contribution(store, bundled, session_id, contribution_step, overrides).await?
+    else {
+        return Ok(None);
+    };
+    Ok(Some(parse_interview_contribution_bytes(
+        &canonical_json_bytes(&payload),
+        contribution_owner_kind(contribution_step),
+    )?))
 }
 
 /// `AuthorityOwner.advance_guided_campaign_draft`: `_operation()` and the campaign's work,
 /// the answer checks, the next question, then the store's advance.
 pub async fn advance_guided_campaign_draft(
     store: &StoreHandle,
+    bundled: &Arc<BundledPackages>,
     advance: &AdvanceAnswer<'_>,
 ) -> StoreResult<GuidedCampaignDraft> {
     let _work = campaign_work(store, advance.campaign_id).await?;
@@ -329,15 +542,39 @@ pub async fn advance_guided_campaign_draft(
     {
         return Err(invalid());
     }
-    let captured = owned_payload(advance.answer).map_err(|_| invalid())?;
+    let mut captured = owned_payload(advance.answer).map_err(|_| invalid())?;
     if GUIDED_CONTRIBUTION_STEPS.contains(&advance.current_step) {
-        return Err(StoreError::NotPorted(
-            "Campaign Interview Contribution steps (_guided_contribution_object)",
-        ));
+        let Some(contribution) = guided_contribution_object(
+            store,
+            bundled,
+            advance.builder_session_id,
+            advance.current_step,
+            None,
+        )
+        .await?
+        else {
+            return Err(rejected(
+                "Selected artifact has no Interview Contribution",
+                "interview_contribution_unavailable",
+            ));
+        };
+        let mut answers = validate_interview_contribution_answers(&contribution, &Json::Object(captured))
+            .map_err(|_| {
+                rejected(
+                    "Campaign Interview Contribution answer is invalid",
+                    "invalid_interview_contribution_answer",
+                )
+            })?;
+        answers.insert(
+            "contribution_sha256".into(),
+            canonical_sha256(&Json::Object(contribution.as_payload())).into(),
+        );
+        captured = answers;
     }
     let index = step_index(advance.current_step);
     let (next_step, next_question) =
-        next_guided_question(store, advance.builder_session_id, advance.current_step, &captured).await?;
+        next_guided_question(store, bundled, advance.builder_session_id, advance.current_step, &captured)
+            .await?;
     let preceding: Vec<&'static str> = GUIDED_CAMPAIGN_STEPS[..index].to_vec();
     let (operation_id, campaign_id, session_id, current_step, visible_answer) = (
         advance.operation_id.to_owned(),
@@ -359,7 +596,7 @@ pub async fn advance_guided_campaign_draft(
                 answer: &captured,
                 preceding_steps: &preceding,
                 next_step,
-                next_question,
+                next_question: &next_question,
             })
         })
         .await
@@ -376,30 +613,13 @@ pub async fn campaign_construction_basis(
     store.call(move |store| store.campaign_construction_basis(&campaign_id)).await
 }
 
-/// `AuthorityOwner._resolve_interview_content` as `guided_campaign_contribution` needs it
-/// for every Contribution step: with no Ruleset chosen there is no content, and a Setting or
-/// Plan chosen without one is refused. A chosen Ruleset needs lane 1's `interview_content`.
-async fn no_interview_contribution(store: &StoreHandle, session_id: &str) -> StoreResult<()> {
-    let ruleset = guided_answer_value(store, session_id, "ruleset").await?.unwrap_or_default();
-    let setting = guided_answer_value(store, session_id, "setting").await?.unwrap_or_default();
-    let plan = guided_answer_value(store, session_id, "plan").await?.unwrap_or_default();
-    let chosen = |answer: &JsonMap, key: &str| !matches!(answer.get(key), None | Some(Json::Null));
-    if chosen(&ruleset, "candidate_id") {
-        return Err(StoreError::NotPorted(
-            "an installed Ruleset's Interview content (lane 1's interview_content)",
-        ));
-    }
-    if chosen(&setting, "setting_id") || chosen(&plan, "plan_id") {
-        return Err(rejected("Selected world content requires its Ruleset", "command_rejected"));
-    }
-    Ok(())
-}
-
-/// `AuthorityOwner.bind_guided_campaign_basis` for a Draft with no Ruleset: the binding
-/// checks under the campaign's work, the semantic payload, the replay prelookup, the
-/// required Interview steps, then the store's binding.
+/// `AuthorityOwner.bind_guided_campaign_basis`: the binding checks under the campaign's work,
+/// the semantic payload, the replay prelookup, the campaign inputs, the required Interview steps
+/// (with each Contribution the selected content declares), then the store's binding.
+/// Participants and initial state, which only a saved-library Start supplies, are not ported.
 pub async fn bind_guided_campaign_basis(
     store: &StoreHandle,
+    bundled: &Arc<BundledPackages>,
     bind: &BindRequest<'_>,
 ) -> StoreResult<CampaignConfirmation> {
     let campaign_id = bind.campaign_id.to_owned();
@@ -458,20 +678,24 @@ pub async fn bind_guided_campaign_basis(
         Some(_) => return Err(coded("IdempotencyConflict", "Campaign operation result kind does not match")),
         None => {}
     }
-    // `_validate_campaign_inputs`: with no packages and no participants it reads and refuses
-    // nothing. A Ruleset's lock needs lane 1's active-Ruleset and participant checks.
-    if !bind.package_lock.entries().is_empty() {
-        return Err(StoreError::NotPorted("binding an installed Ruleset (lane 1's interview_content)"));
+    // `_validate_campaign_inputs`: the primary Ruleset must be active. With no participants and
+    // no initial state its other checks read and refuse nothing.
+    for entry in bind.package_lock.entries() {
+        if entry.role() == PackageRole::Primary {
+            require_active_ruleset(entry.package_id())?;
+        }
     }
     let mut required: Vec<&str> = REQUIRED_INTERVIEW_STEPS.to_vec();
     let ruleset_answer = guided_answer_value(store, bind.builder_session_id, "ruleset").await?;
-    if ruleset_answer.is_some_and(|answer| matches!(answer.get("candidate_id"), None | Some(Json::Null))) {
+    if bind.package_lock.entries().is_empty()
+        && ruleset_answer.is_some_and(|answer| matches!(answer.get("candidate_id"), None | Some(Json::Null)))
+    {
         required.retain(|step| !matches!(*step, "setting" | "plan" | "participants"));
     }
-    // `_guided_contribution_object` for each of the three Contribution steps: `None` without a
-    // Ruleset (each call reads the answers again, as Python's does).
-    for _ in 0..3 {
-        no_interview_contribution(store, bind.builder_session_id).await?;
+    for step in GUIDED_CONTRIBUTION_STEPS {
+        if guided_contribution_object(store, bundled, bind.builder_session_id, step, None).await?.is_some() {
+            required.push(step);
+        }
     }
     let (operation_id, campaign_id, display_name, turn_id, session_id) = (
         bind.operation_id.to_owned(),
@@ -682,16 +906,30 @@ pub async fn finalize_campaign_construction(
             content
         }
     };
-    // `_validate_required_plan_state`: nothing to check unless the Ruleset declares required
-    // starting state, which needs lane 1's `plan_state_admission`.
+    // `_validate_required_plan_state`: a Ruleset's required starting state, checked with lane 1's
+    // `plan_state_admission` against the exact retained manifest.
     {
         let lock_id = lock.lock_id.clone();
         let manifest =
             store.call(move |store| primary_manifest_for_lock(&store.connect()?, &lock_id)).await?;
-        if manifest.is_some_and(|manifest| manifest.state_schemas.iter().any(|schema| schema.required)) {
-            return Err(StoreError::NotPorted(
-                "required Ruleset starting state (lane 1's plan_state_admission)",
-            ));
+        if let Some(manifest) =
+            manifest.filter(|manifest| manifest.state_schemas.iter().any(|schema| schema.required))
+        {
+            let payload = match plan_content.get("campaign_plan") {
+                Some(Json::Object(plan)) => plan.clone(),
+                _ => JsonMap::new(),
+            };
+            if let Err(error) = validate_plan_state(&payload, &manifest) {
+                if error.python_class() != "ContentShapeError" {
+                    return Err(error.into());
+                }
+                return Err(sylvia_domain::DomainError::command_rejected_with(
+                    "Campaign Plan is missing or violates required Ruleset declarations",
+                    "plan_required_state_invalid",
+                    error.diagnostics().to_vec(),
+                )
+                .into());
+            }
         }
     }
     let content_sha256 = canonical_sha256(&Json::Object(plan_content.clone()));

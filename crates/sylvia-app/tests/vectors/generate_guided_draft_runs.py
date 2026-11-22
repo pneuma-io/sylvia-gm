@@ -13,7 +13,7 @@ through the Rust store handle and compares the database. Identities are explicit
 owner's UUIDs are seeded, so a re-run writes byte-identical files. Reference tooling only.
 
 The four guided generators share `guided/` and build on this one's seed. Run them in order with
-`generate_guided_all.py` (draft, advance, start, finalize).
+`generate_guided_all.py` (draft, advance, start, finalize, ruleset).
 """
 
 from __future__ import annotations
