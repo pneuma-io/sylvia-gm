@@ -248,8 +248,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/campaign_archive.py:2975` | `_discover_recovery_manifest` | len() against a limit | `len(info.filename.encode("utf-8")) > RECOVERY_MAX_MEMBER_NAME_BYTES for info in infos` | |
 | `infrastructure/private_records_archive.py:43` | `validate_rows` | len() against a limit | `if len(result) >= MAX_ROWS or not isinstance(row, Mapping) or set(row) != set(FIELDS):` | `sylvia-store` export_capture |
 | `infrastructure/private_records_archive.py:83` | `encode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(output) + len(line) > MAX_BYTES:` | `sylvia-store` export_capture |
-| `infrastructure/private_records_archive.py:91` | `decode` | len() against a limit | `if len(data) > MAX_BYTES or (data and not data.endswith(b"\n")):` | |
-| `infrastructure/private_records_archive.py:95` | `decode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(rows) >= MAX_ROWS:` | |
+| `infrastructure/private_records_archive.py:91` | `decode` | len() against a limit | `if len(data) > MAX_BYTES or (data and not data.endswith(b"\n")):` | `sylvia-store` archive_validation |
+| `infrastructure/private_records_archive.py:95` | `decode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(rows) >= MAX_ROWS:` | `sylvia-store` archive_validation |
 | `infrastructure/sqlite_authority.py:1737` | `SQLiteAuthorityStore._write_export_blob` | len() against a limit | `or len(data) > campaign_archive.STREAM_CHUNK_BYTES` | |
 | `infrastructure/sqlite_authority.py:7403` | `SQLiteAuthorityStore.commit_campaign_continuity_batch` | len() against a limit | `if len(admitted) > 64:` | |
 | `infrastructure/sqlite_authority.py:12867` | `SQLiteAuthorityStore.consume_package_blob` | len() against a limit | `or len(data) > PACKAGE_CHUNK_LIMIT` | |
