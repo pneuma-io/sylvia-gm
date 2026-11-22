@@ -422,6 +422,7 @@ def random_patch(rng: random.Random, kind: str) -> dict:
 
 QUERY_SCENE = copy.deepcopy(BASE)
 QUERY_SCENE["entities"][1]["active"] = True
+QUERY_SCENE["zones"][1]["metadata"] = {"open": None}
 QUERY_SCENE["entities"].append({"id": "elf", "map_id": "keep", "position": [12, 10, 0], "footprint": {"kind": "circle", "radius": 0.5},
                                 "height": 2, "facing": [0, 1], "active": True, "movement": "blocking", "visibility": "clear",
                                 "metadata": {"name": "Elf", "faction": "wood"}})
@@ -502,6 +503,11 @@ AREA_SHAPES = [
     {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1e-13, 0], "length": 4, "width": 2, "height": 3},
     {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1e-11, 0], "length": 4, "width": 2, "height": 3},
     {"kind": "prism", "origin": [5, 5, 0], "direction": [-2, -2, -2], "up": [1e-300, 1, 0], "length": 4, "width": 2, "height": 3},
+    # Up parallel to the direction: rejected; the cross product's magnitude exactly 1e-12 is too.
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 1, 1], "up": [2, 2, 2], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1e-12, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1.0000001e-12, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 2, 3], "up": [2, 4, 6.000000000001], "length": 4, "width": 2, "height": 3},
     {"kind": "prism", "origin": [21, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 4, "width": 2, "height": 3},
     {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 0, "width": 2, "height": 3},
     {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 4, "width": 2},
@@ -585,6 +591,13 @@ def query_targeted() -> list:
                         (["reference_face", "target"], {"kind": "geometry", "id": "orc"}),
                         (["reference_face", "target"], {"kind": "geometry"}), (["reference_face"], {"target": {"kind": "geometry", "id": "pillar"}})):
         cases.append(with_value(place, path, value))
+    for field, text in (("key", "k" * 128), ("key", "k" * 129), ("value", "é" * 128), ("value", "é" * 129)):
+        cases.append(with_value({key: value for key, value in place.items() if key not in ("containing_zone_id", "reference_face")},
+                                ["metadata_filter", field], text))
+    # The dais zone's metadata holds `"open": null`, which reads as missing.
+    for missing in (True, False):
+        open_filter = with_value(place, ["metadata_filter"], {"key": "open", "value": "x", "missing_matches": missing})
+        cases.append(with_value(open_filter, ["containing_zone_id"], "dais"))
     zone_filter = with_value(place, ["metadata_filter"], {"key": "hazard", "value": "x", "missing_matches": True})
     cases.append(with_value(zone_filter, ["containing_zone_id"], "dais"))
     cases.append({key: value for key, value in zone_filter.items() if key != "containing_zone_id"})

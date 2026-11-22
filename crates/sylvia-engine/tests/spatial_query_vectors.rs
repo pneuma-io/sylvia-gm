@@ -8,7 +8,8 @@ use sylvia_engine::spatial::{admit_spatial_query, admit_spatial_scene, SpatialEr
 
 #[test]
 fn queries_admit_as_python() {
-    let vectors: Json = serde_json::from_str(include_str!("vectors/spatial_query_vectors.json")).expect("valid JSON");
+    let vectors: Json =
+        serde_json::from_str(include_str!("vectors/spatial_query_vectors.json")).expect("valid JSON");
     let scene = admit_spatial_scene(&vectors["scene"]).expect("the query scene");
     let cases = vectors["cases"].as_array().unwrap();
     assert!(cases.len() > 6000);
@@ -23,10 +24,17 @@ fn queries_admit_as_python() {
         };
         let mut wanted = case.clone();
         wanted.as_object_mut().unwrap().shift_remove("query");
-        let (actual, wanted) = (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
+        let (actual, wanted) =
+            (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
         if actual != wanted {
             failures.push(format!("case {index}: {}\n  python {wanted}\n  rust   {actual}", case["query"]));
         }
     }
-    assert!(failures.is_empty(), "{} of {} differ, first: {:#?}", failures.len(), cases.len(), &failures[..failures.len().min(5)]);
+    assert!(
+        failures.is_empty(),
+        "{} of {} differ, first: {:#?}",
+        failures.len(),
+        cases.len(),
+        &failures[..failures.len().min(5)]
+    );
 }

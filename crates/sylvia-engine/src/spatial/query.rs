@@ -2,8 +2,9 @@
 //! includes and metadata selectors it uses).
 
 use super::scene::{
-    array, boolean, capture_payload, cell, choice, coordinate, float, floats, identity, integer, number, object,
-    reject, shape, Admit, Bounds, CROSS_MAP, MAX_ABSOLUTE_COORDINATE, MAX_TOTAL_CELLS, OUT_OF_BOUNDS, POSITIVE,
+    array, boolean, capture_payload, cell, choice, coordinate, float, floats, identity, integer, number,
+    object, reject, shape, Admit, Bounds, CROSS_MAP, MAX_ABSOLUTE_COORDINATE, MAX_TOTAL_CELLS, OUT_OF_BOUNDS,
+    POSITIVE,
 };
 use super::{AdmittedSpatialScene, SpatialError};
 use crate::pymath::{dist, hypot};
@@ -17,25 +18,62 @@ const INCLUDE_ORDER: [&str; 3] = ["geometry", "entities", "zones"];
 fn query_keys(kind: &str) -> Option<&'static [&'static str]> {
     Some(match kind {
         "circle_route" => &[
-            "kind", "map_id", "moving_entity_id", "destination", "moving_radius", "circles", "metadata_filter",
-            "max_tests", "edge_costs",
+            "kind",
+            "map_id",
+            "moving_entity_id",
+            "destination",
+            "moving_radius",
+            "circles",
+            "metadata_filter",
+            "max_tests",
+            "edge_costs",
         ],
-        "circle_overlap" => {
-            &["kind", "map_id", "moving_entity_id", "fixed_entity_id", "destination", "moving_radius", "fixed_radius", "origin"]
+        "circle_overlap" => &[
+            "kind",
+            "map_id",
+            "moving_entity_id",
+            "fixed_entity_id",
+            "destination",
+            "moving_radius",
+            "fixed_radius",
+            "origin",
+        ],
+        "body_proximity" => {
+            &["kind", "map_id", "moving_entity_id", "fixed_entity_id", "destination", "radius"]
         }
-        "body_proximity" => &["kind", "map_id", "moving_entity_id", "fixed_entity_id", "destination", "radius"],
         "sweep" => &[
-            "kind", "map_id", "moving_entity_id", "destination", "include_entities", "exclude_entity_ids", "metadata_filter",
+            "kind",
+            "map_id",
+            "moving_entity_id",
+            "destination",
+            "include_entities",
+            "exclude_entity_ids",
+            "metadata_filter",
         ],
         "placement" => &[
-            "kind", "map_id", "moving_entity_id", "origin", "exclude_entity_ids", "metadata_filter", "max_candidates",
-            "containing_zone_id", "reference_face",
+            "kind",
+            "map_id",
+            "moving_entity_id",
+            "origin",
+            "exclude_entity_ids",
+            "metadata_filter",
+            "max_candidates",
+            "containing_zone_id",
+            "reference_face",
         ],
         "ray" => &["kind", "map_id", "origin", "destination", "include", "max_intersections"],
         "exposure" => &["kind", "map_id", "observer", "target", "samples", "include", "metadata_filter"],
         "path" => &[
-            "kind", "map_id", "start", "goal", "allow_diagonal", "corner_policy", "include_entities", "moving_entity_id",
-            "metadata_filter", "max_steps",
+            "kind",
+            "map_id",
+            "start",
+            "goal",
+            "allow_diagonal",
+            "corner_policy",
+            "include_entities",
+            "moving_entity_id",
+            "metadata_filter",
+            "max_steps",
         ],
         "crossed_zones" => &["kind", "map_id", "path", "max_crossings"],
         "area" => &["kind", "map_id", "shape", "include", "max_results"],
@@ -93,7 +131,11 @@ fn query_include(value: &Json, allowed: &[&str], path: &str) -> Admit<Vec<String
     if unique.len() != normalized.len() {
         return reject("Query includes must be unique", QUERY_INVALID, path);
     }
-    Ok(INCLUDE_ORDER.iter().filter(|name| normalized.iter().any(|item| item == *name)).map(|name| (*name).to_owned()).collect())
+    Ok(INCLUDE_ORDER
+        .iter()
+        .filter(|name| normalized.iter().any(|item| item == *name))
+        .map(|name| (*name).to_owned())
+        .collect())
 }
 
 /// A text of at most 128 characters (`len(text) <= 128`).
@@ -118,7 +160,8 @@ fn largest_magnitude(values: &[f64]) -> f64 {
 
 /// `_area_prism(value, bounds=..., ...)`: a rectangular volume from the centre of its origin face.
 fn area_prism(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> Admit<Json> {
-    let item = object(value, &["kind", "origin", "direction", "up", "length", "width", "height"], code, path)?;
+    let item =
+        object(value, &["kind", "origin", "direction", "up", "length", "width", "height"], code, path)?;
     let origin = coordinate(&item["origin"], 3, code, &format!("{path}.origin"))?;
     if !bounds.inside(&floats(&origin)) {
         return reject("Area origin is outside map bounds", OUT_OF_BOUNDS, format!("{path}.origin"));
@@ -163,8 +206,11 @@ fn area_shape(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> 
         Some(kind @ ("sphere" | "cone")) => kind,
         _ => return shape(value, bounds, code, path),
     };
-    let fields: &[&str] =
-        if kind == "sphere" { &["kind", "center", "radius"] } else { &["kind", "apex", "direction", "length", "radius"] };
+    let fields: &[&str] = if kind == "sphere" {
+        &["kind", "center", "radius"]
+    } else {
+        &["kind", "apex", "direction", "length", "radius"]
+    };
     let item = object(value, fields, code, path)?;
     let origin_field = if kind == "sphere" { "center" } else { "apex" };
     let origin = coordinate(&item[origin_field], 3, code, &format!("{path}.{origin_field}"))?;
@@ -188,7 +234,10 @@ fn area_shape(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> 
         normalized.insert("direction".into(), json!(direction));
         normalized.insert("length".into(), length);
     }
-    if !floats(&origin).iter().all(|component| (component + extent).is_finite() && (component - extent).is_finite()) {
+    if !floats(&origin)
+        .iter()
+        .all(|component| (component + extent).is_finite() && (component - extent).is_finite())
+    {
         return reject("Area extent must be finite", code, path);
     }
     Ok(Json::Object(normalized))
@@ -234,14 +283,18 @@ fn exclusions(value: &Json, active: &[String], message: &'static str) -> Admit<V
 }
 
 /// `admit_spatial_query(scene, value)`: validate a bounded query against one admitted scene.
-pub fn admit_spatial_query(scene: &AdmittedSpatialScene, value: &Json) -> Result<AdmittedSpatialQuery, SpatialError> {
+pub fn admit_spatial_query(
+    scene: &AdmittedSpatialScene,
+    value: &Json,
+) -> Result<AdmittedSpatialQuery, SpatialError> {
     Ok(admit(scene, value)?)
 }
 
 fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQuery> {
     let code = QUERY_INVALID;
     let payload = capture_payload(value, code)?;
-    let Some(kind) = payload.get("kind").and_then(Json::as_str).filter(|kind| query_keys(kind).is_some()) else {
+    let Some(kind) = payload.get("kind").and_then(Json::as_str).filter(|kind| query_keys(kind).is_some())
+    else {
         return reject("Spatial query kind is invalid", code, "$.kind");
     };
     let kind = kind.to_owned();
@@ -309,7 +362,10 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
             put("samples", json!({"horizontal": horizontal, "vertical": vertical}));
             put("include", json!(include));
             if item.contains_key("metadata_filter") {
-                put("metadata_filter", metadata_selector(&item["metadata_filter"], code, "$.metadata_filter")?);
+                put(
+                    "metadata_filter",
+                    metadata_selector(&item["metadata_filter"], code, "$.metadata_filter")?,
+                );
             }
         }
         "circle_route" => {
@@ -338,7 +394,11 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
                 seen.push(id.clone());
                 let fixed = number(&circle["radius"], Some(0.0), code, &format!("{path}.radius"))?;
                 if !(0.0 < float(&fixed) && float(&fixed) <= MAX_ABSOLUTE_COORDINATE) {
-                    return reject("Occupied radius must be positive and bounded", code, format!("{path}.radius"));
+                    return reject(
+                        "Occupied radius must be positive and bounded",
+                        code,
+                        format!("{path}.radius"),
+                    );
                 }
                 let blocking = boolean(&circle["blocking"], code, &format!("{path}.blocking"))?;
                 circles.push((id.clone(), json!({"entity_id": id, "radius": fixed, "blocking": blocking})));
@@ -354,7 +414,10 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
             put("max_tests", json!(max_tests));
             let empty = Json::Array(Vec::new());
             let mut edge_costs = Vec::new();
-            for (index, raw) in array(item.get("edge_costs").unwrap_or(&empty), 0, 16384, code, "$.edge_costs")?.iter().enumerate()
+            for (index, raw) in
+                array(item.get("edge_costs").unwrap_or(&empty), 0, 16384, code, "$.edge_costs")?
+                    .iter()
+                    .enumerate()
             {
                 let path = format!("$.edge_costs[{index}]");
                 let edge = object(raw, &["start", "end", "cost"], code, &path)?;
@@ -400,7 +463,11 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
                 for name in ["moving_radius", "fixed_radius"] {
                     let radius = number(&item[name], Some(0.0), code, &format!("$.{name}"))?;
                     if float(&radius) <= 0.0 || float(&radius) > MAX_ABSOLUTE_COORDINATE {
-                        return reject("Occupied radius must be positive and bounded", code, format!("$.{name}"));
+                        return reject(
+                            "Occupied radius must be positive and bounded",
+                            code,
+                            format!("$.{name}"),
+                        );
                     }
                     put(name, radius);
                 }
@@ -421,7 +488,11 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
             let destination = coordinate(&item["destination"], 3, code, "$.destination")?;
             let include_entities = boolean(&item["include_entities"], code, "$.include_entities")?;
             let default_filter = json!({"key": "", "value": "", "missing_matches": false});
-            let filter = metadata_selector(item.get("metadata_filter").unwrap_or(&default_filter), code, "$.metadata_filter")?;
+            let filter = metadata_selector(
+                item.get("metadata_filter").unwrap_or(&default_filter),
+                code,
+                "$.metadata_filter",
+            )?;
             put("moving_entity_id", json!(moving));
             put("destination", json!(destination));
             put("include_entities", json!(include_entities));
@@ -434,11 +505,23 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
             if !active.contains(&moving) {
                 return reject("Moving entity is unavailable", code, "$.moving_entity_id");
             }
-            let excluded =
-                exclusions(&item["exclude_entity_ids"], &active, "Placement exclusions must name unique active entities")?;
-            let selector = object(&item["metadata_filter"], &["key", "value", "missing_matches"], code, "$.metadata_filter")?;
+            let excluded = exclusions(
+                &item["exclude_entity_ids"],
+                &active,
+                "Placement exclusions must name unique active entities",
+            )?;
+            let selector = object(
+                &item["metadata_filter"],
+                &["key", "value", "missing_matches"],
+                code,
+                "$.metadata_filter",
+            )?;
             if !bounded_text(&selector["key"]) || !bounded_text(&selector["value"]) {
-                return reject("Placement metadata filter requires bounded strings", code, "$.metadata_filter");
+                return reject(
+                    "Placement metadata filter requires bounded strings",
+                    code,
+                    "$.metadata_filter",
+                );
             }
             let origin = coordinate(&item["origin"], 3, code, "$.origin")?;
             let missing = boolean(&selector["missing_matches"], code, "$.metadata_filter.missing_matches")?;
@@ -446,12 +529,16 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
             put("moving_entity_id", json!(moving));
             put("origin", json!(origin));
             put("exclude_entity_ids", json!(excluded));
-            put("metadata_filter", json!({"key": selector["key"], "value": selector["value"], "missing_matches": missing}));
+            put(
+                "metadata_filter",
+                json!({"key": selector["key"], "value": selector["value"], "missing_matches": missing}),
+            );
             put("max_candidates", json!(max_candidates));
             if item.contains_key("containing_zone_id") {
                 let zone_id = identity(&item["containing_zone_id"], code, "$.containing_zone_id")?;
                 let zones = admitted["zones"].as_array().expect("admitted zones");
-                let Some(zone) = zones.iter().find(|entry| entry["id"].as_str() == Some(zone_id.as_str())) else {
+                let Some(zone) = zones.iter().find(|entry| entry["id"].as_str() == Some(zone_id.as_str()))
+                else {
                     return reject("Containing zone is unavailable", code, "$.containing_zone_id");
                 };
                 if misses_selector(&zone["metadata"], selector) {
@@ -467,11 +554,14 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
                 let path = "$.reference_face";
                 let reference = object(&item["reference_face"], &["target", "face"], code, path)?;
                 let target = object(&reference["target"], &["kind", "id"], code, &format!("{path}.target"))?;
-                let target_kind = choice(&target["kind"], &["geometry", "entity"], code, &format!("{path}.target.kind"))?;
+                let target_kind =
+                    choice(&target["kind"], &["geometry", "entity"], code, &format!("{path}.target.kind"))?;
                 let target_id = identity(&target["id"], code, &format!("{path}.target.id"))?;
                 let collection = if target_kind == "geometry" { "geometry" } else { "entities" };
                 let entries = admitted[collection].as_array().expect("an admitted collection");
-                let Some(source) = entries.iter().find(|entry| entry["id"].as_str() == Some(target_id.as_str())) else {
+                let Some(source) =
+                    entries.iter().find(|entry| entry["id"].as_str() == Some(target_id.as_str()))
+                else {
                     return reject("Placement reference is unavailable", code, format!("{path}.target.id"));
                 };
                 if misses_selector(&source["metadata"], selector) {
@@ -487,7 +577,10 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
                     code,
                     &format!("{path}.face"),
                 )?;
-                put("reference_face", json!({"target": {"kind": target_kind, "id": target_id}, "face": face}));
+                put(
+                    "reference_face",
+                    json!({"target": {"kind": target_kind, "id": target_id}, "face": face}),
+                );
             }
         }
         "path" => {
@@ -510,7 +603,12 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
                 moving = Some(id);
             }
             let diagonal = boolean(&item["allow_diagonal"], code, "$.allow_diagonal")?;
-            let corner = choice(&item["corner_policy"], &["allow_cutting", "forbid_cutting"], code, "$.corner_policy")?;
+            let corner = choice(
+                &item["corner_policy"],
+                &["allow_cutting", "forbid_cutting"],
+                code,
+                "$.corner_policy",
+            )?;
             let max_steps = integer(&item["max_steps"], 1, MAX_TOTAL_CELLS, code, "$.max_steps")?;
             put("start", json!(start));
             put("goal", json!(goal));
@@ -522,7 +620,10 @@ fn admit(scene: &AdmittedSpatialScene, value: &Json) -> Admit<AdmittedSpatialQue
                 put("moving_entity_id", json!(id));
             }
             if item.contains_key("metadata_filter") {
-                put("metadata_filter", metadata_selector(&item["metadata_filter"], code, "$.metadata_filter")?);
+                put(
+                    "metadata_filter",
+                    metadata_selector(&item["metadata_filter"], code, "$.metadata_filter")?,
+                );
             }
         }
         "crossed_zones" => {

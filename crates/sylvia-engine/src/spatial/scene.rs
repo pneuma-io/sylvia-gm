@@ -254,7 +254,12 @@ pub(super) fn identity(value: &Json, code: &'static str, path: &str) -> Admit<St
 }
 
 /// `_coordinate(value, dimensions, ...)`: the numbers as written.
-pub(super) fn coordinate(value: &Json, dimensions: usize, code: &'static str, path: &str) -> Admit<Vec<Json>> {
+pub(super) fn coordinate(
+    value: &Json,
+    dimensions: usize,
+    code: &'static str,
+    path: &str,
+) -> Admit<Vec<Json>> {
     let items = array(value, dimensions, dimensions, code, path)?;
     items
         .iter()
