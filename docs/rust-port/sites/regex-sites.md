@@ -180,7 +180,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_character_reuse_tool.py:55` | `reuse_character_copy_tool.copy` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", params["expected_content_sha256"]) is None` | |
 | `agent/_participant_file_tool.py:33` | `participant_file_tool.use_file` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", params["expected_version"]) is None` | |
 | `agent/_participant_file_tool.py:78` | `participant_file_tool` | JSON Schema pattern; plain | `"expected_version": {"type": "string", "pattern": "^[0-9a-f]{64}$"},` | |
-| `agent/_provider_session.py:411` | `_package_tool_alias` | re.sub; plain | `slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"` | |
+| `agent/_provider_session.py:411` | `_package_tool_alias` | re.sub; plain | `slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_session.py:894` | `_normalize_state_references.key` | re.sub; plain | `return re.sub(r"[\s_-]+", "_", re.sub(r"['’]", "", value.casefold())).strip("_")` | |
 | `agent/_provider_session.py:1290` | `_speaker_names_overlap.contains` | re.search; pattern built at run time, check by hand | `return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None` | |
 | `agent/_provider_session.py:2369` | `ProviderSessionAdapter._relevant_character_files_message` | re.search; pattern built at run time, check by hand | `if re.search( rf"(?<!\w){re.escape(alias)}(?!\w)", current_player_text, flags=re.IGNORECASE, )` | |

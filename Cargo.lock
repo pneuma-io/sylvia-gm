@@ -2368,12 +2368,9 @@ dependencies = [
  "indexmap",
  "serde",
  "serde_json",
- "sylvia-app",
  "sylvia-base",
  "sylvia-domain",
- "sylvia-engine",
  "sylvia-provider",
- "sylvia-store",
  "thiserror",
 ]
 
