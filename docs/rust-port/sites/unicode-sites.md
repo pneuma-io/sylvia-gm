@@ -22,7 +22,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_profiles.py:134` | `validate_character_profile` | .isspace() | `if any(character.isspace() for character in uri):` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:132` | `_folded_portable_name` | unicodedata.normalize | `if unicodedata.normalize("NFC", name) != name:` | |
 | `application/import_repair.py:134` | `_folded_portable_name` | .casefold() | `return name.casefold()` | |
-| `application/library_sources.py:41` | `LibrarySourceReader.candidates` | .casefold() | `folded = query.casefold()` | |
+| `application/library_sources.py:41` | `LibrarySourceReader.candidates` | .casefold() | `folded = query.casefold()` |  `sylvia-app` library_source_vectors |
 | `application/package_materialization.py:161` | `materialize_package_archive` | .casefold() | `folded = path.casefold()` |  `sylvia-app` bundled_vectors |
 | `builder/_package_materializer.py:176` | `_read_payloads` | .casefold() | `normalized = relative.casefold()` |  `sylvia-app` package_materializer_vectors |
 | `builder/_package_record_edits.py:193` | `apply_package_record_edits` | .casefold() | `if len({name.casefold() for name in expected_paths}) != len(expected_paths):` |  `sylvia-app` package_record_edit_vectors |

@@ -38,9 +38,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/import_repair.py:383` | `_read_draft_files` | len() against a limit | `if total > _EXPANDED_BYTE_LIMIT or len(files) >= _MEMBER_COUNT_LIMIT:` | |
 | `application/import_repair.py:391` | `_package_drafts` | len() against a limit | `if manifest_bytes is None or len(manifest_bytes) > _MANIFEST_LIMIT:` | |
 | `application/initial_character_state.py:106` | `_calculation_contract` | len() against a limit | `or len(calculations) > _MAX_CALCULATIONS` |  `sylvia-app` package_library_vectors |
-| `application/library_sources.py:60` | `LibrarySourceReader.candidates` | len() against a limit | `if len(results) > _MAX_CANDIDATES:` | |
-| `application/library_sources.py:77` | `LibrarySourceReader.files` | len() against a limit | `if len(paths) > _MAX_TOTAL_PATHS:` | |
-| `application/library_sources.py:160` | `LibrarySourceReader._package_index` | len() against a limit | `if len(candidate.package_lock.entries) > _MAX_PACKAGES:` | |
+| `application/library_sources.py:60` | `LibrarySourceReader.candidates` | len() against a limit | `if len(results) > _MAX_CANDIDATES:` |  `sylvia-app` library_source_vectors |
+| `application/library_sources.py:77` | `LibrarySourceReader.files` | len() against a limit | `if len(paths) > _MAX_TOTAL_PATHS:` |  `sylvia-app` library_source_vectors |
+| `application/library_sources.py:160` | `LibrarySourceReader._package_index` | len() against a limit | `if len(candidate.package_lock.entries) > _MAX_PACKAGES:` |  `sylvia-app` library_source_vectors |
 | `application/plan_bundle.py:84` | `_read_bundle` | len() against a limit | `if len(data) > PLAN_BUNDLE_BYTE_LIMIT:` | |
 | `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` |  `sylvia-app` plan_admission_vectors |
 | `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` |  `sylvia-app` plan_snapshot_vectors |
