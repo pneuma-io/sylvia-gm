@@ -5,8 +5,6 @@
 //! Here the caller names them in [`BundledSources`]; [`BundledSources::from_repository_root`] is
 //! the source-checkout layout. Archives are materialized once per [`BundledPackages`], as
 //! Python's `lru_cache` keeps them for the process.
-//!
-//! Not yet here: `bundled_campaign_content_catalog` (it needs `bundled_campaign_plans`).
 
 use crate::package_materialization::{
     materialize_package_archive, MaterializedPackageArchive, NormalizedPackageDraft,
@@ -241,6 +239,8 @@ pub struct BundledPackages {
     srd: OnceLock<MaterializedPackageArchive>,
     rift: OnceLock<MaterializedPackageArchive>,
     authority: OnceLock<BundledRiftAuthority>,
+    /// `_bundled_campaign_content_catalog`'s `lru_cache`.
+    content_catalog: OnceLock<Vec<JsonMap>>,
     /// `bundled_campaign_plans`' caches (Python's `lru_cache`s).
     pub(crate) plan_caches: crate::bundled_campaign_plans::PlanCaches,
 }
@@ -253,6 +253,7 @@ impl BundledPackages {
             srd: OnceLock::new(),
             rift: OnceLock::new(),
             authority: OnceLock::new(),
+            content_catalog: OnceLock::new(),
             plan_caches: Default::default(),
         }
     }
@@ -534,6 +535,33 @@ impl BundledPackages {
         let plan = pyjson::loads(&read_text(&root.join("plan.json"))?)
             .map_err(|error| DomainError::value(error.to_string()))?;
         validate_plan_snapshot(&snapshot, &plan, &read_text(&root.join("plan.md"))?)
+    }
+
+    /// `bundled_campaign_content_catalog()`: caller-owned choices from the bundled content: the
+    /// SRD Ruleset, the Severed Lands Setting, then `bundled_plan_catalog()`. Validated once, as
+    /// Python's `lru_cache` keeps a success; a failure is raised again on the next call.
+    pub fn bundled_campaign_content_catalog(&self) -> DomainResult<Vec<JsonMap>> {
+        if let Some(rows) = self.content_catalog.get() {
+            return Ok(rows.clone());
+        }
+        let ruleset = self.srd()?.manifests.iter().find(|item| item.package_id == SRD_PACKAGE_ID).cloned();
+        let ruleset = ruleset.ok_or_else(|| DomainError::uncaught("StopIteration", ""))?;
+        let setting =
+            self.rift()?.manifests.iter().find(|item| item.package_id == SEVERED_LANDS_PACKAGE_ID).cloned();
+        let setting = setting.ok_or_else(|| DomainError::uncaught("StopIteration", ""))?;
+        let row = |kind: &str, id: &str, version: &str, title: &str| -> JsonMap {
+            let Json::Object(row) = json!({"kind": kind, "id": id, "version": version, "title": title})
+            else {
+                unreachable!("an object")
+            };
+            row
+        };
+        let mut rows = vec![
+            row("ruleset", &ruleset.package_id, &ruleset.version, "D&D 5e SRD 5.2.1"),
+            row("campaign_setting", &setting.package_id, &setting.version, "Severed Lands"),
+        ];
+        rows.extend(self.bundled_plan_catalog()?);
+        Ok(self.content_catalog.get_or_init(|| rows).clone())
     }
 
     /// `bundled_rift_source_catalog(query)`: bounded virtual source paths for Campaign Plan Builder.
