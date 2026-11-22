@@ -30,6 +30,7 @@ pub mod admin_audit;
 pub mod anthropic;
 pub mod catalog;
 pub mod chat;
+pub mod claude;
 pub mod claude_install;
 pub mod claude_kept;
 pub mod claude_native;
