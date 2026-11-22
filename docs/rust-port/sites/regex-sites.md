@@ -27,7 +27,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/import_repair.py:55` | `<module>` | re.compile; plain | `_PLAN_ID_PATTERN = re.compile(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}")` | |
 | `application/import_repair.py:274` | `stage_repair_copy` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_sha256) is None:` | |
 | `application/import_repair_sessions.py:91` | `start_import_repair_chat` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", repair_id) is None:` | |
-| `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` | |
+| `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` |  `sylvia-app` package_library_vectors |
 | `application/plan_bundle.py:119` | `_read_bundle` | re.fullmatch; plain | `or re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", identity) is None` | |
 | `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` | |
 | `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` | |
