@@ -12,6 +12,7 @@
 //!
 //! Documents are [`Data`] trees, the values `yaml.safe_load` returns.
 
+pub mod discovery;
 pub mod env;
 pub mod host_browser;
 pub mod loader;

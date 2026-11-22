@@ -6,8 +6,8 @@
 //! needed, and a failed build is tried again on the next call. A reload builds the replacement
 //! first and swaps it in only when that succeeds.
 //!
-//! Providers come from the real [`DefaultProviderFactory`]; the account runtimes and local
-//! discovery still answer as not ported ([`PendingRuntimes`]).
+//! Providers come from the real [`DefaultProviderFactory`], and local discovery is the real
+//! `discover_provider_models` ([`OwnerRuntimes`]); the account runtimes are not ported yet.
 //!
 //! `_release_unoffered_model_threads` (after a reload) belongs to the account runtimes, which
 //! are not ported yet.
@@ -21,26 +21,63 @@ use sylvia_agent::provider_resolver::{
 };
 use sylvia_base::{CodedResult, Json};
 use sylvia_domain::session::SessionRecord;
+use sylvia_provider::config::discovery::{discover_provider_models, network_clients, ClientFor, Discover};
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::config::protection::PlatformSeal;
+use sylvia_provider::config::provider_settings::{now_isoformat, ConfigSources};
 use sylvia_provider::config::{default_config_path, ConfigFailure, Data};
 use sylvia_provider::factory::DefaultProviderFactory;
 use sylvia_provider::provider::Provider;
 use sylvia_provider::registry::ProviderFactory;
 
-/// The account runtime and local discovery until they are ported.
-pub struct PendingRuntimes;
+/// The services the resolver calls: local model discovery over the network (Python's
+/// `discover_provider_models`), and the ChatGPT account, which is not ported yet.
+pub struct OwnerRuntimes {
+    sources: ResolverSources,
+    clients: Arc<ClientFor>,
+}
 
-impl RuntimeHooks for PendingRuntimes {
-    /// No ChatGPT runtime: Python's answer when the account is unavailable.
+impl OwnerRuntimes {
+    /// Discovery with these configuration sources and HTTP clients.
+    pub fn new(sources: ResolverSources, clients: Arc<ClientFor>) -> Self {
+        Self { sources, clients }
+    }
+}
+
+impl RuntimeHooks for OwnerRuntimes {
+    /// No ChatGPT runtime yet: Python's answer when the account is unavailable.
     fn refresh_subscription_reasoning(&self, _storage_root: &Path) -> bool {
         false
     }
 
-    fn discover_local_models(&self, request: &LocalDiscovery<'_>) -> Result<Data, ConfigFailure> {
-        Err(ConfigFailure::Python {
-            class: "RuntimeError",
-            message: format!("The Rust owner cannot discover {} models yet.", request.provider_id),
+    /// `discover_provider_models(config_path, provider_id=..., preset_id=..., base_url=...,
+    /// credential=None, query=..., limit=100)`.
+    fn discover_local_models<'a>(
+        &'a self,
+        request: LocalDiscovery<'a>,
+    ) -> BoxFuture<'a, Result<Data, ConfigFailure>> {
+        Box::pin(async move {
+            let sources = ConfigSources {
+                default_config: &self.sources.default_config,
+                seal: self.sources.seal.as_ref(),
+                env: &self.sources.env,
+            };
+            let discover = Discover {
+                provider_id: Data::Str(request.provider_id.into()),
+                preset_id: Data::Str(request.preset_id.into()),
+                base_url: Data::Str(request.base_url.into()),
+                query: Data::Str(request.query.into()),
+                limit: Data::Int(request.limit),
+                ..Discover::default()
+            };
+            discover_provider_models(
+                sources,
+                request.config_path,
+                &discover,
+                self.clients.as_ref(),
+                &now_isoformat,
+            )
+            .await
         })
     }
 }
@@ -62,11 +99,12 @@ impl OwnerProviders {
             seal: Arc::new(PlatformSeal),
             env: Environment::current(),
         };
+        let runtimes = OwnerRuntimes::new(sources.clone(), network_clients());
         Self::with(
             storage_root.join("config.yaml"),
             sources,
             Arc::new(DefaultProviderFactory::network()),
-            Arc::new(PendingRuntimes),
+            Arc::new(runtimes),
         )
     }
 
@@ -107,7 +145,7 @@ impl OwnerProviders {
 
 impl ProviderResolver for OwnerProviders {
     fn resolve<'a>(&'a self, session: &'a SessionRecord) -> BoxFuture<'a, CodedResult<Arc<dyn Provider>>> {
-        Box::pin(async move { self.resolver()?.resolve(session).map_err(|error| error.into_coded()) })
+        Box::pin(async move { self.resolver()?.resolve(session).await.map_err(|error| error.into_coded()) })
     }
 
     fn model_choices(&self) -> BoxFuture<'_, CodedResult<Vec<Json>>> {

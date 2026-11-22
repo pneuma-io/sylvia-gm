@@ -25,7 +25,7 @@ use sylvia_provider::config::{
     load_config, provider_credentials, ConfigFailure, Data, ProviderDef, SylviaGMConfig,
 };
 use sylvia_provider::context_capacity::{resolve_context_capacity, CapacityInputs, CONTEXT_CAPACITY_SOURCES};
-use sylvia_provider::provider::Provider;
+use sylvia_provider::provider::{BoxFuture, Provider};
 use sylvia_provider::pyurl::UrlError;
 use sylvia_provider::reasoning::{
     configure_reasoning, mode_reasoning_default, reasoning_values, suggested_from_data, Advertised,
@@ -162,7 +162,10 @@ pub trait RuntimeHooks: Send + Sync {
     fn refresh_subscription_reasoning(&self, storage_root: &Path) -> bool;
 
     /// `discover_provider_models(...)`: the reply (a `dict` with `models`), or its failure.
-    fn discover_local_models(&self, request: &LocalDiscovery<'_>) -> Result<Data, ConfigFailure>;
+    fn discover_local_models<'a>(
+        &'a self,
+        request: LocalDiscovery<'a>,
+    ) -> BoxFuture<'a, Result<Data, ConfigFailure>>;
 }
 
 /// Where the configuration comes from: the shipped defaults, this platform's credential
@@ -627,7 +630,7 @@ impl ConfiguredProviderResolver {
 
     /// `_refresh_local_runtime_capacity(model, definition)`: a fresh local runtime observation
     /// for this GM admission, written into the catalogue entry.
-    fn refresh_local_runtime_capacity(
+    async fn refresh_local_runtime_capacity(
         &self,
         model: &ModelInfo,
         definition: &ProviderDef,
@@ -647,7 +650,7 @@ impl ConfiguredProviderResolver {
                 query: model.wire_model_id(),
                 limit: 100,
             };
-            let result = match self.hooks.discover_local_models(&request) {
+            let result = match self.hooks.discover_local_models(request).await {
                 Ok(result) => result,
                 Err(ConfigFailure::Config(_)) => {
                     Data::Dict(vec![(Data::Str("models".into()), Data::List(Vec::new()))])
@@ -789,7 +792,7 @@ impl ConfiguredProviderResolver {
     }
 
     /// `__call__(session)`: exactly the configured provider and model the session names.
-    pub fn resolve(&self, session: &SessionRecord) -> Result<Arc<dyn Provider>, ResolverError> {
+    pub async fn resolve(&self, session: &SessionRecord) -> Result<Arc<dyn Provider>, ResolverError> {
         let fields = session.fields();
         let rejected = |message: &str| {
             ResolverError::Coded(CodedError::rejected(message).with_error_type("CommandRejected"))
@@ -827,7 +830,7 @@ impl ConfiguredProviderResolver {
         }
         let definition = self.definition(&model.provider_key);
         if session.role().as_str() == "dm" && LOCAL_PROVIDER_MODES.contains(&model.provider_mode.as_str()) {
-            self.refresh_local_runtime_capacity(&model, definition)?;
+            self.refresh_local_runtime_capacity(&model, definition).await?;
         }
         let preset =
             if definition.preset_id.is_empty() { model.provider_key.as_str() } else { &definition.preset_id };

@@ -151,6 +151,10 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,
         "provider_settings" => commands::providers::handle_provider_settings(context, params).await,
+        "detect_local_providers" => commands::providers::handle_detect_local_providers(context, params).await,
+        "discover_provider_models" => {
+            commands::providers::handle_discover_provider_models(context, params).await
+        }
         "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
         "remove_provider_settings" => {
             commands::providers::handle_remove_provider_settings(context, params).await
