@@ -5971,12 +5971,12 @@
  ],
  "closures": [
   {
-   "candidate_id": "candidate-install-bundled-srd-edcfe81cdcc357202ac16a2e",
+   "candidate_id": "candidate-install-bundled-srd-ce8ed6ed7eb6703a10246d29",
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6016,8 +6016,8 @@
      ]
     }
    ],
-   "recorded_closure_sha256": "296117ea7dff1e809ad3e22e87912dfff69dd0cb7f0ac3f5734416e4c5c4573a",
-   "closure_sha256": "296117ea7dff1e809ad3e22e87912dfff69dd0cb7f0ac3f5734416e4c5c4573a"
+   "recorded_closure_sha256": "5abc3a157eb731fda6b7aa5c88a646b0dac0a77ce41ec313c44538f6204ac0a2",
+   "closure_sha256": "5abc3a157eb731fda6b7aa5c88a646b0dac0a77ce41ec313c44538f6204ac0a2"
   },
   {
    "candidate_id": "candidate-install-bundled-riichi-c50d43a0c09abdf6745af7ad",
@@ -6059,9 +6059,9 @@
  "records": [
   {
    "package_id": "sylvia.srd-lite.bg3",
-   "recorded_content_sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
-   "content_root": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
-   "canonical_sha256": "161c05b12589edd4f9aef348de68d1194117fd47e0748b79d429bc83b9d9de26"
+   "recorded_content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
+   "content_root": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
+   "canonical_sha256": "834b23fcca7a35716b225fdf401d9b6958fa530955fb5a21eaf7d5e63522cca9"
   },
   {
    "package_id": "pneuma.srd.5.2.1.reference",
@@ -6092,12 +6092,12 @@
    ]
   },
   {
-   "name": "candidate-install-bundled-srd-edcfe81cdcc357202ac16a2e",
+   "name": "candidate-install-bundled-srd-ce8ed6ed7eb6703a10246d29",
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6139,7 +6139,7 @@
    ],
    "outcome": [
     null,
-    "296117ea7dff1e809ad3e22e87912dfff69dd0cb7f0ac3f5734416e4c5c4573a"
+    "5abc3a157eb731fda6b7aa5c88a646b0dac0a77ce41ec313c44538f6204ac0a2"
    ]
   },
   {
@@ -6185,8 +6185,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6236,8 +6236,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "dependency",
      "load_order": 0,
      "dependencies": [
@@ -6287,8 +6287,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6338,8 +6338,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6389,8 +6389,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 5,
      "dependencies": [
@@ -6440,8 +6440,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6483,7 +6483,7 @@
    ],
    "outcome": [
     null,
-    "d895da7a559e024d9066a2c21adc826c1cb7c4c49f67f81ec4a7919f602b2205"
+    "daeadcdbe3ea72d61ae1cd7c58e29e30b365d78155ec0b8dead2aab9e7adeae2"
    ]
   },
   {
@@ -6491,8 +6491,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": -1,
      "dependencies": [
@@ -6542,8 +6542,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6593,8 +6593,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6651,8 +6651,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6703,8 +6703,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6755,7 +6755,7 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
+     "version": "0.3.29",
      "sha256": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
      "role": "primary",
      "load_order": 0,
@@ -6807,7 +6807,7 @@
     {
      "package_id": "sylvia.srd-lite.bg3",
      "version": "",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6857,8 +6857,8 @@
    "entries": [
     {
      "package_id": "\u001fid",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6908,8 +6908,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -6959,8 +6959,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -7010,8 +7010,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -7061,8 +7061,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
@@ -7112,8 +7112,8 @@
    "entries": [
     {
      "package_id": "sylvia.srd-lite.bg3",
-     "version": "0.3.28",
-     "sha256": "08cdb76c69edbffd3849850db41610ca8ca0635ca15904b1e5f3bf7fde4312af",
+     "version": "0.3.29",
+     "sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
      "role": "primary",
      "load_order": 0,
      "dependencies": [
