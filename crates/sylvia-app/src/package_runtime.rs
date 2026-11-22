@@ -127,14 +127,16 @@ fn unique_keys_flatten(constructor: &mut Constructor, node: NodeId) -> Result<()
 }
 
 /// `yaml.load(text, Loader=_UniqueRuntimeLoader)` with `_load_runtime`'s exception handling.
-fn load_yaml(runtime_bytes: &[u8]) -> Outcome<Data> {
+/// `yaml.load(text, Loader=_UniqueRuntimeLoader if authoring else _BoundedRuntimeLoader)`: both
+/// check the node graph first; only the authoring loader refuses duplicate keys.
+fn load_yaml(runtime_bytes: &[u8], authoring: bool) -> Outcome<Data> {
     const INVALID: &str = "Package runtime YAML is invalid";
     let Ok(text) = std::str::from_utf8(runtime_bytes) else {
         return reject(INVALID);
     };
     let hooks = Hooks {
         construct_document: Some(bounded_document),
-        flatten_mapping: Some(unique_keys_flatten),
+        flatten_mapping: if authoring { Some(unique_keys_flatten) } else { None },
         ..Hooks::default()
     };
     let loaded = match pyyaml::load(text, Loader::C, hooks) {
@@ -590,38 +592,41 @@ fn shape_error(message: &str, error: ContentShapeError) -> PackageRuntimeFailure
 
 // ── The whole check ────────────────────────────────────────────────────────────────────────
 
-/// `_load_runtime(package_id=..., runtime_bytes=..., authoring=True)`.
-fn load_runtime(package_id: &str, runtime_bytes: &[u8]) -> Outcome<RuntimeTables> {
+/// `_load_runtime(package_id=..., runtime_bytes=..., authoring=...)`. The execution load
+/// (`authoring=False`) skips the content schema and the authoring shape checks.
+fn load_runtime(package_id: &str, runtime_bytes: &[u8], authoring: bool) -> Outcome<RuntimeTables> {
     if runtime_bytes.len() > PACKAGE_RUNTIME_BYTE_LIMIT {
         return reject("Package runtime exceeds the byte limit");
     }
-    let raw = load_yaml(runtime_bytes)?;
+    let raw = load_yaml(runtime_bytes, authoring)?;
     let Data::Dict(raw_pairs) = &raw else {
         return reject("Package runtime must be an object");
     };
     validate_shape(&raw)?;
-    validate_content_shape("package_runtime", &json_of(&raw), Some(PACKAGE_RUNTIME_PATH))
-        .map_err(|error| shape_error("Package runtime fields are invalid", error))?;
-    let executable_errors = runtime_authoring_shape_errors(&raw)?;
-    if !executable_errors.is_empty() {
-        let diagnostics = executable_errors
-            .into_iter()
-            .map(|(path, message)| RulesetDiagnostic {
-                code: "runtime_effect_field_invalid".into(),
-                phase: "runtime".into(),
-                message,
-                file: Some(PACKAGE_RUNTIME_PATH.into()),
-                path: Some(path),
-                package_id: None,
-                item_id: None,
-                expected: None,
-                actual: None,
-                guidance: Some("Read the package_runtime executable definition for this field.".into()),
-            })
-            .collect();
-        return Err(
-            PackageRuntimeError::with("Package runtime effect fields are invalid", diagnostics).into()
-        );
+    if authoring {
+        validate_content_shape("package_runtime", &json_of(&raw), Some(PACKAGE_RUNTIME_PATH))
+            .map_err(|error| shape_error("Package runtime fields are invalid", error))?;
+        let executable_errors = runtime_authoring_shape_errors(&raw)?;
+        if !executable_errors.is_empty() {
+            let diagnostics = executable_errors
+                .into_iter()
+                .map(|(path, message)| RulesetDiagnostic {
+                    code: "runtime_effect_field_invalid".into(),
+                    phase: "runtime".into(),
+                    message,
+                    file: Some(PACKAGE_RUNTIME_PATH.into()),
+                    path: Some(path),
+                    package_id: None,
+                    item_id: None,
+                    expected: None,
+                    actual: None,
+                    guidance: Some("Read the package_runtime executable definition for this field.".into()),
+                })
+                .collect();
+            return Err(
+                PackageRuntimeError::with("Package runtime effect fields are invalid", diagnostics).into()
+            );
+        }
     }
     if !validate_parameter_declarations(raw_pairs)?.is_empty() {
         return reject("Package runtime parameter declarations are invalid");
@@ -681,7 +686,7 @@ pub fn validate_package_runtime(
     declarations: &[ToolDeclaration],
     runtime_bytes: &[u8],
 ) -> Result<(), PackageRuntimeFailure> {
-    let runtime = load_runtime(package_id, runtime_bytes)?;
+    let runtime = load_runtime(package_id, runtime_bytes, true)?;
     let declared: Vec<&str> = declarations.iter().map(|declaration| declaration.name.as_str()).collect();
     let unique: HashSet<&str> = declared.iter().copied().collect();
     if unique.len() != declarations.len() {
@@ -723,4 +728,38 @@ pub fn validate_package_runtime(
         }
     }
     Ok(())
+}
+
+/// `_parse_runtime(package_id=..., runtime_bytes=...)`, the execution parse.
+///
+/// Python keeps parsed runtimes in an in-process cache and reuses an authoring parse of the same
+/// bytes. An authoring parse that succeeds has no duplicate keys, so the execution parse of those
+/// bytes builds the same data: the reuse cannot change a result, and each call parses afresh.
+fn parse_runtime(package_id: &str, runtime_bytes: &[u8]) -> Outcome<RuntimeTables> {
+    load_runtime(package_id, runtime_bytes, false)
+}
+
+/// `package_model_decision_boundary(package_id=..., runtime_bytes=...)`: the validated
+/// Ruleset-owned active-actor control projection, `model_decision_scope or
+/// model_decision_boundary`, as mutable JSON. An empty scope falls back to the boundary, and a
+/// value that is not an object counts as absent.
+pub fn package_model_decision_boundary(
+    package_id: &str,
+    runtime_bytes: &[u8],
+) -> Result<Option<JsonMap>, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let declared = |name: &str| {
+        runtime.ruleset.iter().find_map(|(key, value)| match (key, value) {
+            (Data::Str(key), Data::Dict(_)) if key == name => Some(value),
+            _ => None,
+        })
+    };
+    let chosen = match declared("model_decision_scope") {
+        Some(Data::Dict(pairs)) if !pairs.is_empty() => declared("model_decision_scope"),
+        _ => declared("model_decision_boundary"),
+    };
+    Ok(chosen.map(|value| match json_of(value) {
+        Json::Object(map) => map,
+        _ => unreachable!("an object"),
+    }))
 }
