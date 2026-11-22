@@ -1,0 +1,3397 @@
+{
+ "python": "3.12.11",
+ "versions": {
+  "2.1.400": [
+   2,
+   1,
+   400
+  ],
+  " 2.1.400\n": [
+   2,
+   1,
+   400
+  ],
+  "02.010.0400": [
+   2,
+   10,
+   400
+  ],
+  "2.1": "Claude Code could not be downloaded from Anthropic. Check your connection and try again.",
+  "2.1.4.5": "Claude Code could not be downloaded from Anthropic. Check your connection and try again.",
+  "v2.1.4": "Claude Code could not be downloaded from Anthropic. Check your connection and try again.",
+  "\u0662.\u0661.\u0664": [
+   2,
+   1,
+   4
+  ],
+  "": "Claude Code could not be downloaded from Anthropic. Check your connection and try again.",
+  "2..1": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+ },
+ "dearmor": {
+  "plain": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\nComment: Anthropic\n\na2V5IHBhY2tldHMgaGVyZQ==\n=abcd\n-----END PGP PUBLIC KEY BLOCK-----\n",
+   "value": "a2V5IHBhY2tldHMgaGVyZQ=="
+  },
+  "crlf": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\r\nComment: Anthropic\r\n\r\na2V5IHBhY2tldHMgaGVyZQ==\r\n=abcd\r\n-----END PGP PUBLIC KEY BLOCK-----\r\n",
+   "value": "a2V5IHBhY2tldHMgaGVyZQ=="
+  },
+  "no-headers": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\na2V5IHBhY2tldHMgaGVyZQ==\n=abcd\n-----END PGP PUBLIC KEY BLOCK-----\n",
+   "value": "a2V5IHBhY2tldHMgaGVyZQ=="
+  },
+  "missing-end": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\nComment: Anthropic\n\na2V5IHBhY2tldHMgaGVyZQ==\n=abcd\n\n",
+   "error": "ValueError"
+  },
+  "bad-base64": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\nComment: Anthropic\n\nnot*base64\n=abcd\n-----END PGP PUBLIC KEY BLOCK-----\n",
+   "error": "Error"
+  },
+  "non-ascii": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\nComment: Anthr\u00f6pic\n\na2V5IHBhY2tldHMgaGVyZQ==\n=abcd\n-----END PGP PUBLIC KEY BLOCK-----\n",
+   "error": "UnicodeDecodeError"
+  },
+  "spaced": {
+   "text": "-----BEGIN PGP PUBLIC KEY BLOCK-----\nComment: Anthropic\n\n  a2V5IHBhY2tldHMgaGVyZQ==  \n=abcd\n-----END PGP PUBLIC KEY BLOCK-----\n",
+   "value": "a2V5IHBhY2tldHMgaGVyZQ=="
+  }
+ },
+ "gpgv": [
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG ABC Anthropic\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\n",
+    0
+   ],
+   "ok": true
+  },
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG ABC Anthropic\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\n",
+    1
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG ABC Anthropic\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 31ddde24ddfab679f42d7bd2baa929ff1a7ecace\n",
+    0
+   ],
+   "ok": true
+  },
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG ABC Anthropic\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 0000000000000000000000000000000000000000\n",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG ABC Anthropic\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\n[GNUPG:] EXPKEYSIG ABC\n",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "[GNUPG:] GOODSIG ABC\n[GNUPG:] VALIDSIG 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\n",
+    0
+   ],
+   "ok": true
+  },
+  {
+   "outcome": [
+    "[GNUPG:] GOODSIG ABC\n",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "gpgv: Good signature\n",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG ABC Anthropic\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\n[GNUPG:] VALIDSIG X 2026 1 0 4 0 1 8 00 1111111111111111111111111111111111111111\n",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "[GNUPG:] NEWSIG\r\n[GNUPG:] GOODSIG ABC Anthropic\r\n[GNUPG:] VALIDSIG SUBKEY 2026-01-01 1 0 4 0 1 8 00 31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\r\n",
+    0
+   ],
+   "ok": true
+  },
+  {
+   "outcome": [
+    "[GNUPG:]\u001cNEWSIG\n[GNUPG:]\u001cGOODSIG\u001cABC\u001cAnthropic\n[GNUPG:]\u001cVALIDSIG\u001cSUBKEY\u001c2026-01-01\u001c1\u001c0\u001c4\u001c0\u001c1\u001c8\u001c00\u001c31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE\n",
+    0
+   ],
+   "error": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": "oserror",
+   "error": "Sylvia could not check the signature on Claude Code's release list. Try again."
+  },
+  {
+   "outcome": "timeout",
+   "error": "Sylvia could not check the signature on Claude Code's release list. Try again."
+  }
+ ],
+ "publisher": [
+  {
+   "outcome": [
+    "Valid\nAnthropic, PBC",
+    0
+   ],
+   "ok": true
+  },
+  {
+   "outcome": [
+    "Valid\nAnthropic, PBC\n",
+    0
+   ],
+   "error": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "NotSigned\n",
+    0
+   ],
+   "error": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "Valid\nSomeone Else",
+    0
+   ],
+   "error": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "Valid\nAnthropic, PBC",
+    1
+   ],
+   "error": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": [
+    "",
+    0
+   ],
+   "error": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it."
+  },
+  {
+   "outcome": "oserror",
+   "error": "Windows could not check the Claude Code download's signature. Try again."
+  },
+  {
+   "outcome": "timeout",
+   "error": "Windows could not check the Claude Code download's signature. Try again."
+  }
+ ],
+ "installs": [
+  {
+   "name": "win32-x64/fresh",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/older-than-minimum",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjEwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogIjU5YWVkNTg5NTg4YjRkMjVkZmQ0ZjA0ZDk4NGExMDQ5MjNlZDZmNDQ1MTMyNDQ3MjBmOTllYjUxNzBhZmMxYWYiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjMyMg=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.322"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.322",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.322 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.322",
+     null
+    ],
+    [
+     "2.1.322/claude.exe",
+     "claude-version:2.1.322"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/stable-not-a-version",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "PGh0bWw+bWFpbnRlbmFuY2U8L2h0bWw+"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/stable-unicode-digits",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "INmiLtmhLtmk2aDZoCAK"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/up-to-date",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "existing": [
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Sylvia's copy is already up to date."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/existing-other-version",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "existing": [
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.300"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "version",
+     "2.1.400"
+    ],
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/existing-damaged",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "existing": [
+    [
+     "2.1.400/claude.exe",
+     "garbage"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "version",
+     "2.1.400"
+    ],
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/leftovers",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "existing": [
+    [
+     "2.1.100/claude.exe",
+     "claude-version:2.1.100"
+    ],
+    [
+     "notes.txt",
+     "keep"
+    ],
+    [
+     "old.partial/x",
+     "x"
+    ],
+    [
+     ".hidden.partial/x",
+     "x"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ],
+    [
+     "notes.txt",
+     "keep"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/failure-keeps-hidden-partial",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     404,
+     ""
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "existing": [
+    [
+     ".hidden.partial/x",
+     "x"
+    ],
+    [
+     "seen.partial/x",
+     "x"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/checksum-mismatch",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogIjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "The Claude Code download did not match Anthropic's published checksum, so Sylvia discarded it. Try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/longer-than-size",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDE5fSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 19,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/shorter-than-size",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDI1fSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 25,
+    "message": "The Claude Code download did not match Anthropic's published checksum, so Sylvia discarded it. Try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/no-platform-entry",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiB7fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/platforms-not-a-dict",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiBbMV19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/entry-not-a-dict",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiB7IndpbjMyLXg2NCI6ICJ4In19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/missing-size",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiB7IndpbjMyLXg2NCI6IHsiY2hlY2tzdW0iOiAiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJ9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/wrong-binary-name",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJvdGhlciIsICJjaGVja3N1bSI6ICJmM2M0NmQ1OGM5YmNjOTQzNzk0MTg1N2E1OTExOGY2N2RhMjFhZDVlODA4YjgxNzMyN2I2NTE3NjljNmNjN2IwIiwgInNpemUiOiAyMn0sICJvdGhlci1wbGF0Zm9ybSI6IHsic2l6ZSI6IDF9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/uppercase-checksum",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogIkYzQzQ2RDU4QzlCQ0M5NDM3OTQxODU3QTU5MTE4RjY3REEyMUFENUU4MDhCODE3MzI3QjY1MTc2OUM2Q0M3QjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/size-bool",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IHRydWV9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/size-zero",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDB9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/size-too-big",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIxNDc0ODM2NDl9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/size-float",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyLjB9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/invalid-manifest-json",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "e29vcHM="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/little-disk",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "free": 67108885,
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "There is not enough free disk space to install Claude Code."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/just-enough-disk",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "free": 67108886,
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/reports-other-version",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogIjFhYzExMGVmZTliYTgzNTA0MGVlNTliNGM4ZTNmZjc0ZTE1ZTU1NGNjOTZjMTgzYzgxNzE1N2NkMGE3NDljYjgiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjM5OQ=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "The Claude Code download did not report the expected version, so Sylvia discarded it."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/reports-damaged",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogIjhiMmFlYzhkMzY0YzlkZTkzZGRiNDM0NTJlYzMyYTk5Y2VmYTQwMTY0MDUyNzQ4Mzk5NGI1NTA2OGQ1ZWRjYmUiLCAic2l6ZSI6IDE1fSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "bm8gdmVyc2lvbiBoZXJl"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 15,
+    "total": 15,
+    "message": "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude.exe",
+     "no version here"
+    ]
+   ]
+  },
+  {
+   "name": "win32-x64/stable-404",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     404,
+     "bWlzc2luZw=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/manifest-unreachable",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": "connect-error",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/binary-500",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     500,
+     ""
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 22,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/binary-redirect",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     302,
+     ""
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 22,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/cancelled",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "cancel_on_binary": true,
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "idle",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 22,
+    "message": "Setup was cancelled. Nothing was changed."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "win32-x64/publisher-refused",
+   "build": "win32-x64",
+   "executable": "claude.exe",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJ3aW4zMi14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUuZXhlIiwgImNoZWNrc3VtIjogImYzYzQ2ZDU4YzliY2M5NDM3OTQxODU3YTU5MTE4ZjY3ZGEyMWFkNWU4MDhiODE3MzI3YjY1MTc2OWM2Y2M3YjAiLCAic2l6ZSI6IDIyfSwgIm90aGVyLXBsYXRmb3JtIjogeyJzaXplIjogMX19fQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ]
+   },
+   "publisher": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it.",
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/win32-x64/claude.exe"
+   ],
+   "checks": [
+    [
+     "publisher",
+     "claude.exe"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "The Claude Code download is not signed by Anthropic, so Sylvia discarded it."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/fresh",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/older-than-minimum",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjEwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiNTlhZWQ1ODk1ODhiNGQyNWRmZDRmMDRkOTg0YTEwNDkyM2VkNmY0NDUxMzI0NDcyMGY5OWViNTE3MGFmYzFhZiIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjMyMg=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.322/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.322"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.322",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.322 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.322",
+     null
+    ],
+    [
+     "2.1.322/claude",
+     "claude-version:2.1.322"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/stable-not-a-version",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "PGh0bWw+bWFpbnRlbmFuY2U8L2h0bWw+"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/stable-unicode-digits",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "INmiLtmhLtmk2aDZoCAK"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/up-to-date",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "existing": [
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Sylvia's copy is already up to date."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/existing-other-version",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "existing": [
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.300"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "version",
+     "2.1.400"
+    ],
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/existing-damaged",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "existing": [
+    [
+     "2.1.400/claude",
+     "garbage"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "version",
+     "2.1.400"
+    ],
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/leftovers",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "existing": [
+    [
+     "2.1.100/claude",
+     "claude-version:2.1.100"
+    ],
+    [
+     "notes.txt",
+     "keep"
+    ],
+    [
+     "old.partial/x",
+     "x"
+    ],
+    [
+     ".hidden.partial/x",
+     "x"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ],
+    [
+     "notes.txt",
+     "keep"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/failure-keeps-hidden-partial",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     404,
+     ""
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "existing": [
+    [
+     ".hidden.partial/x",
+     "x"
+    ],
+    [
+     "seen.partial/x",
+     "x"
+    ]
+   ],
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/checksum-mismatch",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "The Claude Code download did not match Anthropic's published checksum, so Sylvia discarded it. Try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/longer-than-size",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMTl9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 19,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/shorter-than-size",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjV9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 25,
+    "message": "The Claude Code download did not match Anthropic's published checksum, so Sylvia discarded it. Try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/no-platform-entry",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiB7fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     17,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/platforms-not-a-dict",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiBbMV19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     18,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/entry-not-a-dict",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiB7ImxpbnV4LXg2NCI6ICJ4In19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     33,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/missing-size",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJwbGF0Zm9ybXMiOiB7ImxpbnV4LXg2NCI6IHsiY2hlY2tzdW0iOiAiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJ9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     110,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/wrong-binary-name",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJvdGhlciIsICJjaGVja3N1bSI6ICJmM2M0NmQ1OGM5YmNjOTQzNzk0MTg1N2E1OTExOGY2N2RhMjFhZDVlODA4YjgxNzMyN2I2NTE3NjljNmNjN2IwIiwgInNpemUiOiAyMn0sICJvdGhlci1wbGF0Zm9ybSI6IHsic2l6ZSI6IDF9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     194,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/uppercase-checksum",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiRjNDNDZENThDOUJDQzk0Mzc5NDE4NTdBNTkxMThGNjdEQTIxQUQ1RTgwOEI4MTczMjdCNjUxNzY5QzZDQzdCMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/size-bool",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogdHJ1ZX0sICJvdGhlci1wbGF0Zm9ybSI6IHsic2l6ZSI6IDF9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     197,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/size-zero",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMH0sICJvdGhlci1wbGF0Zm9ybSI6IHsic2l6ZSI6IDF9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     194,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/size-too-big",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjE0NzQ4MzY0OX0sICJvdGhlci1wbGF0Zm9ybSI6IHsic2l6ZSI6IDF9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     203,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/size-float",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjIuMH0sICJvdGhlci1wbGF0Zm9ybSI6IHsic2l6ZSI6IDF9fX0="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     197,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/invalid-manifest-json",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "e29vcHM="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     5,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/little-disk",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "free": 67108885,
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "There is not enough free disk space to install Claude Code."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/just-enough-disk",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "free": 67108886,
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "ready",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "Claude Code 2.1.400 is installed for Sylvia."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "claude-version:2.1.400"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/reports-other-version",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiMWFjMTEwZWZlOWJhODM1MDQwZWU1OWI0YzhlM2ZmNzRlMTVlNTU0Y2M5NmMxODNjODE3MTU3Y2QwYTc0OWNiOCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjM5OQ=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 22,
+    "total": 22,
+    "message": "The Claude Code download did not report the expected version, so Sylvia discarded it."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/reports-damaged",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiOGIyYWVjOGQzNjRjOWRlOTNkZGI0MzQ1MmVjMzJhOTljZWZhNDAxNjQwNTI3NDgzOTk0YjU1MDY4ZDVlZGNiZSIsICJzaXplIjogMTV9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "bm8gdmVyc2lvbiBoZXJl"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ],
+    [
+     "version",
+     "2.1.400"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 15,
+    "total": 15,
+    "message": "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   },
+   "escaped": null,
+   "files": [
+    [
+     "2.1.400",
+     null
+    ],
+    [
+     "2.1.400/claude",
+     "no version here"
+    ]
+   ]
+  },
+  {
+   "name": "linux-x64/stable-404",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     404,
+     "bWlzc2luZw=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/manifest-unreachable",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": "connect-error",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/binary-500",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     500,
+     ""
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 22,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/binary-redirect",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     302,
+     ""
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 22,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/cancelled",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "cancel_on_binary": true,
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "idle",
+    "version": "2.1.400",
+    "received": 0,
+    "total": 22,
+    "message": "Setup was cancelled. Nothing was changed."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/manifest-signature-refused",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     200,
+     "c2lnbmF0dXJlLWJ5dGVz"
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "manifest_check": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it.",
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig",
+    "https://downloads.claude.ai/keys/claude-code.asc"
+   ],
+   "checks": [
+    [
+     "manifest",
+     195,
+     "signature-bytes",
+     "key-bytes"
+    ]
+   ],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "The Claude Code release list is not signed by Anthropic, so Sylvia discarded it."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "linux-x64/signature-404",
+   "build": "linux-x64",
+   "executable": "claude",
+   "routes": {
+    "https://downloads.claude.ai/claude-code-releases/stable": [
+     200,
+     "Mi4xLjQwMAo="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json": [
+     200,
+     "eyJ2ZXJzaW9uIjogIjIuMS40MDAiLCAicGxhdGZvcm1zIjogeyJsaW51eC14NjQiOiB7ImJpbmFyeSI6ICJjbGF1ZGUiLCAiY2hlY2tzdW0iOiAiZjNjNDZkNThjOWJjYzk0Mzc5NDE4NTdhNTkxMThmNjdkYTIxYWQ1ZTgwOGI4MTczMjdiNjUxNzY5YzZjYzdiMCIsICJzaXplIjogMjJ9LCAib3RoZXItcGxhdGZvcm0iOiB7InNpemUiOiAxfX19"
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/linux-x64/claude": [
+     200,
+     "Y2xhdWRlLXZlcnNpb246Mi4xLjQwMA=="
+    ],
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig": [
+     404,
+     ""
+    ],
+    "https://downloads.claude.ai/keys/claude-code.asc": [
+     200,
+     "a2V5LWJ5dGVz"
+    ]
+   },
+   "requested": [
+    "https://downloads.claude.ai/claude-code-releases/stable",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json",
+    "https://downloads.claude.ai/claude-code-releases/2.1.400/manifest.json.sig"
+   ],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": "2.1.400",
+    "received": 0,
+    "total": null,
+    "message": "Claude Code could not be downloaded from Anthropic. Check your connection and try again."
+   },
+   "escaped": null,
+   "files": []
+  },
+  {
+   "name": "unsupported-platform",
+   "build": null,
+   "executable": "claude",
+   "routes": {},
+   "platform_error": "Sylvia can set up Claude Code on Windows and Linux only in this version.",
+   "requested": [],
+   "checks": [],
+   "progress": {
+    "state": "failed",
+    "version": null,
+    "received": 0,
+    "total": null,
+    "message": "Sylvia can set up Claude Code on Windows and Linux only in this version."
+   },
+   "escaped": null,
+   "files": []
+  }
+ ]
+}
