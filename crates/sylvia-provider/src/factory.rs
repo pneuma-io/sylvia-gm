@@ -36,6 +36,8 @@ pub type ClientBuilder = dyn Fn(&TimeoutConfig) -> Result<Arc<dyn HttpTransport>
 /// The product's factory.
 pub struct DefaultProviderFactory {
     client: Arc<ClientBuilder>,
+    /// Gemini's client: Python's plain `httpx.AsyncClient(follow_redirects=False)`.
+    plain_client: Arc<ClientBuilder>,
     environment: SdkEnvironment,
     anthropic: AnthropicEnvironment,
 }
@@ -43,7 +45,18 @@ pub struct DefaultProviderFactory {
 impl DefaultProviderFactory {
     /// A factory whose providers use clients from `client` and the SDK environment given.
     pub fn new(client: Arc<ClientBuilder>, environment: SdkEnvironment) -> Self {
-        Self { client, environment, anthropic: AnthropicEnvironment::default() }
+        Self {
+            plain_client: Arc::clone(&client),
+            client,
+            environment,
+            anthropic: AnthropicEnvironment::default(),
+        }
+    }
+
+    /// The same factory with the client its Gemini providers use (no redirects followed).
+    pub fn with_plain_client(mut self, plain_client: Arc<ClientBuilder>) -> Self {
+        self.plain_client = plain_client;
+        self
     }
 
     /// The same factory with the environment its Anthropic providers read.
@@ -59,7 +72,13 @@ impl DefaultProviderFactory {
             let settings = crate::net::ClientSettings::from_system(timeouts.clone());
             Ok(Arc::new(crate::net::NetworkTransport::new(settings)?) as Arc<dyn HttpTransport>)
         });
+        let plain_client: Arc<ClientBuilder> = Arc::new(|timeouts: &TimeoutConfig| {
+            let mut settings = crate::net::ClientSettings::from_system(timeouts.clone());
+            settings.follow_redirects = false;
+            Ok(Arc::new(crate::net::NetworkTransport::new(settings)?) as Arc<dyn HttpTransport>)
+        });
         Self::new(client, SdkEnvironment::from_process())
+            .with_plain_client(plain_client)
             .with_anthropic_environment(AnthropicEnvironment::from_process())
     }
 }
@@ -177,7 +196,7 @@ impl DefaultProviderFactory {
                 Ok(BuiltProvider::Anthropic(provider))
             }
             transport::GEMINI_GENERATE_CONTENT => {
-                let client = (self.client)(&GEMINI_CLIENT_TIMEOUTS).map_err(|error| match error {
+                let client = (self.plain_client)(&GEMINI_CLIENT_TIMEOUTS).map_err(|error| match error {
                     ProxyError::Value(message) => value_error(message),
                     ProxyError::Internal(message) => internal("InvalidURL", message),
                 })?;
