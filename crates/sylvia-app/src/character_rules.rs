@@ -1,10 +1,9 @@
 //! `application/character_rules.py`: read-only character constraints for the bounded Ruleset
 //! runtime.
 //!
-//! Ported: `validate_character_rules` (admission, through lane 2's
-//! `sylvia_engine::ruleset::validate_effects`) and `campaign_character_state`.
-//! `prepare_character_rules` and `verify_character_rules` run the admitted effects with
-//! `runtime/_effect_executor.py`'s `execute_effects`, and follow once lane 2 ports it.
+//! `validate_character_rules` admits a program through lane 2's
+//! `sylvia_engine::ruleset::validate_effects`; `prepare_character_rules` and
+//! `verify_character_rules` run it with lane 2's `sylvia_engine::exec::execute_effects`.
 
 use sylvia_base::pystr::INT_RANGE_MESSAGE;
 use sylvia_base::pyyaml::Data;
@@ -12,8 +11,13 @@ use sylvia_base::{pyjson, pystr, Json, JsonMap};
 use sylvia_domain::error::{DomainError, DomainResult, RulesetDiagnostic};
 use sylvia_domain::package_library::canonical_json_bytes;
 use sylvia_domain::pyops::{py_eq, py_get_attr, py_item, py_iter, py_str};
+use sylvia_engine::exec::context::{Extras, NestedMode};
+use sylvia_engine::exec::effects::execute_effects;
+use sylvia_engine::exec::{Combat, ExecError, ExecTool, ExecutionContext, ToolHost};
+use sylvia_engine::expr::{Dict, ExecutionBudget, Value};
 use sylvia_engine::pyerror::{PyError, PyErrorKind};
 use sylvia_engine::ruleset::validate_effects;
+use sylvia_engine::Dice;
 
 /// `_HANDLERS`: the read-only runtime effects a character validation may use.
 const HANDLERS: [&str; 6] = ["set", "list_push", "require", "condition", "for_each", "table_lookup"];
@@ -197,4 +201,142 @@ fn read_back(canonical: Vec<u8>) -> JsonMap {
         Ok(Json::Object(map)) => map,
         _ => unreachable!("canonical JSON of an object reads back as one"),
     }
+}
+
+/// No tools: an admitted character validation runs no `call` effect.
+struct NoTools {
+    config: Value,
+    definitions: Value,
+}
+
+impl ToolHost for NoTools {
+    fn tool(&self, _name: &str) -> Option<&ExecTool> {
+        None
+    }
+    fn ruleset_config(&self) -> &Value {
+        &self.config
+    }
+    fn definitions(&self) -> &Value {
+        &self.definitions
+    }
+}
+
+/// `canonical_json_bytes(value)` of a runtime value, read back: finite JSON data only, else
+/// `thaw_json_value`'s `TypeError`.
+pub(crate) fn runtime_json(value: &Value) -> DomainResult<Json> {
+    let refuse = || DomainError::type_error("Value is not JSON-compatible");
+    let json = match value {
+        Value::None => Json::Null,
+        Value::Bool(flag) => Json::Bool(*flag),
+        Value::Int(number) => Json::from(*number),
+        Value::Float(number) => Json::Number(serde_json::Number::from_f64(*number).ok_or_else(refuse)?),
+        Value::Str(text) => Json::String(text.to_string()),
+        Value::List(items) | Value::Tuple(items) => {
+            Json::Array(items.iter().map(runtime_json).collect::<DomainResult<_>>()?)
+        }
+        Value::Dict(map) => Json::Object(
+            map.iter()
+                .map(|(key, item)| Ok((key.clone(), runtime_json(item)?)))
+                .collect::<DomainResult<_>>()?,
+        ),
+        Value::Object(_) | Value::Method(_) => return Err(refuse()),
+    };
+    Ok(json)
+}
+
+/// The runtime's dict of a JSON object.
+pub(crate) fn runtime_dict(value: &Json) -> Dict {
+    match Value::from_json(value) {
+        Value::Dict(map) => (*map).clone(),
+        _ => Dict::new(),
+    }
+}
+
+/// `prepare_character_rules(...)`'s `check`: an admitted program with its fixed inputs.
+pub struct PreparedCharacterRules {
+    checked: Option<JsonMap>,
+    participant: Json,
+    setting_data: Json,
+    campaign_state: Json,
+}
+
+impl PreparedCharacterRules {
+    /// `check(state)`: run the program on fresh private copies and return its local results,
+    /// in canonical key order. Without a program, an empty result.
+    pub fn check(&self, state: &Json) -> DomainResult<JsonMap> {
+        let Some(checked) = &self.checked else { return Ok(JsonMap::new()) };
+        let mut inputs = JsonMap::new();
+        inputs.insert("participant".into(), self.participant.clone());
+        inputs.insert("state".into(), state.clone());
+        inputs.insert("setting_data".into(), self.setting_data.clone());
+        inputs.insert("campaign_state".into(), self.campaign_state.clone());
+        let inputs = Json::Object(read_back(canonical_json_bytes(&Json::Object(inputs))));
+        // Local lists can alias table values or literal effects. Keep every execution owned.
+        let definitions = Value::from_json(&checked["definitions"]);
+        let effects = Value::from_json(&checked["effects"]);
+        let budget = ExecutionBudget::default();
+        let mut dice = Dice::default();
+        let host = NoTools { config: Value::dict(Dict::new()), definitions: definitions.clone() };
+        let mut context = ExecutionContext {
+            params: runtime_dict(&inputs),
+            vars: Dict::new(),
+            entities: Dict::new(),
+            ruleset_config: Value::dict(Dict::new()),
+            definitions,
+            combat: Combat::own(Dict::new()),
+            state_bridge: None,
+            current_tool: String::new(),
+            extras: Extras::default(),
+            budget: &budget,
+            dice: &mut dice,
+            choice: None,
+            list_history: Vec::new(),
+            procedure_executor: None,
+            nested_mode: NestedMode::Package,
+        };
+        match execute_effects(&effects, &mut context, &host) {
+            Ok(()) => {}
+            Err(ExecError::PreCondition { message, .. }) => {
+                return Err(reject("character_initial_state_rule_rejected", &message))
+            }
+            Err(ExecError::Effect { .. }) => {
+                return Err(reject(
+                    "character_initial_state_validation_failed",
+                    "The Ruleset could not validate the character's declared choices.",
+                ))
+            }
+            Err(other) => return Err(DomainError::uncaught(other.class_name(), other.message())),
+        }
+        let vars = runtime_json(&Value::dict(context.vars))?;
+        Ok(read_back(canonical_json_bytes(&vars)))
+    }
+}
+
+/// `prepare_character_rules(participant, program, setting_data, campaign_state=...)`: admit a
+/// program once; check each changing state with fresh private runtime data.
+pub fn prepare_character_rules(
+    participant: &Json,
+    program: Option<&Json>,
+    setting_data: Option<&Json>,
+    campaign_state: Option<&Json>,
+) -> DomainResult<PreparedCharacterRules> {
+    let empty = || Json::Object(JsonMap::new());
+    Ok(PreparedCharacterRules {
+        checked: validate_character_rules(program)?,
+        participant: participant.clone(),
+        setting_data: setting_data.cloned().unwrap_or_else(empty),
+        campaign_state: campaign_state.cloned().unwrap_or_else(empty),
+    })
+}
+
+/// `verify_character_rules(participant, state, program, setting_data, campaign_state=...)`:
+/// check private copies and return local results without mutation or external access.
+pub fn verify_character_rules(
+    participant: &Json,
+    state: &Json,
+    program: Option<&Json>,
+    setting_data: Option<&Json>,
+    campaign_state: Option<&Json>,
+) -> DomainResult<JsonMap> {
+    prepare_character_rules(participant, program, setting_data, campaign_state)?.check(state)
 }
