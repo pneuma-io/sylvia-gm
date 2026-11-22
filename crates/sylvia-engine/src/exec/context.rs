@@ -241,6 +241,7 @@ impl<'a> ExecutionContext<'a> {
             ruleset_config: &self.ruleset_config,
             definitions: &self.definitions,
             budget: Some(self.budget),
+            required_inputs: false,
         };
         f(&eval)
     }

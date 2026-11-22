@@ -147,6 +147,9 @@ pub struct EvalContext<'a> {
     pub definitions: &'a Value,
     /// `ctx.budget`.
     pub budget: Option<&'a ExecutionBudget>,
+    /// Whether the dicts under the parameters are `initial_character_state._RequiredInputs`,
+    /// whose `.get` raises `FieldNotFoundError` for a missing key. Only `_calculate` sets it.
+    pub required_inputs: bool,
 }
 
 /// `evaluate_expression(expr, context)`: parse (Python caches successful parses; a parse has no
@@ -214,6 +217,22 @@ pub fn resolve_root(name: &str, ctx: &EvalContext<'_>) -> Value {
     }
 }
 
+/// `_traverse_field(value, field)` where a dict is `_RequiredInputs` when `required_inputs`:
+/// a missing key raises instead of giving `None`. A present key holding null still gives `None`.
+/// The one dict a creation calculation builds fresh, a `merge(...)` result, is plain in Python
+/// and so returns `None` for its own missing keys: differences row 41 (merge results in
+/// creation calculations).
+pub(crate) fn traverse_required(value: &Value, field: &str, required_inputs: bool) -> EvalResult<Value> {
+    if let (true, Value::Dict(map)) = (required_inputs, value) {
+        if !map.contains_key(field) {
+            return Err(EvalError::Expression(ExpressionError::field_not_found(
+                "A required creation input is missing",
+            )));
+        }
+    }
+    Ok(traverse(value, field))
+}
+
 /// `_traverse_field(value, field)`.
 pub(crate) fn traverse(value: &Value, field: &str) -> Value {
     match value {
@@ -263,7 +282,11 @@ fn field_access(segments: &[(String, Option<Box<Node>>)], ctx: &EvalContext<'_>)
     let path = || segments.iter().map(|(name, _)| name.as_str()).collect::<Vec<_>>().join(".");
     let mut value = Value::None;
     for (index, (name, index_expr)) in segments.iter().enumerate() {
-        value = if index == 0 { resolve_root(name, ctx) } else { traverse(&value, name) };
+        value = if index == 0 {
+            resolve_root(name, ctx)
+        } else {
+            traverse_required(&value, name, ctx.required_inputs)?
+        };
         let Some(index_expr) = index_expr else { continue };
         let idx = evaluate(index_expr, ctx)?;
         let out_of_range = || {
@@ -798,6 +821,7 @@ mod tests {
             ruleset_config: &none,
             definitions: &none,
             budget: None,
+            required_inputs: false,
         };
         evaluate_expression(expr, &ctx)
     }

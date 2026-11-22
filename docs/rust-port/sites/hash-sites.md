@@ -160,11 +160,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:598` | `<module>` | hashlib.sha256 | `_MIGRATION_5_SHA256 = hashlib.sha256(_MIGRATION_5.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:607` | `<module>` | hashlib.sha256 | `_MIGRATION_8_SHA256 = hashlib.sha256(_MIGRATION_8.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:944` | `_stored_action_hash` | hashlib.sha256 | `return hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | |
-| `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | |
-| `infrastructure/sqlite_authority.py:1586` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:1715` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:1738` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `or str(row["chunk_sha256"]) != hashlib.sha256(data).hexdigest()` | |
+| `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1586` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1715` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1738` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `or str(row["chunk_sha256"]) != hashlib.sha256(data).hexdigest()` | `sylvia-store` export_writer |
 | `infrastructure/sqlite_authority.py:4165` | `SQLiteAuthorityStore._verify_construction_authority` | hashlib.sha256 | `or hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | |
 | `infrastructure/sqlite_authority.py:4460` | `SQLiteAuthorityStore._verify_construction_authority` | hashlib.sha256 | `representation_sha256 = hashlib.sha256( canonical_json_bytes( { "canonical_input": canonical_input, "canonical_plan": canonical_plan, } ) ).hexdige...` | |
 | `infrastructure/sqlite_authority.py:5675` | `SQLiteAuthorityStore._verify_session_identities` | hashlib.sha256 | `if hashlib.sha256(_dump(plan.content).encode("utf-8")).hexdigest() != (` | |
@@ -238,8 +238,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:424` | `_provider_profile_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{display_name.casefold()}\n{base_url}".encode()).hexdigest()[:16]` | |
 | `provider/_admin_audit.py:94` | `_serialization_projection` | hashlib.sha256 | `"sha256": hashlib.sha256(encoded).hexdigest(),` | |
 | `provider/_claude_install.py:350` | `ClaudeInstaller._install` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | |
-| `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | |
+| `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | `sylvia-provider` context_fit_vectors |
+| `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | `sylvia-provider` context_fit_vectors |
 | `provider/_request_metadata.py:33` | `opencode_request_headers` | hashlib.sha256 | `digest = hashlib.sha256(session_id.encode("utf-8")).hexdigest()` | |
 | `session/_prompt_assembler.py:232` | `PromptAssembler.__init__` | hashlib.sha256 | `self._stable_base_hash = hashlib.sha256(self._stable_base.encode()).hexdigest()` | |
 | `session/_prompt_assembler.py:456` | `PromptAssembler.build_character` | hashlib.sha256 | `current_hash = hashlib.sha256(state_payload.encode()).hexdigest()` | |

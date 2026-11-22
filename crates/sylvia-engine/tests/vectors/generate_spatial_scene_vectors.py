@@ -23,16 +23,18 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 import random
 import sys
 from pathlib import Path
 
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from sylvia_gm.spatial import SpatialValidationError, admit_spatial_scene, mutate_spatial_scene
+from sylvia_gm.spatial import SpatialValidationError, admit_spatial_query, admit_spatial_scene, mutate_spatial_scene
 
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "spatial_scene_vectors.json"
 MUTATION_OUTPUT = HERE / "spatial_mutation_vectors.json"
+QUERY_OUTPUT = HERE / "spatial_query_vectors.json"
 
 BASE = {
     "format": 1,
@@ -418,6 +420,228 @@ def random_patch(rng: random.Random, kind: str) -> dict:
     return patch
 
 
+QUERY_SCENE = copy.deepcopy(BASE)
+QUERY_SCENE["entities"][1]["active"] = True
+QUERY_SCENE["zones"][1]["metadata"] = {"open": None}
+QUERY_SCENE["entities"].append({"id": "elf", "map_id": "keep", "position": [12, 10, 0], "footprint": {"kind": "circle", "radius": 0.5},
+                                "height": 2, "facing": [0, 1], "active": True, "movement": "blocking", "visibility": "clear",
+                                "metadata": {"name": "Elf", "faction": "wood"}})
+QUERY_SCENE["entities"].append({"id": "ghost", "map_id": "keep", "position": [14, 3, 0], "footprint": {"kind": "circle", "radius": 0.5},
+                                "height": 2, "facing": [1, 1], "active": False, "movement": "passable", "visibility": "clear",
+                                "metadata": {}})
+FILTER = {"key": "name", "value": "Orc", "missing_matches": False}
+NO_FILTER = {"key": "", "value": "", "missing_matches": False}
+
+QUERIES = {
+    "ray": {"kind": "ray", "map_id": "keep", "origin": [1, 1, 1], "destination": [10, 10, 1.5],
+            "include": ["entities", "geometry"], "max_intersections": 8},
+    "exposure": {"kind": "exposure", "map_id": "keep", "observer": {"point": [1, 1, 1.5]}, "target": {"entity_id": "orc"},
+                 "samples": {"horizontal": 3, "vertical": 2}, "include": ["geometry"], "metadata_filter": FILTER},
+    "circle_route": {"kind": "circle_route", "map_id": "keep", "moving_entity_id": "orc", "destination": [12, 10, 0],
+                     "moving_radius": 0.5, "circles": [{"entity_id": "elf", "radius": 0.5, "blocking": True},
+                                                       {"entity_id": "cart", "radius": 1, "blocking": False}],
+                     "metadata_filter": FILTER, "max_tests": 100, "edge_costs": [{"start": [0, 0, 0], "end": [3, 4, 0], "cost": 5}]},
+    "circle_overlap": {"kind": "circle_overlap", "map_id": "keep", "moving_entity_id": "orc", "fixed_entity_id": "elf",
+                       "destination": [6, 6, 0], "moving_radius": 0.5, "fixed_radius": 0.5, "origin": [5.5, 5.5, 0]},
+    "body_proximity": {"kind": "body_proximity", "map_id": "keep", "moving_entity_id": "orc", "fixed_entity_id": "elf",
+                       "destination": [6, 6, 0], "radius": 1},
+    "sweep": {"kind": "sweep", "map_id": "keep", "moving_entity_id": "orc", "destination": [10, 10, 0],
+              "include_entities": True, "exclude_entity_ids": ["elf"], "metadata_filter": FILTER},
+    "placement": {"kind": "placement", "map_id": "keep", "moving_entity_id": "orc", "origin": [5, 5, 0],
+                  "exclude_entity_ids": ["elf"], "metadata_filter": NO_FILTER, "max_candidates": 50,
+                  "containing_zone_id": "pool", "reference_face": {"target": {"kind": "geometry", "id": "wall.b"}, "face": "east"}},
+    "path": {"kind": "path", "map_id": "keep", "start": [0, 0], "goal": [10, 10], "allow_diagonal": True,
+             "corner_policy": "forbid_cutting", "include_entities": True, "moving_entity_id": "orc", "metadata_filter": FILTER,
+             "max_steps": 1000},
+    "crossed_zones": {"kind": "crossed_zones", "map_id": "keep", "path": [[0, 0, 0], [15, 10, 0.2]], "max_crossings": 10},
+    "area": {"kind": "area", "map_id": "keep", "shape": {"kind": "sphere", "center": [5, 5, 1], "radius": 2},
+             "include": ["zones", "geometry"], "max_results": 10},
+}
+OPTIONAL = {"circle_overlap": ["origin"], "circle_route": ["edge_costs"], "path": ["moving_entity_id", "metadata_filter"],
+            "exposure": ["metadata_filter"], "sweep": ["metadata_filter", "exclude_entity_ids"],
+            "placement": ["containing_zone_id", "reference_face"]}
+
+
+def run_query(query: object) -> dict:
+    scene = admit_spatial_scene(QUERY_SCENE)
+    try:
+        admitted = admit_spatial_query(scene, query)
+    except SpatialValidationError as error:
+        return {"error": ["SpatialValidationError", str(error), error.code, error.path]}
+    except Exception as error:  # noqa: BLE001 - every exception Python lets through
+        return {"error": [type(error).__name__, str(error)]}
+    return {"payload": admitted.as_payload(), "kind": admitted.kind, "map_id": admitted.map_id}
+
+
+def with_value(query: dict, path: list, value: object = None, delete: bool = False) -> dict:
+    query = copy.deepcopy(query)
+    target = query
+    for step in path[:-1]:
+        target = target[step]
+    if delete:
+        del target[path[-1]]
+    else:
+        target[path[-1]] = value
+    return query
+
+
+AREA_SHAPES = [
+    {"kind": "sphere", "center": [5, 5, 1], "radius": 2}, {"kind": "sphere", "center": [5, 5, 1], "radius": 0},
+    {"kind": "sphere", "center": [5, 5, 11], "radius": 2}, {"kind": "sphere", "center": [20, 15.5, 10], "radius": 1e6},
+    {"kind": "sphere", "center": [5, 5, 1]}, {"kind": "sphere", "center": [5, 5], "radius": 1},
+    {"kind": "cone", "apex": [5, 5, 1], "direction": [1, 0, 0], "length": 4, "radius": 1},
+    {"kind": "cone", "apex": [5, 5, 1], "direction": [0, 0, 0], "length": 4, "radius": 1},
+    {"kind": "cone", "apex": [5, 5, 1], "direction": [1e-300, 0, 0], "length": 4, "radius": 1},
+    {"kind": "cone", "apex": [5, 5, 1], "direction": [3, 4, 12], "length": 0, "radius": 1},
+    {"kind": "cone", "apex": [-1, 5, 1], "direction": [1, 1, 1], "length": 1, "radius": 1},
+    {"kind": "cone", "apex": [5, 5, 1], "direction": [1, 1], "length": 1, "radius": 1},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [3, -4, 0], "up": [0, 0, 7.5], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [0, 0, 0], "up": [0, 0, 1], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [2, 0, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1e-13, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1e-11, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [-2, -2, -2], "up": [1e-300, 1, 0], "length": 4, "width": 2, "height": 3},
+    # Up parallel to the direction: rejected; the cross product's magnitude exactly 1e-12 is too.
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 1, 1], "up": [2, 2, 2], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1e-12, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [1, 1.0000001e-12, 0], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 2, 3], "up": [2, 4, 6.000000000001], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [21, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 4, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 0, "width": 2, "height": 3},
+    {"kind": "prism", "origin": [5, 5, 0], "direction": [1, 0, 0], "up": [0, 0, 1], "length": 4, "width": 2},
+    {"kind": "box", "min": [0, 0, 0], "max": [4, 4, 1]}, {"kind": "cylinder", "center": [5, 5, 0], "radius": 1, "height": 1},
+    {"kind": "pyramid"}, [], None, "sphere",
+]
+
+
+def query_targeted() -> list:
+    cases = [None, [], {}, {"kind": "ray"}, {"kind": "teleport", "map_id": "keep"}, {"kind": 1}]
+    for kind, base in QUERIES.items():
+        cases.append(base)
+        cases.append({**copy.deepcopy(base), "extra": 1})
+        cases.append(with_value(base, ["map_id"], "other"))
+        for key in base:
+            if key != "kind":
+                cases.append(with_value(base, [key], delete=True))
+                for value in POOL:
+                    cases.append(with_value(base, [key], value))
+        for key in OPTIONAL.get(kind, []):
+            cases.append({name: value for name, value in base.items() if name not in OPTIONAL[kind] or name == key})
+            cases.append({name: value for name, value in base.items() if name not in OPTIONAL[kind]})
+    for shape in AREA_SHAPES:
+        cases.append(with_value(QUERIES["area"], ["shape"], shape))
+    for include in (["zones"], ["geometry", "entities", "zones"], ["zones", "zones"], [], ["walls"], ["entities", "geometry", "zones", "x"]):
+        cases.append(with_value(QUERIES["area"], ["include"], include))
+        cases.append(with_value(QUERIES["ray"], ["include"], include))
+    for key, value in (("max_intersections", 1024), ("max_intersections", 1025), ("max_intersections", 0),
+                       ("origin", [20, 15.5, 10]), ("origin", [20.0001, 1, 1]), ("destination", [0, 0, -0.1])):
+        cases.append(with_value(QUERIES["ray"], [key], value))
+    for path, value in ((["samples", "horizontal"], 9), (["samples", "horizontal"], 10), (["samples", "vertical"], 0),
+                        (["target", "entity_id"], "ghost"), (["target", "entity_id"], "nobody"), (["observer", "point"], [1, 1, 11]),
+                        (["metadata_filter", "key"], "k" * 128), (["metadata_filter", "key"], "k" * 129),
+                        (["metadata_filter", "value"], "\u00e9" * 128), (["metadata_filter", "value"], "\u00e9" * 129),
+                        (["metadata_filter", "missing_matches"], 1)):
+        cases.append(with_value(QUERIES["exposure"], path, value))
+    route = QUERIES["circle_route"]
+    for path, value in ((["moving_entity_id"], "ghost"), (["moving_radius"], 0), (["moving_radius"], 1e6), (["moving_radius"], 1000000.5),
+                        (["destination"], [20, 16, 0]), (["circles"], []), (["circles", 0, "entity_id"], "orc"),
+                        (["circles", 0, "entity_id"], "ghost"), (["circles", 1, "entity_id"], "elf"), (["circles", 0, "radius"], 0),
+                        (["circles", 0, "blocking"], "yes"), (["circles"], [{"entity_id": "elf", "radius": 1, "blocking": True}] * 65),
+                        (["max_tests"], 16384), (["max_tests"], 16385), (["edge_costs", 0, "cost"], 4.999999999),
+                        (["edge_costs", 0, "cost"], 4.9999999989), (["edge_costs", 0, "cost"], 4.99999999), (["edge_costs"], []),
+                        (["edge_costs", 0, "end"], [3, 4]), (["edge_costs", 0], {"start": [0, 0, 0], "end": [1, 1, 1], "cost": 1.7320508}),
+                        (["edge_costs", 0], {"start": [0, 0, 0], "end": [1, 1, 1], "cost": 1.732050807}),
+                        (["edge_costs"], [{"start": [0, 0, 0], "end": [0, 0, 0], "cost": 0}] * 16385)):
+        cases.append(with_value(route, path, value))
+    # Edge costs right at `cost + 1e-9 < math.dist(start, end)`, for distances math.dist rounds carefully.
+    rng = random.Random(4805)
+    for _ in range(200):
+        start = [rng.uniform(0, 20), rng.uniform(0, 15), rng.uniform(0, 10)]
+        end = [rng.uniform(0, 20), rng.uniform(0, 15), rng.uniform(0, 10)]
+        distance = math.dist(start, end)
+        cost = rng.choice([distance - 1e-9, math.nextafter(distance - 1e-9, 0), math.nextafter(distance - 1e-9, 100), distance])
+        cases.append(with_value(route, ["edge_costs"], [{"start": start, "end": end, "cost": cost}]))
+    for kind in ("circle_overlap", "body_proximity"):
+        base = QUERIES[kind]
+        for path, value in ((["moving_entity_id"], "ghost"), (["fixed_entity_id"], "orc"), (["fixed_entity_id"], "nobody"),
+                            (["destination"], [20, 15.5, 0]), (["destination"], [20.5, 15, 0])):
+            cases.append(with_value(base, path, value))
+    for path, value in ((["origin"], [30, 0, 0]), (["moving_radius"], 1e6), (["fixed_radius"], 1000000.5), (["fixed_radius"], 0)):
+        cases.append(with_value(QUERIES["circle_overlap"], path, value))
+    cases.append(with_value(QUERIES["body_proximity"], ["radius"], 0))
+    for path, value in ((["exclude_entity_ids"], ["elf", "elf"]), (["exclude_entity_ids"], ["ghost"]), (["exclude_entity_ids"], ["bad id"]),
+                        (["exclude_entity_ids"], ["cart", "elf"]), (["exclude_entity_ids"], ["orc"]), (["destination"], [99, 99, 99]),
+                        (["include_entities"], 0), (["moving_entity_id"], "ghost")):
+        cases.append(with_value(QUERIES["sweep"], path, value))
+        cases.append(with_value(QUERIES["placement"], path, value))
+    place = QUERIES["placement"]
+    for path, value in ((["containing_zone_id"], "dais"), (["containing_zone_id"], "nowhere"), (["max_candidates"], 100000),
+                        (["max_candidates"], 100001), (["metadata_filter"], {"key": "hazard", "value": "x", "missing_matches": True}),
+                        (["metadata_filter"], {"key": "label", "value": "Wall", "missing_matches": False}),
+                        (["metadata_filter"], {"key": "label", "value": "Wall", "missing_matches": True}),
+                        (["metadata_filter"], {"key": "absent", "value": "x", "missing_matches": True}),
+                        (["metadata_filter"], {"key": "absent", "value": "x", "missing_matches": False}),
+                        (["metadata_filter"], {"key": 1, "value": "x", "missing_matches": True}),
+                        (["metadata_filter", "missing_matches"], "true"),
+                        (["reference_face", "face"], "up"), (["reference_face", "face"], "inside"),
+                        (["reference_face", "target"], {"kind": "entity", "id": "elf"}),
+                        (["reference_face", "target"], {"kind": "zone", "id": "pool"}),
+                        (["reference_face", "target"], {"kind": "geometry", "id": "orc"}),
+                        (["reference_face", "target"], {"kind": "geometry"}), (["reference_face"], {"target": {"kind": "geometry", "id": "pillar"}})):
+        cases.append(with_value(place, path, value))
+    for field, text in (("key", "k" * 128), ("key", "k" * 129), ("value", "é" * 128), ("value", "é" * 129)):
+        cases.append(with_value({key: value for key, value in place.items() if key not in ("containing_zone_id", "reference_face")},
+                                ["metadata_filter", field], text))
+    # The dais zone's metadata holds `"open": null`, which reads as missing.
+    for missing in (True, False):
+        open_filter = with_value(place, ["metadata_filter"], {"key": "open", "value": "x", "missing_matches": missing})
+        cases.append(with_value(open_filter, ["containing_zone_id"], "dais"))
+    zone_filter = with_value(place, ["metadata_filter"], {"key": "hazard", "value": "x", "missing_matches": True})
+    cases.append(with_value(zone_filter, ["containing_zone_id"], "dais"))
+    cases.append({key: value for key, value in zone_filter.items() if key != "containing_zone_id"})
+    pathq = QUERIES["path"]
+    for path, value in ((["start"], [19, 15]), (["start"], [20, 0]), (["goal"], [0, 16]), (["goal"], [0, 15]), (["start"], [2048, 0]),
+                        (["include_entities"], False), (["moving_entity_id"], "ghost"), (["corner_policy"], "allow_cutting"),
+                        (["corner_policy"], "cut"), (["max_steps"], 4000000), (["max_steps"], 4000001), (["allow_diagonal"], None)):
+        cases.append(with_value(pathq, path, value))
+    zones = QUERIES["crossed_zones"]
+    for value in ([[0, 0, 0]], [[0, 0, 0]] * 256, [[0, 0, 0]] * 257, [[0, 0, 0], [21, 0, 0]], [[0, 0, 0], [1, 1]]):
+        cases.append(with_value(zones, ["path"], value))
+    for value in (4096, 4097, 0):
+        cases.append(with_value(zones, ["max_crossings"], value))
+    # Normalization of random prisms and cones: hypot-scaled unit vectors.
+    for _ in range(300):
+        vector = [rng.choice([0, rng.uniform(-5, 5), rng.randint(-3, 3), rng.uniform(-1e-3, 1e-3)]) for _ in range(3)]
+        up = [rng.choice([0, rng.uniform(-5, 5), rng.randint(-3, 3)]) for _ in range(3)]
+        cases.append(with_value(QUERIES["area"], ["shape"], {"kind": "prism", "origin": [5, 5, 0], "direction": vector, "up": up,
+                                                              "length": rng.choice([1, 2.5]), "width": 1, "height": 1}))
+        cases.append(with_value(QUERIES["area"], ["shape"], {"kind": "cone", "apex": [5, 5, 1], "direction": vector,
+                                                              "length": rng.choice([1, 2.5]), "radius": 1}))
+    return cases
+
+
+def random_query(rng: random.Random) -> object:
+    query = copy.deepcopy(QUERIES[rng.choice(list(QUERIES))])
+    for _ in range(rng.randint(1, 2)):
+        path = random_path(rng, query, [])
+        if not path or path == ["kind"]:
+            continue
+        target = query
+        for step in path[:-1]:
+            target = target[step]
+        action = rng.random()
+        if action < 0.15 and isinstance(target, dict):
+            del target[path[-1]]
+        elif action < 0.55 and isinstance(target[path[-1]], (int, float)) and not isinstance(target[path[-1]], bool):
+            target[path[-1]] = rng.choice([target[path[-1]] + rng.choice([-1, 1, 0.5, -0.5]), float(target[path[-1]]),
+                                           -target[path[-1]], target[path[-1]] * 100])
+        else:
+            target[path[-1]] = copy.deepcopy(rng.choice(POOL))
+    return query
+
+
 def main() -> int:
     mutation_rng = random.Random(4803)
     mutation_inputs = mutation_targeted()
@@ -430,6 +654,12 @@ def main() -> int:
                                             allow_nan=False) + "\n").encode("ascii"))
     applied = sum("payload" in case for case in mutation_cases)
     print(f"{len(mutation_cases)} mutation cases, {applied} applied")
+    query_rng = random.Random(4806)
+    query_inputs = query_targeted() + [random_query(query_rng) for _ in range(3000)]
+    query_cases = [{"query": item, **run_query(item)} for item in query_inputs]
+    QUERY_OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "scene": QUERY_SCENE, "cases": query_cases},
+                                         ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
+    print(f"{len(query_cases)} query cases, {sum('payload' in case for case in query_cases)} admitted")
     rng = random.Random(4801)
     inputs = targeted() + [random_case(rng) for _ in range(2500)] + [valid_variant(rng) for _ in range(500)]
     cases = [{"input": value, **run(build(value))} for value in inputs]

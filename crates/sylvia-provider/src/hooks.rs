@@ -41,6 +41,12 @@ pub trait ProviderHook: Send + Sync {
     /// The hook's class name, for the failure warning.
     fn name(&self) -> &str;
 
+    /// The hook as `Any`, for an `isinstance` check by a hook's owner (`token_estimator`).
+    /// `None` for hooks nobody looks up.
+    fn as_any(&self) -> Option<&dyn std::any::Any> {
+        None
+    }
+
     /// Before the provider sends a request.
     fn on_request<'a>(&'a self, _context: &'a HookContext) -> BoxFuture<'a, Result<(), String>> {
         Box::pin(async { Ok(()) })

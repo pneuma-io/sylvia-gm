@@ -10,6 +10,7 @@ pub mod dice_expr;
 pub mod exec;
 pub mod expr;
 pub mod pyerror;
+pub mod pymath;
 pub mod pynum;
 pub mod pyrandom;
 pub mod rng_queue;
