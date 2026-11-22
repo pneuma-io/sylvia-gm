@@ -66,7 +66,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_workspace_files.py` | 114 | `sylvia-app::workspace_files` | ported | Unit test: stale versions, unique and overlapping literals, atomic replace with no leftover temporary file |
 | `src/sylvia_gm/campaign/__init__.py` | 10 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/campaign/_folder.py` | 600 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
-| `src/sylvia_gm/campaign/rift.py` | 543 | `sylvia-domain` | pending | |
+| `src/sylvia_gm/campaign/rift.py` | 543 | `sylvia-app::campaign_rift` | ported | `rift_vectors`: template validation, the shipped template (cached per `BundledPackages`, from `BundledSources::rift_party_template`), the public setup metadata, `materialize_rift_selection` over lanes, policies, choices, templates, reusable sets and Setting schemas, and `validate_rift_party_handoff`. In `sylvia-app`, not `sylvia-domain`: it runs the bundled Rift Plan, the initial character state check and the starting world. An encounter list whose pair key is not text answers `rust_port_pending`: a JSON object cannot hold it |
 | `src/sylvia_gm/domain/__init__.py` | 1 | `sylvia-domain` | pending | |
 | `src/sylvia_gm/domain/_content_schema_campaign_export.py` | 276 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
 | `src/sylvia_gm/domain/_content_schema_character.py` | 175 | `sylvia-domain::content::catalog` | ported | Exported as data: `content/definitions/*.json` by `content/generate_definitions.py` |
