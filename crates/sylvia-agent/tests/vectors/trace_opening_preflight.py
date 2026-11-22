@@ -2,14 +2,17 @@
 
 Launched by sylvia-compare as the Python owner (`python -B trace_opening_preflight.py`). Wraps
 the application owner and the bus given to `_preflight_guided_start` in a proxy that logs every
-read with its arguments and full result, and logs the adapter's inputs and `_messages`' result.
-Writes JSON lines to `opening_preflight_trace.jsonl` beside this file. Reference tooling only;
+read with its arguments and full result, and logs the adapter's inputs and `_messages`' result
+with each message's ledger tags. With `SYLVIA_TRACE_LEDGER_MESSAGES=1` it then assembles the
+same request once more with the ledger mode forced (`_context_mode = "ledger"`), logging those
+reads and that result too; the preflight itself still uses the first. Writes JSON lines to `opening_preflight_trace.jsonl` beside this file. Reference tooling only;
 retired with the Python source.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -164,16 +167,30 @@ _provider_session.ProviderSessionAdapter.__init__ = traced_init
 original_messages = _provider_session.ProviderSessionAdapter._messages
 
 
+def ledger_tags(messages: list[object]) -> list[object]:
+    """Each message's tags; a plain dict (no attribute) has none."""
+    return [plain(getattr(message, "ledger_tags", None) or {}) for message in messages]
+
+
 def traced_messages(self, provider_input, **kwargs):
     result = original_messages(self, provider_input, **kwargs)
     if isinstance(self._owner, Traced):
         log({"event": "messages", "kwargs": plain(kwargs),
+             "context_mode": self._context_mode,
              "input": plain({"session": provider_input.session,
                              "history": provider_input.history,
                              "basis_message_id": provider_input.basis_message_id,
                              "recovery_kind": provider_input.recovery_kind,
                              "has_reference_reader": provider_input.reference_reader is not None}),
-             "result": plain(result)})
+             "result": plain(result), "tags": ledger_tags(result)})
+        if os.environ.get("SYLVIA_TRACE_LEDGER_MESSAGES") == "1":
+            mode = self._context_mode
+            self._context_mode = _provider_session.LEDGER_MODE
+            try:
+                ledger = original_messages(self, provider_input, **kwargs)
+            finally:
+                self._context_mode = mode
+            log({"event": "ledger_messages", "result": plain(ledger), "tags": ledger_tags(ledger)})
     return result
 
 
