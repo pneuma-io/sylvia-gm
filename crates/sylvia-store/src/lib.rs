@@ -16,6 +16,7 @@ pub mod continuity;
 pub mod error;
 pub mod guided;
 pub mod guided_advance;
+pub mod guided_start;
 pub mod handle;
 pub mod lanes;
 pub mod launch;

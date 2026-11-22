@@ -144,7 +144,7 @@ pub(crate) fn operation_result(row: &Named<'_>) -> StoreResult<OperationResult> 
 }
 
 /// `_operation_lock_payload`.
-fn operation_lock_payload(package_lock: &PackageLock) -> Json {
+pub(crate) fn operation_lock_payload(package_lock: &PackageLock) -> Json {
     Json::Array(
         package_lock
             .entries()

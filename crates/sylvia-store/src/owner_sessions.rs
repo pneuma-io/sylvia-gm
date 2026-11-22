@@ -37,7 +37,7 @@ impl AuthorityStore {
 }
 
 /// What `_session_campaign_work` holds: a Builder chat's owner lane, or campaign work.
-enum SessionWork {
+pub(crate) enum SessionWork {
     #[allow(dead_code)] // Held for its drop.
     BuilderChat(crate::lanes::LaneGuard),
     #[allow(dead_code)] // Held for its drop.
@@ -118,7 +118,7 @@ impl StoreHandle {
 
     /// `AuthorityOwner._session_campaign_work`: a campaign-less Builder chat's owner lane, or the
     /// session campaign's work, each re-checked against the session after it is held.
-    async fn session_campaign_work(&self, session_id: &str) -> StoreResult<SessionWork> {
+    pub(crate) async fn session_campaign_work(&self, session_id: &str) -> StoreResult<SessionWork> {
         let initial = self.raw_context(session_id).await?;
         match initial.session.campaign_id() {
             None => {
