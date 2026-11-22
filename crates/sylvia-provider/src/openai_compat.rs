@@ -859,7 +859,7 @@ impl Provider for OpenAICompatProvider {
         tools: Option<&[Json]>,
         options: &JsonMap,
     ) -> Option<ProviderResult<JsonMap>> {
-        Some(Ok(self.provider_request_representation(messages, tools, options)))
+        Some(self.provider_request_representation(messages, tools, options))
     }
 
     fn generate(&self, request: ProviderRequest) -> BoxFuture<'_, ProviderResult<ProviderResponse>> {
