@@ -125,7 +125,7 @@ def boundary_cases() -> list[str]:
         return dump({"meta": {"id": "ok"}, "tools": {"t": {"effects": effects}}})
 
     def spatial(operation: str, **query) -> str:
-        fields = {name: "x" for name in sv._SPATIAL_QUERY_FIELDS[operation]}
+        fields = {name: "x" for name in sorted(sv._SPATIAL_QUERY_FIELDS[operation])}  # a frozenset
         fields.update(query)
         body = {"scene": "state.map", "operation": operation, "query": fields}
         return tool_doc([{"spatial_query": body, "store_as": "_q"}])
