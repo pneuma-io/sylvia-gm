@@ -432,3 +432,24 @@ fn a_random_call_id_is_a_version_4_uuid() {
     assert!(matches!(&groups[3][..1], "8" | "9" | "a" | "b"), "{id}");
     assert_ne!(id, sylvia_provider::gemini::uuid4());
 }
+
+/// Python's Gemini client is a plain `httpx.AsyncClient(follow_redirects=False)`, so the
+/// factory builds it from its no-redirect builder, never the SDK providers' one.
+#[test]
+fn the_factory_gives_gemini_the_plain_client() {
+    use sylvia_provider::factory::{BuiltProvider, ClientBuilder, DefaultProviderFactory};
+    use sylvia_provider::http::HttpTransport;
+    use sylvia_provider::openai_compat::SdkEnvironment;
+    use sylvia_provider::types::{ProviderConfig, TimeoutConfig};
+    let sdk: Arc<ClientBuilder> = Arc::new(|_: &TimeoutConfig| panic!("the SDK providers' client builder"));
+    let built = Arc::new(Mutex::new(Vec::new()));
+    let seen = built.clone();
+    let plain: Arc<ClientBuilder> = Arc::new(move |timeouts: &TimeoutConfig| {
+        seen.lock().unwrap().push(timeouts.clone());
+        Ok(Arc::new(ScriptedTransport::new(Vec::new())) as Arc<dyn HttpTransport>)
+    });
+    let factory = DefaultProviderFactory::new(sdk, SdkEnvironment::default()).with_plain_client(plain);
+    let config = ProviderConfig::new("gemini", "gemini_generate_content", "https://standin.test/v1beta");
+    assert!(matches!(factory.build(config), Ok(BuiltProvider::Gemini(_))));
+    assert_eq!(*built.lock().unwrap(), vec![sylvia_provider::factory::GEMINI_CLIENT_TIMEOUTS]);
+}

@@ -490,3 +490,46 @@ fn the_model_table_is_the_locked_sdks() {
     assert_eq!(pydantic, "2.13.4");
     assert_eq!(anthropic::TOOL_CHANGES_BETA, vectors()["tool_changes_beta"].as_str().unwrap());
 }
+
+/// `context_mode(transport="anthropic_messages", provider_key=...)` decides the cache
+/// breakpoints: first-party Anthropic only, unless `SYLVIA_GM_CONTEXT_MODE` names `legacy`.
+#[test]
+fn the_context_mode_decides_the_cache_breakpoints() {
+    let cases = [
+        ("anthropic", None, true),
+        ("anthropic", Some(" Legacy\n"), false),
+        ("anthropic", Some("LEDGER"), true),
+        ("anthropic", Some("something else"), true),
+        ("byok", None, false),
+        ("byok", Some("ledger"), false),
+    ];
+    for (provider_key, mode, marked) in cases {
+        let mut info =
+            ModelInfo::new("anthropic/claude-sonnet-5-5", "Model", "Anthropic", provider_key, "byok");
+        info.transport = "anthropic_messages".into();
+        let provider = AnthropicProvider::new(
+            "https://api.anthropic.com/v1",
+            "test-key-not-a-secret",
+            info.post_init(),
+            None,
+            None,
+            4096,
+            Vec::new(),
+            AnthropicEnvironment { custom_headers: None, context_mode: mode.map(str::to_owned) },
+            Arc::new(ScriptedTransport::new(Vec::new())),
+        )
+        .unwrap();
+        let request = provider
+            .provider_request_representation(
+                &[serde_json::json!({"role": "user", "content": "x"})],
+                None,
+                &JsonMap::new(),
+            )
+            .unwrap();
+        assert_eq!(
+            dumps(&Json::Object(request)).contains("cache_control"),
+            marked,
+            "{provider_key} {mode:?}"
+        );
+    }
+}
