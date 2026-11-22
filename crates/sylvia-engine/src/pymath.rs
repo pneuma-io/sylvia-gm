@@ -181,3 +181,19 @@ pub fn min_first(values: impl IntoIterator<Item = f64>) -> f64 {
     let first = values.next().expect("min() of an empty sequence");
     values.fold(first, |best, value| if value < best { value } else { best })
 }
+
+/// `math.cos(x)`: the platform C library's `cos`, as CPython calls it. The argument passes
+/// through `black_box` so the compiler can't fold a constant call with its own arithmetic.
+pub fn cos(x: f64) -> f64 {
+    std::hint::black_box(x).cos()
+}
+
+/// `math.sin(x)`: the platform C library's `sin`.
+pub fn sin(x: f64) -> f64 {
+    std::hint::black_box(x).sin()
+}
+
+/// `math.atan2(y, x)` for finite arguments: the platform C library's `atan2`.
+pub fn atan2(y: f64, x: f64) -> f64 {
+    std::hint::black_box(y).atan2(std::hint::black_box(x))
+}

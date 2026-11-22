@@ -1,0 +1,249 @@
+"""Generate spatial engine vectors for sylvia_engine::spatial from the frozen Python, per platform.
+
+Run with the snapshot's own interpreter, from the repository root, on each platform:
+
+    .venv/Scripts/python.exe -I crates/sylvia-engine/tests/vectors/generate_spatial_engine_vectors.py
+
+(`.venv/bin/python` on Linux.) Windows writes `spatial_engine_vectors.windows.json`, Linux
+`spatial_engine_vectors.linux.json`: `_resolve_circle_route` calls `math.cos`, `math.sin` and
+`math.atan2`, which are the platform C library's (the Microsoft runtime on Windows, glibc on
+Linux). Deterministic and checked in. Reference tooling for the port, retired with the Python
+source.
+
+Each case is a scene and a query, both admitted by Python first (inadmissible random draws are
+discarded). The record is `_engine._resolve_<kind>(_engine._compile(scene), query.as_payload())`
+or the exception it raises. Placement is S3c's and not here.
+"""
+
+from __future__ import annotations
+
+import copy
+import importlib.util
+import json
+import math
+import random
+import sys
+from pathlib import Path
+
+from sylvia_gm.spatial import SpatialValidationError, admit_spatial_query, admit_spatial_scene
+from sylvia_gm.spatial import _engine
+
+HERE = Path(__file__).resolve().parent
+PLATFORM = "windows" if sys.platform == "win32" else "linux"
+OUTPUT = HERE / f"spatial_engine_vectors.{PLATFORM}.json"
+
+_spec = importlib.util.spec_from_file_location("scene_fixtures", HERE / "generate_spatial_scene_vectors.py")
+fixtures = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(fixtures)
+
+RESOLVERS = {
+    "ray": _engine._resolve_ray, "exposure": _engine._resolve_exposure, "path": _engine._resolve_path,
+    "crossed_zones": _engine._resolve_zones, "area": _engine._resolve_area,
+    "body_proximity": _engine._resolve_body_proximity, "circle_overlap": _engine._resolve_circle_overlap,
+    "sweep": _engine._resolve_sweep, "circle_route": _engine._resolve_circle_route,
+}
+
+
+def entity(identity, position, footprint, height=2, active=True, movement="blocking", visibility="clear", metadata=None):
+    return {"id": identity, "map_id": "hall", "position": position, "footprint": footprint, "height": height, "facing": [1, 0],
+            "active": active, "movement": movement, "visibility": visibility, "metadata": metadata or {}}
+
+
+def wall(identity, lower, upper, *, occupies=True, visibility="opaque", movement="blocking", active=True, metadata=None):
+    return {"id": identity, "map_id": "hall", "volume": {"kind": "box", "min": lower, "max": upper}, "active": active,
+            "movement": movement, "occupies_cells": occupies, "visibility": visibility, "metadata": metadata or {},
+            "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}}
+
+
+HALL = {
+    "format": 1,
+    "map": {"id": "hall", "revision": 7, "bounds": {"min": [-5, 2.5, -1], "max": [15, 20.5, 9]},
+            "grid": {"cell_size": 0.5, "unit": "m", "origin": [-5, 2.5]},
+            "layers": [{"id": "floor", "min_elevation": -1, "max_elevation": 9}]},
+    "geometry": [
+        wall("w.north", [-5, 19.5, -1], [15, 20.5, 4]), wall("w.mid", [2, 6, -1], [2.5, 15, 3.5], metadata={"material": "stone"}),
+        wall("w.glass", [6, 8, -1], [6.2, 14, 3], visibility="clear", metadata={"material": "glass"}),
+        wall("w.thin", [9.1, 4, -1], [9.15, 12.3, 2.5], occupies=False),
+        wall("w.low", [10, 14, -1], [13, 14.4, 0.2], metadata={"material": "wood"}),
+        wall("w.off", [-3, 3, -1], [-2, 4, 2], active=False), wall("w.pass", [12, 3, -1], [13, 5, 2], movement="passable"),
+        wall("w.edge", [3.25, 17.25, -1], [3.75, 17.75, 8], occupies=False, metadata={"material": "stone"}),
+    ],
+    "entities": [
+        entity("e.knight", [0, 10, -1], {"kind": "circle", "radius": 0.4}, metadata={"side": "red"}),
+        entity("e.ogre", [4, 10, -1], {"kind": "circle", "radius": 0.9}, height=3, metadata={"side": "blue"}),
+        entity("e.crate", [8, 16, -1], {"kind": "box", "half_extents": [0.5, 0.5]}, height=1, visibility="opaque"),
+        entity("e.wolf", [11.5, 9, -1], {"kind": "circle", "radius": 0.3}, height=1, metadata={"side": "blue"}),
+        entity("e.cart", [5, 4, -1], {"kind": "box", "half_extents": [1.2, 0.6]}, height=1.5, movement="passable"),
+        entity("e.ghost", [13, 17, -1], {"kind": "circle", "radius": 0.5}, active=False),
+        entity("e.bat", [7, 12, 4], {"kind": "circle", "radius": 0.2}, height=0.5, metadata={"side": "red"}),
+    ],
+    "zones": [
+        {"id": "z.pit", "map_id": "hall", "shape": {"kind": "cylinder", "center": [9, 17, -1], "radius": 1.5, "height": 1},
+         "metadata": {"hazard": "fall"}},
+        {"id": "z.room", "map_id": "hall", "shape": {"kind": "box", "min": [-5, 2.5, -1], "max": [2, 19.5, 9]}, "metadata": {}},
+        {"id": "z.aura", "map_id": "hall", "shape": {"kind": "cylinder", "center": [4, 10, -1], "radius": 3, "height": 4},
+         "metadata": {"hazard": "fear"}},
+    ],
+    "terrain": [{"cell": [x, y], "layer_id": "floor", "cost": cost}
+                for (x, y, cost) in ((10, 10, 2), (11, 10, 2), (12, 10, 3.5), (10, 11, 0.5), (24, 20, 4), (25, 20, 4))],
+}
+
+
+def pillars(count: int, rng: random.Random) -> dict:
+    scene = copy.deepcopy(HALL)
+    scene["map"]["id"] = "yard"
+    scene["map"]["bounds"] = {"min": [0, 0, 0], "max": [30, 30, 6]}
+    scene["map"]["grid"] = {"cell_size": 1.5, "unit": "m", "origin": [0, 0]}
+    scene["map"]["layers"] = [{"id": "floor", "min_elevation": 0, "max_elevation": 6}]
+    scene["geometry"], scene["zones"], scene["terrain"] = [], [], []
+    scene["entities"] = [entity("p.mover", [3, 3, 0], {"kind": "circle", "radius": 0.5}, metadata={"side": "red"})]
+    for index in range(count):
+        scene["entities"].append(entity(f"p.{index:02d}", [round(rng.uniform(5, 25), 3), round(rng.uniform(5, 25), 3), 0],
+                                        {"kind": "circle", "radius": rng.choice([0.5, 1, 1.5])}, height=rng.choice([1, 3]),
+                                        metadata={"side": rng.choice(["red", "blue"])}))
+    scene["geometry"].append(wall("y.wall", [14, 0, 0], [15, 12, 4]))
+    for item in scene["entities"] + scene["geometry"]:
+        item["map_id"] = "yard"
+    return scene
+
+
+def run(scene_value: dict, query_value: dict) -> dict | None:
+    scene = admit_spatial_scene(scene_value)
+    try:
+        query = admit_spatial_query(scene, query_value)
+    except SpatialValidationError:
+        return None
+    if query.kind not in RESOLVERS:
+        return None
+    try:
+        result = RESOLVERS[query.kind](_engine._compile(scene), query.as_payload())
+    except SpatialValidationError as error:
+        return {"error": ["SpatialValidationError", str(error), error.code, error.path]}
+    return {"result": result}
+
+
+def point(rng, bounds, z=None):
+    lower, upper = bounds["min"], bounds["max"]
+    values = [round(rng.uniform(lower[i], upper[i]), rng.choice([0, 1, 3, 6])) for i in range(3)]
+    if z is not None:
+        values[2] = z
+    return values
+
+
+def selector(rng):
+    return rng.choice([{"key": "", "value": "", "missing_matches": False}, {"key": "material", "value": "stone", "missing_matches": False},
+                       {"key": "material", "value": "glass", "missing_matches": True}, {"key": "side", "value": "red", "missing_matches": True},
+                       {"key": "side", "value": "blue", "missing_matches": False}])
+
+
+def random_query(rng: random.Random, scene: dict) -> dict:
+    map_id, bounds = scene["map"]["id"], scene["map"]["bounds"]
+    active = [row["id"] for row in scene["entities"] if row["active"]]
+    everyone = [row["id"] for row in scene["entities"]]
+    kind = rng.choice(list(RESOLVERS))
+    floor = bounds["min"][2]
+    if kind == "ray":
+        return {"kind": "ray", "map_id": map_id, "origin": point(rng, bounds), "destination": point(rng, bounds),
+                "include": rng.choice([["geometry"], ["entities"], ["geometry", "entities"]]), "max_intersections": rng.randint(1, 6)}
+    if kind == "exposure":
+        query = {"kind": "exposure", "map_id": map_id, "observer": {"point": point(rng, bounds)},
+                 "target": {"entity_id": rng.choice(everyone)}, "samples": {"horizontal": rng.randint(1, 9), "vertical": rng.randint(1, 9)},
+                 "include": rng.choice([["geometry"], ["entities"], ["geometry", "entities"]])}
+        if rng.random() < 0.5:
+            query["metadata_filter"] = selector(rng)
+        return query
+    if kind == "path":
+        counts = [math.ceil((bounds["max"][i] - bounds["min"][i]) / scene["map"]["grid"]["cell_size"]) for i in range(2)]
+        query = {"kind": "path", "map_id": map_id, "start": [rng.randrange(counts[0]), rng.randrange(counts[1])],
+                 "goal": [rng.randrange(counts[0]), rng.randrange(counts[1])], "allow_diagonal": rng.random() < 0.6,
+                 "corner_policy": rng.choice(["allow_cutting", "forbid_cutting"]), "include_entities": rng.random() < 0.7,
+                 "max_steps": rng.choice([5, 50, 400, 100000])}
+        if rng.random() < 0.4 and query["include_entities"]:
+            chosen = rng.choice(active)
+            mover = next(row for row in scene["entities"] if row["id"] == chosen)
+            query["moving_entity_id"] = mover["id"]
+            cell = [math.floor((mover["position"][i] - scene["map"]["grid"]["origin"][i]) / scene["map"]["grid"]["cell_size"]) for i in range(2)]
+            if rng.random() < 0.85:
+                query["start"] = [min(max(cell[i], 0), counts[i] - 1) for i in range(2)]
+        if rng.random() < 0.3:
+            query["metadata_filter"] = selector(rng)
+        return query
+    if kind == "crossed_zones":
+        return {"kind": "crossed_zones", "map_id": map_id, "path": [point(rng, bounds) for _ in range(rng.randint(2, 5))],
+                "max_crossings": rng.randint(1, 4)}
+    if kind == "area":
+        shape_kind = rng.choice(["sphere", "cone", "prism", "box", "cylinder"])
+        if shape_kind == "sphere":
+            shape = {"kind": "sphere", "center": point(rng, bounds), "radius": rng.choice([0.5, 1, 2.5, 6])}
+        elif shape_kind == "cone":
+            shape = {"kind": "cone", "apex": point(rng, bounds), "direction": [rng.choice([-1, 0, 1, 0.3]) for _ in range(2)] + [rng.choice([0, -0.2, 0.5])],
+                     "length": rng.choice([2, 5, 9]), "radius": rng.choice([1, 2, 4])}
+            if not any(shape["direction"]):
+                shape["direction"][0] = 1
+        elif shape_kind == "prism":
+            shape = {"kind": "prism", "origin": point(rng, bounds), "direction": [rng.choice([-1, 0, 1, 2]) for _ in range(2)] + [rng.choice([0, 0.5])],
+                     "up": rng.choice([[0, 0, 1], [0, 0.2, 1], [1, 0, 1]]), "length": rng.choice([2, 6]), "width": rng.choice([1, 3]),
+                     "height": rng.choice([1, 4])}
+            if not any(shape["direction"]):
+                shape["direction"][0] = 1
+        elif shape_kind == "box":
+            a, b = point(rng, bounds), point(rng, bounds)
+            shape = {"kind": "box", "min": [min(a[i], b[i]) for i in range(3)], "max": [max(a[i], b[i]) + 0.5 for i in range(3)]}
+        else:
+            shape = {"kind": "cylinder", "center": point(rng, bounds, floor), "radius": rng.choice([0.5, 2]), "height": rng.choice([1, 3])}
+        return {"kind": "area", "map_id": map_id, "shape": shape,
+                "include": rng.choice([["geometry"], ["entities"], ["zones"], ["geometry", "entities", "zones"]]),
+                "max_results": rng.randint(1, 8)}
+    moving = rng.choice(active)
+    fixed = rng.choice([value for value in active if value != moving] or active)
+    destination = point(rng, bounds, rng.choice([floor, floor, floor + 0.5]))
+    if kind == "body_proximity":
+        return {"kind": "body_proximity", "map_id": map_id, "moving_entity_id": moving, "fixed_entity_id": fixed,
+                "destination": destination, "radius": rng.choice([0, 0.5, 1, 3])}
+    if kind == "circle_overlap":
+        query = {"kind": "circle_overlap", "map_id": map_id, "moving_entity_id": moving, "fixed_entity_id": fixed,
+                 "destination": destination, "moving_radius": rng.choice([0.5, 1]), "fixed_radius": rng.choice([0.5, 1.5])}
+        if rng.random() < 0.5:
+            query["origin"] = point(rng, bounds, floor)
+        return query
+    if kind == "sweep":
+        return {"kind": "sweep", "map_id": map_id, "moving_entity_id": moving, "destination": destination,
+                "include_entities": rng.random() < 0.7, "exclude_entity_ids": rng.sample([v for v in active if v != moving], rng.randint(0, 1)),
+                "metadata_filter": selector(rng)}
+    others = [value for value in active if value != moving]
+    circles = [{"entity_id": value, "radius": rng.choice([0.5, 1, 1.5]), "blocking": rng.random() < 0.7}
+               for value in rng.sample(others, min(len(others), rng.randint(0, 6)))]
+    query = {"kind": "circle_route", "map_id": map_id, "moving_entity_id": moving, "destination": destination,
+             "moving_radius": rng.choice([0.5, 1]), "circles": circles, "metadata_filter": selector(rng),
+             "max_tests": rng.choice([3, 40, 400])}
+    if rng.random() < 0.3:
+        origin = next(row for row in scene["entities"] if row["id"] == moving)["position"]
+        query["edge_costs"] = [{"start": origin, "end": destination, "cost": 1000}]
+    return query
+
+
+def main() -> int:
+    rng = random.Random(4807)
+    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2))]
+    cases = []
+    for query in fixtures.query_targeted():
+        record = run(fixtures.QUERY_SCENE, query)
+        if record is not None:
+            cases.append({"scene": 0, "query": query, **record})
+    while len(cases) < 7000:
+        index = rng.randrange(len(scenes))
+        query = random_query(rng, scenes[index])
+        record = run(scenes[index], query)
+        if record is not None:
+            cases.append({"scene": index, "query": query, **record})
+    OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "platform": PLATFORM, "scenes": scenes, "cases": cases},
+                                   ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
+    kinds = {}
+    for case in cases:
+        kinds[case["query"]["kind"]] = kinds.get(case["query"]["kind"], 0) + 1
+    print(f"{len(cases)} engine cases ({PLATFORM}): {kinds}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
