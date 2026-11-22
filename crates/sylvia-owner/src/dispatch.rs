@@ -139,6 +139,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "advance_guided_campaign_draft" => {
+            commands::campaigns::handle_advance_guided_campaign_draft(context, params).await
+        }
         "create_guided_campaign_draft" => {
             commands::campaigns::handle_create_guided_campaign_draft(context, params).await
         }

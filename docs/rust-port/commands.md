@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 32 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 33 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -116,7 +116,7 @@ Ported: 32 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_gui
 | `start_guided_campaign` | `campaigns.handle_start_guided_campaign` | yes | no | |
 | `create_guided_campaign_draft` | `campaigns.handle_create_guided_campaign_draft` | yes | yes | `ruleless-turn`, `stop-redirect`, `fail-retry`, `reopen` (step 2 or 3) |
 | `navigate_guided_campaign_draft` | `campaigns.handle_navigate_guided_campaign_draft` | yes | no | |
-| `advance_guided_campaign_draft` | `campaigns.handle_advance_guided_campaign_draft` | yes | no | |
+| `advance_guided_campaign_draft` | `campaigns.handle_advance_guided_campaign_draft` | yes | yes | `ruleless-turn`, `stop-redirect`, `fail-retry`, `reopen` (No Ruleset answers; Contribution steps not yet) |
 | `guided_campaign_contribution` | `campaigns.handle_guided_campaign_contribution` | yes | no | |
 | `save_reusable_campaign_plan` | `campaigns.handle_save_reusable_campaign_plan` | yes | no | |
 | `start_guided_creation_subflow` | `campaigns.handle_start_guided_creation_subflow` | yes | no | |
