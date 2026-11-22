@@ -163,8 +163,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude_native.py:297` | `_round_row` | Dump::DEFAULT | `return {"type": "assistant", "message": json.loads(json.dumps(message))}` | |
 | `provider/_claude_native.py:298` | `_round_row` | Dump::DEFAULT | `return {"type": "user", "message": json.loads(json.dumps( {key: message[key] for key in ("role", "content") if key in message}))}` | |
 | `provider/_claude_native.py:480` | `collect_answer` | Dump::DEFAULT | `"collected", tuple(records), answer=json.loads(json.dumps(rows[index]["message"])),` | |
-| `provider/_claude_runtime.py:401` | `ClaudeConnection.write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | |
-| `provider/_codex_rpc.py:294` | `CodexConnection._write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | |
+| `provider/_claude_runtime.py:401` | `ClaudeConnection.write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | `sylvia-provider` runtime_process |
+| `provider/_codex_rpc.py:294` | `CodexConnection._write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | `sylvia-provider` runtime_process |
 | `provider/_context_fit.py:85` | `_canonical_request_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( {"messages": messages, "tools": tools or [], "options": dict(options)}, sort_keys=True, separators=(",", ":"), ensure_ascii=Fals...` | `sylvia-provider` context_fit_vectors |
 | `provider/_context_fit.py:97` | `_canonical_value_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-provider` context_fit_vectors |
 | `provider/_gemini.py:228` | `GeminiProvider._parse` | Dump::DEFAULT | `arguments=json.dumps(fn.get("args", {})),` | `sylvia-provider` gemini_vectors |

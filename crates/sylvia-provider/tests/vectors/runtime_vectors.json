@@ -1,0 +1,1574 @@
+{
+ "python": "3.12.11",
+ "context_windows": [
+  {
+   "model": "opus",
+   "window": 1000000
+  },
+  {
+   "model": "sonnet[1m]",
+   "window": 1000000
+  },
+  {
+   "model": "claude-opus-5-5",
+   "window": 1000000
+  },
+  {
+   "model": "claude-opus-5-5[1m]",
+   "window": 1000000
+  },
+  {
+   "model": "fable",
+   "window": 1000000
+  },
+  {
+   "model": "claude-unknown",
+   "window": null
+  },
+  {
+   "model": "[1m]",
+   "window": null
+  },
+  {
+   "model": "opus[1m][1m]",
+   "window": null
+  },
+  {
+   "model": 5,
+   "window": null
+  },
+  {
+   "model": null,
+   "window": null
+  }
+ ],
+ "native_environments": [
+  {
+   "name": "windows",
+   "environ": [
+    [
+     "SYSTEMROOT",
+     "C:\\Windows"
+    ],
+    [
+     "PATH",
+     "C:\\Windows\\system32;C:\\Tools"
+    ],
+    [
+     "PATHEXT",
+     ".COM;.EXE"
+    ],
+    [
+     "TEMP",
+     "C:\\Temp"
+    ],
+    [
+     "USERPROFILE",
+     "C:\\Users\\dev"
+    ],
+    [
+     "LOCALAPPDATA",
+     "C:\\Users\\dev\\AppData\\Local"
+    ],
+    [
+     "ANTHROPIC_API_KEY",
+     "secret"
+    ],
+    [
+     "OPENAI_API_KEY",
+     "secret"
+    ],
+    [
+     "CODEX_HOME",
+     "C:\\other"
+    ],
+    [
+     "LANG",
+     "en_AU.UTF-8"
+    ],
+    [
+     "PROGRAMFILES(X86)",
+     "C:\\Program Files (x86)"
+    ],
+    [
+     "DISPLAY",
+     ":0"
+    ],
+    [
+     "HOMEDRIVE",
+     "C:"
+    ],
+    [
+     "HOMEPATH",
+     "\\Users\\dev"
+    ]
+   ],
+   "home": "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\claude",
+   "separator": "\\",
+   "linux": false,
+   "windows": true,
+   "environment": [
+    [
+     "SYSTEMROOT",
+     "C:\\Windows"
+    ],
+    [
+     "PATH",
+     "C:\\Windows\\system32;C:\\Tools"
+    ],
+    [
+     "PATHEXT",
+     ".COM;.EXE"
+    ],
+    [
+     "TEMP",
+     "C:\\Temp"
+    ],
+    [
+     "USERPROFILE",
+     "C:\\Users\\dev"
+    ],
+    [
+     "LOCALAPPDATA",
+     "C:\\Users\\dev\\AppData\\Local"
+    ],
+    [
+     "LANG",
+     "en_AU.UTF-8"
+    ],
+    [
+     "PROGRAMFILES(X86)",
+     "C:\\Program Files (x86)"
+    ],
+    [
+     "HOMEDRIVE",
+     "C:"
+    ],
+    [
+     "HOMEPATH",
+     "\\Users\\dev"
+    ],
+    [
+     "CLAUDE_CONFIG_DIR",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\claude\\profile"
+    ],
+    [
+     "ANTHROPIC_CONFIG_DIR",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\claude\\anthropic"
+    ],
+    [
+     "CLAUDE_CODE_TMPDIR",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\claude\\temp"
+    ],
+    [
+     "DISABLE_AUTOUPDATER",
+     "1"
+    ],
+    [
+     "DISABLE_UPDATES",
+     "1"
+    ],
+    [
+     "DISABLE_INSTALLATION_CHECKS",
+     "1"
+    ],
+    [
+     "DISABLE_TELEMETRY",
+     "1"
+    ],
+    [
+     "DISABLE_ERROR_REPORTING",
+     "1"
+    ],
+    [
+     "ENABLE_CLAUDEAI_MCP_SERVERS",
+     "false"
+    ],
+    [
+     "ENABLE_TOOL_SEARCH",
+     "false"
+    ],
+    [
+     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+     "1"
+    ]
+   ]
+  },
+  {
+   "name": "linux",
+   "environ": [
+    [
+     "PATH",
+     "/tmp/.mount_SylviaX/usr/bin:/usr/bin:/bin"
+    ],
+    [
+     "HOME",
+     "/home/dev"
+    ],
+    [
+     "LANG",
+     "C.UTF-8"
+    ],
+    [
+     "LC_ALL",
+     "C"
+    ],
+    [
+     "Path",
+     "/odd"
+    ],
+    [
+     "APPDIR",
+     "/tmp/.mount_SylviaX"
+    ],
+    [
+     "LD_LIBRARY_PATH",
+     "/tmp/.mount_SylviaX/usr/lib"
+    ],
+    [
+     "DISPLAY",
+     ":0"
+    ],
+    [
+     "WAYLAND_DISPLAY",
+     "wayland-0"
+    ],
+    [
+     "XDG_RUNTIME_DIR",
+     "/run/user/1000"
+    ],
+    [
+     "DBUS_SESSION_BUS_ADDRESS",
+     "unix:path=/run/user/1000/bus"
+    ],
+    [
+     "ANTHROPIC_API_KEY",
+     "secret"
+    ],
+    [
+     "XDG_CONFIG_HOME",
+     "/home/dev/.config"
+    ],
+    [
+     "BROWSER",
+     "firefox"
+    ],
+    [
+     "TMP",
+     "/tmp"
+    ]
+   ],
+   "home": "/home/dev/.local/share/sylvia-gm/claude",
+   "separator": "/",
+   "linux": true,
+   "windows": false,
+   "environment": [
+    [
+     "PATH",
+     "/usr/bin:/bin"
+    ],
+    [
+     "HOME",
+     "/home/dev"
+    ],
+    [
+     "LANG",
+     "C.UTF-8"
+    ],
+    [
+     "LC_ALL",
+     "C"
+    ],
+    [
+     "Path",
+     "/odd"
+    ],
+    [
+     "XDG_CONFIG_HOME",
+     "/home/dev/.config"
+    ],
+    [
+     "TMP",
+     "/tmp"
+    ],
+    [
+     "CLAUDE_CONFIG_DIR",
+     "/home/dev/.local/share/sylvia-gm/claude/profile"
+    ],
+    [
+     "ANTHROPIC_CONFIG_DIR",
+     "/home/dev/.local/share/sylvia-gm/claude/anthropic"
+    ],
+    [
+     "CLAUDE_CODE_TMPDIR",
+     "/home/dev/.local/share/sylvia-gm/claude/temp"
+    ],
+    [
+     "DISABLE_AUTOUPDATER",
+     "1"
+    ],
+    [
+     "DISABLE_UPDATES",
+     "1"
+    ],
+    [
+     "DISABLE_INSTALLATION_CHECKS",
+     "1"
+    ],
+    [
+     "DISABLE_TELEMETRY",
+     "1"
+    ],
+    [
+     "DISABLE_ERROR_REPORTING",
+     "1"
+    ],
+    [
+     "ENABLE_CLAUDEAI_MCP_SERVERS",
+     "false"
+    ],
+    [
+     "ENABLE_TOOL_SEARCH",
+     "false"
+    ],
+    [
+     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+     "1"
+    ],
+    [
+     "XDG_CACHE_HOME",
+     "/home/dev/.local/share/sylvia-gm/claude/cache"
+    ],
+    [
+     "XDG_STATE_HOME",
+     "/home/dev/.local/share/sylvia-gm/claude/state"
+    ],
+    [
+     "DISPLAY",
+     ":0"
+    ],
+    [
+     "WAYLAND_DISPLAY",
+     "wayland-0"
+    ],
+    [
+     "XDG_RUNTIME_DIR",
+     "/run/user/1000"
+    ],
+    [
+     "DBUS_SESSION_BUS_ADDRESS",
+     "unix:path=/run/user/1000/bus"
+    ],
+    [
+     "BROWSER",
+     "firefox"
+    ]
+   ]
+  },
+  {
+   "name": "linux-plain",
+   "environ": [
+    [
+     "PATH",
+     "/usr/bin"
+    ],
+    [
+     "HOME",
+     "/home/dev"
+    ]
+   ],
+   "home": "/srv/claude",
+   "separator": "/",
+   "linux": true,
+   "windows": false,
+   "environment": [
+    [
+     "PATH",
+     "/usr/bin"
+    ],
+    [
+     "HOME",
+     "/home/dev"
+    ],
+    [
+     "CLAUDE_CONFIG_DIR",
+     "/srv/claude/profile"
+    ],
+    [
+     "ANTHROPIC_CONFIG_DIR",
+     "/srv/claude/anthropic"
+    ],
+    [
+     "CLAUDE_CODE_TMPDIR",
+     "/srv/claude/temp"
+    ],
+    [
+     "DISABLE_AUTOUPDATER",
+     "1"
+    ],
+    [
+     "DISABLE_UPDATES",
+     "1"
+    ],
+    [
+     "DISABLE_INSTALLATION_CHECKS",
+     "1"
+    ],
+    [
+     "DISABLE_TELEMETRY",
+     "1"
+    ],
+    [
+     "DISABLE_ERROR_REPORTING",
+     "1"
+    ],
+    [
+     "ENABLE_CLAUDEAI_MCP_SERVERS",
+     "false"
+    ],
+    [
+     "ENABLE_TOOL_SEARCH",
+     "false"
+    ],
+    [
+     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+     "1"
+    ],
+    [
+     "XDG_CACHE_HOME",
+     "/srv/claude/cache"
+    ],
+    [
+     "XDG_STATE_HOME",
+     "/srv/claude/state"
+    ]
+   ]
+  }
+ ],
+ "isolated_environments": [
+  {
+   "name": "windows",
+   "environ": [
+    [
+     "SYSTEMROOT",
+     "C:\\Windows"
+    ],
+    [
+     "PATH",
+     "C:\\Windows\\system32;C:\\Tools"
+    ],
+    [
+     "PATHEXT",
+     ".COM;.EXE"
+    ],
+    [
+     "TEMP",
+     "C:\\Temp"
+    ],
+    [
+     "USERPROFILE",
+     "C:\\Users\\dev"
+    ],
+    [
+     "LOCALAPPDATA",
+     "C:\\Users\\dev\\AppData\\Local"
+    ],
+    [
+     "ANTHROPIC_API_KEY",
+     "secret"
+    ],
+    [
+     "OPENAI_API_KEY",
+     "secret"
+    ],
+    [
+     "CODEX_HOME",
+     "C:\\other"
+    ],
+    [
+     "LANG",
+     "en_AU.UTF-8"
+    ],
+    [
+     "PROGRAMFILES(X86)",
+     "C:\\Program Files (x86)"
+    ],
+    [
+     "DISPLAY",
+     ":0"
+    ],
+    [
+     "HOMEDRIVE",
+     "C:"
+    ],
+    [
+     "HOMEPATH",
+     "\\Users\\dev"
+    ]
+   ],
+   "home": "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt",
+   "drive": "C:",
+   "separator": "\\",
+   "environment": [
+    [
+     "SYSTEMROOT",
+     "C:\\Windows"
+    ],
+    [
+     "PATH",
+     "C:\\Windows\\system32;C:\\Tools"
+    ],
+    [
+     "PATHEXT",
+     ".COM;.EXE"
+    ],
+    [
+     "TEMP",
+     "C:\\Temp"
+    ],
+    [
+     "USERPROFILE",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt"
+    ],
+    [
+     "LOCALAPPDATA",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt\\AppData\\Local"
+    ],
+    [
+     "PROGRAMFILES(X86)",
+     "C:\\Program Files (x86)"
+    ],
+    [
+     "HOMEDRIVE",
+     "C:"
+    ],
+    [
+     "HOMEPATH",
+     "\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt"
+    ],
+    [
+     "CODEX_HOME",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt"
+    ],
+    [
+     "HOME",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt"
+    ],
+    [
+     "APPDATA",
+     "C:\\Users\\dev\\AppData\\Local\\Sylvia GM\\chatgpt\\AppData\\Roaming"
+    ]
+   ]
+  },
+  {
+   "name": "windows-unc",
+   "environ": [
+    [
+     "SYSTEMROOT",
+     "C:\\Windows"
+    ],
+    [
+     "PATH",
+     "C:\\Windows\\system32;C:\\Tools"
+    ],
+    [
+     "PATHEXT",
+     ".COM;.EXE"
+    ],
+    [
+     "TEMP",
+     "C:\\Temp"
+    ],
+    [
+     "USERPROFILE",
+     "C:\\Users\\dev"
+    ],
+    [
+     "LOCALAPPDATA",
+     "C:\\Users\\dev\\AppData\\Local"
+    ],
+    [
+     "ANTHROPIC_API_KEY",
+     "secret"
+    ],
+    [
+     "OPENAI_API_KEY",
+     "secret"
+    ],
+    [
+     "CODEX_HOME",
+     "C:\\other"
+    ],
+    [
+     "LANG",
+     "en_AU.UTF-8"
+    ],
+    [
+     "PROGRAMFILES(X86)",
+     "C:\\Program Files (x86)"
+    ],
+    [
+     "DISPLAY",
+     ":0"
+    ],
+    [
+     "HOMEDRIVE",
+     "C:"
+    ],
+    [
+     "HOMEPATH",
+     "\\Users\\dev"
+    ]
+   ],
+   "home": "\\\\server\\share\\sylvia\\chatgpt",
+   "drive": "\\\\server\\share",
+   "separator": "\\",
+   "environment": [
+    [
+     "SYSTEMROOT",
+     "C:\\Windows"
+    ],
+    [
+     "PATH",
+     "C:\\Windows\\system32;C:\\Tools"
+    ],
+    [
+     "PATHEXT",
+     ".COM;.EXE"
+    ],
+    [
+     "TEMP",
+     "C:\\Temp"
+    ],
+    [
+     "USERPROFILE",
+     "\\\\server\\share\\sylvia\\chatgpt"
+    ],
+    [
+     "LOCALAPPDATA",
+     "\\\\server\\share\\sylvia\\chatgpt\\AppData\\Local"
+    ],
+    [
+     "PROGRAMFILES(X86)",
+     "C:\\Program Files (x86)"
+    ],
+    [
+     "HOMEDRIVE",
+     "\\\\server\\share"
+    ],
+    [
+     "HOMEPATH",
+     "\\sylvia\\chatgpt"
+    ],
+    [
+     "CODEX_HOME",
+     "\\\\server\\share\\sylvia\\chatgpt"
+    ],
+    [
+     "HOME",
+     "\\\\server\\share\\sylvia\\chatgpt"
+    ],
+    [
+     "APPDATA",
+     "\\\\server\\share\\sylvia\\chatgpt\\AppData\\Roaming"
+    ]
+   ]
+  },
+  {
+   "name": "linux",
+   "environ": [
+    [
+     "PATH",
+     "/tmp/.mount_SylviaX/usr/bin:/usr/bin:/bin"
+    ],
+    [
+     "HOME",
+     "/home/dev"
+    ],
+    [
+     "LANG",
+     "C.UTF-8"
+    ],
+    [
+     "LC_ALL",
+     "C"
+    ],
+    [
+     "Path",
+     "/odd"
+    ],
+    [
+     "APPDIR",
+     "/tmp/.mount_SylviaX"
+    ],
+    [
+     "LD_LIBRARY_PATH",
+     "/tmp/.mount_SylviaX/usr/lib"
+    ],
+    [
+     "DISPLAY",
+     ":0"
+    ],
+    [
+     "WAYLAND_DISPLAY",
+     "wayland-0"
+    ],
+    [
+     "XDG_RUNTIME_DIR",
+     "/run/user/1000"
+    ],
+    [
+     "DBUS_SESSION_BUS_ADDRESS",
+     "unix:path=/run/user/1000/bus"
+    ],
+    [
+     "ANTHROPIC_API_KEY",
+     "secret"
+    ],
+    [
+     "XDG_CONFIG_HOME",
+     "/home/dev/.config"
+    ],
+    [
+     "BROWSER",
+     "firefox"
+    ],
+    [
+     "TMP",
+     "/tmp"
+    ]
+   ],
+   "home": "/home/dev/.local/share/sylvia-gm/chatgpt",
+   "drive": "",
+   "separator": "/",
+   "environment": [
+    [
+     "PATH",
+     "/tmp/.mount_SylviaX/usr/bin:/usr/bin:/bin"
+    ],
+    [
+     "Path",
+     "/odd"
+    ],
+    [
+     "TMP",
+     "/tmp"
+    ],
+    [
+     "CODEX_HOME",
+     "/home/dev/.local/share/sylvia-gm/chatgpt"
+    ],
+    [
+     "HOME",
+     "/home/dev/.local/share/sylvia-gm/chatgpt"
+    ],
+    [
+     "USERPROFILE",
+     "/home/dev/.local/share/sylvia-gm/chatgpt"
+    ],
+    [
+     "HOMEDRIVE",
+     ""
+    ],
+    [
+     "HOMEPATH",
+     "/home/dev/.local/share/sylvia-gm/chatgpt"
+    ],
+    [
+     "APPDATA",
+     "/home/dev/.local/share/sylvia-gm/chatgpt/AppData/Roaming"
+    ],
+    [
+     "LOCALAPPDATA",
+     "/home/dev/.local/share/sylvia-gm/chatgpt/AppData/Local"
+    ]
+   ]
+  }
+ ],
+ "auth_commands": [
+  {
+   "executable": "C:\\Sylvia\\claude.exe",
+   "action": "status",
+   "command": [
+    "C:\\Sylvia\\claude.exe",
+    "--safe-mode",
+    "--restricted",
+    "--setting-sources",
+    "",
+    "--settings",
+    "{\"disableAllHooks\":true}",
+    "auth",
+    "status"
+   ]
+  },
+  {
+   "executable": "C:\\Sylvia\\claude.exe",
+   "action": "login",
+   "command": [
+    "C:\\Sylvia\\claude.exe",
+    "--safe-mode",
+    "--restricted",
+    "--setting-sources",
+    "",
+    "--settings",
+    "{\"disableAllHooks\":true}",
+    "auth",
+    "login"
+   ]
+  },
+  {
+   "executable": "C:\\Sylvia\\claude.exe",
+   "action": "logout",
+   "command": [
+    "C:\\Sylvia\\claude.exe",
+    "--safe-mode",
+    "--restricted",
+    "--setting-sources",
+    "",
+    "--settings",
+    "{\"disableAllHooks\":true}",
+    "auth",
+    "logout"
+   ]
+  }
+ ],
+ "versions": [
+  {
+   "outcome": [
+    "2.1.322 (Claude Code)\n",
+    0
+   ],
+   "value": "2.1.322"
+  },
+  {
+   "outcome": [
+    "2.1.400 (Claude Code)",
+    0
+   ],
+   "value": "2.1.400"
+  },
+  {
+   "outcome": [
+    "2.1.321 (Claude Code)\n",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Claude Code 2.1.322 or later is required. Update Sylvia's copy in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": [
+    "10.0.0 (Claude Code)  \n\n",
+    0
+   ],
+   "value": "10.0.0"
+  },
+  {
+   "outcome": [
+    "2.1.322 (Claude Code) extra\n",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": [
+    "",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": [
+    "\u0662.\u0661.\u0663\u0662\u0662 (Claude Code)\n",
+    0
+   ],
+   "value": "2.1.322"
+  },
+  {
+   "outcome": [
+    "2.1.322 (Claude Code)\n",
+    1
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": [
+    "02.01.0400 (Claude Code)\n",
+    0
+   ],
+   "value": "2.1.400"
+  },
+  {
+   "outcome": [
+    "2.1 (Claude Code)\n",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": [
+    "v2.1.322 (Claude Code)\n",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": [
+    "2.1.322 (Claude Code)\u00a0\n",
+    0
+   ],
+   "value": "2.1.322"
+  },
+  {
+   "outcome": [
+    "2.1.322 (Claude Code)\n",
+    -9
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Sylvia's copy of Claude Code is damaged. Install it again in Settings > Accounts."
+   ]
+  },
+  {
+   "outcome": "oserror",
+   "error": [
+    "ProviderConnectionError",
+    "The Claude executable could not report its version."
+   ]
+  },
+  {
+   "outcome": "timeout",
+   "error": [
+    "ProviderConnectionError",
+    "The Claude executable could not report its version."
+   ]
+  }
+ ],
+ "auth_statuses": [
+  {
+   "outcome": [
+    "{\"loggedIn\": true, \"authMethod\": \"claude.ai\", \"email\": \"x@y\"}",
+    0
+   ],
+   "value": {
+    "signed_in": true,
+    "auth_method": "claude.ai",
+    "billing": "subscription"
+   }
+  },
+  {
+   "outcome": [
+    "{\"loggedIn\": true, \"authMethod\": \"api_key\"}",
+    0
+   ],
+   "value": {
+    "signed_in": true,
+    "auth_method": "api_key",
+    "billing": "api"
+   }
+  },
+  {
+   "outcome": [
+    "{\"loggedIn\": true, \"authMethod\": \"api_key_helper\"}",
+    1
+   ],
+   "value": {
+    "signed_in": false,
+    "auth_method": "api_key_helper",
+    "billing": "api"
+   }
+  },
+  {
+   "outcome": [
+    "{\"loggedIn\": false, \"authMethod\": \"none\"}",
+    1
+   ],
+   "value": {
+    "signed_in": false,
+    "auth_method": "none",
+    "billing": "unknown"
+   }
+  },
+  {
+   "outcome": [
+    "{\"loggedIn\": 1, \"authMethod\": \"oauth_token\"}",
+    0
+   ],
+   "value": {
+    "signed_in": false,
+    "auth_method": "oauth_token",
+    "billing": "unknown"
+   }
+  },
+  {
+   "outcome": [
+    "{\"authMethod\": \"something_new\"}",
+    0
+   ],
+   "value": {
+    "signed_in": false,
+    "auth_method": null,
+    "billing": "unknown"
+   }
+  },
+  {
+   "outcome": [
+    "{\"loggedIn\": true, \"authMethod\": [\"claude.ai\"]}",
+    0
+   ],
+   "error": [
+    "TypeError",
+    "unhashable type: 'list'"
+   ]
+  },
+  {
+   "outcome": [
+    "{\"loggedIn\": true}",
+    2
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Claude could not report its sign-in status."
+   ]
+  },
+  {
+   "outcome": [
+    "[1, 2]",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Claude could not report its sign-in status."
+   ]
+  },
+  {
+   "outcome": [
+    "not json",
+    0
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Claude could not report its sign-in status."
+   ]
+  },
+  {
+   "outcome": [
+    "",
+    1
+   ],
+   "error": [
+    "ProviderConnectionError",
+    "Claude could not report its sign-in status."
+   ]
+  },
+  {
+   "outcome": [
+    " {\"loggedIn\": true} \n",
+    0
+   ],
+   "value": {
+    "signed_in": true,
+    "auth_method": null,
+    "billing": "unknown"
+   }
+  },
+  {
+   "outcome": "oserror",
+   "error": [
+    "ProviderConnectionError",
+    "Claude could not report its sign-in status."
+   ]
+  },
+  {
+   "outcome": "timeout",
+   "error": [
+    "ProviderConnectionError",
+    "Claude could not report its sign-in status."
+   ]
+  }
+ ],
+ "runtimes": [
+  {
+   "entries": [],
+   "chosen": null
+  },
+  {
+   "entries": [
+    [
+     "2.1.322",
+     "file"
+    ]
+   ],
+   "chosen": "2.1.322"
+  },
+  {
+   "entries": [
+    [
+     "2.1.322",
+     "file"
+    ],
+    [
+     "2.1.400",
+     "file"
+    ],
+    [
+     "2.10.1",
+     "file"
+    ],
+    [
+     "2.9.9",
+     "file"
+    ]
+   ],
+   "chosen": "2.10.1"
+  },
+  {
+   "entries": [
+    [
+     "2.1.500",
+     "dir"
+    ],
+    [
+     "2.1.400",
+     "file"
+    ],
+    [
+     "2.1.600",
+     "none"
+    ]
+   ],
+   "chosen": "2.1.400"
+  },
+  {
+   "entries": [
+    [
+     "latest",
+     "file"
+    ],
+    [
+     "2.1",
+     "file"
+    ],
+    [
+     "2.1.322.1",
+     "file"
+    ],
+    [
+     "v2.1.322",
+     "file"
+    ]
+   ],
+   "chosen": null
+  },
+  {
+   "entries": [
+    [
+     "\u0662.\u0661.\u0665",
+     "file"
+    ],
+    [
+     "2.1.4",
+     "file"
+    ]
+   ],
+   "chosen": "\u0662.\u0661.\u0665"
+  },
+  {
+   "entries": [
+    [
+     "10.0.0",
+     "file"
+    ],
+    [
+     "9.99.99",
+     "file"
+    ]
+   ],
+   "chosen": "10.0.0"
+  }
+ ],
+ "claude_frames": [
+  {
+   "name": "events",
+   "data": "{\"type\": \"system\", \"subtype\": \"init\"}\n{\"type\": \"assistant\", \"message\": {\"content\": []}}\n",
+   "events": [
+    {
+     "event": {
+      "type": "system",
+      "subtype": "init"
+     }
+    },
+    {
+     "event": {
+      "type": "assistant",
+      "message": {
+       "content": []
+      }
+     }
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "crlf",
+   "data": "{\"type\": \"a\"}\r\n{\"type\": \"b\"}\r{\"type\": \"c\"}\n",
+   "events": [
+    {
+     "event": {
+      "type": "a"
+     }
+    },
+    {
+     "event": {
+      "type": "b"
+     }
+    },
+    {
+     "event": {
+      "type": "c"
+     }
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "heartbeats",
+   "data": "{\"type\": \"tool_progress\", \"n\": 1}\n{\"type\": \"result\"}\n",
+   "events": [
+    {
+     "event": {
+      "type": "result"
+     }
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "unicode",
+   "data": "{\"type\": \"text\", \"text\": \"\u00c3\u0089tienne \u00f0\u009f\u008e\u00b2\"}\n",
+   "events": [
+    {
+     "event": {
+      "type": "text",
+      "text": "\u00c9tienne \ud83c\udfb2"
+     }
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "no-final-newline",
+   "data": "{\"type\": \"a\"}\n{\"type\": \"b\"}",
+   "events": [
+    {
+     "event": {
+      "type": "a"
+     }
+    },
+    {
+     "error": [
+      "InvalidResponseError",
+      "Claude returned an invalid runtime stream."
+     ]
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "not-an-object",
+   "data": "{\"type\": \"a\"}\n[1, 2]\n{\"type\": \"b\"}\n",
+   "events": [
+    {
+     "event": {
+      "type": "a"
+     }
+    },
+    {
+     "error": [
+      "InvalidResponseError",
+      "Claude returned an invalid runtime stream."
+     ]
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "invalid-json",
+   "data": "{\"type\": \"a\"}\n{oops\n",
+   "events": [
+    {
+     "event": {
+      "type": "a"
+     }
+    },
+    {
+     "error": [
+      "InvalidResponseError",
+      "Claude returned an invalid runtime stream."
+     ]
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "blank-line",
+   "data": "{\"type\": \"a\"}\n\n{\"type\": \"b\"}\n",
+   "events": [
+    {
+     "event": {
+      "type": "a"
+     }
+    },
+    {
+     "error": [
+      "InvalidResponseError",
+      "Claude returned an invalid runtime stream."
+     ]
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "bad-utf8",
+   "data": "{\"type\": \"a\"}\n{\"type\": \"\u00ff\"}\n",
+   "events": [
+    {
+     "error": [
+      "InvalidResponseError",
+      "Claude returned an invalid runtime stream."
+     ]
+    },
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "empty",
+   "data": "",
+   "events": [
+    {
+     "exit": true
+    }
+   ]
+  },
+  {
+   "name": "nan",
+   "data": "{\"type\": \"a\", \"value\": 1.5, \"big\": 12345678901234567890}\n",
+   "events": [
+    {
+     "event": {
+      "type": "a",
+      "value": 1.5,
+      "big": 12345678901234567890
+     }
+    },
+    {
+     "exit": true
+    }
+   ]
+  }
+ ],
+ "claude_writes": [
+  {
+   "message": {
+    "type": "user",
+    "message": {
+     "role": "user",
+     "content": "I open the door. \u00c9tienne \ud83c\udfb2"
+    }
+   },
+   "text": "{\"type\": \"user\", \"message\": {\"role\": \"user\", \"content\": \"I open the door. \\u00c9tienne \\ud83c\\udfb2\"}}\n"
+  },
+  {
+   "message": {
+    "type": "control_response",
+    "response": {
+     "subtype": "success",
+     "request_id": "r1",
+     "value": [
+      1,
+      2.5,
+      true,
+      null
+     ]
+    }
+   },
+   "text": "{\"type\": \"control_response\", \"response\": {\"subtype\": \"success\", \"request_id\": \"r1\", \"value\": [1, 2.5, true, null]}}\n"
+  }
+ ],
+ "codex_reads": [
+  {
+   "name": "routing",
+   "data": "{\"id\": 1, \"result\": {\"userAgent\": \"codex\"}}\n{\"method\": \"thread/started\", \"params\": {\"thread\": {\"id\": \"t\"}}}\n{\"id\": 7, \"method\": \"item/tool/call\", \"params\": {\"namespace\": \"sylvia\", \"tool\": \"roll\", \"arguments\": {}}}\n{\"id\": 8, \"method\": \"item/tool/call\", \"params\": {\"namespace\": \"sylvia\", \"tool\": \"unknown\"}}\n{\"id\": 9, \"method\": \"item/tool/call\", \"params\": {\"namespace\": \"other\", \"tool\": \"roll\"}}\n{\"id\": \"x\", \"method\": \"execCommandApproval\", \"params\": {\"command\": [\"rm\"]}}\n{\"id\": 10, \"method\": \"item/tool/call\", \"params\": [\"not\", \"a\", \"dict\"]}\n{\"id\": 2, \"error\": {\"code\": 1, \"message\": \"secret\"}}\n{\"method\": 5}\n{\"note\": \"no id or method\"}\n{\"method\": \"turn/completed\"}\n",
+   "responses": [
+    {
+     "id": 1,
+     "result": {
+      "userAgent": "codex"
+     }
+    },
+    {
+     "id": 2,
+     "error": {
+      "code": 1,
+      "message": "secret"
+     }
+    },
+    null
+   ],
+   "notifications": [
+    {
+     "method": "thread/started",
+     "params": {
+      "thread": {
+       "id": "t"
+      }
+     }
+    },
+    {
+     "id": 7,
+     "method": "item/tool/call",
+     "params": {
+      "namespace": "sylvia",
+      "tool": "roll",
+      "arguments": {}
+     }
+    },
+    {
+     "method": "turn/completed"
+    }
+   ],
+   "written": "{\"id\": 8, \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n{\"id\": 9, \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n{\"id\": \"x\", \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n{\"id\": 10, \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n"
+  },
+  {
+   "name": "crlf",
+   "data": "{\"id\": 1, \"result\": {\"userAgent\": \"codex\"}}\r\n{\"method\": \"thread/started\", \"params\": {\"thread\": {\"id\": \"t\"}}}\r\n{\"id\": 7, \"method\": \"item/tool/call\", \"params\": {\"namespace\": \"sylvia\", \"tool\": \"roll\", \"arguments\": {}}}\r\n{\"id\": 8, \"method\": \"item/tool/call\", \"params\": {\"namespace\": \"sylvia\", \"tool\": \"unknown\"}}\r\n{\"id\": 9, \"method\": \"item/tool/call\", \"params\": {\"namespace\": \"other\", \"tool\": \"roll\"}}\r\n{\"id\": \"x\", \"method\": \"execCommandApproval\", \"params\": {\"command\": [\"rm\"]}}\r\n{\"id\": 10, \"method\": \"item/tool/call\", \"params\": [\"not\", \"a\", \"dict\"]}\r\n{\"id\": 2, \"error\": {\"code\": 1, \"message\": \"secret\"}}\r\n{\"method\": 5}\r\n{\"note\": \"no id or method\"}\r\n{\"method\": \"turn/completed\"}\r\n",
+   "responses": [
+    {
+     "id": 1,
+     "result": {
+      "userAgent": "codex"
+     }
+    },
+    {
+     "id": 2,
+     "error": {
+      "code": 1,
+      "message": "secret"
+     }
+    },
+    null
+   ],
+   "notifications": [
+    {
+     "method": "thread/started",
+     "params": {
+      "thread": {
+       "id": "t"
+      }
+     }
+    },
+    {
+     "id": 7,
+     "method": "item/tool/call",
+     "params": {
+      "namespace": "sylvia",
+      "tool": "roll",
+      "arguments": {}
+     }
+    },
+    {
+     "method": "turn/completed"
+    }
+   ],
+   "written": "{\"id\": 8, \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n{\"id\": 9, \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n{\"id\": \"x\", \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n{\"id\": 10, \"error\": {\"code\": -32601, \"message\": \"This capability is not available in Sylvia.\"}}\n"
+  },
+  {
+   "name": "stops-at-invalid-json",
+   "data": "{\"method\": \"a\"}\n{oops\n{\"method\": \"b\"}\n",
+   "responses": [
+    null
+   ],
+   "notifications": [
+    {
+     "method": "a"
+    }
+   ],
+   "written": ""
+  },
+  {
+   "name": "stops-at-non-object",
+   "data": "{\"method\": \"a\"}\n[1]\n{\"method\": \"b\"}\n",
+   "responses": [
+    null
+   ],
+   "notifications": [
+    {
+     "method": "a"
+    }
+   ],
+   "written": ""
+  },
+  {
+   "name": "stops-at-blank-line",
+   "data": "{\"method\": \"a\"}\n\n{\"method\": \"b\"}\n",
+   "responses": [
+    null
+   ],
+   "notifications": [
+    {
+     "method": "a"
+    }
+   ],
+   "written": ""
+  },
+  {
+   "name": "bad-utf8",
+   "data": "{\"method\": \"a\"}\n{\"method\": \"\u00ff\"}\n",
+   "responses": [
+    null
+   ],
+   "notifications": [],
+   "written": ""
+  }
+ ],
+ "missing_runtime": {
+  "windows": "Install the Codex runtime before connecting ChatGPT.",
+  "other": "Install the Codex runtime before connecting ChatGPT. Sylvia looks for the codex program in the folders on its PATH. If Codex is already installed, start Sylvia from a terminal in which codex works, or link codex into a folder your desktop session has on its PATH, such as ~/.local/bin."
+ },
+ "minimum_version": "2.1.322",
+ "max_frame_bytes": 8388608
+}

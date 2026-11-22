@@ -27,6 +27,8 @@
 pub mod anthropic;
 pub mod catalog;
 pub mod chat;
+pub mod claude_runtime;
+pub mod codex_rpc;
 pub mod config;
 pub mod context_capacity;
 pub mod context_fit;
@@ -54,6 +56,7 @@ pub mod reply;
 pub mod responses;
 pub mod retry;
 pub mod routes;
+pub mod runtime_process;
 mod sdk_models;
 pub mod speed;
 pub mod sse;
