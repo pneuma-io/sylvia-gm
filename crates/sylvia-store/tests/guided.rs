@@ -266,3 +266,66 @@ async fn guided_start_matches_python() {
     let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
     assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
 }
+
+async fn finalize_step(
+    handle: &StoreHandle,
+    op: &Json,
+    campaigns: &mut std::collections::HashMap<String, String>,
+) -> StoreResult<Json> {
+    if op["op"] != "finalize_campaign_construction" {
+        return start_step(handle, op, campaigns).await;
+    }
+    let key = op["campaign"].as_str().unwrap();
+    let campaign = campaigns.get(key).cloned().unwrap_or_else(|| key.to_owned());
+    let (completed, plan, handoff) = handle
+        .finalize_campaign_construction(&sylvia_store::guided_finalize::FinalizeConstruction {
+            campaign_id: &campaign,
+            dm_provider_id: text(op, "dm_provider_id"),
+            dm_model_id: text(op, "dm_model_id"),
+            plan_artifact_text: text(op, "plan_artifact_text"),
+            structured_plan: op["structured_plan"].as_object(),
+            model_guidance_override: op["model_guidance_override"].as_bool().unwrap(),
+        })
+        .await?;
+    let plan_fields = plan.fields();
+    let handoff_fields = handoff.fields();
+    Ok(json!({
+        "completed": {"campaign_id": completed.campaign_id, "lane": completed.lane,
+                      "canonical_representation_sha256": completed.canonical_representation_sha256,
+                      "resulting_revision": completed.resulting_revision},
+        "plan": {"plan_id": plan_fields.plan_id, "content_sha256": plan_fields.content_sha256,
+                 "plan_revision": plan_fields.plan_revision,
+                 "resulting_campaign_revision": plan_fields.resulting_campaign_revision,
+                 "payload_sha256": plan_fields.payload_sha256},
+        "handoff": {"handoff_id": handoff_fields.handoff_id, "dm_session_id": handoff_fields.dm_session_id,
+                    "resulting_campaign_revision": handoff_fields.resulting_campaign_revision,
+                    "payload_sha256": handoff_fields.payload_sha256},
+    }))
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn guided_finalize_matches_python() {
+    let record = common::read_json("tests/vectors/guided/finalize_runs.json");
+    let folder = common::work_folder("guided-finalize-runs");
+    let database = folder.join("authority.sqlite3");
+    std::fs::write(&database, gunzip("seed")).unwrap();
+    let path = database.clone();
+    let (handle, thread) =
+        StoreHandle::spawn(move || AuthorityStore::open_for_application_owner(&path, None)).unwrap();
+    let mut campaigns = std::collections::HashMap::new();
+    let operations = record["operations"].as_array().unwrap();
+    for (index, (op, want)) in operations.iter().zip(record["outcomes"].as_array().unwrap()).enumerate() {
+        let outcome = finalize_step(&handle, op, &mut campaigns).await;
+        check(&format!("#{index} {} {}", op["op"], op["operation_id"]), outcome, want);
+    }
+    drop(handle);
+    tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+    let rules = sylvia_compare::diff::Rules::defaults();
+    let python = folder.join("python.sqlite3");
+    std::fs::write(&python, gunzip("finalize_runs")).unwrap();
+    let dump = |path: &Path| {
+        sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
+    };
+    let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
+    assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
+}
