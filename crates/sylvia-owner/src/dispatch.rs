@@ -159,6 +159,8 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
         }
+        "recover_campaign" => commands::campaigns::handle_recover_campaign(context, params).await,
+        "recover_campaign_file" => commands::campaigns::handle_recover_campaign_file(context, params).await,
         "restore_trashed_campaign" => {
             commands::campaigns::handle_restore_trashed_campaign(context, params).await
         }

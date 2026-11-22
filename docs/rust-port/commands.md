@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 45 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 47 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -146,8 +146,8 @@ Ported: 45 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_gui
 | `export_package_candidate_file` | `packages.handle_export_package_candidate` | no | no | |
 | `export_campaign` | `campaigns.handle_export_campaign` | no | yes | paired run through owner dispatch (lane 3's Python run of `handle_export_campaign`, `commands/campaigns.rs`); the store's export by `sylvia-store/tests/export_writer.rs` |
 | `export_campaign_file` | `campaigns.handle_export_campaign` | no | yes | paired run through owner dispatch (lane 3's Python run of `handle_export_campaign`, `commands/campaigns.rs`); the store's export by `sylvia-store/tests/export_writer.rs` |
-| `recover_campaign` | `campaigns.handle_recover_campaign` | no | no | |
-| `recover_campaign_file` | `campaigns.handle_recover_campaign_file` | no | no | |
+| `recover_campaign` | `campaigns.handle_recover_campaign` | no | yes | paired run through owner dispatch (lane 3's Python run of `handle_recover_campaign` and `handle_recover_campaign_file`, `commands/campaigns.rs`) on three storage roots, with each final database |
+| `recover_campaign_file` | `campaigns.handle_recover_campaign_file` | no | yes | paired run through owner dispatch (lane 3's Python run of `handle_recover_campaign` and `handle_recover_campaign_file`, `commands/campaigns.rs`) on three storage roots, with each final database |
 | `cancel_display_load` | run loop | yes | yes | `local-services` |
 | `cancel_local_report` | run loop | no | yes | `local-services` |
 | `load_desktop_drafts` | run loop | yes | yes | `local-services` |
