@@ -6,9 +6,9 @@ use sha2::{Digest, Sha256};
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::package_library::canonical_json_bytes;
 
-const MAX_ABSOLUTE_COORDINATE: f64 = 1_000_000.0;
+pub(super) const MAX_ABSOLUTE_COORDINATE: f64 = 1_000_000.0;
 const MAX_AXIS_CELLS: i64 = 2_048;
-const MAX_TOTAL_CELLS: i64 = 4_000_000;
+pub(super) const MAX_TOTAL_CELLS: i64 = 4_000_000;
 const MAX_GEOMETRY: usize = 20_000;
 const MAX_ENTITIES: usize = 5_000;
 const MAX_ZONES: usize = 5_000;
@@ -17,7 +17,7 @@ const MAX_JSON_DEPTH: usize = 24;
 const MAX_JSON_NODES: usize = 100_000;
 const MAX_METADATA_BYTES: usize = 16_384;
 /// `minimum=0.000001`, the smallest positive size a scene may declare.
-const POSITIVE: f64 = 0.000001;
+pub(super) const POSITIVE: f64 = 0.000001;
 
 const SCENE_KEYS: &[&str] = &["format", "map", "geometry", "entities", "zones", "terrain"];
 const MAP_KEYS: &[&str] = &["id", "revision", "bounds", "grid", "layers"];
@@ -53,9 +53,9 @@ const TERRAIN_KEYS: &[&str] = &["cell", "layer_id", "cost"];
 
 const SCENE_INVALID: &str = "spatial_scene_invalid";
 const LIMIT_EXCEEDED: &str = "spatial_limit_exceeded";
-const OUT_OF_BOUNDS: &str = "spatial_out_of_bounds";
+pub(super) const OUT_OF_BOUNDS: &str = "spatial_out_of_bounds";
 const DUPLICATE_ID: &str = "spatial_duplicate_id";
-const CROSS_MAP: &str = "spatial_cross_map";
+pub(super) const CROSS_MAP: &str = "spatial_cross_map";
 
 pub(super) type Admit<T> = Result<T, SpatialValidationError>;
 
@@ -160,7 +160,7 @@ fn type_name(value: &Json) -> &'static str {
 }
 
 /// `float(value)` of an admitted number.
-fn float(value: &Json) -> f64 {
+pub(super) fn float(value: &Json) -> f64 {
     value.as_f64().expect("an admitted number")
 }
 
@@ -188,7 +188,7 @@ pub(super) fn object<'v>(
 }
 
 /// `_array(value, minimum=..., maximum=..., ...)`.
-fn array<'v>(
+pub(super) fn array<'v>(
     value: &'v Json,
     minimum: usize,
     maximum: usize,
@@ -202,7 +202,7 @@ fn array<'v>(
 }
 
 /// `_number(value, minimum=..., ...)`: the value as written.
-fn number(value: &Json, minimum: Option<f64>, code: &'static str, path: &str) -> Admit<Json> {
+pub(super) fn number(value: &Json, minimum: Option<f64>, code: &'static str, path: &str) -> Admit<Json> {
     let Json::Number(written) = value else { return reject("Finite number is required", code, path) };
     let number = written.as_f64().expect("a JSON number");
     if !number.is_finite() || number.abs() > MAX_ABSOLUTE_COORDINATE {
@@ -232,7 +232,7 @@ pub(super) fn integer(
 }
 
 /// `_boolean(value, ...)`.
-fn boolean(value: &Json, code: &'static str, path: &str) -> Admit<bool> {
+pub(super) fn boolean(value: &Json, code: &'static str, path: &str) -> Admit<bool> {
     match value {
         Json::Bool(flag) => Ok(*flag),
         _ => reject("Boolean is required", code, path),
@@ -254,7 +254,7 @@ pub(super) fn identity(value: &Json, code: &'static str, path: &str) -> Admit<St
 }
 
 /// `_coordinate(value, dimensions, ...)`: the numbers as written.
-fn coordinate(value: &Json, dimensions: usize, code: &'static str, path: &str) -> Admit<Vec<Json>> {
+pub(super) fn coordinate(value: &Json, dimensions: usize, code: &'static str, path: &str) -> Admit<Vec<Json>> {
     let items = array(value, dimensions, dimensions, code, path)?;
     items
         .iter()
@@ -264,7 +264,7 @@ fn coordinate(value: &Json, dimensions: usize, code: &'static str, path: &str) -
 }
 
 /// `_cell(value, ...)`.
-fn cell(value: &Json, code: &'static str, path: &str) -> Admit<[i64; 2]> {
+pub(super) fn cell(value: &Json, code: &'static str, path: &str) -> Admit<[i64; 2]> {
     let items = array(value, 2, 2, code, path)?;
     let x = integer(&items[0], 0, MAX_AXIS_CELLS - 1, code, &format!("{path}[0]"))?;
     let y = integer(&items[1], 0, MAX_AXIS_CELLS - 1, code, &format!("{path}[1]"))?;
@@ -301,14 +301,14 @@ fn metadata(value: &Json, code: &'static str, path: &str) -> Admit<Json> {
 }
 
 /// The scene's map bounds, on `float(...)` values.
-struct Bounds {
-    lower: [f64; 3],
-    upper: [f64; 3],
+pub(super) struct Bounds {
+    pub(super) lower: [f64; 3],
+    pub(super) upper: [f64; 3],
 }
 
 impl Bounds {
     /// `_inside(point, bounds)`.
-    fn inside(&self, point: &[f64]) -> bool {
+    pub(super) fn inside(&self, point: &[f64]) -> bool {
         point
             .iter()
             .enumerate()
@@ -316,12 +316,12 @@ impl Bounds {
     }
 }
 
-fn floats(values: &[Json]) -> Vec<f64> {
+pub(super) fn floats(values: &[Json]) -> Vec<f64> {
     values.iter().map(float).collect()
 }
 
 /// `_box(value, bounds=..., ...)`.
-fn volume_box(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> Admit<Json> {
+pub(super) fn volume_box(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> Admit<Json> {
     let item = object(value, &["kind", "min", "max"], code, path)?;
     if item["kind"] != json!("box") {
         return reject("Box volume kind is required", code, format!("{path}.kind"));
@@ -339,7 +339,7 @@ fn volume_box(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> 
 }
 
 /// `_shape(value, bounds=..., ...)`: a box or an upright cylinder.
-fn shape(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> Admit<Json> {
+pub(super) fn shape(value: &Json, bounds: &Bounds, code: &'static str, path: &str) -> Admit<Json> {
     let Json::Object(map) = value else { return reject("Spatial shape must be an object", code, path) };
     if map.get("kind") == Some(&json!("box")) {
         return volume_box(value, bounds, code, path);
