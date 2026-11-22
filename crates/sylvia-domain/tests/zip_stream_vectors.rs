@@ -71,17 +71,22 @@ fn content(index: usize, size: usize) -> Vec<u8> {
     (0..size).map(|offset| ((index + offset) % 251) as u8).collect()
 }
 
-fn members(case: &Json) -> Vec<(String, usize)> {
+/// Each member's name, the bytes written, and the `file_size` preset before `open` (the bytes
+/// written unless the vector gives a third value).
+fn members(case: &Json) -> Vec<(String, usize, u64)> {
     match &case["members"] {
         Json::Array(items) => items
             .iter()
-            .map(|item| (item[0].as_str().unwrap().to_owned(), item[1].as_u64().unwrap() as usize))
+            .map(|item| {
+                let size = item[1].as_u64().unwrap();
+                (item[0].as_str().unwrap().to_owned(), size as usize, item[2].as_u64().unwrap_or(size))
+            })
             .collect(),
         pattern => {
             assert_eq!(pattern["pattern"], "m/{index:05d}");
             let size = pattern["size"].as_u64().unwrap() as usize;
             (0..pattern["count"].as_u64().unwrap() as usize)
-                .map(|index| (format!("m/{index:05}"), size))
+                .map(|index| (format!("m/{index:05}"), size, size as u64))
                 .collect()
         }
     }
@@ -92,13 +97,13 @@ fn streamed_archives_are_cpythons_bytes() {
     let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/zip_stream_vectors.json");
     let record: Json = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
     let cases = record["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 7);
+    assert_eq!(cases.len(), 8);
     for case in cases {
         let name = case["name"].as_str().unwrap();
         let bias = case["bias"].as_u64().unwrap();
         let members = members(case);
         let mut writer = StreamingZipWriter::new(Biased { bias, data: Vec::new(), position: bias }).unwrap();
-        for (index, (member_name, size)) in members.iter().enumerate() {
+        for (index, (member_name, size, preset)) in members.iter().enumerate() {
             let member = ZipMember {
                 filename: member_name.clone(),
                 date_time: (1980, 1, 1, 0, 0, 0),
@@ -107,7 +112,7 @@ fn streamed_archives_are_cpythons_bytes() {
                 external_attr: 0o100600 << 16,
             };
             let data = content(index, *size);
-            let mut open = writer.open_member(member, *size as u64).unwrap();
+            let mut open = writer.open_member(member, *preset).unwrap();
             for chunk in data.chunks(65_536) {
                 open.write(chunk).unwrap();
             }
@@ -119,7 +124,7 @@ fn streamed_archives_are_cpythons_bytes() {
         // Read back from the biased positions CPython wrote at.
         let archive = ZipArchive::open_source(Box::new(Mapped { bias, data: written })).unwrap();
         assert_eq!(archive.infos().len(), members.len(), "{name}: members");
-        for (index, (info, (member_name, size))) in archive.infos().iter().zip(&members).enumerate() {
+        for (index, (info, (member_name, size, _))) in archive.infos().iter().zip(&members).enumerate() {
             assert_eq!(&info.filename, member_name, "{name}");
             assert!(info.header_offset >= bias as i64, "{name}: offsets are the stream's own");
             let mut read = Vec::new();

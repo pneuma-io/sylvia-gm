@@ -235,7 +235,11 @@ pub struct StreamingZipWriter<W: std::io::Write + std::io::Seek> {
     written: Vec<StreamedMember>,
 }
 
-/// One member open for writing (`_ZipWriteFile`).
+/// One member open for writing (`_ZipWriteFile`). It must be closed with
+/// [`StreamedMemberWriter::close`]: dropping it unclosed leaves the member's header provisional
+/// and the member out of the central directory, a corrupt archive (CPython raises `ValueError`
+/// when the archive is closed with a member still open).
+#[must_use = "a member writer must be closed, or the archive is corrupt"]
 pub struct StreamedMemberWriter<'a, W: std::io::Write + std::io::Seek> {
     writer: &'a mut StreamingZipWriter<W>,
     member: ZipMember,
