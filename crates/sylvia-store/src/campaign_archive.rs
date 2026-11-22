@@ -821,3 +821,206 @@ pub fn validate_migration_provenance(
     }
     Ok(())
 }
+
+/// `PRIVATE_FORMAT_VERSION`: an archive that carries the private provider member.
+pub const PRIVATE_FORMAT_VERSION: i64 = 2;
+
+/// `LIMITS`, in Python's order (`checked_archive_ledger` refuses the first one exceeded).
+pub const LIMITS: [(&str, i64); 9] = [
+    ("member_count", 65_536),
+    ("authority_record_count", 1_000_000),
+    ("single_table_row_count", 250_000),
+    ("manifest_bytes", 16_777_216),
+    ("authority_jsonl_bytes", 67_108_864),
+    ("single_authority_row_bytes", 16_777_216),
+    ("single_text_or_json_value_bytes", 16_777_216),
+    ("single_blob_bytes", 536_870_912),
+    ("total_uncompressed_bytes", 8_589_934_592),
+];
+
+/// One of [`LIMITS`] by name.
+pub fn limit(name: &str) -> i64 {
+    LIMITS.iter().find(|(limit, _)| *limit == name).map_or(0, |(_, value)| *value)
+}
+
+/// `MANIFEST_FIELDS`.
+pub const MANIFEST_FIELDS: [&str; 14] = [
+    "format_id",
+    "format_version",
+    "product_id",
+    "product_generation",
+    "source_authority_schema_version",
+    "source_authority_schema_identity_sha256",
+    "migration_provenance",
+    "campaign_id",
+    "captured_revision",
+    "authority_record_count",
+    "table_row_counts",
+    "blob_count",
+    "closure_index",
+    "non_manifest_members",
+];
+
+/// `private_records_archive.MEMBER_NAME`.
+pub const PRIVATE_MEMBER_NAME: &str = "provider-private.jsonl";
+
+/// `canonical_authority_record(table, row)`: one JSONL line of the authority member.
+pub fn canonical_authority_record(table: &str, row: &JsonMap) -> Vec<u8> {
+    let mut record = JsonMap::new();
+    record.insert("table".into(), table.into());
+    record.insert("row".into(), Json::Object(row.clone()));
+    let mut bytes = json_bytes(&Json::Object(record));
+    bytes.push(b'\n');
+    bytes
+}
+
+/// `canonical_authority_record_size(table, row)`. Python counts it piecewise to bound memory;
+/// the count is the record's length.
+pub fn canonical_authority_record_size(table: &str, row: &JsonMap) -> usize {
+    canonical_authority_record(table, row).len()
+}
+
+/// `checked_archive_ledger(**values)`: every named limit, in [`LIMITS`] order (a value not
+/// given is zero).
+pub fn checked_archive_ledger(values: &[(&str, i64)]) -> StoreResult<()> {
+    for (name, maximum) in LIMITS {
+        let value = values.iter().find(|(key, _)| *key == name).map_or(0, |(_, value)| *value);
+        if value < 0 || value > maximum {
+            return Err(failure(&format!("portable_export_limit_{name}")));
+        }
+    }
+    Ok(())
+}
+
+/// Every portable table's captured rows, in `TABLES_IN_ORDER`, each row in its columns' order.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct CapturedRows(pub Vec<(&'static str, Vec<JsonMap>)>);
+
+impl CapturedRows {
+    /// One table's rows (none for a table not captured).
+    pub fn get(&self, table: &str) -> &[JsonMap] {
+        self.0.iter().find(|(name, _)| *name == table).map_or(&[], |(_, rows)| rows.as_slice())
+    }
+}
+
+/// `str(row[column])` of a captured value.
+fn text_of(value: &Json) -> String {
+    match value {
+        Json::String(text) => text.clone(),
+        Json::Null => "None".into(),
+        other => pyjson::dumps(other, Dump::CANONICAL),
+    }
+}
+
+/// `closure_index(rows_by_table)`.
+pub fn closure_index(rows: &CapturedRows) -> Json {
+    let identities = |table: &str, column: &str| -> Json {
+        let set: std::collections::BTreeSet<String> =
+            rows.get(table).iter().map(|row| text_of(row.get(column).unwrap_or(&Json::Null))).collect();
+        Json::Array(set.into_iter().map(Json::String).collect())
+    };
+    let packages: std::collections::BTreeSet<(String, String, String)> = rows
+        .get("package_manifests")
+        .iter()
+        .map(|row| {
+            let field = |key: &str| text_of(row.get(key).unwrap_or(&Json::Null));
+            (field("package_id"), field("version"), field("content_sha256"))
+        })
+        .collect();
+    let mut index = JsonMap::new();
+    index.insert("lock_ids".into(), identities("campaign_locks", "lock_id"));
+    index.insert("action_ids".into(), identities("actions", "action_id"));
+    index.insert("candidate_ids".into(), identities("package_candidates", "candidate_id"));
+    index.insert(
+        "package_identities".into(),
+        Json::Array(
+            packages
+                .into_iter()
+                .map(|(package_id, version, content_sha256)| {
+                    let mut identity = JsonMap::new();
+                    identity.insert("package_id".into(), package_id.into());
+                    identity.insert("version".into(), version.into());
+                    identity.insert("content_sha256".into(), content_sha256.into());
+                    Json::Object(identity)
+                })
+                .collect(),
+        ),
+    );
+    index.insert("blob_sha256s".into(), identities("package_blobs", "blob_sha256"));
+    index.insert("plan_ids".into(), identities("campaign_plans", "plan_id"));
+    index.insert("handoff_ids".into(), identities("builder_dm_handoffs", "handoff_id"));
+    index.insert("session_ids".into(), identities("agent_sessions", "session_id"));
+    Json::Object(index)
+}
+
+/// `make_manifest(...)`'s keyword arguments.
+pub struct ManifestInput<'a> {
+    pub source_schema_version: i64,
+    pub source_schema_identity_sha256: &'a str,
+    pub migration_provenance: &'a Json,
+    pub campaign_id: &'a str,
+    pub captured_revision: i64,
+    pub rows: &'a CapturedRows,
+    pub non_manifest_members: &'a [JsonMap],
+}
+
+/// `make_manifest(...)`: the archive manifest in `MANIFEST_FIELDS` order.
+pub fn make_manifest(input: &ManifestInput<'_>) -> StoreResult<JsonMap> {
+    if input.source_schema_version != SOURCE_AUTHORITY_SCHEMA_VERSION
+        || input.source_schema_identity_sha256
+            != source_authority_schema_claim_sha256(input.source_schema_version)
+    {
+        return Err(failure("portable_export_invalid_source_schema"));
+    }
+    validate_migration_provenance(
+        input.migration_provenance,
+        true,
+        &Json::from(SOURCE_AUTHORITY_SCHEMA_VERSION),
+    )?;
+    let mut counts = JsonMap::new();
+    let mut total = 0i64;
+    for table in TABLES {
+        let count = input.rows.get(table.name).len() as i64;
+        total += count;
+        counts.insert(table.name.into(), count.into());
+    }
+    let private = input
+        .non_manifest_members
+        .iter()
+        .any(|member| member.get("name") == Some(&Json::String(PRIVATE_MEMBER_NAME.into())));
+    let provenance = &input.migration_provenance;
+    let mut manifest = JsonMap::new();
+    manifest.insert("format_id".into(), FORMAT_ID.into());
+    manifest.insert(
+        "format_version".into(),
+        (if private { PRIVATE_FORMAT_VERSION } else { FORMAT_VERSION }).into(),
+    );
+    manifest.insert("product_id".into(), PRODUCT_ID.into());
+    manifest.insert("product_generation".into(), PRODUCT_GENERATION.into());
+    manifest.insert("source_authority_schema_version".into(), input.source_schema_version.into());
+    manifest
+        .insert("source_authority_schema_identity_sha256".into(), input.source_schema_identity_sha256.into());
+    let mut normalized = JsonMap::new();
+    normalized.insert("schema_migrations".into(), provenance["schema_migrations"].clone());
+    normalized.insert("schema_extensions".into(), provenance["schema_extensions"].clone());
+    manifest.insert("migration_provenance".into(), Json::Object(normalized));
+    manifest.insert("campaign_id".into(), input.campaign_id.into());
+    manifest.insert("captured_revision".into(), input.captured_revision.into());
+    manifest.insert("authority_record_count".into(), total.into());
+    manifest.insert("table_row_counts".into(), Json::Object(counts));
+    manifest.insert("blob_count".into(), (input.rows.get("package_blobs").len() as i64).into());
+    manifest.insert("closure_index".into(), closure_index(input.rows));
+    manifest.insert(
+        "non_manifest_members".into(),
+        Json::Array(input.non_manifest_members.iter().cloned().map(Json::Object).collect()),
+    );
+    Ok(manifest)
+}
+
+/// `manifest_bytes(manifest)`.
+pub fn manifest_bytes(manifest: &JsonMap) -> StoreResult<Vec<u8>> {
+    if !manifest.keys().map(String::as_str).eq(MANIFEST_FIELDS) {
+        return Err(failure("portable_export_invalid_manifest"));
+    }
+    Ok(json_bytes(&Json::Object(manifest.clone())))
+}
