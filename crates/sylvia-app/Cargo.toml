@@ -16,6 +16,8 @@ sylvia-store.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]
+# The vector tests' hooks (`vector-hooks`); never a normal dependency's feature.
+sylvia-engine = { workspace = true, features = ["vector-hooks"] }
 sylvia-compare = { path = "../sylvia-compare" }
 flate2.workspace = true
 rusqlite.workspace = true

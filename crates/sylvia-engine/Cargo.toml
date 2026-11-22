@@ -22,5 +22,11 @@ indexmap.workspace = true
 [dev-dependencies]
 hex.workspace = true
 
+[features]
+# Vector tooling only: `exec::handlers::with_identity_shuffle_for_vectors`, which leaves `shuffle` in
+# order. Only test builds enable it, through `[dev-dependencies]`; no product build may
+# (`docs/rust-port/check.sh` checks that the owner's dependency graph does not).
+vector-hooks = []
+
 [lints]
 workspace = true
