@@ -1,0 +1,235 @@
+{
+ "python": "3.12.11",
+ "operations": [
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": " storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "  ",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": " Storm",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin ",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "\t"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Other Name",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/other"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "other",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "storm",
+   "display_name": "Storm Courier",
+   "builder_session_id": "session-guided-2",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "harbour",
+   "display_name": "Harbour Lights",
+   "builder_session_id": "session-guided-2",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "lantern",
+   "display_name": "Lantern",
+   "builder_session_id": "session-guided-1",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "tide",
+   "display_name": "Tide  of  Glass \u2014 \u00dcnder",
+   "builder_session_id": "session-guided-3",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  }
+ ],
+ "outcomes": [
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "invalid_authority_identity",
+   "message": "Guided Campaign Draft authority is invalid"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-9a105749cfcbac2e07d76406",
+    "builder_session_id": "session-guided-1",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "error": "IdempotencyConflict",
+   "code": "idempotency_conflict",
+   "message": "Guided Campaign Draft identity payload does not match"
+  },
+  {
+   "error": "IdempotencyConflict",
+   "code": "idempotency_conflict",
+   "message": "Guided Campaign Draft identity payload does not match"
+  },
+  {
+   "error": "IdempotencyConflict",
+   "code": "idempotency_conflict",
+   "message": "Guided Campaign Draft identity payload does not match"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "session_unavailable",
+   "message": "Agent session is unavailable"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-aa74f6fd03bf68be7e0f4bd0",
+    "builder_session_id": "session-guided-2",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "error": "IdempotencyConflict",
+   "code": "idempotency_conflict",
+   "message": "Agent session identity payload does not match"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-8a28929ac7f9a17e97a421ac",
+    "builder_session_id": "session-guided-3",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  }
+ ]
+}

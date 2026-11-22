@@ -36,14 +36,16 @@ pub(crate) fn config_error(failure: ConfigFailure) -> CodedError {
 
 /// Run `operation` with the product's configuration sources: the shipped defaults, this
 /// platform's credential protection and the process environment.
-fn with_sources<T>(operation: impl FnOnce(ConfigSources<'_>) -> Result<T, ConfigFailure>) -> CodedResult<T> {
+pub(crate) fn with_sources<T>(
+    operation: impl FnOnce(ConfigSources<'_>) -> Result<T, ConfigFailure>,
+) -> CodedResult<T> {
     let default_config = default_config_path();
     let env = Environment::current();
     operation(ConfigSources { default_config: &default_config, seal: &PlatformSeal, env: &env })
         .map_err(config_error)
 }
 
-fn config_path(ctx: &DispatchContext) -> PathBuf {
+pub(crate) fn config_path(ctx: &DispatchContext) -> PathBuf {
     ctx.storage_root.join("config.yaml")
 }
 
@@ -64,7 +66,7 @@ fn providers(ctx: &DispatchContext) -> CodedResult<&std::sync::Arc<dyn crate::se
 }
 
 /// `ctx.model_choices()`.
-async fn model_choices(ctx: &DispatchContext) -> CodedResult<Vec<Json>> {
+pub(crate) async fn model_choices(ctx: &DispatchContext) -> CodedResult<Vec<Json>> {
     let Some(providers) = ctx.providers.as_ref() else {
         return Err(CodedError::new("internal_error", "The provider resolver is not available.")
             .with_error_type("RuntimeError"));
