@@ -7,6 +7,11 @@
 //! A saved queue is the content of an `action_sequence` evidence message, as Python's own
 //! sequence code wrote it. A field Python indexes that is missing is its `KeyError`, an internal
 //! failure here too.
+//!
+//! One divergence is left, reachable only through a hand-corrupted queue: Python's
+//! `latest[content["sequence_id"]]`, `bases = {...}` and `... in bases` raise `TypeError` for an
+//! unhashable value (a list or object as a sequence or basis identity); here those are compared
+//! by Python's `==` instead.
 
 use crate::player_actions::player_action_request_matches;
 use std::collections::BTreeSet;
@@ -99,36 +104,31 @@ fn committed_ids(store: &AuthorityStore, queue: &JsonMap) -> StoreResult<Vec<Str
         .filter(|marker| marker.get("status") == Some(&Json::from(STEP_COMMITTED)))
         .map(|marker| (sylvia_domain::pyops::py_str(&marker["action_id"]), marker["origin"].clone()))
         .collect();
-    let session_id = item(queue, "session_id")?;
     let mut identities = Vec::new();
     for (step, operation_id) in steps.iter().zip(&operation_ids) {
-        let Some(Json::Object(envelope)) = step.get("execution").filter(|value| truthy(Some(value))) else {
+        let Some(execution) = step.get("execution").filter(|value| truthy(Some(value))) else {
             continue;
         };
-        let Some((_, stored)) = origins.iter().find(|(action_id, _)| action_id == operation_id) else {
+        // `origins` is a dict: of two committed markers for one action, the later one counts.
+        let Some((_, stored)) = origins.iter().rev().find(|(action_id, _)| action_id == operation_id) else {
             continue;
         };
-        let selection = match envelope.get("selection") {
-            None | Some(Json::Null) => None,
-            Some(Json::Object(selection)) => Some(selection),
-            Some(_) => None,
+        // `envelope["source"]` on a truthy value that is not a mapping is Python's `TypeError`.
+        let Json::Object(envelope) = execution else {
+            return Err(StoreError::Other("TypeError: the step's execution is not a mapping".into()));
         };
-        // Python's origin carries `expected_revision` as saved; one that is not an integer cannot
-        // equal the stored origin's, so the step is inconsistent.
-        let expected = item(envelope, "expected_revision")?;
-        let request = match expected
-            .as_i64()
-            .or_else(|| expected.as_f64().filter(|value| value.fract() == 0.0).map(|value| value as i64))
-        {
-            Some(revision) => Some(
-                player_control_origin(item(envelope, "source")?, revision, selection, session_id.as_str())
-                    .map_err(StoreError::from)?,
-            ),
-            None => None,
-        };
-        let matches =
-            request.is_some_and(|request| player_action_request_matches(stored.as_object(), &request));
-        if !matches {
+        // Python's arguments, in its order, each as saved: the domain function validates the
+        // source and supplies the control fields; the origin's first three items are then the raw
+        // saved values (their keys already exist, so they keep their places).
+        let source = item(envelope, "source")?;
+        let expected_revision = item(envelope, "expected_revision")?.clone();
+        let selection = envelope.get("selection").cloned().filter(|value| truthy(Some(value)));
+        let session_id = item(queue, "session_id")?.clone();
+        let mut request = player_control_origin(source, 0, None, None).map_err(StoreError::from)?;
+        request.insert("expected_revision".into(), expected_revision);
+        request.insert("selection".into(), selection.unwrap_or_else(|| Json::Object(JsonMap::new())));
+        request.insert("session_id".into(), session_id);
+        if !player_action_request_matches(stored.as_object(), &request) {
             return Err(sylvia_domain::DomainError::command_rejected(
                 "Saved sequence action identity is inconsistent",
             )
