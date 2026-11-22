@@ -246,8 +246,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/campaign_sequels.py:63` | `preview` | len() against a limit | `if len(rows) >= MAX_ADVENTURES:` | |
 | `infrastructure/builder_source_ingestion.py:174` | `ingest_builder_sources` | len() against a limit | `if not 1 <= len(source_paths) <= MAX_SOURCE_FILES:` | |
 | `infrastructure/campaign_archive.py:2975` | `_discover_recovery_manifest` | len() against a limit | `len(info.filename.encode("utf-8")) > RECOVERY_MAX_MEMBER_NAME_BYTES for info in infos` | |
-| `infrastructure/private_records_archive.py:43` | `validate_rows` | len() against a limit | `if len(result) >= MAX_ROWS or not isinstance(row, Mapping) or set(row) != set(FIELDS):` | |
-| `infrastructure/private_records_archive.py:83` | `encode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(output) + len(line) > MAX_BYTES:` | |
+| `infrastructure/private_records_archive.py:43` | `validate_rows` | len() against a limit | `if len(result) >= MAX_ROWS or not isinstance(row, Mapping) or set(row) != set(FIELDS):` | `sylvia-store` export_capture |
+| `infrastructure/private_records_archive.py:83` | `encode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(output) + len(line) > MAX_BYTES:` | `sylvia-store` export_capture |
 | `infrastructure/private_records_archive.py:91` | `decode` | len() against a limit | `if len(data) > MAX_BYTES or (data and not data.endswith(b"\n")):` | |
 | `infrastructure/private_records_archive.py:95` | `decode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(rows) >= MAX_ROWS:` | |
 | `infrastructure/sqlite_authority.py:1737` | `SQLiteAuthorityStore._write_export_blob` | len() against a limit | `or len(data) > campaign_archive.STREAM_CHUNK_BYTES` | |

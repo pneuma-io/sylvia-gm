@@ -1,0 +1,1829 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "captured_revision": 8,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 5,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 10,
+      "campaign_revisions": 9,
+      "campaign_package_memberships": 1,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 1,
+      "campaign_state": 1,
+      "turns": 2,
+      "actions": 1,
+      "idempotency_records": 1,
+      "canonical_events": 8,
+      "narration_interruptions": 0,
+      "mutations": 1,
+      "consequences": 1,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 1,
+      "package_activations": 0,
+      "campaign_plans": 1,
+      "builder_dm_handoffs": 1,
+      "agent_sessions": 2,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 13,
+      "package_candidates": 1,
+      "package_candidate_memberships": 1,
+      "package_staging": 1,
+      "packages": 1,
+      "package_dependencies": 0,
+      "package_manifests": 1,
+      "package_manifest_files": 1,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 1,
+      "package_tools": 1,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 1
+     },
+     "authority": {
+      "sha256": "33beb16ff466c5bb6e215f04e0c548edf28dea4e3a17c253221e3bdf43fd2305",
+      "length": 27418
+     },
+     "private": null,
+     "blob_sha256s": [
+      "5bdaae6d71b72e0772154fffbf994bc4e203c6e708b9e5b2f1df06ff414a9d5a"
+     ],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 27418,
+       "sha256": "33beb16ff466c5bb6e215f04e0c548edf28dea4e3a17c253221e3bdf43fd2305"
+      }
+     ],
+     "manifest": {
+      "sha256": "5440e1912044c577a28d5c0580395fa4822bf8bcf14d402f08ee2280c42beccf",
+      "length": 4669
+     }
+    }
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "captured_revision": 8,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 5,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 10,
+      "campaign_revisions": 9,
+      "campaign_package_memberships": 1,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 1,
+      "campaign_state": 1,
+      "turns": 2,
+      "actions": 1,
+      "idempotency_records": 1,
+      "canonical_events": 8,
+      "narration_interruptions": 0,
+      "mutations": 1,
+      "consequences": 1,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 1,
+      "package_activations": 0,
+      "campaign_plans": 1,
+      "builder_dm_handoffs": 1,
+      "agent_sessions": 2,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 13,
+      "package_candidates": 1,
+      "package_candidate_memberships": 1,
+      "package_staging": 1,
+      "packages": 1,
+      "package_dependencies": 0,
+      "package_manifests": 1,
+      "package_manifest_files": 1,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 1,
+      "package_tools": 1,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 1
+     },
+     "authority": {
+      "sha256": "33beb16ff466c5bb6e215f04e0c548edf28dea4e3a17c253221e3bdf43fd2305",
+      "length": 27418
+     },
+     "private": {
+      "sha256": "43e944a00fe72f0bae7792e39d05b8c600877212c06f101a3c7ec4ba4e502cd2",
+      "length": 559
+     },
+     "blob_sha256s": [
+      "5bdaae6d71b72e0772154fffbf994bc4e203c6e708b9e5b2f1df06ff414a9d5a"
+     ],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 27418,
+       "sha256": "33beb16ff466c5bb6e215f04e0c548edf28dea4e3a17c253221e3bdf43fd2305"
+      },
+      {
+       "name": "provider-private.jsonl",
+       "byte_count": 559,
+       "sha256": "43e944a00fe72f0bae7792e39d05b8c600877212c06f101a3c7ec4ba4e502cd2"
+      }
+     ],
+     "manifest": {
+      "sha256": "fd8f1383c0941240e5ea157d44018d7269e09a9b563226632406b32ab0779ab4",
+      "length": 4796
+     }
+    }
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-build",
+   "include_thinking": true,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 0,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 1,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 1,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 1,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 8,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 1,
+      "package_dependencies": 0,
+      "package_manifests": 1,
+      "package_manifest_files": 1,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 1,
+      "package_tools": 1,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 1
+     },
+     "authority": {
+      "sha256": "387b362ffc1d750dc0a54b6da36530a7415dfd22c61c78cc9082d4ad7dc419c4",
+      "length": 6819
+     },
+     "private": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "length": 0
+     },
+     "blob_sha256s": [
+      "5bdaae6d71b72e0772154fffbf994bc4e203c6e708b9e5b2f1df06ff414a9d5a"
+     ],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 6819,
+       "sha256": "387b362ffc1d750dc0a54b6da36530a7415dfd22c61c78cc9082d4ad7dc419c4"
+      },
+      {
+       "name": "provider-private.jsonl",
+       "byte_count": 0,
+       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+     ],
+     "manifest": {
+      "sha256": "8ced6e09d2bd7d0f5b26c8d1805e43f875f3b8f320851142afc3fce151b186f3",
+      "length": 4730
+     }
+    }
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-missing",
+   "include_thinking": false,
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "command_rejected",
+    "message": "Portable campaign export failed (command_rejected)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "constructed",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+     "captured_revision": 4,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 3,
+      "campaign_constructions": 1,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 5,
+      "campaign_package_memberships": 0,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 0,
+      "package_activations": 0,
+      "campaign_plans": 1,
+      "builder_dm_handoffs": 1,
+      "agent_sessions": 2,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 1,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 0,
+      "package_dependencies": 0,
+      "package_manifests": 0,
+      "package_manifest_files": 0,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 0,
+      "package_tools": 0,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 0
+     },
+     "authority": {
+      "sha256": "44b05530f48c49b5b21bdb5f1feb09636b3af3538bf01ec43709e226592e927e",
+      "length": 9326
+     },
+     "private": null,
+     "blob_sha256s": [],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 9326,
+       "sha256": "44b05530f48c49b5b21bdb5f1feb09636b3af3538bf01ec43709e226592e927e"
+      }
+     ],
+     "manifest": {
+      "sha256": "90899ebbd5bf4795cb8aed82e2f45187d3d606fa3a03f64bb260c51dfa1d46c5",
+      "length": 4555
+     }
+    }
+   }
+  },
+  {
+   "base": "constructed",
+   "campaign_id": "campaign-clockwork",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-clockwork",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 0,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 1,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 1,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 1,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 3,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 1,
+      "package_dependencies": 0,
+      "package_manifests": 1,
+      "package_manifest_files": 1,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 1,
+      "package_tools": 1,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 1
+     },
+     "authority": {
+      "sha256": "0aff47ba3c8fe13485adf141eb615cfb6180f4945b247603a17c373943e2bed3",
+      "length": 5509
+     },
+     "private": null,
+     "blob_sha256s": [
+      "5bdaae6d71b72e0772154fffbf994bc4e203c6e708b9e5b2f1df06ff414a9d5a"
+     ],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 5509,
+       "sha256": "0aff47ba3c8fe13485adf141eb615cfb6180f4945b247603a17c373943e2bed3"
+      }
+     ],
+     "manifest": {
+      "sha256": "91997b0645c4d0f012f32410b50b390bbaa6648df2ce9b9a578c3a691e37eb7c",
+      "length": 4612
+     }
+    }
+   }
+  },
+  {
+   "base": "constructed",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 1,
+      "campaign_constructions": 1,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 0,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 0,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 1,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 2,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 0,
+      "package_dependencies": 0,
+      "package_manifests": 0,
+      "package_manifest_files": 0,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 0,
+      "package_tools": 0,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 0
+     },
+     "authority": {
+      "sha256": "8d4dbde7c6c388324ac622afd937e25179dbf323bf1aeefde1ee83cde00f15f2",
+      "length": 3581
+     },
+     "private": null,
+     "blob_sha256s": [],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 3581,
+       "sha256": "8d4dbde7c6c388324ac622afd937e25179dbf323bf1aeefde1ee83cde00f15f2"
+      }
+     ],
+     "manifest": {
+      "sha256": "259057ca3f9107048dda0c46f50a038e6ed48067a602046ef7a63fe2e81b074c",
+      "length": 4433
+     }
+    }
+   }
+  },
+  {
+   "base": "constructed",
+   "campaign_id": "campaign-b",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-b",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 0,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 0,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 0,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 0,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 0,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 0,
+      "package_dependencies": 0,
+      "package_manifests": 0,
+      "package_manifest_files": 0,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 0,
+      "package_tools": 0,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 0
+     },
+     "authority": {
+      "sha256": "117d4444ceb2dbe7ebbe86ebb66cc51c43f3678b56fe69e14115894787b1bf3e",
+      "length": 1079
+     },
+     "private": null,
+     "blob_sha256s": [],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 1079,
+       "sha256": "117d4444ceb2dbe7ebbe86ebb66cc51c43f3678b56fe69e14115894787b1bf3e"
+      }
+     ],
+     "manifest": {
+      "sha256": "fbc74ead02c02095a89e56583e8b9b94cbeac1a7a027ca005373587f26758960",
+      "length": 4387
+     }
+    }
+   }
+  },
+  {
+   "base": "constructed",
+   "campaign_id": "campaign-a2",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-a2",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 0,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 0,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 0,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 0,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 0,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 0,
+      "package_dependencies": 0,
+      "package_manifests": 0,
+      "package_manifest_files": 0,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 0,
+      "package_tools": 0,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 0
+     },
+     "authority": {
+      "sha256": "6e334b74d7339b86e0091f8dfa309310dcd8c5c48a801c0005ae7462f7ab4b83",
+      "length": 1086
+     },
+     "private": null,
+     "blob_sha256s": [],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 1086,
+       "sha256": "6e334b74d7339b86e0091f8dfa309310dcd8c5c48a801c0005ae7462f7ab4b83"
+      }
+     ],
+     "manifest": {
+      "sha256": "315506bf54d040ac536b0f540f15e97422c622c34df3e104840c855c18bc107d",
+      "length": 4388
+     }
+    }
+   }
+  },
+  {
+   "base": "constructed",
+   "campaign_id": "campaign-a1",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-a1",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 0,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 0,
+      "participants": 0,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 0,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 0,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 0,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 0,
+      "package_dependencies": 0,
+      "package_manifests": 0,
+      "package_manifest_files": 0,
+      "package_exact_dependencies": 0,
+      "package_capabilities": 0,
+      "package_tools": 0,
+      "package_prompt_fragments": 0,
+      "package_ui_surfaces": 0,
+      "package_participant_artifacts": 0,
+      "package_blobs": 0
+     },
+     "authority": {
+      "sha256": "de1bd206399f7b20612c4953a1d025efcebc1d37046b2493dbdcdeefa216ed46",
+      "length": 1086
+     },
+     "private": null,
+     "blob_sha256s": [],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 1086,
+       "sha256": "de1bd206399f7b20612c4953a1d025efcebc1d37046b2493dbdcdeefa216ed46"
+      }
+     ],
+     "manifest": {
+      "sha256": "ccd40fff5b25b12d33b61abc855636d03b625f69cc15f006de1f4a4d41b2824d",
+      "length": 4388
+     }
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "campaign_id": "campaign-table",
+   "include_thinking": false,
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_adaptation_ineligible",
+    "message": "Portable campaign export failed (portable_export_adaptation_ineligible)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "cast",
+   "campaign_id": "campaign-workshop",
+   "include_thinking": false,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-workshop",
+     "captured_revision": 0,
+     "source_schema_version": 12,
+     "source_schema_identity_sha256": "6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8",
+     "migration_provenance": {
+      "schema_migrations": [
+       {
+        "version": 1,
+        "applied_name": "f1_neutral_authority",
+        "sql_sha256": "6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1"
+       },
+       {
+        "version": 2,
+        "applied_name": "f2_provisional_event_protocol",
+        "sql_sha256": "71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193"
+       },
+       {
+        "version": 3,
+        "applied_name": "f3_sqlite_package_library",
+        "sql_sha256": "58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f"
+       },
+       {
+        "version": 4,
+        "applied_name": "f4_builder_dm_sessions",
+        "sql_sha256": "e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb"
+       },
+       {
+        "version": 5,
+        "applied_name": "f5_campaign_lifecycle_recovery",
+        "sql_sha256": "ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483"
+       },
+       {
+        "version": 6,
+        "applied_name": "f7_relational_state_namespace_ownership",
+        "sql_sha256": "91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6"
+       },
+       {
+        "version": 7,
+        "applied_name": "mechanics_choice_reservations",
+        "sql_sha256": "5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53"
+       },
+       {
+        "version": 8,
+        "applied_name": "standalone_builder_chats",
+        "sql_sha256": "70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0"
+       },
+       {
+        "version": 9,
+        "applied_name": "campaign_state_continuity",
+        "sql_sha256": "6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee"
+       },
+       {
+        "version": 10,
+        "applied_name": "unbound_draft_lifecycle",
+        "sql_sha256": "3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f"
+       },
+       {
+        "version": 11,
+        "applied_name": "private_provider_records",
+        "sql_sha256": "4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34"
+       },
+       {
+        "version": 12,
+        "applied_name": "session_reasoning_preferences",
+        "sql_sha256": "d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28"
+       }
+      ],
+      "schema_extensions": [
+       {
+        "extension_name": "f5_portable_campaign_recovery_v1",
+        "extension_sha256": "d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61",
+        "predecessor_migration_name": "f5_reversible_lifecycle_v3",
+        "predecessor_sql_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06"
+       },
+       {
+        "extension_name": "f5_probe_01_stable_campaign_identity",
+        "extension_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4",
+        "predecessor_migration_name": "f5_campaign_lifecycle_recovery",
+        "predecessor_sql_sha256": "49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802"
+       },
+       {
+        "extension_name": "f5_reversible_lifecycle_v3",
+        "extension_sha256": "a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06",
+        "predecessor_migration_name": "f5_probe_01_stable_campaign_identity",
+        "predecessor_sql_sha256": "0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4"
+       }
+      ]
+     },
+     "table_row_counts": {
+      "campaigns": 1,
+      "campaign_lifecycle_state": 1,
+      "campaign_lifecycle_transitions": 0,
+      "campaign_operations": 0,
+      "campaign_constructions": 0,
+      "campaign_continuity_records": 0,
+      "campaign_revisions": 1,
+      "campaign_package_memberships": 2,
+      "participants": 1,
+      "participant_quarantines": 0,
+      "campaign_state_namespace_owners": 0,
+      "campaign_state": 0,
+      "turns": 1,
+      "actions": 0,
+      "idempotency_records": 0,
+      "canonical_events": 0,
+      "narration_interruptions": 0,
+      "mutations": 0,
+      "consequences": 0,
+      "campaign_locks": 1,
+      "campaign_lock_memberships": 2,
+      "package_activations": 0,
+      "campaign_plans": 0,
+      "builder_dm_handoffs": 0,
+      "agent_sessions": 0,
+      "pending_mechanics_actions": 0,
+      "pending_mechanics_action_aliases": 0,
+      "mechanics_choice_resolutions": 0,
+      "agent_session_messages": 0,
+      "package_candidates": 0,
+      "package_candidate_memberships": 0,
+      "package_staging": 0,
+      "packages": 2,
+      "package_dependencies": 1,
+      "package_manifests": 2,
+      "package_manifest_files": 6,
+      "package_exact_dependencies": 1,
+      "package_capabilities": 2,
+      "package_tools": 2,
+      "package_prompt_fragments": 1,
+      "package_ui_surfaces": 1,
+      "package_participant_artifacts": 1,
+      "package_blobs": 6
+     },
+     "authority": {
+      "sha256": "66324412934cb5d04dccdd7f23ffa2e2b7ac0908a0c0c9a0bcd44abb65ad9847",
+      "length": 16147
+     },
+     "private": null,
+     "blob_sha256s": [
+      "0430aa0cb13d09d2aee930bcba47b3f2c5c1a996314d7131ac82f3db57305f2e",
+      "3752141ff5e613d83818ccc0b40de0a406b6003e55656cf96024df346176db46",
+      "3a37a5008691f5d9e3f67ac4124d86fe51b9e282b272b91cee3b2c46a4d763c9",
+      "92f09c5dddffc18fa0a271653e4c19b71e8db8e173be156da4bf47c369d1d355",
+      "b030067e9b22ff2d18ea46ba797d6e839762f1157fbc153a9ad837c42ffe3de4",
+      "c8150e7306ccca7710c41ea5e6f08421d0410aee8934b353a179ca01f0063957"
+     ],
+     "members": [
+      {
+       "name": "authority.jsonl",
+       "byte_count": 16147,
+       "sha256": "66324412934cb5d04dccdd7f23ffa2e2b7ac0908a0c0c9a0bcd44abb65ad9847"
+      }
+     ],
+     "manifest": {
+      "sha256": "b3c5858ae3c63a15f924124b9f67bb6fac9ce899702792197b5d3098b2fba60b",
+      "length": 5075
+     }
+    }
+   }
+  },
+  {
+   "base": "fresh",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "command_rejected",
+    "message": "Portable campaign export failed (command_rejected)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "riichi",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "command_rejected",
+    "message": "Portable campaign export failed (command_rejected)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "v4",
+   "campaign_id": "campaign-1",
+   "include_thinking": false,
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_source_schema_unsupported",
+    "message": "Portable campaign export failed (portable_export_source_schema_unsupported)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "sql": [
+    "UPDATE campaigns SET display_name = replace(hex(zeroblob(8388609)), '0', 'x') WHERE campaign_id = 'campaign-story'"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_limit_single_text_or_json_value_bytes",
+    "message": "Portable campaign export failed (portable_export_limit_single_text_or_json_value_bytes)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "faults": [
+    "capture_open"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_open_failed",
+    "message": "Portable campaign export failed (portable_export_capture_open_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "faults": [
+    "capture_begin"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_begin_failed",
+    "message": "Portable campaign export failed (portable_export_capture_begin_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "faults": [
+    "capture_preflight"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_preflight_failed",
+    "message": "Portable campaign export failed (portable_export_capture_preflight_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "faults": [
+    "capture_read"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_read_failed",
+    "message": "Portable campaign export failed (portable_export_capture_read_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "faults": [
+    "capture_encode"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_encode_failed",
+    "message": "Portable campaign export failed (portable_export_capture_encode_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": true,
+   "faults": [
+    "capture_commit"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_commit_failed",
+    "message": "Portable campaign export failed (portable_export_capture_commit_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "faults": [
+    "capture_read",
+    "capture_rollback"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_read_failed",
+    "message": "Portable campaign export failed (portable_export_capture_read_failed)",
+    "supplemental_codes": [
+     "portable_export_capture_rollback_failed"
+    ]
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "faults": [
+    "capture_close"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_close_failed",
+    "message": "Portable campaign export failed (portable_export_capture_close_failed)",
+    "supplemental_codes": []
+   }
+  },
+  {
+   "base": "story",
+   "campaign_id": "campaign-story",
+   "include_thinking": false,
+   "faults": [
+    "capture_encode",
+    "capture_rollback",
+    "capture_close"
+   ],
+   "outcome": {
+    "error": "_ExportFailure",
+    "code": "portable_export_capture_encode_failed",
+    "message": "Portable campaign export failed (portable_export_capture_encode_failed)",
+    "supplemental_codes": [
+     "portable_export_capture_rollback_failed",
+     "portable_export_capture_close_failed"
+    ]
+   }
+  }
+ ]
+}
