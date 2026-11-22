@@ -52,6 +52,21 @@ impl Drop for CampaignWorkGuard {
     }
 }
 
+/// One reserved campaign transition (`_reserve_campaign_transition`):
+/// `_release_campaign_transition` runs when it drops.
+#[derive(Debug)]
+pub struct TransitionGuard {
+    state: Arc<Mutex<State>>,
+    campaign_id: String,
+}
+
+impl Drop for TransitionGuard {
+    fn drop(&mut self) {
+        let mut state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
+        state.transitions.remove(&self.campaign_id);
+    }
+}
+
 fn rejected(message: &str, code: &str) -> StoreError {
     crate::actions::rejected(message, code)
 }
@@ -87,6 +102,25 @@ impl CampaignWork {
         let mut state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
         *state.counts.entry(campaign_id.to_owned()).or_insert(0) += 1;
         Ok(CampaignWorkGuard { state: Arc::clone(&self.state), campaign_id: campaign_id.to_owned() })
+    }
+
+    /// `_reserve_campaign_transition(campaign_id)`: refused while another transition is reserved
+    /// or while any work is registered on the campaign; it is never queued. It takes the
+    /// admission lock, as [`Self::begin`] does, so work cannot be admitted halfway through.
+    pub async fn reserve_transition(&self, campaign_id: &str) -> StoreResult<TransitionGuard> {
+        let _admission = self.admission.lock().await;
+        let mut state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
+        if state.transitions.contains(campaign_id) {
+            return Err(rejected("Campaign package transition is already in progress", "command_rejected"));
+        }
+        if state.counts.get(campaign_id).copied().unwrap_or(0) != 0 {
+            return Err(rejected(
+                "Campaign has active work; activation is not queued",
+                "campaign_work_in_progress",
+            ));
+        }
+        state.transitions.insert(campaign_id.to_owned());
+        Ok(TransitionGuard { state: Arc::clone(&self.state), campaign_id: campaign_id.to_owned() })
     }
 
     /// How much work is registered on a campaign (`_campaign_work_counts.get(id, 0)`).
