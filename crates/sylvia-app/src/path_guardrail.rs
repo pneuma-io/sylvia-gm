@@ -124,7 +124,7 @@ impl PathGuardrail {
 }
 
 #[cfg(windows)]
-mod platform {
+pub(crate) mod platform {
     //! `ntpath` and `PureWindowsPath`.
 
     fn is_sep(c: char) -> bool {
@@ -300,7 +300,7 @@ mod platform {
 }
 
 #[cfg(not(windows))]
-mod platform {
+pub(crate) mod platform {
     //! `posixpath` and `PurePosixPath`.
 
     use std::collections::HashMap;
