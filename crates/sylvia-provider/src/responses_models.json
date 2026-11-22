@@ -1,0 +1,8081 @@
+{
+ "openai": "2.53.0",
+ "pydantic": "2.13.4",
+ "python": "3.12.11",
+ "output_item": {
+  "union": {
+   "message": "response_output_message.ResponseOutputMessage",
+   "file_search_call": "response_file_search_tool_call.ResponseFileSearchToolCall",
+   "function_call": "response_function_tool_call.ResponseFunctionToolCall",
+   "function_call_output": "response_function_tool_call_output_item.ResponseFunctionToolCallOutputItem",
+   "web_search_call": "response_function_web_search.ResponseFunctionWebSearch",
+   "computer_call": "response_computer_tool_call.ResponseComputerToolCall",
+   "computer_call_output": "response_computer_tool_call_output_item.ResponseComputerToolCallOutputItem",
+   "reasoning": "response_reasoning_item.ResponseReasoningItem",
+   "program": "response_output_item.Program",
+   "program_output": "response_output_item.ProgramOutput",
+   "tool_search_call": "response_tool_search_call.ResponseToolSearchCall",
+   "tool_search_output": "response_tool_search_output_item.ResponseToolSearchOutputItem",
+   "additional_tools": "response_output_item.AdditionalTools",
+   "compaction": "response_compaction_item.ResponseCompactionItem",
+   "image_generation_call": "response_output_item.ImageGenerationCall",
+   "code_interpreter_call": "response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall",
+   "local_shell_call": "response_output_item.LocalShellCall",
+   "local_shell_call_output": "response_output_item.LocalShellCallOutput",
+   "shell_call": "response_function_shell_tool_call.ResponseFunctionShellToolCall",
+   "shell_call_output": "response_function_shell_tool_call_output.ResponseFunctionShellToolCallOutput",
+   "apply_patch_call": "response_apply_patch_tool_call.ResponseApplyPatchToolCall",
+   "apply_patch_call_output": "response_apply_patch_tool_call_output.ResponseApplyPatchToolCallOutput",
+   "mcp_call": "response_output_item.McpCall",
+   "mcp_list_tools": "response_output_item.McpListTools",
+   "mcp_approval_request": "response_output_item.McpApprovalRequest",
+   "mcp_approval_response": "response_output_item.McpApprovalResponse",
+   "custom_tool_call": "response_custom_tool_call.ResponseCustomToolCall",
+   "custom_tool_call_output": "response_custom_tool_call_output_item.ResponseCustomToolCallOutputItem"
+  },
+  "first": "response_output_message.ResponseOutputMessage"
+ },
+ "response": {
+  "model": "response.Response"
+ },
+ "stream_event": {
+  "union": {
+   "response.audio.delta": "response_audio_delta_event.ResponseAudioDeltaEvent",
+   "response.audio.done": "response_audio_done_event.ResponseAudioDoneEvent",
+   "response.audio.transcript.delta": "response_audio_transcript_delta_event.ResponseAudioTranscriptDeltaEvent",
+   "response.audio.transcript.done": "response_audio_transcript_done_event.ResponseAudioTranscriptDoneEvent",
+   "response.code_interpreter_call_code.delta": "response_code_interpreter_call_code_delta_event.ResponseCodeInterpreterCallCodeDeltaEvent",
+   "response.code_interpreter_call_code.done": "response_code_interpreter_call_code_done_event.ResponseCodeInterpreterCallCodeDoneEvent",
+   "response.code_interpreter_call.completed": "response_code_interpreter_call_completed_event.ResponseCodeInterpreterCallCompletedEvent",
+   "response.code_interpreter_call.in_progress": "response_code_interpreter_call_in_progress_event.ResponseCodeInterpreterCallInProgressEvent",
+   "response.code_interpreter_call.interpreting": "response_code_interpreter_call_interpreting_event.ResponseCodeInterpreterCallInterpretingEvent",
+   "response.completed": "response_completed_event.ResponseCompletedEvent",
+   "response.content_part.added": "response_content_part_added_event.ResponseContentPartAddedEvent",
+   "response.content_part.done": "response_content_part_done_event.ResponseContentPartDoneEvent",
+   "response.created": "response_created_event.ResponseCreatedEvent",
+   "error": "response_error_event.ResponseErrorEvent",
+   "response.file_search_call.completed": "response_file_search_call_completed_event.ResponseFileSearchCallCompletedEvent",
+   "response.file_search_call.in_progress": "response_file_search_call_in_progress_event.ResponseFileSearchCallInProgressEvent",
+   "response.file_search_call.searching": "response_file_search_call_searching_event.ResponseFileSearchCallSearchingEvent",
+   "response.function_call_arguments.delta": "response_function_call_arguments_delta_event.ResponseFunctionCallArgumentsDeltaEvent",
+   "response.function_call_arguments.done": "response_function_call_arguments_done_event.ResponseFunctionCallArgumentsDoneEvent",
+   "response.in_progress": "response_in_progress_event.ResponseInProgressEvent",
+   "response.failed": "response_failed_event.ResponseFailedEvent",
+   "response.incomplete": "response_incomplete_event.ResponseIncompleteEvent",
+   "response.output_item.added": "response_output_item_added_event.ResponseOutputItemAddedEvent",
+   "response.output_item.done": "response_output_item_done_event.ResponseOutputItemDoneEvent",
+   "response.reasoning_summary_part.added": "response_reasoning_summary_part_added_event.ResponseReasoningSummaryPartAddedEvent",
+   "response.reasoning_summary_part.done": "response_reasoning_summary_part_done_event.ResponseReasoningSummaryPartDoneEvent",
+   "response.reasoning_summary_text.delta": "response_reasoning_summary_text_delta_event.ResponseReasoningSummaryTextDeltaEvent",
+   "response.reasoning_summary_text.done": "response_reasoning_summary_text_done_event.ResponseReasoningSummaryTextDoneEvent",
+   "response.reasoning_text.delta": "response_reasoning_text_delta_event.ResponseReasoningTextDeltaEvent",
+   "response.reasoning_text.done": "response_reasoning_text_done_event.ResponseReasoningTextDoneEvent",
+   "response.refusal.delta": "response_refusal_delta_event.ResponseRefusalDeltaEvent",
+   "response.refusal.done": "response_refusal_done_event.ResponseRefusalDoneEvent",
+   "response.output_text.delta": "response_text_delta_event.ResponseTextDeltaEvent",
+   "response.output_text.done": "response_text_done_event.ResponseTextDoneEvent",
+   "response.web_search_call.completed": "response_web_search_call_completed_event.ResponseWebSearchCallCompletedEvent",
+   "response.web_search_call.in_progress": "response_web_search_call_in_progress_event.ResponseWebSearchCallInProgressEvent",
+   "response.web_search_call.searching": "response_web_search_call_searching_event.ResponseWebSearchCallSearchingEvent",
+   "response.image_generation_call.completed": "response_image_gen_call_completed_event.ResponseImageGenCallCompletedEvent",
+   "response.image_generation_call.generating": "response_image_gen_call_generating_event.ResponseImageGenCallGeneratingEvent",
+   "response.image_generation_call.in_progress": "response_image_gen_call_in_progress_event.ResponseImageGenCallInProgressEvent",
+   "response.image_generation_call.partial_image": "response_image_gen_call_partial_image_event.ResponseImageGenCallPartialImageEvent",
+   "response.mcp_call_arguments.delta": "response_mcp_call_arguments_delta_event.ResponseMcpCallArgumentsDeltaEvent",
+   "response.mcp_call_arguments.done": "response_mcp_call_arguments_done_event.ResponseMcpCallArgumentsDoneEvent",
+   "response.mcp_call.completed": "response_mcp_call_completed_event.ResponseMcpCallCompletedEvent",
+   "response.mcp_call.failed": "response_mcp_call_failed_event.ResponseMcpCallFailedEvent",
+   "response.mcp_call.in_progress": "response_mcp_call_in_progress_event.ResponseMcpCallInProgressEvent",
+   "response.mcp_list_tools.completed": "response_mcp_list_tools_completed_event.ResponseMcpListToolsCompletedEvent",
+   "response.mcp_list_tools.failed": "response_mcp_list_tools_failed_event.ResponseMcpListToolsFailedEvent",
+   "response.mcp_list_tools.in_progress": "response_mcp_list_tools_in_progress_event.ResponseMcpListToolsInProgressEvent",
+   "response.output_text.annotation.added": "response_output_text_annotation_added_event.ResponseOutputTextAnnotationAddedEvent",
+   "response.queued": "response_queued_event.ResponseQueuedEvent",
+   "response.custom_tool_call_input.delta": "response_custom_tool_call_input_delta_event.ResponseCustomToolCallInputDeltaEvent",
+   "response.custom_tool_call_input.done": "response_custom_tool_call_input_done_event.ResponseCustomToolCallInputDoneEvent"
+  },
+  "first": "response_audio_delta_event.ResponseAudioDeltaEvent"
+ },
+ "models": {
+  "apply_patch_tool.ApplyPatchTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "comparison_filter.ComparisonFilter": [
+   [
+    "key",
+    "key",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "value",
+    "value",
+    {
+     "either": [
+      "any",
+      "float",
+      "any",
+      {
+       "list": {
+        "either": [
+         "any",
+         "float"
+        ]
+       }
+      }
+     ]
+    },
+    null
+   ]
+  ],
+  "compound_filter.CompoundFilter": [
+   [
+    "filters",
+    "filters",
+    {
+     "list": {
+      "either": [
+       {
+        "model": "comparison_filter.ComparisonFilter"
+       },
+       "any"
+      ]
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "computer_action.Click": [
+   [
+    "button",
+    "button",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "computer_action.DoubleClick": [
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ]
+  ],
+  "computer_action.Drag": [
+   [
+    "path",
+    "path",
+    {
+     "list": {
+      "model": "computer_action.DragPath"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "computer_action.DragPath": [
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ]
+  ],
+  "computer_action.Keypress": [
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "computer_action.Move": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "computer_action.Screenshot": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "computer_action.Scroll": [
+   [
+    "scroll_x",
+    "scroll_x",
+    "any",
+    null
+   ],
+   [
+    "scroll_y",
+    "scroll_y",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "computer_action.Type": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "computer_action.Wait": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "computer_tool.ComputerTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "computer_use_preview_tool.ComputerUsePreviewTool": [
+   [
+    "display_height",
+    "display_height",
+    "any",
+    null
+   ],
+   [
+    "display_width",
+    "display_width",
+    "any",
+    null
+   ],
+   [
+    "environment",
+    "environment",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "container_auto.ContainerAuto": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "file_ids",
+    "file_ids",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "memory_limit",
+    "memory_limit",
+    "any",
+    null
+   ],
+   [
+    "network_policy",
+    "network_policy",
+    {
+     "union": {
+      "disabled": "container_network_policy_disabled.ContainerNetworkPolicyDisabled",
+      "allowlist": "container_network_policy_allowlist.ContainerNetworkPolicyAllowlist"
+     },
+     "first": "container_network_policy_disabled.ContainerNetworkPolicyDisabled"
+    },
+    null
+   ],
+   [
+    "skills",
+    "skills",
+    {
+     "list": {
+      "union": {
+       "skill_reference": "skill_reference.SkillReference",
+       "inline": "inline_skill.InlineSkill"
+      },
+      "first": "skill_reference.SkillReference"
+     }
+    },
+    null
+   ]
+  ],
+  "container_network_policy_allowlist.ContainerNetworkPolicyAllowlist": [
+   [
+    "allowed_domains",
+    "allowed_domains",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "domain_secrets",
+    "domain_secrets",
+    {
+     "list": {
+      "model": "container_network_policy_domain_secret.ContainerNetworkPolicyDomainSecret"
+     }
+    },
+    null
+   ]
+  ],
+  "container_network_policy_disabled.ContainerNetworkPolicyDisabled": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "container_network_policy_domain_secret.ContainerNetworkPolicyDomainSecret": [
+   [
+    "domain",
+    "domain",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "value",
+    "value",
+    "any",
+    null
+   ]
+  ],
+  "container_reference.ContainerReference": [
+   [
+    "container_id",
+    "container_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "custom_tool.CustomTool": [
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "defer_loading",
+    "defer_loading",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "format",
+    "format",
+    {
+     "union": {
+      "text": "custom_tool_input_format.Text",
+      "grammar": "custom_tool_input_format.Grammar"
+     },
+     "first": "custom_tool_input_format.Text"
+    },
+    null
+   ]
+  ],
+  "custom_tool_input_format.Grammar": [
+   [
+    "definition",
+    "definition",
+    "any",
+    null
+   ],
+   [
+    "syntax",
+    "syntax",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "custom_tool_input_format.Text": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "easy_input_message.EasyInputMessage": [
+   [
+    "content",
+    "content",
+    {
+     "either": [
+      "any",
+      {
+       "list": {
+        "union": {
+         "input_text": "response_input_text.ResponseInputText",
+         "input_image": "response_input_image.ResponseInputImage",
+         "input_file": "response_input_file.ResponseInputFile"
+        },
+        "first": "response_input_text.ResponseInputText"
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "role",
+    "role",
+    "any",
+    null
+   ],
+   [
+    "phase",
+    "phase",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "file_search_tool.FileSearchTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "vector_store_ids",
+    "vector_store_ids",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "filters",
+    "filters",
+    {
+     "union": {
+      "eq": "comparison_filter.ComparisonFilter",
+      "and": "compound_filter.CompoundFilter"
+     },
+     "first": "comparison_filter.ComparisonFilter"
+    },
+    null
+   ],
+   [
+    "max_num_results",
+    "max_num_results",
+    "any",
+    null
+   ],
+   [
+    "ranking_options",
+    "ranking_options",
+    {
+     "model": "file_search_tool.RankingOptions"
+    },
+    null
+   ]
+  ],
+  "file_search_tool.RankingOptions": [
+   [
+    "hybrid_search",
+    "hybrid_search",
+    {
+     "model": "file_search_tool.RankingOptionsHybridSearch"
+    },
+    null
+   ],
+   [
+    "ranker",
+    "ranker",
+    "any",
+    null
+   ],
+   [
+    "score_threshold",
+    "score_threshold",
+    "float",
+    null
+   ]
+  ],
+  "file_search_tool.RankingOptionsHybridSearch": [
+   [
+    "embedding_weight",
+    "embedding_weight",
+    "float",
+    null
+   ],
+   [
+    "text_weight",
+    "text_weight",
+    "float",
+    null
+   ]
+  ],
+  "function_shell_tool.FunctionShellTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "environment",
+    "environment",
+    {
+     "union": {
+      "container_auto": "container_auto.ContainerAuto",
+      "local": "local_environment.LocalEnvironment",
+      "container_reference": "container_reference.ContainerReference"
+     },
+     "first": "container_auto.ContainerAuto"
+    },
+    null
+   ]
+  ],
+  "function_tool.FunctionTool": [
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "parameters",
+    "parameters",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "strict",
+    "strict",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "defer_loading",
+    "defer_loading",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "output_schema",
+    "output_schema",
+    {
+     "dict": "any"
+    },
+    null
+   ]
+  ],
+  "inline_skill.InlineSkill": [
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "source",
+    "source",
+    {
+     "model": "inline_skill_source.InlineSkillSource"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "inline_skill_source.InlineSkillSource": [
+   [
+    "data",
+    "data",
+    "any",
+    null
+   ],
+   [
+    "media_type",
+    "media_type",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "local_environment.LocalEnvironment": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "skills",
+    "skills",
+    {
+     "list": {
+      "model": "local_skill.LocalSkill"
+     }
+    },
+    null
+   ]
+  ],
+  "local_skill.LocalSkill": [
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ]
+  ],
+  "namespace_tool.NamespaceTool": [
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "union": {
+       "function": "namespace_tool.ToolFunction",
+       "custom": "custom_tool.CustomTool"
+      },
+      "first": "namespace_tool.ToolFunction"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "namespace_tool.ToolFunction": [
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "defer_loading",
+    "defer_loading",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "output_schema",
+    "output_schema",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "parameters",
+    "parameters",
+    "any",
+    null
+   ],
+   [
+    "strict",
+    "strict",
+    "any",
+    null
+   ]
+  ],
+  "reasoning.Reasoning": [
+   [
+    "context",
+    "context",
+    "any",
+    null
+   ],
+   [
+    "effort",
+    "effort",
+    "any",
+    null
+   ],
+   [
+    "generate_summary",
+    "generate_summary",
+    "any",
+    null
+   ],
+   [
+    "mode",
+    "mode",
+    {
+     "either": [
+      "any",
+      "any"
+     ]
+    },
+    null
+   ],
+   [
+    "summary",
+    "summary",
+    "any",
+    null
+   ]
+  ],
+  "response.Conversation": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ]
+  ],
+  "response.IncompleteDetails": [
+   [
+    "reason",
+    "reason",
+    "any",
+    null
+   ]
+  ],
+  "response.Moderation": [
+   [
+    "input",
+    "input",
+    {
+     "union": {
+      "moderation_result": "response.ModerationInputModerationResult",
+      "error": "response.ModerationInputError"
+     },
+     "first": "response.ModerationInputModerationResult"
+    },
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "union": {
+      "moderation_result": "response.ModerationOutputModerationResult",
+      "error": "response.ModerationOutputError"
+     },
+     "first": "response.ModerationOutputModerationResult"
+    },
+    null
+   ]
+  ],
+  "response.ModerationInputError": [
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response.ModerationInputModerationResult": [
+   [
+    "categories",
+    "categories",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "category_applied_input_types",
+    "category_applied_input_types",
+    {
+     "dict": {
+      "list": "any"
+     }
+    },
+    null
+   ],
+   [
+    "category_scores",
+    "category_scores",
+    {
+     "dict": "float"
+    },
+    null
+   ],
+   [
+    "flagged",
+    "flagged",
+    "any",
+    null
+   ],
+   [
+    "model",
+    "model",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response.ModerationOutputError": [
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response.ModerationOutputModerationResult": [
+   [
+    "categories",
+    "categories",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "category_applied_input_types",
+    "category_applied_input_types",
+    {
+     "dict": {
+      "list": "any"
+     }
+    },
+    null
+   ],
+   [
+    "category_scores",
+    "category_scores",
+    {
+     "dict": "float"
+    },
+    null
+   ],
+   [
+    "flagged",
+    "flagged",
+    "any",
+    null
+   ],
+   [
+    "model",
+    "model",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response.PromptCacheOptions": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ],
+   [
+    "ttl",
+    "ttl",
+    "any",
+    null
+   ]
+  ],
+  "response.Response": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "created_at",
+    "created_at",
+    "float",
+    null
+   ],
+   [
+    "error",
+    "error",
+    {
+     "model": "response_error.ResponseError"
+    },
+    null
+   ],
+   [
+    "incomplete_details",
+    "incomplete_details",
+    {
+     "model": "response.IncompleteDetails"
+    },
+    null
+   ],
+   [
+    "instructions",
+    "instructions",
+    {
+     "either": [
+      "any",
+      {
+       "list": {
+        "either": [
+         {
+          "model": "easy_input_message.EasyInputMessage"
+         },
+         {
+          "model": "response_input_item.Message"
+         },
+         {
+          "model": "response_output_message.ResponseOutputMessage"
+         },
+         {
+          "model": "response_file_search_tool_call.ResponseFileSearchToolCall"
+         },
+         {
+          "model": "response_computer_tool_call.ResponseComputerToolCall"
+         },
+         {
+          "model": "response_input_item.ComputerCallOutput"
+         },
+         {
+          "model": "response_function_web_search.ResponseFunctionWebSearch"
+         },
+         {
+          "model": "response_function_tool_call.ResponseFunctionToolCall"
+         },
+         {
+          "model": "response_input_item.FunctionCallOutput"
+         },
+         {
+          "model": "response_input_item.ToolSearchCall"
+         },
+         {
+          "model": "response_tool_search_output_item_param.ResponseToolSearchOutputItemParam"
+         },
+         {
+          "model": "response_input_item.AdditionalTools"
+         },
+         {
+          "model": "response_reasoning_item.ResponseReasoningItem"
+         },
+         {
+          "model": "response_compaction_item_param.ResponseCompactionItemParam"
+         },
+         {
+          "model": "response_input_item.ImageGenerationCall"
+         },
+         {
+          "model": "response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall"
+         },
+         {
+          "model": "response_input_item.LocalShellCall"
+         },
+         {
+          "model": "response_input_item.LocalShellCallOutput"
+         },
+         {
+          "model": "response_input_item.ShellCall"
+         },
+         {
+          "model": "response_input_item.ShellCallOutput"
+         },
+         {
+          "model": "response_input_item.ApplyPatchCall"
+         },
+         {
+          "model": "response_input_item.ApplyPatchCallOutput"
+         },
+         {
+          "model": "response_input_item.McpListTools"
+         },
+         {
+          "model": "response_input_item.McpApprovalRequest"
+         },
+         {
+          "model": "response_input_item.McpApprovalResponse"
+         },
+         {
+          "model": "response_input_item.McpCall"
+         },
+         {
+          "model": "response_custom_tool_call_output.ResponseCustomToolCallOutput"
+         },
+         {
+          "model": "response_custom_tool_call.ResponseCustomToolCall"
+         },
+         {
+          "model": "response_input_item.CompactionTrigger"
+         },
+         {
+          "model": "response_input_item.ItemReference"
+         },
+         {
+          "model": "response_input_item.Program"
+         },
+         {
+          "model": "response_input_item.ProgramOutput"
+         }
+        ]
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "metadata",
+    "metadata",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "model",
+    "model",
+    {
+     "either": [
+      "any",
+      "any",
+      "any"
+     ]
+    },
+    null
+   ],
+   [
+    "object",
+    "object",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "list": {
+      "union": {
+       "message": "response_output_message.ResponseOutputMessage",
+       "file_search_call": "response_file_search_tool_call.ResponseFileSearchToolCall",
+       "function_call": "response_function_tool_call.ResponseFunctionToolCall",
+       "function_call_output": "response_function_tool_call_output_item.ResponseFunctionToolCallOutputItem",
+       "web_search_call": "response_function_web_search.ResponseFunctionWebSearch",
+       "computer_call": "response_computer_tool_call.ResponseComputerToolCall",
+       "computer_call_output": "response_computer_tool_call_output_item.ResponseComputerToolCallOutputItem",
+       "reasoning": "response_reasoning_item.ResponseReasoningItem",
+       "program": "response_output_item.Program",
+       "program_output": "response_output_item.ProgramOutput",
+       "tool_search_call": "response_tool_search_call.ResponseToolSearchCall",
+       "tool_search_output": "response_tool_search_output_item.ResponseToolSearchOutputItem",
+       "additional_tools": "response_output_item.AdditionalTools",
+       "compaction": "response_compaction_item.ResponseCompactionItem",
+       "image_generation_call": "response_output_item.ImageGenerationCall",
+       "code_interpreter_call": "response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall",
+       "local_shell_call": "response_output_item.LocalShellCall",
+       "local_shell_call_output": "response_output_item.LocalShellCallOutput",
+       "shell_call": "response_function_shell_tool_call.ResponseFunctionShellToolCall",
+       "shell_call_output": "response_function_shell_tool_call_output.ResponseFunctionShellToolCallOutput",
+       "apply_patch_call": "response_apply_patch_tool_call.ResponseApplyPatchToolCall",
+       "apply_patch_call_output": "response_apply_patch_tool_call_output.ResponseApplyPatchToolCallOutput",
+       "mcp_call": "response_output_item.McpCall",
+       "mcp_list_tools": "response_output_item.McpListTools",
+       "mcp_approval_request": "response_output_item.McpApprovalRequest",
+       "mcp_approval_response": "response_output_item.McpApprovalResponse",
+       "custom_tool_call": "response_custom_tool_call.ResponseCustomToolCall",
+       "custom_tool_call_output": "response_custom_tool_call_output_item.ResponseCustomToolCallOutputItem"
+      },
+      "first": "response_output_message.ResponseOutputMessage"
+     }
+    },
+    null
+   ],
+   [
+    "parallel_tool_calls",
+    "parallel_tool_calls",
+    "any",
+    null
+   ],
+   [
+    "temperature",
+    "temperature",
+    "float",
+    null
+   ],
+   [
+    "tool_choice",
+    "tool_choice",
+    {
+     "either": [
+      "any",
+      {
+       "model": "tool_choice_allowed.ToolChoiceAllowed"
+      },
+      {
+       "model": "tool_choice_types.ToolChoiceTypes"
+      },
+      {
+       "model": "tool_choice_function.ToolChoiceFunction"
+      },
+      {
+       "model": "tool_choice_mcp.ToolChoiceMcp"
+      },
+      {
+       "model": "tool_choice_custom.ToolChoiceCustom"
+      },
+      {
+       "model": "response.ToolChoiceSpecificProgrammaticToolCallingParam"
+      },
+      {
+       "model": "tool_choice_apply_patch.ToolChoiceApplyPatch"
+      },
+      {
+       "model": "tool_choice_shell.ToolChoiceShell"
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "union": {
+       "function": "function_tool.FunctionTool",
+       "file_search": "file_search_tool.FileSearchTool",
+       "computer": "computer_tool.ComputerTool",
+       "computer_use_preview": "computer_use_preview_tool.ComputerUsePreviewTool",
+       "web_search": "web_search_tool.WebSearchTool",
+       "mcp": "tool.Mcp",
+       "code_interpreter": "tool.CodeInterpreter",
+       "programmatic_tool_calling": "tool.ProgrammaticToolCalling",
+       "image_generation": "tool.ImageGeneration",
+       "local_shell": "tool.LocalShell",
+       "shell": "function_shell_tool.FunctionShellTool",
+       "custom": "custom_tool.CustomTool",
+       "namespace": "namespace_tool.NamespaceTool",
+       "tool_search": "tool_search_tool.ToolSearchTool",
+       "web_search_preview": "web_search_preview_tool.WebSearchPreviewTool",
+       "apply_patch": "apply_patch_tool.ApplyPatchTool"
+      },
+      "first": "function_tool.FunctionTool"
+     }
+    },
+    null
+   ],
+   [
+    "top_p",
+    "top_p",
+    "float",
+    null
+   ],
+   [
+    "background",
+    "background",
+    "any",
+    null
+   ],
+   [
+    "completed_at",
+    "completed_at",
+    "float",
+    null
+   ],
+   [
+    "conversation",
+    "conversation",
+    {
+     "model": "response.Conversation"
+    },
+    null
+   ],
+   [
+    "max_output_tokens",
+    "max_output_tokens",
+    "any",
+    null
+   ],
+   [
+    "max_tool_calls",
+    "max_tool_calls",
+    "any",
+    null
+   ],
+   [
+    "moderation",
+    "moderation",
+    {
+     "model": "response.Moderation"
+    },
+    null
+   ],
+   [
+    "previous_response_id",
+    "previous_response_id",
+    "any",
+    null
+   ],
+   [
+    "prompt",
+    "prompt",
+    {
+     "model": "response_prompt.ResponsePrompt"
+    },
+    null
+   ],
+   [
+    "prompt_cache_key",
+    "prompt_cache_key",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_options",
+    "prompt_cache_options",
+    {
+     "model": "response.PromptCacheOptions"
+    },
+    null
+   ],
+   [
+    "prompt_cache_retention",
+    "prompt_cache_retention",
+    "any",
+    null
+   ],
+   [
+    "reasoning",
+    "reasoning",
+    {
+     "model": "reasoning.Reasoning"
+    },
+    null
+   ],
+   [
+    "safety_identifier",
+    "safety_identifier",
+    "any",
+    null
+   ],
+   [
+    "service_tier",
+    "service_tier",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "text",
+    "text",
+    {
+     "model": "response_text_config.ResponseTextConfig"
+    },
+    null
+   ],
+   [
+    "top_logprobs",
+    "top_logprobs",
+    "any",
+    null
+   ],
+   [
+    "truncation",
+    "truncation",
+    "any",
+    null
+   ],
+   [
+    "usage",
+    "usage",
+    {
+     "model": "response_usage.ResponseUsage"
+    },
+    null
+   ],
+   [
+    "user",
+    "user",
+    "any",
+    null
+   ]
+  ],
+  "response.ToolChoiceSpecificProgrammaticToolCallingParam": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call.OperationCreateFile": [
+   [
+    "diff",
+    "diff",
+    "any",
+    null
+   ],
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call.OperationDeleteFile": [
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call.OperationUpdateFile": [
+   [
+    "diff",
+    "diff",
+    "any",
+    null
+   ],
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call.ResponseApplyPatchToolCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "operation",
+    "operation",
+    {
+     "union": {
+      "create_file": "response_apply_patch_tool_call.OperationCreateFile",
+      "delete_file": "response_apply_patch_tool_call.OperationDeleteFile",
+      "update_file": "response_apply_patch_tool_call.OperationUpdateFile"
+     },
+     "first": "response_apply_patch_tool_call.OperationCreateFile"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_apply_patch_tool_call.CallerDirect",
+      "program": "response_apply_patch_tool_call.CallerProgram"
+     },
+     "first": "response_apply_patch_tool_call.CallerDirect"
+    },
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call_output.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call_output.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_apply_patch_tool_call_output.ResponseApplyPatchToolCallOutput": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_apply_patch_tool_call_output.CallerDirect",
+      "program": "response_apply_patch_tool_call_output.CallerProgram"
+     },
+     "first": "response_apply_patch_tool_call_output.CallerDirect"
+    },
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    "any",
+    null
+   ]
+  ],
+  "response_audio_delta_event.ResponseAudioDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_audio_done_event.ResponseAudioDoneEvent": [
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_audio_transcript_delta_event.ResponseAudioTranscriptDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_audio_transcript_done_event.ResponseAudioTranscriptDoneEvent": [
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_call_code_delta_event.ResponseCodeInterpreterCallCodeDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_call_code_done_event.ResponseCodeInterpreterCallCodeDoneEvent": [
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_call_completed_event.ResponseCodeInterpreterCallCompletedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_call_in_progress_event.ResponseCodeInterpreterCallInProgressEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_call_interpreting_event.ResponseCodeInterpreterCallInterpretingEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_tool_call.OutputImage": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_tool_call.OutputLogs": [
+   [
+    "logs",
+    "logs",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "container_id",
+    "container_id",
+    "any",
+    null
+   ],
+   [
+    "outputs",
+    "outputs",
+    {
+     "list": {
+      "union": {
+       "logs": "response_code_interpreter_tool_call.OutputLogs",
+       "image": "response_code_interpreter_tool_call.OutputImage"
+      },
+      "first": "response_code_interpreter_tool_call.OutputLogs"
+     }
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_compaction_item.ResponseCompactionItem": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "encrypted_content",
+    "encrypted_content",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_compaction_item_param.ResponseCompactionItemParam": [
+   [
+    "encrypted_content",
+    "encrypted_content",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ]
+  ],
+  "response_completed_event.ResponseCompletedEvent": [
+   [
+    "response",
+    "response",
+    {
+     "model": "response.Response"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionClick": [
+   [
+    "button",
+    "button",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionDoubleClick": [
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionDrag": [
+   [
+    "path",
+    "path",
+    {
+     "list": {
+      "model": "response_computer_tool_call.ActionDragPath"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionDragPath": [
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionKeypress": [
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionMove": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionScreenshot": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionScroll": [
+   [
+    "scroll_x",
+    "scroll_x",
+    "any",
+    null
+   ],
+   [
+    "scroll_y",
+    "scroll_y",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "x",
+    "x",
+    "any",
+    null
+   ],
+   [
+    "y",
+    "y",
+    "any",
+    null
+   ],
+   [
+    "keys",
+    "keys",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionType": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ActionWait": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.PendingSafetyCheck": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call.ResponseComputerToolCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "pending_safety_checks",
+    "pending_safety_checks",
+    {
+     "list": {
+      "model": "response_computer_tool_call.PendingSafetyCheck"
+     }
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "action",
+    "action",
+    {
+     "union": {
+      "click": "response_computer_tool_call.ActionClick",
+      "double_click": "response_computer_tool_call.ActionDoubleClick",
+      "drag": "response_computer_tool_call.ActionDrag",
+      "keypress": "response_computer_tool_call.ActionKeypress",
+      "move": "response_computer_tool_call.ActionMove",
+      "screenshot": "response_computer_tool_call.ActionScreenshot",
+      "scroll": "response_computer_tool_call.ActionScroll",
+      "type": "response_computer_tool_call.ActionType",
+      "wait": "response_computer_tool_call.ActionWait"
+     },
+     "first": "response_computer_tool_call.ActionClick"
+    },
+    null
+   ],
+   [
+    "actions",
+    "actions",
+    {
+     "list": {
+      "union": {
+       "click": "computer_action.Click",
+       "double_click": "computer_action.DoubleClick",
+       "drag": "computer_action.Drag",
+       "keypress": "computer_action.Keypress",
+       "move": "computer_action.Move",
+       "screenshot": "computer_action.Screenshot",
+       "scroll": "computer_action.Scroll",
+       "type": "computer_action.Type",
+       "wait": "computer_action.Wait"
+      },
+      "first": "computer_action.Click"
+     }
+    },
+    null
+   ]
+  ],
+  "response_computer_tool_call_output_item.AcknowledgedSafetyCheck": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call_output_item.ResponseComputerToolCallOutputItem": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "model": "response_computer_tool_call_output_screenshot.ResponseComputerToolCallOutputScreenshot"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "acknowledged_safety_checks",
+    "acknowledged_safety_checks",
+    {
+     "list": {
+      "model": "response_computer_tool_call_output_item.AcknowledgedSafetyCheck"
+     }
+    },
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_computer_tool_call_output_screenshot.ResponseComputerToolCallOutputScreenshot": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "image_url",
+    "image_url",
+    "any",
+    null
+   ]
+  ],
+  "response_container_reference.ResponseContainerReference": [
+   [
+    "container_id",
+    "container_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_content_part_added_event.PartReasoningText": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_content_part_added_event.ResponseContentPartAddedEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "part",
+    "part",
+    {
+     "union": {
+      "output_text": "response_output_text.ResponseOutputText",
+      "refusal": "response_output_refusal.ResponseOutputRefusal",
+      "reasoning_text": "response_content_part_added_event.PartReasoningText"
+     },
+     "first": "response_output_text.ResponseOutputText"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_content_part_done_event.PartReasoningText": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_content_part_done_event.ResponseContentPartDoneEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "part",
+    "part",
+    {
+     "union": {
+      "output_text": "response_output_text.ResponseOutputText",
+      "refusal": "response_output_refusal.ResponseOutputRefusal",
+      "reasoning_text": "response_content_part_done_event.PartReasoningText"
+     },
+     "first": "response_output_text.ResponseOutputText"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_created_event.ResponseCreatedEvent": [
+   [
+    "response",
+    "response",
+    {
+     "model": "response.Response"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call.ResponseCustomToolCall": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "input",
+    "input",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_custom_tool_call.CallerDirect",
+      "program": "response_custom_tool_call.CallerProgram"
+     },
+     "first": "response_custom_tool_call.CallerDirect"
+    },
+    null
+   ],
+   [
+    "namespace",
+    "namespace",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call_input_delta_event.ResponseCustomToolCallInputDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call_input_done_event.ResponseCustomToolCallInputDoneEvent": [
+   [
+    "input",
+    "input",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call_output.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call_output.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_custom_tool_call_output.ResponseCustomToolCallOutput": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "either": [
+      "any",
+      {
+       "list": {
+        "union": {
+         "input_text": "response_input_text.ResponseInputText",
+         "input_image": "response_input_image.ResponseInputImage",
+         "input_file": "response_input_file.ResponseInputFile"
+        },
+        "first": "response_input_text.ResponseInputText"
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_custom_tool_call_output.CallerDirect",
+      "program": "response_custom_tool_call_output.CallerProgram"
+     },
+     "first": "response_custom_tool_call_output.CallerDirect"
+    },
+    null
+   ]
+  ],
+  "response_custom_tool_call_output_item.ResponseCustomToolCallOutputItem": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "either": [
+      "any",
+      {
+       "list": {
+        "union": {
+         "input_text": "response_input_text.ResponseInputText",
+         "input_image": "response_input_image.ResponseInputImage",
+         "input_file": "response_input_file.ResponseInputFile"
+        },
+        "first": "response_input_text.ResponseInputText"
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_custom_tool_call_output.CallerDirect",
+      "program": "response_custom_tool_call_output.CallerProgram"
+     },
+     "first": "response_custom_tool_call_output.CallerDirect"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_error.ResponseError": [
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ]
+  ],
+  "response_error_event.ResponseErrorEvent": [
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ],
+   [
+    "param",
+    "param",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_failed_event.ResponseFailedEvent": [
+   [
+    "response",
+    "response",
+    {
+     "model": "response.Response"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_file_search_call_completed_event.ResponseFileSearchCallCompletedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_file_search_call_in_progress_event.ResponseFileSearchCallInProgressEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_file_search_call_searching_event.ResponseFileSearchCallSearchingEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_file_search_tool_call.ResponseFileSearchToolCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "queries",
+    "queries",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "results",
+    "results",
+    {
+     "list": {
+      "model": "response_file_search_tool_call.Result"
+     }
+    },
+    null
+   ]
+  ],
+  "response_file_search_tool_call.Result": [
+   [
+    "attributes",
+    "attributes",
+    {
+     "dict": {
+      "either": [
+       "any",
+       "float",
+       "any"
+      ]
+     }
+    },
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "filename",
+    "filename",
+    "any",
+    null
+   ],
+   [
+    "score",
+    "score",
+    "float",
+    null
+   ],
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ]
+  ],
+  "response_format_json_object.ResponseFormatJSONObject": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_format_text.ResponseFormatText": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_format_text_json_schema_config.ResponseFormatTextJSONSchemaConfig": [
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "schema_",
+    "schema",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "strict",
+    "strict",
+    "any",
+    null
+   ]
+  ],
+  "response_function_call_arguments_delta_event.ResponseFunctionCallArgumentsDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_call_arguments_done_event.ResponseFunctionCallArgumentsDoneEvent": [
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_call_output_content.OutcomeExit": [
+   [
+    "exit_code",
+    "exit_code",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_call_output_content.OutcomeTimeout": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_call_output_content.ResponseFunctionShellCallOutputContent": [
+   [
+    "outcome",
+    "outcome",
+    {
+     "union": {
+      "timeout": "response_function_shell_call_output_content.OutcomeTimeout",
+      "exit": "response_function_shell_call_output_content.OutcomeExit"
+     },
+     "first": "response_function_shell_call_output_content.OutcomeTimeout"
+    },
+    null
+   ],
+   [
+    "stderr",
+    "stderr",
+    "any",
+    null
+   ],
+   [
+    "stdout",
+    "stdout",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call.Action": [
+   [
+    "commands",
+    "commands",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "max_output_length",
+    "max_output_length",
+    "any",
+    null
+   ],
+   [
+    "timeout_ms",
+    "timeout_ms",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call.ResponseFunctionShellToolCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "action",
+    "action",
+    {
+     "model": "response_function_shell_tool_call.Action"
+    },
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "environment",
+    "environment",
+    {
+     "union": {
+      "local": "response_local_environment.ResponseLocalEnvironment",
+      "container_reference": "response_container_reference.ResponseContainerReference"
+     },
+     "first": "response_local_environment.ResponseLocalEnvironment"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_function_shell_tool_call.CallerDirect",
+      "program": "response_function_shell_tool_call.CallerProgram"
+     },
+     "first": "response_function_shell_tool_call.CallerDirect"
+    },
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call_output.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call_output.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call_output.Output": [
+   [
+    "outcome",
+    "outcome",
+    {
+     "union": {
+      "timeout": "response_function_shell_tool_call_output.OutputOutcomeTimeout",
+      "exit": "response_function_shell_tool_call_output.OutputOutcomeExit"
+     },
+     "first": "response_function_shell_tool_call_output.OutputOutcomeTimeout"
+    },
+    null
+   ],
+   [
+    "stderr",
+    "stderr",
+    "any",
+    null
+   ],
+   [
+    "stdout",
+    "stdout",
+    "any",
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call_output.OutputOutcomeExit": [
+   [
+    "exit_code",
+    "exit_code",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call_output.OutputOutcomeTimeout": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_shell_tool_call_output.ResponseFunctionShellToolCallOutput": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "max_output_length",
+    "max_output_length",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "list": {
+      "model": "response_function_shell_tool_call_output.Output"
+     }
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_function_shell_tool_call_output.CallerDirect",
+      "program": "response_function_shell_tool_call_output.CallerProgram"
+     },
+     "first": "response_function_shell_tool_call_output.CallerDirect"
+    },
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_function_tool_call.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_tool_call.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_tool_call.ResponseFunctionToolCall": [
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_function_tool_call.CallerDirect",
+      "program": "response_function_tool_call.CallerProgram"
+     },
+     "first": "response_function_tool_call.CallerDirect"
+    },
+    null
+   ],
+   [
+    "namespace",
+    "namespace",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_function_tool_call_output_item.CallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_tool_call_output_item.CallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_function_tool_call_output_item.ResponseFunctionToolCallOutputItem": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "either": [
+      "any",
+      {
+       "list": {
+        "union": {
+         "input_text": "response_input_text.ResponseInputText",
+         "input_image": "response_input_image.ResponseInputImage",
+         "input_file": "response_input_file.ResponseInputFile"
+        },
+        "first": "response_input_text.ResponseInputText"
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_function_tool_call_output_item.CallerDirect",
+      "program": "response_function_tool_call_output_item.CallerProgram"
+     },
+     "first": "response_function_tool_call_output_item.CallerDirect"
+    },
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "namespace",
+    "namespace",
+    "any",
+    null
+   ]
+  ],
+  "response_function_web_search.ActionFind": [
+   [
+    "pattern",
+    "pattern",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "response_function_web_search.ActionOpenPage": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "response_function_web_search.ActionSearch": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "queries",
+    "queries",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "query",
+    "query",
+    "any",
+    null
+   ],
+   [
+    "sources",
+    "sources",
+    {
+     "list": {
+      "model": "response_function_web_search.ActionSearchSource"
+     }
+    },
+    null
+   ]
+  ],
+  "response_function_web_search.ActionSearchSource": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "response_function_web_search.ResponseFunctionWebSearch": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "action",
+    "action",
+    {
+     "union": {
+      "search": "response_function_web_search.ActionSearch",
+      "open_page": "response_function_web_search.ActionOpenPage",
+      "find_in_page": "response_function_web_search.ActionFind"
+     },
+     "first": "response_function_web_search.ActionSearch"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_image_gen_call_completed_event.ResponseImageGenCallCompletedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_image_gen_call_generating_event.ResponseImageGenCallGeneratingEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_image_gen_call_in_progress_event.ResponseImageGenCallInProgressEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_image_gen_call_partial_image_event.ResponseImageGenCallPartialImageEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "partial_image_b64",
+    "partial_image_b64",
+    "any",
+    null
+   ],
+   [
+    "partial_image_index",
+    "partial_image_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_in_progress_event.ResponseInProgressEvent": [
+   [
+    "response",
+    "response",
+    {
+     "model": "response.Response"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_incomplete_event.ResponseIncompleteEvent": [
+   [
+    "response",
+    "response",
+    {
+     "model": "response.Response"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_file.PromptCacheBreakpoint": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ]
+  ],
+  "response_input_file.ResponseInputFile": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "detail",
+    "detail",
+    "any",
+    null
+   ],
+   [
+    "file_data",
+    "file_data",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "file_url",
+    "file_url",
+    "any",
+    null
+   ],
+   [
+    "filename",
+    "filename",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_breakpoint",
+    "prompt_cache_breakpoint",
+    {
+     "model": "response_input_file.PromptCacheBreakpoint"
+    },
+    null
+   ]
+  ],
+  "response_input_file_content.PromptCacheBreakpoint": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ]
+  ],
+  "response_input_file_content.ResponseInputFileContent": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "detail",
+    "detail",
+    "any",
+    null
+   ],
+   [
+    "file_data",
+    "file_data",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "file_url",
+    "file_url",
+    "any",
+    null
+   ],
+   [
+    "filename",
+    "filename",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_breakpoint",
+    "prompt_cache_breakpoint",
+    {
+     "model": "response_input_file_content.PromptCacheBreakpoint"
+    },
+    null
+   ]
+  ],
+  "response_input_image.PromptCacheBreakpoint": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ]
+  ],
+  "response_input_image.ResponseInputImage": [
+   [
+    "detail",
+    "detail",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "image_url",
+    "image_url",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_breakpoint",
+    "prompt_cache_breakpoint",
+    {
+     "model": "response_input_image.PromptCacheBreakpoint"
+    },
+    null
+   ]
+  ],
+  "response_input_image_content.PromptCacheBreakpoint": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ]
+  ],
+  "response_input_image_content.ResponseInputImageContent": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "detail",
+    "detail",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "image_url",
+    "image_url",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_breakpoint",
+    "prompt_cache_breakpoint",
+    {
+     "model": "response_input_image_content.PromptCacheBreakpoint"
+    },
+    null
+   ]
+  ],
+  "response_input_item.AdditionalTools": [
+   [
+    "role",
+    "role",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "union": {
+       "function": "function_tool.FunctionTool",
+       "file_search": "file_search_tool.FileSearchTool",
+       "computer": "computer_tool.ComputerTool",
+       "computer_use_preview": "computer_use_preview_tool.ComputerUsePreviewTool",
+       "web_search": "web_search_tool.WebSearchTool",
+       "mcp": "tool.Mcp",
+       "code_interpreter": "tool.CodeInterpreter",
+       "programmatic_tool_calling": "tool.ProgrammaticToolCalling",
+       "image_generation": "tool.ImageGeneration",
+       "local_shell": "tool.LocalShell",
+       "shell": "function_shell_tool.FunctionShellTool",
+       "custom": "custom_tool.CustomTool",
+       "namespace": "namespace_tool.NamespaceTool",
+       "tool_search": "tool_search_tool.ToolSearchTool",
+       "web_search_preview": "web_search_preview_tool.WebSearchPreviewTool",
+       "apply_patch": "apply_patch_tool.ApplyPatchTool"
+      },
+      "first": "function_tool.FunctionTool"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCall": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "operation",
+    "operation",
+    {
+     "union": {
+      "create_file": "response_input_item.ApplyPatchCallOperationCreateFile",
+      "delete_file": "response_input_item.ApplyPatchCallOperationDeleteFile",
+      "update_file": "response_input_item.ApplyPatchCallOperationUpdateFile"
+     },
+     "first": "response_input_item.ApplyPatchCallOperationCreateFile"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_input_item.ApplyPatchCallCallerDirect",
+      "program": "response_input_item.ApplyPatchCallCallerProgram"
+     },
+     "first": "response_input_item.ApplyPatchCallCallerDirect"
+    },
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallCallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallCallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallOperationCreateFile": [
+   [
+    "diff",
+    "diff",
+    "any",
+    null
+   ],
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallOperationDeleteFile": [
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallOperationUpdateFile": [
+   [
+    "diff",
+    "diff",
+    "any",
+    null
+   ],
+   [
+    "path",
+    "path",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallOutput": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_input_item.ApplyPatchCallOutputCallerDirect",
+      "program": "response_input_item.ApplyPatchCallOutputCallerProgram"
+     },
+     "first": "response_input_item.ApplyPatchCallOutputCallerDirect"
+    },
+    null
+   ],
+   [
+    "output",
+    "output",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallOutputCallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ApplyPatchCallOutputCallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.CompactionTrigger": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ComputerCallOutput": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "model": "response_computer_tool_call_output_screenshot.ResponseComputerToolCallOutputScreenshot"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "acknowledged_safety_checks",
+    "acknowledged_safety_checks",
+    {
+     "list": {
+      "model": "response_input_item.ComputerCallOutputAcknowledgedSafetyCheck"
+     }
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ComputerCallOutputAcknowledgedSafetyCheck": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "message",
+    "message",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.FunctionCallOutput": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "either": [
+      "any",
+      {
+       "list": {
+        "union": {
+         "input_text": "response_input_text_content.ResponseInputTextContent",
+         "input_image": "response_input_image_content.ResponseInputImageContent",
+         "input_file": "response_input_file_content.ResponseInputFileContent"
+        },
+        "first": "response_input_text_content.ResponseInputTextContent"
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_input_item.FunctionCallOutputCallerDirect",
+      "program": "response_input_item.FunctionCallOutputCallerProgram"
+     },
+     "first": "response_input_item.FunctionCallOutputCallerDirect"
+    },
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "namespace",
+    "namespace",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.FunctionCallOutputCallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.FunctionCallOutputCallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ImageGenerationCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "result",
+    "result",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ItemReference": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.LocalShellCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "action",
+    "action",
+    {
+     "model": "response_input_item.LocalShellCallAction"
+    },
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.LocalShellCallAction": [
+   [
+    "command",
+    "command",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "env",
+    "env",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "timeout_ms",
+    "timeout_ms",
+    "any",
+    null
+   ],
+   [
+    "user",
+    "user",
+    "any",
+    null
+   ],
+   [
+    "working_directory",
+    "working_directory",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.LocalShellCallOutput": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.McpApprovalRequest": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.McpApprovalResponse": [
+   [
+    "approval_request_id",
+    "approval_request_id",
+    "any",
+    null
+   ],
+   [
+    "approve",
+    "approve",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "reason",
+    "reason",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.McpCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "approval_request_id",
+    "approval_request_id",
+    "any",
+    null
+   ],
+   [
+    "error",
+    "error",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.McpListTools": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "model": "response_input_item.McpListToolsTool"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "error",
+    "error",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.McpListToolsTool": [
+   [
+    "input_schema",
+    "input_schema",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "annotations",
+    "annotations",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.Message": [
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "union": {
+       "input_text": "response_input_text.ResponseInputText",
+       "input_image": "response_input_image.ResponseInputImage",
+       "input_file": "response_input_file.ResponseInputFile"
+      },
+      "first": "response_input_text.ResponseInputText"
+     }
+    },
+    null
+   ],
+   [
+    "role",
+    "role",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.Program": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "fingerprint",
+    "fingerprint",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ProgramOutput": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "result",
+    "result",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCall": [
+   [
+    "action",
+    "action",
+    {
+     "model": "response_input_item.ShellCallAction"
+    },
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_input_item.ShellCallCallerDirect",
+      "program": "response_input_item.ShellCallCallerProgram"
+     },
+     "first": "response_input_item.ShellCallCallerDirect"
+    },
+    null
+   ],
+   [
+    "environment",
+    "environment",
+    {
+     "union": {
+      "local": "local_environment.LocalEnvironment",
+      "container_reference": "container_reference.ContainerReference"
+     },
+     "first": "local_environment.LocalEnvironment"
+    },
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCallAction": [
+   [
+    "commands",
+    "commands",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "max_output_length",
+    "max_output_length",
+    "any",
+    null
+   ],
+   [
+    "timeout_ms",
+    "timeout_ms",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCallCallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCallCallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCallOutput": [
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    {
+     "list": {
+      "model": "response_function_shell_call_output_content.ResponseFunctionShellCallOutputContent"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "response_input_item.ShellCallOutputCallerDirect",
+      "program": "response_input_item.ShellCallOutputCallerProgram"
+     },
+     "first": "response_input_item.ShellCallOutputCallerDirect"
+    },
+    null
+   ],
+   [
+    "max_output_length",
+    "max_output_length",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCallOutputCallerDirect": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ShellCallOutputCallerProgram": [
+   [
+    "caller_id",
+    "caller_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_input_item.ToolSearchCall": [
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "execution",
+    "execution",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_input_text.PromptCacheBreakpoint": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ]
+  ],
+  "response_input_text.ResponseInputText": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_breakpoint",
+    "prompt_cache_breakpoint",
+    {
+     "model": "response_input_text.PromptCacheBreakpoint"
+    },
+    null
+   ]
+  ],
+  "response_input_text_content.PromptCacheBreakpoint": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ]
+  ],
+  "response_input_text_content.ResponseInputTextContent": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "prompt_cache_breakpoint",
+    "prompt_cache_breakpoint",
+    {
+     "model": "response_input_text_content.PromptCacheBreakpoint"
+    },
+    null
+   ]
+  ],
+  "response_local_environment.ResponseLocalEnvironment": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_call_arguments_delta_event.ResponseMcpCallArgumentsDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_call_arguments_done_event.ResponseMcpCallArgumentsDoneEvent": [
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_call_completed_event.ResponseMcpCallCompletedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_call_failed_event.ResponseMcpCallFailedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_call_in_progress_event.ResponseMcpCallInProgressEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_list_tools_completed_event.ResponseMcpListToolsCompletedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_list_tools_failed_event.ResponseMcpListToolsFailedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_mcp_list_tools_in_progress_event.ResponseMcpListToolsInProgressEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.AdditionalTools": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "role",
+    "role",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "union": {
+       "function": "function_tool.FunctionTool",
+       "file_search": "file_search_tool.FileSearchTool",
+       "computer": "computer_tool.ComputerTool",
+       "computer_use_preview": "computer_use_preview_tool.ComputerUsePreviewTool",
+       "web_search": "web_search_tool.WebSearchTool",
+       "mcp": "tool.Mcp",
+       "code_interpreter": "tool.CodeInterpreter",
+       "programmatic_tool_calling": "tool.ProgrammaticToolCalling",
+       "image_generation": "tool.ImageGeneration",
+       "local_shell": "tool.LocalShell",
+       "shell": "function_shell_tool.FunctionShellTool",
+       "custom": "custom_tool.CustomTool",
+       "namespace": "namespace_tool.NamespaceTool",
+       "tool_search": "tool_search_tool.ToolSearchTool",
+       "web_search_preview": "web_search_preview_tool.WebSearchPreviewTool",
+       "apply_patch": "apply_patch_tool.ApplyPatchTool"
+      },
+      "first": "function_tool.FunctionTool"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.ImageGenerationCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "result",
+    "result",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.LocalShellCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "action",
+    "action",
+    {
+     "model": "response_output_item.LocalShellCallAction"
+    },
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.LocalShellCallAction": [
+   [
+    "command",
+    "command",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "env",
+    "env",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "timeout_ms",
+    "timeout_ms",
+    "any",
+    null
+   ],
+   [
+    "user",
+    "user",
+    "any",
+    null
+   ],
+   [
+    "working_directory",
+    "working_directory",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.LocalShellCallOutput": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.McpApprovalRequest": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.McpApprovalResponse": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "approval_request_id",
+    "approval_request_id",
+    "any",
+    null
+   ],
+   [
+    "approve",
+    "approve",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "reason",
+    "reason",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.McpCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "approval_request_id",
+    "approval_request_id",
+    "any",
+    null
+   ],
+   [
+    "error",
+    "error",
+    "any",
+    null
+   ],
+   [
+    "output",
+    "output",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.McpListTools": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "model": "response_output_item.McpListToolsTool"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "error",
+    "error",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.McpListToolsTool": [
+   [
+    "input_schema",
+    "input_schema",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "annotations",
+    "annotations",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.Program": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "code",
+    "code",
+    "any",
+    null
+   ],
+   [
+    "fingerprint",
+    "fingerprint",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item.ProgramOutput": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "result",
+    "result",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item_added_event.ResponseOutputItemAddedEvent": [
+   [
+    "item",
+    "item",
+    {
+     "union": {
+      "message": "response_output_message.ResponseOutputMessage",
+      "file_search_call": "response_file_search_tool_call.ResponseFileSearchToolCall",
+      "function_call": "response_function_tool_call.ResponseFunctionToolCall",
+      "function_call_output": "response_function_tool_call_output_item.ResponseFunctionToolCallOutputItem",
+      "web_search_call": "response_function_web_search.ResponseFunctionWebSearch",
+      "computer_call": "response_computer_tool_call.ResponseComputerToolCall",
+      "computer_call_output": "response_computer_tool_call_output_item.ResponseComputerToolCallOutputItem",
+      "reasoning": "response_reasoning_item.ResponseReasoningItem",
+      "program": "response_output_item.Program",
+      "program_output": "response_output_item.ProgramOutput",
+      "tool_search_call": "response_tool_search_call.ResponseToolSearchCall",
+      "tool_search_output": "response_tool_search_output_item.ResponseToolSearchOutputItem",
+      "additional_tools": "response_output_item.AdditionalTools",
+      "compaction": "response_compaction_item.ResponseCompactionItem",
+      "image_generation_call": "response_output_item.ImageGenerationCall",
+      "code_interpreter_call": "response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall",
+      "local_shell_call": "response_output_item.LocalShellCall",
+      "local_shell_call_output": "response_output_item.LocalShellCallOutput",
+      "shell_call": "response_function_shell_tool_call.ResponseFunctionShellToolCall",
+      "shell_call_output": "response_function_shell_tool_call_output.ResponseFunctionShellToolCallOutput",
+      "apply_patch_call": "response_apply_patch_tool_call.ResponseApplyPatchToolCall",
+      "apply_patch_call_output": "response_apply_patch_tool_call_output.ResponseApplyPatchToolCallOutput",
+      "mcp_call": "response_output_item.McpCall",
+      "mcp_list_tools": "response_output_item.McpListTools",
+      "mcp_approval_request": "response_output_item.McpApprovalRequest",
+      "mcp_approval_response": "response_output_item.McpApprovalResponse",
+      "custom_tool_call": "response_custom_tool_call.ResponseCustomToolCall",
+      "custom_tool_call_output": "response_custom_tool_call_output_item.ResponseCustomToolCallOutputItem"
+     },
+     "first": "response_output_message.ResponseOutputMessage"
+    },
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_item_done_event.ResponseOutputItemDoneEvent": [
+   [
+    "item",
+    "item",
+    {
+     "union": {
+      "message": "response_output_message.ResponseOutputMessage",
+      "file_search_call": "response_file_search_tool_call.ResponseFileSearchToolCall",
+      "function_call": "response_function_tool_call.ResponseFunctionToolCall",
+      "function_call_output": "response_function_tool_call_output_item.ResponseFunctionToolCallOutputItem",
+      "web_search_call": "response_function_web_search.ResponseFunctionWebSearch",
+      "computer_call": "response_computer_tool_call.ResponseComputerToolCall",
+      "computer_call_output": "response_computer_tool_call_output_item.ResponseComputerToolCallOutputItem",
+      "reasoning": "response_reasoning_item.ResponseReasoningItem",
+      "program": "response_output_item.Program",
+      "program_output": "response_output_item.ProgramOutput",
+      "tool_search_call": "response_tool_search_call.ResponseToolSearchCall",
+      "tool_search_output": "response_tool_search_output_item.ResponseToolSearchOutputItem",
+      "additional_tools": "response_output_item.AdditionalTools",
+      "compaction": "response_compaction_item.ResponseCompactionItem",
+      "image_generation_call": "response_output_item.ImageGenerationCall",
+      "code_interpreter_call": "response_code_interpreter_tool_call.ResponseCodeInterpreterToolCall",
+      "local_shell_call": "response_output_item.LocalShellCall",
+      "local_shell_call_output": "response_output_item.LocalShellCallOutput",
+      "shell_call": "response_function_shell_tool_call.ResponseFunctionShellToolCall",
+      "shell_call_output": "response_function_shell_tool_call_output.ResponseFunctionShellToolCallOutput",
+      "apply_patch_call": "response_apply_patch_tool_call.ResponseApplyPatchToolCall",
+      "apply_patch_call_output": "response_apply_patch_tool_call_output.ResponseApplyPatchToolCallOutput",
+      "mcp_call": "response_output_item.McpCall",
+      "mcp_list_tools": "response_output_item.McpListTools",
+      "mcp_approval_request": "response_output_item.McpApprovalRequest",
+      "mcp_approval_response": "response_output_item.McpApprovalResponse",
+      "custom_tool_call": "response_custom_tool_call.ResponseCustomToolCall",
+      "custom_tool_call_output": "response_custom_tool_call_output_item.ResponseCustomToolCallOutputItem"
+     },
+     "first": "response_output_message.ResponseOutputMessage"
+    },
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_message.ResponseOutputMessage": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "union": {
+       "output_text": "response_output_text.ResponseOutputText",
+       "refusal": "response_output_refusal.ResponseOutputRefusal"
+      },
+      "first": "response_output_text.ResponseOutputText"
+     }
+    },
+    null
+   ],
+   [
+    "role",
+    "role",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "phase",
+    "phase",
+    "any",
+    null
+   ]
+  ],
+  "response_output_refusal.ResponseOutputRefusal": [
+   [
+    "refusal",
+    "refusal",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_text.AnnotationContainerFileCitation": [
+   [
+    "container_id",
+    "container_id",
+    "any",
+    null
+   ],
+   [
+    "end_index",
+    "end_index",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "filename",
+    "filename",
+    "any",
+    null
+   ],
+   [
+    "start_index",
+    "start_index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_text.AnnotationFileCitation": [
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "filename",
+    "filename",
+    "any",
+    null
+   ],
+   [
+    "index",
+    "index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_text.AnnotationFilePath": [
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "index",
+    "index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_output_text.AnnotationURLCitation": [
+   [
+    "end_index",
+    "end_index",
+    "any",
+    null
+   ],
+   [
+    "start_index",
+    "start_index",
+    "any",
+    null
+   ],
+   [
+    "title",
+    "title",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "response_output_text.Logprob": [
+   [
+    "token",
+    "token",
+    "any",
+    null
+   ],
+   [
+    "bytes",
+    "bytes",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "logprob",
+    "logprob",
+    "float",
+    null
+   ],
+   [
+    "top_logprobs",
+    "top_logprobs",
+    {
+     "list": {
+      "model": "response_output_text.LogprobTopLogprob"
+     }
+    },
+    null
+   ]
+  ],
+  "response_output_text.LogprobTopLogprob": [
+   [
+    "token",
+    "token",
+    "any",
+    null
+   ],
+   [
+    "bytes",
+    "bytes",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "logprob",
+    "logprob",
+    "float",
+    null
+   ]
+  ],
+  "response_output_text.ResponseOutputText": [
+   [
+    "annotations",
+    "annotations",
+    {
+     "list": {
+      "union": {
+       "file_citation": "response_output_text.AnnotationFileCitation",
+       "url_citation": "response_output_text.AnnotationURLCitation",
+       "container_file_citation": "response_output_text.AnnotationContainerFileCitation",
+       "file_path": "response_output_text.AnnotationFilePath"
+      },
+      "first": "response_output_text.AnnotationFileCitation"
+     }
+    },
+    null
+   ],
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "logprobs",
+    "logprobs",
+    {
+     "list": {
+      "model": "response_output_text.Logprob"
+     }
+    },
+    null
+   ]
+  ],
+  "response_output_text_annotation_added_event.ResponseOutputTextAnnotationAddedEvent": [
+   [
+    "annotation",
+    "annotation",
+    "any",
+    null
+   ],
+   [
+    "annotation_index",
+    "annotation_index",
+    "any",
+    null
+   ],
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_prompt.ResponsePrompt": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "variables",
+    "variables",
+    {
+     "dict": {
+      "either": [
+       "any",
+       {
+        "model": "response_input_text.ResponseInputText"
+       },
+       {
+        "model": "response_input_image.ResponseInputImage"
+       },
+       {
+        "model": "response_input_file.ResponseInputFile"
+       }
+      ]
+     }
+    },
+    null
+   ],
+   [
+    "version",
+    "version",
+    "any",
+    null
+   ]
+  ],
+  "response_queued_event.ResponseQueuedEvent": [
+   [
+    "response",
+    "response",
+    {
+     "model": "response.Response"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_item.Content": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_item.ResponseReasoningItem": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "summary",
+    "summary",
+    {
+     "list": {
+      "model": "response_reasoning_item.Summary"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "model": "response_reasoning_item.Content"
+     }
+    },
+    null
+   ],
+   [
+    "encrypted_content",
+    "encrypted_content",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_item.Summary": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_summary_part_added_event.Part": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_summary_part_added_event.ResponseReasoningSummaryPartAddedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "part",
+    "part",
+    {
+     "model": "response_reasoning_summary_part_added_event.Part"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "summary_index",
+    "summary_index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_summary_part_done_event.Part": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_summary_part_done_event.ResponseReasoningSummaryPartDoneEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "part",
+    "part",
+    {
+     "model": "response_reasoning_summary_part_done_event.Part"
+    },
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "summary_index",
+    "summary_index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_summary_text_delta_event.ResponseReasoningSummaryTextDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "summary_index",
+    "summary_index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_summary_text_done_event.ResponseReasoningSummaryTextDoneEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "summary_index",
+    "summary_index",
+    "any",
+    null
+   ],
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_text_delta_event.ResponseReasoningTextDeltaEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_reasoning_text_done_event.ResponseReasoningTextDoneEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_refusal_delta_event.ResponseRefusalDeltaEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_refusal_done_event.ResponseRefusalDoneEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "refusal",
+    "refusal",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_text_config.ResponseTextConfig": [
+   [
+    "format",
+    "format",
+    {
+     "union": {
+      "text": "response_format_text.ResponseFormatText",
+      "json_schema": "response_format_text_json_schema_config.ResponseFormatTextJSONSchemaConfig",
+      "json_object": "response_format_json_object.ResponseFormatJSONObject"
+     },
+     "first": "response_format_text.ResponseFormatText"
+    },
+    null
+   ],
+   [
+    "verbosity",
+    "verbosity",
+    "any",
+    null
+   ]
+  ],
+  "response_text_delta_event.Logprob": [
+   [
+    "token",
+    "token",
+    "any",
+    null
+   ],
+   [
+    "logprob",
+    "logprob",
+    "float",
+    null
+   ],
+   [
+    "top_logprobs",
+    "top_logprobs",
+    {
+     "list": {
+      "model": "response_text_delta_event.LogprobTopLogprob"
+     }
+    },
+    null
+   ]
+  ],
+  "response_text_delta_event.LogprobTopLogprob": [
+   [
+    "token",
+    "token",
+    "any",
+    null
+   ],
+   [
+    "logprob",
+    "logprob",
+    "float",
+    null
+   ]
+  ],
+  "response_text_delta_event.ResponseTextDeltaEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "delta",
+    "delta",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "logprobs",
+    "logprobs",
+    {
+     "list": {
+      "model": "response_text_delta_event.Logprob"
+     }
+    },
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_text_done_event.Logprob": [
+   [
+    "token",
+    "token",
+    "any",
+    null
+   ],
+   [
+    "logprob",
+    "logprob",
+    "float",
+    null
+   ],
+   [
+    "top_logprobs",
+    "top_logprobs",
+    {
+     "list": {
+      "model": "response_text_done_event.LogprobTopLogprob"
+     }
+    },
+    null
+   ]
+  ],
+  "response_text_done_event.LogprobTopLogprob": [
+   [
+    "token",
+    "token",
+    "any",
+    null
+   ],
+   [
+    "logprob",
+    "logprob",
+    "float",
+    null
+   ]
+  ],
+  "response_text_done_event.ResponseTextDoneEvent": [
+   [
+    "content_index",
+    "content_index",
+    "any",
+    null
+   ],
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "logprobs",
+    "logprobs",
+    {
+     "list": {
+      "model": "response_text_done_event.Logprob"
+     }
+    },
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_tool_search_call.ResponseToolSearchCall": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "arguments",
+    "arguments",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "execution",
+    "execution",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_tool_search_output_item.ResponseToolSearchOutputItem": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "execution",
+    "execution",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "union": {
+       "function": "function_tool.FunctionTool",
+       "file_search": "file_search_tool.FileSearchTool",
+       "computer": "computer_tool.ComputerTool",
+       "computer_use_preview": "computer_use_preview_tool.ComputerUsePreviewTool",
+       "web_search": "web_search_tool.WebSearchTool",
+       "mcp": "tool.Mcp",
+       "code_interpreter": "tool.CodeInterpreter",
+       "programmatic_tool_calling": "tool.ProgrammaticToolCalling",
+       "image_generation": "tool.ImageGeneration",
+       "local_shell": "tool.LocalShell",
+       "shell": "function_shell_tool.FunctionShellTool",
+       "custom": "custom_tool.CustomTool",
+       "namespace": "namespace_tool.NamespaceTool",
+       "tool_search": "tool_search_tool.ToolSearchTool",
+       "web_search_preview": "web_search_preview_tool.WebSearchPreviewTool",
+       "apply_patch": "apply_patch_tool.ApplyPatchTool"
+      },
+      "first": "function_tool.FunctionTool"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "created_by",
+    "created_by",
+    "any",
+    null
+   ]
+  ],
+  "response_tool_search_output_item_param.ResponseToolSearchOutputItemParam": [
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "union": {
+       "function": "function_tool.FunctionTool",
+       "file_search": "file_search_tool.FileSearchTool",
+       "computer": "computer_tool.ComputerTool",
+       "computer_use_preview": "computer_use_preview_tool.ComputerUsePreviewTool",
+       "web_search": "web_search_tool.WebSearchTool",
+       "mcp": "tool.Mcp",
+       "code_interpreter": "tool.CodeInterpreter",
+       "programmatic_tool_calling": "tool.ProgrammaticToolCalling",
+       "image_generation": "tool.ImageGeneration",
+       "local_shell": "tool.LocalShell",
+       "shell": "function_shell_tool.FunctionShellTool",
+       "custom": "custom_tool.CustomTool",
+       "namespace": "namespace_tool.NamespaceTool",
+       "tool_search": "tool_search_tool.ToolSearchTool",
+       "web_search_preview": "web_search_preview_tool.WebSearchPreviewTool",
+       "apply_patch": "apply_patch_tool.ApplyPatchTool"
+      },
+      "first": "function_tool.FunctionTool"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "call_id",
+    "call_id",
+    "any",
+    null
+   ],
+   [
+    "execution",
+    "execution",
+    "any",
+    null
+   ],
+   [
+    "status",
+    "status",
+    "any",
+    null
+   ]
+  ],
+  "response_usage.InputTokensDetails": [
+   [
+    "cache_write_tokens",
+    "cache_write_tokens",
+    "any",
+    null
+   ],
+   [
+    "cached_tokens",
+    "cached_tokens",
+    "any",
+    null
+   ]
+  ],
+  "response_usage.OutputTokensDetails": [
+   [
+    "reasoning_tokens",
+    "reasoning_tokens",
+    "any",
+    null
+   ]
+  ],
+  "response_usage.ResponseUsage": [
+   [
+    "input_tokens",
+    "input_tokens",
+    "any",
+    null
+   ],
+   [
+    "input_tokens_details",
+    "input_tokens_details",
+    {
+     "model": "response_usage.InputTokensDetails"
+    },
+    null
+   ],
+   [
+    "output_tokens",
+    "output_tokens",
+    "any",
+    null
+   ],
+   [
+    "output_tokens_details",
+    "output_tokens_details",
+    {
+     "model": "response_usage.OutputTokensDetails"
+    },
+    null
+   ],
+   [
+    "total_tokens",
+    "total_tokens",
+    "any",
+    null
+   ]
+  ],
+  "response_web_search_call_completed_event.ResponseWebSearchCallCompletedEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_web_search_call_in_progress_event.ResponseWebSearchCallInProgressEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "response_web_search_call_searching_event.ResponseWebSearchCallSearchingEvent": [
+   [
+    "item_id",
+    "item_id",
+    "any",
+    null
+   ],
+   [
+    "output_index",
+    "output_index",
+    "any",
+    null
+   ],
+   [
+    "sequence_number",
+    "sequence_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "skill_reference.SkillReference": [
+   [
+    "skill_id",
+    "skill_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "version",
+    "version",
+    "any",
+    null
+   ]
+  ],
+  "tool.CodeInterpreter": [
+   [
+    "container",
+    "container",
+    {
+     "either": [
+      "any",
+      {
+       "model": "tool.CodeInterpreterContainerCodeInterpreterToolAuto"
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "tool.CodeInterpreterContainerCodeInterpreterToolAuto": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "file_ids",
+    "file_ids",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "memory_limit",
+    "memory_limit",
+    "any",
+    null
+   ],
+   [
+    "network_policy",
+    "network_policy",
+    {
+     "union": {
+      "disabled": "container_network_policy_disabled.ContainerNetworkPolicyDisabled",
+      "allowlist": "container_network_policy_allowlist.ContainerNetworkPolicyAllowlist"
+     },
+     "first": "container_network_policy_disabled.ContainerNetworkPolicyDisabled"
+    },
+    null
+   ]
+  ],
+  "tool.ImageGeneration": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "action",
+    "action",
+    "any",
+    null
+   ],
+   [
+    "background",
+    "background",
+    "any",
+    null
+   ],
+   [
+    "input_fidelity",
+    "input_fidelity",
+    "any",
+    null
+   ],
+   [
+    "input_image_mask",
+    "input_image_mask",
+    {
+     "model": "tool.ImageGenerationInputImageMask"
+    },
+    null
+   ],
+   [
+    "model",
+    "model",
+    {
+     "either": [
+      "any",
+      "any"
+     ]
+    },
+    null
+   ],
+   [
+    "moderation",
+    "moderation",
+    "any",
+    null
+   ],
+   [
+    "output_compression",
+    "output_compression",
+    "any",
+    null
+   ],
+   [
+    "output_format",
+    "output_format",
+    "any",
+    null
+   ],
+   [
+    "partial_images",
+    "partial_images",
+    "any",
+    null
+   ],
+   [
+    "quality",
+    "quality",
+    "any",
+    null
+   ],
+   [
+    "size",
+    "size",
+    {
+     "either": [
+      "any",
+      "any"
+     ]
+    },
+    null
+   ]
+  ],
+  "tool.ImageGenerationInputImageMask": [
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "image_url",
+    "image_url",
+    "any",
+    null
+   ]
+  ],
+  "tool.LocalShell": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool.Mcp": [
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "allowed_callers",
+    "allowed_callers",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "allowed_tools",
+    "allowed_tools",
+    {
+     "either": [
+      {
+       "list": "any"
+      },
+      {
+       "model": "tool.McpAllowedToolsMcpToolFilter"
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "authorization",
+    "authorization",
+    "any",
+    null
+   ],
+   [
+    "connector_id",
+    "connector_id",
+    "any",
+    null
+   ],
+   [
+    "defer_loading",
+    "defer_loading",
+    "any",
+    null
+   ],
+   [
+    "headers",
+    "headers",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "require_approval",
+    "require_approval",
+    {
+     "either": [
+      {
+       "model": "tool.McpRequireApprovalMcpToolApprovalFilter"
+      },
+      "any"
+     ]
+    },
+    null
+   ],
+   [
+    "server_description",
+    "server_description",
+    "any",
+    null
+   ],
+   [
+    "server_url",
+    "server_url",
+    "any",
+    null
+   ],
+   [
+    "tunnel_id",
+    "tunnel_id",
+    "any",
+    null
+   ]
+  ],
+  "tool.McpAllowedToolsMcpToolFilter": [
+   [
+    "read_only",
+    "read_only",
+    "any",
+    null
+   ],
+   [
+    "tool_names",
+    "tool_names",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "tool.McpRequireApprovalMcpToolApprovalFilter": [
+   [
+    "always",
+    "always",
+    {
+     "model": "tool.McpRequireApprovalMcpToolApprovalFilterAlways"
+    },
+    null
+   ],
+   [
+    "never",
+    "never",
+    {
+     "model": "tool.McpRequireApprovalMcpToolApprovalFilterNever"
+    },
+    null
+   ]
+  ],
+  "tool.McpRequireApprovalMcpToolApprovalFilterAlways": [
+   [
+    "read_only",
+    "read_only",
+    "any",
+    null
+   ],
+   [
+    "tool_names",
+    "tool_names",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "tool.McpRequireApprovalMcpToolApprovalFilterNever": [
+   [
+    "read_only",
+    "read_only",
+    "any",
+    null
+   ],
+   [
+    "tool_names",
+    "tool_names",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "tool.ProgrammaticToolCalling": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_allowed.ToolChoiceAllowed": [
+   [
+    "mode",
+    "mode",
+    "any",
+    null
+   ],
+   [
+    "tools",
+    "tools",
+    {
+     "list": {
+      "dict": "any"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_apply_patch.ToolChoiceApplyPatch": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_custom.ToolChoiceCustom": [
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_function.ToolChoiceFunction": [
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_mcp.ToolChoiceMcp": [
+   [
+    "server_label",
+    "server_label",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_shell.ToolChoiceShell": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_choice_types.ToolChoiceTypes": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_search_tool.ToolSearchTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "description",
+    "description",
+    "any",
+    null
+   ],
+   [
+    "execution",
+    "execution",
+    "any",
+    null
+   ],
+   [
+    "parameters",
+    "parameters",
+    "any",
+    null
+   ]
+  ],
+  "web_search_preview_tool.UserLocation": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "city",
+    "city",
+    "any",
+    null
+   ],
+   [
+    "country",
+    "country",
+    "any",
+    null
+   ],
+   [
+    "region",
+    "region",
+    "any",
+    null
+   ],
+   [
+    "timezone",
+    "timezone",
+    "any",
+    null
+   ]
+  ],
+  "web_search_preview_tool.WebSearchPreviewTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "search_content_types",
+    "search_content_types",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "search_context_size",
+    "search_context_size",
+    "any",
+    null
+   ],
+   [
+    "user_location",
+    "user_location",
+    {
+     "model": "web_search_preview_tool.UserLocation"
+    },
+    null
+   ]
+  ],
+  "web_search_tool.Filters": [
+   [
+    "allowed_domains",
+    "allowed_domains",
+    {
+     "list": "any"
+    },
+    null
+   ]
+  ],
+  "web_search_tool.UserLocation": [
+   [
+    "city",
+    "city",
+    "any",
+    null
+   ],
+   [
+    "country",
+    "country",
+    "any",
+    null
+   ],
+   [
+    "region",
+    "region",
+    "any",
+    null
+   ],
+   [
+    "timezone",
+    "timezone",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "web_search_tool.WebSearchTool": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "filters",
+    "filters",
+    {
+     "model": "web_search_tool.Filters"
+    },
+    null
+   ],
+   [
+    "search_context_size",
+    "search_context_size",
+    "any",
+    null
+   ],
+   [
+    "user_location",
+    "user_location",
+    {
+     "model": "web_search_tool.UserLocation"
+    },
+    null
+   ]
+  ]
+ }
+}
