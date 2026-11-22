@@ -1143,7 +1143,7 @@ pub(crate) fn plan_from_row(row: &Named<'_>) -> StoreResult<CampaignPlan> {
 }
 
 /// `sqlite_session.read_plan`.
-fn read_plan(connection: &Connection, plan_id: &str) -> StoreResult<Option<CampaignPlan>> {
+pub(crate) fn read_plan(connection: &Connection, plan_id: &str) -> StoreResult<Option<CampaignPlan>> {
     match first(connection, "SELECT * FROM campaign_plans WHERE plan_id = ?", &[&plan_id])? {
         Some((columns, values)) => plan_from_row(&Named { columns: &columns, values }).map(Some),
         None => Ok(None),
@@ -1151,7 +1151,10 @@ fn read_plan(connection: &Connection, plan_id: &str) -> StoreResult<Option<Campa
 }
 
 /// `sqlite_session.read_handoff`.
-fn read_handoff(connection: &Connection, handoff_id: &str) -> StoreResult<Option<BuilderDMHandoff>> {
+pub(crate) fn read_handoff(
+    connection: &Connection,
+    handoff_id: &str,
+) -> StoreResult<Option<BuilderDMHandoff>> {
     match first(connection, "SELECT * FROM builder_dm_handoffs WHERE handoff_id = ?", &[&handoff_id])? {
         Some((columns, values)) => {
             crate::campaigns::handoff_from_row(&Named { columns: &columns, values }).map(Some)

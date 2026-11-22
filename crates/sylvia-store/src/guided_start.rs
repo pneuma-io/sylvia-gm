@@ -75,21 +75,24 @@ fn campaign_operation_hit_on(
 }
 
 /// `_insert_campaign_operation`'s keyword arguments.
-struct NewOperation<'a> {
-    operation_id: &'a str,
-    operation_kind: &'a str,
-    campaign_id: &'a str,
-    semantic_payload: &'a JsonMap,
-    payload_sha256: &'a str,
-    result: &'a JsonMap,
-    basis_turn_id: Option<&'a str>,
-    basis_lock_id: Option<&'a str>,
-    basis_revision: i64,
-    resulting_revision: i64,
+pub(crate) struct NewOperation<'a> {
+    pub(crate) operation_id: &'a str,
+    pub(crate) operation_kind: &'a str,
+    pub(crate) campaign_id: &'a str,
+    pub(crate) semantic_payload: &'a JsonMap,
+    pub(crate) payload_sha256: &'a str,
+    pub(crate) result: &'a JsonMap,
+    pub(crate) basis_turn_id: Option<&'a str>,
+    pub(crate) basis_lock_id: Option<&'a str>,
+    pub(crate) basis_revision: i64,
+    pub(crate) resulting_revision: i64,
 }
 
 /// `_insert_campaign_operation`.
-fn insert_campaign_operation(connection: &Connection, operation: &NewOperation<'_>) -> StoreResult<()> {
+pub(crate) fn insert_campaign_operation(
+    connection: &Connection,
+    operation: &NewOperation<'_>,
+) -> StoreResult<()> {
     connection.execute(
         "INSERT INTO campaign_operations \
          (operation_id, operation_kind, campaign_id, semantic_payload_json, semantic_payload_sha256, \
@@ -167,26 +170,26 @@ pub(crate) fn insert_campaign_lock(
 }
 
 /// The rows `_construction_basis` reads, with their column names.
-struct BasisRows {
+pub(crate) struct BasisRows {
     campaign: (Vec<String>, Vec<Value>),
     construction: (Vec<String>, Vec<Value>),
     turn: (Vec<String>, Vec<Value>),
 }
 
 impl BasisRows {
-    fn campaign(&self) -> Named<'_> {
+    pub(crate) fn campaign(&self) -> Named<'_> {
         Named { columns: &self.campaign.0, values: self.campaign.1.clone() }
     }
-    fn construction(&self) -> Named<'_> {
+    pub(crate) fn construction(&self) -> Named<'_> {
         Named { columns: &self.construction.0, values: self.construction.1.clone() }
     }
-    fn turn(&self) -> Named<'_> {
+    pub(crate) fn turn(&self) -> Named<'_> {
         Named { columns: &self.turn.0, values: self.turn.1.clone() }
     }
 }
 
 /// `_construction_basis`: the campaign, its construction and the construction's TURN.
-fn construction_basis(connection: &Connection, campaign_id: &str) -> StoreResult<BasisRows> {
+pub(crate) fn construction_basis(connection: &Connection, campaign_id: &str) -> StoreResult<BasisRows> {
     let (campaign_columns, campaign) =
         named_rows(connection, "SELECT * FROM campaigns WHERE campaign_id = ?", &[&campaign_id])?;
     let (construction_columns, construction) = named_rows(
