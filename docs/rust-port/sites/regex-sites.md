@@ -203,8 +203,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude_install.py:188` | `_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", text.strip())` | |
 | `provider/_claude_install.py:334` | `ClaudeInstaller._install` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", checksum) is None` | |
 | `provider/_claude_native.py:38` | `<module>` | re.compile; plain | `_UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", re.I)` | |
-| `provider/_claude_runtime.py:238` | `find_runtime` | re.fullmatch; plain | `if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():` | |
-| `provider/_claude_runtime.py:260` | `runtime_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)` | |
+| `provider/_claude_runtime.py:238` | `find_runtime` | re.fullmatch; plain | `if re.fullmatch(r"\d+\.\d+\.\d+", entry.name) and candidate.is_file():` | `sylvia-provider` runtime_process |
+| `provider/_claude_runtime.py:260` | `runtime_version` | re.fullmatch; plain | `match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+) \(Claude Code\)\s*", result.stdout)` | `sylvia-provider` runtime_process |
 | `provider/_model_facts.py:145` | `claude_model_id` | re.sub; plain | `bare = re.sub(r"[-@]\d{8}$", "", model_id.strip().casefold().rsplit("/", 1)[-1])` | |
 | `provider/_reasoning.py:43` | `reasoning_values` | re.fullmatch; plain | `not isinstance(value, str) or not re.fullmatch(r"[a-z][a-z0-9_-]{0,31}", value)` | |
 | `provider/_speed.py:22` | `<module>` | re.compile; plain | `_TIER_ID = re.compile(r"[a-z][a-z0-9_-]{0,31}")` | |
