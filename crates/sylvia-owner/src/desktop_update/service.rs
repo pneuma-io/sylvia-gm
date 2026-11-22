@@ -35,20 +35,6 @@ pub type Release = Arc<dyn Fn(&str) -> CodedResult<()> + Send + Sync>;
 /// `backup_database(target)`: the owning authority's coherent online backup.
 pub type Backup = Arc<dyn Fn(&Path) -> CodedResult<()> + Send + Sync>;
 
-/// A transport for a build without update trust: it is never asked for anything, because
-/// every request is refused before a controller exists.
-struct NoTransport;
-
-impl Transport for NoTransport {
-    fn open<'a>(
-        &'a self,
-        _url: &str,
-        _cancel: &super::transport::Cancel,
-    ) -> CodedResult<Box<dyn super::transport::Response + 'a>> {
-        Err(update_error("network_unavailable", "The update connection failed. You can retry safely."))
-    }
-}
-
 struct Restore {
     worker: Option<tokio::task::JoinHandle<()>>,
     error: Option<CodedError>,
@@ -99,7 +85,8 @@ impl DesktopUpdateService {
             reserved,
             release,
             public_keys(),
-            Arc::new(|| Arc::new(NoTransport)),
+            // `transport=HttpsTransport()`, made when a controller is.
+            Arc::new(|| Arc::new(super::https::HttpsTransport::new())),
         )
     }
 

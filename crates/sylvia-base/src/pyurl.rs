@@ -444,3 +444,194 @@ pub fn has_bare_percent(text: &str) -> bool {
                 && bytes.get(index + 2).is_some_and(u8::is_ascii_hexdigit))
     })
 }
+
+/// `urlsplit(url, scheme)`: the default scheme is kept when the URL has none of its own.
+pub fn urlsplit_with_scheme(url: &str, scheme: &str) -> Result<SplitUrl, UrlError> {
+    let mut result = urlsplit(url)?;
+    if result.scheme.is_empty() {
+        // `scheme.strip(_WHATWG_C0_CONTROL_OR_SPACE)` and the unsafe bytes removed.
+        result.scheme = scheme
+            .trim_matches(|c: char| c <= ' ')
+            .chars()
+            .filter(|c| !matches!(c, '\t' | '\r' | '\n'))
+            .collect();
+    }
+    Ok(result)
+}
+
+/// The six parts of `urlparse(url)` (`ParseResult`).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct ParsedUrl {
+    pub scheme: String,
+    pub netloc: String,
+    pub path: String,
+    pub params: String,
+    pub query: String,
+    pub fragment: String,
+}
+
+/// `uses_params`.
+const USES_PARAMS: [&str; 16] = [
+    "", "ftp", "hdl", "prospero", "http", "imap", "https", "shttp", "rtsp", "rtsps", "rtspu", "sip", "sips",
+    "mms", "sftp", "tel",
+];
+
+/// `uses_relative`.
+const USES_RELATIVE: [&str; 20] = [
+    "", "ftp", "http", "gopher", "nntp", "imap", "wais", "file", "https", "shttp", "mms", "prospero", "rtsp",
+    "rtsps", "rtspu", "sftp", "svn", "svn+ssh", "ws", "wss",
+];
+
+/// `urlparse(url, scheme)`.
+pub fn urlparse(url: &str, scheme: &str) -> Result<ParsedUrl, UrlError> {
+    let split = urlsplit_with_scheme(url, scheme)?;
+    let (path, params) = if USES_PARAMS.contains(&split.scheme.as_str()) && split.path.contains(';') {
+        // `_splitparams(url)`.
+        let at = match split.path.rfind('/') {
+            Some(slash) => split.path[slash..].find(';').map(|offset| slash + offset),
+            None => split.path.find(';'),
+        };
+        match at {
+            Some(at) => (split.path[..at].to_string(), split.path[at + 1..].to_string()),
+            None => (split.path.clone(), String::new()),
+        }
+    } else {
+        (split.path.clone(), String::new())
+    };
+    Ok(ParsedUrl {
+        scheme: split.scheme,
+        netloc: split.netloc,
+        path,
+        params,
+        query: split.query,
+        fragment: split.fragment,
+    })
+}
+
+/// `urlunparse((scheme, netloc, path, params, query, fragment))`.
+pub fn urlunparse(parts: &ParsedUrl) -> String {
+    let path =
+        if parts.params.is_empty() { parts.path.clone() } else { format!("{};{}", parts.path, parts.params) };
+    urlunsplit(&SplitUrl {
+        scheme: parts.scheme.clone(),
+        netloc: parts.netloc.clone(),
+        path,
+        query: parts.query.clone(),
+        fragment: parts.fragment.clone(),
+    })
+}
+
+/// `urljoin(base, url)`.
+pub fn urljoin(base: &str, url: &str) -> Result<String, UrlError> {
+    if base.is_empty() {
+        return Ok(url.to_string());
+    }
+    if url.is_empty() {
+        return Ok(base.to_string());
+    }
+    let b = urlparse(base, "")?;
+    let mut u = urlparse(url, &b.scheme)?;
+    if u.scheme != b.scheme || !USES_RELATIVE.contains(&u.scheme.as_str()) {
+        return Ok(url.to_string());
+    }
+    if USES_NETLOC.contains(&u.scheme.as_str()) {
+        if !u.netloc.is_empty() {
+            return Ok(urlunparse(&u));
+        }
+        u.netloc = b.netloc.clone();
+    }
+    if u.path.is_empty() && u.params.is_empty() {
+        u.path = b.path.clone();
+        u.params = b.params.clone();
+        if u.query.is_empty() {
+            u.query = b.query.clone();
+        }
+        return Ok(urlunparse(&u));
+    }
+    let mut base_parts: Vec<&str> = b.path.split('/').collect();
+    if base_parts.last() != Some(&"") {
+        base_parts.pop();
+    }
+    let segments: Vec<&str> = if u.path.starts_with('/') {
+        u.path.split('/').collect()
+    } else {
+        let mut joined: Vec<&str> = base_parts;
+        joined.extend(u.path.split('/'));
+        // segments[1:-1] = filter(None, segments[1:-1])
+        if joined.len() > 2 {
+            let last = joined.len() - 1;
+            let middle: Vec<&str> =
+                joined[1..last].iter().copied().filter(|segment| !segment.is_empty()).collect();
+            let mut filtered = vec![joined[0]];
+            filtered.extend(middle);
+            filtered.push(joined[last]);
+            filtered
+        } else {
+            joined
+        }
+    };
+    let mut resolved: Vec<&str> = Vec::new();
+    for segment in &segments {
+        match *segment {
+            ".." => {
+                resolved.pop();
+            }
+            "." => {}
+            other => resolved.push(other),
+        }
+    }
+    if matches!(segments.last(), Some(&".") | Some(&"..")) {
+        resolved.push("");
+    }
+    let path = resolved.join("/");
+    u.path = if path.is_empty() { "/".to_string() } else { path };
+    Ok(urlunparse(&u))
+}
+
+/// `_ALWAYS_SAFE`: ASCII letters, digits and `_.-~`.
+fn always_safe(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'_' | b'.' | b'-' | b'~')
+}
+
+/// `quote_from_bytes(bytes, safe)`: bytes outside the safe set as `%XX` (uppercase hex).
+pub fn quote_from_bytes(bytes: &[u8], safe: &str) -> String {
+    let safe: Vec<u8> = safe.bytes().filter(u8::is_ascii).collect();
+    let mut out = String::with_capacity(bytes.len());
+    for byte in bytes {
+        if always_safe(*byte) || safe.contains(byte) {
+            out.push(char::from(*byte));
+        } else {
+            out.push_str(&format!("%{byte:02X}"));
+        }
+    }
+    out
+}
+
+/// `quote(text, safe, encoding="iso-8859-1")`: `Err` where Python's strict Latin-1 encoding
+/// raises (a character above U+00FF).
+pub fn quote_latin1(text: &str, safe: &str) -> Result<String, UrlError> {
+    let characters: Vec<char> = text.chars().collect();
+    if let Some(start) = characters.iter().position(|c| u32::from(*c) > 0xFF) {
+        // `UnicodeEncodeError.__str__`: the run of unencodable characters from the first one.
+        let end = characters[start..]
+            .iter()
+            .position(|c| u32::from(*c) <= 0xFF)
+            .map_or(characters.len(), |n| start + n);
+        if end - start == 1 {
+            let code = u32::from(characters[start]);
+            let escaped = if code <= 0xFFFF { format!("\\u{code:04x}") } else { format!("\\U{code:08x}") };
+            return Err(invalid(format!(
+                "'latin-1' codec can't encode character '{escaped}' in position {start}: ordinal not in range(256)"
+            )));
+        }
+        return Err(invalid(format!(
+            "'latin-1' codec can't encode characters in position {start}-{}: ordinal not in range(256)",
+            end - 1
+        )));
+    }
+    let bytes: Vec<u8> = characters.iter().map(|c| u32::from(*c) as u8).collect();
+    Ok(quote_from_bytes(&bytes, safe))
+}
+
+/// `string.punctuation`.
+pub const PUNCTUATION: &str = r##"!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"##;
