@@ -119,7 +119,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/owner_process.py:1176` | `_selection_from_reference` | .casefold() | `folded = reference.casefold()` | |
 | `interfaces/owner_process.py:1188` | `_selection_from_reference` | .casefold() | `candidates = {model_id.casefold(), upstream_id.casefold()}` | |
 | `interfaces/owner_process.py:1190` | `_selection_from_reference` | .casefold() | `candidates.add(model_name.casefold())` | |
-| `local_dictation_process.py:122` | `serve_session` | .isalnum() | `c.isascii() and (c.isalnum() or c == "-") for c in identity` | |
+| `local_dictation_process.py:122` | `serve_session` | .isalnum() | `c.isascii() and (c.isalnum() or c == "-") for c in identity` | `dictation_vectors` (non-ASCII letters, a space, `-`) |
 | `release_artifact.py:336` | `_validated_artifacts` | .casefold() | `if source.suffix.casefold() != expected_suffix:` | |
 | `release_artifact.py:338` | `_validated_artifacts` | .casefold() | `folded = name.casefold()` | |
 | `release_artifact.py:348` | `_validated_artifacts` | .casefold() | `return tuple(sorted(validated, key=lambda item: item.source.name.casefold()))` | |
