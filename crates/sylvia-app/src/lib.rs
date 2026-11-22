@@ -15,14 +15,22 @@
 //! - [`srd_lite_character_compatibility`]: the retained SRD Lite 0.2 character contract.
 //! - [`workspace_files`]: Builder file writes that refuse a stale version.
 //! - [`srd_lite_weapon_set_migration`]: the SRD Lite 0.2 to 0.3 saved weapon-set migration.
+//!
+//! Lane 2 (game engine):
+//! - [`package_runtime`]: `validate_package_runtime`, the runtime checks before package publication.
+//! - [`player_actions`]: the Ruleset's direct-control policy (`parse_player_controls`).
+//! - [`result_card_admission`]: authoring-time result-card and activity-label checks.
 
 pub mod bundled_packages;
 pub mod campaign_starting_world;
 pub mod character_rules;
 pub mod network_graph;
 pub mod package_materialization;
+pub mod package_runtime;
 pub mod path_guardrail;
 pub mod plan_state_admission;
+pub mod player_actions;
+pub mod result_card_admission;
 pub mod setting_character_requirements;
 pub mod srd_lite_character_compatibility;
 pub mod srd_lite_weapon_set_migration;

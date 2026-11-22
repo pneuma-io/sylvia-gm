@@ -2,8 +2,10 @@
 //! and `runtime/_authoring_shape.py`, over YAML-loaded data (`sylvia_base::pyyaml::Data`).
 
 pub mod authoring_shape;
+pub mod model;
 pub mod parameter_declarations;
 pub mod pydata;
+pub mod runtime_tables;
 pub mod schema_validator;
 
 pub use parameter_declarations::{resolve_parameter_declarations, ParameterDeclarationError};

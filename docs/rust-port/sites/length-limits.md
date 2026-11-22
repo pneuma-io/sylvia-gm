@@ -135,24 +135,24 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/actor_decisions.py:140` | `project_actor_decision` | len() against a limit | `not isinstance(row[key], str) or not row[key] or len(row[key].encode()) > 256` | |
 | `application/decision_scope.py:109` | `_project_side_scope` | len() against a limit | `or len(eligible_value) > 128` | |
 | `application/decision_scope.py:221` | `project_campaign_preparation_scope` | len() against a limit | `or len(queue) > 64 or not all(isinstance(event, Mapping) for event in queue)):` | |
-| `application/package_runtime.py:152` | `_validate_shape.visit` | len() against a limit | `if len(item) > _MAX_OBJECT_MEMBERS:` | |
+| `application/package_runtime.py:152` | `_validate_shape.visit` | len() against a limit | `if len(item) > _MAX_OBJECT_MEMBERS:` |  `sylvia-app` package_runtime_vectors |
 | `application/package_runtime.py:420` | `AuthorityMemoryStateBridge._record_spatial_evidence` | len() against a limit | `if len(self._spatial_evidence) >= _MAX_SPATIAL_EVIDENCE:` | |
 | `application/package_runtime.py:423` | `AuthorityMemoryStateBridge._record_spatial_evidence` | len() against a limit | `if len(result_bytes) > _MAX_SPATIAL_RESULT_BYTES:` | |
 | `application/package_runtime.py:563` | `AuthorityMemoryStateBridge.record_shot_effect` | len() against a limit | `if not isinstance(request, Mapping) or len(self._shot_effects) >= 256:` | |
 | `application/package_runtime.py:917` | `_parse_runtime` | len() against a limit | `while len(_PARSED_RUNTIMES) > 16:` | |
-| `application/package_runtime.py:925` | `_load_runtime` | len() against a limit | `if len(runtime_bytes) > PACKAGE_RUNTIME_BYTE_LIMIT:` | |
+| `application/package_runtime.py:925` | `_load_runtime` | len() against a limit | `if len(runtime_bytes) > PACKAGE_RUNTIME_BYTE_LIMIT:` |  `sylvia-app` package_runtime_vectors |
 | `application/package_runtime.py:1126` | `package_tool_decision_title` | len() against a limit | `return title.strip() if isinstance(title, str) and 0 < len(title) <= 256 else ""` | |
-| `application/player_actions.py:25` | `_valid_control_queries` | len() against a limit | `if (not isinstance(queries, (list, tuple)) or len(queries) > 8` | |
-| `application/player_actions.py:26` | `_valid_control_queries` | len() against a limit | `or not isinstance(calculations, (list, tuple)) or len(calculations) > 24):` | |
-| `application/player_actions.py:51` | `_valid_control_queries` | len() against a limit | `or not isinstance(expression, str) or not 0 < len(expression) <= 500` | |
-| `application/player_actions.py:52` | `_valid_control_queries` | len() against a limit | `or not isinstance(condition, str) or not 0 < len(condition) <= 500):` | |
-| `application/player_actions.py:160` | `parse_player_controls` | len() against a limit | `if (not isinstance(checks, (list, tuple)) or len(checks) > 32 or any(` | |
-| `application/player_actions.py:163` | `parse_player_controls` | len() against a limit | `or len(check["condition"]) > 4096` | |
-| `application/player_actions.py:165` | `parse_player_controls` | len() against a limit | `or len(check["reason"]) > 256` | |
-| `application/player_actions.py:175` | `parse_player_controls` | len() against a limit | `or len(actor_parameter) > 128` | |
-| `application/result_card_admission.py:14` | `validate_activity_label` | len() against a limit | `if isinstance(value, str) and value.strip() and len(value) <= 80:` | |
-| `application/result_card_admission.py:17` | `validate_activity_label` | len() against a limit | `and isinstance(value["path"], str) and 1 <= len(value["path"]) <= 256):` | |
-| `application/result_card_admission.py:64` | `_value_issues` | len() against a limit | `if len(parts) > 16 or any(not part for part in parts):` | |
+| `application/player_actions.py:25` | `_valid_control_queries` | len() against a limit | `if (not isinstance(queries, (list, tuple)) or len(queries) > 8` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:26` | `_valid_control_queries` | len() against a limit | `or not isinstance(calculations, (list, tuple)) or len(calculations) > 24):` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:51` | `_valid_control_queries` | len() against a limit | `or not isinstance(expression, str) or not 0 < len(expression) <= 500` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:52` | `_valid_control_queries` | len() against a limit | `or not isinstance(condition, str) or not 0 < len(condition) <= 500):` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:160` | `parse_player_controls` | len() against a limit | `if (not isinstance(checks, (list, tuple)) or len(checks) > 32 or any(` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:163` | `parse_player_controls` | len() against a limit | `or len(check["condition"]) > 4096` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:165` | `parse_player_controls` | len() against a limit | `or len(check["reason"]) > 256` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:175` | `parse_player_controls` | len() against a limit | `or len(actor_parameter) > 128` |  `sylvia-app` package_runtime_vectors |
+| `application/result_card_admission.py:14` | `validate_activity_label` | len() against a limit | `if isinstance(value, str) and value.strip() and len(value) <= 80:` |  `sylvia-app` package_runtime_vectors |
+| `application/result_card_admission.py:17` | `validate_activity_label` | len() against a limit | `and isinstance(value["path"], str) and 1 <= len(value["path"]) <= 256):` |  `sylvia-app` package_runtime_vectors |
+| `application/result_card_admission.py:64` | `_value_issues` | len() against a limit | `if len(parts) > 16 or any(not part for part in parts):` |  `sylvia-app` package_runtime_vectors |
 | `application/result_cards.py:34` | `_scalar` | len() against a limit | `if isinstance(value, str) and len(value) > 4000:` | |
 | `application/result_cards.py:45` | `_public_value` | len() against a limit | `if len(path) > 16 or path[0] not in {"parameters", "context"}:` | |
 | `application/result_cards.py:64` | `_value` | len() against a limit | `if not isinstance(labels, Mapping) or len(labels) > 64:` | |

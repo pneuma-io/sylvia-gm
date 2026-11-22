@@ -22,6 +22,10 @@ pub enum PyErrorKind {
     RuntimeError,
     /// `MemoryError`.
     MemoryError,
+    /// `KeyError`.
+    KeyError,
+    /// `AttributeError`.
+    AttributeError,
 }
 
 impl PyErrorKind {
@@ -35,6 +39,8 @@ impl PyErrorKind {
             Self::ZeroDivisionError => "ZeroDivisionError",
             Self::RuntimeError => "RuntimeError",
             Self::MemoryError => "MemoryError",
+            Self::KeyError => "KeyError",
+            Self::AttributeError => "AttributeError",
         }
     }
 }

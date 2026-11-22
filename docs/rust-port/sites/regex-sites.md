@@ -98,11 +98,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/package_runtime.py:610` | `AuthorityMemoryStateBridge.spatial_private_variables` | re.findall; plain | `private.intersection(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", expression))` | |
 | `application/package_runtime.py:612` | `AuthorityMemoryStateBridge.spatial_private_variables` | re.search; pattern built at run time, check by hand | `re.search(r"(?<![\w.])" + re.escape(path) + r"(?=$\|[.\s\[])", expression)` | |
 | `application/package_runtime.py:1365` | `<module>` | re.compile; plain | `_SAFE_REFERENCE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}")` | |
-| `application/player_actions.py:19` | `<module>` | re.compile; plain | `_LOCAL_NAME = re.compile(r"^_[A-Za-z][A-Za-z0-9_]{0,63}$")` | |
-| `application/player_actions.py:140` | `parse_player_controls` | re.fullmatch; plain | `or any(not isinstance(name, str) or re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,127}', name) is None` | |
-| `application/player_actions.py:147` | `parse_player_controls` | re.fullmatch; plain | `or re.fullmatch(r'state\.[A-Za-z_][A-Za-z0-9_.]{0,127}', preflight_path["scene"]) is None` | |
+| `application/player_actions.py:19` | `<module>` | re.compile; plain | `_LOCAL_NAME = re.compile(r"^_[A-Za-z][A-Za-z0-9_]{0,63}$")` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:140` | `parse_player_controls` | re.fullmatch; plain | `or any(not isinstance(name, str) or re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]{0,127}', name) is None` |  `sylvia-app` package_runtime_vectors |
+| `application/player_actions.py:147` | `parse_player_controls` | re.fullmatch; plain | `or re.fullmatch(r'state\.[A-Za-z_][A-Za-z0-9_.]{0,127}', preflight_path["scene"]) is None` |  `sylvia-app` package_runtime_vectors |
 | `application/shot_effects.py:24` | `<module>` | re.compile; plain | `_HEX_COLOR = re.compile(r"#[0-9A-Fa-f]{6}\Z")` | |
-| `ruleset/schema.py:38` | `Meta.id_must_be_kebab_case` | re.match; plain | `if not re.match(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", v):` | |
+| `ruleset/schema.py:38` | `Meta.id_must_be_kebab_case` | re.match; plain | `if not re.match(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", v):` |  `sylvia-app` package_runtime_vectors |
 | `runtime/_effect_executor.py:69` | `_handle_shuffle` | re.fullmatch; plain | `if not isinstance(destination, str) or re.fullmatch(r"_[A-Za-z0-9_]+", destination) is None:` | |
 | `runtime/_effect_executor.py:367` | `_handle_request_choice` | re.fullmatch; plain | `if isinstance(raw_options, str) and re.fullmatch(r"_[A-Za-z0-9_]+", raw_options):` | |
 | `runtime/_effect_executor.py:390` | `_handle_request_choice` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` | |
