@@ -21,7 +21,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/result_cards.py` | 243 | `sylvia-app::result_cards` | pending | |
 | `src/sylvia_gm/application/shot_effects.py` | 376 | `sylvia-app::shot_effects` | pending | |
 | `src/sylvia_gm/application/spatial_preview.py` | 118 | `sylvia-app::spatial_preview` | pending | |
-| `src/sylvia_gm/application/tactical_grid.py` | 710 | `sylvia-app::tactical_grid` | pending | |
+| `src/sylvia_gm/application/tactical_grid.py` | 710 | `sylvia-app::tactical_grid` | in progress | `resolve_surface_source` is `sylvia-app::tactical_grid::resolve_surface_source`, with `SurfaceParticipant` (implemented for `sylvia_domain::authority::Participant`) and `NoParticipant` (`surface_source_vectors`). Still to port, after the spatial queries (S4): the projections, the player-known scene, the coordinate map and the tactical action parameters. |
 | `src/sylvia_gm/dice.py` | 920 | `sylvia-engine::dice` | ported | `sylvia-engine::dice`, drawing from `sylvia-engine::pyrandom`. The three context-variable streams (`use_roll_source`, `seeded_rolls`, the module default) are a `Dice` value the caller passes down; a scripted source implements `RollSource` (Python's `ScenarioDice` overrides `randint` the same way). `weighted_pick` returns the picked row's index. Python's `TypeError` branches for non-`int` arguments cannot arise from typed Rust callers; the dynamic ones (`weighted_pick` weights, `sum()`) are kept. Sums, totals plus modifiers, margins and success counts beyond `i64` are refused (`differences.md` row 5). Vectors: `tests/vectors/dice_vectors.json`. |
 | `src/sylvia_gm/ruleset/__init__.py` | 5 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/ruleset/schema.py` | 273 | `sylvia-engine` | in progress | Admission ported: `sylvia-engine::ruleset::model::check_ruleset_file` answers `RulesetFile.model_validate` (pydantic 2 lax conversions, field validators) and `validate()`'s error verdict (`package_runtime_vectors`: the `coercion` table and the `models` corpus). Still to port: the typed model the agent runner and the turn system read (`TurnSystemConfig`, the convenience methods). |
@@ -61,11 +61,11 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/runtime/_tool_executor.py` | 528 | `sylvia-engine` | in progress | `sylvia-engine::exec::tool`: `execute_tool`, `prepare_tool_context`, parameter validation, context building, range variables and narrative collection (`execution_vectors`). The flag store's `_flag_*` injection reads `extras["flag_store"]`, which the package path never sets (retired with `_flag_store`). Still to port: `register_state_parameter` (with the spatial effects). |
 | `src/sylvia_gm/runtime/_turn_system.py` | 174 | `sylvia-engine` | pending | |
 | `src/sylvia_gm/runtime/_types.py` | 327 | `sylvia-engine` | in progress | `ExecutionBudget` is `sylvia-engine::expr::ExecutionBudget`; `ExecutionContext`'s expression-facing fields are `EvalContext`. The rest comes with the effects. `ExecutionContext` (with `resolve_field`) and `ToolResult` are `sylvia-engine::exec`; `ToolParameter`, `ToolDef` and `ProcedureDef` are `sylvia-engine::ruleset::runtime_tables`. |
-| `src/sylvia_gm/spatial/__init__.py` | 29 | `sylvia-engine::spatial` | pending | |
+| `src/sylvia_gm/spatial/__init__.py` | 29 | `sylvia-engine::spatial` | in progress | `sylvia-engine::spatial` re-exports what is ported so far (S1). |
 | `src/sylvia_gm/spatial/_clearance.py` | 73 | `sylvia-engine::spatial` | pending | |
 | `src/sylvia_gm/spatial/_convex.py` | 102 | `sylvia-engine::spatial` | pending | |
 | `src/sylvia_gm/spatial/_engine.py` | 1,865 | `sylvia-engine::spatial` | pending | |
-| `src/sylvia_gm/spatial/_interface.py` | 1,899 | `sylvia-engine::spatial` | pending | |
+| `src/sylvia_gm/spatial/_interface.py` | 1,899 | `sylvia-engine::spatial` | in progress | Scene admission ported (S1): `admit_spatial_scene`, `AdmittedSpatialScene`, `SpatialValidationError` (with `SpatialError::Uncaught` for the `AttributeError` a non-object entity footprint raises), `_capture_payload` and `_validate_scene` with their limits, in `sylvia-engine::spatial` (`spatial_scene_vectors`). The 100,000-node capture limit comes first, so the geometry (20,000) and terrain (100,000) count limits cannot be reached. Still to port: `mutate_spatial_scene` (S2), query admission and `admit_spatial_result` (S3). |
 
 ## Open items
 

@@ -45,4 +45,5 @@ pub mod ruleset_source;
 pub mod setting_character_requirements;
 pub mod srd_lite_character_compatibility;
 pub mod srd_lite_weapon_set_migration;
+pub mod tactical_grid;
 pub mod workspace_files;
