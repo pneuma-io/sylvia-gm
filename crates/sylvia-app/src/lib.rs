@@ -25,6 +25,7 @@ pub mod package_materialization;
 pub mod path_guardrail;
 pub mod plan_state_admission;
 pub mod reusable_library_deletion;
+pub mod ruleset_source;
 pub mod setting_character_requirements;
 pub mod srd_lite_character_compatibility;
 pub mod srd_lite_weapon_set_migration;

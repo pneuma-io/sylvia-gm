@@ -59,7 +59,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/builder/_plan_draft_check.py` | 101 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_plan_snapshot_materializer.py` | 292 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_prompts.py` | 248 | `sylvia-app::builder` | pending | |
-| `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_ruleset_source.py` | 689 | `sylvia-app::ruleset_source` | ported | `ruleset_source_vectors` (the shipped Riichi source, edits, and YAML whose aliases reach the dumped runtime as anchors); Python's object graph and `deepcopy` sharing are kept for `yaml.safe_dump` |
 | `src/sylvia_gm/builder/_setting_draft_check.py` | 46 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_setting_materializer.py` | 150 | `sylvia-app::builder` | pending | |
 | `src/sylvia_gm/builder/_tools.py` | 496 | `sylvia-app::builder` | pending | |
