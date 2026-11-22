@@ -112,12 +112,12 @@ fn needs_contribution(step: &str) -> bool {
 }
 
 /// One of Python's `AuthorityError` classes, by name.
-fn coded(kind: &'static str, message: &str) -> StoreError {
+pub(super) fn coded(kind: &'static str, message: &str) -> StoreError {
     StoreError::Coded(sylvia_store::error::authority_coded(kind, message))
 }
 
 /// `CommandRejected(message, code=code)`.
-fn rejected(message: &str, code: &str) -> StoreError {
+pub(super) fn rejected(message: &str, code: &str) -> StoreError {
     sylvia_domain::DomainError::command_rejected_with(message, code, Vec::new()).into()
 }
 
@@ -131,7 +131,7 @@ fn canonical_sha256(value: &Json) -> String {
 }
 
 /// `{"operation_id": ..., "operation_kind": ..., **values}` and the SHA-256 of its canonical bytes.
-fn operation_payload(
+pub(super) fn operation_payload(
     operation_id: &str,
     operation_kind: &str,
     values: Vec<(&str, Json)>,

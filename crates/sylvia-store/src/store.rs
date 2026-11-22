@@ -49,6 +49,10 @@ pub struct Faults {
     pub before_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
     /// `_before_package_publication`, in `publish_package_archive`.
     pub before_package_publication: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
+    /// `_before_lifecycle_commit`, in `commit_lifecycle_operation`.
+    pub before_lifecycle_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
+    /// `_after_lifecycle_commit`, in `commit_lifecycle_operation`: the lost acknowledgement.
+    pub after_lifecycle_commit: Option<Box<dyn Fn() -> StoreResult<()> + Send>>,
 }
 
 impl std::fmt::Debug for Faults {
@@ -57,6 +61,8 @@ impl std::fmt::Debug for Faults {
             .debug_struct("Faults")
             .field("before_commit", &self.before_commit.is_some())
             .field("before_package_publication", &self.before_package_publication.is_some())
+            .field("before_lifecycle_commit", &self.before_lifecycle_commit.is_some())
+            .field("after_lifecycle_commit", &self.after_lifecycle_commit.is_some())
             .finish()
     }
 }
