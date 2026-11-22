@@ -34,6 +34,7 @@ pub mod error;
 pub mod factory;
 pub mod hooks;
 pub mod http;
+mod httpx_text;
 pub mod httpx_url;
 mod log;
 pub mod model_facts;
