@@ -235,13 +235,16 @@ pub fn check_all(vectors: &Json, minimum: usize) {
         }
         if let Some(names) = case.get("deferred").and_then(Json::as_array) {
             // `defer` names each call with `uuid4()[:8]`; the generator pins it to zeros.
-            let mut ids: Vec<String> = names.iter().filter_map(Json::as_str).map(|n| format!("/result/context/{n}")).collect();
+            let mut ids: Vec<String> =
+                names.iter().filter_map(Json::as_str).map(|n| format!("/result/context/{n}")).collect();
             if let Some(Json::Array(calls)) = actual.pointer("/result/context/_deferred_calls") {
                 ids.extend((0..calls.len()).map(|i| format!("/result/context/_deferred_calls/{i}/call_id")));
             }
             for id in ids {
                 if let Some(slot) = actual.pointer_mut(&id) {
-                    if slot.as_str().is_some_and(|t| t.len() == 8 && t.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))) {
+                    if slot.as_str().is_some_and(|t| {
+                        t.len() == 8 && t.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+                    }) {
                         *slot = json!("00000000");
                     }
                 }

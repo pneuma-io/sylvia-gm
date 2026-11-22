@@ -694,7 +694,9 @@ pub fn execute_tool(
 ) -> Result<ToolResult, ExecError> {
     let local = ExecutionBudget::default();
     let budget = budget.unwrap_or(&local);
-    let mut ctx = match prepare_tool_context(tool_name, params, host, bridge, combat, budget, dice, choice, procedure, mode)? {
+    let mut ctx = match prepare_tool_context(
+        tool_name, params, host, bridge, combat, budget, dice, choice, procedure, mode,
+    )? {
         Prepared::Result(result) => return Ok(*result),
         Prepared::Context(ctx) => ctx,
     };

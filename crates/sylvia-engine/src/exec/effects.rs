@@ -6,8 +6,8 @@
 use super::context::{Combat, ExecutionContext, NestedMode};
 use super::error::{float_to_int, ExecError};
 use super::handlers;
-use super::time;
 use super::template::{resolve_params, resolve_template};
+use super::time;
 use super::tool::{execute_tool, ToolHost};
 use crate::expr::value::{Dict, Value};
 use crate::expr::EvalError;

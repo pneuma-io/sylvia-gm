@@ -142,8 +142,12 @@ fn repoint_dict(value: &mut Value, old: &Arc<Dict>, new: &Arc<Dict>) {
     match value {
         Value::Dict(map) if Arc::ptr_eq(map, old) => *value = Value::Dict(new.clone()),
         Value::Dict(map) => Arc::make_mut(map).values_mut().for_each(|item| repoint_dict(item, old, new)),
-        Value::List(items) | Value::Tuple(items) => Arc::make_mut(items).iter_mut().for_each(|item| repoint_dict(item, old, new)),
-        Value::Object(object) => Arc::make_mut(object).fields.iter_mut().for_each(|(_, item)| repoint_dict(item, old, new)),
+        Value::List(items) | Value::Tuple(items) => {
+            Arc::make_mut(items).iter_mut().for_each(|item| repoint_dict(item, old, new))
+        }
+        Value::Object(object) => {
+            Arc::make_mut(object).fields.iter_mut().for_each(|(_, item)| repoint_dict(item, old, new))
+        }
         _ => {}
     }
 }

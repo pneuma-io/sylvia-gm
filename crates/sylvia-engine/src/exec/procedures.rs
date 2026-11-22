@@ -94,8 +94,12 @@ fn contains(step: &Value, name: &str) -> Result<bool, ExecError> {
     match step {
         Value::Dict(map) => Ok(map.contains_key(name)),
         Value::Str(text) => Ok(text.contains(name)),
-        Value::List(items) | Value::Tuple(items) => Ok(items.iter().any(|item| py_eq(item, &Value::str(name)))),
-        other => Err(ExecError::type_error(format!("argument of type '{}' is not iterable", other.type_name()))),
+        Value::List(items) | Value::Tuple(items) => {
+            Ok(items.iter().any(|item| py_eq(item, &Value::str(name))))
+        }
+        other => {
+            Err(ExecError::type_error(format!("argument of type '{}' is not iterable", other.type_name())))
+        }
     }
 }
 
@@ -115,7 +119,16 @@ fn references_missing_entity(step: &Value, ctx: &ExecutionContext<'_>) -> Result
             }
         }
     }
-    for key in ["call", "apply_damage", "apply_condition", "remove_condition", "heal", "save_throw", "decrement", "increment"] {
+    for key in [
+        "call",
+        "apply_damage",
+        "apply_condition",
+        "remove_condition",
+        "heal",
+        "save_throw",
+        "decrement",
+        "increment",
+    ] {
         if !contains(step, key)? {
             continue;
         }
@@ -170,7 +183,11 @@ pub struct TriggerCall<'a, 'b> {
 }
 
 /// `trigger_procedure(trigger_name, ..., context=..., combat_state=..., budget=..., _depth=...)`.
-pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'_, '_>) -> Result<ProcedureResult, ExecError> {
+pub fn trigger_procedure(
+    trigger_name: &str,
+    context: &Dict,
+    call: TriggerCall<'_, '_>,
+) -> Result<ProcedureResult, ExecError> {
     let TriggerCall { host, mut bridge, combat, budget, dice, depth } = call;
     if depth > MAX_PROCEDURE_DEPTH {
         return Err(ExecError::Python {
@@ -181,11 +198,15 @@ pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'
         });
     }
     let trigger = Value::str(trigger_name);
-    let matching: Vec<&ExecProcedure> = host.procedures().iter().filter(|p| py_eq(&p.trigger, &trigger)).collect();
+    let matching: Vec<&ExecProcedure> =
+        host.procedures().iter().filter(|p| py_eq(&p.trigger, &trigger)).collect();
     if matching.is_empty() {
         return Ok(ProcedureResult::new(trigger_name, trigger_name));
     }
-    let mut result = ProcedureResult::new(&matching.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(","), trigger_name);
+    let mut result = ProcedureResult::new(
+        &matching.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(","),
+        trigger_name,
+    );
     let failure = |result: &ProcedureResult, name: &str, error: String| ProcedureResult {
         procedure_name: name.into(),
         success: false,
@@ -195,7 +216,8 @@ pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'
     for procedure in matching {
         if procedure.condition.truthy() {
             let (condition_combat, _) = combat_or_new(&combat, bridge.as_deref());
-            let mut ctx = context_for(context, host, bridge.as_deref_mut(), condition_combat, budget, &mut *dice, "");
+            let mut ctx =
+                context_for(context, host, bridge.as_deref_mut(), condition_combat, budget, &mut *dice, "");
             inject_flags(&mut ctx);
             let expression = procedure.condition.to_str();
             match ctx.with_eval(|eval| crate::expr::evaluate_condition(&expression, eval)) {
@@ -208,8 +230,17 @@ pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'
             }
         }
         let (procedure_combat, truthy) = combat_or_new(&combat, bridge.as_deref());
-        let mut ctx = context_for(context, host, bridge.as_deref_mut(), procedure_combat, budget, &mut *dice, &procedure.name);
-        for key in ["actor", "attacker", "target", "entity", "caster", "current_actor", "member", "combatant"] {
+        let mut ctx = context_for(
+            context,
+            host,
+            bridge.as_deref_mut(),
+            procedure_combat,
+            budget,
+            &mut *dice,
+            &procedure.name,
+        );
+        for key in ["actor", "attacker", "target", "entity", "caster", "current_actor", "member", "combatant"]
+        {
             if let (Some(Value::Str(id)), Some(bridge)) = (context.get(key), ctx.state_bridge.as_deref()) {
                 if !id.is_empty() {
                     if let Ok(snapshot) = bridge.get_entity(id) {
@@ -224,7 +255,12 @@ pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'
                 Value::List(items) | Value::Tuple(items) => items.len(),
                 Value::Str(text) => text.chars().count(),
                 Value::Dict(map) => map.len(),
-                other => return Err(ExecError::type_error(format!("object of type '{}' has no len()", other.type_name()))),
+                other => {
+                    return Err(ExecError::type_error(format!(
+                        "object of type '{}' has no len()",
+                        other.type_name()
+                    )))
+                }
             };
             ctx.set_combat("order_length", Value::Int(length as i64));
         }
@@ -234,7 +270,9 @@ pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'
             Value::List(items) | Value::Tuple(items) => (**items).clone(),
             Value::Dict(map) => map.keys().map(|key| Value::str(key.as_str())).collect(),
             Value::Str(text) => text.chars().map(|c| Value::str(c.to_string())).collect(),
-            other => return Err(ExecError::type_error(format!("'{}' object is not iterable", other.type_name()))),
+            other => {
+                return Err(ExecError::type_error(format!("'{}' object is not iterable", other.type_name())))
+            }
         };
         let outcome: Result<(), ExecError> = (|| {
             for step in steps {
@@ -260,7 +298,12 @@ pub fn trigger_procedure(trigger_name: &str, context: &Dict, call: TriggerCall<'
                 Value::List(items) | Value::Tuple(items) => result.logs.extend(items.iter().cloned()),
                 Value::Dict(map) => result.logs.extend(map.keys().map(|key| Value::str(key.as_str()))),
                 Value::Str(text) => result.logs.extend(text.chars().map(|c| Value::str(c.to_string()))),
-                other => return Err(ExecError::type_error(format!("'{}' object is not iterable", other.type_name()))),
+                other => {
+                    return Err(ExecError::type_error(format!(
+                        "'{}' object is not iterable",
+                        other.type_name()
+                    )))
+                }
             }
         }
         for (key, value) in &ctx.vars {

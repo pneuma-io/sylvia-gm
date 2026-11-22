@@ -29,7 +29,12 @@ fn body_dict<'v>(body: &'v Value, effect_type: &str, message: &str) -> Result<&'
 }
 
 /// `_handle_trigger_procedure`: run the named trigger's procedures.
-pub(crate) fn handle_trigger(body: &Value, effect: &Dict, ctx: &mut ExecutionContext<'_>, host: &dyn ToolHost) -> Result<(), ExecError> {
+pub(crate) fn handle_trigger(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+    host: &dyn ToolHost,
+) -> Result<(), ExecError> {
     let (name, context) = match body {
         Value::Str(_) => (body.clone(), get(effect, "context", Value::dict(Dict::new()))),
         Value::Dict(map) => (
@@ -65,7 +70,11 @@ pub(crate) fn handle_trigger(body: &Value, effect: &Dict, ctx: &mut ExecutionCon
     budget.leave_call().map_err(ExecError::from)?;
     let result = result?;
     if !result.success {
-        let message = result.error.clone().filter(|e| !e.is_empty()).unwrap_or_else(|| format!("Procedure trigger '{name}' failed"));
+        let message = result
+            .error
+            .clone()
+            .filter(|e| !e.is_empty())
+            .unwrap_or_else(|| format!("Procedure trigger '{name}' failed"));
         return Err(ExecError::effect("trigger", message));
     }
     if let Some(Value::Str(store_as)) = effect.get("store_as") {
@@ -91,7 +100,11 @@ impl NonEmpty for Value {
 }
 
 /// `_handle_set_flag` without a flag store: the flag lives in the context only.
-pub(crate) fn handle_set_flag(body: &Value, effect: &Dict, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+pub(crate) fn handle_set_flag(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
     let (name, value) = match body {
         Value::Str(name) => (name.to_string(), get(effect, "value", Value::Bool(true))),
         Value::Dict(map) => (
@@ -107,8 +120,18 @@ pub(crate) fn handle_set_flag(body: &Value, effect: &Dict, ctx: &mut ExecutionCo
 }
 
 const TIME_UNITS: [(&str, i64); 12] = [
-    ("round", 1), ("rounds", 1), ("minute", 10), ("minutes", 10), ("hour", 600), ("hours", 600), ("day", 14400),
-    ("days", 14400), ("month", 432_000), ("months", 432_000), ("year", 5_184_000), ("years", 5_184_000),
+    ("round", 1),
+    ("rounds", 1),
+    ("minute", 10),
+    ("minutes", 10),
+    ("hour", 600),
+    ("hours", 600),
+    ("day", 14400),
+    ("days", 14400),
+    ("month", 432_000),
+    ("months", 432_000),
+    ("year", 5_184_000),
+    ("years", 5_184_000),
 ];
 
 /// `parse_duration(duration_str)`: `^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$` with Python's Unicode
@@ -151,7 +174,10 @@ fn parse_duration(duration: &str) -> Result<i64, ExecError> {
         let mut names: Vec<&str> = TIME_UNITS.iter().map(|(name, _)| *name).collect();
         names.sort_unstable();
         let listed = names.iter().map(|name| format!("'{name}'")).collect::<Vec<_>>().join(", ");
-        return Err(ExecError::value_error(format!("Unknown time unit: {}. Valid units: [{listed}]", Value::str(unit).repr())));
+        return Err(ExecError::value_error(format!(
+            "Unknown time unit: {}. Valid units: [{listed}]",
+            Value::str(unit).repr()
+        )));
     };
     super::error::float_to_int(amount * *multiplier as f64)
 }
@@ -162,12 +188,19 @@ fn parse_duration(duration: &str) -> Result<i64, ExecError> {
 pub(crate) fn handle_advance_time(body: &Value, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
     let duration = match body {
         Value::Str(text) => text.to_string(),
-        Value::Dict(map) => map.get("advance_time").or_else(|| map.get("duration")).cloned().unwrap_or_else(|| text("1 round")).to_str(),
+        Value::Dict(map) => map
+            .get("advance_time")
+            .or_else(|| map.get("duration"))
+            .cloned()
+            .unwrap_or_else(|| text("1 round"))
+            .to_str(),
         _ => return Err(ExecError::effect("advance_time", "Invalid advance_time format")),
     };
     let rounds = parse_duration(&duration)?;
     let current = to_int(&ctx.combat_state().get("round").cloned().unwrap_or(Value::Int(0)))?;
-    let round = current.checked_add(rounds).ok_or_else(|| ExecError::value_error(sylvia_base::pystr::INT_RANGE_MESSAGE))?;
+    let round = current
+        .checked_add(rounds)
+        .ok_or_else(|| ExecError::value_error(sylvia_base::pystr::INT_RANGE_MESSAGE))?;
     ctx.set_combat("round", Value::Int(round));
     Ok(())
 }
@@ -184,17 +217,24 @@ fn nested_field(entity: &Value, path: &str) -> Value {
 }
 
 /// `_handle_initiative`: roll each combatant's initiative and set the order.
-pub(crate) fn handle_initiative(body: &Value, effect: &Dict, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+pub(crate) fn handle_initiative(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
     let map = body_dict(body, "initiative", "body must be a dict")?;
     let combatants = get(map, "combatants", text("combatants"));
-    let expression = map.get("expression").or_else(|| map.get("roll")).cloned().unwrap_or_else(|| text("d20"));
+    let expression =
+        map.get("expression").or_else(|| map.get("roll")).cloned().unwrap_or_else(|| text("d20"));
     let store_as = get(effect, "store_as", text("_initiative_order")).to_str();
     let mut fields = Vec::new();
     for option in ["modifier_field", "required_truthy_field", "label_field"] {
         let value = get(map, option, Value::None);
         match &value {
             Value::None => fields.push(None),
-            Value::Str(name) if !sylvia_base::pystr::strip(name).is_empty() => fields.push(Some(name.to_string())),
+            Value::Str(name) if !sylvia_base::pystr::strip(name).is_empty() => {
+                fields.push(Some(name.to_string()))
+            }
             _ => return Err(ExecError::effect("initiative", format!("{option} must be a field name"))),
         }
     }
@@ -206,7 +246,8 @@ pub(crate) fn handle_initiative(body: &Value, effect: &Dict, ctx: &mut Execution
             _ => return Err(ExecError::effect("initiative", format!("{option} must be an integer"))),
         }
     }
-    let (modifier_field, required_field, label_field) = (fields[0].clone(), fields[1].clone(), fields[2].clone());
+    let (modifier_field, required_field, label_field) =
+        (fields[0].clone(), fields[1].clone(), fields[2].clone());
     let (minimum, maximum) = (bounds[0], bounds[1]);
     if let (Some(minimum), Some(maximum)) = (minimum, maximum) {
         if minimum > maximum {
@@ -280,15 +321,25 @@ pub(crate) fn handle_initiative(body: &Value, effect: &Dict, ctx: &mut Execution
         let mut entry = Dict::new();
         entry.insert("entity_id".into(), Value::str(id.as_str()));
         let overflow = || ExecError::value_error(sylvia_base::pystr::INT_RANGE_MESSAGE);
-        entry.insert("initiative_result".into(), Value::Int(value.checked_add(modifier).ok_or_else(overflow)?));
+        entry.insert(
+            "initiative_result".into(),
+            Value::Int(value.checked_add(modifier).ok_or_else(overflow)?),
+        );
         entry.insert("roll".into(), roll.as_ref().map_or(Value::None, Value::from_json));
-        entry.insert("modifier".into(), Value::Int(modifier.checked_add(roll_modifier).ok_or_else(overflow)?));
+        entry
+            .insert("modifier".into(), Value::Int(modifier.checked_add(roll_modifier).ok_or_else(overflow)?));
         if let Some(field) = &label_field {
             match nested_field(&entity, field) {
-                Value::Str(label) if !sylvia_base::pystr::strip(&label).is_empty() && label.chars().count() <= 200 => {
+                Value::Str(label)
+                    if !sylvia_base::pystr::strip(&label).is_empty() && label.chars().count() <= 200 =>
+                {
                     entry.insert("label".into(), Value::Str(label));
                 }
-                _ => return Err(ExecError::value_error("Initiative requires the declared entity display label")),
+                _ => {
+                    return Err(ExecError::value_error(
+                        "Initiative requires the declared entity display label",
+                    ))
+                }
             }
         }
         results.push(Value::dict(entry));
@@ -318,7 +369,9 @@ fn advance_turn(ctx: &mut ExecutionContext<'_>) -> Result<Value, ExecError> {
     };
     let items = match &order {
         Value::List(items) | Value::Tuple(items) => items.clone(),
-        other => return Err(ExecError::type_error(format!("object of type '{}' has no len()", other.type_name()))),
+        other => {
+            return Err(ExecError::type_error(format!("object of type '{}' has no len()", other.type_name())))
+        }
     };
     let index = combat.get("turn_index").cloned().unwrap_or(Value::Int(-1));
     let last = Value::Int(items.len() as i64 - 1);
@@ -361,9 +414,10 @@ fn advance_turn(ctx: &mut ExecutionContext<'_>) -> Result<Value, ExecError> {
         return Err(ExecError::Python { class: "IndexError", message: "list index out of range".into() });
     };
     let current = match current {
-        Value::Dict(entry) => {
-            entry.get("entity_id").cloned().unwrap_or_else(|| entry.get("id").cloned().unwrap_or_else(|| text("")))
-        }
+        Value::Dict(entry) => entry
+            .get("entity_id")
+            .cloned()
+            .unwrap_or_else(|| entry.get("id").cloned().unwrap_or_else(|| text(""))),
         other => Value::str(other.to_str()),
     };
     ctx.set_combat("current_actor", current.clone());
@@ -371,7 +425,11 @@ fn advance_turn(ctx: &mut ExecutionContext<'_>) -> Result<Value, ExecError> {
 }
 
 /// `_handle_advance_initiative`.
-pub(crate) fn handle_advance_initiative(body: &Value, effect: &Dict, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+pub(crate) fn handle_advance_initiative(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
     let map = body_dict(body, "advance_initiative", "body must be a dict")?;
     let skip_field = match get(map, "skip_field", Value::None) {
         Value::None => None,
@@ -396,7 +454,9 @@ pub(crate) fn handle_advance_initiative(body: &Value, effect: &Dict, ctx: &mut E
         };
         let key = match &candidate {
             Value::Str(id) => id.to_string(),
-            Value::List(_) | Value::Dict(_) => return Err(ExecError::type_error(format!("unhashable type: '{}'", candidate.type_name()))),
+            Value::List(_) | Value::Dict(_) => {
+                return Err(ExecError::type_error(format!("unhashable type: '{}'", candidate.type_name())))
+            }
             other => other.to_str(),
         };
         let mut entity = ctx.entities.get(&key).cloned();
@@ -425,7 +485,12 @@ pub(crate) fn handle_advance_initiative(body: &Value, effect: &Dict, ctx: &mut E
 pub(crate) fn handle_transition_scene(body: &Value, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
     let scene = match body {
         Value::Str(text) => text.to_string(),
-        Value::Dict(map) => map.get("transition_scene").or_else(|| map.get("scene")).cloned().unwrap_or_else(|| text("")).to_str(),
+        Value::Dict(map) => map
+            .get("transition_scene")
+            .or_else(|| map.get("scene"))
+            .cloned()
+            .unwrap_or_else(|| text(""))
+            .to_str(),
         _ => return Err(ExecError::effect("transition_scene", "Invalid transition_scene format")),
     };
     if !scene.is_empty() {
@@ -448,7 +513,11 @@ fn short_uuid() -> String {
 }
 
 /// `_handle_defer` without a deferred queue: the call is recorded in the context.
-pub(crate) fn handle_defer(body: &Value, effect: &Dict, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+pub(crate) fn handle_defer(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
     let map = body_dict(body, "defer", "defer effect body must be a dict")?;
     let call = map.get("call").or_else(|| map.get("tool")).cloned().unwrap_or_else(|| text(""));
     if !call.truthy() {
@@ -456,7 +525,9 @@ pub(crate) fn handle_defer(body: &Value, effect: &Dict, ctx: &mut ExecutionConte
     }
     let params = match get(map, "params", Value::dict(Dict::new())) {
         Value::Dict(params) => Value::dict((*params).clone()),
-        other => return Err(ExecError::type_error(format!("'{}' object is not iterable", other.type_name()))),
+        other => {
+            return Err(ExecError::type_error(format!("'{}' object is not iterable", other.type_name())))
+        }
     };
     let call_id = short_uuid();
     // `ctx.vars["_deferred_calls"] = ctx.vars.get("_deferred_calls", [])`.
@@ -478,19 +549,27 @@ pub(crate) fn handle_defer(body: &Value, effect: &Dict, ctx: &mut ExecutionConte
 fn int_or(value: &Value, fallback: i64) -> Result<i64, ExecError> {
     match to_int(value) {
         Ok(n) => Ok(n),
-        Err(ExecError::Python { class: "ValueError" | "TypeError", message }) if message != sylvia_base::pystr::INT_RANGE_MESSAGE => Ok(fallback),
+        Err(ExecError::Python { class: "ValueError" | "TypeError", message })
+            if message != sylvia_base::pystr::INT_RANGE_MESSAGE =>
+        {
+            Ok(fallback)
+        }
         Err(error) => Err(error),
     }
 }
 
 /// `_handle_register_initiative_trigger` without its manager: recorded in the context.
-pub(crate) fn handle_register_initiative_trigger(body: &Value, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+pub(crate) fn handle_register_initiative_trigger(
+    body: &Value,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
     let map = body_dict(body, "register_initiative_trigger", "body must be a dict")?;
     let trigger_id = map.get("trigger_id").or_else(|| map.get("id")).cloned().unwrap_or_else(|| text(""));
     if !trigger_id.truthy() {
         return Err(ExecError::effect("register_initiative_trigger", "trigger_id is required"));
     }
-    let procedure = map.get("procedure").or_else(|| map.get("procedure_name")).cloned().unwrap_or_else(|| text(""));
+    let procedure =
+        map.get("procedure").or_else(|| map.get("procedure_name")).cloned().unwrap_or_else(|| text(""));
     if !procedure.truthy() {
         return Err(ExecError::effect("register_initiative_trigger", "procedure is required"));
     }
@@ -516,7 +595,12 @@ pub(crate) fn handle_clock_create(body: &Value, ctx: &mut ExecutionContext<'_>) 
     let thresholds_raw = match get(map, "thresholds", Value::dict(Dict::new())) {
         value if !value.truthy() => Dict::new(),
         Value::Dict(map) => (*map).clone(),
-        other => return Err(ExecError::Python { class: "AttributeError", message: format!("'{}' object has no attribute 'items'", other.type_name()) }),
+        other => {
+            return Err(ExecError::Python {
+                class: "AttributeError",
+                message: format!("'{}' object has no attribute 'items'", other.type_name()),
+            })
+        }
     };
     let mut thresholds = Dict::new();
     for (key, value) in &thresholds_raw {
@@ -527,7 +611,12 @@ pub(crate) fn handle_clock_create(body: &Value, ctx: &mut ExecutionContext<'_>) 
     let metadata_raw = match get(map, "metadata", Value::dict(Dict::new())) {
         value if !value.truthy() => Dict::new(),
         Value::Dict(map) => (*map).clone(),
-        other => return Err(ExecError::Python { class: "AttributeError", message: format!("'{}' object has no attribute 'items'", other.type_name()) }),
+        other => {
+            return Err(ExecError::Python {
+                class: "AttributeError",
+                message: format!("'{}' object has no attribute 'items'", other.type_name()),
+            })
+        }
     };
     let metadata: Dict = metadata_raw
         .into_iter()
@@ -572,7 +661,11 @@ pub(crate) fn handle_clock_tick(body: &Value, ctx: &mut ExecutionContext<'_>) ->
     let old = clock.get("filled_segments").cloned().unwrap_or(Value::Int(0));
     let maximum = clock.get("max_segments").cloned().unwrap_or(Value::Int(4));
     let sum = crate::expr::ops::add(&old, &Value::Int(segments))?;
-    let filled = if crate::expr::compare::py_order(crate::expr::compare::Order::Lt, &sum, &maximum)? { sum } else { maximum };
+    let filled = if crate::expr::compare::py_order(crate::expr::compare::Order::Lt, &sum, &maximum)? {
+        sum
+    } else {
+        maximum
+    };
     let mut updated = (*clock).clone();
     updated.insert("filled_segments".into(), filled);
     let updated = ctx.replace_dict(&clock, updated);
