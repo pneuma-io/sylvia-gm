@@ -5,9 +5,11 @@
 //! `float(...)` values.
 
 mod mutation;
+mod query;
 mod scene;
 
 pub use mutation::{mutate_spatial_scene, AdmittedSpatialMutation};
+pub use query::{admit_spatial_query, AdmittedSpatialQuery};
 pub use scene::{admit_spatial_scene, AdmittedSpatialScene};
 
 use sylvia_domain::error::DomainError;

@@ -205,10 +205,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `spatial/_engine.py:1825` | `SpatialEngine.replace_scene` | len() against a limit | `while len(self._compiled) > _CACHE_LIMIT:` | |
 | `spatial/_engine.py:1863` | `SpatialEngine.query` | len() against a limit | `while len(self._cache) > _CACHE_LIMIT:` | |
 | `spatial/_interface.py:457` | `_metadata` | len() against a limit | `if len(canonical_json_bytes(payload)) > _MAX_METADATA_BYTES:` |  `sylvia-engine` spatial_scene_vectors |
-| `spatial/_interface.py:1031` | `_metadata_selector` | len() against a limit | `or len(selector["key"]) > 128` | |
-| `spatial/_interface.py:1033` | `_metadata_selector` | len() against a limit | `or len(selector["value"]) > 128` | |
-| `spatial/_interface.py:1287` | `admit_spatial_query` | len() against a limit | `or len(selector["key"]) > 128` | |
-| `spatial/_interface.py:1289` | `admit_spatial_query` | len() against a limit | `or len(selector["value"]) > 128` | |
+| `spatial/_interface.py:1031` | `_metadata_selector` | len() against a limit | `or len(selector["key"]) > 128` |  `sylvia-engine` spatial_query_vectors |
+| `spatial/_interface.py:1033` | `_metadata_selector` | len() against a limit | `or len(selector["value"]) > 128` |  `sylvia-engine` spatial_query_vectors |
+| `spatial/_interface.py:1287` | `admit_spatial_query` | len() against a limit | `or len(selector["key"]) > 128` |  `sylvia-engine` spatial_query_vectors |
+| `spatial/_interface.py:1289` | `admit_spatial_query` | len() against a limit | `or len(selector["value"]) > 128` |  `sylvia-engine` spatial_query_vectors |
 
 ## Lane 3: Storage and authority
 
