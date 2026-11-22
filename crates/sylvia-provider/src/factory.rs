@@ -2,11 +2,12 @@
 //!
 //! Chat Completions and Responses build an [`OpenAICompatProvider`], Anthropic Messages an
 //! [`AnthropicProvider`] and Gemini a [`GeminiProvider`] (lane 5), each over its own HTTP client,
-//! as each Python provider builds its own client (its own connection pool and cookie jar). The
-//! Claude and ChatGPT runtimes pass Python's checks and then answer `rust_port_pending` until
-//! their adapters are ported.
+//! as each Python provider builds its own client (its own connection pool and cookie jar). Claude
+//! Code builds a [`ClaudeProvider`] over Sylvia's copy in the runtime home. The ChatGPT runtime
+//! passes Python's checks and then answers `rust_port_pending` until its adapter is ported.
 
 use crate::anthropic::{AnthropicEnvironment, AnthropicProvider};
+use crate::claude_provider::ClaudeProvider;
 use crate::gemini::GeminiProvider;
 use crate::http::HttpTransport;
 use crate::openai_compat::{BuildError, OpenAICompatProvider, SdkEnvironment};
@@ -93,6 +94,7 @@ impl ProviderFactory for DefaultProviderFactory {
             BuiltProvider::OpenAICompat(provider) => Arc::new(provider),
             BuiltProvider::Anthropic(provider) => Arc::new(provider),
             BuiltProvider::Gemini(provider) => Arc::new(provider),
+            BuiltProvider::Claude(provider) => Arc::new(*provider),
         })
     }
 }
@@ -105,6 +107,8 @@ pub enum BuiltProvider {
     Anthropic(AnthropicProvider),
     /// Gemini GenerateContent.
     Gemini(GeminiProvider),
+    /// Sylvia's copy of Claude Code.
+    Claude(Box<ClaudeProvider>),
 }
 
 /// The client timeouts for a Gemini provider. Python's `httpx.AsyncClient` applies each call's
@@ -134,7 +138,10 @@ impl DefaultProviderFactory {
                     "Claude requires its native runtime connection without API credentials",
                 ));
             }
-            return Err(pending(wire));
+            return Ok(BuiltProvider::Claude(Box::new(ClaudeProvider::new(
+                std::path::Path::new(&config.runtime_home),
+                model_info,
+            ))));
         }
         if wire == transport::CODEX_APP_SERVER {
             if config.provider_key != "chatgpt_subscription" || config.runtime_home.is_empty() {

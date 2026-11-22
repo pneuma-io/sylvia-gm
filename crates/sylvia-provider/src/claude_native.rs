@@ -40,7 +40,8 @@ pub struct NativeCollection {
 }
 
 impl NativeCollection {
-    fn unknown(reason: &'static str) -> Self {
+    /// `NativeCollection("unknown", reason=reason)`.
+    pub fn unknown(reason: &'static str) -> Self {
         Self { status: "unknown", records: Vec::new(), reason: Some(reason), answer: None }
     }
 
@@ -77,17 +78,23 @@ impl NativeRoute {
 }
 
 tokio::task_local! {
-    static CURRENT_NATIVE_ROUTE: Option<NativeRoute>;
+    static CURRENT_NATIVE_ROUTE: std::sync::Mutex<Option<NativeRoute>>;
 }
 
 /// Run `future` with `route` as `CURRENT_NATIVE_ROUTE`.
 pub async fn with_native_route<F: std::future::Future>(route: Option<NativeRoute>, future: F) -> F::Output {
-    CURRENT_NATIVE_ROUTE.scope(route, future).await
+    CURRENT_NATIVE_ROUTE.scope(std::sync::Mutex::new(route), future).await
 }
 
 /// `CURRENT_NATIVE_ROUTE.get()`: `None` outside a scope, as the `ContextVar`'s default.
 pub fn current_native_route() -> Option<NativeRoute> {
-    CURRENT_NATIVE_ROUTE.try_with(Clone::clone).ok().flatten()
+    CURRENT_NATIVE_ROUTE.try_with(|route| route.lock().expect("native route").clone()).ok().flatten()
+}
+
+/// `CURRENT_NATIVE_ROUTE.get()` then `.set(None)`: the provider takes the route, which belongs
+/// to exactly the request it was planned for.
+pub fn take_native_route() -> Option<NativeRoute> {
+    CURRENT_NATIVE_ROUTE.try_with(|route| route.lock().expect("native route").take()).ok().flatten()
 }
 
 /// Every entry of `folder` whose name is `name` (`Path.glob(f"*/{name}")` one level down).
