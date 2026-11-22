@@ -241,6 +241,8 @@ pub struct BundledPackages {
     authority: OnceLock<BundledRiftAuthority>,
     /// `_bundled_campaign_content_catalog`'s `lru_cache`.
     content_catalog: OnceLock<Vec<JsonMap>>,
+    /// `campaign/rift.py`'s `_template` `lru_cache`.
+    pub(crate) rift_template: OnceLock<Json>,
     /// `bundled_campaign_plans`' caches (Python's `lru_cache`s).
     pub(crate) plan_caches: crate::bundled_campaign_plans::PlanCaches,
 }
@@ -254,6 +256,7 @@ impl BundledPackages {
             rift: OnceLock::new(),
             authority: OnceLock::new(),
             content_catalog: OnceLock::new(),
+            rift_template: OnceLock::new(),
             plan_caches: Default::default(),
         }
     }
