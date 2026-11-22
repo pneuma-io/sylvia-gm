@@ -29,50 +29,128 @@ pub struct ProxySource {
 impl ProxySource {
     /// The current process's environment and, on Windows, its registry settings.
     pub fn from_system() -> Self {
-        Self { environment: std::env::vars().collect(), windows: cfg!(windows), registry: read_registry() }
+        Self { environment: std::env::vars().collect(), windows: cfg!(windows), registry: system_registry() }
     }
 }
 
-/// `ProxyEnable` and `ProxyServer` from `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet
-/// Settings`, read as `urllib.request.getproxies_registry` reads them with `winreg`
-/// (`sylvia_base::winreg`, CPython 3.12's `QueryValueEx`): only the truth of `ProxyEnable`
-/// counts, and `ProxyServer` is `str()` of its value, read only when proxies are enabled.
-/// Any `OSError` (a missing key or value included) means no registry proxies, as Python's
-/// `except (OSError, ValueError, TypeError)` gives.
-///
-/// A value of a type Windows never writes for these settings (binary, QWORD, multi-string) also
-/// gives none, where Python would take its truth or its `str()`.
-/// The current user's registry proxy settings, as [`ProxySource::from_system`] reads them.
-pub fn system_registry() -> Option<(u32, String)> {
-    read_registry()
+/// A registry value as CPython 3.12's `winreg.QueryValueEx` (`Reg2Py`) gives it to Python.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RegistryValue {
+    /// `REG_DWORD` and `REG_QWORD`: an `int` (no data reads as 0).
+    Int(u64),
+    /// `REG_SZ` and `REG_EXPAND_SZ`: a `str` (`sylvia_base::winreg::sz_units`). A lone surrogate,
+    /// which Python keeps, becomes U+FFFD here; a proxy address never holds one.
+    Str(String),
+    /// `REG_MULTI_SZ` with data: a `list` of `str`.
+    List(Vec<String>),
+    /// Any other type with data: `bytes`.
+    Bytes(Vec<u8>),
+    /// `None`: an empty `REG_MULTI_SZ`, `REG_BINARY` or other type.
+    None,
 }
 
-#[cfg(windows)]
-fn read_registry() -> Option<(u32, String)> {
-    use sylvia_base::winreg::{Key, Root, Value, View};
-    let key = Key::open(
-        Root::CurrentUser,
-        r"Software\Microsoft\Windows\CurrentVersion\Internet Settings",
-        View::Default,
-    )
-    .ok()?;
-    let enabled = match key.query_value_ex("ProxyEnable").ok()? {
-        Value::Dword(number) => number != 0,
-        Value::Sz(units) | Value::ExpandSz(units) => !units.is_empty(),
+const REG_SZ: u32 = 1;
+const REG_EXPAND_SZ: u32 = 2;
+const REG_DWORD: u32 = 4;
+const REG_MULTI_SZ: u32 = 7;
+const REG_QWORD: u32 = 11;
+
+/// `Reg2Py(data, size, kind)` for the bytes Windows returned.
+pub fn reg2py(kind: u32, data: &[u8]) -> RegistryValue {
+    let number = |width: usize| {
+        let mut bytes = [0u8; 8];
+        let taken = data.len().min(width);
+        bytes[..taken].copy_from_slice(&data[..taken]);
+        RegistryValue::Int(u64::from_le_bytes(bytes))
     };
-    if !enabled {
+    match kind {
+        REG_DWORD => number(4),
+        REG_QWORD => number(8),
+        REG_SZ | REG_EXPAND_SZ => {
+            RegistryValue::Str(String::from_utf16_lossy(&sylvia_base::winreg::sz_units(data)))
+        }
+        _ if data.is_empty() => RegistryValue::None,
+        REG_MULTI_SZ => {
+            // `countStrings` and `fixupMultiSZ`: one final NUL ends the list; each string runs to
+            // its NUL or the end of the data. An odd trailing byte is dropped.
+            let units: Vec<u16> =
+                data.as_chunks::<2>().0.iter().map(|pair| u16::from_le_bytes(*pair)).collect();
+            let stop = if units.last() == Some(&0) { units.len() - 1 } else { units.len() };
+            let mut strings = Vec::new();
+            let mut index = 0;
+            while index < stop {
+                let start = index;
+                while index < stop && units[index] != 0 {
+                    index += 1;
+                }
+                let end =
+                    units[start..].iter().position(|unit| *unit == 0).map_or(units.len(), |at| start + at);
+                strings.push(String::from_utf16_lossy(&units[start..end]));
+                index += 1;
+            }
+            RegistryValue::List(strings)
+        }
+        _ => RegistryValue::Bytes(data.to_vec()),
+    }
+}
+
+impl RegistryValue {
+    /// `bool(value)`.
+    pub fn truthy(&self) -> bool {
+        match self {
+            Self::Int(number) => *number != 0,
+            Self::Str(text) => !text.is_empty(),
+            Self::List(items) => !items.is_empty(),
+            Self::Bytes(bytes) => !bytes.is_empty(),
+            Self::None => false,
+        }
+    }
+
+    /// `str(value)`.
+    pub fn py_str(&self) -> String {
+        match self {
+            Self::Int(number) => number.to_string(),
+            Self::Str(text) => text.clone(),
+            Self::List(items) => {
+                let items: Vec<String> = items.iter().map(|item| sylvia_base::pystr::repr(item)).collect();
+                format!("[{}]", items.join(", "))
+            }
+            Self::Bytes(bytes) => crate::config::pyvalue::bytes_repr(bytes),
+            Self::None => "None".into(),
+        }
+    }
+}
+
+/// `ProxyEnable` and `ProxyServer` as `urllib.request.getproxies_registry` reads them from one
+/// key, given each value's registry type and bytes: only the truth of `ProxyEnable` counts, and
+/// `ProxyServer` is `str()` of its value, read only when proxies are enabled. `None` stands for
+/// Python's caught `OSError` (a missing key or value included), which gives no registry proxies.
+pub fn proxy_values(read: impl Fn(&str) -> Option<(u32, Vec<u8>)>) -> Option<(u32, String)> {
+    let (kind, data) = read("ProxyEnable")?;
+    if !reg2py(kind, &data).truthy() {
         return Some((0, String::new()));
     }
-    let server = match key.query_value_ex("ProxyServer").ok()? {
-        Value::Dword(number) => number.to_string(),
-        // A lone surrogate cannot be held in a Rust string; a proxy address never has one.
-        Value::Sz(units) | Value::ExpandSz(units) => String::from_utf16_lossy(&units),
-    };
-    Some((1, server))
+    let (kind, data) = read("ProxyServer")?;
+    Some((1, reg2py(kind, &data).py_str()))
 }
 
+/// The current user's registry proxy settings, as [`ProxySource::from_system`] reads them.
+pub fn system_registry() -> Option<(u32, String)> {
+    read_registry(r"Software\Microsoft\Windows\CurrentVersion\Internet Settings")
+}
+
+/// The proxy values of one current-user key, read through `sylvia_base::winreg` (CPython's
+/// `winreg.OpenKey` and `QueryValueEx`).
+#[cfg(windows)]
+pub fn read_registry(subkey: &str) -> Option<(u32, String)> {
+    use sylvia_base::winreg::{Key, Root, View};
+    let key = Key::open(Root::CurrentUser, subkey, View::Default).ok()?;
+    proxy_values(|name| key.query_raw(name).ok())
+}
+
+/// No registry outside Windows.
 #[cfg(not(windows))]
-fn read_registry() -> Option<(u32, String)> {
+pub fn read_registry(_subkey: &str) -> Option<(u32, String)> {
     None
 }
 

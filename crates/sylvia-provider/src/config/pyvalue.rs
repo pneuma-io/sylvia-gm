@@ -52,7 +52,7 @@ fn float_text(value: f64) -> String {
 }
 
 /// `repr(bytes)`.
-fn bytes_repr(bytes: &[u8]) -> String {
+pub(crate) fn bytes_repr(bytes: &[u8]) -> String {
     let quote = if bytes.contains(&b'\'') && !bytes.contains(&b'"') { '"' } else { '\'' };
     let mut out = format!("b{quote}");
     for &byte in bytes {
