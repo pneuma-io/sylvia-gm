@@ -36,11 +36,23 @@ name = "dictation_native"
 harness = false
 required-features = ["dictation"]
 
+# The engine across the C++ boundary against the shipped CTranslate2 (Windows, `dictation`).
+[[test]]
+name = "dictation_engine"
+harness = false
+required-features = ["dictation"]
+
+# Whole transcriptions on the shipped natives against faster-whisper (Windows, `dictation`).
+[[test]]
+name = "dictation_transcribe"
+harness = false
+required-features = ["dictation"]
+
 [features]
 # faster-whisper dictation on its native libraries (CTranslate2, ONNX Runtime, NumPy's OpenBLAS,
 # the LGPL libswresample), Windows only. Off by default: the normal build and check.sh never
 # build or load them.
-dictation = []
+dictation = ["dep:ct2rs", "dep:ort", "dep:tokenizers", "dep:flate2"]
 
 [dependencies]
 sylvia-base.workspace = true
@@ -69,6 +81,11 @@ rustls.workspace = true
 tokio-rustls.workspace = true
 
 [target.'cfg(windows)'.dependencies]
+ct2rs = { workspace = true, optional = true }
+ort = { workspace = true, optional = true }
+tokenizers = { workspace = true, optional = true }
+# The compression ratio's zlib (`zlib.compress`), as the dev dependency below.
+flate2 = { workspace = true, optional = true }
 windows-version.workspace = true
 schannel.workspace = true
 winapi-util.workspace = true

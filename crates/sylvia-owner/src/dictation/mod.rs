@@ -19,6 +19,22 @@ pub mod worker;
 #[path = "openblas/windows.rs"]
 pub mod openblas;
 
+/// faster-whisper's engine on the shipped CTranslate2 (Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+pub mod engine;
+
+/// faster-whisper's VAD on the shipped ONNX Runtime (Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+pub mod vad;
+
+/// faster-whisper's transcription loop (Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+pub mod whisper;
+
+/// The worker's `WhisperModel` on the shipped libraries (Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+pub mod speech;
+
 /// libswresample from the shipped LGPL FFmpeg (rule 9; Windows, `dictation` feature).
 #[cfg(all(windows, feature = "dictation"))]
 #[path = "swresample/windows.rs"]

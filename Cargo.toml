@@ -124,6 +124,26 @@ rcgen = { version = "=0.14.10", default-features = false, features = ["ring", "p
 # bundled webpki roots (like certifi), a cookie jar (httpx keeps one per client). Proxies come
 # from Sylvia's own port of httpx's environment rules, not reqwest's.
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-webpki-roots", "cookies"] }
+# Dictation (lane 5, the owner's `dictation` feature, Windows): faster-whisper's engine through
+# the C++ bridge of ct2rs, linked (`system`) against the shipped CTranslate2 4.8.3 wheel's own
+# `ctranslate2.dll` with an import library from `docs/rust-port/tools/ct2_import_lib.sh`.
+# Pinned: 0.10.2 is the ct2rs whose bundled CTranslate2 headers are v4.8.3 (commit 8d91aa0), the
+# shipped DLL's version; a bump must move ct2rs and the shipped DLL together. No default
+# features (they would add ruy and CUDA). `dictation::engine` reads `DetectionResult` (private
+# fields) through its `Debug` text, which this exact pin makes stable: a bump must recheck that
+# (`engine::tests::detection_results_parse_back_exactly`), and switch to the fields if ct2rs
+# makes them public.
+ct2rs = { version = "=0.10.2", default-features = false, features = ["system"] }
+# Dictation's VAD (lane 5, `dictation` feature, Windows): the Silero model on the shipped
+# onnxruntime 1.31.0 wheel's own `onnxruntime.dll`, loaded at run time (`load-dynamic`, so ort
+# downloads and links nothing). Pinned: a bump must keep `api-31` within the shipped runtime's
+# API version.
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["load-dynamic", "std", "api-31"] }
+# Dictation's tokenizer (lane 5): the model's `tokenizer.json` through the Rust crate the Python
+# `tokenizers` wheel wraps. The lock has the 0.23.3 wheel; 0.23.2 is the newest crate of that
+# line on crates.io, and the transcript vectors check every token the clips decode and encode.
+# `onig` for its byte-level regex.
+tokenizers = { version = "=0.23.2", default-features = false, features = ["onig"] }
 
 [workspace.lints.rust]
 unsafe_code = "deny"
