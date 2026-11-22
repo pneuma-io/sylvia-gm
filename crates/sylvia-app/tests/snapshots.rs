@@ -323,7 +323,9 @@ async fn snapshots_match_python() {
             }
         };
         let want = &run["outcome"];
-        if got.to_string() != want.to_string() {
+        // As text: object equality ignores key order, and Python's order is part of the value.
+        let (got_text, want_text) = (got.to_string(), want.to_string());
+        if got_text != want_text {
             failures.push(format!(
                 "#{index} {name} {} {}:\n  Rust   {got}\n  Python {want}",
                 run["campaign_id"], run["read"]
