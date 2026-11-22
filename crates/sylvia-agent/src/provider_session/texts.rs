@@ -22,6 +22,11 @@ fn text(key: &str) -> &'static str {
     texts()[key].as_str().expect("an exported text")
 }
 
+/// The exported text `key` of `gm_texts.json`.
+pub(crate) fn gm_text(key: &str) -> &'static str {
+    text(key)
+}
+
 /// `_dm_system_prompt(...)`: the stable same-agent GM contract (its arguments are unused).
 pub fn dm_system_prompt() -> &'static str {
     text("gm_system_prompt")

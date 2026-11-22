@@ -6,8 +6,10 @@
 //! - [`tagged`]: `Tagged`, a message and its context-ledger tags, as `_messages` returns them.
 //! - [`reads`]: the application-owner reads the request assembly makes ([`reads::OpeningReads`]).
 //! - [`texts`]: the GM request's fixed texts and the small messages built from them.
+//! - [`control_texts`]: the turn's application-owned control messages.
 
 pub mod context;
+pub mod control_texts;
 pub mod messages;
 pub mod reads;
 pub mod tagged;

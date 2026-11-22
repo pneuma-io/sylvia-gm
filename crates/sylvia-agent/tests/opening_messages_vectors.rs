@@ -16,6 +16,7 @@ use sylvia_agent::provider_session::context::{
     ProviderSessionAdapter, SessionProviderInput, LEDGER_MODE, MODE_ENV,
 };
 use sylvia_agent::provider_session::reads::OpeningReads;
+use sylvia_agent::session_loop::ProviderControl;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
     CampaignConstructionBasis, CampaignContinuityView, CampaignDisplaySnapshot, CampaignSnapshot,
@@ -366,14 +367,19 @@ fn check(case: &J, mode: &str, recorded: &J, environment: &Environment) {
     .expect("the recorded adapter inputs are valid");
     assert_eq!(adapter.context_mode(), mode, "{name}: the adapter's context mode");
     let input = &case["input"];
-    let provider_input = SessionProviderInput {
-        session: session_record(&input["session"]),
-        history: session_context(&input["history"]),
-        catalog: Vec::new(),
-        basis_message_id: opt(&input["basis_message_id"]),
-        recovery_kind: opt(&input["recovery_kind"]),
-        has_reference_reader: input["has_reference_reader"].as_bool().unwrap(),
-    };
+    let mut provider_input = SessionProviderInput::new(
+        session_record(&input["session"]),
+        session_context(&input["history"]),
+        Vec::new(),
+        Arc::new(ProviderControl::new()),
+    );
+    provider_input.basis_message_id = opt(&input["basis_message_id"]);
+    provider_input.recovery_kind = opt(&input["recovery_kind"]);
+    assert_eq!(
+        input["has_reference_reader"],
+        J::Bool(false),
+        "{name}: the openings have no reference reader"
+    );
     // Every recorded read is ready, so the assembly completes on its first poll.
     let messages = adapter
         .messages(&provider_input, &no_facts)

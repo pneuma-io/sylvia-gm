@@ -8,8 +8,8 @@
 //! measures and later strips them.
 
 use super::context::{
-    canonical_player_narration, py_str, rejected, saved_action_sequence_results, splitlines,
-    ProviderSessionAdapter, SessionProviderInput,
+    canonical_player_narration, py_str, rejected, saved_action_sequence_results, ProviderSessionAdapter,
+    SessionProviderInput,
 };
 use super::tagged::{Tagged, HOST_RECORD_KEY, LEDGER_KEY, STABLE_KEY};
 use super::texts::{
@@ -18,28 +18,13 @@ use super::texts::{
     system,
 };
 use crate::campaign_memory::RankReferences;
+use crate::provider_turn::decisions::looks_like_private_deliberation;
 use serde_json::{json, Value as Json};
 use std::collections::{HashMap, HashSet};
 use sylvia_base::pyjson::{self, Dump};
-use sylvia_base::{pystr, CodedError, CodedResult, JsonMap};
+use sylvia_base::{CodedError, CodedResult, JsonMap};
 use sylvia_domain::authority::WriterRole;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
-
-/// `_PRIVATE_DELIBERATION_STARTS`.
-const PRIVATE_DELIBERATION_STARTS: [&str; 4] =
-    ["the player wants ", "the player's declared action ", "the declared player action ", "the user wants "];
-
-/// `_is_private_deliberation_line(line)`.
-pub(crate) fn is_private_deliberation_line(line: &str) -> bool {
-    let folded = pystr::casefold(pystr::strip(line));
-    PRIVATE_DELIBERATION_STARTS.iter().any(|start| folded.starts_with(start))
-}
-
-/// `_looks_like_private_deliberation(text)`: provider prose describing the player request as an
-/// instruction.
-pub(crate) fn looks_like_private_deliberation(text: &str) -> bool {
-    splitlines(text).into_iter().any(is_private_deliberation_line)
-}
 
 fn coded(code: &str, message: &str) -> CodedError {
     CodedError::new(code, message).with_error_type("CommandRejected")
@@ -308,7 +293,7 @@ impl ProviderSessionAdapter {
                 .filter(|message| message.kind() == SessionMessageKind::User)
                 .map(SessionMessage::message_id),
         };
-        if dm && input.has_reference_reader {
+        if dm && input.reference_reader.is_some() {
             return Err(CodedError::new(
                 sylvia_provider::factory::PORT_PENDING,
                 "The Rust owner cannot select relevant Character Files yet.",
