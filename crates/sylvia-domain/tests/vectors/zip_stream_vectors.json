@@ -45,6 +45,27 @@
    ]
   },
   {
+   "name": "zip64_at_open",
+   "bias": 0,
+   "sha256": "64d6d2daacf1e855b425858d0f548167538909d5186944bed71903b927ac3f6a",
+   "length": 390,
+   "members": [
+    [
+     "authority.jsonl",
+     40
+    ],
+    [
+     "big.bin",
+     7,
+     2100000000
+    ],
+    [
+     "manifest.json",
+     3
+    ]
+   ]
+  },
+  {
    "name": "count_at_limit",
    "bias": 0,
    "sha256": "365b4201deea39cdcd35b32eb98699ee87ea383cc663fa146abf6afcbe0266d9",
