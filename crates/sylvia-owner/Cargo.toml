@@ -28,6 +28,20 @@ harness = false
 name = "webui_files"
 harness = false
 
+# Dictation against the native libraries the product ships (Windows): runs itself again under
+# each OpenBLAS thread setting, before the library loads. Never part of check.sh; see the
+# dictation check in docs/rust-port/README.md.
+[[test]]
+name = "dictation_native"
+harness = false
+required-features = ["dictation"]
+
+[features]
+# faster-whisper dictation on its native libraries (CTranslate2, ONNX Runtime, NumPy's OpenBLAS,
+# the LGPL libswresample), Windows only. Off by default: the normal build and check.sh never
+# build or load them.
+dictation = []
+
 [dependencies]
 sylvia-base.workspace = true
 serde_json.workspace = true

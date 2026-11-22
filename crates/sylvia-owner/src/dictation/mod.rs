@@ -9,7 +9,19 @@
 //!
 //! [`worker`] is `local_dictation_process.py`, the line protocol the desktop drives.
 
+pub mod audio;
+pub mod features;
 pub mod worker;
+
+/// NumPy's OpenBLAS (rule 9; Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+#[path = "openblas/windows.rs"]
+pub mod openblas;
+
+/// libswresample from the shipped LGPL FFmpeg (rule 9; Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+#[path = "swresample/windows.rs"]
+pub mod swresample;
 
 use sha2::{Digest, Sha256};
 use std::fs::{self, File, OpenOptions};
