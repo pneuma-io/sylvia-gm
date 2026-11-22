@@ -6,12 +6,10 @@
 //! (`_historical_writers`).
 //!
 //! In Python's order it runs: SQLite's `integrity_check` and `foreign_key_check`, the stored
-//! identities, the session graph (`crate::stored_sessions`), the state-ownership verifier (from
-//! schema 6), the `packages` rows, each campaign's lock binding and `_verify_campaign_authority`
-//! (`crate::stored_campaigns`), and `_verify_construction_authority`
-//! (`crate::stored_construction`). Still to come, only making this less strict until it lands:
-//! `sqlite_recovery.verify_recovery_receipts` (with the archive family, which owns
-//! `campaign_archive.py`).
+//! identities, the session graph (`crate::stored_sessions`), the recovery receipts
+//! (`crate::recovery`), the state-ownership verifier (from schema 6), the `packages` rows, each
+//! campaign's lock binding and `_verify_campaign_authority` (`crate::stored_campaigns`), and
+//! `_verify_construction_authority` (`crate::stored_construction`).
 //!
 //! Only the failures Python raises itself become its `SchemaIdentityError`; anything else
 //! escapes as it does in Python, and startup words it as `_migrate` does
@@ -363,8 +361,7 @@ pub fn verify_stored_authority(connection: &Connection) -> StoreResult<()> {
     // `TypeError` and `ValueError` there.
     verify_stored_identities(connection)?;
     crate::stored_sessions::verify_session_identities(connection)?;
-    // `sqlite_recovery.verify_recovery_receipts` runs here in Python; it comes with the archive
-    // family (see the module documentation).
+    crate::recovery::verify_recovery_receipts(connection)?;
     let version: i64 = connection.query_row("PRAGMA user_version", [], |row| row.get(0))?;
     if matches!(version, 6 | 10 | 11 | 12) {
         verify_state_ownership(connection)?;

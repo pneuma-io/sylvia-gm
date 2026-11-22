@@ -12,6 +12,7 @@
 //!
 //! Documents are [`Data`] trees, the values `yaml.safe_load` returns.
 
+pub mod discovery;
 pub mod env;
 pub mod host_browser;
 pub mod loader;
@@ -23,6 +24,7 @@ pub mod provider_writes;
 pub(crate) mod pyvalue;
 pub mod resolver;
 pub mod user_settings;
+pub mod validation;
 
 pub use loader::{
     default_config_path, load_config, provider_credentials, ProviderDef, Secret, SylviaGMConfig,

@@ -1,0 +1,123 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "name": "empty",
+   "bias": 0,
+   "sha256": "8739c76e681f900923b900c9df0ef75cf421d39cabb54650c4b9ad19b6a76d85",
+   "length": 22,
+   "members": []
+  },
+  {
+   "name": "small",
+   "bias": 0,
+   "sha256": "e9a4aac15648b2948c9e23566cba4ce6e0243251c5eb183a3f485f0ae6a921cb",
+   "length": 70746,
+   "members": [
+    [
+     "authority.jsonl",
+     300
+    ],
+    [
+     "blobs/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     70000
+    ],
+    [
+     "manifest.json",
+     0
+    ]
+   ]
+  },
+  {
+   "name": "non_ascii",
+   "bias": 0,
+   "sha256": "e84f06f5dc6bc3e9d3a6c085c8cb25755d13312af22986cb8d537b669cbdc6db",
+   "length": 232,
+   "members": [
+    [
+     "caf\u00e9.txt",
+     5
+    ],
+    [
+     "\u00fcnder/\u00df.txt",
+     9
+    ]
+   ]
+  },
+  {
+   "name": "zip64_at_open",
+   "bias": 0,
+   "sha256": "64d6d2daacf1e855b425858d0f548167538909d5186944bed71903b927ac3f6a",
+   "length": 390,
+   "members": [
+    [
+     "authority.jsonl",
+     40
+    ],
+    [
+     "big.bin",
+     7,
+     2100000000
+    ],
+    [
+     "manifest.json",
+     3
+    ]
+   ]
+  },
+  {
+   "name": "count_at_limit",
+   "bias": 0,
+   "sha256": "365b4201deea39cdcd35b32eb98699ee87ea383cc663fa146abf6afcbe0266d9",
+   "length": 5963707,
+   "members": {
+    "pattern": "m/{index:05d}",
+    "count": 65535,
+    "size": 1
+   }
+  },
+  {
+   "name": "count_past_limit",
+   "bias": 0,
+   "sha256": "72689e41c90a0dc79caba3a5202e5259b02a7308dae7bc7f569b54d473ce6a66",
+   "length": 5963874,
+   "members": {
+    "pattern": "m/{index:05d}",
+    "count": 65536,
+    "size": 1
+   }
+  },
+  {
+   "name": "offset_at_limit",
+   "bias": 2147482602,
+   "sha256": "ecd9ab2715f6e285f4971e2f09a35826223bc682bd340e8634934c5c3869eb1f",
+   "length": 1506,
+   "members": [
+    [
+     "authority.jsonl",
+     1000
+    ],
+    [
+     "manifest.json",
+     200
+    ]
+   ]
+  },
+  {
+   "name": "offset_past_limit",
+   "bias": 2147482603,
+   "sha256": "91d316ec4d8f90266821e7c1a8d41beb9d6a0b898bad3d24bc46bad74b62e77a",
+   "length": 1518,
+   "members": [
+    [
+     "authority.jsonl",
+     1000
+    ],
+    [
+     "manifest.json",
+     200
+    ]
+   ]
+  }
+ ]
+}

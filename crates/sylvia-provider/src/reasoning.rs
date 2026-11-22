@@ -1,13 +1,17 @@
 //! `provider/_reasoning.py`: provider-native reasoning capabilities and the per-turn selection.
 //!
-//! `TurnReasoningProvider` and `bind_session_reasoning` wrap a provider for one reply; they come
-//! with the agent layer's session loop.
+//! [`TurnReasoningProvider`] and [`bind_session_reasoning`] wrap a provider for one reply.
 
+use crate::error::ProviderResult;
+use crate::hooks::HookManager;
 use crate::model_facts::{
     claude_model_facts, documented_model_defaults, documented_openai_id, openai_model_facts, Present,
 };
+use crate::provider::{BoxFuture, ChunkStream, Provider, ProviderRequest};
 use crate::pyurl::{urlsplit, UrlError};
-use crate::types::{transport, ModelInfo};
+use crate::speed::{select_speed, SpeedSelection};
+use crate::types::{transport, ModelInfo, ProviderResponse};
+use std::sync::Arc;
 use sylvia_base::{CodedError, Json, JsonMap};
 
 /// A native setting name: `re.fullmatch(r"[a-z][a-z0-9_-]{0,31}", value)`.
@@ -317,4 +321,176 @@ pub fn select_reasoning(
         transport: model.map(|model| model.transport.clone()),
         scope: scope.to_owned(),
     })
+}
+
+/// `TurnReasoningProvider`: one immutable effort and speed selection applied to every provider
+/// call in a reply. Tool continuations and retries inside the reply reuse the same selections.
+pub struct TurnReasoningProvider {
+    provider: Arc<dyn Provider>,
+    /// `selection`.
+    pub selection: ReasoningSelection,
+    /// `speed`.
+    pub speed: SpeedSelection,
+}
+
+impl TurnReasoningProvider {
+    /// `TurnReasoningProvider(provider, selection, speed)`. `None` for `speed` is
+    /// `SpeedSelection(None, None, None, "provider_default")`. Like Python's constructor, it
+    /// calls `set_audit_context({})`, which hands the selections to the wrapped provider.
+    pub fn new(
+        provider: Arc<dyn Provider>,
+        selection: ReasoningSelection,
+        speed: Option<SpeedSelection>,
+    ) -> Self {
+        let speed = speed.unwrap_or(SpeedSelection {
+            requested: None,
+            effective: None,
+            control: None,
+            scope: "provider_default".into(),
+        });
+        let wrapper = Self { provider, selection, speed };
+        wrapper.set_audit_context(&JsonMap::new());
+        wrapper
+    }
+
+    /// The wrapped provider.
+    pub fn inner(&self) -> &Arc<dyn Provider> {
+        &self.provider
+    }
+
+    /// `{**context, **_selections()}`.
+    fn with_selections(&self, context: &JsonMap) -> JsonMap {
+        let mut merged = context.clone();
+        merged.insert("reasoning_selection".into(), self.selection.projection());
+        merged.insert("speed_selection".into(), self.speed.projection());
+        merged
+    }
+
+    /// `_options(options)`: the snapshotted choice wins over call-local reasoning defaults.
+    pub fn options(&self, options: &JsonMap) -> JsonMap {
+        let mut result = options.clone();
+        for key in ["reasoning_effort", "thinking", "service_tier", "speed"] {
+            result.shift_remove(key);
+        }
+        for key in ["reasoning", "output_config"] {
+            if let Some(Json::Object(value)) = result.get_mut(key) {
+                value.shift_remove("effort");
+                if value.is_empty() {
+                    result.shift_remove(key);
+                }
+            }
+        }
+        for (key, value) in self.selection.options() {
+            let merge = matches!(key.as_str(), "reasoning" | "output_config")
+                && value.is_object()
+                && matches!(result.get(&key), Some(Json::Object(_)));
+            if !merge {
+                result.insert(key, value);
+            } else if let (Some(Json::Object(existing)), Json::Object(update)) = (result.get_mut(&key), value)
+            {
+                // `existing.update(value)`.
+                for (name, item) in update {
+                    existing.insert(name, item);
+                }
+            }
+        }
+        for (key, value) in self.speed.options() {
+            result.insert(key, value);
+        }
+        result
+    }
+
+    fn bound(&self, mut request: ProviderRequest) -> ProviderRequest {
+        request.options = self.options(&request.options);
+        request
+    }
+}
+
+impl Provider for TurnReasoningProvider {
+    fn model_info(&self) -> Option<&ModelInfo> {
+        self.provider.model_info()
+    }
+
+    fn generate(&self, request: ProviderRequest) -> BoxFuture<'_, ProviderResult<ProviderResponse>> {
+        self.provider.generate(self.bound(request))
+    }
+
+    fn generate_stream(&self, request: ProviderRequest) -> ChunkStream<'_> {
+        self.provider.generate_stream(self.bound(request))
+    }
+
+    fn close(&self) -> BoxFuture<'_, ()> {
+        self.provider.close()
+    }
+
+    fn release_idle(&self) -> BoxFuture<'_, ()> {
+        self.provider.release_idle()
+    }
+
+    fn hooks(&self) -> Option<&HookManager> {
+        self.provider.hooks()
+    }
+
+    fn wrapped(&self) -> Option<&dyn Provider> {
+        Some(self.provider.as_ref())
+    }
+
+    /// `provider_request_representation`: the first wrapped provider down the chain that has
+    /// one, given this turn's options; otherwise the neutral request with them.
+    fn request_representation(
+        &self,
+        messages: &[Json],
+        tools: Option<&[Json]>,
+        options: &JsonMap,
+    ) -> Option<ProviderResult<JsonMap>> {
+        let options = self.options(options);
+        if let Some(value) = crate::provider::capability(self.provider.as_ref(), |p| {
+            p.request_representation(messages, tools, &options)
+        }) {
+            return Some(value);
+        }
+        let mut neutral = JsonMap::new();
+        neutral.insert("messages".into(), Json::Array(messages.to_vec()));
+        neutral.insert("tools".into(), Json::Array(tools.map(<[Json]>::to_vec).unwrap_or_default()));
+        neutral.insert("options".into(), Json::Object(options));
+        Some(Ok(neutral))
+    }
+
+    /// Forward preflight evidence without losing the selected native options (one level down).
+    fn record_context_fit(&self, context: &JsonMap) -> bool {
+        self.provider.record_context_fit(&self.with_selections(context));
+        true
+    }
+
+    /// Keep the turn's requested effort and speed beside request correlation (one level down).
+    fn set_audit_context(&self, context: &JsonMap) -> bool {
+        self.provider.set_audit_context(&self.with_selections(context));
+        true
+    }
+}
+
+/// `bind_session_reasoning(provider, session, speed)`: resolve the session's preferences once
+/// for every call in its next provider turn. The session is given by its role
+/// (`session.role.value`) and its two effort preferences. `speed` is the chat's saved tier;
+/// a tier the answering model does not offer is simply not sent.
+pub fn bind_session_reasoning(
+    provider: Arc<dyn Provider>,
+    role: &str,
+    reasoning_effort: Option<&str>,
+    reasoning_effort_once: Option<&str>,
+    speed: Option<&str>,
+) -> Result<TurnReasoningProvider, CodedError> {
+    // `session.reasoning_effort_once or session.reasoning_effort`.
+    let requested = reasoning_effort_once.filter(|value| !value.is_empty()).or(reasoning_effort);
+    let scope = if reasoning_effort_once.is_some() {
+        "once"
+    } else if reasoning_effort.is_some() {
+        "session"
+    } else {
+        "mode_default"
+    };
+    let model = provider.model_info();
+    let selection = select_reasoning(model, role, requested.map(Some), scope)?;
+    let speed = select_speed(model, speed.map(Some), false, "session")?;
+    Ok(TurnReasoningProvider::new(provider, selection, Some(speed)))
 }

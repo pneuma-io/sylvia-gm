@@ -13,6 +13,8 @@ Sections:
   `LARGE_KEPT`), and archives built here from the small Ruleset source
   of the ruleset-source vectors (`compile_ruleset_source`, then `materialize_package_archive`;
   the Rust test rebuilds them with its own ports, which those vectors prove byte for byte).
+- `large_installs`: the 24 other large repository archives, installed the same way by
+  `large_package_archives_match_python` (ignored: run with --release -- --ignored).
 - `predicates`, `admissions`, `surfaces`, `rebinds`, `migrations`: the module's pure functions.
 This script is reference tooling for the port and is retired with the Python source.
 """
@@ -224,11 +226,12 @@ def built_archive(spec) -> bytes:
 
 
 # An archive carrying an SRD Lite runtime (3 MB) takes about 40 s to validate in a debug build,
-# so of those 26 the test installs two representatives (the current SRD Lite inside the bundled
-# Rift Setting, and an older fixture version); every smaller repository archive is installed.
+# so of those 26 the normal test installs two representatives (the current SRD Lite inside the
+# bundled Rift Setting, and an older fixture version); every smaller repository archive is
+# installed. The other 24 are `large_installs`, installed by an ignored test run with --release.
 LARGE = 1024 * 1024
 LARGE_KEPT = {"campaign-plans/rift-awakening/setting.sylvia-gm-package", "tests/fixtures/lite-0.3.28.sylvia-gm-package"}
-OMITTED: list[str] = []
+LARGE_INSTALLS: list[dict] = []
 
 
 def install_outcome(archive: bytes) -> list:
@@ -246,7 +249,7 @@ def install_cases() -> list:
     for path in sorted(str(Path(p).relative_to(ROOT)).replace(chr(92), "/")
                        for p in glob.glob(str(ROOT / "**/*.sylvia-gm-package"), recursive=True)):
         if (ROOT / path).stat().st_size > LARGE and path not in LARGE_KEPT:
-            OMITTED.append(path)
+            LARGE_INSTALLS.append({"repository": path, "outcome": install_outcome((ROOT / path).read_bytes())})
             continue
         cases.append({"repository": path, "outcome": install_outcome((ROOT / path).read_bytes())})
     artifact = ["participant_artifacts", 0]
@@ -373,7 +376,7 @@ def main() -> None:
     vectors = {"python": ".".join(sys.version.split()[0].split(".")[:2]), "srd": SRD, "small": SMALL,
                "installable": INSTALLABLE, "contracts": contract_cases(base), "installs": install_cases(), "predicates": predicates,
                "admissions": admissions, "surfaces": surfaces, "rebinds": rebinds, "migrations": migrations,
-               "predicate_specs": PREDICATES, "surface_specs": SURFACES, "omitted_large_archives": OMITTED}
+               "predicate_specs": PREDICATES, "surface_specs": SURFACES, "large_installs": LARGE_INSTALLS}
     OUTPUT.write_text(json.dumps(vectors, ensure_ascii=True, separators=(",", ":")) + NEWLINE, encoding="utf-8",
                       newline=NEWLINE)
     for section in ("contracts", "installs"):

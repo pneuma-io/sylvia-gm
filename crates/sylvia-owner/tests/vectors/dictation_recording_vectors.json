@@ -1,0 +1,47 @@
+{
+ "python": "3.12.11",
+ "clip_sha256": {
+  "zira-16k": "2a4da52d3b7d2e404b664fb28fdeed0a551edb00505d2cb7961250c05ec15bd5",
+  "hazel-48k": "603a9a523c3fc086202a27044d3b621217a1dbc4495da7f2b004ef7f791f34d0",
+  "zira-44k": "ad5266dfb58b335337414dba969d5d16a581f9841d27dfa2f4a388eead2d2601"
+ },
+ "omp_num_threads": "2",
+ "clips": [
+  {
+   "clip": "zira-16k",
+   "rate": 16000,
+   "block": 480,
+   "wav_sha256": "2a37965729f0b8c484e0bc9a563f07a8fcd5b7b20d892d8c1781cdc6846f903f",
+   "en": {
+    "text": "The ranger draws her bow and aims at the goblin by the bridge."
+   },
+   "auto": {
+    "text": "The ranger draws her bow and aims at the goblin by the bridge."
+   }
+  },
+  {
+   "clip": "hazel-48k",
+   "rate": 48000,
+   "block": 480,
+   "wav_sha256": "624015f60cfdfcac67a92f55cd2f4ed67d77f49ad1339725a5b78940b5b65a2c",
+   "en": {
+    "text": "I open the old wooden chest and look for the silver key."
+   },
+   "auto": {
+    "text": "I open the old wooden chest and look for the silver key."
+   }
+  },
+  {
+   "clip": "zira-44k",
+   "rate": 44100,
+   "block": 480,
+   "wav_sha256": "8259021d3576c75fbe0dafe6df008f3256c329cac0849ae853165fd3f48d7107",
+   "en": {
+    "text": "Roll for initiative. The dragon wakes up, and it is very angry."
+   },
+   "auto": {
+    "text": "Roll for initiative. The dragon wakes up, and it is very angry."
+   }
+  }
+ ]
+}

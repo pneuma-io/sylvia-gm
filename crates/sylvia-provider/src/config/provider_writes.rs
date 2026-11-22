@@ -98,12 +98,12 @@ fn has_control(value: &str) -> bool {
 }
 
 /// `_preset(preset_id)`.
-fn known_preset(preset_id: &Data) -> Result<&'static Preset, ConfigFailure> {
+pub(super) fn known_preset(preset_id: &Data) -> Result<&'static Preset, ConfigFailure> {
     preset_id.as_str().and_then(preset).ok_or_else(|| config("Provider preset is unsupported"))
 }
 
 /// `_base_url(preset_id, preset, value)`. `Err` may be Python's `ValueError` from `urlsplit`.
-fn base_url(preset: &Preset, value: &Data) -> Result<String, ConfigFailure> {
+pub(super) fn base_url(preset: &Preset, value: &Data) -> Result<String, ConfigFailure> {
     let expected = preset.base_url;
     let mut candidate =
         value.as_str().map(|value| pystr::strip(value).trim_end_matches('/').to_owned()).unwrap_or_default();
@@ -204,7 +204,7 @@ fn is_header_name(name: &str) -> bool {
 }
 
 /// `_private_headers(value)`.
-fn private_headers(value: &Data) -> Result<Vec<(String, String)>, ConfigFailure> {
+pub(super) fn private_headers(value: &Data) -> Result<Vec<(String, String)>, ConfigFailure> {
     if matches!(value, Data::None) {
         return Ok(Vec::new());
     }

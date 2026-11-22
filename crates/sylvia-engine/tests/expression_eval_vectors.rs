@@ -73,6 +73,7 @@ fn every_generated_expression_evaluates_as_python_does() {
             ruleset_config: &ruleset_config,
             definitions: &definitions,
             budget: Some(&budget),
+            required_inputs: false,
         };
         let actual = outcome(&evaluate_expression(text, &ctx));
         let expected = match case.get("refuse").and_then(Json::as_str) {

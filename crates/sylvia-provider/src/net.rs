@@ -7,14 +7,14 @@
 //! | `SSL_CERT_FILE`, else `SSL_CERT_DIR`, else certifi | that file, that folder's certificates, else the bundled webpki roots (both Mozilla's set) |
 //! | connect 15 s, read 120 s (each read) | `connect_timeout`, `read_timeout` from [`TimeoutConfig`] |
 //! | keep-alive expiry 5 s, 100 idle connections | `pool_idle_timeout(5 s)`, `pool_max_idle_per_host(100)` |
-//! | `follow_redirects=True`, at most 20 | `redirect::Policy::limited(20)` |
+//! | `follow_redirects=True`, at most 20 (Sylvia's own discovery clients: none) | `redirect::Policy::limited(20)` (or `none`) |
 //! | a cookie jar per client | `cookie_store(true)` |
 //! | header values decoded as ASCII, else UTF-8, else Latin-1 (one choice for all headers) | [`decode_headers`] |
 //!
 //! Not reproduced: httpx's write timeout (30 s per write) and pool timeout (5 s waiting for a
 //! connection); reqwest has neither. A request body is sent in one piece, and the pool has no
-//! wait limit. Header names go out lowercase (HTTP/1.1 names are case-insensitive); see the
-//! `differences.md` row for request headers.
+//! wait limit. Headers go out in httpx's order ([`wire_headers`]), less the client defaults
+//! differences row 8 covers, with names in lowercase (differences row 40, header name case).
 
 use crate::http::{BodyStream, HttpRequest, HttpResponse, HttpTransport, TransportError};
 use crate::httpx_url::HttpxUrl;
@@ -56,12 +56,33 @@ pub struct ClientSettings {
     pub timeouts: TimeoutConfig,
     pub proxies: ProxySource,
     pub trust: TrustSource,
+    /// httpx's `follow_redirects`: the SDK's client follows up to 20; Sylvia's own discovery
+    /// clients (`httpx.Client(follow_redirects=False)`) follow none.
+    pub follow_redirects: bool,
 }
 
 impl ClientSettings {
     /// The process's environment, as the SDK reads it when it builds its client.
     pub fn from_system(timeouts: TimeoutConfig) -> Self {
-        Self { timeouts, proxies: ProxySource::from_system(), trust: TrustSource::from_environment() }
+        Self {
+            timeouts,
+            proxies: ProxySource::from_system(),
+            trust: TrustSource::from_environment(),
+            follow_redirects: true,
+        }
+    }
+
+    /// A plain `httpx.Client(timeout=seconds, follow_redirects=False)` with the process
+    /// environment: one timeout for every phase, no redirects.
+    pub fn plain(seconds: f64) -> Self {
+        let timeouts = TimeoutConfig {
+            connect: seconds,
+            read: seconds,
+            write: seconds,
+            pool: seconds,
+            ..TimeoutConfig::default()
+        };
+        Self { follow_redirects: false, ..Self::from_system(timeouts) }
     }
 }
 
@@ -118,7 +139,11 @@ fn build_client(settings: &ClientSettings) -> Result<reqwest::Client, ProxyError
         .read_timeout(seconds(settings.timeouts.read))
         .pool_idle_timeout(Duration::from_secs(5))
         .pool_max_idle_per_host(100)
-        .redirect(reqwest::redirect::Policy::limited(20))
+        .redirect(if settings.follow_redirects {
+            reqwest::redirect::Policy::limited(20)
+        } else {
+            reqwest::redirect::Policy::none()
+        })
         .cookie_store(true);
     if let Some(certificates) = certificates(&settings.trust)? {
         builder = builder.tls_built_in_root_certs(false);
@@ -169,6 +194,52 @@ impl BodyStream for NetworkBody {
     }
 }
 
+/// The request's headers in the order httpx writes them, less the client defaults Sylvia does
+/// not send (differences row 8).
+///
+/// httpx merges a client's default headers with a request's by dropping each default the
+/// request names and appending the request's own, in order (`Headers.update`). It then puts
+/// `Host` first unless the request gives one, with `Content-Length: 0` after it for a body-less
+/// `POST`, `PUT` or `PATCH`, and appends the body's `Content-Length` (`setdefault`). Of its
+/// defaults, `Accept: */*` is sent here; `Accept-Encoding`, `Connection` and its `User-Agent`
+/// are not. A caller that encodes JSON as `json=` does puts `Content-Length` and `Content-Type`
+/// in its own headers, in that order; a `Content-Length` the request gives stays where it is.
+/// Header names still go out lowercase (differences row 40, header name case).
+pub fn wire_headers(request: &HttpRequest) -> Vec<(String, String)> {
+    let names = |wanted: &str| request.headers.iter().any(|(name, _)| name.eq_ignore_ascii_case(wanted));
+    let mut headers = Vec::with_capacity(request.headers.len() + 3);
+    if !names("host") {
+        if let Ok(url) = HttpxUrl::parse(&request.url) {
+            headers.push(("Host".to_owned(), url.netloc()));
+        }
+    }
+    let bodyless_write =
+        request.body.is_empty() && matches!(request.method.as_str(), "POST" | "PUT" | "PATCH");
+    if bodyless_write && !names("content-length") {
+        headers.push(("Content-Length".to_owned(), "0".to_owned()));
+    }
+    if !names("accept") {
+        headers.push(("Accept".to_owned(), "*/*".to_owned()));
+    }
+    headers.extend(request.headers.iter().cloned());
+    if !request.body.is_empty() && !names("content-length") {
+        headers.push(("Content-Length".to_owned(), request.body.len().to_string()));
+    }
+    headers
+}
+
+/// The headers httpx's `json=` encoding adds (`setdefault`): `Content-Length`, then
+/// `Content-Type: application/json`, each unless the request already names it.
+pub fn json_content_headers(headers: &mut Vec<(String, String)>, length: usize) {
+    for (name, value) in
+        [("Content-Length", length.to_string()), ("Content-Type", "application/json".to_owned())]
+    {
+        if !headers.iter().any(|(given, _)| given.eq_ignore_ascii_case(name)) {
+            headers.push((name.to_owned(), value));
+        }
+    }
+}
+
 /// The network transport. Cheap to share; one connection pool and cookie jar per instance.
 pub struct NetworkTransport {
     settings: ClientSettings,
@@ -194,7 +265,7 @@ impl HttpTransport for NetworkTransport {
             let method = reqwest::Method::from_bytes(request.method.as_bytes())
                 .map_err(|error| TransportError::Connection(error.to_string()))?;
             let mut headers = reqwest::header::HeaderMap::new();
-            for (name, value) in &request.headers {
+            for (name, value) in wire_headers(&request) {
                 let name = reqwest::header::HeaderName::from_bytes(name.as_bytes())
                     .map_err(|error| TransportError::Connection(error.to_string()))?;
                 let value = reqwest::header::HeaderValue::from_bytes(value.as_bytes())

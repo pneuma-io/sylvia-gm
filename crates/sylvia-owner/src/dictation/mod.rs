@@ -31,6 +31,10 @@ pub mod vad;
 #[cfg(all(windows, feature = "dictation"))]
 pub mod whisper;
 
+/// Microphone capture on cpal's WASAPI host (Windows, `dictation` feature).
+#[cfg(all(windows, feature = "dictation"))]
+pub mod capture;
+
 /// The worker's `WhisperModel` on the shipped libraries (Windows, `dictation` feature).
 #[cfg(all(windows, feature = "dictation"))]
 pub mod speech;
@@ -440,6 +444,9 @@ pub struct Device {
     pub index: i64,
     /// `rate`: `int(default_samplerate)`.
     pub rate: i64,
+    /// The identity hashes a saved id from the Python worker's PortAudio list may carry for
+    /// this device ([`Sound::previous_identities`]); empty under PortAudio itself.
+    pub previous: Vec<String>,
 }
 
 /// What a stream open or start raised.
@@ -486,6 +493,15 @@ pub trait Sound {
         rate: i64,
         sink: Arc<CaptureSink>,
     ) -> Result<Box<dyn Stream>, StreamError>;
+    /// The identity hashes (`d-<index>-<hash>`'s hash) a saved id from another audio library's
+    /// list may carry for the listed device at `index`. PortAudio itself has none.
+    fn previous_identities(&mut self, _index: usize) -> Vec<String> {
+        Vec::new()
+    }
+    /// The same for the system default entry.
+    fn previous_default_identities(&mut self) -> Vec<String> {
+        Vec::new()
+    }
 }
 
 /// `_device_id(index, row, host)`.
@@ -541,6 +557,7 @@ fn list_devices(sound: &mut dyn Sound) -> Result<Vec<Device>, Raised> {
                 label: format!("{} ({host})", row.name),
                 index: index as i64,
                 rate: python_int(&row.default_samplerate)?,
+                previous: sound.previous_identities(index),
             });
         }
     }
@@ -550,7 +567,8 @@ fn list_devices(sound: &mut dyn Sound) -> Result<Vec<Device>, Raised> {
         None => "System default input (unavailable)".to_string(),
     };
     let rate = selected.map_or(0, |device| device.rate);
-    let mut options = vec![Device { id: "default".into(), label, index: default, rate }];
+    let previous = sound.previous_default_identities();
+    let mut options = vec![Device { id: "default".into(), label, index: default, rate, previous }];
     options.extend(devices);
     Ok(options)
 }
@@ -628,7 +646,9 @@ impl Recording {
     /// `Recording(device, sound=sound)`: select the input by its listed id.
     pub fn new(device: &str, sound: &mut dyn Sound) -> Outcome<Self> {
         let options = input_devices(sound)?;
-        let Some(selected) = options.iter().find(|option| option.id == device) else {
+        let Some(selected) =
+            options.iter().find(|option| option.id == device).or_else(|| migrated(&options, device))
+        else {
             return speech("device");
         };
         if selected.index < 0 || selected.rate <= 0 {
@@ -714,6 +734,26 @@ impl Recording {
         let samples: Vec<f32> = chunks.concat();
         wav_bytes(&samples, self.rate).ok_or(Failure::Other)
     }
+}
+
+/// The listed device a saved id from another audio library's list names (difference row 38):
+/// `d-<index>-<hash>` whose hash exactly one listed device had there. The index is that list's
+/// own and is ignored.
+pub fn migrated<'a>(options: &'a [Device], saved: &str) -> Option<&'a Device> {
+    let mut parts = saved.splitn(3, '-');
+    let (Some("d"), Some(index), Some(hash)) = (parts.next(), parts.next(), parts.next()) else {
+        return None;
+    };
+    let well_formed = !index.is_empty()
+        && index.bytes().all(|byte| byte.is_ascii_digit())
+        && hash.len() == 16
+        && hash.bytes().all(|byte| matches!(byte, b'0'..=b'9' | b'a'..=b'f'));
+    if !well_formed {
+        return None;
+    }
+    let mut matches = options.iter().filter(|option| option.previous.iter().any(|previous| previous == hash));
+    let first = matches.next()?;
+    matches.next().is_none().then_some(first)
 }
 
 /// `(np.clip(samples, -1, 1) * 32767).astype("<i2")`: float32 arithmetic, then truncation
@@ -833,5 +873,79 @@ mod tests {
             pcm16(&[0.0, 1.0, -1.0, 2.0, -2.0, 0.5, -0.5, f32::NAN]),
             [0, 32767, -32767, 32767, -32767, 16383, -16383, 0]
         );
+    }
+
+    /// Two listed microphones under a library that knows their PortAudio-era identities.
+    struct Listed;
+
+    impl Sound for Listed {
+        fn initialized(&self) -> bool {
+            false
+        }
+        fn terminate(&mut self) -> Result<(), Raised> {
+            Ok(())
+        }
+        fn initialize(&mut self) -> Result<(), Raised> {
+            Ok(())
+        }
+        fn query_devices(&mut self) -> Result<Vec<DeviceRow>, Raised> {
+            let row = |name: &str| DeviceRow {
+                name: name.into(),
+                max_input_channels: 2,
+                hostapi: 0,
+                default_samplerate: serde_json::Number::from_f64(48_000.0).unwrap(),
+            };
+            Ok(vec![row("Mic A"), row("Mic B")])
+        }
+        fn query_hostapis(&mut self) -> Result<Vec<String>, Raised> {
+            Ok(vec!["Windows WASAPI".into()])
+        }
+        fn default_input(&mut self) -> Result<i64, Raised> {
+            Ok(1)
+        }
+        fn open_stream(
+            &mut self,
+            _: i64,
+            _: i64,
+            _: Arc<CaptureSink>,
+        ) -> Result<Box<dyn Stream>, StreamError> {
+            Err(StreamError::Other)
+        }
+        fn previous_identities(&mut self, index: usize) -> Vec<String> {
+            // Mic B shares one old identity with Mic A, which is then ambiguous.
+            [
+                vec!["aaaaaaaaaaaaaaaa".into(), "cccccccccccccccc".into()],
+                vec!["bbbbbbbbbbbbbbbb".into(), "cccccccccccccccc".into()],
+            ][index]
+                .clone()
+        }
+        fn previous_default_identities(&mut self) -> Vec<String> {
+            vec!["dddddddddddddddd".into()]
+        }
+    }
+
+    #[test]
+    fn a_saved_portaudio_id_selects_the_same_device_by_its_identity() {
+        let mut sound = Listed;
+        // PortAudio's index (here 9) is its own list's and is ignored.
+        assert_eq!(Recording::new("d-9-aaaaaaaaaaaaaaaa", &mut sound).unwrap().device, 0);
+        assert_eq!(Recording::new("d-21-bbbbbbbbbbbbbbbb", &mut sound).unwrap().device, 1);
+        // PortAudio's own default entries follow the system default.
+        assert_eq!(Recording::new("d-0-dddddddddddddddd", &mut sound).unwrap().device, 1);
+        // Ambiguous, unknown or malformed ids are not guessed: the player chooses again.
+        for saved in [
+            "d-1-cccccccccccccccc",
+            "d-1-eeeeeeeeeeeeeeee",
+            "d--aaaaaaaaaaaaaaaa",
+            "d-1-AAAAAAAAAAAAAAAA",
+            "x-1-aaaaaaaaaaaaaaaa",
+            "d-1-aaaa",
+        ] {
+            assert_eq!(Recording::new(saved, &mut sound).err(), Some(Failure::Speech("device")), "{saved}");
+        }
+        // The current ids still match first.
+        let options = input_devices(&mut sound).unwrap();
+        assert_eq!(Recording::new(&options[1].id, &mut sound).unwrap().device, 0);
+        assert_eq!(options[0].previous, ["dddddddddddddddd"]);
     }
 }

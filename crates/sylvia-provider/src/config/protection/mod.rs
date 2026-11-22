@@ -47,7 +47,8 @@ pub const SECRET_BYTE_LIMIT: usize = 128 * 1024;
 pub const OVERSIZE_MESSAGE: &str = "Protected credentials exceed the supported size";
 
 /// `_platform_seal(value, decrypt=...)`: seal or open bytes with user-scoped protection.
-pub trait Seal {
+/// `Send + Sync` so a settings operation can run inside the owner's async tasks.
+pub trait Seal: Send + Sync {
     fn seal(&self, value: &[u8], decrypt: bool) -> Result<Vec<u8>, ConfigFailure>;
 }
 

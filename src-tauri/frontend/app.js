@@ -141,8 +141,19 @@ const SylviaGMFrontend = (() => {
       const preferred = engines.find(engine => engine.id === saved) || engines.find(engine =>
         engine.language === navigator.language || engine.language === (navigator.language || '').split('-')[0]);
       select.value = (preferred || engines[0]).id;
-      const device = $('dictation-device'), selectedDevice = device.value || savedDictationChoice('device');
+      const device = $('dictation-device');
       const devices = capabilities.devices || [{ id: 'default', label: 'System default input' }];
+      let selectedDevice = device.value || savedDictationChoice('device');
+      // A microphone saved under an earlier audio library's list: the worker names the device
+      // that had its identity (`previous`), and the choice moves to that device's id once.
+      const earlier = /^d-\d+-([0-9a-f]{16})$/.exec(selectedDevice || '');
+      if (earlier && !devices.some(item => item.id === selectedDevice)) {
+        const same = devices.filter(item => Array.isArray(item.previous) && item.previous.includes(earlier[1]));
+        if (same.length === 1) {
+          selectedDevice = same[0].id;
+          try { localStorage.setItem('sylvia-dictation-device', selectedDevice); } catch (_) { /* Input works without storage. */ }
+        }
+      }
       if (selectedDevice && selectedDevice !== 'default' && !devices.some(item => item.id === selectedDevice)) {
         devices.push({ id: selectedDevice, label: 'Selected microphone unavailable — choose an input' });
       }

@@ -1,0 +1,2634 @@
+{
+"now": "2026-11-22T08:00:00.123456+00:00",
+"discover": [
+{
+"name": "openai-needs-key",
+"user": null,
+"request": {
+"preset_id": "openai"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "OpenAI API requires an API key"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "openai",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": " sk-disposable "
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226770742d362d736f6c222c20226f626a656374223a20226d6f64656c227d2c207b226964223a20226770742d362d6c756e61227d2c207b226964223a20226770742d362d736f6c227d2c207b226964223a2022746578742d656d62656464696e672d33227d2c20226e6f742d612d726f77222c207b226964223a20357d5d7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "gpt-6-luna",
+"name": "GPT-6 Luna",
+"declared_context_window": 1050000,
+"declared_context_source": "model_catalog",
+"runtime_context_window": 1050000,
+"runtime_context_source": "model_catalog",
+"configured_context_window": null,
+"effective_context_window": 1050000,
+"effective_context_source": "model_catalog",
+"declared_context_observed_at": "2026-09-23",
+"runtime_context_observed_at": "2026-09-23",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-09-23",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 1050000,
+"context_window_source": "model_catalog",
+"max_output_tokens": 128000,
+"declared_max_output_tokens": 128000,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": true,
+"supports_streaming": true,
+"documented_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+"documented_at": "2026-09-23"
+},
+{
+"id": "gpt-6-sol",
+"name": "GPT-6 Sol",
+"declared_context_window": 1050000,
+"declared_context_source": "model_catalog",
+"runtime_context_window": 1050000,
+"runtime_context_source": "model_catalog",
+"configured_context_window": null,
+"effective_context_window": 1050000,
+"effective_context_source": "model_catalog",
+"declared_context_observed_at": "2026-09-23",
+"runtime_context_observed_at": "2026-09-23",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-09-23",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 1050000,
+"context_window_source": "model_catalog",
+"max_output_tokens": 128000,
+"declared_max_output_tokens": 128000,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": true,
+"supports_streaming": true,
+"documented_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+"documented_at": "2026-09-23"
+},
+{
+"id": "text-embedding-3",
+"name": "text-embedding-3",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 3,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer sk-disposable"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "openai-search",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k",
+"query": "  LUNA "
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226770742d362d736f6c222c20226f626a656374223a20226d6f64656c227d2c207b226964223a20226770742d362d6c756e61227d2c207b226964223a20226770742d362d736f6c227d2c207b226964223a2022746578742d656d62656464696e672d33227d2c20226e6f742d612d726f77222c207b226964223a20357d5d7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "gpt-6-luna",
+"name": "GPT-6 Luna",
+"declared_context_window": 1050000,
+"declared_context_source": "model_catalog",
+"runtime_context_window": 1050000,
+"runtime_context_source": "model_catalog",
+"configured_context_window": null,
+"effective_context_window": 1050000,
+"effective_context_source": "model_catalog",
+"declared_context_observed_at": "2026-09-23",
+"runtime_context_observed_at": "2026-09-23",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-09-23",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 1050000,
+"context_window_source": "model_catalog",
+"max_output_tokens": 128000,
+"declared_max_output_tokens": 128000,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": true,
+"supports_streaming": true,
+"documented_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+"documented_at": "2026-09-23"
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "openai-page",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k",
+"offset": 1,
+"limit": 1
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226770742d362d736f6c222c20226f626a656374223a20226d6f64656c227d2c207b226964223a20226770742d362d6c756e61227d2c207b226964223a20226770742d362d736f6c227d2c207b226964223a2022746578742d656d62656464696e672d33227d2c20226e6f742d612d726f77222c207b226964223a20357d5d7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "gpt-6-sol",
+"name": "GPT-6 Sol",
+"declared_context_window": 1050000,
+"declared_context_source": "model_catalog",
+"runtime_context_window": 1050000,
+"runtime_context_source": "model_catalog",
+"configured_context_window": null,
+"effective_context_window": 1050000,
+"effective_context_source": "model_catalog",
+"declared_context_observed_at": "2026-09-23",
+"runtime_context_observed_at": "2026-09-23",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-09-23",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 1050000,
+"context_window_source": "model_catalog",
+"max_output_tokens": 128000,
+"declared_max_output_tokens": 128000,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": true,
+"supports_streaming": true,
+"documented_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+"documented_at": "2026-09-23"
+}
+],
+"total": 3,
+"offset": 1,
+"limit": 1,
+"has_more": true,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "openai-offset-past",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k",
+"offset": 9
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226770742d362d736f6c222c20226f626a656374223a20226d6f64656c227d2c207b226964223a20226770742d362d6c756e61227d2c207b226964223a20226770742d362d736f6c227d2c207b226964223a2022746578742d656d62656464696e672d33227d2c20226e6f742d612d726f77222c207b226964223a20357d5d7d"
+}
+],
+"value": {
+"models": [],
+"total": 3,
+"offset": 9,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "401",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 401,
+"hex": "7b7d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "OpenAI API rejected the API credential"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "404",
+"user": null,
+"request": {
+"preset_id": "openrouter",
+"credential": "k"
+},
+"replies": [
+{
+"status": 404,
+"hex": "7b7d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "OpenRouter does not expose model discovery here. Enter its documented model identifier and limits under Advanced."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://openrouter.ai/api/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "500",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 503,
+"hex": "7b7d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "OpenAI API model discovery failed with HTTP 503"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "not-json",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b6e6f"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "Could not connect to OpenAI API"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "utf16-json",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "fffe7b002200640061007400610022003a0020005b007b0022006900640022003a00200022006700700074002d0036002d0073006f006c0022007d005d007d00"
+}
+],
+"value": {
+"models": [
+{
+"id": "gpt-6-sol",
+"name": "GPT-6 Sol",
+"declared_context_window": 1050000,
+"declared_context_source": "model_catalog",
+"runtime_context_window": 1050000,
+"runtime_context_source": "model_catalog",
+"configured_context_window": null,
+"effective_context_window": 1050000,
+"effective_context_source": "model_catalog",
+"declared_context_observed_at": "2026-09-23",
+"runtime_context_observed_at": "2026-09-23",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-09-23",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 1050000,
+"context_window_source": "model_catalog",
+"max_output_tokens": 128000,
+"declared_max_output_tokens": 128000,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": true,
+"supports_streaming": true,
+"documented_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+"documented_at": "2026-09-23"
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "connect-error",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"error": "refused"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "Could not connect to OpenAI API"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "bad-catalog",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a207b226964223a202278227d7d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "Provider returned an invalid model catalog"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "list-document",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "5b7b226964223a202278227d5d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "Provider returned an invalid model catalog"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "together-list",
+"user": null,
+"request": {
+"preset_id": "together",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "5b7b226964223a20226d6574612f6c6c616d61222c202274797065223a202263686174222c2022636f6e746578745f6c656e677468223a20383139327d2c207b226964223a2022696d67222c202274797065223a2022696d616765227d5d"
+}
+],
+"value": {
+"models": [
+{
+"id": "meta/llama",
+"name": "meta/llama",
+"declared_context_window": 8192,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 8192,
+"runtime_context_source": "provider_metadata",
+"configured_context_window": null,
+"effective_context_window": 8192,
+"effective_context_source": "provider_metadata",
+"declared_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 8192,
+"context_window_source": "provider_metadata",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.together.ai/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "anthropic-pages",
+"user": null,
+"request": {
+"preset_id": "anthropic",
+"credential": "sk-ant"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a2022636c617564652d6f7075732d342d36222c2022646973706c61795f6e616d65223a2022436c61756465204f70757320342e36227d5d2c20226861735f6d6f7265223a20747275652c20226c6173745f6964223a20226120622f632bc3a9227d"
+},
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a2022636c617564652d736f6e6e65742d342d35227d5d2c20226861735f6d6f7265223a2066616c73657d"
+}
+],
+"value": {
+"models": [
+{
+"id": "claude-opus-4-6",
+"name": "Claude Opus 4.6",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "anthropic_messages",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+},
+{
+"id": "claude-sonnet-4-5",
+"name": "claude-sonnet-4-5",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "anthropic_messages",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 2,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models?limit=1000",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+},
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models?limit=1000&after_id=a+b%2Fc%2B%C3%A9",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "anthropic-cursor-repeat",
+"user": null,
+"request": {
+"preset_id": "anthropic",
+"credential": "sk-ant"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a202261227d5d2c20226861735f6d6f7265223a20747275652c20226c6173745f6964223a20226331227d"
+},
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a202262227d5d2c20226861735f6d6f7265223a20747275652c20226c6173745f6964223a20226331227d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "Provider returned invalid model catalog pagination"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models?limit=1000",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+},
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models?limit=1000&after_id=c1",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "anthropic-empty-page",
+"user": null,
+"request": {
+"preset_id": "anthropic",
+"credential": "sk-ant"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b5d2c20226861735f6d6f7265223a20747275652c20226c6173745f6964223a20226331227d"
+}
+],
+"error": {
+"class": "ConfigError",
+"message": "Provider returned invalid model catalog pagination"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models?limit=1000",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "anthropic-headers",
+"user": null,
+"request": {
+"preset_id": "anthropic",
+"credential": "sk-ant",
+"headers": {
+"x-api-key": "custom",
+"X-Extra": "e"
+}
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b5d7d"
+}
+],
+"value": {
+"models": [],
+"total": 0,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models?limit=1000",
+"headers": [
+[
+"x-api-key",
+"custom"
+],
+[
+"x-extra",
+"e"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "featherless",
+"user": null,
+"request": {
+"preset_id": "featherless",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a2022662f6f6e65222c2022636f6e746578745f6c656e677468223a2033323736387d2c207b226964223a2022662f74776f227d5d7d"
+},
+{
+"status": 200,
+"hex": "7b226d61785f636f6e746578745f6c656e677468223a2031363338347d"
+}
+],
+"value": {
+"models": [
+{
+"id": "f/one",
+"name": "f/one",
+"declared_context_window": 32768,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 16384,
+"runtime_context_source": "provider_metadata",
+"configured_context_window": null,
+"effective_context_window": 16384,
+"effective_context_source": "provider_metadata",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 16384,
+"context_window_source": "provider_metadata",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+},
+{
+"id": "f/two",
+"name": "f/two",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": 16384,
+"runtime_context_source": "provider_metadata",
+"configured_context_window": null,
+"effective_context_window": 16384,
+"effective_context_source": "provider_metadata",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 16384,
+"context_window_source": "provider_metadata",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 2,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/plan",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "featherless-no-plan",
+"user": null,
+"request": {
+"preset_id": "featherless",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a2022662f6f6e65222c2022636f6e746578745f6c656e677468223a2033323736387d5d7d"
+},
+{
+"status": 500,
+"hex": "7b7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "f/one",
+"name": "f/one",
+"declared_context_window": 32768,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": "Featherless plan limits were unavailable. Refresh, or enter your plan's context allowance under Advanced."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/plan",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "featherless-bad-limit",
+"user": null,
+"request": {
+"preset_id": "featherless",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a2022662f6f6e65227d5d7d"
+},
+{
+"status": 200,
+"hex": "7b226d61785f636f6e746578745f6c656e677468223a203130307d"
+}
+],
+"value": {
+"models": [
+{
+"id": "f/one",
+"name": "f/one",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": "Featherless plan limits were unavailable. Refresh, or enter your plan's context allowance under Advanced."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/plan",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "featherless-null-limit",
+"user": null,
+"request": {
+"preset_id": "featherless",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a2022662f6f6e65222c2022636f6e746578745f6c656e677468223a20343039367d5d7d"
+},
+{
+"status": 200,
+"hex": "7b226d61785f636f6e746578745f6c656e677468223a206e756c6c7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "f/one",
+"name": "f/one",
+"declared_context_window": 4096,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 4096,
+"runtime_context_source": "provider_metadata",
+"configured_context_window": null,
+"effective_context_window": 4096,
+"effective_context_source": "provider_metadata",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 4096,
+"context_window_source": "provider_metadata",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "GET",
+"url": "https://api.featherless.ai/v1/plan",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "lm-studio",
+"user": null,
+"request": {
+"preset_id": "lm_studio"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20227177656e227d2c207b226964223a20227177656e3a32227d2c207b226964223a20226f74686572227d5d7d"
+},
+{
+"status": 200,
+"hex": "7b226d6f64656c73223a205b7b2274797065223a20226c6c6d222c20226b6579223a20227177656e222c2022646973706c61795f6e616d65223a20225177656e222c20226d61785f636f6e746578745f6c656e677468223a2033323736382c20226c6f616465645f696e7374616e636573223a205b7b226964223a20227177656e3a32222c2022636f6e666967223a207b22636f6e746578745f6c656e677468223a20383139327d7d5d2c20226361706162696c6974696573223a207b22747261696e65645f666f725f746f6f6c5f757365223a20747275657d7d2c207b2274797065223a20226c6c6d222c20226b6579223a20226e61746976652d6f6e6c79222c20226d61785f636f6e746578745f6c656e677468223a20343039362c20226c6f616465645f696e7374616e636573223a205b7b226964223a20226e31222c2022636f6e666967223a207b22636f6e746578745f6c656e677468223a20323034387d7d5d7d2c207b2274797065223a2022656d62656464696e67222c20226b6579223a2022656d62227d2c207b2274797065223a20226c6c6d222c20226b6579223a2022227d5d7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "native-only",
+"name": "native-only",
+"declared_context_window": 4096,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 2048,
+"runtime_context_source": "runtime_reported",
+"configured_context_window": null,
+"effective_context_window": 2048,
+"effective_context_source": "runtime_reported",
+"declared_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 2048,
+"context_window_source": "runtime_reported",
+"max_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null
+},
+{
+"id": "other",
+"name": "other",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+},
+{
+"id": "qwen",
+"name": "Qwen",
+"declared_context_window": 32768,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 8192,
+"runtime_context_source": "runtime_reported",
+"configured_context_window": null,
+"effective_context_window": 8192,
+"effective_context_source": "runtime_reported",
+"declared_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 8192,
+"context_window_source": "runtime_reported",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": true,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+},
+{
+"id": "qwen:2",
+"name": "Qwen",
+"declared_context_window": 32768,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 8192,
+"runtime_context_source": "runtime_reported",
+"configured_context_window": null,
+"effective_context_window": 8192,
+"effective_context_source": "runtime_reported",
+"declared_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 8192,
+"context_window_source": "runtime_reported",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": true,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 4,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/api/v1/models",
+"headers": [],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "lm-studio-native-fails",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"base_url": "http://127.0.0.1:4321/v1"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20227177656e227d5d7d"
+},
+{
+"error": "refused"
+}
+],
+"value": {
+"models": [
+{
+"id": "qwen",
+"name": "qwen",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:4321/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:4321/api/v1/models",
+"headers": [],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "ollama",
+"user": null,
+"request": {
+"preset_id": "ollama"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226c6c616d61332e313a3862227d2c207b226964223a20226d69737472616c3a3762227d5d7d"
+},
+{
+"status": 200,
+"hex": "7b226d6f64656c73223a205b7b226d6f64656c223a20226c6c616d61332e313a3862222c2022636f6e746578745f6c656e677468223a20383139327d2c207b226e616d65223a20226d69737472616c3a3762222c2022636f6e746578745f6c656e677468223a203130307d5d7d"
+},
+{
+"status": 200,
+"hex": "7b226d6f64656c5f696e666f223a207b226c6c616d612e636f6e746578745f6c656e677468223a203133313037322c202267656e6572616c2e636f6e746578745f6c656e677468223a20343039362c20226f74686572223a20397d7d"
+},
+{
+"status": 404,
+"hex": "7b7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "llama3.1:8b",
+"name": "llama3.1:8b",
+"declared_context_window": 131072,
+"declared_context_source": "provider_metadata",
+"runtime_context_window": 8192,
+"runtime_context_source": "runtime_reported",
+"configured_context_window": null,
+"effective_context_window": 8192,
+"effective_context_source": "runtime_reported",
+"declared_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"runtime_context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-11-22T08:00:00.123456+00:00",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 8192,
+"context_window_source": "runtime_reported",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+},
+{
+"id": "mistral:7b",
+"name": "mistral:7b",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 2,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/api/ps",
+"headers": [],
+"body": ""
+},
+{
+"method": "POST",
+"url": "http://127.0.0.1:11434/api/show",
+"headers": [
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"llama3.1:8b\"}"
+},
+{
+"method": "POST",
+"url": "http://127.0.0.1:11434/api/show",
+"headers": [
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"mistral:7b\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "ollama-show-fails",
+"user": null,
+"request": {
+"preset_id": "ollama"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226d227d5d7d"
+},
+{
+"error": "refused"
+},
+{
+"error": "refused"
+}
+],
+"value": {
+"models": [
+{
+"id": "m",
+"name": "m",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+},
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/api/ps",
+"headers": [],
+"body": ""
+},
+{
+"method": "POST",
+"url": "http://127.0.0.1:11434/api/show",
+"headers": [
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "claude",
+"user": null,
+"request": {
+"preset_id": "claude_runtime"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Use the Claude runtime controls in Accounts; HTTP discovery is unavailable"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "chatgpt",
+"user": null,
+"request": {
+"preset_id": "chatgpt_subscription"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Use the ChatGPT subscription controls to discover models"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "unknown-preset",
+"user": null,
+"request": {
+"preset_id": "nope"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Provider preset is unsupported"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "no-preset",
+"user": null,
+"request": {},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Provider preset is unsupported"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "bad-offset",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"offset": -1
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Model discovery offset is invalid"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "bool-offset",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"offset": true
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Model discovery offset is invalid"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "bad-limit",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"limit": 201
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Model discovery page size is invalid"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "zero-limit",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"limit": 0
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Model discovery page size is invalid"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "long-query",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"query": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Model discovery search is too long"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "bad-headers",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"headers": {
+"Bad Name": "1"
+}
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Provider header name is invalid"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "fixed-endpoint",
+"user": null,
+"request": {
+"preset_id": "openai",
+"credential": "k",
+"base_url": "https://elsewhere.test/v1"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "OpenAI API uses its official API endpoint"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "custom",
+"user": null,
+"request": {
+"preset_id": "custom",
+"credential": "k",
+"base_url": "https://models.example.test/v1/",
+"headers": {
+"X-Org": "o"
+}
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20227a2d6d6f64656c227d2c207b226964223a2022612d6d6f64656c227d5d7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "a-model",
+"name": "a-model",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+},
+{
+"id": "z-model",
+"name": "z-model",
+"declared_context_window": null,
+"declared_context_source": "unknown",
+"runtime_context_window": null,
+"runtime_context_source": "unknown",
+"configured_context_window": null,
+"effective_context_window": null,
+"effective_context_source": "unknown",
+"declared_context_observed_at": null,
+"runtime_context_observed_at": null,
+"configured_context_observed_at": null,
+"context_observed_at": null,
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": null,
+"context_window_source": "unknown",
+"max_output_tokens": null,
+"declared_max_output_tokens": null,
+"configured_output_tokens": null,
+"transport": "chat_completions",
+"supports_tools": null,
+"supports_streaming": null,
+"documented_source": null,
+"documented_at": null
+}
+],
+"total": 2,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://models.example.test/v1/models",
+"headers": [
+[
+"x-org",
+"o"
+],
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "saved-connection",
+"user": "providers:\n  openai:\n    enabled: true\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjEiIDoiZGV2YVMtWCJ7IDoic3JlZGFlaCIgLCJlbGJhc29wc2lkLWRldmFzLWtzIiA6Inlla19pcGEiew==\"}\n    models: []\n",
+"request": {
+"provider_id": "openai"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a20226770742d362d736f6c227d5d7d"
+}
+],
+"value": {
+"models": [
+{
+"id": "gpt-6-sol",
+"name": "GPT-6 Sol",
+"declared_context_window": 1050000,
+"declared_context_source": "model_catalog",
+"runtime_context_window": 1050000,
+"runtime_context_source": "model_catalog",
+"configured_context_window": null,
+"effective_context_window": 1050000,
+"effective_context_source": "model_catalog",
+"declared_context_observed_at": "2026-09-23",
+"runtime_context_observed_at": "2026-09-23",
+"configured_context_observed_at": null,
+"context_observed_at": "2026-09-23",
+"configured_runtime_mismatch": false,
+"configured_declared_mismatch": false,
+"context_window": 1050000,
+"context_window_source": "model_catalog",
+"max_output_tokens": 128000,
+"declared_max_output_tokens": 128000,
+"configured_output_tokens": null,
+"transport": "responses",
+"supports_tools": true,
+"supports_streaming": true,
+"documented_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+"documented_at": "2026-09-23"
+}
+],
+"total": 1,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"x-saved",
+"1"
+],
+[
+"authorization",
+"Bearer sk-saved-disposable"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "saved-connection-new-key",
+"user": "providers:\n  openai:\n    enabled: true\n    protected_credentials: {version: 1, protection: nope, data: AAAA}\n    models: []\n",
+"request": {
+"provider_id": "openai",
+"credential": "sk-new"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b5d7d"
+}
+],
+"value": {
+"models": [],
+"total": 0,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer sk-new"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "saved-connection-locked",
+"user": "providers:\n  openai:\n    enabled: true\n    protected_credentials: {version: 1, protection: nope, data: AAAA}\n    models: []\n",
+"request": {
+"provider_id": "openai"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "<UNAVAILABLE>"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "saved-disabled",
+"user": "providers:\n  openai:\n    enabled: false\n    models: []\n",
+"request": {
+"provider_id": "openai",
+"credential": "k"
+},
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b5d7d"
+}
+],
+"value": {
+"models": [],
+"total": 0,
+"offset": 0,
+"limit": 100,
+"has_more": false,
+"notice": null
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+}
+],
+"detect": [
+{
+"name": "all-down",
+"replies": [
+{
+"error": "refused"
+},
+{
+"error": "refused"
+},
+{
+"error": "refused"
+},
+{
+"error": "refused"
+},
+{
+"error": "refused"
+}
+],
+"value": [
+{
+"provider_id": "lm_studio",
+"name": "LM Studio",
+"base_url": "http://127.0.0.1:1234/v1",
+"reachable": false,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start the LM Studio local server, then detect or find models."
+},
+{
+"provider_id": "ollama",
+"name": "Ollama",
+"base_url": "http://127.0.0.1:11434/v1",
+"reachable": false,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start Ollama before connecting. Sylvia GM does not launch it."
+},
+{
+"provider_id": "llama_cpp",
+"name": "llama.cpp server",
+"base_url": "http://127.0.0.1:9931/v1",
+"reachable": false,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start llama-server with an appropriate chat template and tool support."
+},
+{
+"provider_id": "vllm",
+"name": "vLLM",
+"base_url": "http://127.0.0.1:8000/v1",
+"reachable": false,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start the vLLM OpenAI-compatible server before connecting."
+},
+{
+"provider_id": "localai",
+"name": "LocalAI",
+"base_url": "http://127.0.0.1:8080/v1",
+"reachable": false,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start LocalAI before connecting. The port is editable."
+}
+],
+"clients": [
+{
+"timeout": 1.5,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:9931/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:8000/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:8080/v1/models",
+"headers": [],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "mixed",
+"replies": [
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a202261227d5d7d"
+},
+{
+"status": 200,
+"hex": "7b2264617461223a205b7b226964223a202261227d2c207b226964223a202262227d5d7d"
+},
+{
+"status": 401,
+"hex": "7b7d"
+},
+{
+"status": 503,
+"hex": "7b7d"
+},
+{
+"status": 200,
+"hex": "6e6f"
+}
+],
+"value": [
+{
+"provider_id": "lm_studio",
+"name": "LM Studio",
+"base_url": "http://127.0.0.1:1234/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 1,
+"message": "Detected 1 model."
+},
+{
+"provider_id": "ollama",
+"name": "Ollama",
+"base_url": "http://127.0.0.1:11434/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 2,
+"message": "Detected 2 models."
+},
+{
+"provider_id": "llama_cpp",
+"name": "llama.cpp server",
+"base_url": "http://127.0.0.1:9931/v1",
+"reachable": true,
+"authentication_required": true,
+"model_count": 0,
+"message": "Start llama-server with an appropriate chat template and tool support."
+},
+{
+"provider_id": "vllm",
+"name": "vLLM",
+"base_url": "http://127.0.0.1:8000/v1",
+"reachable": false,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start the vLLM OpenAI-compatible server before connecting."
+},
+{
+"provider_id": "localai",
+"name": "LocalAI",
+"base_url": "http://127.0.0.1:8080/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start LocalAI before connecting. The port is editable."
+}
+],
+"clients": [
+{
+"timeout": 1.5,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:9931/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:8000/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:8080/v1/models",
+"headers": [],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "no-data",
+"replies": [
+{
+"status": 200,
+"hex": "7b226f74686572223a20317d"
+},
+{
+"status": 200,
+"hex": "7b2264617461223a205b5d7d"
+},
+{
+"status": 200,
+"hex": "5b315d"
+},
+{
+"status": 404,
+"hex": "7b7d"
+},
+{
+"status": 200,
+"hex": "7b2264617461223a202278227d"
+}
+],
+"value": [
+{
+"provider_id": "lm_studio",
+"name": "LM Studio",
+"base_url": "http://127.0.0.1:1234/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start the LM Studio local server, then detect or find models."
+},
+{
+"provider_id": "ollama",
+"name": "Ollama",
+"base_url": "http://127.0.0.1:11434/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 0,
+"message": "Detected 0 models."
+},
+{
+"provider_id": "llama_cpp",
+"name": "llama.cpp server",
+"base_url": "http://127.0.0.1:9931/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start llama-server with an appropriate chat template and tool support."
+},
+{
+"provider_id": "vllm",
+"name": "vLLM",
+"base_url": "http://127.0.0.1:8000/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start the vLLM OpenAI-compatible server before connecting."
+},
+{
+"provider_id": "localai",
+"name": "LocalAI",
+"base_url": "http://127.0.0.1:8080/v1",
+"reachable": true,
+"authentication_required": false,
+"model_count": 0,
+"message": "Start LocalAI before connecting. The port is editable."
+}
+],
+"clients": [
+{
+"timeout": 1.5,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:11434/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:9931/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:8000/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "GET",
+"url": "http://127.0.0.1:8080/v1/models",
+"headers": [],
+"body": ""
+}
+],
+"unused_replies": 0
+}
+]
+}

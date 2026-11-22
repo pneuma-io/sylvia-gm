@@ -829,6 +829,71 @@ pub(crate) fn activation_result_from_row(row: &Named<'_>) -> StoreResult<Activat
     })
 }
 
+/// `sqlite_packages.reclaim`: delete every package blob no root holds. Roots are the campaign
+/// lock memberships, validated or activated candidates, read leases and recovery roots; the
+/// counts of each root kind are returned in lane 1's `ReclamationResult`.
+pub(crate) fn reclaim(
+    connection: &Connection,
+) -> StoreResult<sylvia_domain::package_library::ReclamationResult> {
+    let count = |query: &str| -> StoreResult<i64> {
+        let value: Value = connection.query_row(query, [], |row| row.get(0))?;
+        py_int(&value).ok_or_else(|| crate::error::value_error("invalid literal for int() with base 10"))
+    };
+    let campaign_lock_roots = count("SELECT COUNT(*) FROM campaign_locks")?;
+    let candidate_roots =
+        count("SELECT COUNT(*) FROM package_candidates WHERE status IN ('validated','activated')")?;
+    let activation_roots = count("SELECT COUNT(*) FROM package_activations")?;
+    let staging_roots = count("SELECT COUNT(*) FROM package_staging WHERE status = 'staging'")?;
+    let read_roots = count("SELECT COUNT(*) FROM package_read_leases")?;
+    let recovery_roots = count("SELECT COUNT(*) FROM package_recovery_roots")?;
+    let text_rows = |query: &str, values: &[&dyn rusqlite::ToSql]| -> StoreResult<Vec<Vec<String>>> {
+        Ok(exact_rows(connection, query, values)?
+            .iter()
+            .map(|row| row.iter().map(py_str).collect())
+            .collect())
+    };
+    let mut rooted_packages = BTreeSet::new();
+    for query in [
+        "SELECT package_id, version, content_sha256 FROM campaign_lock_memberships",
+        "SELECT package_id, version, content_sha256 FROM package_candidate_memberships          WHERE candidate_id IN (SELECT candidate_id FROM package_candidates          WHERE status IN ('validated','activated'))",
+    ] {
+        rooted_packages.extend(text_rows(query, &[])?);
+    }
+    let mut rooted_blobs = HashSet::new();
+    for identity in &rooted_packages {
+        for row in text_rows(
+            "SELECT blob_sha256 FROM package_manifest_files WHERE package_id = ? AND version = ?              AND content_sha256 = ?",
+            &[&identity[0], &identity[1], &identity[2]],
+        )? {
+            rooted_blobs.insert(row[0].clone());
+        }
+    }
+    for query in
+        ["SELECT blob_sha256 FROM package_read_leases", "SELECT blob_sha256 FROM package_recovery_roots"]
+    {
+        rooted_blobs.extend(text_rows(query, &[])?.into_iter().map(|row| row[0].clone()));
+    }
+    let deletable: BTreeSet<String> = text_rows("SELECT blob_sha256 FROM package_blobs", &[])?
+        .into_iter()
+        .map(|row| row[0].clone())
+        .filter(|blob| !rooted_blobs.contains(blob))
+        .collect();
+    for blob in &deletable {
+        connection.execute("DELETE FROM package_blobs WHERE blob_sha256 = ?", [blob])?;
+    }
+    let deleted =
+        i64::try_from(deletable.len()).map_err(|_| StoreError::Other("blob count overflow".into()))?;
+    Ok(sylvia_domain::package_library::ReclamationResult {
+        deleted_blobs: deleted,
+        campaign_lock_roots,
+        candidate_roots,
+        activation_roots,
+        staging_roots,
+        read_lease_roots: read_roots,
+        recovery_roots,
+    })
+}
+
 /// `sqlite_draft_history.DRAFT_LIFECYCLE_KINDS`.
 pub(crate) const DRAFT_LIFECYCLE_KINDS: [&str; 4] =
     ["rename_campaign", "archive_campaign", "restore_campaign", "trash_campaign"];

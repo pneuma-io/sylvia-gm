@@ -1,0 +1,2819 @@
+{
+"cases": [
+{
+"name": "chat-ready",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a",
+"646174613a205b444f4e455d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "chat-no-tool",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22636f6e74656e74223a20226869227d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "failed",
+"agent_ready": false,
+"message": "The provider connected, but this model did not pass every agent capability check."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "chat-no-events",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"3a206b6565702d616c6976650a0a",
+"646174613a206e6f74206a736f6e0a0a",
+"646174613a205b315d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "failed",
+"tool_calling": "failed",
+"agent_ready": false,
+"message": "The provider connected, but this model did not pass every agent capability check."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "not-listed",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "absent",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "model_not_listed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"absent\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "catalog-invalid",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b78"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "invalid_response",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "catalog-not-dict",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"5b315d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "unverified",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "catalog-404",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 404,
+"headers": [],
+"pieces": [
+"7b7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "unverified",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "catalog-401",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 401,
+"headers": [],
+"pieces": [
+"7b7d"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "failed",
+"model_discovery": "unverified",
+"transport": "unverified",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider rejected the API credential."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "catalog-503",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 503,
+"headers": [],
+"pieces": [
+"7b7d"
+]
+}
+],
+"value": {
+"reachability": "failed",
+"authentication": "unverified",
+"model_discovery": "unverified",
+"transport": "unverified",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider is unreachable. Start it or check the endpoint."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "catalog-down",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"error": "refused"
+}
+],
+"value": {
+"reachability": "failed",
+"authentication": "unverified",
+"model_discovery": "unverified",
+"transport": "unverified",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider is unreachable. Start it or check the endpoint."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+}
+],
+"unused_replies": 0
+},
+{
+"name": "stream-401",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 403,
+"headers": [],
+"pieces": [
+"7b7d"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "failed",
+"model_discovery": "passed",
+"transport": "unverified",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider rejected the API credential."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "stream-400",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 400,
+"headers": [],
+"pieces": [
+"7b7d"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "failed",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The endpoint is reachable, but the selected transport was rejected."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "stream-down",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"error": "reset"
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "unverified",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider is unreachable. Start it or check the endpoint."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "error-event",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2274797065223a20226572726f72222c20226572726f72223a207b7d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "failed",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider could not complete the test response."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "unhashable-type",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2274797065223a205b2278225d7d0a0a"
+]
+}
+],
+"error": {
+"class": "TypeError",
+"message": "unhashable type: 'list'"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "choices-int",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a20357d0a0a"
+]
+}
+],
+"error": {
+"class": "TypeError",
+"message": "'int' object is not iterable"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "choices-none",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a206e756c6c7d0a0a"
+]
+}
+],
+"error": {
+"class": "TypeError",
+"message": "'NoneType' object is not iterable"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "choices-odd",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b2273222c207b2264656c7461223a20337d2c207b2264656c7461223a207b22746f6f6c5f63616c6c73223a20226162227d7d2c207b2264656c7461223a207b22746f6f6c5f63616c6c73223a20307d7d5d7d0a0a",
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "tool-calls-int",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a20377d7d5d7d0a0a"
+]
+}
+],
+"error": {
+"class": "TypeError",
+"message": "'int' object is not iterable"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "split-pieces",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"6461",
+"74613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e61",
+"6d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265227d7d5d7d7d5d7d0d",
+"0a0d0a646174613a207b2278223a2022c3a9",
+"e282",
+"ac22",
+"7d0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "bad-utf8",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2278223a2022ff227d0a",
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "latin1",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream; charset=ISO-8859-1"
+]
+],
+"pieces": [
+"646174613a207b2278223a2022e9227d0a",
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "other-breaks",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2261223a20317de280a8646174613a205b444f4e455dc285646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "no-trailing-newline",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "too-long",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "chat_completions"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"0a",
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+],
+"filler": 1048586
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "failed",
+"tool_calling": "failed",
+"agent_ready": false,
+"message": "The provider connected, but this model did not pass every agent capability check."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/chat/completions",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "responses",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "responses"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2274797065223a2022726573706f6e73652e6f75747075745f6974656d2e6164646564222c20226974656d223a207b2274797065223a202266756e6374696f6e5f63616c6c222c20226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265227d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/responses",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"input\":\"Call sylvia_compatibility_probe with an empty object.\",\"stream\":true,\"max_output_tokens\":128,\"tools\":[{\"type\":\"function\",\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}],\"tool_choice\":\"required\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "responses-failed",
+"user": null,
+"request": {
+"preset_id": "custom",
+"base_url": "https://probe.example.test/v1",
+"credential": "k",
+"model_id": "m",
+"transport": "responses"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d2c207b226964223a20226d227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2274797065223a2022726573706f6e73652e6661696c6564227d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "failed",
+"streaming": "unverified",
+"tool_calling": "unverified",
+"agent_ready": false,
+"message": "The provider could not complete the test response."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://probe.example.test/v1/models",
+"headers": [
+[
+"authorization",
+"Bearer k"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://probe.example.test/v1/responses",
+"headers": [
+[
+"authorization",
+"Bearer k"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"input\":\"Call sylvia_compatibility_probe with an empty object.\",\"stream\":true,\"max_output_tokens\":128,\"tools\":[{\"type\":\"function\",\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}],\"tool_choice\":\"required\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "anthropic",
+"user": null,
+"request": {
+"preset_id": "anthropic",
+"credential": "sk-ant",
+"model_id": "claude-opus-4-6"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a2022636c617564652d6f7075732d342d36227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2274797065223a2022636f6e74656e745f626c6f636b5f7374617274222c2022636f6e74656e745f626c6f636b223a207b2274797065223a2022746f6f6c5f757365222c20226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265227d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://api.anthropic.com/v1/messages",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"claude-opus-4-6\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":1024,\"tools\":[{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}],\"tool_choice\":{\"type\":\"tool\",\"name\":\"sylvia_compatibility_probe\"}}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "anthropic-other-model",
+"user": null,
+"request": {
+"preset_id": "anthropic",
+"credential": "sk-ant",
+"model_id": "claude-fable-5-2"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2274797065223a20226d6573736167655f7374617274227d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "model_not_listed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "failed",
+"agent_ready": false,
+"message": "The provider connected, but this model did not pass every agent capability check."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.anthropic.com/v1/models",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://api.anthropic.com/v1/messages",
+"headers": [
+[
+"x-api-key",
+"sk-ant"
+],
+[
+"anthropic-version",
+"2023-06-01"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"claude-fable-5-2\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":1024,\"tools\":[{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"input_schema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}]}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "gemini",
+"user": null,
+"request": {
+"preset_id": "gemini",
+"credential": "g-key",
+"transport": "gemini_generate_content",
+"model_id": "models/gemini 3/pro"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263616e64696461746573223a205b7b22636f6e74656e74223a207b227061727473223a205b7b2266756e6374696f6e43616c6c223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "model_not_listed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models/gemini%203%2Fpro:streamGenerateContent?alt=sse",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Call sylvia_compatibility_probe with an empty object.\"}]}],\"generationConfig\":{\"maxOutputTokens\":128},\"tools\":[{\"functionDeclarations\":[{\"name\":\"sylvia_compatibility_probe\",\"parametersJsonSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}]}],\"toolConfig\":{\"functionCallingConfig\":{\"mode\":\"ANY\",\"allowedFunctionNames\":[\"sylvia_compatibility_probe\"]}}}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "gemini-odd",
+"user": null,
+"request": {
+"preset_id": "gemini",
+"credential": "g-key",
+"transport": "gemini_generate_content",
+"model_id": "gemini-3-pro"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263616e64696461746573223a202278227d0a0a",
+"646174613a207b2263616e64696461746573223a205b22626164225d7d0a0a"
+]
+}
+],
+"error": {
+"class": "AttributeError",
+"message": "'str' object has no attribute 'get'"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models/gemini-3-pro:streamGenerateContent?alt=sse",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Call sylvia_compatibility_probe with an empty object.\"}]}],\"generationConfig\":{\"maxOutputTokens\":128},\"tools\":[{\"functionDeclarations\":[{\"name\":\"sylvia_compatibility_probe\",\"parametersJsonSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}]}],\"toolConfig\":{\"functionCallingConfig\":{\"mode\":\"ANY\",\"allowedFunctionNames\":[\"sylvia_compatibility_probe\"]}}}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "gemini-parts-int",
+"user": null,
+"request": {
+"preset_id": "gemini",
+"credential": "g-key",
+"transport": "gemini_generate_content",
+"model_id": "gemini-3-pro"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263616e64696461746573223a205b7b22636f6e74656e74223a207b227061727473223a20337d7d5d7d0a0a"
+]
+}
+],
+"error": {
+"class": "TypeError",
+"message": "'int' object is not iterable"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models/gemini-3-pro:streamGenerateContent?alt=sse",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Call sylvia_compatibility_probe with an empty object.\"}]}],\"generationConfig\":{\"maxOutputTokens\":128},\"tools\":[{\"functionDeclarations\":[{\"name\":\"sylvia_compatibility_probe\",\"parametersJsonSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}]}],\"toolConfig\":{\"functionCallingConfig\":{\"mode\":\"ANY\",\"allowedFunctionNames\":[\"sylvia_compatibility_probe\"]}}}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "gemini-call-str",
+"user": null,
+"request": {
+"preset_id": "gemini",
+"credential": "g-key",
+"transport": "gemini_generate_content",
+"model_id": "gemini-3-pro"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263616e64696461746573223a205b7b22636f6e74656e74223a207b227061727473223a205b7b2266756e6374696f6e43616c6c223a202266227d5d7d7d5d7d0a0a"
+]
+}
+],
+"error": {
+"class": "AttributeError",
+"message": "'str' object has no attribute 'get'"
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://generativelanguage.googleapis.com/v1beta/openai/models/gemini-3-pro:streamGenerateContent?alt=sse",
+"headers": [
+[
+"x-goog-api-key",
+"g-key"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"contents\":[{\"role\":\"user\",\"parts\":[{\"text\":\"Call sylvia_compatibility_probe with an empty object.\"}]}],\"generationConfig\":{\"maxOutputTokens\":128},\"tools\":[{\"functionDeclarations\":[{\"name\":\"sylvia_compatibility_probe\",\"parametersJsonSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}]}],\"toolConfig\":{\"functionCallingConfig\":{\"mode\":\"ANY\",\"allowedFunctionNames\":[\"sylvia_compatibility_probe\"]}}}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "opencode",
+"user": null,
+"request": {
+"preset_id": "opencode_zen",
+"credential": "k",
+"model_id": "q",
+"headers": {
+"User-Agent": "mine",
+"X-Keep": "1"
+}
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "model_not_listed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://opencode.ai/inference/v1/models",
+"headers": [
+[
+"x-keep",
+"1"
+],
+[
+"authorization",
+"Bearer k"
+],
+[
+"x-opencode-session",
+"sylvia_96104c85e27e1d43b29f05b67c97f4e760d1d659115a94c7088667b43b79efd8"
+],
+[
+"x-opencode-client",
+"sylvia-gm"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://opencode.ai/inference/v1/chat/completions",
+"headers": [
+[
+"x-keep",
+"1"
+],
+[
+"authorization",
+"Bearer k"
+],
+[
+"x-opencode-session",
+"sylvia_96104c85e27e1d43b29f05b67c97f4e760d1d659115a94c7088667b43b79efd8"
+],
+[
+"x-opencode-client",
+"sylvia-gm"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"q\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "local-no-key",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"model_id": "qwen"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20227177656e227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "not_required",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "POST",
+"url": "http://127.0.0.1:1234/v1/chat/completions",
+"headers": [
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"qwen\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "claude",
+"user": null,
+"request": {
+"preset_id": "claude_runtime",
+"model_id": "x"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Use the Claude runtime connection; an HTTP probe cannot verify this model"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "chatgpt",
+"user": null,
+"request": {
+"preset_id": "chatgpt_subscription",
+"model_id": "x"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Use the ChatGPT subscription connection for model verification"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "no-model",
+"user": null,
+"request": {
+"preset_id": "lm_studio"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Provider model ID is required"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "bad-model",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"model_id": "a\tb"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Provider model ID is invalid"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "bad-transport",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"model_id": "m",
+"transport": "pigeon"
+},
+"replies": [],
+"error": {
+"class": "ConfigError",
+"message": "Provider model transport is unsupported"
+},
+"clients": [],
+"requests": [],
+"unused_replies": 0
+},
+{
+"name": "codex-transport",
+"user": null,
+"request": {
+"preset_id": "lm_studio",
+"model_id": "m",
+"transport": "codex_app_server"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b2263686f69636573223a205b7b2264656c7461223a207b22746f6f6c5f63616c6c73223a205b7b2266756e6374696f6e223a207b226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265222c2022617267756d656e7473223a20227b7d227d7d5d7d7d5d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "not_required",
+"model_discovery": "model_not_listed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "http://127.0.0.1:1234/v1/models",
+"headers": [],
+"body": ""
+},
+{
+"method": "POST",
+"url": "http://127.0.0.1:1234/v1/chat/completions",
+"headers": [
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"m\",\"messages\":[{\"role\":\"user\",\"content\":\"Call sylvia_compatibility_probe with an empty object.\"}],\"stream\":true,\"max_tokens\":128,\"tools\":[{\"type\":\"function\",\"function\":{\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}}],\"tool_choice\":\"auto\"}"
+}
+],
+"unused_replies": 0
+},
+{
+"name": "saved",
+"user": "providers:\n  openai:\n    enabled: true\n    protected_credentials: {version: 1, protection: \"<PROTECTION>\", data: \"RkFLRX19IjEiIDoiZGV2YVMtWCJ7IDoic3JlZGFlaCIgLCJlbGJhc29wc2lkLWRldmFzLWtzIiA6Inlla19pcGEiew==\"}\n    models: []\n",
+"request": {
+"provider_id": "openai",
+"model_id": "gpt-6-sol",
+"transport": "responses"
+},
+"replies": [
+{
+"status": 200,
+"headers": [],
+"pieces": [
+"7b2264617461223a205b7b226964223a20226770742d362d736f6c227d5d7d"
+]
+},
+{
+"status": 200,
+"headers": [
+[
+"content-type",
+"text/event-stream"
+]
+],
+"pieces": [
+"646174613a207b226974656d223a207b2274797065223a202266756e6374696f6e5f63616c6c222c20226e616d65223a202273796c7669615f636f6d7061746962696c6974795f70726f6265227d7d0a0a"
+]
+}
+],
+"value": {
+"reachability": "passed",
+"authentication": "passed",
+"model_discovery": "passed",
+"transport": "passed",
+"streaming": "passed",
+"tool_calling": "passed",
+"agent_ready": true,
+"message": "Provider and model passed the agent compatibility probe."
+},
+"clients": [
+{
+"timeout": 20.0,
+"follow_redirects": false
+}
+],
+"requests": [
+{
+"method": "GET",
+"url": "https://api.openai.com/v1/models",
+"headers": [
+[
+"x-saved",
+"1"
+],
+[
+"authorization",
+"Bearer sk-saved-disposable"
+]
+],
+"body": ""
+},
+{
+"method": "POST",
+"url": "https://api.openai.com/v1/responses",
+"headers": [
+[
+"x-saved",
+"1"
+],
+[
+"authorization",
+"Bearer sk-saved-disposable"
+],
+[
+"content-type",
+"application/json"
+]
+],
+"body": "{\"model\":\"gpt-6-sol\",\"input\":\"Call sylvia_compatibility_probe with an empty object.\",\"stream\":true,\"max_output_tokens\":128,\"tools\":[{\"type\":\"function\",\"name\":\"sylvia_compatibility_probe\",\"description\":\"Confirm function-calling compatibility.\",\"parameters\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}],\"tool_choice\":\"required\"}"
+}
+],
+"unused_replies": 0
+}
+]
+}

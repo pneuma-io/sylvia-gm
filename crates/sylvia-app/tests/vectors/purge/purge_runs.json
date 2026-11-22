@@ -1,0 +1,412 @@
+{
+ "python": "3.12.11",
+ "runs": [
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": -1,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "outcome": {
+    "error": "OwnerProtocolError",
+    "code": null,
+    "message": "expected_revision must be a nonnegative integer"
+   },
+   "tree": []
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": " purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 8,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign purge identity is invalid"
+   },
+   "tree": []
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 8,
+    "confirmation": "purge it"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign purge confirmation is not exact"
+   },
+   "tree": []
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 8,
+    "confirmation": "permanently purge campaign-build"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign purge confirmation is not exact"
+   },
+   "tree": []
+  },
+  {
+   "op": "write",
+   "path": "campaigns/campaign-story/.builder-sources/notes.md",
+   "text": "# Notes\n",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "path": "campaigns/campaign-story/.builder-sources/maps/coast.txt",
+   "text": "coast",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps/coast.txt",
+     "file",
+     "23c075a035f3889718034dcf3b77008cf38c1714b8940712a77962a01d4ed508"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 8,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign must be tombstoned before purge"
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps/coast.txt",
+     "file",
+     "23c075a035f3889718034dcf3b77008cf38c1714b8940712a77962a01d4ed508"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ]
+  },
+  {
+   "op": "trash_campaign",
+   "params": {
+    "operation_id": "trash-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 8,
+    "designated_session_id": "dm-1"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "tombstoned",
+     "writer": "none",
+     "resulting_revision": 9,
+     "session_id": "dm-1"
+    }
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps/coast.txt",
+     "file",
+     "23c075a035f3889718034dcf3b77008cf38c1714b8940712a77962a01d4ed508"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 8,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Campaign purge expected revision is stale"
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps/coast.txt",
+     "file",
+     "23c075a035f3889718034dcf3b77008cf38c1714b8940712a77962a01d4ed508"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 9,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "fault": "before",
+   "outcome": {
+    "error": "Fault",
+    "code": null,
+    "message": "before lifecycle commit fault"
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps/coast.txt",
+     "file",
+     "23c075a035f3889718034dcf3b77008cf38c1714b8940712a77962a01d4ed508"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 9,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "fault": "after",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "resulting_revision": 10
+    }
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-1",
+    "campaign_id": "campaign-story",
+    "expected_revision": 9,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "resulting_revision": 10
+    }
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-2",
+    "campaign_id": "campaign-story",
+    "expected_revision": 10,
+    "confirmation": "permanently purge campaign-story"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is missing or already purged"
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ]
+   ]
+  },
+  {
+   "op": "trash_campaign",
+   "params": {
+    "operation_id": "trash-2",
+    "campaign_id": "campaign-build",
+    "expected_revision": 0,
+    "designated_session_id": "builder-2"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "lifecycle": "tombstoned",
+     "writer": "none",
+     "resulting_revision": 1,
+     "session_id": "builder-2"
+    }
+   },
+   "tree": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ]
+   ]
+  },
+  {
+   "op": "purge_campaign",
+   "params": {
+    "operation_id": "purge-3",
+    "campaign_id": "campaign-build",
+    "expected_revision": 1,
+    "confirmation": "permanently purge campaign-build"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "resulting_revision": 2
+    }
+   },
+   "tree": [
+    [
+     "campaigns/campaign-build",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ]
+   ]
+  }
+ ]
+}

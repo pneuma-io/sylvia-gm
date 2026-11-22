@@ -1,0 +1,199 @@
+{
+ "python": "3.12.11",
+ "cases": [
+  {
+   "name": "portable",
+   "archive": "504b03041400000000000000210006b0a1dd03000000030000000f000000617574686f726974792e6a736f6e6c7b7d0a504b03041400000000000000210043bfa6a302000000020000000d0000006d616e69666573742e6a736f6e7b7d504b010214031400000000000000210006b0a1dd03000000030000000f0000000000000000000000808100000000617574686f726974792e6a736f6e6c504b010214031400000000000000210043bfa6a302000000020000000d00000000000000000000008081300000006d616e69666573742e6a736f6e504b05060000000002000200780000005d0000000000",
+   "comment": "",
+   "members": [
+    {
+     "filename": "authority.jsonl",
+     "date_time": [
+      1980,
+      1,
+      1,
+      0,
+      0,
+      0
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 0,
+     "compress_type": 0,
+     "file_size": 3
+    },
+    {
+     "filename": "manifest.json",
+     "date_time": [
+      1980,
+      1,
+      1,
+      0,
+      0,
+      0
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 0,
+     "compress_type": 0,
+     "file_size": 2
+    }
+   ]
+  },
+  {
+   "name": "comments_and_extra",
+   "archive": "504b03041400000000000000210043beb7e8010000000100000005000600612e74787499990200616261504b030414000000000000002100ae1baeb5020000000200000005000000622e7478746262504b010214031400000000000000210043beb7e80100000001000000050006000b00000000000000808100000000612e7478749999020061626d656d626572206e6f7465504b0102140014000000000000002100ae1baeb5020000000200000005000000000000000100000080012a000000622e747874504b05060000000002000200770000004f0000000c0061726368697665206e6f7465",
+   "comment": "61726368697665206e6f7465",
+   "members": [
+    {
+     "filename": "a.txt",
+     "date_time": [
+      1980,
+      1,
+      1,
+      0,
+      0,
+      0
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "999902006162",
+     "comment": "6d656d626572206e6f7465",
+     "flag_bits": 0,
+     "compress_type": 0,
+     "file_size": 1
+    },
+    {
+     "filename": "b.txt",
+     "date_time": [
+      1980,
+      1,
+      1,
+      0,
+      0,
+      0
+     ],
+     "create_system": 0,
+     "internal_attr": 1,
+     "external_attr": 25165824,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 0,
+     "compress_type": 0,
+     "file_size": 2
+    }
+   ]
+  },
+  {
+   "name": "deflated_dated",
+   "archive": "504b03041400000008001dad765d4e95d15c060000006400000005000000632e7478744b4ea63d0000504b010214031400000008001dad765d4e95d15c0600000064000000050000000000000000000000808100000000632e747874504b0506000000000100010033000000290000000000",
+   "comment": "",
+   "members": [
+    {
+     "filename": "c.txt",
+     "date_time": [
+      2026,
+      11,
+      22,
+      21,
+      40,
+      58
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 0,
+     "compress_type": 8,
+     "file_size": 100
+    }
+   ]
+  },
+  {
+   "name": "odd_date",
+   "archive": "504b030414000000000000002100cc4add98010000000100000005000000642e74787464504b010214031400000000001f000000cc4add980100000001000000050000000000000000000000808100000000642e747874504b0506000000000100010033000000240000000000",
+   "comment": "",
+   "members": [
+    {
+     "filename": "d.txt",
+     "date_time": [
+      1980,
+      0,
+      0,
+      0,
+      0,
+      62
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 0,
+     "compress_type": 0,
+     "file_size": 1
+    }
+   ]
+  },
+  {
+   "name": "latest_date",
+   "archive": "504b0304140000000000000021005a7adaef010000000100000005000000652e74787465504b01021403140000000000ffffffff5a7adaef0100000001000000050000000000000000000000808100000000652e747874504b0506000000000100010033000000240000000000",
+   "comment": "",
+   "members": [
+    {
+     "filename": "e.txt",
+     "date_time": [
+      2107,
+      15,
+      31,
+      31,
+      63,
+      62
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 0,
+     "compress_type": 0,
+     "file_size": 1
+    }
+   ]
+  },
+  {
+   "name": "utf8_name",
+   "archive": "504b0304140000080000000021003e6a6df201000000010000000d000000c3bc6e6465722fc39f2e74787475504b01021403140000080000000021003e6a6df201000000010000000d0000000000000000000000808100000000c3bc6e6465722fc39f2e747874504b050600000000010001003b0000002c0000000000",
+   "comment": "",
+   "members": [
+    {
+     "filename": "\u00fcnder/\u00df.txt",
+     "date_time": [
+      1980,
+      1,
+      1,
+      0,
+      0,
+      0
+     ],
+     "create_system": 3,
+     "internal_attr": 0,
+     "external_attr": 2172649472,
+     "extra": "",
+     "comment": "",
+     "flag_bits": 2048,
+     "compress_type": 0,
+     "file_size": 1
+    }
+   ]
+  }
+ ]
+}

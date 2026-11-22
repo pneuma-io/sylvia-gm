@@ -160,6 +160,37 @@ fn report(
     rules: &diff::Rules,
     limit: usize,
 ) -> Result<ExitCode, String> {
+    let dropped = |recording: &Json| diff::drop_row_8_headers(&mut recording.clone(), rules);
+    let (from_reference, from_candidate) = (dropped(reference)?, dropped(candidate)?);
+    if from_reference.headers + from_candidate.headers > 0 {
+        println!(
+            "rules: ignore_headers_row_8 dropped {} header(s) from {} model request(s) (reference {}/{}, candidate {}/{})",
+            from_reference.headers + from_candidate.headers,
+            from_reference.requests + from_candidate.requests,
+            from_reference.headers,
+            from_reference.requests,
+            from_candidate.headers,
+            from_candidate.requests,
+        );
+    }
+    let folded = |recording: &Json| {
+        let mut recording = recording.clone();
+        // Names row 8 drops are not counted as folded.
+        let _ = diff::drop_row_8_headers(&mut recording, rules);
+        diff::fold_header_names(&mut recording, rules)
+    };
+    let (folded_reference, folded_candidate) = (folded(reference), folded(candidate));
+    if folded_reference.headers + folded_candidate.headers > 0 {
+        println!(
+            "rules: header_name_case_row_40 compared {} header name(s) in {} model request(s) without case (reference {}/{}, candidate {}/{})",
+            folded_reference.headers + folded_candidate.headers,
+            folded_reference.requests + folded_candidate.requests,
+            folded_reference.headers,
+            folded_reference.requests,
+            folded_candidate.headers,
+            folded_candidate.requests,
+        );
+    }
     let reference = diff::normalise(reference, rules)?;
     let candidate = diff::normalise(candidate, rules)?;
     // Count far past what is printed, so the number is the real amount of work left.

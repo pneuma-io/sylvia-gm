@@ -398,7 +398,7 @@ fn update_preferences(
 }
 
 /// `sqlite_session.insert_builder_chat`.
-fn insert_builder_chat(
+pub(crate) fn insert_builder_chat(
     connection: &Connection,
     session_id: &str,
     provider_id: &str,
