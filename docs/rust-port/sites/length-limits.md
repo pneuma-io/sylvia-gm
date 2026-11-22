@@ -16,7 +16,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/bundled_campaign_plans.py:116` | `read_plan_catalogue` | len() against a limit | `if not isinstance(rows, list) or not 1 <= len(rows) <= 256:` | |
+| `application/bundled_campaign_plans.py:116` | `read_plan_catalogue` | len() against a limit | `if not isinstance(rows, list) or not 1 <= len(rows) <= 256:` |  `sylvia-app` plan_catalogue_vectors |
 | `application/bundled_starter_characters.py:117` | `bundled_starter_participants` | len() against a limit | `if len(_ROSTERS) >= 32:` | |
 | `application/campaign_library_selection.py:640` | `plan_with_interview_intent` | len() against a limit | `if not isinstance(value, str) or len(value) > 131_072:` | |
 | `application/character_card_import.py:128` | `_png_json` | len() against a limit | `if len(encoded) > 350000:` | |

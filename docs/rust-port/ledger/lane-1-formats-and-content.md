@@ -15,11 +15,11 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/builder_references.py` | 435 | `sylvia-app::builder_references` | pending | |
 | `src/sylvia_gm/application/builder_session_migration.py` | 136 | `sylvia-app::builder_session_migration` | pending | |
 | `src/sylvia_gm/application/builder_source_selection.py` | 123 | `sylvia-app::builder_source_selection` | pending | |
-| `src/sylvia_gm/application/bundled_campaign_plans.py` | 271 | `sylvia-app::bundled_campaign_plans` | pending | |
-| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`); `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` in `plan_snapshot_vectors`. `bundled_campaign_content_catalog` waits on `bundled_campaign_plans.py` |
+| `src/sylvia_gm/application/bundled_campaign_plans.py` | 271 | `sylvia-app::bundled_campaign_plans` | ported | `plan_catalogue_vectors` (the repository collection and synthetic collections). Methods on `BundledPackages`, whose `PlanCaches` are Python's `lru_cache`s; the collection root is `BundledSources::campaign_plans_root` |
+| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`); `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` in `plan_snapshot_vectors`. `bundled_campaign_content_catalog` is unblocked (its `bundled_campaign_plans` dependency is ported) and not yet here |
 | `src/sylvia_gm/application/bundled_starter_characters.py` | 150 | `sylvia-app::bundled_starter_characters` | pending | |
 | `src/sylvia_gm/application/campaign_library_selection.py` | 668 | `sylvia-app::campaign_library_selection` | pending | |
-| `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | pending | |
+| `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | ported | `plan_catalogue_vectors` (over lane 3's package-read base with `AuthorityStore`). Owner reads through `library_sources::LibraryOwner`; `read_setting` is a method keeping the owner |
 | `src/sylvia_gm/application/campaign_starting_world.py` | 97 | `sylvia-app::campaign_starting_world` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/application/character_card_import.py` | 628 | `sylvia-app::character_card_import` | pending | |
 | `src/sylvia_gm/application/character_profiles.py` | 391 | `sylvia-app::character_profiles` | ported | `character_profile_vectors` (one file for Windows and Linux); reads through `pyjson::loads_hooked`; differences rows 1, 3 and 4 |

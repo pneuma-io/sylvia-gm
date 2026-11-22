@@ -16,7 +16,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/bundled_campaign_plans.py:120` | `read_plan_catalogue` | re.fullmatch; plain | `if not isinstance(row, dict) or not isinstance(row.get("id"), str) or re.fullmatch( r"[a-z0-9]+(?:-[a-z0-9]+)*", row["id"], ) is None or row["id"] ...` | |
+| `application/bundled_campaign_plans.py:120` | `read_plan_catalogue` | re.fullmatch; plain | `if not isinstance(row, dict) or not isinstance(row.get("id"), str) or re.fullmatch( r"[a-z0-9]+(?:-[a-z0-9]+)*", row["id"], ) is None or row["id"] ...` |  `sylvia-app` plan_catalogue_vectors |
 | `application/character_card_import.py:435` | `_original_path` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
 | `application/character_card_import.py:558` | `_retire_completed_previews` | re.fullmatch; plain | `if re.fullmatch("[0-9a-f]{64}", target.name) is None:` | |
 | `application/character_card_import.py:611` | `confirm_card_preview` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
