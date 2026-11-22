@@ -189,7 +189,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_runner.py:2016` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"\s*'''$", "", clean)` | |
 | `agent/_stateless_mcp.py:1341` | `_safe_error` | re.findall; pattern built at run time, check by hand | `for match in re.findall(pattern, str(error))` | |
 | `agent/_tool_loader.py:79` | `<module>` | re.compile; plain | `_ALIAS = re.compile(r"^tool_[0-9a-f]{12}_(.+)$")` | |
-| `agent/_working_context.py:579` | `WorkingContextProvider.read_history` | re.compile; pattern built at run time, check by hand | `match = re.compile(re.escape(query), re.IGNORECASE).search(text, offset)` | |
+| `agent/_working_context.py:579` | `WorkingContextProvider.read_history` | re.compile; pattern built at run time, check by hand | `match = re.compile(re.escape(query), re.IGNORECASE).search(text, offset)` | `sylvia-agent` working_context_vectors (Python's `_sre` case tables: `sylvia_base::pyre::ignorecase_search`) |
 | `application/character_chat.py:37` | `<module>` | re.compile; plain | `CHAT_ID = re.compile(r"character-chat-[0-9a-f]{24}")` | |
 | `application/character_chat.py:48` | `<module>` | re.compile; plain | `_MACRO = re.compile(r"\{\{\s*(char\|user)\s*\}\}\|<(BOT\|USER)>", re.IGNORECASE)` | |
 | `application/character_chat.py:49` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` | |

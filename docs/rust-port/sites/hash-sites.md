@@ -231,8 +231,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_turn_phases.py:387` | `retry_repeated_response` | hashlib.sha256 | `"response_sha256": hashlib.sha256(state.narration.encode("utf-8")).hexdigest(),` | |
 | `agent/_stateless_mcp.py:2359` | `StatelessMcpMechanics.commit_campaign_file` | hashlib.sha256 | `update_id = f"campaign-file-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |
 | `agent/_stateless_mcp.py:2497` | `StatelessMcpMechanics.commit_narrative_state` | hashlib.sha256 | `update_id = f"narrative-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |
-| `agent/_working_context.py:89` | `durable_tool_result` | hashlib.sha256 | `result["content_sha256"] = hashlib.sha256(content.encode("utf-8")).hexdigest()` | |
-| `agent/_working_context.py:177` | `_groups` | hashlib.sha256 | `groups.append(_Group(bundle, [hashlib.sha256(k.encode()).hexdigest() for k in keys]))` | |
+| `agent/_working_context.py:89` | `durable_tool_result` | hashlib.sha256 | `result["content_sha256"] = hashlib.sha256(content.encode("utf-8")).hexdigest()` | `sylvia-agent` working_context_vectors |
+| `agent/_working_context.py:177` | `_groups` | hashlib.sha256 | `groups.append(_Group(bundle, [hashlib.sha256(k.encode()).hexdigest() for k in keys]))` | `sylvia-agent` working_context_vectors |
 | `application/character_chat.py:398` | `create_chat` | hashlib.sha256 | `chat_id = "character-chat-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
 | `application/character_chat.py:636` | `send_message` | hashlib.sha256 | `operation = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()` | |
 | `config/provider_settings.py:424` | `_provider_profile_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{display_name.casefold()}\n{base_url}".encode()).hexdigest()[:16]` | |

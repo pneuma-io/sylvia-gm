@@ -19,6 +19,6 @@ pub use float_parse::parse_float;
 pub use identifier::isidentifier;
 pub use int_parse::{decimal, parse_int, IntParseError, ValueError, INT_MAX_STR_DIGITS, INT_RANGE_MESSAGE};
 pub use len::len;
-pub use lines::splitlines;
+pub use lines::{splitlines, splitlines_keepends};
 pub use repr::{is_printable, repr, repr_200, repr_json};
 pub use whitespace::{is_space, isspace, lstrip, rstrip, strip};

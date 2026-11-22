@@ -81,6 +81,10 @@ pub enum ErrorKind {
     /// (for example `TypeError` from an unknown request keyword in the streaming path). The owner
     /// answers it with `internal_error`. It is outside the class tree: `is(Provider)` is false.
     Internal,
+    /// Not a `ProviderError`: `asyncio.CancelledError`, raised inside provider work once its
+    /// control was cancelled (the working context's `_check_cancelled`). Outside the class
+    /// tree, as [`ErrorKind::Internal`] is.
+    Cancelled,
 }
 
 impl ErrorKind {
@@ -132,13 +136,14 @@ impl ErrorKind {
             Self::Unavailable => "ProviderUnavailableError",
             Self::ModelCapacity => "ModelCapacityError",
             Self::Internal => "Exception",
+            Self::Cancelled => "CancelledError",
         }
     }
 
     /// The Python base class, or `None` for `ProviderError`.
     pub fn parent(self) -> Option<ErrorKind> {
         match self {
-            Self::Provider | Self::Internal => None,
+            Self::Provider | Self::Internal | Self::Cancelled => None,
             Self::StaleConnection => Some(Self::Timeout),
             Self::Refusal
             | Self::Paused
@@ -168,10 +173,14 @@ impl ErrorKind {
     /// The class attribute `category`, inherited where a subclass does not set its own.
     pub fn category(self) -> ErrorCategory {
         match self {
-            // `Internal` has no category in Python; it never reaches retry or category checks.
-            Self::Provider | Self::Connection | Self::Unavailable | Self::ModelCapacity | Self::Internal => {
-                ErrorCategory::ProviderUnavailable
-            }
+            // `Internal` and `Cancelled` have no category in Python; they never reach retry or
+            // category checks.
+            Self::Provider
+            | Self::Connection
+            | Self::Unavailable
+            | Self::ModelCapacity
+            | Self::Internal
+            | Self::Cancelled => ErrorCategory::ProviderUnavailable,
             Self::Authentication => ErrorCategory::AuthFailure,
             Self::RateLimit => ErrorCategory::RateLimit,
             Self::Timeout | Self::StaleConnection => ErrorCategory::Transient,

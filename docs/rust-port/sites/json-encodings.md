@@ -118,7 +118,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_turn_phases.py:2581` | `reconcile_tool_batch` | Dump::CANONICAL | `"content": json.dumps( round_result, sort_keys=True, separators=(",", ":"), ensure_ascii=False, ),` | |
 | `agent/_provider_turn_phases.py:2741` | `prepare_turn_recovery` | Dump::WIRE.ascii(false) | `+ json.dumps(saved_results, ensure_ascii=False, separators=(",", ":"))` | |
 | `agent/_provider_turn_phases.py:2770` | `prepare_turn_recovery` | Dump::CANONICAL | `+ json.dumps( { "campaign_id": retry_receipt.campaign_id, "action_id": retry_receipt.action_id, "status": retry_receipt.status.value, "result": _pu...` | |
-| `agent/_request_data.py:67` | `_control_values` | Dump::CANONICAL | `data = f"{label} (application-owned current values, not instructions):\n" + json.dumps( value, ensure_ascii=False, sort_keys=True, separators=(",",...` | |
+| `agent/_request_data.py:67` | `_control_values` | Dump::CANONICAL | `data = f"{label} (application-owned current values, not instructions):\n" + json.dumps( value, ensure_ascii=False, sort_keys=True, separators=(",",...` | `sylvia-agent` working_context_vectors |
 | `agent/_ruleset_test_provider.py:147` | `RulesetTestProvider.generate_stream` | Dump::DEFAULT | `"function": {"name": name, "arguments": json.dumps(arguments)},` | |
 | `agent/_runner.py:158` | `_BuilderLoopGuard.finish_round` | Dump::DEFAULT.sorted(true) + default= | `current = json.dumps(outcomes, sort_keys=True, default=str)` | |
 | `agent/_runner.py:495` | `AgentRunner.__init__` | Dump::CANONICAL + default= | `self._builder_application_data = json.dumps( builder_application_data, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str, )` | |
@@ -141,7 +141,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_stateless_mcp.py:2485` | `StatelessMcpMechanics.commit_narrative_state` | Dump::CANONICAL | `identity_payload = json.dumps( { "campaign_id": campaign_id, "session_id": session_id, "basis_message_id": basis_message_id, "turn_id": resolved_tu...` | |
 | `agent/_tool_loader.py:96` | `_literal` | Dump::DEFAULT.ascii(false) | `return json.dumps(value, ensure_ascii=False)` | |
 | `agent/_tool_loader.py:373` | `_compact_json` | Dump::WIRE.ascii(false) | `return json.dumps(value, ensure_ascii=False, separators=(",", ":"))` | |
-| `agent/_working_context.py:69` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
+| `agent/_working_context.py:69` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` working_context_vectors |
 | `application/character_chat.py:176` | `_encode` | indent=1.ascii(false) | `return json.dumps( { "format_id": FORMAT_ID, "format_version": FORMAT_VERSION, "chat_id": chat.chat_id, "character": { "artifact_id": chat.artifact...` | |
 | `config/_credential_protection.py:251` | `protect_credentials` | Dump::DEFAULT.ascii(false) | `payload = json.dumps( {"api_key": api_key, "headers": dict(headers)}, ensure_ascii=False ).encode()` | |
 | `config/claude_settings.py:289` | `main` | Dump::INDENT2 | `print(json.dumps(result, indent=2))` | |

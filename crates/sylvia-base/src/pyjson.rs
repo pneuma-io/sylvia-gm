@@ -32,7 +32,7 @@ mod bytes;
 mod decode_error;
 
 pub use bytes::{detect_encoding, loads_bytes};
-pub use decode_error::{loads_hooked, HookFailure, HookPolicy, Hooked, JsonDecodeError};
+pub use decode_error::{loads_hooked, raw_decode, HookFailure, HookPolicy, Hooked, JsonDecodeError};
 
 use crate::{CodedError, Json};
 use std::fmt::Write as _;
