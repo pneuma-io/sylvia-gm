@@ -46,7 +46,7 @@ fn first<'a>(columns: &'a [String], rows: Vec<Vec<Value>>) -> Option<Named<'a>> 
 
 /// `_campaign_operation_hit`: the stored result of an operation already committed with this
 /// kind and payload, or `None`; any other kind or payload is an `IdempotencyConflict`.
-fn campaign_operation_hit_on(
+pub(crate) fn campaign_operation_hit_on(
     connection: &Connection,
     operation_id: &str,
     operation_kind: &str,

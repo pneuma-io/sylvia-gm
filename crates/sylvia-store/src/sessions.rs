@@ -292,7 +292,7 @@ fn store_session(
 }
 
 /// `sqlite_session.update_session_status`.
-fn update_session_status(
+pub(crate) fn update_session_status(
     connection: &Connection,
     session_id: &str,
     status: SessionStatus,
@@ -316,7 +316,10 @@ fn update_session_status(
 }
 
 /// `sqlite_session.restore_stopped_session`.
-fn restore_stopped_session(connection: &Connection, session_id: &str) -> StoreResult<SessionRecord> {
+pub(crate) fn restore_stopped_session(
+    connection: &Connection,
+    session_id: &str,
+) -> StoreResult<SessionRecord> {
     let current = read_session(connection, session_id)?;
     if current.fields().status != SessionStatus::Stopped {
         return Err(rejected("Designated campaign session is not stopped", "command_rejected"));
