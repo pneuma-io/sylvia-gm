@@ -160,6 +160,19 @@ fn report(
     rules: &diff::Rules,
     limit: usize,
 ) -> Result<ExitCode, String> {
+    let dropped = |recording: &Json| diff::drop_row_8_headers(&mut recording.clone(), rules);
+    let (from_reference, from_candidate) = (dropped(reference)?, dropped(candidate)?);
+    if from_reference.headers + from_candidate.headers > 0 {
+        println!(
+            "rules: ignore_headers_row_8 dropped {} header(s) from {} model request(s) (reference {}/{}, candidate {}/{})",
+            from_reference.headers + from_candidate.headers,
+            from_reference.requests + from_candidate.requests,
+            from_reference.headers,
+            from_reference.requests,
+            from_candidate.headers,
+            from_candidate.requests,
+        );
+    }
     let reference = diff::normalise(reference, rules)?;
     let candidate = diff::normalise(candidate, rules)?;
     // Count far past what is printed, so the number is the real amount of work left.
