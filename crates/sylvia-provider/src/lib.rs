@@ -31,6 +31,8 @@ pub mod anthropic;
 pub mod catalog;
 pub mod chat;
 pub mod claude_install;
+pub mod claude_kept;
+pub mod claude_native;
 pub mod claude_runtime;
 pub mod codex_rpc;
 pub mod config;

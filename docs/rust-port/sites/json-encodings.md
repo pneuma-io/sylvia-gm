@@ -158,11 +158,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude.py:608` | `ClaudeProvider._keep_plan` | Dump::DEFAULT.sorted(true) | `tools_key=json.dumps(native_tools, sort_keys=True), history=history,` | |
 | `provider/_claude.py:796` | `ClaudeProvider._fresh` | Dump::DEFAULT | `transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)` | |
 | `provider/_claude.py:1033` | `ClaudeProvider._run_events` | Dump::DEFAULT + allow_nan= | `json.dumps(candidate["input"], allow_nan=False),` | |
-| `provider/_claude_kept.py:265` | `_same` | Dump::DEFAULT.ascii(false).sorted(true) | `return json.dumps(_plain(a), sort_keys=True, ensure_ascii=False) == json.dumps(` | |
-| `provider/_claude_kept.py:265` | `_same` | Dump::DEFAULT.ascii(false).sorted(true) | `return json.dumps(_plain(a), sort_keys=True, ensure_ascii=False) == json.dumps( _plain(b), sort_keys=True, ensure_ascii=False)` | |
-| `provider/_claude_native.py:297` | `_round_row` | Dump::DEFAULT | `return {"type": "assistant", "message": json.loads(json.dumps(message))}` | |
-| `provider/_claude_native.py:298` | `_round_row` | Dump::DEFAULT | `return {"type": "user", "message": json.loads(json.dumps( {key: message[key] for key in ("role", "content") if key in message}))}` | |
-| `provider/_claude_native.py:480` | `collect_answer` | Dump::DEFAULT | `"collected", tuple(records), answer=json.loads(json.dumps(rows[index]["message"])),` | |
+| `provider/_claude_kept.py:265` | `_same` | Dump::DEFAULT.ascii(false).sorted(true) | `return json.dumps(_plain(a), sort_keys=True, ensure_ascii=False) == json.dumps(` | `sylvia-provider` kept_vectors |
+| `provider/_claude_kept.py:265` | `_same` | Dump::DEFAULT.ascii(false).sorted(true) | `return json.dumps(_plain(a), sort_keys=True, ensure_ascii=False) == json.dumps( _plain(b), sort_keys=True, ensure_ascii=False)` | `sylvia-provider` kept_vectors |
+| `provider/_claude_native.py:297` | `_round_row` | Dump::DEFAULT | `return {"type": "assistant", "message": json.loads(json.dumps(message))}` | `sylvia-provider` kept_vectors |
+| `provider/_claude_native.py:298` | `_round_row` | Dump::DEFAULT | `return {"type": "user", "message": json.loads(json.dumps( {key: message[key] for key in ("role", "content") if key in message}))}` | `sylvia-provider` kept_vectors |
+| `provider/_claude_native.py:480` | `collect_answer` | Dump::DEFAULT | `"collected", tuple(records), answer=json.loads(json.dumps(rows[index]["message"])),` | `sylvia-provider` kept_vectors |
 | `provider/_claude_runtime.py:401` | `ClaudeConnection.write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | `sylvia-provider` runtime_process |
 | `provider/_codex_rpc.py:294` | `CodexConnection._write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | `sylvia-provider` runtime_process |
 | `provider/_context_fit.py:85` | `_canonical_request_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( {"messages": messages, "tools": tools or [], "options": dict(options)}, sort_keys=True, separators=(",", ":"), ensure_ascii=Fals...` | `sylvia-provider` context_fit_vectors |

@@ -16,8 +16,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/builder_references.py:176` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` | |
-| `application/builder_references.py:241` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` | |
+| `application/builder_references.py:176` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` |  `sylvia-app` builder_reference_vectors |
+| `application/builder_references.py:241` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` |  `sylvia-app` builder_reference_vectors |
 | `application/builder_references.py:353` | `with_character_examples` | hashlib.sha256 | `"content_sha256": hashlib.sha256(canonical_json_bytes(draft)).hexdigest(),` | |
 | `application/bundled_packages.py:210` | `_srd_drafts` | hashlib.sha256 | `if item.byte_count != len(value) or item.sha256 != hashlib.sha256(value).hexdigest():` |  `sylvia-app` bundled_vectors |
 | `application/bundled_starter_characters.py:89` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(source.encode()).hexdigest(),` | |

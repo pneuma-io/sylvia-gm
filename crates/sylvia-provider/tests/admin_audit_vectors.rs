@@ -352,7 +352,7 @@ impl Provider for Hanging {
     }
 }
 
-/// Differences row NEXT (Admin Full Audit early close): a dropped call is recorded as cancelled.
+/// Differences row 44 (Admin Full Audit early close): a dropped call is recorded as cancelled.
 #[tokio::test]
 async fn a_dropped_call_is_recorded_as_cancelled() {
     use futures_util::FutureExt;
