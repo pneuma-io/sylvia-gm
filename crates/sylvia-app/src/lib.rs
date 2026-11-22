@@ -26,6 +26,7 @@ pub mod actor_decisions;
 pub mod authority;
 pub mod builder_prompts;
 pub mod builder_references;
+pub mod builder_session_migration;
 pub mod builder_tools;
 pub mod bundled_campaign_plans;
 pub mod bundled_packages;

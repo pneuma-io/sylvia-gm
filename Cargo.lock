@@ -2717,6 +2717,7 @@ name = "sylvia-app"
 version = "0.4.1"
 dependencies = [
  "flate2",
+ "rusqlite",
  "serde_json",
  "sylvia-base",
  "sylvia-compare",
