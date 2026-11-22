@@ -14,6 +14,9 @@ point, so its outcome is recorded without changing the database the other steps 
 `guided/advance_runs.json` and `guided/advance_runs.sqlite3.gz` (the database afterwards);
 `tests/guided.rs` replays them. Identities are explicit and the owner's UUIDs are seeded, so a
 re-run writes byte-identical files. Reference tooling only.
+
+The four guided generators share `guided/` and build on this one's seed. Run them in order with
+`generate_guided_all.py` (draft, advance, start, finalize).
 """
 
 from __future__ import annotations
