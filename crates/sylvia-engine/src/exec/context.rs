@@ -7,7 +7,7 @@ use crate::expr::value::{Dict, Value};
 use crate::expr::{EvalContext, ExecutionBudget};
 use std::cell::Cell;
 use std::collections::BTreeSet;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 /// A list value's shared storage (its Python identity).
 pub type ListRef = Arc<Vec<Value>>;
@@ -15,12 +15,27 @@ use sylvia_domain::authority::MechanicsChoiceRequest;
 
 /// Where `ctx.combat_state` lives. Python hands a tool the bridge's own combat dict, so writes
 /// through the context change state; a caller without a bridge passes its own dict.
+///
+/// Cloning a `Combat` shares the dict, as Python shares the object: a procedure whose combat
+/// state is its own dict passes that same dict to the procedures it triggers, and their writes
+/// reach it. [`Combat::own`] makes a new dict (`dict(...)` or `{}`).
 #[derive(Debug, Clone)]
 pub enum Combat {
     /// The bridge's combat dict (`state_bridge.combat_state`).
     Bridge,
-    /// A dict of the caller's.
-    Own(Dict),
+    /// A dict of the caller's, shared by every clone.
+    Own(Arc<Mutex<Dict>>),
+}
+
+impl Combat {
+    /// A new combat dict holding `map`.
+    pub fn own(map: Dict) -> Self {
+        Self::Own(Arc::new(Mutex::new(map)))
+    }
+}
+
+fn locked(map: &Mutex<Dict>) -> std::sync::MutexGuard<'_, Dict> {
+    map.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
 }
 
 /// `ctx.extras`: the runtime managers and per-call bookkeeping Python keeps in a free dict.
@@ -32,6 +47,22 @@ pub struct Extras {
     pub entity_parameter_names: BTreeSet<String>,
     /// `extras["participant_parameter_names"]`.
     pub participant_parameter_names: BTreeSet<String>,
+}
+
+/// How a nested `call` runs: as the package runtime's `nested` executor (the bridge's combat
+/// state, the choice control, prepared parameters) or as a procedure's `_make_nested_executor`
+/// (a copy of the combat state, no choice control).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NestedMode {
+    Package,
+    Procedure,
+}
+
+/// `ctx.procedure_executor`: a trigger's depth and the combat state its procedures run against.
+#[derive(Debug, Clone)]
+pub struct ProcedureExecutor {
+    pub depth: usize,
+    pub combat: Combat,
 }
 
 /// `ChoiceResolutionControl`: the owner's authorized answer for one suspended package choice,
@@ -65,6 +96,10 @@ pub struct ExecutionContext<'a> {
     /// Lists changed in place so far, each old list with the one that replaced it (kept alive so
     /// their addresses stay unique while the call runs).
     pub list_history: Vec<(ListRef, ListRef)>,
+    /// `ctx.procedure_executor`.
+    pub procedure_executor: Option<ProcedureExecutor>,
+    /// How nested calls run.
+    pub nested_mode: NestedMode,
 }
 
 /// `copy.deepcopy(value)` for execution values: every container rebuilt, so nothing aliases the
@@ -87,6 +122,33 @@ fn holds(value: &Value, old: &Arc<Vec<Value>>) -> bool {
         Value::Dict(map) => map.values().any(|item| holds(item, old)),
         Value::Object(object) => object.fields.iter().any(|(_, item)| holds(item, old)),
         _ => false,
+    }
+}
+
+fn holds_dict(value: &Value, old: &Arc<Dict>) -> bool {
+    match value {
+        Value::Dict(map) => Arc::ptr_eq(map, old) || map.values().any(|item| holds_dict(item, old)),
+        Value::List(items) | Value::Tuple(items) => items.iter().any(|item| holds_dict(item, old)),
+        Value::Object(object) => object.fields.iter().any(|(_, item)| holds_dict(item, old)),
+        _ => false,
+    }
+}
+
+/// Point every reference to the dict `old` at `new`.
+fn repoint_dict(value: &mut Value, old: &Arc<Dict>, new: &Arc<Dict>) {
+    if !holds_dict(value, old) {
+        return;
+    }
+    match value {
+        Value::Dict(map) if Arc::ptr_eq(map, old) => *value = Value::Dict(new.clone()),
+        Value::Dict(map) => Arc::make_mut(map).values_mut().for_each(|item| repoint_dict(item, old, new)),
+        Value::List(items) | Value::Tuple(items) => {
+            Arc::make_mut(items).iter_mut().for_each(|item| repoint_dict(item, old, new))
+        }
+        Value::Object(object) => {
+            Arc::make_mut(object).fields.iter_mut().for_each(|(_, item)| repoint_dict(item, old, new))
+        }
+        _ => {}
     }
 }
 
@@ -123,6 +185,19 @@ impl<'a> ExecutionContext<'a> {
         new
     }
 
+    /// A dict changed in place (`clock_tick`): the new contents replace `old` wherever the
+    /// context holds it, as for lists.
+    pub fn replace_dict(&mut self, old: &Arc<Dict>, contents: Dict) -> Arc<Dict> {
+        let new = Arc::new(contents);
+        for map in [&mut self.params, &mut self.vars, &mut self.entities] {
+            map.values_mut().for_each(|value| repoint_dict(value, old, &new));
+        }
+        if let Some(published) = self.extras.published_result.as_mut() {
+            repoint_dict(published, old, &new);
+        }
+        new
+    }
+
     /// The list object `list` is now (following its in-place changes).
     pub fn current_list(&self, list: &Arc<Vec<Value>>) -> Arc<Vec<Value>> {
         let mut current = list.clone();
@@ -136,7 +211,7 @@ impl<'a> ExecutionContext<'a> {
     /// `ctx.combat_state`.
     pub fn combat_state(&self) -> Dict {
         match (&self.combat, &self.state_bridge) {
-            (Combat::Own(map), _) => map.clone(),
+            (Combat::Own(map), _) => locked(map).clone(),
             (Combat::Bridge, Some(bridge)) => bridge.combat().clone(),
             (Combat::Bridge, None) => Dict::new(),
         }
@@ -146,7 +221,7 @@ impl<'a> ExecutionContext<'a> {
     pub fn set_combat(&mut self, key: &str, value: Value) {
         match (&mut self.combat, &mut self.state_bridge) {
             (Combat::Own(map), _) => {
-                map.insert(key.to_owned(), value);
+                locked(map).insert(key.to_owned(), value);
             }
             (Combat::Bridge, Some(bridge)) => {
                 bridge.combat_mut().insert(key.to_owned(), value);

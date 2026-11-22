@@ -10,9 +10,10 @@ use sylvia_engine::spatial::{admit_spatial_scene, SpatialError};
 /// The generator's `build(value)`: a `copies` recipe repeats the first item of that list in the
 /// base scene, the copies' ids `{key[0]}00000`, `{key[0]}00001` and so on, their metadata `{}`.
 fn build(input: &Json, base: &Json) -> Json {
-    let (Some(key), Some(count)) =
-        (input.pointer("/recipe/copies").and_then(Json::as_str), input.pointer("/recipe/count").and_then(Json::as_u64))
-    else {
+    let (Some(key), Some(count)) = (
+        input.pointer("/recipe/copies").and_then(Json::as_str),
+        input.pointer("/recipe/count").and_then(Json::as_u64),
+    ) else {
         return input.clone();
     };
     let mut scene = base.clone();
@@ -66,11 +67,21 @@ fn scenes_admit_as_python() {
         let mut wanted = case.clone();
         wanted.as_object_mut().unwrap().shift_remove("input");
         // Key order matters (the payload keeps Python's), so compare the serialized text.
-        let (actual, wanted) = (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
+        let (actual, wanted) =
+            (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
         if actual != wanted {
-            failures.push(format!("case {index}\n  python {}\n  rust   {}", &wanted[..wanted.len().min(600)],
-                                  &actual[..actual.len().min(600)]));
+            failures.push(format!(
+                "case {index}\n  python {}\n  rust   {}",
+                &wanted[..wanted.len().min(600)],
+                &actual[..actual.len().min(600)]
+            ));
         }
     }
-    assert!(failures.is_empty(), "{} of {} differ, first: {:#?}", failures.len(), cases.len(), &failures[..failures.len().min(5)]);
+    assert!(
+        failures.is_empty(),
+        "{} of {} differ, first: {:#?}",
+        failures.len(),
+        cases.len(),
+        &failures[..failures.len().min(5)]
+    );
 }

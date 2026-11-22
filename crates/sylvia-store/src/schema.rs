@@ -565,7 +565,7 @@ pub fn migrate_legacy_campaigns(connection: &Connection) -> StoreResult<()> {
 }
 
 /// `sqlite_campaign._parse_mapping`.
-fn parse_mapping(text: &str) -> StoreResult<sylvia_base::JsonMap> {
+pub(crate) fn parse_mapping(text: &str) -> StoreResult<sylvia_base::JsonMap> {
     match crate::campaigns::parse_canonical(text)? {
         Json::Object(map) => Ok(map),
         _ => Err(crate::error::value_error("Stored canonical JSON must be an object")),

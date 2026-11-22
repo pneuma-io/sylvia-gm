@@ -64,7 +64,8 @@ pub fn resolve_surface_source<P: SurfaceParticipant>(
     Ok(match kind {
         Some("literal") => Json::Object(owned_payload(source.get("value").unwrap_or(&Json::Null))?),
         Some("state") => {
-            let (Some(Json::String(namespace)), Some(Json::String(key))) = (source.get("namespace"), source.get("key"))
+            let (Some(Json::String(namespace)), Some(Json::String(key))) =
+                (source.get("namespace"), source.get("key"))
             else {
                 return Ok(Json::Null);
             };
@@ -109,8 +110,10 @@ pub fn resolve_surface_source<P: SurfaceParticipant>(
             let mut keyed = JsonMap::new();
             for entry in sequence(source.get("entries")).into_iter().flatten() {
                 let Json::Object(entry) = entry else { continue };
-                let key = resolve_surface_source(entry.get("key").unwrap_or(&Json::Null), state, participants)?;
-                let value = resolve_surface_source(entry.get("value").unwrap_or(&Json::Null), state, participants)?;
+                let key =
+                    resolve_surface_source(entry.get("key").unwrap_or(&Json::Null), state, participants)?;
+                let value =
+                    resolve_surface_source(entry.get("value").unwrap_or(&Json::Null), state, participants)?;
                 if let Json::String(key) = key {
                     if !sylvia_base::pystr::strip(&key).is_empty() && !value.is_null() {
                         keyed.insert(key, value);

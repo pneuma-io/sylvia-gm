@@ -14,6 +14,7 @@ pub mod backup;
 pub mod campaigns;
 pub mod continuity;
 pub mod error;
+pub mod f5;
 pub mod guided;
 pub mod guided_advance;
 pub mod guided_finalize;

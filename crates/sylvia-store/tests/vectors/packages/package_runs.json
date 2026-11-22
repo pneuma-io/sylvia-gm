@@ -1257,6 +1257,9 @@
      "archive": "riichi",
      "install_id": "install-2",
      "fault": false
+    },
+    {
+     "op": "reopen"
     }
    ],
    "outcomes": [
@@ -1270,6 +1273,11 @@
      "error": "ValueError",
      "code": null,
      "message": "Immutable participant declarations conflict"
+    },
+    {
+     "error": "SchemaIdentityError",
+     "code": "schema_identity_mismatch",
+     "message": "Authority stored integrity could not be verified"
     }
    ]
   },

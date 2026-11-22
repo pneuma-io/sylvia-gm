@@ -8,8 +8,10 @@ pub mod context;
 pub mod effects;
 pub mod error;
 pub mod handlers;
+pub mod procedures;
 pub mod shape;
 pub mod template;
+pub mod time;
 pub mod tool;
 
 pub use bridge::{MemoryStateBridge, StateBridge};

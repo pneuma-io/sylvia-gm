@@ -52,7 +52,8 @@ fn surface_sources_resolve_as_python() {
     assert!(cases.len() > 1500);
     let mut failures = Vec::new();
     for (index, case) in cases.iter().enumerate() {
-        let participants: Vec<Fixture> = case["participants"].as_array().unwrap().iter().map(fixture).collect();
+        let participants: Vec<Fixture> =
+            case["participants"].as_array().unwrap().iter().map(fixture).collect();
         let actual = match resolve_surface_source(&case["source"], state, &participants) {
             Ok(value) => json!({"result": value}),
             Err(error) => json!({"error": [class(&error), error.to_string()]}),
@@ -63,10 +64,17 @@ fn surface_sources_resolve_as_python() {
                 wanted.insert(key.into(), value.clone());
             }
         }
-        let (actual, wanted) = (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
+        let (actual, wanted) =
+            (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
         if actual != wanted {
             failures.push(format!("case {index}: {}\n  python {wanted}\n  rust   {actual}", case["source"]));
         }
     }
-    assert!(failures.is_empty(), "{} of {} differ, first: {:#?}", failures.len(), cases.len(), &failures[..failures.len().min(5)]);
+    assert!(
+        failures.is_empty(),
+        "{} of {} differ, first: {:#?}",
+        failures.len(),
+        cases.len(),
+        &failures[..failures.len().min(5)]
+    );
 }

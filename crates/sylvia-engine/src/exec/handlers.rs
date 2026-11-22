@@ -490,7 +490,7 @@ pub(crate) fn handle_random_table(
 
 /// `_resolve_collection(ref, ctx)`: the list object itself (`live`), or a sequence's members
 /// copied into a new list, or `None`.
-fn resolve_collection(
+pub(crate) fn resolve_collection(
     reference: &Value,
     ctx: &ExecutionContext<'_>,
 ) -> Result<Option<(ListRef, bool)>, ExecError> {
@@ -551,7 +551,7 @@ fn sort_key(item: &Value, by: &str) -> Value {
 
 /// `list.sort(key=..., reverse=...)` with CPython's comparisons: reverse, a stable sort by key
 /// (one `count_run` and one `binarysort` below 64 items), reverse again.
-fn sort_by_key(
+pub(crate) fn sort_by_key(
     items: &mut Vec<Value>,
     keys: Vec<Value>,
     reverse: bool,

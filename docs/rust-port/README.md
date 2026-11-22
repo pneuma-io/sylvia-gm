@@ -149,7 +149,13 @@ One model for the whole port; do not introduce another without the manager.
 
 ## Where Python and Rust differ without telling you
 
-The lists in `sites/` give every occurrence by lane. The traps behind them:
+The lists in `sites/` give every occurrence by lane. A row's Done cell names the vector or
+session that proves it. Otherwise it says why no proof is needed:
+- `retired` when the code holding the site is retired;
+- `not reached: <reason>` when the site is in kept code that no live path reaches;
+- `not needed: <reason>` when the site is reached but has no observable effect.
+
+The traps behind them:
 
 | Trap | Python | Rust | What to do |
 | --- | --- | --- | --- |

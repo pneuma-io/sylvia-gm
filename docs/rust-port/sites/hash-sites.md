@@ -192,9 +192,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_campaign.py:152` | `<module>` | hashlib.sha256 | `CAMPAIGN_IDENTITY_DELTA_SHA256 = hashlib.sha256( CAMPAIGN_IDENTITY_DELTA_SQL.strip().encode("utf-8") ).hexdigest()` | yes |
 | `infrastructure/sqlite_campaign.py:214` | `<module>` | hashlib.sha256 | `LIFECYCLE_EXTENSION_SHA256 = hashlib.sha256(LIFECYCLE_EXTENSION_SQL.encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_campaign.py:259` | `<module>` | hashlib.sha256 | `PURGE_EXTENSION_SHA256 = hashlib.sha256(PURGE_EXTENSION_SQL.encode("utf-8")).hexdigest()` | yes |
-| `infrastructure/sqlite_campaign.py:361` | `adaptation_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | |
-| `infrastructure/sqlite_campaign.py:589` | `verify_f5_campaign_authority` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(source_data)).hexdigest(),` | |
-| `infrastructure/sqlite_campaign.py:626` | `verify_f5_campaign_authority` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(value)).hexdigest()` | |
+| `infrastructure/sqlite_campaign.py:361` | `adaptation_payload_sha256` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | `sylvia-store` stored_authority (`cast`) |
+| `infrastructure/sqlite_campaign.py:589` | `verify_f5_campaign_authority` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(source_data)).hexdigest(),` | not needed: Python never compares this tuple member |
+| `infrastructure/sqlite_campaign.py:626` | `verify_f5_campaign_authority` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(value)).hexdigest()` | `sylvia-store` stored_authority (`cast`) |
 | `infrastructure/sqlite_continuity.py:45` | `<module>` | hashlib.sha256 | `MIGRATION_9_SHA256 = hashlib.sha256(MIGRATION_9_SQL.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_continuity.py:111` | `_initial_entry_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{campaign_id}\0{kind}\0{record_id}".encode()).hexdigest()[:32]` | |
 | `infrastructure/sqlite_continuity.py:266` | `_backfill_legacy_messages` | hashlib.sha256 | `entry_id = f"legacy-{hashlib.sha256(legacy_key.encode()).hexdigest()[:32]}"` | |

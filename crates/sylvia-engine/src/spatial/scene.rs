@@ -24,11 +24,30 @@ const MAP_KEYS: &[&str] = &["id", "revision", "bounds", "grid", "layers"];
 const BOUNDS_KEYS: &[&str] = &["min", "max"];
 const GRID_KEYS: &[&str] = &["cell_size", "unit", "origin"];
 const LAYER_KEYS: &[&str] = &["id", "min_elevation", "max_elevation"];
-const GEOMETRY_KEYS: &[&str] =
-    &["id", "map_id", "volume", "active", "movement", "occupies_cells", "visibility", "metadata", "destroyed"];
+const GEOMETRY_KEYS: &[&str] = &[
+    "id",
+    "map_id",
+    "volume",
+    "active",
+    "movement",
+    "occupies_cells",
+    "visibility",
+    "metadata",
+    "destroyed",
+];
 const DESTROYED_KEYS: &[&str] = &["active", "movement", "visibility"];
-const ENTITY_KEYS: &[&str] =
-    &["id", "map_id", "position", "footprint", "height", "facing", "active", "movement", "visibility", "metadata"];
+const ENTITY_KEYS: &[&str] = &[
+    "id",
+    "map_id",
+    "position",
+    "footprint",
+    "height",
+    "facing",
+    "active",
+    "movement",
+    "visibility",
+    "metadata",
+];
 const ZONE_KEYS: &[&str] = &["id", "map_id", "shape", "metadata"];
 const TERRAIN_KEYS: &[&str] = &["cell", "layer_id", "cost"];
 
@@ -77,7 +96,8 @@ pub fn admit_spatial_scene(value: &Json) -> Result<AdmittedSpatialScene, Spatial
     let map = payload["map"].as_object().expect("the normalized map");
     let map_id = map["id"].as_str().expect("an admitted identity").to_owned();
     let geometry_revision = map["revision"].as_i64().expect("an admitted revision");
-    let identity = json!({"algorithm_version": SPATIAL_ALGORITHM_VERSION, "scene": Json::Object(payload.clone())});
+    let identity =
+        json!({"algorithm_version": SPATIAL_ALGORITHM_VERSION, "scene": Json::Object(payload.clone())});
     let snapshot_id = hex(&Sha256::digest(canonical_json_bytes(&identity)));
     Ok(AdmittedSpatialScene {
         payload,
@@ -163,7 +183,13 @@ fn object<'v>(value: &'v Json, keys: &[&str], code: &'static str, path: &str) ->
 }
 
 /// `_array(value, minimum=..., maximum=..., ...)`.
-fn array<'v>(value: &'v Json, minimum: usize, maximum: usize, code: &'static str, path: &str) -> Admit<&'v Vec<Json>> {
+fn array<'v>(
+    value: &'v Json,
+    minimum: usize,
+    maximum: usize,
+    code: &'static str,
+    path: &str,
+) -> Admit<&'v Vec<Json>> {
     match value {
         Json::Array(items) if (minimum..=maximum).contains(&items.len()) => Ok(items),
         _ => reject("Spatial array length is invalid", code, path),
@@ -207,7 +233,8 @@ fn identity(value: &Json, code: &'static str, path: &str) -> Admit<String> {
     if let Json::String(text) = value {
         let mut bytes = text.bytes();
         let first_ok = bytes.next().is_some_and(|byte| byte.is_ascii_alphanumeric());
-        let rest_ok = bytes.all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b':' | b'-'));
+        let rest_ok =
+            bytes.all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'.' | b'_' | b':' | b'-'));
         if first_ok && rest_ok && text.len() <= 128 {
             return Ok(text.clone());
         }
@@ -218,7 +245,11 @@ fn identity(value: &Json, code: &'static str, path: &str) -> Admit<String> {
 /// `_coordinate(value, dimensions, ...)`: the numbers as written.
 fn coordinate(value: &Json, dimensions: usize, code: &'static str, path: &str) -> Admit<Vec<Json>> {
     let items = array(value, dimensions, dimensions, code, path)?;
-    items.iter().enumerate().map(|(index, item)| number(item, None, code, &format!("{path}[{index}]"))).collect()
+    items
+        .iter()
+        .enumerate()
+        .map(|(index, item)| number(item, None, code, &format!("{path}[{index}]")))
+        .collect()
 }
 
 /// `_cell(value, ...)`.
@@ -267,7 +298,10 @@ struct Bounds {
 impl Bounds {
     /// `_inside(point, bounds)`.
     fn inside(&self, point: &[f64]) -> bool {
-        point.iter().enumerate().all(|(index, value)| self.lower[index] <= *value && *value <= self.upper[index])
+        point
+            .iter()
+            .enumerate()
+            .all(|(index, value)| self.lower[index] <= *value && *value <= self.upper[index])
     }
 }
 
@@ -324,7 +358,11 @@ fn same_map(item: &JsonMap, map_id: &str, path: &str) -> Admit<()> {
 }
 
 /// The identity check every placed object makes: valid and unique across the scene.
-fn unique_identity(item: &JsonMap, seen: &mut std::collections::HashSet<String>, path: &str) -> Admit<String> {
+fn unique_identity(
+    item: &JsonMap,
+    seen: &mut std::collections::HashSet<String>,
+    path: &str,
+) -> Admit<String> {
     let id = identity(&item["id"], SCENE_INVALID, &format!("{path}.id"))?;
     if !seen.insert(id.clone()) {
         return reject("Spatial identities must be unique", DUPLICATE_ID, format!("{path}.id"));
@@ -386,7 +424,10 @@ fn validate_scene(payload: &JsonMap) -> Result<JsonMap, SpatialError> {
         let minimum = number(&item["min_elevation"], None, code, &format!("{path}.min_elevation"))?;
         let maximum = number(&item["max_elevation"], None, code, &format!("{path}.max_elevation"))?;
         let (bottom, top) = (float(&minimum), float(&maximum));
-        if bottom >= top || !bounds.inside(&[low[0], low[1], bottom]) || !bounds.inside(&[high[0], high[1], top]) {
+        if bottom >= top
+            || !bounds.inside(&[low[0], low[1], bottom])
+            || !bounds.inside(&[high[0], high[1], top])
+        {
             reject::<()>("Layer elevation is outside map bounds", OUT_OF_BOUNDS, path)?;
         }
         layers.push(json!({"id": layer_id, "min_elevation": minimum, "max_elevation": maximum}));
@@ -419,8 +460,10 @@ fn validate_scene(payload: &JsonMap) -> Result<JsonMap, SpatialError> {
         let sight = visibility(&item["visibility"], code, &format!("{path}.visibility"))?;
         let meta = metadata(&item["metadata"], code, &format!("{path}.metadata"))?;
         let destroyed_active = boolean(&destroyed["active"], code, &format!("{path}.destroyed.active"))?;
-        let destroyed_movement = movement(&destroyed["movement"], code, &format!("{path}.destroyed.movement"))?;
-        let destroyed_visibility = visibility(&destroyed["visibility"], code, &format!("{path}.destroyed.visibility"))?;
+        let destroyed_movement =
+            movement(&destroyed["movement"], code, &format!("{path}.destroyed.movement"))?;
+        let destroyed_visibility =
+            visibility(&destroyed["visibility"], code, &format!("{path}.destroyed.visibility"))?;
         geometry.push(json!({
             "id": item_id, "map_id": map_id, "volume": volume, "active": active, "movement": blocks,
             "occupies_cells": occupies, "visibility": sight, "metadata": meta,
@@ -446,8 +489,10 @@ fn validate_scene(payload: &JsonMap) -> Result<JsonMap, SpatialError> {
             });
         };
         let (normalized_footprint, extents) = if footprint_map.get("kind") == Some(&json!("box")) {
-            let footprint = object(footprint_raw, &["kind", "half_extents"], code, &format!("{path}.footprint"))?;
-            let half_extents = coordinate(&footprint["half_extents"], 2, code, &format!("{path}.footprint.half_extents"))?;
+            let footprint =
+                object(footprint_raw, &["kind", "half_extents"], code, &format!("{path}.footprint"))?;
+            let half_extents =
+                coordinate(&footprint["half_extents"], 2, code, &format!("{path}.footprint.half_extents"))?;
             let half = floats(&half_extents);
             if half.iter().any(|value| *value <= 0.0) {
                 reject::<()>("Footprint extent must be positive", code, format!("{path}.footprint"))?;
@@ -458,7 +503,8 @@ fn validate_scene(payload: &JsonMap) -> Result<JsonMap, SpatialError> {
             if footprint["kind"] != json!("circle") {
                 reject::<()>("Footprint kind is invalid", code, format!("{path}.footprint.kind"))?;
             }
-            let radius = number(&footprint["radius"], Some(POSITIVE), code, &format!("{path}.footprint.radius"))?;
+            let radius =
+                number(&footprint["radius"], Some(POSITIVE), code, &format!("{path}.footprint.radius"))?;
             let r = float(&radius);
             (json!({"kind": "circle", "radius": radius}), [r, r])
         };

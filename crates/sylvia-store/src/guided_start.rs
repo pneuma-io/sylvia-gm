@@ -7,13 +7,8 @@
 //! `_insert_campaign_operation`, `sqlite_packages.insert_campaign_lock` (`_lock_id`) and
 //! `AuthorityOwner.append_agent_message`.
 //!
-//! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently:
-//! - binding an installed Ruleset (a non-empty lock): `_validate_campaign_inputs` and the
-//!   Interview Contribution lookup need lane 1's `interview_content`;
-//! - participants and initial state, which only the saved-library Start supplies;
-//! - `sqlite_campaign.verify_f5_campaign_authority`, which Python runs before committing a
-//!   binding. Startup does not run it yet either (see the ledger), so a binding is that much less
-//!   strictly checked until the lifecycle family lands.
+//! Before committing a binding it runs `sqlite_campaign.verify_f5_campaign_authority` (`f5`), as
+//! Python does. What is still not ported is refused in `sylvia_app::authority::guided`.
 
 use crate::actions::{dump, load_payload};
 use crate::campaigns::{named_rows, Named};
@@ -425,8 +420,7 @@ impl AuthorityStore {
             )?;
             crate::stored::verify_stored_authority(connection)?;
             crate::packages::verify_package_authority(connection)?;
-            // `sqlite_campaign.verify_f5_campaign_authority` runs here in Python (see the module
-            // documentation).
+            crate::f5::verify_f5_campaign_authority(connection)?;
             Ok(CampaignConfirmation { campaign_id: bind.campaign_id.to_owned(), resulting_revision: confirmation_revision })
         })
     }

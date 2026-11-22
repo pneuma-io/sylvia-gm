@@ -39,9 +39,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
 | `runtime/_scene_awareness.py:266` | `SceneAwarenessBuilder._build_single_npc` | .capitalize() | `role = kind.capitalize()` | |
-| `runtime/_time_manager.py:215` | `advance_time` | .title() | `time_str = f"Day {day}, {time_of_day.title()}, {hour:02d}:{minute:02d}"` | |
-| `runtime/_time_manager.py:283` | `get_current_datestamp` | .title() | `main_parts.append(time_of_day.title())` | |
-| `runtime/_time_manager.py:330` | `get_time_for_context` | .title() | `parts.append(time_of_day.title())` | |
+| `runtime/_time_manager.py:215` | `advance_time` | .title() | `time_str = f"Day {day}, {time_of_day.title()}, {hour:02d}:{minute:02d}"` |  not reached: the package bridge has no `_ensure_campaign_entity`, so `advance_time`'s campaign-clock branch raises before it (#349) |
+| `runtime/_time_manager.py:283` | `get_current_datestamp` | .title() | `main_parts.append(time_of_day.title())` |  not reached: only the retired `_state_memo` calls `get_current_datestamp` (#349) |
+| `runtime/_time_manager.py:330` | `get_time_for_context` | .title() | `parts.append(time_of_day.title())` |  not reached: nothing calls `get_time_for_context` outside the `runtime/__init__.py` re-exports (#349) |
 
 ## Lane 3: Storage and authority
 
