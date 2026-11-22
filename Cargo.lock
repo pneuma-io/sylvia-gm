@@ -2365,6 +2365,7 @@ name = "sylvia-agent"
 version = "0.4.1"
 dependencies = [
  "futures-util",
+ "indexmap",
  "serde",
  "serde_json",
  "sylvia-app",
