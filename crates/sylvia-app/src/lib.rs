@@ -22,6 +22,7 @@ pub mod character_profiles;
 pub mod character_rules;
 pub mod network_graph;
 pub mod package_materialization;
+pub mod package_materializer;
 pub mod path_guardrail;
 pub mod plan_state_admission;
 pub mod reusable_library_deletion;
