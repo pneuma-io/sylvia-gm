@@ -221,16 +221,24 @@ with an absolute path:
 
 ```
 bash docs/rust-port/tools/stage_dictation_natives.sh <empty folder outside the checkout>
-SYLVIA_DICTATION_NATIVE_DIR=<that folder>/native cargo test -p sylvia-owner --features dictation \
-    --test dictation_native
-SYLVIA_DICTATION_NATIVE_DIR=<that folder>/native cargo test -p sylvia-owner --features dictation \
-    --lib dictation -- --include-ignored
+powershell -NoProfile -ExecutionPolicy Bypass -File docs/rust-port/tools/sapi_speech.ps1 <speech folder>
+export LIBRARY_PATH=<that folder>/ct2-lib SYLVIA_DICTATION_NATIVE_DIR=<that folder>/native
+export SYLVIA_DICTATION_MODEL_DIR=<the pinned model, as prepare_model downloads it>
+export SYLVIA_DICTATION_SPEECH_DIR=<speech folder>
+cargo test -p sylvia-owner --features dictation --test dictation_native
+cargo test -p sylvia-owner --features dictation --test dictation_engine
+cargo test -p sylvia-owner --features dictation --test dictation_transcribe
+cargo test -p sylvia-owner --features dictation --lib dictation -- --include-ignored
 cargo clippy -p sylvia-owner --features dictation --all-targets -- -D warnings
 ```
 
 `dictation_native` runs itself again under `OMP_NUM_THREADS=2` (the desktop's setting for the
-speech worker) and `OMP_NUM_THREADS=1`. OpenBLAS reads the variable when it loads and its
-threads decide the bits, so do not set `OPENBLAS_NUM_THREADS` in the shell.
+speech worker) and `OMP_NUM_THREADS=1`; `dictation_engine` and `dictation_transcribe` under
+`OMP_NUM_THREADS=2` with the native folder first on `PATH`. OpenBLAS reads the variable when it
+loads and its threads decide the bits, so do not set `OPENBLAS_NUM_THREADS` in the shell.
+`dictation_transcribe` compares whole transcriptions with faster-whisper's, segment by segment,
+and the worker's final text; the SAPI clips' hashes are in its vectors, so a different Windows
+voice build fails as a clip mismatch. It takes about ten minutes.
 
 ## Files in this folder
 

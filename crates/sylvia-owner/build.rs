@@ -10,5 +10,15 @@ fn main() {
             .join("common-controls-6.manifest");
         println!("cargo:rustc-link-arg-tests=/MANIFEST:EMBED");
         println!("cargo:rustc-link-arg-tests=/MANIFESTINPUT:{}", manifest.display());
+        // Dictation: the shipped `ctranslate2.dll` is loaded at its first use, not at start, so
+        // the worker checks the file beside the owner before anything calls it, and an owner
+        // without it still starts (`dictation::engine`).
+        if std::env::var_os("CARGO_FEATURE_DICTATION").is_some() {
+            println!("cargo:rustc-link-arg=/DELAYLOAD:ctranslate2.dll");
+            println!("cargo:rustc-link-lib=delayimp");
+            // LNK4199: binaries that never call the engine (most test binaries) have nothing to
+            // delay-load.
+            println!("cargo:rustc-link-arg=/IGNORE:4199");
+        }
     }
 }
