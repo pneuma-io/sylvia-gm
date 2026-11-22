@@ -106,7 +106,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_effect_executor.py:69` | `_handle_shuffle` | re.fullmatch; plain | `if not isinstance(destination, str) or re.fullmatch(r"_[A-Za-z0-9_]+", destination) is None:` | |
 | `runtime/_effect_executor.py:367` | `_handle_request_choice` | re.fullmatch; plain | `if isinstance(raw_options, str) and re.fullmatch(r"_[A-Za-z0-9_]+", raw_options):` | |
 | `runtime/_effect_executor.py:390` | `_handle_request_choice` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` | |
-| `runtime/_effect_executor.py:2151` | `_resolve_value` | re.match; plain | `match = re.match(r"^([A-Za-z_][A-Za-z_0-9]*)", expr)` | |
+| `runtime/_effect_executor.py:2151` | `_resolve_value` | re.match; plain | `match = re.match(r"^([A-Za-z_][A-Za-z_0-9]*)", expr)` |  `sylvia-engine` execution_vectors |
 | `runtime/_expression_parser.py:156` | `<module>` | re.compile; pattern built at run time, check by hand | `_TOKEN_PATTERN = re.compile(_TOKEN_REGEX)` | yes: `expression_parse_vectors` |
 | `runtime/_frontmatter.py:18` | `<module>` | re.compile; plain | `_FRONTMATTER_RE = re.compile( r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL )` | |
 | `runtime/_parameter_declarations.py:84` | `resolve_parameter_declarations` | re.fullmatch; pattern built at run time, check by hand | `if not isinstance(name, str) or not re.fullmatch(PARAMETER_DECLARATION_ID_PATTERN, name):` |  `sylvia-engine` ruleset_validation_vectors |
@@ -135,8 +135,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `runtime/_schema_validator.py:1607` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", choice_id) is None` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_schema_validator.py:1615` | `_validate_request_choice_effect` | re.fullmatch; plain | `if isinstance(options, str) and re.fullmatch(r"_[A-Za-z0-9_]+", options):` |  `sylvia-engine` ruleset_validation_vectors |
 | `runtime/_schema_validator.py:1629` | `_validate_request_choice_effect` | re.fullmatch; plain | `or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]*", option_id) is None` |  `sylvia-engine` ruleset_validation_vectors |
-| `runtime/_template_resolver.py:19` | `<module>` | re.compile; plain | `_TEMPLATE_RE: re.Pattern[str] = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}")  # noqa: E501` | |
-| `runtime/_template_resolver.py:67` | `resolve_params` | re.fullmatch; plain | `match = re.fullmatch(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}", value)  # noqa: E501` | |
+| `runtime/_template_resolver.py:19` | `<module>` | re.compile; plain | `_TEMPLATE_RE: re.Pattern[str] = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}")  # noqa: E501` |  `sylvia-engine` execution_vectors |
+| `runtime/_template_resolver.py:67` | `resolve_params` | re.fullmatch; plain | `match = re.fullmatch(r"\{([a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*)\}", value)  # noqa: E501` |  `sylvia-engine` execution_vectors |
 | `runtime/_time_manager.py:55` | `<module>` | re.compile; plain | `_DURATION_RE = re.compile(r"^\s*(\d+(?:\.\d+)?)\s+(\w+)\s*$")` | |
 | `spatial/_interface.py:17` | `<module>` | re.compile; plain | `_IDENTITY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")` | |
 

@@ -109,6 +109,25 @@ impl ExecutionBudget {
         }
         Ok(())
     }
+
+    /// `enter_call()`: one level deeper, refused past `max_call_depth`.
+    pub fn enter_call(&self) -> Result<(), PyError> {
+        self.call_depth.set(self.call_depth.get() + 1);
+        if self.call_depth.get() > self.max_call_depth {
+            self.call_depth.set(self.call_depth.get() - 1);
+            return Err(PyError::of(PyErrorKind::RuntimeError, "Package runtime call depth exceeded"));
+        }
+        Ok(())
+    }
+
+    /// `leave_call()`.
+    pub fn leave_call(&self) -> Result<(), PyError> {
+        if self.call_depth.get() < 1 {
+            return Err(PyError::of(PyErrorKind::RuntimeError, "Package runtime call depth underflow"));
+        }
+        self.call_depth.set(self.call_depth.get() - 1);
+        Ok(())
+    }
 }
 
 /// The parts of `ExecutionContext` an expression reads.
@@ -196,7 +215,7 @@ pub fn resolve_root(name: &str, ctx: &EvalContext<'_>) -> Value {
 }
 
 /// `_traverse_field(value, field)`.
-fn traverse(value: &Value, field: &str) -> Value {
+pub(crate) fn traverse(value: &Value, field: &str) -> Value {
     match value {
         Value::None => Value::None,
         Value::Dict(map) => map.get(field).cloned().unwrap_or(Value::None),
