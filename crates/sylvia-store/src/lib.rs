@@ -11,8 +11,8 @@
 pub mod actions;
 pub mod authority;
 pub mod backup;
-pub mod builder_sources;
 pub mod builder_launch_migration;
+pub mod builder_sources;
 pub mod campaign_archive;
 pub mod campaigns;
 pub mod continuity;
