@@ -16,6 +16,7 @@
 pub mod commands;
 pub mod desktop_update;
 pub mod diagnostics;
+pub mod dictation;
 pub mod dispatch;
 pub mod display_reads;
 pub mod protocol;

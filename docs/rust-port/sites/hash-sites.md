@@ -290,8 +290,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `interfaces/webui.py:107` | `RemoteAccess.from_file` | hashlib.sha256 | `return cls(origin, hashlib.sha256(matched[1]).digest())` | `webui-remote` (the access-key file's digest, then a key sign-in) |
 | `interfaces/webui.py:442` | `LocalWebUI.login` | hashlib.sha256 | `hashlib.sha256(key.encode()).digest(), self.remote.key_digest` | `webui-remote` (right and wrong access keys) |
 | `interfaces/webui.py:525` | `LocalWebUI.command` | hashlib.sha256 | `digest = hashlib.sha256( json.dumps( [method, params], sort_keys=True, allow_nan=False, ).encode() ).hexdigest()` | `webui-guard` (a repeated request identity with other parameters: `idempotency_conflict`) |
-| `local_dictation.py:42` | `_verified` | hashlib.file_digest | `return hashlib.file_digest(stream, "sha256").hexdigest() == expected[1]` | |
-| `local_dictation.py:210` | `_device_id` | hashlib.sha256 | `identity = hashlib.sha256( f"{host}\n{row['name']}\n{row['default_samplerate']}".encode() ).hexdigest()[:16]` | |
+| `local_dictation.py:42` | `_verified` | hashlib.file_digest | `return hashlib.file_digest(stream, "sha256").hexdigest() == expected[1]` | `dictation_vectors` (capabilities and prepare with complete, missing and corrupt model files) |
+| `local_dictation.py:210` | `_device_id` | hashlib.sha256 | `identity = hashlib.sha256( f"{host}\n{row['name']}\n{row['default_samplerate']}".encode() ).hexdigest()[:16]` | `dictation_vectors` (`device_ids`: int and float rates, non-ASCII names; every capabilities scenario) |
 | `portable_artifact.py:80` | `_digest` | hashlib.sha256 | `return hashlib.sha256(raw).hexdigest()` | |
 | `release_artifact.py:124` | `_sha256_file` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `release_artifact.py:405` | `read_dependency_notices` | hashlib.sha256 | `if expected_sha256 is not None and hashlib.sha256(content).hexdigest() != expected_sha256:` | |
