@@ -413,8 +413,28 @@ CARDS = [
     {"version": 1, "summary": [{"label": "Row", "value": {"path": "context._nested"}}]},
     {"version": 1, "summary": [{"label": "Row", "value": [1, 2, {"a": 1}]}]},
     {"version": 1, "summary": [{"label": "Row", "value": "y" * 4001}]},
+    # Character, not byte, bounds; Python's float repr for labels; the path depth bound; a
+    # details-only card; an equation-only card (dropped); a private channel in action parameters.
+    {"version": 1, "title": "\u00e9" * 150},
+    {"version": 1, "summary": [{"label": "Big", "value": {"path": "context._big", "labels": {"1e+16": "Huge"}}},
+                               {"label": "Tiny", "value": {"path": "context._tiny", "labels": {"1e-07": "Tiny"}}}]},
+    {"version": 1, "title": {"path": "context._deep" + ".a" * 15}},
+    {"version": 1, "title": {"path": "context._deep16" + ".a" * 14}},
+    {"version": 1, "details": [{"label": "D", "value": 1}]},
+    {"version": 1, "equation": {"die_sides": 4, "roll": 2, "modifier": 1, "total": 3}},
+    {"version": 1, "title": "T", "actions": [{"label": "Go", "tool": "go", "parameters": {"private_reasoning": 1}}]},
 ]
-LABELS = [None, "Quick move", {"path": "context._title"}, "x" * 81, {"path": "context._rolls"}, "   ", 5]
+LABELS = [None, "Quick move", {"path": "context._title"}, "x" * 81, {"path": "context._rolls"}, "   ", 5, "\u00e9" * 60]
+LABEL_CARDS = [{"version": 1, "title": "Only a title"}, {"version": 1, "title": "T", "summary": [{"value": 1}]},
+               {"version": 1, "title": "T", "subtitle": "S"},
+               {"version": 1, "title": "T", "equation": {"die_sides": 4, "roll": 2, "modifier": 1, "total": 3}}, None]
+
+
+def nested(depth: int, leaf: str) -> object:
+    value: object = leaf
+    for _ in range(depth):
+        value = {"a": value}
+    return value
 
 
 def scene_vars() -> list:
@@ -423,7 +443,9 @@ def scene_vars() -> list:
             {"set": {"field": "_hit", "value": True}}, {"set": {"field": "_kind", "value": "'a'"}},
             {"set": {"field": "_half", "value": 0.5}}, {"set": {"field": "_d", "value": 4}},
             {"set": {"field": "_rolls", "value": [1, 3]}}, {"set": {"field": "_long", "value": "'" + "z" * 300 + "'"}},
-            {"set": {"field": "_nested", "value": {"a": 1}}},
+            {"set": {"field": "_nested", "value": {"a": 1}}}, {"set": {"field": "_big", "value": 1e16}},
+            {"set": {"field": "_tiny", "value": 1e-7}}, {"set": {"field": "_deep", "value": nested(15, "'Deep'")}},
+            {"set": {"field": "_deep16", "value": nested(14, "'Deep'")}},
             {"set": {"field": "_rows", "value": [{"label": "R", "value": 1}, {"label": "S", "value": 2, "emphasis": True}]}},
             {"set": {"field": "_rows_ref", "value": [{"label": "R", "value": {"path": "context._roll"}}]}}]
 
@@ -610,11 +632,19 @@ def targeted() -> list[dict]:
          choice={**resolution, "option_id": "attack", "prior_answers": prior})
     case("choice unused", synthetic("plain", [{"set": {"field": "_x", "value": 1}}]), "plain", target, choice=resolution)
     case("choice after shuffle", synthetic("choose", [shuffle, choose]), "choose", target)
+    # A procedure's context holds no choice control, so its request suspends while the outer
+    # resolution is still unconsumed.
+    in_procedure = {"on_choose": {"trigger": "on_choose", "steps": [
+        {"request_choice": {"choice_id": "c1", "prompt": "Choose", "options": CHOICE_OPTIONS[1:] + [
+            {"id": "stay", "label": "Stay"}]}, "store_as": "_choice"}]}}
+    procedure_choice = synthetic("choose", [{"trigger": "on_choose"}], procedures=in_procedure)
+    case("choice in procedure", procedure_choice, "choose", target)
+    case("choice in procedure resolved", procedure_choice, "choose", target, choice=resolution)
     # Result cards and activity labels.
     for index, card in enumerate(CARDS):
         case(f"card {index}", synthetic("card", scene_vars(), metadata={"result_card": card}), "card", target)
     for index, label in enumerate(LABELS):
-        for card in ({"version": 1, "title": "Only a title"}, {"version": 1, "title": "T", "summary": [{"value": 1}]}, None):
+        for card in LABEL_CARDS:
             metadata = {"activity_label": label}
             if card is not None:
                 metadata["result_card"] = card
