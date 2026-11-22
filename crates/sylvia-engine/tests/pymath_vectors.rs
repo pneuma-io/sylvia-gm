@@ -3,7 +3,7 @@
 //! Regenerate with `tests/vectors/generate_pymath_vectors.py` (needs the snapshot's Python).
 
 use serde_json::Value as Json;
-use sylvia_engine::pymath::{dist, hypot};
+use sylvia_engine::pymath::{dist, hypot, round_digits};
 
 fn floats(value: &Json) -> Vec<f64> {
     value.as_array().unwrap().iter().map(|bits| f64::from_bits(bits.as_u64().unwrap())).collect()
@@ -36,6 +36,16 @@ fn hypot_and_dist_match_cpython() {
         if !same(actual, case["result"].as_u64().unwrap()) {
             failures.push(format!(
                 "dist({p:?}, {q:?}) = {actual:e}, python {:e}",
+                f64::from_bits(case["result"].as_u64().unwrap())
+            ));
+        }
+    }
+    for case in vectors["round12"].as_array().unwrap() {
+        let input = f64::from_bits(case["input"].as_u64().unwrap());
+        let actual = round_digits(input, 12);
+        if !same(actual, case["result"].as_u64().unwrap()) {
+            failures.push(format!(
+                "round({input:e}, 12) = {actual:e}, python {:e}",
                 f64::from_bits(case["result"].as_u64().unwrap())
             ));
         }
