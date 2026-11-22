@@ -150,7 +150,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:6262` | `AuthorityOwner.read_campaign_reference` | re.fullmatch; plain | `match = re.fullmatch(r"adventures/([1-9][0-9]*)/(structured(?:/.*)?\|markdown)", path)` | |
 | `application/authority.py:6313` | `AuthorityOwner.read_campaign_reference` | re.fullmatch; plain | `if not isinstance(readable, str) or not re.fullmatch(r"[0-9]{1,10}", page):` | |
 | `application/authority.py:6443` | `AuthorityOwner.read_campaign_reference` | re.fullmatch; plain | `if re.fullmatch(r"text/(0\|[1-9][0-9]{0,9})", fragment) is None:` | |
-| `application/knowledge_search.py:101` | `knowledge_terms` | re.findall; plain | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | |
+| `application/knowledge_search.py:101` | `knowledge_terms` | re.findall; plain | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | `sylvia-app` knowledge_search (`knowledge_terms`: `str.isalnum` runs) |
 | `application/ruleless_play.py:83` | `<module>` | re.compile; NEEDS fancy-regex: lookahead, lookbehind | `re.compile(r"(?<![\w-])\d{0,3}d(?:4\|6\|8\|10\|12\|20\|100)(?![\w-])", re.IGNORECASE),` | |
 | `application/ruleless_play.py:87` | `<module>` | re.compile; plain | `re.compile( r"\broll(?:ing)?\s+(?:for\b\|initiative\b\|to\s+(?:see\|hit\|save\|resist)\b" r"\|(?:a\|an\|your)\s+(?:[a-z]+\s+){0,2}(?:check\|save\|r...` | |
 | `application/ruleless_play.py:95` | `<module>` | re.compile; pattern built at run time, check by hand | `re.compile( r"\b(?:(?:" + _SKILL_WORDS + r")\s+(?:check\|save\|saving\s+throw\|test\|roll)s?" r"\|saving\s+throws?)\b", re.IGNORECASE, ),` | |

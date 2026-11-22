@@ -16,6 +16,7 @@ pub mod builder_launch_migration;
 pub mod builder_sources;
 pub mod campaign_archive;
 pub mod campaigns;
+pub mod catalog_reads;
 pub mod continuity;
 pub mod error;
 pub mod export;

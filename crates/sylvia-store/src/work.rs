@@ -123,6 +123,18 @@ impl CampaignWork {
         Ok(TransitionGuard { state: Arc::clone(&self.state), campaign_id: campaign_id.to_owned() })
     }
 
+    /// `_ensure_campaign_not_transitioning(campaign_id)`: refused while a package transition is
+    /// reserved for the campaign.
+    pub fn ensure_not_transitioning(&self, campaign_id: &str) -> StoreResult<()> {
+        if self.state.lock().unwrap_or_else(PoisonError::into_inner).transitions.contains(campaign_id) {
+            return Err(rejected(
+                "Campaign package transition blocks admission",
+                "package_transition_in_progress",
+            ));
+        }
+        Ok(())
+    }
+
     /// How much work is registered on a campaign (`_campaign_work_counts.get(id, 0)`).
     pub fn count(&self, campaign_id: &str) -> usize {
         self.state

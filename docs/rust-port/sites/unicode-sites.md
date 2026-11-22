@@ -54,7 +54,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:5872` | `AuthorityOwner.search_campaign_knowledge` | .casefold() | `if Path(path).suffix.casefold() not in {` | |
 | `application/authority.py:5967` | `AuthorityOwner.search_campaign_knowledge` | .casefold() | `heading_key = heading.casefold().rstrip("s")` | |
 | `application/authority.py:6501` | `AuthorityOwner.read_campaign_reference` | .casefold() | `selected_heading.casefold().rstrip("s") if selected_heading is not None else ""` | |
-| `application/knowledge_search.py:101` | `knowledge_terms` | .casefold() | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | |
+| `application/knowledge_search.py:101` | `knowledge_terms` | .casefold() | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | `sylvia-app` knowledge_search (`sylvia_base::pystr::casefold`) |
 | `infrastructure/builder_source_ingestion.py:143` | `_extract_source` | .casefold() | `extension = path.suffix.casefold()` | |
 | `infrastructure/campaign_archive.py:2587` | `validate_campaign_archive` | .casefold() | `casefold_aliases = [name.casefold() for name in names]` | `sylvia-store` archive_validation (`alias_case`, `alias_sharp_s`, `alias_long_s`) |
 | `infrastructure/campaign_archive.py:2588` | `validate_campaign_archive` | unicodedata.normalize | `nfc_aliases = [unicodedata.normalize("NFC", name).casefold() for name in names]` | `sylvia-store` archive_validation (`alias_nfc`, `no_alias_distinct`) |
