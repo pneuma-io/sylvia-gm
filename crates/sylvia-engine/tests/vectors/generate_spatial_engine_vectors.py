@@ -334,6 +334,12 @@ def targeted_engine(scenes: list[dict]) -> list[tuple[int, dict]]:
                           "destination": [5.5 + step, 5.5, 0], "origin": [12, 10.3, 0], "moving_radius": 0.5, "fixed_radius": 1}))
         cases.append((0, {"kind": "circle_overlap", "map_id": "keep", "moving_entity_id": "orc", "fixed_entity_id": "elf",
                           "destination": [12 + step, 10, 1], "origin": [12, 10, 0], "moving_radius": 0.5, "fixed_radius": 1}))
+    # The same tiny moves starting just inside the circle's edge, so the horizontal crossing ends partway.
+    for step in (1e-13, 1e-9, 1e-7, 1e-6):
+        for inset in (5e-8, 5e-10, 5e-14):
+            start = [12 + 1.5 - inset, 10, 0.5]
+            cases.append((0, {"kind": "circle_overlap", "map_id": "keep", "moving_entity_id": "orc", "fixed_entity_id": "elf",
+                              "destination": [start[0] + step, 10, 0.5], "origin": start, "moving_radius": 0.5, "fixed_radius": 1}))
     # Circle routes: sixteen and seventeen blocking circles; an angle that wraps.
     yard_scene = scenes[yard]
     others = [row["id"] for row in yard_scene["entities"] if row["id"] != "p.mover"]
