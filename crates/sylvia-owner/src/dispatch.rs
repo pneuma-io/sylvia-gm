@@ -139,6 +139,11 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             CodedError::new(PORT_PENDING, format!("The Rust owner does not answer {method} yet.")).into()
         );
     }
+    // Its preflight's provider errors keep Python's provider-error reply, so it answers a
+    // `Failure` itself.
+    if method == "finalize_campaign_construction" {
+        return commands::campaigns::handle_finalize_campaign_construction(context, params).await;
+    }
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,

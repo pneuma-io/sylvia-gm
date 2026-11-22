@@ -239,7 +239,15 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     async fn the_opening_reads_are_the_owner_reads() {
         let folder = std::env::temp_dir().join(format!("sylvia-owner-reads-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&folder);
+        // A folder left by an earlier run must go, or its files would look like this run's.
+        if let Err(error) = std::fs::remove_dir_all(&folder) {
+            assert_eq!(
+                error.kind(),
+                std::io::ErrorKind::NotFound,
+                "cannot clear the old work folder {}: {error}",
+                folder.display()
+            );
+        }
         std::fs::create_dir_all(&folder).unwrap();
         let database = folder.join("authority.sqlite3");
         let source = crate::util::source_root()
