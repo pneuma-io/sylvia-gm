@@ -39,6 +39,65 @@ pub trait StateBridge {
         field_path: &str,
         value: Value,
     ) -> Result<(), ExecError>;
+    /// `take_damage(entity_id, amount)`.
+    fn take_damage(&mut self, entity_id: &str, amount: i64) -> Result<i64, ExecError> {
+        let amount = amount.max(0);
+        let Value::Int(hp) = self.read_field(entity_id, "hp")? else {
+            return Err(ExecError::package_runtime("Damage target has no integer hp"));
+        };
+        let replacement = (hp - amount).max(0);
+        self.write_field(entity_id, "hp", Value::Int(replacement))?;
+        Ok(replacement)
+    }
+
+    /// `heal(entity_id, amount)`.
+    fn heal(&mut self, entity_id: &str, amount: i64) -> Result<i64, ExecError> {
+        let (hp, maximum) = (self.read_field(entity_id, "hp")?, self.read_field(entity_id, "max_hp")?);
+        let (Value::Int(hp), Value::Int(maximum)) = (hp, maximum) else {
+            return Err(ExecError::package_runtime("Healing target has no integer hp/max_hp"));
+        };
+        let replacement = maximum.min(hp + amount.max(0));
+        self.write_field(entity_id, "hp", Value::Int(replacement))?;
+        Ok(replacement)
+    }
+
+    /// `add_condition(entity_id, condition)`.
+    fn add_condition(&mut self, entity_id: &str, condition: &str) -> Result<(), ExecError> {
+        let mut values = match self.read_field(entity_id, "conditions")? {
+            Value::List(items) => (*items).clone(),
+            _ => Vec::new(),
+        };
+        let item = Value::str(condition);
+        if !values.iter().any(|value| py_eq(value, &item)) {
+            values.push(item);
+        }
+        self.write_field(entity_id, "conditions", Value::list(values))
+    }
+
+    /// `remove_condition(entity_id, condition)`.
+    fn remove_condition(&mut self, entity_id: &str, condition: &str) -> Result<(), ExecError> {
+        let mut values = match self.read_field(entity_id, "conditions")? {
+            Value::List(items) => (*items).clone(),
+            _ => Vec::new(),
+        };
+        let item = Value::str(condition);
+        if let Some(index) = values.iter().position(|value| py_eq(value, &item)) {
+            values.remove(index);
+        }
+        self.write_field(entity_id, "conditions", Value::list(values))
+    }
+
+    /// `damage_ability(entity_id, ability, amount)`.
+    fn damage_ability(&mut self, entity_id: &str, ability: &str, amount: i64) -> Result<i64, ExecError> {
+        let path = format!("abilities.{ability}.score");
+        let Value::Int(score) = self.read_field(entity_id, &path)? else {
+            return Err(ExecError::package_runtime("Ability damage target has no integer score"));
+        };
+        let replacement = (score - amount.max(0)).max(0);
+        self.write_field(entity_id, &path, Value::Int(replacement))?;
+        Ok(replacement)
+    }
+
     /// The live combat dict (`combat_state`), which Python hands to tools by reference.
     fn combat_mut(&mut self) -> &mut Dict;
     /// `combat_state`, read only.
@@ -262,65 +321,6 @@ impl MemoryStateBridge {
         }
         Ok(changed)
     }
-
-    /// `take_damage(entity_id, amount)`.
-    pub fn take_damage(&mut self, entity_id: &str, amount: i64) -> Result<i64, ExecError> {
-        let amount = amount.max(0);
-        let Value::Int(hp) = self.read_field(entity_id, "hp")? else {
-            return Err(ExecError::package_runtime("Damage target has no integer hp"));
-        };
-        let replacement = (hp - amount).max(0);
-        self.write_field(entity_id, "hp", Value::Int(replacement))?;
-        Ok(replacement)
-    }
-
-    /// `heal(entity_id, amount)`.
-    pub fn heal(&mut self, entity_id: &str, amount: i64) -> Result<i64, ExecError> {
-        let (hp, maximum) = (self.read_field(entity_id, "hp")?, self.read_field(entity_id, "max_hp")?);
-        let (Value::Int(hp), Value::Int(maximum)) = (hp, maximum) else {
-            return Err(ExecError::package_runtime("Healing target has no integer hp/max_hp"));
-        };
-        let replacement = maximum.min(hp + amount.max(0));
-        self.write_field(entity_id, "hp", Value::Int(replacement))?;
-        Ok(replacement)
-    }
-
-    /// `add_condition(entity_id, condition)`.
-    pub fn add_condition(&mut self, entity_id: &str, condition: &str) -> Result<(), ExecError> {
-        let mut values = match self.read_field(entity_id, "conditions")? {
-            Value::List(items) => (*items).clone(),
-            _ => Vec::new(),
-        };
-        let item = Value::str(condition);
-        if !values.iter().any(|value| py_eq(value, &item)) {
-            values.push(item);
-        }
-        self.write_field(entity_id, "conditions", Value::list(values))
-    }
-
-    /// `remove_condition(entity_id, condition)`.
-    pub fn remove_condition(&mut self, entity_id: &str, condition: &str) -> Result<(), ExecError> {
-        let mut values = match self.read_field(entity_id, "conditions")? {
-            Value::List(items) => (*items).clone(),
-            _ => Vec::new(),
-        };
-        let item = Value::str(condition);
-        if let Some(index) = values.iter().position(|value| py_eq(value, &item)) {
-            values.remove(index);
-        }
-        self.write_field(entity_id, "conditions", Value::list(values))
-    }
-
-    /// `damage_ability(entity_id, ability, amount)`.
-    pub fn damage_ability(&mut self, entity_id: &str, ability: &str, amount: i64) -> Result<i64, ExecError> {
-        let path = format!("abilities.{ability}.score");
-        let Value::Int(score) = self.read_field(entity_id, &path)? else {
-            return Err(ExecError::package_runtime("Ability damage target has no integer score"));
-        };
-        let replacement = (score - amount.max(0)).max(0);
-        self.write_field(entity_id, &path, Value::Int(replacement))?;
-        Ok(replacement)
-    }
 }
 
 /// `re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}", entity_id)`.
@@ -337,7 +337,7 @@ impl StateBridge for MemoryStateBridge {
     }
 
     fn get_entity(&self, entity_id: &str) -> Result<Value, ExecError> {
-        Ok(Value::dict(self.entity(entity_id)?.clone()))
+        Ok(super::context::deep_copy(&Value::dict(self.entity(entity_id)?.clone())))
     }
 
     fn participant_exists(&self, participant_id: &str) -> bool {
@@ -346,7 +346,7 @@ impl StateBridge for MemoryStateBridge {
 
     fn get_participant(&self, participant_id: &str) -> Result<Value, ExecError> {
         match self.participants.get(participant_id) {
-            Some(value @ Value::Dict(_)) => Ok(value.clone()),
+            Some(value @ Value::Dict(_)) => Ok(super::context::deep_copy(value)),
             _ => Err(ExecError::key_error(participant_id)),
         }
     }
@@ -354,7 +354,7 @@ impl StateBridge for MemoryStateBridge {
     fn get_position(&self, entity_id: &str) -> Option<Value> {
         match self.entities.get(entity_id) {
             Some(Value::Dict(map)) => match map.get("position") {
-                Some(position @ Value::Dict(_)) => Some(position.clone()),
+                Some(position @ Value::Dict(_)) => Some(super::context::deep_copy(position)),
                 _ => None,
             },
             _ => None,
@@ -362,7 +362,7 @@ impl StateBridge for MemoryStateBridge {
     }
 
     fn read_field(&self, entity_id: &str, field_path: &str) -> Result<Value, ExecError> {
-        Ok(nested_get(&Value::dict(self.entity(entity_id)?.clone()), field_path))
+        Ok(super::context::deep_copy(&nested_get(&Value::dict(self.entity(entity_id)?.clone()), field_path)))
     }
 
     fn write_field(&mut self, entity_id: &str, field_path: &str, value: Value) -> Result<(), ExecError> {

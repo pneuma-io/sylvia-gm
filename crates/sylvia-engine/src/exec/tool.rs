@@ -1,10 +1,11 @@
 //! `runtime/_tool_executor.py`: one tool invocation, from parameters to `ToolResult`.
 
 use super::bridge::StateBridge;
-use super::context::{Combat, ExecutionContext, Extras};
+use super::context::{ChoiceControl, Combat, ExecutionContext, Extras};
 use super::effects::execute_effects;
 use super::error::ExecError;
 use super::template::resolve_template;
+use crate::dice::Dice;
 use crate::expr::value::{py_eq, Dict, Object, Value};
 use crate::expr::ExecutionBudget;
 use crate::ruleset::runtime_tables::{ToolDef, ToolParameter};
@@ -394,6 +395,8 @@ const NAMED_ENTITY_PARAMETERS: [&str; 8] =
     ["actor", "against_target", "ally", "attacker", "caster", "entity", "helper", "target"];
 
 /// `_build_context(...)`.
+// The arguments are Python's own (`execute_tool`'s and `prepare_tool_context`'s parameter lists).
+#[allow(clippy::too_many_arguments)]
 fn build_context<'a>(
     tool: &ExecTool,
     params: &Dict,
@@ -401,6 +404,8 @@ fn build_context<'a>(
     host: &dyn ToolHost,
     combat: Combat,
     budget: &'a ExecutionBudget,
+    dice: &'a mut Dice,
+    choice: Option<&'a ChoiceControl>,
 ) -> ExecutionContext<'a> {
     let mut ctx = ExecutionContext {
         params: params.clone(),
@@ -413,6 +418,9 @@ fn build_context<'a>(
         current_tool: tool.name.clone(),
         extras: Extras::default(),
         budget,
+        dice,
+        choice,
+        list_history: Vec::new(),
     };
     if let Some(bridge) = ctx.state_bridge.as_deref() {
         if bridge.entity_exists("state") {
@@ -553,6 +561,8 @@ pub enum Prepared<'a> {
 
 /// `prepare_tool_context(...)`: bind the context and check prerequisites without running
 /// effects.
+// The arguments are Python's own (`execute_tool`'s and `prepare_tool_context`'s parameter lists).
+#[allow(clippy::too_many_arguments)]
 pub fn prepare_tool_context<'a>(
     tool_name: &str,
     params: &Dict,
@@ -560,6 +570,8 @@ pub fn prepare_tool_context<'a>(
     bridge: Option<&'a mut (dyn StateBridge + 'static)>,
     combat: Combat,
     budget: &'a ExecutionBudget,
+    dice: &'a mut Dice,
+    choice: Option<&'a ChoiceControl>,
 ) -> Result<Prepared<'a>, ExecError> {
     let Some(tool) = host.tool(tool_name) else {
         return Ok(Prepared::Result(Box::new(ToolResult::failure(
@@ -572,7 +584,7 @@ pub fn prepare_tool_context<'a>(
     for parameter in &tool.parameters {
         let name = parameter.name_text();
         if !params.contains_key(&name) && (parameter.default != Value::None || !parameter.required.truthy()) {
-            merged.insert(name, parameter.default.clone());
+            merged.insert(name, super::context::deep_copy(&parameter.default));
         }
     }
     for (key, value) in params {
@@ -596,7 +608,7 @@ pub fn prepare_tool_context<'a>(
             )
         })));
     }
-    let mut ctx = build_context(tool, &merged, bridge, host, combat, budget);
+    let mut ctx = build_context(tool, &merged, bridge, host, combat, budget, dice, choice);
     inject_distance_vars(tool, &merged, &mut ctx);
     let mut failures: Vec<String> = Vec::new();
     let mut evaluation_error: Option<String> = None;
@@ -656,6 +668,8 @@ pub fn prepare_tool_context<'a>(
 }
 
 /// `execute_tool(...)`. A suspended choice is the only exception that leaves it.
+// The arguments are Python's own (`execute_tool`'s and `prepare_tool_context`'s parameter lists).
+#[allow(clippy::too_many_arguments)]
 pub fn execute_tool(
     tool_name: &str,
     params: &Dict,
@@ -663,10 +677,12 @@ pub fn execute_tool(
     bridge: Option<&mut (dyn StateBridge + 'static)>,
     combat: Combat,
     budget: Option<&ExecutionBudget>,
+    dice: &mut Dice,
+    choice: Option<&ChoiceControl>,
 ) -> Result<ToolResult, ExecError> {
     let local = ExecutionBudget::default();
     let budget = budget.unwrap_or(&local);
-    let mut ctx = match prepare_tool_context(tool_name, params, host, bridge, combat, budget)? {
+    let mut ctx = match prepare_tool_context(tool_name, params, host, bridge, combat, budget, dice, choice)? {
         Prepared::Result(result) => return Ok(*result),
         Prepared::Context(ctx) => ctx,
     };

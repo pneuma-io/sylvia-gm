@@ -5,6 +5,7 @@
 
 use super::context::{Combat, ExecutionContext};
 use super::error::{float_to_int, ExecError};
+use super::handlers;
 use super::template::{resolve_params, resolve_template};
 use super::tool::{execute_tool, ToolHost};
 use crate::expr::value::{Dict, Value};
@@ -53,7 +54,7 @@ pub fn execute_effects(
 }
 
 /// `for item in value` over what a body list holds.
-fn iterate(value: &Value) -> Result<Vec<Value>, ExecError> {
+pub(crate) fn iterate(value: &Value) -> Result<Vec<Value>, ExecError> {
     match value {
         Value::List(items) | Value::Tuple(items) => Ok((**items).clone()),
         Value::Dict(map) => Ok(map.keys().map(|key| Value::str(key.as_str())).collect()),
@@ -67,7 +68,7 @@ fn get<'v>(map: &'v Dict, key: &str) -> Option<&'v Value> {
 }
 
 /// `_execute_effect(effect, context, tool_executor)`.
-fn execute_effect(
+pub(crate) fn execute_effect(
     effect: &Value,
     ctx: &mut ExecutionContext<'_>,
     host: &dyn ToolHost,
@@ -131,6 +132,24 @@ fn execute_effect(
         "create_entity" => handle_create_entity(&body, ctx),
         "set_participant" => handle_set_participant(&body, ctx),
         "call" => handle_nested_call(&body, effect_map, ctx, host),
+        "dice" => handlers::handle_dice(&body, effect_map, ctx),
+        "save_throw" => handlers::handle_save_throw(&body, effect_map, ctx),
+        "apply_damage" => handlers::handle_apply_damage(&body, ctx),
+        "heal" => handlers::handle_heal(&body, ctx),
+        "apply_condition" => handlers::handle_condition_change(&body, ctx, true),
+        "remove_condition" => handlers::handle_condition_change(&body, ctx, false),
+        "apply_ability_damage" => handlers::handle_apply_ability_damage(&body, ctx),
+        "count_successes" => handlers::handle_count_successes(&body, effect_map, ctx),
+        "reroll" => handlers::handle_reroll(&body, effect_map, ctx, host),
+        "hunger_dice" => handlers::handle_hunger_dice(&body, effect_map, ctx),
+        "table_lookup" => handlers::handle_table_lookup(&body, effect_map, ctx),
+        "random_table" => handlers::handle_random_table(&body, effect_map, ctx),
+        "for_each" => handlers::handle_for_each(&body, ctx, host),
+        "sort" => handlers::handle_sort(&body, ctx),
+        "list_push" => handlers::handle_list_push(&body, effect_map, ctx),
+        "list_pop" => handlers::handle_list_pop(&body, effect_map, ctx),
+        "shuffle" => handlers::handle_shuffle(&body, effect_map, ctx),
+        "request_choice" => handlers::handle_request_choice(&body, effect_map, ctx),
         other => Err(ExecError::effect(other, "This effect is not yet ported to Rust")),
     };
     result.map_err(|error| error.in_effect(&effect_type))
@@ -184,12 +203,12 @@ pub fn resolve_value(expr: &Value, ctx: &ExecutionContext<'_>) -> Result<Value, 
                 Ok(value) => Ok(value),
             }
         }
-        other => Ok(other.clone()),
+        other => Ok(super::context::deep_copy(other)),
     }
 }
 
 /// `int(value)` for a resolved amount.
-fn to_int(value: &Value) -> Result<i64, ExecError> {
+pub(crate) fn to_int(value: &Value) -> Result<i64, ExecError> {
     match value {
         Value::Int(number) => Ok(*number),
         Value::Bool(flag) => Ok(i64::from(*flag)),
@@ -204,7 +223,7 @@ fn to_int(value: &Value) -> Result<i64, ExecError> {
 }
 
 /// `_resolve_int(expr, ctx)`.
-fn resolve_int(expr: &Value, ctx: &ExecutionContext<'_>) -> Result<i64, ExecError> {
+pub(crate) fn resolve_int(expr: &Value, ctx: &ExecutionContext<'_>) -> Result<i64, ExecError> {
     match expr {
         Value::Int(_) | Value::Float(_) | Value::Bool(_) => to_int(expr),
         other => {
@@ -218,7 +237,7 @@ fn resolve_int(expr: &Value, ctx: &ExecutionContext<'_>) -> Result<i64, ExecErro
 }
 
 /// `_resolve_entity_ref(ref, ctx)`.
-fn resolve_entity_ref(reference: &str, ctx: &ExecutionContext<'_>) -> Option<String> {
+pub(crate) fn resolve_entity_ref(reference: &str, ctx: &ExecutionContext<'_>) -> Option<String> {
     let clean = reference.trim_matches(|c| c == '{' || c == '}');
     if let Some(param) = ctx.params.get(clean) {
         match param {
@@ -242,7 +261,7 @@ fn resolve_entity_ref(reference: &str, ctx: &ExecutionContext<'_>) -> Option<Str
 }
 
 /// `_refresh_entity_snapshots(ctx)`.
-fn refresh_entity_snapshots(ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+pub(crate) fn refresh_entity_snapshots(ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
     let Some(bridge) = ctx.state_bridge.as_deref() else {
         return Ok(());
     };
@@ -403,12 +422,15 @@ fn handle_conditional(
     Ok(())
 }
 
-/// Append to a context list variable as `ctx.vars.setdefault(name, []).append(item)` does.
-fn append_var(ctx: &mut ExecutionContext<'_>, name: &str, item: Value) -> Result<(), ExecError> {
+/// Append to a context list variable as `ctx.vars.setdefault(name, []).append(item)` does, in
+/// place: every alias of that list sees the new item.
+pub(crate) fn append_var(ctx: &mut ExecutionContext<'_>, name: &str, item: Value) -> Result<(), ExecError> {
     let slot = ctx.vars.entry(name.to_owned()).or_insert_with(|| Value::list(Vec::new()));
-    match slot {
+    match slot.clone() {
         Value::List(items) => {
-            std::sync::Arc::make_mut(items).push(item);
+            let mut grown = (*items).clone();
+            grown.push(item);
+            ctx.replace_list(&items, grown);
             Ok(())
         }
         other => Err(ExecError::Python {
@@ -547,8 +569,17 @@ fn handle_nested_call(
         Combat::Own(map) => Combat::Own(map.clone()),
     };
     let budget = ctx.budget;
-    let result =
-        execute_tool(&tool_name, &resolved, host, ctx.state_bridge.as_deref_mut(), combat, Some(budget));
+    let choice = ctx.choice;
+    let result = execute_tool(
+        &tool_name,
+        &resolved,
+        host,
+        ctx.state_bridge.as_deref_mut(),
+        combat,
+        Some(budget),
+        &mut *ctx.dice,
+        choice,
+    );
     budget.leave_call().map_err(ExecError::from)?;
     let result = result?;
     if !result.success {
@@ -573,7 +604,7 @@ fn handle_nested_call(
         if all {
             for (name, value) in &result.context {
                 if name.starts_with('_') {
-                    ctx.vars.insert(name.clone(), value.clone());
+                    ctx.vars.insert(name.clone(), super::context::deep_copy(value));
                 }
             }
         } else if let Value::Dict(pairs) = export {
@@ -596,7 +627,7 @@ fn handle_nested_call(
                         format!("Nested tool context does not contain '{source}'"),
                     ));
                 };
-                ctx.vars.insert(destination.clone(), value.clone());
+                ctx.vars.insert(destination.clone(), super::context::deep_copy(value));
             }
         }
     }
