@@ -28,6 +28,17 @@ fn repository() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join("..")
 }
 
+/// A fresh work folder: one left by a killed run must not show up later as an unrelated error.
+fn fresh_work(name: &str) -> PathBuf {
+    let work = Path::new(env!("CARGO_TARGET_TMPDIR")).join(name);
+    match std::fs::remove_dir_all(&work) {
+        Ok(()) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => panic!("cannot clear the old work folder {}: {error}", work.display()),
+    }
+    work
+}
+
 /// The generator's `skipped`, as lane 5's store vectors skip.
 fn skipped(relative: &str) -> bool {
     ["authority.sqlite3", "migration-sources", "bundled-srd-starters"]
@@ -198,8 +209,7 @@ fn builder_migration_matches_python() {
         ["bases"]
         .clone();
     let bundled = BundledPackages::new(BundledSources::from_repository_root(&root));
-    let work = Path::new(env!("CARGO_TARGET_TMPDIR")).join("builder-migration-vectors");
-    let _ = std::fs::remove_dir_all(&work);
+    let work = fresh_work("builder-migration-vectors");
     let mut failures = Vec::new();
     let cases = vectors["cases"].as_array().unwrap();
     for (index, case) in cases.iter().enumerate() {
@@ -244,8 +254,7 @@ fn authority_store_owner_reports_python_errors() {
         ["bases"]
         .clone();
     let bundled = BundledPackages::new(BundledSources::from_repository_root(&root));
-    let work = Path::new(env!("CARGO_TARGET_TMPDIR")).join("builder-migration-store-errors");
-    let _ = std::fs::remove_dir_all(&work);
+    let work = fresh_work("builder-migration-store-errors");
     for (index, mutation) in
         ["transcript_ghost", "parent_unknown", "state_answer_ghost"].into_iter().enumerate()
     {
