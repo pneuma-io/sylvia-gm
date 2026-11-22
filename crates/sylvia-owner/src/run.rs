@@ -479,9 +479,9 @@ async fn serve(
         return startup_failed();
     }
     // Python's `reconcile_builder_source_purges(storage_root, live campaign ids,
-    // application_owner.campaign_purge_receipt_exists)`, after storage preparation. (The bundled
-    // preinstalls and the legacy Builder chat migration Python runs between the two are not
-    // ported yet.) A failure ends the launch as the preparation's does.
+    // application_owner.campaign_purge_receipt_exists)`, after storage preparation and the bundled
+    // preinstalls. (The legacy Builder chat migration Python runs between them is not ported
+    // yet.) A failure ends the launch as the preparation's does.
     let storage_root = owner.context.storage_root.clone();
     let reconciled = owner
         .context
