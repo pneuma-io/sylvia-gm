@@ -1,0 +1,648 @@
+{
+ "python": "3.12.11",
+ "drafts": {
+  "draft": "campaign-draft-af72250d489ae165bf74a26d",
+  "crowded": "campaign-draft-3c73935729e9ae7a6e6d5646",
+  "helped": "campaign-draft-46eef70dad14b82322064199"
+ },
+ "runs": [
+  {
+   "op": "rename_campaign",
+   "operation_id": "",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": "Story",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle identity is invalid"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": " campaign-story",
+   "expected_revision": 8,
+   "display_name": "Story",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle identity is invalid"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": "  ",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle identity is invalid"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": " Story",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle identity is invalid"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "designated_session_id": " dm-1",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle identity is invalid"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-story",
+   "expected_revision": -1,
+   "display_name": "Story",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle identity is invalid"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-missing",
+   "expected_revision": 0,
+   "display_name": "Gone",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle authority is unavailable"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-story",
+   "expected_revision": 7,
+   "display_name": "Story",
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Campaign lifecycle expected revision is stale"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-x",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": "Busy",
+   "busy": true,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_work_in_progress",
+    "message": "Campaign has active work; activation is not queued"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-1",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": "Story Renamed",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "active",
+     "writer": "dm",
+     "resulting_revision": 9,
+     "session_id": null
+    }
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-1",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": "Story Renamed",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "active",
+     "writer": "dm",
+     "resulting_revision": 9,
+     "session_id": null
+    }
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-1",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "display_name": "Other Name",
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Campaign operation identity payload does not match"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-1",
+   "campaign_id": "campaign-story",
+   "expected_revision": 8,
+   "designated_session_id": "dm-1",
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Campaign operation identity payload does not match"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-2",
+   "campaign_id": "campaign-story",
+   "expected_revision": 9,
+   "designated_session_id": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Designated campaign session is not exact"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-2",
+   "campaign_id": "campaign-story",
+   "expected_revision": 9,
+   "designated_session_id": "builder-1",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Designated campaign session is not exact"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-2",
+   "campaign_id": "campaign-story",
+   "expected_revision": 9,
+   "designated_session_id": "dm-x",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Designated campaign session is not exact"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-2",
+   "campaign_id": "campaign-story",
+   "expected_revision": 9,
+   "designated_session_id": "dm-1",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "archived",
+     "writer": "none",
+     "resulting_revision": 10,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-2",
+   "campaign_id": "campaign-story",
+   "expected_revision": 9,
+   "designated_session_id": "dm-1",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "archived",
+     "writer": "none",
+     "resulting_revision": 10,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-3",
+   "campaign_id": "campaign-story",
+   "expected_revision": 10,
+   "designated_session_id": "dm-1",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle transition is not admissible"
+   }
+  },
+  {
+   "op": "restore_archived_campaign",
+   "operation_id": "life-3",
+   "campaign_id": "campaign-story",
+   "expected_revision": 10,
+   "session_id": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Restore designated session does not match archived campaign"
+   }
+  },
+  {
+   "op": "restore_archived_campaign",
+   "operation_id": "life-3",
+   "campaign_id": "campaign-story",
+   "expected_revision": 10,
+   "session_id": "builder-1",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Restore designated session does not match archived campaign"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-4",
+   "campaign_id": "campaign-story",
+   "expected_revision": 10,
+   "display_name": "Story Archived",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "archived",
+     "writer": "none",
+     "resulting_revision": 11,
+     "session_id": null
+    }
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-5",
+   "campaign_id": "campaign-story",
+   "expected_revision": 11,
+   "designated_session_id": null,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "tombstoned",
+     "writer": "none",
+     "resulting_revision": 12,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-6",
+   "campaign_id": "campaign-story",
+   "expected_revision": 12,
+   "designated_session_id": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle transition is not admissible"
+   }
+  },
+  {
+   "op": "restore_trashed_campaign",
+   "operation_id": "life-7",
+   "campaign_id": "campaign-story",
+   "expected_revision": 12,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "archived",
+     "writer": "none",
+     "resulting_revision": 13,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "restore_archived_campaign",
+   "operation_id": "life-8",
+   "campaign_id": "campaign-story",
+   "expected_revision": 13,
+   "session_id": "dm-1",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "active",
+     "writer": "dm",
+     "resulting_revision": 14,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "restore_trashed_campaign",
+   "operation_id": "life-9",
+   "campaign_id": "campaign-story",
+   "expected_revision": 14,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "active campaign cannot be restored"
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-10",
+   "campaign_id": "campaign-story",
+   "expected_revision": 14,
+   "designated_session_id": "dm-1",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "tombstoned",
+     "writer": "none",
+     "resulting_revision": 15,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "restore_trashed_campaign",
+   "operation_id": "life-11",
+   "campaign_id": "campaign-story",
+   "expected_revision": 15,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "active",
+     "writer": "dm",
+     "resulting_revision": 16,
+     "session_id": "dm-1"
+    }
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-12",
+   "campaign_id": "campaign-story",
+   "expected_revision": 16,
+   "display_name": "Faulted",
+   "fault": "before",
+   "outcome": {
+    "error": "Fault",
+    "code": null,
+    "message": "before lifecycle commit fault"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-12",
+   "campaign_id": "campaign-story",
+   "expected_revision": 16,
+   "display_name": "Committed",
+   "fault": "after",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "active",
+     "writer": "dm",
+     "resulting_revision": 17,
+     "session_id": null
+    }
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-12",
+   "campaign_id": "campaign-story",
+   "expected_revision": 16,
+   "display_name": "Committed",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-story",
+     "lifecycle": "active",
+     "writer": "dm",
+     "resulting_revision": 17,
+     "session_id": null
+    }
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-13",
+   "campaign_id": "campaign-build",
+   "expected_revision": 0,
+   "designated_session_id": "builder-2",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "lifecycle": "archived",
+     "writer": "none",
+     "resulting_revision": 1,
+     "session_id": "builder-2"
+    }
+   }
+  },
+  {
+   "op": "restore_archived_campaign",
+   "operation_id": "life-14",
+   "campaign_id": "campaign-build",
+   "expected_revision": 1,
+   "session_id": "builder-2",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "lifecycle": "active",
+     "writer": "builder",
+     "resulting_revision": 2,
+     "session_id": "builder-2"
+    }
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-15",
+   "campaign_id": "campaign-build",
+   "expected_revision": 2,
+   "designated_session_id": "builder-2",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "lifecycle": "tombstoned",
+     "writer": "none",
+     "resulting_revision": 3,
+     "session_id": "builder-2"
+    }
+   }
+  },
+  {
+   "op": "restore_trashed_campaign",
+   "operation_id": "life-16",
+   "campaign_id": "campaign-build",
+   "expected_revision": 3,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-build",
+     "lifecycle": "active",
+     "writer": "builder",
+     "resulting_revision": 4,
+     "session_id": "builder-2"
+    }
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-17",
+   "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+   "expected_revision": 0,
+   "display_name": "Draft Renamed",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+     "lifecycle": "active",
+     "writer": "builder",
+     "resulting_revision": 1,
+     "session_id": null
+    }
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-18",
+   "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+   "expected_revision": 1,
+   "designated_session_id": "session-draft",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+     "lifecycle": "archived",
+     "writer": "none",
+     "resulting_revision": 2,
+     "session_id": "session-draft"
+    }
+   }
+  },
+  {
+   "op": "restore_archived_campaign",
+   "operation_id": "life-19",
+   "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+   "expected_revision": 2,
+   "session_id": "session-draft",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+     "lifecycle": "active",
+     "writer": "builder",
+     "resulting_revision": 3,
+     "session_id": "session-draft"
+    }
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-20",
+   "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+   "expected_revision": 3,
+   "designated_session_id": "session-draft",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+     "lifecycle": "tombstoned",
+     "writer": "none",
+     "resulting_revision": 4,
+     "session_id": "session-draft"
+    }
+   }
+  },
+  {
+   "op": "restore_trashed_campaign",
+   "operation_id": "life-21",
+   "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+   "expected_revision": 4,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-draft-af72250d489ae165bf74a26d",
+     "lifecycle": "active",
+     "writer": "builder",
+     "resulting_revision": 5,
+     "session_id": "session-draft"
+    }
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-22",
+   "campaign_id": "campaign-draft-3c73935729e9ae7a6e6d5646",
+   "expected_revision": 0,
+   "designated_session_id": "session-crowded",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle session authority is ambiguous"
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-22",
+   "campaign_id": "campaign-draft-3c73935729e9ae7a6e6d5646",
+   "expected_revision": 0,
+   "designated_session_id": "session-crowded",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle session authority is ambiguous"
+   }
+  },
+  {
+   "op": "archive_campaign",
+   "operation_id": "life-23",
+   "campaign_id": "campaign-draft-46eef70dad14b82322064199",
+   "expected_revision": 0,
+   "designated_session_id": "session-helped",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle has active child work"
+   }
+  },
+  {
+   "op": "trash_campaign",
+   "operation_id": "life-23",
+   "campaign_id": "campaign-draft-46eef70dad14b82322064199",
+   "expected_revision": 0,
+   "designated_session_id": "session-helped",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign lifecycle has active child work"
+   }
+  },
+  {
+   "op": "rename_campaign",
+   "operation_id": "life-24",
+   "campaign_id": "campaign-draft-46eef70dad14b82322064199",
+   "expected_revision": 0,
+   "display_name": "Helped Renamed",
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign-draft-46eef70dad14b82322064199",
+     "lifecycle": "active",
+     "writer": "builder",
+     "resulting_revision": 1,
+     "session_id": null
+    }
+   }
+  }
+ ]
+}

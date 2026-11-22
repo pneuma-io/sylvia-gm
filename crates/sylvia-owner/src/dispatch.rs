@@ -149,6 +149,15 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "create_guided_campaign_draft" => {
             commands::campaigns::handle_create_guided_campaign_draft(context, params).await
         }
+        "rename_campaign" => commands::campaigns::handle_rename_campaign(context, params).await,
+        "archive_campaign" => commands::campaigns::handle_archive_campaign(context, params).await,
+        "restore_archived_campaign" => {
+            commands::campaigns::handle_restore_archived_campaign(context, params).await
+        }
+        "trash_campaign" => commands::campaigns::handle_trash_campaign(context, params).await,
+        "restore_trashed_campaign" => {
+            commands::campaigns::handle_restore_trashed_campaign(context, params).await
+        }
         "builder_chat_index" => commands::builder::handle_builder_chat_index(context, params).await,
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
