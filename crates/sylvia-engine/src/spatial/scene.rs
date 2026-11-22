@@ -57,9 +57,9 @@ const OUT_OF_BOUNDS: &str = "spatial_out_of_bounds";
 const DUPLICATE_ID: &str = "spatial_duplicate_id";
 const CROSS_MAP: &str = "spatial_cross_map";
 
-type Admit<T> = Result<T, SpatialValidationError>;
+pub(super) type Admit<T> = Result<T, SpatialValidationError>;
 
-fn reject<T>(message: &'static str, code: &'static str, path: impl Into<String>) -> Admit<T> {
+pub(super) fn reject<T>(message: &'static str, code: &'static str, path: impl Into<String>) -> Admit<T> {
     Err(SpatialValidationError { message, code, path: path.into() })
 }
 
@@ -108,14 +108,14 @@ pub fn admit_spatial_scene(value: &Json) -> Result<AdmittedSpatialScene, Spatial
     })
 }
 
-fn hex(bytes: &[u8]) -> String {
+pub(super) fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
 /// `_capture_payload(value, code=...)`: the depth and node limits, walked in Python's stack
 /// order (the last child first), then the top-level object check. A [`Json`] holds no
 /// non-string keys and no non-finite numbers, so those refusals cannot arise.
-fn capture_payload(value: &Json, code: &'static str) -> Admit<JsonMap> {
+pub(super) fn capture_payload(value: &Json, code: &'static str) -> Admit<JsonMap> {
     let mut stack: Vec<(&Json, usize, String)> = vec![(value, 1, "$".to_owned())];
     let mut nodes = 0usize;
     while let Some((item, depth, path)) = stack.pop() {
@@ -174,7 +174,12 @@ fn equals_one(value: &Json) -> bool {
 }
 
 /// `_object(value, keys, ...)`: an object with exactly these keys.
-fn object<'v>(value: &'v Json, keys: &[&str], code: &'static str, path: &str) -> Admit<&'v JsonMap> {
+pub(super) fn object<'v>(
+    value: &'v Json,
+    keys: &[&str],
+    code: &'static str,
+    path: &str,
+) -> Admit<&'v JsonMap> {
     let Json::Object(map) = value else { return reject("Spatial object is required", code, path) };
     if map.len() != keys.len() || !keys.iter().all(|key| map.contains_key(*key)) {
         return reject("Spatial object uses a closed schema", code, path);
@@ -210,7 +215,13 @@ fn number(value: &Json, minimum: Option<f64>, code: &'static str, path: &str) ->
 }
 
 /// `_integer(value, minimum=..., maximum=..., ...)`.
-fn integer(value: &Json, minimum: i64, maximum: i64, code: &'static str, path: &str) -> Admit<i64> {
+pub(super) fn integer(
+    value: &Json,
+    minimum: i64,
+    maximum: i64,
+    code: &'static str,
+    path: &str,
+) -> Admit<i64> {
     match value {
         Json::Number(number) if !number.is_f64() => match number.as_i64() {
             Some(integer) if (minimum..=maximum).contains(&integer) => Ok(integer),
@@ -229,7 +240,7 @@ fn boolean(value: &Json, code: &'static str, path: &str) -> Admit<bool> {
 }
 
 /// `_identity(value, ...)`: `[A-Za-z0-9][A-Za-z0-9._:-]{0,127}`, the whole string.
-fn identity(value: &Json, code: &'static str, path: &str) -> Admit<String> {
+pub(super) fn identity(value: &Json, code: &'static str, path: &str) -> Admit<String> {
     if let Json::String(text) = value {
         let mut bytes = text.bytes();
         let first_ok = bytes.next().is_some_and(|byte| byte.is_ascii_alphanumeric());
@@ -261,7 +272,7 @@ fn cell(value: &Json, code: &'static str, path: &str) -> Admit<[i64; 2]> {
 }
 
 /// `_enum(value, allowed, ...)`.
-fn choice(value: &Json, allowed: &[&str], code: &'static str, path: &str) -> Admit<String> {
+pub(super) fn choice(value: &Json, allowed: &[&str], code: &'static str, path: &str) -> Admit<String> {
     match value {
         Json::String(text) if allowed.contains(&text.as_str()) => Ok(text.clone()),
         _ => reject("Spatial enum value is invalid", code, path),

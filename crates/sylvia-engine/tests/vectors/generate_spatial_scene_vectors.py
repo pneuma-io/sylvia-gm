@@ -28,10 +28,11 @@ import sys
 from pathlib import Path
 
 from sylvia_gm.domain.package_library import canonical_json_bytes
-from sylvia_gm.spatial import SpatialValidationError, admit_spatial_scene
+from sylvia_gm.spatial import SpatialValidationError, admit_spatial_scene, mutate_spatial_scene
 
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "spatial_scene_vectors.json"
+MUTATION_OUTPUT = HERE / "spatial_mutation_vectors.json"
 
 BASE = {
     "format": 1,
@@ -313,7 +314,122 @@ def random_case(rng: random.Random) -> object:
     return scene
 
 
+def sha(value: object) -> str:
+    return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+
+
+def run_mutation(scene_input: object, request: object) -> dict:
+    scene = admit_spatial_scene(scene_input)
+    try:
+        mutation = mutate_spatial_scene(scene, request)
+    except SpatialValidationError as error:
+        return {"error": ["SpatialValidationError", str(error), error.code, error.path]}
+    except Exception as error:  # noqa: BLE001 - every exception Python lets through
+        return {"error": [type(error).__name__, str(error)]}
+    advanced = mutation.scene
+    return {"payload": mutation.as_payload(), "scene": {"map_id": advanced.map_id, "revision": advanced.geometry_revision,
+                                                        "snapshot_id": advanced.snapshot_id,
+                                                        "canonical_sha256": sha(advanced.as_payload())}}
+
+
+def request(patch: object, *, kind: str = "geometry", target: str = "wall.b", revision: object = 3,
+            map_id: object = "keep") -> dict:
+    return {"map_id": map_id, "expected_revision": revision, "target": {"kind": kind, "id": target}, "patch": patch}
+
+
+def deep(levels: int) -> object:
+    value: object = 1
+    for _ in range(levels):
+        value = [value]
+    return value
+
+
+GEOMETRY_PATCHES = [
+    {"active": False}, {"movement": "passable", "visibility": "clear"}, {"occupies_cells": False},
+    {"volume": {"kind": "box", "min": [1, 1, 0], "max": [2, 2, 1.5]}}, {"metadata": {"label": "Broken", "hp": 0}},
+    {"metadata": {}, "active": True, "volume": {"kind": "box", "min": [0, 0, 0], "max": [20, 15.5, 10]}},
+    {"volume": {"kind": "box", "min": [1, 1, 0], "max": [21, 2, 1]}}, {"volume": {"kind": "box", "min": [1, 1, 0], "max": [1, 2, 1]}},
+    {"volume": {"kind": "cylinder", "center": [1, 1, 0], "radius": 1, "height": 1}}, {"active": "yes"}, {"movement": "solid"},
+    {"metadata": []}, {"metadata": {"a": "x" * 16377}}, {"id": "new"}, {"map_id": "keep"}, {"destroyed": {}}, {}, [],
+    {"active": False, "colour": "red"}, None, "active", {"metadata": {"deep": deep(21)}}, {"metadata": {"deep": deep(22)}},
+    {"metadata": {"deep": deep(25)}},
+    # Admission rebuilds the patched value in its own key order, and the evidence echoes that.
+    {"volume": {"max": [3, 8, 4], "min": [2, 2, 0], "kind": "box"}},
+]
+ENTITY_PATCHES = [
+    {"position": [6.5, 6.5, 0]}, {"position": [6.5, 6.5]}, {"position": [0.1, 6.5, 0]}, {"facing": [0, 1]}, {"facing": [0, 0]},
+    {"footprint": {"kind": "box", "half_extents": [0.5, 0.5]}}, {"footprint": [1]}, {"footprint": "circle"}, {"footprint": None},
+    {"footprint": {"kind": "circle", "radius": 6}}, {"height": 3.5}, {"height": 0}, {"active": False, "movement": "passable"},
+    {"visibility": "opaque"}, {"metadata": {"name": "Orc chief"}}, {"volume": {"kind": "box", "min": [1, 1, 0], "max": [2, 2, 1]}},
+    {"occupies_cells": True}, {"id": "orc2"},
+    {"footprint": {"radius": 0.25, "kind": "circle"}}, {"footprint": {"half_extents": [0.5, 0.25], "kind": "box"}},
+]
+
+
+def mutation_targeted() -> list:
+    cases = []
+    for patch in GEOMETRY_PATCHES:
+        cases.append((BASE, request(patch)))
+        cases.append((BASE, request(patch, target="pillar")))
+    for patch in ENTITY_PATCHES:
+        cases.append((BASE, request(patch, kind="entity", target="orc")))
+        cases.append((BASE, request(patch, kind="entity", target="cart")))
+    for item in (request({"active": False}, map_id="other"), request({"active": False}, map_id=None),
+                 request({"active": False}, revision=2), request({"active": False}, revision=4),
+                 request({"active": False}, revision=3.0), request({"active": False}, revision=True),
+                 request({"active": False}, revision=-1), request({"active": False}, revision="3"),
+                 request({"active": False}, kind="zone", target="pool"), request({"active": False}, kind="entities", target="orc"),
+                 request({"active": False}, target="orc"), request({"active": False}, kind="entity", target="wall.b"),
+                 request({"active": False}, target="ghost"), request({"active": False}, target="bad id"),
+                 request({"active": False}, target=""),
+                 {"map_id": "keep", "expected_revision": 3, "target": {"kind": "geometry", "id": "wall.b"}},
+                 {"map_id": "keep", "expected_revision": 3, "target": {"kind": "geometry", "id": "wall.b", "x": 1},
+                  "patch": {"active": False}},
+                 {"map_id": "keep", "expected_revision": 3, "target": ["geometry", "wall.b"], "patch": {"active": False}},
+                 {**request({"active": False}), "extra": 1}, None, [], "mutate", {},
+                 {**request({"active": False}), "pad": deep(30)}):
+        cases.append((BASE, item))
+    # Revisions: the first and the last a scene may hold; advancing past the last fails readmission.
+    for revision in (0, 2**63 - 2, 2**63 - 1):
+        scene = edited(["map", "revision"], revision)
+        cases.append((scene, request({"active": False}, revision=revision)))
+    # The patched object is re-sorted into place by id; ids don't change.
+    many = edited(["geometry"], [copy.deepcopy(BASE["geometry"][0]) | {"id": name} for name in ("c", "a", "b")])
+    cases.append((many, request({"active": False}, target="b")))
+    cases.append((many, request({"metadata": {"z": 1}, "active": False, "movement": "passable"}, target="a")))
+    return cases
+
+
+def random_patch(rng: random.Random, kind: str) -> dict:
+    fields = (["volume", "active", "movement", "occupies_cells", "visibility", "metadata"] if kind == "geometry" else
+              ["position", "footprint", "height", "facing", "active", "movement", "visibility", "metadata"])
+    patch = {}
+    for field in rng.sample(fields, rng.randint(1, 3)):
+        source = BASE["geometry"][0] if kind == "geometry" else BASE["entities"][rng.randrange(2)]
+        value = copy.deepcopy(source.get(field, True))
+        if rng.random() < 0.4:
+            value = copy.deepcopy(rng.choice(POOL))
+        elif isinstance(value, list):
+            value = [item + rng.choice([0, 0.5, -0.5, 1]) if isinstance(item, (int, float)) and not isinstance(item, bool)
+                     else item for item in value]
+        patch[field] = value
+    if rng.random() < 0.1:
+        patch[rng.choice(["id", "map_id", "shape", "x"])] = 1
+    return patch
+
+
 def main() -> int:
+    mutation_rng = random.Random(4803)
+    mutation_inputs = mutation_targeted()
+    for _ in range(1500):
+        kind = mutation_rng.choice(["geometry", "entity"])
+        target = mutation_rng.choice(["wall.b", "pillar"] if kind == "geometry" else ["orc", "cart"])
+        mutation_inputs.append((BASE, request(random_patch(mutation_rng, kind), kind=kind, target=target)))
+    mutation_cases = [{"scene_input": scene, "request": item, **run_mutation(scene, item)} for scene, item in mutation_inputs]
+    MUTATION_OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "cases": mutation_cases}, ensure_ascii=True,
+                                            allow_nan=False) + "\n").encode("ascii"))
+    applied = sum("payload" in case for case in mutation_cases)
+    print(f"{len(mutation_cases)} mutation cases, {applied} applied")
     rng = random.Random(4801)
     inputs = targeted() + [random_case(rng) for _ in range(2500)] + [valid_variant(rng) for _ in range(500)]
     cases = [{"input": value, **run(build(value))} for value in inputs]
