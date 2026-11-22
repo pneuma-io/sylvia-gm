@@ -49,7 +49,7 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/agent/_ruleset_test_runner.py` | 348 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_ruleset_test_tool.py` | 70 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_runner.py` | 2,549 | `sylvia-agent` | pending | Port without the `store` (`StateAPI`) and `reveal_guard` parameters and every `DM_SESSION` branch: no live caller in the 0.4.1 snapshot. The constructor refuses `DM_SESSION` before any of that code runs, and its two callers (`agent/_builder_session.py`) pass `BUILDER_FREEFORM`. If the Rust mode type can still hold `DM_SESSION`, construction refuses it with Python's `ValueError` text; if it cannot, this row will say the mode is not representable. |
-| `src/sylvia_gm/agent/_session_loop.py` | 1,953 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/agent/_session_loop.py` | 1,953 | `sylvia-agent` | pending |Narration (lane 3's note, at the manager's request): `AuthorityOwner._provisional_projection` reads `sylvia_app::authority::narration::NarrationState`; wire narration attempts and pending tools there when narration is ported. |
 | `src/sylvia_gm/agent/_skills.py` | 59 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_stateless_mcp.py` | 2,828 | `sylvia-agent` | in progress | `stateless_mcp::ModelMechanicsTool` (P2), for lane 3's catalog work. The rest (the MCP listing and calls, `_model_input_schema`, the action-sequence and Campaign File tools) is pending. |
 | `src/sylvia_gm/agent/_tool_exposure.py` | 209 | `sylvia-agent` | pending | |
