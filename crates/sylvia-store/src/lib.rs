@@ -40,6 +40,7 @@ mod player_reads;
 pub mod private_records;
 pub mod purge;
 pub mod pytext;
+pub mod reasoning;
 pub mod recovery;
 pub mod recovery_graph;
 pub mod recovery_staging;

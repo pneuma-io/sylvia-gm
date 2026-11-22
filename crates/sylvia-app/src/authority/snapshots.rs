@@ -66,6 +66,16 @@ pub async fn model_context_snapshot(
         .await
 }
 
+/// `except DecisionScopeProjectionError as error: raise CommandRejected(str(error))`.
+pub(super) fn projection_rejected(error: sylvia_domain::DomainError) -> StoreError {
+    match &error {
+        sylvia_domain::DomainError::Diagnosed {
+            error_type: "DecisionScopeProjectionError", message, ..
+        } => sylvia_domain::DomainError::command_rejected(message.clone()).into(),
+        _ => error.into(),
+    }
+}
+
 /// The projection `model_context_snapshot` makes of a declared decision scope: the current
 /// boundary and, when the GM decides for an isolated participant, that participant's public
 /// observation in place of its private state, with no eligible actors.
@@ -74,16 +84,7 @@ fn project_boundary(
     state: &sylvia_domain::authority::CampaignState,
     declared: &sylvia_base::JsonMap,
 ) -> StoreResult<Option<ModelDecisionBoundary>> {
-    let rejected = |error: sylvia_domain::DomainError| -> StoreError {
-        match &error {
-            sylvia_domain::DomainError::Diagnosed {
-                error_type: "DecisionScopeProjectionError",
-                message,
-                ..
-            } => sylvia_domain::DomainError::command_rejected(message.clone()).into(),
-            _ => error.into(),
-        }
-    };
+    let rejected = projection_rejected;
     let Some(mut boundary) =
         crate::decision_scope::project_model_decision_scope(state, declared).map_err(rejected)?
     else {
