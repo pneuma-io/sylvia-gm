@@ -32,6 +32,7 @@ pub mod context_capacity;
 pub mod context_fit;
 pub mod error;
 pub mod factory;
+pub mod gemini;
 pub mod hooks;
 pub mod http;
 mod httpx_text;
