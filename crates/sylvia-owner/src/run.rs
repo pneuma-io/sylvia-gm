@@ -967,6 +967,9 @@ fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
         store,
         providers: Some(providers),
         session_loop: None,
+        bundled: Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+            sylvia_app::bundled_packages::BundledSources::from_repository_root(&crate::util::source_root()),
+        )),
         record_provider_warning: Arc::new(|_: &str| {}),
     };
     let (installation, startup) = std::mem::take(&mut *checked.lock().expect("startup context lock"));

@@ -184,7 +184,7 @@
    "answer": {
     "plan_id": null
    },
-   "not_ported": true
+   "not_ported": false
   },
   {
    "op": "advance_guided_campaign_draft",
@@ -195,7 +195,7 @@
    "current_step": "ruleset_contribution",
    "visible_answer": "An answer",
    "answer": {},
-   "not_ported": true
+   "not_ported": false
   },
   {
    "op": "advance_guided_campaign_draft",

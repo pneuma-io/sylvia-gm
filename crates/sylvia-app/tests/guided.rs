@@ -23,6 +23,14 @@ fn work_folder(name: &str) -> std::path::PathBuf {
     folder
 }
 
+/// The bundled package sources of this checkout, as the owner builds them at launch.
+fn bundled() -> std::sync::Arc<sylvia_app::bundled_packages::BundledPackages> {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("..");
+    std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+        sylvia_app::bundled_packages::BundledSources::from_repository_root(&root),
+    ))
+}
+
 fn read_json(relative: &str) -> Json {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(relative);
     serde_json::from_str(&std::fs::read_to_string(&path).expect("vector file")).expect("valid JSON")
@@ -59,6 +67,7 @@ async fn advance(handle: &StoreHandle, op: &Json, campaign_id: &str) -> StoreRes
     let campaign = op["campaign_id"].as_str().unwrap_or(campaign_id);
     let draft = guided::advance_guided_campaign_draft(
         handle,
+        &bundled(),
         &guided::AdvanceAnswer {
             operation_id: text(op, "operation_id"),
             campaign_id: campaign,
@@ -220,6 +229,7 @@ async fn start_step(
             let lock = sylvia_domain::authority::PackageLock::new(Vec::new()).unwrap();
             let confirmation = guided::bind_guided_campaign_basis(
                 handle,
+                &bundled(),
                 &guided::BindRequest {
                     operation_id: text(op, "operation_id"),
                     campaign_id: &campaign,
@@ -341,6 +351,104 @@ async fn guided_finalize_matches_python() {
     let rules = sylvia_compare::diff::Rules::defaults();
     let python = folder.join("python.sqlite3");
     std::fs::write(&python, gunzip("finalize_runs")).unwrap();
+    let dump = |path: &Path| {
+        sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
+    };
+    let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
+    assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
+}
+
+async fn ruleset_step(
+    handle: &StoreHandle,
+    op: &Json,
+    campaigns: &mut std::collections::HashMap<String, String>,
+) -> StoreResult<Json> {
+    let key = op["campaign"].as_str().unwrap_or_default();
+    let campaign = campaigns.get(key).cloned().unwrap_or_else(|| key.to_owned());
+    match text(op, "op") {
+        "create_guided_campaign_draft" => {
+            let value = run(handle, op).await?;
+            campaigns.insert(
+                text(op, "operation_id").to_owned(),
+                value["campaign_id"].as_str().unwrap().to_owned(),
+            );
+            Ok(value)
+        }
+        "advance_guided_campaign_draft" => {
+            let mut step = op.clone();
+            step["campaign_id"] = Json::String(campaign);
+            advance(handle, &step, "").await
+        }
+        "append_agent_message" => start_step(handle, op, campaigns).await,
+        "bind_guided_campaign_basis" => {
+            let candidate_id = text(op, "candidate").to_owned();
+            let candidate = {
+                let id = candidate_id.clone();
+                handle.call(move |store| store.package_candidate(&id)).await?
+            };
+            let confirmation = guided::bind_guided_campaign_basis(
+                handle,
+                &bundled(),
+                &guided::BindRequest {
+                    operation_id: text(op, "operation_id"),
+                    campaign_id: &campaign,
+                    display_name: text(op, "display_name"),
+                    package_lock: candidate.package_lock(),
+                    turn_id: text(op, "turn_id"),
+                    builder_session_id: text(op, "builder_session_id"),
+                    package_candidate_id: Some(&candidate_id),
+                },
+            )
+            .await?;
+            Ok(
+                json!({"campaign_id": confirmation.campaign_id, "resulting_revision": confirmation.resulting_revision}),
+            )
+        }
+        "begin_campaign_construction" => start_step(handle, op, campaigns).await,
+        "finalize_campaign_construction" => {
+            let (completed, plan, handoff) = guided::finalize_campaign_construction(
+                handle,
+                &guided::FinalizeConstruction {
+                    campaign_id: &campaign,
+                    dm_provider_id: text(op, "dm_provider_id"),
+                    dm_model_id: text(op, "dm_model_id"),
+                    plan_artifact_text: text(op, "plan_artifact_text"),
+                    structured_plan: op["structured_plan"].as_object(),
+                    model_guidance_override: op["model_guidance_override"].as_bool().unwrap(),
+                },
+            )
+            .await?;
+            Ok(json!({
+                "completion_revision": completed.resulting_revision, "plan_id": plan.fields().plan_id,
+                "plan_payload_sha256": plan.fields().payload_sha256, "handoff_id": handoff.fields().handoff_id,
+                "handoff_payload_sha256": handoff.fields().payload_sha256,
+                "handoff_revision": handoff.fields().resulting_campaign_revision,
+            }))
+        }
+        other => panic!("unknown operation {other}"),
+    }
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn guided_ruleset_matches_python() {
+    let record = read_json("tests/vectors/guided/ruleset_runs.json");
+    let folder = work_folder("guided-ruleset-runs");
+    let database = folder.join("authority.sqlite3");
+    std::fs::write(&database, gunzip("ruleset_seed")).unwrap();
+    let path = database.clone();
+    let (handle, thread) =
+        StoreHandle::spawn(move || AuthorityStore::open_for_application_owner(&path, None)).unwrap();
+    let mut campaigns = std::collections::HashMap::new();
+    let operations = record["operations"].as_array().unwrap();
+    for (index, (op, want)) in operations.iter().zip(record["outcomes"].as_array().unwrap()).enumerate() {
+        let outcome = ruleset_step(&handle, op, &mut campaigns).await;
+        check(&format!("#{index} {} {}", op["op"], op["operation_id"]), outcome, want);
+    }
+    drop(handle);
+    tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+    let rules = sylvia_compare::diff::Rules::defaults();
+    let python = folder.join("python.sqlite3");
+    std::fs::write(&python, gunzip("ruleset_runs")).unwrap();
     let dump = |path: &Path| {
         sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
     };

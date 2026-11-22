@@ -7,13 +7,16 @@ Run with the snapshot's own interpreter, from the repository root, after
 
 It makes one Draft, then answers its Interview: a No Ruleset interview through to the review,
 exact and loose replays, stale revisions, every refusal, a return to an earlier step that
-drops the later answers, a missing campaign and a wrong Builder session. Steps that need an
-Interview Contribution are marked `not_ported`: the Rust store refuses them until
-`_guided_contribution_object` is ported. Python runs them on a copy of the profile taken at that
-point, so its outcome is recorded without changing the database the other steps share. It writes
+drops the later answers, a missing campaign and a wrong Builder session. An operation
+marked `not_ported` (none today) is one the Rust port refuses: Python runs it on a copy of the
+profile taken at that point, so its outcome is recorded without changing the database the
+other steps share. It writes
 `guided/advance_runs.json` and `guided/advance_runs.sqlite3.gz` (the database afterwards);
 `tests/guided.rs` replays them. Identities are explicit and the owner's UUIDs are seeded, so a
 re-run writes byte-identical files. Reference tooling only.
+
+The four guided generators share `guided/` and build on this one's seed. Run them in order with
+`generate_guided_all.py` (draft, advance, start, finalize, ruleset).
 """
 
 from __future__ import annotations
@@ -62,9 +65,9 @@ OPERATIONS: list[dict[str, object]] = [
     answer("a-ruleset", "ruleset", 0, visible="A different visible answer", value={"candidate_id": "x"}),
     answer("a-stale", "name", 0, visible="Storm Courier"),
     answer("a-name", "name", 1, visible="Storm Courier", value={"display_name": "Storm Courier"}),
-    # Content and Contribution steps need `_guided_contribution_object`.
-    answer("a-plan", "plan", 2, value={"plan_id": None}, not_ported=True),
-    answer("a-contribution", "ruleset_contribution", 2, not_ported=True),
+    # Content and Contribution steps go through `_guided_contribution_object` (none here).
+    answer("a-plan", "plan", 2, value={"plan_id": None}),
+    answer("a-contribution", "ruleset_contribution", 2),
     answer("a-boundaries", "boundaries_preferences", 2, visible="No graphic violence",
            value={"boundaries": ["graphic violence"], "preferences": []}),
     # Back to the first question: the later answers are dropped.

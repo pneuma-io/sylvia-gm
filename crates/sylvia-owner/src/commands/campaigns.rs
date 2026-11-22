@@ -75,6 +75,7 @@ pub async fn handle_advance_guided_campaign_draft(
     let visible_answer = required(params, "visible_answer")?;
     let draft = sylvia_app::authority::guided::advance_guided_campaign_draft(
         &ctx.store,
+        &ctx.bundled,
         &sylvia_app::authority::guided::AdvanceAnswer {
             operation_id: &operation_id,
             campaign_id: &campaign_id,
@@ -190,9 +191,9 @@ fn no_ruleset_plan(display_name: &str, premise: &str) -> String {
     )
 }
 
-/// `handle_start_guided_campaign` for a Draft with no Ruleset. An installed Ruleset is refused
-/// as not yet ported once it reaches the Interview content lane 1 owns, and a saved Campaign Plan
-/// (`plan_id`) needs lane 1's library selection and party materialisation.
+/// `handle_start_guided_campaign` for a Draft with no Ruleset or an installed one. A saved
+/// Campaign Plan (`plan_id`) needs lane 1's library selection and party materialisation, so it is
+/// refused as not yet ported.
 pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let operation_id = required(params, "operation_id")?;
     let campaign_id = required(params, "campaign_id")?;
@@ -280,6 +281,7 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
         .map_err(store_error)?;
     let confirmation = sylvia_app::authority::guided::bind_guided_campaign_basis(
         &ctx.store,
+        &ctx.bundled,
         &sylvia_app::authority::guided::BindRequest {
             operation_id: &format!("{operation_id}-bind"),
             campaign_id: &campaign_id,
@@ -418,10 +420,9 @@ pub async fn handle_campaign_index(ctx: &DispatchContext, _params: &JsonMap) -> 
 mod tests {
     use super::*;
     use std::io::Read;
-    use std::path::Path;
 
     fn workspace(path: &str) -> std::path::PathBuf {
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../..").join(path)
+        crate::util::source_root().join(path)
     }
 
     fn read_json(path: &str) -> Json {

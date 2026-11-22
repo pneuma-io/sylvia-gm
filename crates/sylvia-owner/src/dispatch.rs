@@ -40,6 +40,9 @@ pub struct DispatchContext {
     pub providers: Option<Arc<dyn ProviderResolver>>,
     /// `session_loop` (lane 4).
     pub session_loop: Option<Arc<dyn SessionLoop>>,
+    /// The bundled package sources (the shipped Ruleset, Setting, Plan and archives), built once at
+    /// launch from [`crate::util::source_root`].
+    pub bundled: Arc<sylvia_app::bundled_packages::BundledPackages>,
     /// `record_provider_warning(code)`: a `provider_warning` record in local diagnostics.
     pub record_provider_warning: Arc<dyn Fn(&str) + Send + Sync>,
 }
