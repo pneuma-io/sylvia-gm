@@ -19,8 +19,8 @@
 //! ownership lock, before migrations), the `desktop_update_*` methods, the update reservation
 //! and both update gates. Not ported yet: the recovery-only owner Python starts when an
 //! interrupted update meets a native update context, and confirming an update restart; both
-//! need update preparation. Also not ported: the bundled package installs and Builder
-//! migrations at launch (lanes 1 and 3), the provider resolver and session loop (lane 4).
+//! need update preparation. Also not ported: the Builder migrations at launch (lane 3), the
+//! provider resolver and session loop (lane 4).
 
 use crate::desktop_update::drafts::DraftStore;
 use crate::desktop_update::launch::Installation;
@@ -459,8 +459,18 @@ async fn serve(
         update_operation: Arc::new(Mutex::new(None)),
         closing: Arc::clone(&replies.closing),
     });
-    // Python's `application_owner.prepare_new_campaign_storage()`, after diagnostics opened.
-    if owner.context.store.call(|store| store.prepare_new_campaign_storage()).await.is_err() {
+    // Python's `application_owner.prepare_new_campaign_storage()`, after diagnostics opened, then
+    // `_preinstall_bundled_srd(bus)` and `_preinstall_bundled_riichi(bus)`.
+    let bundled = Arc::clone(&owner.context.bundled);
+    let prepared = owner
+        .context
+        .store
+        .call(move |store| {
+            store.prepare_new_campaign_storage()?;
+            crate::preinstall::preinstall_bundled(store, &bundled)
+        })
+        .await;
+    if prepared.is_err() {
         owner.diagnostics.record(
             "owner_failed",
             Fields { outcome: Some("error"), error_code: Some("internal_error"), ..Fields::default() },
