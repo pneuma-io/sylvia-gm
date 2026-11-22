@@ -202,7 +202,7 @@ fn character_state_matches_python() {
         let label = format!("synthetic {variant} {}", case["input"]);
         let states = [json!({"advancement": {"x": 1}}), json!({})];
         if case.get("row").is_some() {
-            // Differences row NEXT (merge results in creation calculations): a `merge(...)`
+            // Differences row 41 (merge results in creation calculations): a `merge(...)`
             // result's own missing key raises here, where Python's plain dict gives None.
             row_cases += 1;
             let schema = synthetic.entity_state_schema.clone().unwrap();
@@ -222,7 +222,7 @@ fn character_state_matches_python() {
                 == Some("character_initial_state_input_missing");
             if python_ok && !rust_missing {
                 failures
-                    .push(format!("{label}: row NEXT expected input_missing, rust {:?}", result.map(object)));
+                    .push(format!("{label}: row 41 expected input_missing, rust {:?}", result.map(object)));
             }
             if !python_ok {
                 check_set(&label, &synthetic, &inputs[0], &inputs[1], &states, case, &mut failures);

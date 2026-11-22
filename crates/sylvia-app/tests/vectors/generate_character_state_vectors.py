@@ -13,7 +13,7 @@ Inputs:
   materialized, verified, checked by its rules, initialized with real Plans' campaign state,
   verified as placed, and verified after tampering; then mutations of its authored inputs;
 - a small synthetic declaration for edges SRD Lite does not reach (missing and null inputs,
-  `rules` reads, parents, limits, arithmetic, rejections). One case is differences row NEXT
+  `rules` reads, parents, limits, arithmetic, rejections). One case is differences row 41
   (merge results in creation calculations).
 Outcomes are ["ok", value] or [class, message, code, diagnostics].
 This script is reference tooling for the port and is retired with the Python source.

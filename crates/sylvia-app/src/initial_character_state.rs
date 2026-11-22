@@ -4,7 +4,7 @@
 //! The calculations evaluate with lane 2's expression evaluator. `_RequiredInputs` is the
 //! evaluator's `required_inputs` flag: a missing key under the creation inputs raises
 //! `FieldNotFoundError` instead of giving `None`. Only a `merge(...)` result differs, which Python
-//! leaves a plain dict: differences row NEXT (merge results in creation calculations).
+//! leaves a plain dict: differences row 41 (merge results in creation calculations).
 
 use crate::character_rules::{
     prepare_character_rules, runtime_json, validate_character_rules, verify_character_rules,

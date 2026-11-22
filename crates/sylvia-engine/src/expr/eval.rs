@@ -220,7 +220,7 @@ pub fn resolve_root(name: &str, ctx: &EvalContext<'_>) -> Value {
 /// `_traverse_field(value, field)` where a dict is `_RequiredInputs` when `required_inputs`:
 /// a missing key raises instead of giving `None`. A present key holding null still gives `None`.
 /// The one dict a creation calculation builds fresh, a `merge(...)` result, is plain in Python
-/// and so returns `None` for its own missing keys: differences row NEXT (merge results in
+/// and so returns `None` for its own missing keys: differences row 41 (merge results in
 /// creation calculations).
 pub(crate) fn traverse_required(value: &Value, field: &str, required_inputs: bool) -> EvalResult<Value> {
     if let (true, Value::Dict(map)) = (required_inputs, value) {
