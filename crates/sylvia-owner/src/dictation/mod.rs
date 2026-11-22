@@ -10,6 +10,7 @@
 //! [`worker`] is `local_dictation_process.py`, the line protocol the desktop drives.
 
 pub mod audio;
+pub mod download;
 pub mod features;
 pub mod worker;
 
@@ -139,8 +140,8 @@ pub trait Fetch {
     fn open(&mut self, url: &str, user_agent: &str, timeout_s: u64) -> Result<Box<dyn Response>, FetchError>;
 }
 
-/// The model download before lane 4's HTTP client is in the owner: every request fails as an
-/// unreachable network does (`URLError`, so `download`).
+/// No network at all: every request fails as an unreachable network does (`URLError`, so
+/// `download`). For tests that must never reach the network.
 #[derive(Debug, Default)]
 pub struct NoNetwork;
 
@@ -753,12 +754,24 @@ pub const LANGUAGE_CODES: [&str; 100] = [
 ];
 
 /// The owner built without the speech runtime, as Python's PyInstaller owner is everywhere but
-/// Windows: `sounddevice` and `faster_whisper` fail to import. The model download needs lane 4's
-/// HTTP client and fails as an unreachable network until then.
-#[derive(Default)]
+/// Windows: `sounddevice` and `faster_whisper` fail to import. The model download works, as
+/// `urllib` does there (`download::UrllibFetch`).
 pub struct Absent {
     model: AbsentModel,
-    fetch: NoNetwork,
+    fetch: Box<dyn Fetch>,
+}
+
+impl Default for Absent {
+    fn default() -> Self {
+        Self { model: AbsentModel, fetch: Box::new(download::UrllibFetch::default()) }
+    }
+}
+
+impl Absent {
+    /// The same runtime with no network at all (tests).
+    pub fn offline() -> Self {
+        Self { model: AbsentModel, fetch: Box::new(NoNetwork) }
+    }
 }
 
 #[derive(Default)]
@@ -781,7 +794,7 @@ impl Runtime for Absent {
         &mut self.model
     }
     fn fetch(&mut self) -> &mut dyn Fetch {
-        &mut self.fetch
+        self.fetch.as_mut()
     }
     fn disk_free(&mut self, path: &Path) -> std::io::Result<u64> {
         crate::desktop_update::storage::disk_free(path)

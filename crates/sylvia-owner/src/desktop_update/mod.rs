@@ -18,6 +18,7 @@ pub mod controller;
 pub mod discovery;
 pub mod drafts;
 pub mod helper;
+pub mod https;
 pub mod identity;
 pub mod installed;
 pub mod launch;

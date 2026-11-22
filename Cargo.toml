@@ -98,7 +98,7 @@ futures-util = { version = "0.3", default-features = false, features = ["std"] }
 # runs it on tokio, http-body-util builds and reads bodies, multer parses multipart uploads as a
 # stream, and bytes is the buffer type all four share. Lane 4's reqwest client sits on the same
 # hyper and http types.
-hyper = { version = "1", features = ["server", "http1"] }
+hyper = { version = "1", features = ["server", "client", "http1"] }
 hyper-util = { version = "0.1", features = ["tokio"] }
 http-body-util = "0.1"
 multer = "3"
@@ -106,6 +106,20 @@ bytes = "1"
 # Desktop update (lane 5): verifying the Ed25519 signature on a release manifest, as Python does
 # with `cryptography`. Verification only; no signing or key generation in the product.
 ed25519-dalek = "2"
+# The owner's urllib-faithful HTTPS client (lane 5: the desktop updater's `HttpsTransport` and
+# dictation's model download, both `urllib.request` in Python): hyper's low-level HTTP/1 client
+# connection (the `client` feature above) over tokio-rustls, so redirects are followed from the
+# raw `Location` header and the request bytes are urllib's. Pinned to the versions reqwest
+# already locks, with the same ring provider.
+rustls = { version = "=0.23.46", default-features = false, features = ["ring", "std", "tls12"] }
+tokio-rustls = { version = "=0.26.6", default-features = false, features = ["ring", "tls12"] }
+# Windows only: the current user's "CA" and "ROOT" system stores with each certificate's usages,
+# through its safe `CertStore` API, as `ssl.create_default_context()` loads them
+# (`load_default_certs`). No unsafe code in the owner.
+schannel = "=0.1.30"
+# Tests only (lane 5's urllib comparison harness): the test-only certificate authority and
+# server certificates, made from fixed seeds inside the test, so no key is committed.
+rcgen = { version = "=0.14.10", default-features = false, features = ["ring", "pem"] }
 # Lane 4: the HTTP client for provider APIs. HTTP/1.1 only (httpx without h2), rustls with the
 # bundled webpki roots (like certifi), a cookie jar (httpx keeps one per client). Proxies come
 # from Sylvia's own port of httpx's environment rules, not reqwest's.

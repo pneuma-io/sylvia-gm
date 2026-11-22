@@ -1,0 +1,3219 @@
+{
+ "python": "3.12.11",
+ "openssl": "OpenSSL 3.0.16 11 Feb 2025",
+ "bypass_environment": [
+  {
+   "host": "github.com",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "github.com",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "no_proxy": ".github.com",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "no_proxy": " github.com , example ",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "GITHUB.COM",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "github.com",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": ".github.com",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": " github.com , example ",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "GITHUB.COM",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "github.com:443",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "githubusercontent.com",
+   "bypass": true
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": " github.com , example ",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "github.com",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": ".github.com",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": " github.com , example ",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "GITHUB.COM",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": " github.com , example ",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": true
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": " github.com , example ",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": true
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": " github.com , example ",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": true
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": " github.com , example ",
+   "bypass": true
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "example",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": " github.com , example ",
+   "bypass": true
+  },
+  {
+   "host": "example",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": " github.com , example ",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "*",
+   "bypass": true
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": ".github.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": " github.com , example ",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "hub.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "github.com:443",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "*.github.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "no_proxy": "intranet,10.1.2.3",
+   "bypass": false
+  }
+ ],
+ "bypass_override": [
+  {
+   "host": "github.com",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "*.github.com;<local>",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "github.com",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "GITHUB.COM",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": " github.com ; api.github.com",
+   "bypass": true
+  },
+  {
+   "host": "github.com",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "github.com",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "*.github.com;<local>",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "github.com",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "GITHUB.COM",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": " github.com ; api.github.com",
+   "bypass": true
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "GitHub.com:443",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "*.github.com;<local>",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "*.githubusercontent.com",
+   "bypass": true
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "release-assets.githubusercontent.com",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "*.github.com;<local>",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": " github.com ; api.github.com",
+   "bypass": true
+  },
+  {
+   "host": "api.github.com",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "api.github.com",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "<local>",
+   "bypass": true
+  },
+  {
+   "host": "intranet",
+   "override": "*.github.com;<local>",
+   "bypass": true
+  },
+  {
+   "host": "intranet",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "intranet",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "intranet",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "<local>",
+   "bypass": true
+  },
+  {
+   "host": "intranet:8080",
+   "override": "*.github.com;<local>",
+   "bypass": true
+  },
+  {
+   "host": "intranet:8080",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "intranet:8080",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "intranet:8080",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "*.github.com;<local>",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "10.*",
+   "bypass": true
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "10.1.2.3",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "*.github.com;<local>",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "a?b.example",
+   "bypass": true
+  },
+  {
+   "host": "a.b.example",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "a.b.example",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "*.example.org;*.example",
+   "bypass": true
+  },
+  {
+   "host": "a.b.example",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "a.b.example",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "<local>",
+   "bypass": true
+  },
+  {
+   "host": "example",
+   "override": "*.github.com;<local>",
+   "bypass": true
+  },
+  {
+   "host": "example",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "example",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "example",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "<local>",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "*.github.com;<local>",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "x.example.org",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "*.example.org;*.example",
+   "bypass": true
+  },
+  {
+   "host": "x.example.org",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "x.example.org",
+   "override": "intranet:8080",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "<local>",
+   "bypass": true
+  },
+  {
+   "host": "[::1]:443",
+   "override": "*.github.com;<local>",
+   "bypass": true
+  },
+  {
+   "host": "[::1]:443",
+   "override": "github.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "*.githubusercontent.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "GITHUB.COM",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "10.*",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "[abc]xample",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "a?b.example",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "*",
+   "bypass": true
+  },
+  {
+   "host": "[::1]:443",
+   "override": "",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": " github.com ; api.github.com",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "x[!a-c].example",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "*.example.org;*.example",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "[",
+   "bypass": false
+  },
+  {
+   "host": "[::1]:443",
+   "override": "intranet:8080",
+   "bypass": false
+  }
+ ],
+ "fnmatch": [
+  {
+   "name": "github.com",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "github.com",
+   "pattern": "*.com",
+   "match": true
+  },
+  {
+   "name": "github.com",
+   "pattern": "github.???",
+   "match": true
+  },
+  {
+   "name": "github.com",
+   "pattern": "[ga]*",
+   "match": true
+  },
+  {
+   "name": "github.com",
+   "pattern": "[!g]*",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "[a-c]bc",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "a/b",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "a\\b",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "x[y",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "x[[]y",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "",
+   "match": false
+  },
+  {
+   "name": "github.com",
+   "pattern": "?",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "*.com",
+   "match": true
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "github.???",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "[ga]*",
+   "match": true
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "[!g]*",
+   "match": true
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "[a-c]bc",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "a/b",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "a\\b",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "x[y",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "x[[]y",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "",
+   "match": false
+  },
+  {
+   "name": "API.GitHub.com",
+   "pattern": "?",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "a/b",
+   "pattern": "*.com",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "github.???",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "[ga]*",
+   "match": true
+  },
+  {
+   "name": "a/b",
+   "pattern": "[!g]*",
+   "match": true
+  },
+  {
+   "name": "a/b",
+   "pattern": "[a-c]bc",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "a/b",
+   "match": true
+  },
+  {
+   "name": "a/b",
+   "pattern": "a\\b",
+   "match": true
+  },
+  {
+   "name": "a/b",
+   "pattern": "x[y",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "x[[]y",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "",
+   "match": false
+  },
+  {
+   "name": "a/b",
+   "pattern": "?",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "a\\b",
+   "pattern": "*.com",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "github.???",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "[ga]*",
+   "match": true
+  },
+  {
+   "name": "a\\b",
+   "pattern": "[!g]*",
+   "match": true
+  },
+  {
+   "name": "a\\b",
+   "pattern": "[a-c]bc",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "a/b",
+   "match": true
+  },
+  {
+   "name": "a\\b",
+   "pattern": "a\\b",
+   "match": true
+  },
+  {
+   "name": "a\\b",
+   "pattern": "x[y",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "x[[]y",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "",
+   "match": false
+  },
+  {
+   "name": "a\\b",
+   "pattern": "?",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "x[y",
+   "pattern": "*.com",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "github.???",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "[ga]*",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "[!g]*",
+   "match": true
+  },
+  {
+   "name": "x[y",
+   "pattern": "[a-c]bc",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "a/b",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "a\\b",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "x[y",
+   "match": true
+  },
+  {
+   "name": "x[y",
+   "pattern": "x[[]y",
+   "match": true
+  },
+  {
+   "name": "x[y",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "",
+   "match": false
+  },
+  {
+   "name": "x[y",
+   "pattern": "?",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "abc",
+   "pattern": "*.com",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "github.???",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "[ga]*",
+   "match": true
+  },
+  {
+   "name": "abc",
+   "pattern": "[!g]*",
+   "match": true
+  },
+  {
+   "name": "abc",
+   "pattern": "[a-c]bc",
+   "match": true
+  },
+  {
+   "name": "abc",
+   "pattern": "a/b",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "a\\b",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "x[y",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "x[[]y",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "",
+   "match": false
+  },
+  {
+   "name": "abc",
+   "pattern": "?",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "*",
+   "match": true
+  },
+  {
+   "name": "",
+   "pattern": "*.com",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "github.???",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "[ga]*",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "[!g]*",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "[a-c]bc",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "a/b",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "a\\b",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "x[y",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "x[[]y",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "[]]",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "[!]]x",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "*[",
+   "match": false
+  },
+  {
+   "name": "",
+   "pattern": "",
+   "match": true
+  },
+  {
+   "name": "",
+   "pattern": "?",
+   "match": false
+  }
+ ],
+ "parse_proxy": [
+  {
+   "proxy": "http://proxy:8080",
+   "ok": [
+    "http",
+    null,
+    null,
+    "proxy:8080"
+   ]
+  },
+  {
+   "proxy": "http://u:p@proxy:8080",
+   "ok": [
+    "http",
+    "u",
+    "p",
+    "proxy:8080"
+   ]
+  },
+  {
+   "proxy": "http://u%40x:p%3Ay@proxy:3128/",
+   "ok": [
+    "http",
+    "u%40x",
+    "p%3Ay",
+    "proxy:3128"
+   ]
+  },
+  {
+   "proxy": "proxy:8080",
+   "ok": [
+    null,
+    null,
+    null,
+    "proxy:8080"
+   ]
+  },
+  {
+   "proxy": "https://proxy",
+   "ok": [
+    "https",
+    null,
+    null,
+    "proxy"
+   ]
+  },
+  {
+   "proxy": "http://u@proxy",
+   "ok": [
+    "http",
+    "u",
+    null,
+    "proxy"
+   ]
+  },
+  {
+   "proxy": "socks5://proxy:1080",
+   "ok": [
+    "socks5",
+    null,
+    null,
+    "proxy:1080"
+   ]
+  },
+  {
+   "proxy": "http:/proxy",
+   "error": "proxy URL with no authority: 'http:/proxy'"
+  },
+  {
+   "proxy": "http://p:8080/path",
+   "ok": [
+    "http",
+    null,
+    null,
+    "p:8080"
+   ]
+  },
+  {
+   "proxy": "http://a@b@proxy:1",
+   "ok": [
+    "http",
+    "a@b",
+    null,
+    "proxy:1"
+   ]
+  },
+  {
+   "proxy": "http://u:@proxy",
+   "ok": [
+    "http",
+    "u",
+    "",
+    "proxy"
+   ]
+  },
+  {
+   "proxy": "http://:p@proxy",
+   "ok": [
+    "http",
+    "",
+    "p",
+    "proxy"
+   ]
+  }
+ ],
+ "request_headers": [
+  {
+   "given": [
+    [
+     "User-Agent",
+     "Sylvia-GM-updater/1"
+    ],
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "Accept",
+     "application/octet-stream"
+    ]
+   ],
+   "sent": [
+    [
+     "Host",
+     "<host>"
+    ],
+    [
+     "User-Agent",
+     "Sylvia-GM-updater/1"
+    ],
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "Accept",
+     "application/octet-stream"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  },
+  {
+   "given": [
+    [
+     "User-Agent",
+     "Sylvia-GM-local-dictation"
+    ]
+   ],
+   "sent": [
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "Host",
+     "<host>"
+    ],
+    [
+     "User-Agent",
+     "Sylvia-GM-local-dictation"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  },
+  {
+   "given": [],
+   "sent": [
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "Host",
+     "<host>"
+    ],
+    [
+     "User-Agent",
+     "Python-urllib/3.12"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  },
+  {
+   "given": [
+    [
+     "connection",
+     "keep-alive"
+    ]
+   ],
+   "sent": [
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "Host",
+     "<host>"
+    ],
+    [
+     "User-Agent",
+     "Python-urllib/3.12"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  },
+  {
+   "given": [
+    [
+     "X-Custom",
+     "1"
+    ],
+    [
+     "x-custom",
+     "2"
+    ]
+   ],
+   "sent": [
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "Host",
+     "<host>"
+    ],
+    [
+     "User-Agent",
+     "Python-urllib/3.12"
+    ],
+    [
+     "X-Custom",
+     "2"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  },
+  {
+   "given": [
+    [
+     "HOST",
+     "other.example"
+    ]
+   ],
+   "sent": [
+    [
+     "Accept-Encoding",
+     "identity"
+    ],
+    [
+     "User-Agent",
+     "Python-urllib/3.12"
+    ],
+    [
+     "Host",
+     "other.example"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  },
+  {
+   "given": [
+    [
+     "accept-encoding",
+     "gzip"
+    ]
+   ],
+   "sent": [
+    [
+     "Host",
+     "<host>"
+    ],
+    [
+     "User-Agent",
+     "Python-urllib/3.12"
+    ],
+    [
+     "Accept-Encoding",
+     "gzip"
+    ],
+    [
+     "Connection",
+     "close"
+    ]
+   ]
+  }
+ ],
+ "scenarios": [
+  {
+   "kind": "update",
+   "name": "release index",
+   "url": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\n[]"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT api.github.com:443 HTTP/1.1\r\nHost: api.github.com:443\r\n\r\n",
+      "request": "GET /repos/pneuma-io/sylvia-gm/releases?per_page=30 HTTP/1.1\r\nHost: api.github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "[]"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "asset via release-assets",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/a/b?sig=x%2Fy\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 12\r\n\r\n{\"ok\": true}"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /a/b?sig=x%2Fy HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "{\"ok\": true}"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "relative redirect",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 301 Moved\r\nLocation: /pneuma-io/sylvia-gm/releases/download/v0.4.2/other.json\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 1\r\n\r\nx"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/other.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "x"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect to an untrusted host",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://evil.example/x\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "unsafe_redirect"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect with a backslash",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://github.com\\@evil.example/x\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "unsafe_redirect"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect with a space",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/a b\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 1\r\n\r\ny"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /a%20b HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "y"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect with non-ASCII",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 307 Temporary\r\nLocation: https://release-assets.githubusercontent.com/caf\u00e9\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 1\r\n\r\nz"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /caf%E9 HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "z"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect downgrade",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: http://release-assets.githubusercontent.com/x\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "unsafe_redirect"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect to ftp",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: ftp://release-assets.githubusercontent.com/x\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "unsafe_redirect"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect to javascript",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: javascript:alert(1)\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "302 without Location",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "300 is not followed",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 300 Multiple\r\nLocation: https://release-assets.githubusercontent.com/x\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect repeated past max_repeats",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /loop HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /loop HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "redirect chain past max_redirections",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/0\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/1\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/2\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/3\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/4\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/5\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://release-assets.githubusercontent.com/6\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /0 HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /1 HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /2 HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /3 HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT release-assets.githubusercontent.com:443 HTTP/1.1\r\nHost: release-assets.githubusercontent.com:443\r\n\r\n",
+      "request": "GET /4 HTTP/1.1\r\nHost: release-assets.githubusercontent.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "404",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 404 Not Found\r\nContent-Length: 2\r\n\r\nno"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "429",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 429 Too Many Requests\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "rate_limited"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "403 rate limited",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\nX-RateLimit-Remaining: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "rate_limited"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "403 other",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 403 Forbidden\r\nContent-Length: 0\r\nX-RateLimit-Remaining: 7\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "500",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "service_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "proxy refuses",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "connect": "HTTP/1.1 407 Proxy Authentication Required\r\n\r\n",
+     "response": []
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n"
+     }
+    ],
+    "error": "network_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "wrong certificate",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "certificate": "evil.example",
+     "response": []
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "tls": "failed"
+     }
+    ],
+    "error": "network_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "closed before a response",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": []
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "network_unavailable"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "malformed status line",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "NOT HTTP\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "escaped": "BadStatusLine"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "chunked body",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n3\r\nabc\r\n2\r\nde\r\n0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "abcde"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "short body",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nabc"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "download_incomplete"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "encoded body",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 1\r\nContent-Encoding: gzip\r\n\r\nx"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "invalid_length"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "cancelled mid-body",
+   "url": "https://github.com/pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nabc",
+      "cancel"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT github.com:443 HTTP/1.1\r\nHost: github.com:443\r\n\r\n",
+      "request": "GET /pneuma-io/sylvia-gm/releases/download/v0.4.2/manifest.json HTTP/1.1\r\nHost: github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "cancelled"
+   }
+  },
+  {
+   "kind": "update",
+   "name": "proxy credentials",
+   "url": "https://api.github.com/repos/pneuma-io/sylvia-gm/releases?per_page=30",
+   "credentials": "us%3Aer:p%40ss@",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\n[]"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT api.github.com:443 HTTP/1.1\r\nProxy-Authorization: Basic dXM6ZXI6cEBzcw==\r\nHost: api.github.com:443\r\n\r\n",
+      "request": "GET /repos/pneuma-io/sylvia-gm/releases?per_page=30 HTTP/1.1\r\nHost: api.github.com\r\nUser-Agent: Sylvia-GM-updater/1\r\nAccept-Encoding: identity\r\nAccept: application/octet-stream\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "[]"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model via the CDN",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/repos/x/model.bin?Expires=1\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 22\r\n\r\ncontrolled model bytes"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT cdn-lfs.huggingface.co:443 HTTP/1.1\r\nHost: cdn-lfs.huggingface.co:443\r\n\r\n",
+      "request": "GET /repos/x/model.bin?Expires=1 HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: cdn-lfs.huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "ready"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model relative redirect",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 307 Temporary\r\nLocation: /api/resolve-cache/models/x/model.bin\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 22\r\n\r\ncontrolled model bytes"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /api/resolve-cache/models/x/model.bin HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "ready"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model redirect loop",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: https://cdn-lfs.huggingface.co/loop\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT cdn-lfs.huggingface.co:443 HTTP/1.1\r\nHost: cdn-lfs.huggingface.co:443\r\n\r\n",
+      "request": "GET /loop HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: cdn-lfs.huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT cdn-lfs.huggingface.co:443 HTTP/1.1\r\nHost: cdn-lfs.huggingface.co:443\r\n\r\n",
+      "request": "GET /loop HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: cdn-lfs.huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT cdn-lfs.huggingface.co:443 HTTP/1.1\r\nHost: cdn-lfs.huggingface.co:443\r\n\r\n",
+      "request": "GET /loop HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: cdn-lfs.huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "connect": "CONNECT cdn-lfs.huggingface.co:443 HTTP/1.1\r\nHost: cdn-lfs.huggingface.co:443\r\n\r\n",
+      "request": "GET /loop HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: cdn-lfs.huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "download"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model 404",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "download"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model wrong bytes",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 22\r\n\r\ncontrolled model bytez"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "download"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model short body",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 30\r\n\r\ncontrolled"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "error": "download"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model proxy refuses",
+   "steps": [
+    {
+     "connect": "HTTP/1.1 403 Forbidden\r\n\r\n",
+     "response": []
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n"
+     }
+    ],
+    "error": "download"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model malformed status",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.0\r\n\r\n"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "escaped": "BadStatusLine"
+   }
+  },
+  {
+   "kind": "download",
+   "url": "https://huggingface.co/Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true",
+   "name": "model redirect to http",
+   "steps": [
+    {
+     "response": [
+      "HTTP/1.1 302 Found\r\nLocation: http://cdn-lfs.huggingface.co/x\r\nContent-Length: 0\r\n\r\n"
+     ]
+    },
+    {
+     "response": [
+      "HTTP/1.1 200 OK\r\nContent-Length: 22\r\n\r\ncontrolled model bytes"
+     ]
+    }
+   ],
+   "expect": {
+    "seen": [
+     {
+      "connect": "CONNECT huggingface.co:443 HTTP/1.1\r\nHost: huggingface.co:443\r\n\r\n",
+      "request": "GET /Systran/faster-whisper-base/resolve/ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66/model.bin?download=true HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     },
+     {
+      "plain": "GET http://cdn-lfs.huggingface.co/x HTTP/1.1\r\nAccept-Encoding: identity\r\nHost: cdn-lfs.huggingface.co\r\nUser-Agent: Sylvia-GM-local-dictation\r\nConnection: close\r\n\r\n"
+     }
+    ],
+    "ok": "ready"
+   }
+  }
+ ]
+}

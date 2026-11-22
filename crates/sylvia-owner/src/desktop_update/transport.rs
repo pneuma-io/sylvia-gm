@@ -4,7 +4,7 @@
 //! Ported here: `official_request`, the redirect and final-location rules of
 //! `OfficialRedirects` and `HttpsTransport.open`, `content_length`, `metadata_bytes` and
 //! `download_artifact`, over a [`Transport`] the caller supplies. The HTTPS client itself
-//! (`HttpsTransport`) comes with the update controller.
+//! (`HttpsTransport`) is `super::https`.
 
 use super::manifest::{Manifest, MANIFEST_LIMIT, OFFICIAL_RELEASES};
 use super::storage::stage_identity;
@@ -34,6 +34,11 @@ impl Cancel {
     /// `event.is_set()`.
     pub fn is_set(&self) -> bool {
         self.0.load(Ordering::SeqCst)
+    }
+
+    /// The shared flag, for the transport's socket interruption.
+    pub(crate) fn flag(&self) -> Arc<AtomicBool> {
+        Arc::clone(&self.0)
     }
 }
 
