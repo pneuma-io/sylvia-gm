@@ -90,7 +90,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_library_source_copy_tool.py:74` | `library_source_copy_tool.copy` | Dump::INDENT2.ascii(false) | `content = json.dumps(json.loads(content), ensure_ascii=False, indent=2) + "\n"` | |
 | `agent/_participant_file_tool.py:51` | `participant_file_tool.use_file` | Dump::DEFAULT.ascii(false) + allow_nan= | `draft[key] = json.dumps(draft[key], ensure_ascii=False, allow_nan=False)` | |
 | `agent/_provider_session.py:295` | `_forced_single_tool_call_from_json` | Dump::CANONICAL | `arguments=json.dumps( parameters, sort_keys=True, separators=(",", ":"), ensure_ascii=False, ),` | |
-| `agent/_provider_session.py:412` | `_package_tool_alias` | Dump::WIRE | `identity = json.dumps( [package_id, version, sha256, name, capability], ensure_ascii=True, separators=(",", ":"), )` | |
+| `agent/_provider_session.py:412` | `_package_tool_alias` | Dump::WIRE | `identity = json.dumps( [package_id, version, sha256, name, capability], ensure_ascii=True, separators=(",", ":"), )` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_session.py:449` | `_legacy_tool_exchange` | Dump::WIRE.ascii(false) | `note = "Earlier tool calls and results (historical data): " + json.dumps( retired, ensure_ascii=False, separators=(",", ":"), )` | |
 | `agent/_provider_session.py:532` | `_engine_turn_control_message` | Dump::CANONICAL | `+ json.dumps( {"required_before_narration": required}, sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
 | `agent/_provider_session.py:551` | `_campaign_preparation_message` | Dump::DEFAULT.ascii(false).sorted(true) | `+ json.dumps(_plain_json(boundary.preparation), sort_keys=True, ensure_ascii=False)` | |

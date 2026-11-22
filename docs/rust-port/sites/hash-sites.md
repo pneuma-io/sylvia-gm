@@ -227,7 +227,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_context_ledger.py:436` | `host_seal` | hashlib.sha256 | `digest = hashlib.sha256(b"sylvia-gm-host-record-seal/v1\x00" + session_id.encode("utf-8"))` | |
 | `agent/_context_ledger.py:491` | `_sha` | hashlib.sha256 | `return hashlib.sha256(text.encode("utf-8")).hexdigest()` | |
 | `agent/_inference_identity.py:18` | `inference_context_id` | hashlib.sha256 | `return "sylvia-" + hashlib.sha256(encoded).hexdigest()` | |
-| `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | |
+| `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_turn_phases.py:387` | `retry_repeated_response` | hashlib.sha256 | `"response_sha256": hashlib.sha256(state.narration.encode("utf-8")).hexdigest(),` | |
 | `agent/_stateless_mcp.py:2359` | `StatelessMcpMechanics.commit_campaign_file` | hashlib.sha256 | `update_id = f"campaign-file-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |
 | `agent/_stateless_mcp.py:2497` | `StatelessMcpMechanics.commit_narrative_state` | hashlib.sha256 | `update_id = f"narrative-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |

@@ -2701,14 +2701,12 @@ name = "sylvia-agent"
 version = "0.4.1"
 dependencies = [
  "futures-util",
+ "indexmap",
  "serde",
  "serde_json",
- "sylvia-app",
  "sylvia-base",
  "sylvia-domain",
- "sylvia-engine",
  "sylvia-provider",
- "sylvia-store",
  "thiserror 2.0.21",
 ]
 
