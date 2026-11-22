@@ -18,6 +18,7 @@ pub mod handle;
 pub mod lanes;
 pub mod launch;
 pub mod owner_lock;
+pub mod package_reads;
 pub mod packages;
 mod participant_history;
 pub mod pytext;
