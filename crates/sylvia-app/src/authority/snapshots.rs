@@ -3,15 +3,14 @@
 //! `sylvia_store::snapshots`.
 //!
 //! `model_context_snapshot` hides the state a package declares engine-private (`visibility:
-//! engine`). Where the package declares such state, Python also projects the current model
-//! decision boundary with lane 2's `decision_scope.py`, `actor_decisions.py` and
-//! `package_runtime.package_model_decision_boundary`, which are not ported yet: a campaign with
-//! engine-private state is refused as [`StoreError::NotPorted`] until they are. Of the bundled
-//! packages only Riichi declares any; a No Ruleset or SRD Lite campaign is answered exactly.
+//! engine`). Where the package declares such state, it also projects the current model decision
+//! boundary from the full state, with lane 2's `decision_scope::project_model_decision_scope`
+//! and, for an isolated participant under the GM, `actor_decisions::public_actor_observation`,
+//! as Python does.
 
 use std::collections::BTreeSet;
 use sylvia_domain::authority::{
-    CampaignDisplaySnapshot, CampaignSnapshot, ModelDecisionBoundary, PackageLock,
+    CampaignDisplaySnapshot, CampaignSnapshot, ModelDecisionBoundary, ModelDecisionOwner, PackageLock,
 };
 use sylvia_store::snapshots::DisplayQuery;
 use sylvia_store::{AuthorityStore, StoreError, StoreHandle, StoreResult};
@@ -50,15 +49,52 @@ pub async fn model_context_snapshot(
         .call(move |store| {
             let query = DisplayQuery { include_continuity: true, ..DisplayQuery::default() };
             let snapshot = store.display_snapshot(&campaign_id, &query)?;
-            // With no engine-private state the visible state is all of it and Python projects no
-            // boundary; with some, the projection is lane 2's (see the module documentation).
-            if !engine_private_keys(store, &snapshot.state.package_lock)?.is_empty() {
-                return Err(StoreError::NotPorted(
-                    "model decision scope projection (lane 2: decision_scope.py, actor_decisions.py, \
-                     package_runtime.package_model_decision_boundary)",
-                ));
+            let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
+            let mut boundary = None;
+            if !private_keys.is_empty() {
+                if let Some(declared) =
+                    super::content_reads::decision_scope_declaration(store, &snapshot.state)?
+                {
+                    boundary = project_boundary(&snapshot.state, &declared)?;
+                }
             }
-            Ok((snapshot, None))
+            // The boundary is projected from the full state; the model sees only the rest.
+            let mut visible = snapshot;
+            visible.state.state.retain(|key, _| !private_keys.contains(key));
+            Ok((visible, boundary))
         })
         .await
+}
+
+/// The projection `model_context_snapshot` makes of a declared decision scope: the current
+/// boundary and, when the GM decides for an isolated participant, that participant's public
+/// observation in place of its private state, with no eligible actors.
+/// `DecisionScopeProjectionError` is Python's `CommandRejected` with its message.
+fn project_boundary(
+    state: &sylvia_domain::authority::CampaignState,
+    declared: &sylvia_base::JsonMap,
+) -> StoreResult<Option<ModelDecisionBoundary>> {
+    let rejected = |error: sylvia_domain::DomainError| -> StoreError {
+        match &error {
+            sylvia_domain::DomainError::Diagnosed {
+                error_type: "DecisionScopeProjectionError",
+                message,
+                ..
+            } => sylvia_domain::DomainError::command_rejected(message.clone()).into(),
+            _ => error.into(),
+        }
+    };
+    let Some(mut boundary) =
+        crate::decision_scope::project_model_decision_scope(state, declared).map_err(rejected)?
+    else {
+        return Ok(None);
+    };
+    if let Some(sylvia_base::Json::Object(isolated)) = declared.get("isolated_participant") {
+        if boundary.owner == ModelDecisionOwner::Gm {
+            boundary.actor_state =
+                crate::actor_decisions::public_actor_observation(state, isolated).map_err(rejected)?;
+            boundary.eligible_actors = Vec::new();
+        }
+    }
+    Ok(Some(boundary))
 }

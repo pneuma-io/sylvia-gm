@@ -2,9 +2,9 @@
 //! `generate_snapshot_runs.py`): every campaign of eight Python-made profiles read with
 //! `snapshot`, `model_context_snapshot` and six display queries, plus a missing campaign. Each
 //! read must be Python's value field for field, in Python's order, or Python's refusal. The two
-//! Riichi campaigns of the participant profile declare engine-private state, so their
-//! `model_context_snapshot` waits on lane 2's decision-scope projection and is refused as not
-//! ported; their other reads are compared like every other.
+//! Riichi campaigns of the participant profile declare engine-private state and a decision
+//! scope, so their `model_context_snapshot` hides that state and projects the boundary through
+//! lane 2's `decision_scope`, as Python does.
 
 use flate2::read::GzDecoder;
 use serde_json::json;
@@ -29,6 +29,8 @@ fn base(name: &str) -> Vec<u8> {
         "campaigns" => "campaigns/seed.sqlite3.gz",
         "continuity" => "continuity/batch_and_view.sqlite3.gz",
         "v4" => "packages/participants_v4.sqlite3.gz",
+        // The generator's own base: the cast base with a Riichi game started on `campaign-table`.
+        "riichi_started" => "../../../sylvia-app/tests/vectors/snapshots/riichi_started.sqlite3.gz",
         other => panic!("unknown base {other}"),
     };
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../sylvia-store/tests/vectors").join(relative);
@@ -261,9 +263,8 @@ async fn snapshots_match_python() {
     )
     .unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 234);
+    assert_eq!(runs.len(), 261);
     let mut failures = Vec::new();
-    let mut not_ported = Vec::new();
     let mut current: Option<(String, StoreHandle, sylvia_store::StoreThread)> = None;
     for (index, run) in runs.iter().enumerate() {
         let name = run["base"].as_str().unwrap();
@@ -300,18 +301,11 @@ async fn snapshots_match_python() {
                     ],
                 )
             })),
-            "model_context_snapshot" => match snapshots::model_context_snapshot(handle, &campaign_id).await {
-                // Riichi declares engine-private state, whose decision boundary is lane 2's
-                // projection, not ported yet: only these two campaigns may be refused for it.
-                Err(sylvia_store::StoreError::NotPorted(_)) => {
-                    not_ported.push(format!("{name} {campaign_id}"));
-                    continue;
-                }
-                read => outcome(read.map(|(snapshot, boundary)| {
-                    assert!(boundary.is_none(), "a boundary is lane 2's projection");
-                    json!([display_json(&snapshot), null])
-                })),
-            },
+            "model_context_snapshot" => outcome(
+                snapshots::model_context_snapshot(handle, &campaign_id).await.map(|(snapshot, boundary)| {
+                    json!([display_json(&snapshot), boundary.as_ref().map_or(Json::Null, boundary_json)])
+                }),
+            ),
             _ => {
                 let asked = query(&run["query"]);
                 outcome(
@@ -343,7 +337,6 @@ async fn snapshots_match_python() {
         runs.len(),
         failures.join("\n")
     );
-    assert_eq!(not_ported, ["cast campaign-table", "cast campaign-workshop"]);
 }
 
 fn display_json(snapshot: &sylvia_domain::authority::CampaignDisplaySnapshot) -> Json {
@@ -355,6 +348,37 @@ fn display_json(snapshot: &sylvia_domain::authority::CampaignDisplaySnapshot) ->
             ("events", snapshot.events.iter().map(event).collect()),
             ("turns", turns(&snapshot.turns)),
             ("continuity", continuity(&snapshot.continuity)),
+        ],
+    )
+}
+
+fn boundary_json(boundary: &sylvia_domain::authority::ModelDecisionBoundary) -> Json {
+    let actors = boundary
+        .eligible_actors
+        .iter()
+        .map(|actor| {
+            object(
+                "ModelDecisionActor",
+                vec![
+                    ("actor_id", actor.actor_id.as_str().into()),
+                    ("actor_name", actor.actor_name.as_str().into()),
+                    ("actor_state", Json::Object(actor.actor_state.clone())),
+                ],
+            )
+        })
+        .collect();
+    object(
+        "ModelDecisionBoundary",
+        vec![
+            ("owner", boundary.owner.as_str().into()),
+            ("actor_id", optional(boundary.actor_id.as_deref())),
+            ("actor_name", optional(boundary.actor_name.as_deref())),
+            ("actor_state", Json::Object(boundary.actor_state.clone())),
+            ("campaign_revision", boundary.campaign_revision.into()),
+            ("active_side_id", optional(boundary.active_side_id.as_deref())),
+            ("focused_actor_id", optional(boundary.focused_actor_id.as_deref())),
+            ("eligible_actors", Json::Array(actors)),
+            ("preparation", boundary.preparation.clone().map_or(Json::Null, Json::Object)),
         ],
     )
 }
