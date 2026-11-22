@@ -152,9 +152,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | `sylvia-provider` anthropic_vectors |
 | `provider/_chatgpt.py:319` | `_in_place_answer` | Dump::DEFAULT.ascii(false) | `result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)` | |
 | `provider/_chatgpt.py:1313` | `ChatGPTProvider._attempt` | Dump::DEFAULT + allow_nan= | `arguments = json.dumps( params.get("arguments"), ensure_ascii=True, allow_nan=False )` | |
-| `provider/_claude.py:131` | `prepare_request` | Dump::DEFAULT + allow_nan= | `history = json.loads(json.dumps(request["messages"], allow_nan=False))` | |
-| `provider/_claude.py:203` | `_replay_record` | Dump::DEFAULT | `add(str(saved["type"]), {"message": json.loads(json.dumps(saved["message"]))})` | |
-| `provider/_claude.py:322` | `_native_projection` | Dump::DEFAULT | `add("user", {"message": json.loads(json.dumps(answer))})` | |
+| `provider/_claude.py:131` | `prepare_request` | Dump::DEFAULT + allow_nan= | `history = json.loads(json.dumps(request["messages"], allow_nan=False))` | `sylvia-provider` claude_vectors |
+| `provider/_claude.py:203` | `_replay_record` | Dump::DEFAULT | `add(str(saved["type"]), {"message": json.loads(json.dumps(saved["message"]))})` | `sylvia-provider` claude_vectors |
+| `provider/_claude.py:322` | `_native_projection` | Dump::DEFAULT | `add("user", {"message": json.loads(json.dumps(answer))})` | `sylvia-provider` claude_vectors |
 | `provider/_claude.py:608` | `ClaudeProvider._keep_plan` | Dump::DEFAULT.sorted(true) | `tools_key=json.dumps(native_tools, sort_keys=True), history=history,` | |
 | `provider/_claude.py:796` | `ClaudeProvider._fresh` | Dump::DEFAULT | `transcript = "".join(json.dumps(r, ensure_ascii=True) + "\n" for r in records)` | |
 | `provider/_claude.py:1033` | `ClaudeProvider._run_events` | Dump::DEFAULT + allow_nan= | `json.dumps(candidate["input"], allow_nan=False),` | |
