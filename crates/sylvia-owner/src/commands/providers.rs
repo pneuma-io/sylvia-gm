@@ -19,6 +19,7 @@ use sylvia_provider::config::provider_writes::{
     remove_provider_settings, save_provider_settings, set_chat_defaults_settings, set_default_model_settings,
     SaveProvider,
 };
+use sylvia_provider::config::validation::{validate_provider_model, Validate};
 use sylvia_provider::config::{data_from_json, default_config_path, reply_json, ConfigFailure, Data};
 use sylvia_provider::pyobj::py_str;
 use sylvia_provider::reasoning::{reasoning_values, select_reasoning, suggested_from_data, Advertised};
@@ -120,6 +121,27 @@ pub async fn handle_discover_provider_models(ctx: &DispatchContext, params: &Jso
             .await
             .map_err(config_error)?;
     reply(&found)
+}
+
+/// `handle_validate_provider_model`: one bounded agent-compatibility probe.
+pub async fn handle_validate_provider_model(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let default_config = default_config_path();
+    let env = Environment::current();
+    let sources = ConfigSources { default_config: &default_config, seal: &PlatformSeal, env: &env };
+    let request = Validate {
+        provider_id: param(params, "provider_id")?,
+        preset_id: param(params, "preset_id")?,
+        base_url: param(params, "base_url")?,
+        credential: param(params, "credential")?,
+        model_id: param(params, "model_id")?,
+        transport: param(params, "transport")?,
+        headers: param(params, "headers")?,
+    };
+    let path = config_path(ctx);
+    let report = validate_provider_model(sources, &path, &request, network_clients().as_ref())
+        .await
+        .map_err(config_error)?;
+    reply(&report)
 }
 
 /// `handle_save_provider_settings`: save one model, then reload the provider resolver.
