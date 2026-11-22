@@ -2,7 +2,7 @@
 
 Run with the snapshot's own interpreter, from the repository root:
 
-    .venv/Scripts/python.exe -B crates/sylvia-store/tests/vectors/generate_guided_draft_runs.py
+    .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_guided_draft_runs.py
 
 It drives `create_guided_campaign_draft` on a new profile: identity refusals, a first Draft,
 an exact replay, replays that differ (name, Builder model, Builder session), a second Draft, and a

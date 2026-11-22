@@ -3,7 +3,7 @@
 Run with the snapshot's own interpreter, from the repository root, after
 `generate_guided_draft_runs.py` (its new profile is the base):
 
-    .venv/Scripts/python.exe -B crates/sylvia-store/tests/vectors/generate_guided_advance_runs.py
+    .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_guided_advance_runs.py
 
 It makes one Draft, then answers its Interview: a No Ruleset interview through to the review,
 exact and loose replays, stale revisions, every refusal, a return to an earlier step that

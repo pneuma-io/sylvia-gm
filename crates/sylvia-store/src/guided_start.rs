@@ -1,11 +1,11 @@
 //! Starting a guided campaign: binding the finished Interview's content to its Draft and
-//! beginning construction, in the store (`SQLiteAuthorityStore`) and the application owner
-//! (`AuthorityOwner`).
+//! beginning construction, in the store (`SQLiteAuthorityStore`), and the application owner's
+//! `append_agent_message`. The other application halves are `sylvia_app::authority::guided`.
 //!
 //! Python: `bind_guided_campaign_basis`, `campaign_construction_basis` (with `_construction_basis`)
-//! and `begin_campaign_construction` in both layers, `campaign_operation_hit`,
-//! `_campaign_operation_hit`, `_insert_campaign_operation`, `sqlite_packages.insert_campaign_lock`
-//! (`_lock_id`) and the application's `append_agent_message`.
+//! and `begin_campaign_construction`, `campaign_operation_hit`, `_campaign_operation_hit`,
+//! `_insert_campaign_operation`, `sqlite_packages.insert_campaign_lock` (`_lock_id`) and
+//! `AuthorityOwner.append_agent_message`.
 //!
 //! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently:
 //! - binding an installed Ruleset (a non-empty lock): `_validate_campaign_inputs` and the
@@ -29,20 +29,13 @@ use rusqlite::{params, Connection};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
-    canonical_payload_is_safe, owned_payload, validate_authority_identity, CampaignConfirmation,
-    CampaignConstructionBasis, CampaignConstructionBegun, PackageLock, WriterRole,
+    CampaignConfirmation, CampaignConstructionBasis, CampaignConstructionBegun, PackageLock, WriterRole,
 };
-use sylvia_domain::package_library::{
-    canonical_json_bytes, closure_sha256, PackageLockAvailability, PackageLockRecord,
-};
-use sylvia_domain::session::{SessionMessage, SessionMessageKind, SessionStatus};
+use sylvia_domain::package_library::{closure_sha256, PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::session::{SessionMessage, SessionMessageKind};
 
 /// `_UNBOUND_CAMPAIGN_LOCK_HASH`.
 const UNBOUND_CAMPAIGN_LOCK_HASH: &str = "unbound";
-
-/// The Interview steps a binding requires by default.
-const REQUIRED_INTERVIEW_STEPS: [&str; 7] =
-    ["ruleset", "setting", "plan", "name", "participants", "boundaries_preferences", "specific_requests"];
 
 fn coded(kind: &'static str, message: &str) -> StoreError {
     StoreError::Coded(crate::error::authority_coded(kind, message))
@@ -245,7 +238,7 @@ pub struct BeginConstruction<'a> {
 impl AuthorityStore {
     /// `campaign_operation_hit`: the application's prelookup, on a read-only connection. Before
     /// the session schema exists there are no operations.
-    pub(crate) fn campaign_operation_hit(
+    pub fn campaign_operation_hit(
         &self,
         operation_id: &str,
         operation_kind: &str,
@@ -536,49 +529,11 @@ impl AuthorityStore {
 }
 
 /// `_package_lock_payload`.
-fn package_lock_payload(package_lock: &PackageLock) -> Json {
+pub fn package_lock_payload(package_lock: &PackageLock) -> Json {
     crate::stored_construction::operation_lock_payload(package_lock)
 }
 
-/// `{"operation_id": ..., "operation_kind": ..., **values}` and the SHA-256 of its canonical bytes.
-fn operation_payload(
-    operation_id: &str,
-    operation_kind: &str,
-    values: Vec<(&str, Json)>,
-) -> (JsonMap, String) {
-    let mut payload = JsonMap::new();
-    payload.insert("operation_id".into(), operation_id.into());
-    payload.insert("operation_kind".into(), operation_kind.into());
-    for (key, value) in values {
-        payload.insert(key.to_owned(), value);
-    }
-    let sha256 = sha256_hex(canonical_json_bytes(&Json::Object(payload.clone())));
-    (payload, sha256)
-}
-
-/// The application's binding arguments.
-pub struct BindRequest<'a> {
-    pub operation_id: &'a str,
-    pub campaign_id: &'a str,
-    pub display_name: &'a str,
-    pub package_lock: &'a PackageLock,
-    pub turn_id: &'a str,
-    pub builder_session_id: &'a str,
-    pub package_candidate_id: Option<&'a str>,
-}
-
 impl StoreHandle {
-    /// `AuthorityOwner.campaign_construction_basis`: the identity check (a `ValueError` Python
-    /// does not catch), then the store's read.
-    pub async fn campaign_construction_basis(
-        &self,
-        campaign_id: &str,
-    ) -> StoreResult<CampaignConstructionBasis> {
-        validate_authority_identity(campaign_id, "Campaign identity", false)?;
-        let campaign_id = campaign_id.to_owned();
-        self.call(move |store| store.campaign_construction_basis(&campaign_id)).await
-    }
-
     /// `AuthorityOwner.append_agent_message`: the session's campaign work, then
     /// `SessionApplication.append_message` under the session lane.
     pub async fn append_agent_message(
@@ -594,208 +549,5 @@ impl StoreHandle {
             (session_id.to_owned(), message_id.to_owned(), content.clone());
         self.call(move |store| store.append_agent_message(&session_id, &message_id, kind, &content, None))
             .await
-    }
-
-    /// `AuthorityOwner._resolve_interview_content` as `guided_campaign_contribution` needs it
-    /// for every Contribution step: with no Ruleset chosen there is no content, and a Setting or
-    /// Plan chosen without one is refused. A chosen Ruleset needs lane 1's `interview_content`.
-    async fn no_interview_contribution(&self, session_id: &str) -> StoreResult<()> {
-        let ruleset = self.guided_answer_value(session_id, "ruleset").await?.unwrap_or_default();
-        let setting = self.guided_answer_value(session_id, "setting").await?.unwrap_or_default();
-        let plan = self.guided_answer_value(session_id, "plan").await?.unwrap_or_default();
-        let chosen = |answer: &JsonMap, key: &str| !matches!(answer.get(key), None | Some(Json::Null));
-        if chosen(&ruleset, "candidate_id") {
-            return Err(StoreError::NotPorted(
-                "an installed Ruleset's Interview content (lane 1's interview_content)",
-            ));
-        }
-        if chosen(&setting, "setting_id") || chosen(&plan, "plan_id") {
-            return Err(rejected("Selected world content requires its Ruleset", "command_rejected"));
-        }
-        Ok(())
-    }
-
-    /// `AuthorityOwner.bind_guided_campaign_basis` for a Draft with no Ruleset: the binding
-    /// checks under the campaign's work, the semantic payload, the replay prelookup, the
-    /// required Interview steps, then the store's binding.
-    pub async fn bind_guided_campaign_basis(
-        &self,
-        bind: &BindRequest<'_>,
-    ) -> StoreResult<CampaignConfirmation> {
-        let campaign_id = bind.campaign_id.to_owned();
-        let _work = self
-            .lanes()
-            .work
-            .begin(&campaign_id, || {
-                let campaign_id = campaign_id.clone();
-                async move { self.call(move |store| store.campaign_lifecycle(&campaign_id)).await }
-            })
-            .await?;
-        let invalid =
-            || rejected("Guided Campaign binding authority is invalid", "invalid_authority_identity");
-        for (value, label) in [
-            (bind.operation_id, "Campaign operation identity"),
-            (bind.campaign_id, "Campaign identity"),
-            (bind.display_name, "Campaign display name"),
-            (bind.turn_id, "TURN identity"),
-            (bind.builder_session_id, "Builder session identity"),
-        ] {
-            if validate_authority_identity(value, label, false).is_err() {
-                return Err(invalid());
-            }
-        }
-        if let Some(candidate) = bind.package_candidate_id {
-            if validate_authority_identity(candidate, "Campaign package candidate identity", false).is_err() {
-                return Err(invalid());
-            }
-        }
-        let session_id = bind.builder_session_id.to_owned();
-        let session = self.call(move |store| store.session_context(&session_id)).await?.session;
-        if session.campaign_id() != Some(bind.campaign_id)
-            || session.role() != WriterRole::Builder
-            || session.fields().status != SessionStatus::Active
-        {
-            return Err(invalid());
-        }
-        let fields = session.fields();
-        let mut builder = JsonMap::new();
-        builder.insert("session_id".into(), fields.session_id.as_str().into());
-        builder.insert("provider_id".into(), fields.provider_id.as_str().into());
-        builder.insert("model_id".into(), fields.model_id.as_str().into());
-        builder.insert(
-            "selected_skill".into(),
-            fields.selected_skill.as_deref().unwrap_or("BUILD CAMPAIGN PLAN").into(),
-        );
-        let mut values = vec![
-            ("display_name", Json::from(bind.display_name)),
-            ("package_lock", package_lock_payload(bind.package_lock)),
-            ("turn_id", Json::from(bind.turn_id)),
-            ("builder_session", Json::Object(builder)),
-        ];
-        if let Some(candidate) = bind.package_candidate_id {
-            values.push(("package_candidate_id", Json::from(candidate)));
-        }
-        let (semantic_payload, payload_sha256) =
-            operation_payload(bind.operation_id, "confirm_new_campaign", values);
-        let (operation_id, sha) = (bind.operation_id.to_owned(), payload_sha256.clone());
-        match self
-            .call(move |store| store.campaign_operation_hit(&operation_id, "confirm_new_campaign", &sha))
-            .await?
-        {
-            Some(OperationResult::Confirmation(existing)) => return Ok(existing),
-            Some(_) => {
-                return Err(coded("IdempotencyConflict", "Campaign operation result kind does not match"))
-            }
-            None => {}
-        }
-        // `_validate_campaign_inputs`: with no packages and no participants it reads and refuses
-        // nothing. A Ruleset's lock needs lane 1's active-Ruleset and participant checks.
-        if !bind.package_lock.entries().is_empty() {
-            return Err(StoreError::NotPorted("binding an installed Ruleset (lane 1's interview_content)"));
-        }
-        let mut required: Vec<&str> = REQUIRED_INTERVIEW_STEPS.to_vec();
-        let ruleset_answer = self.guided_answer_value(bind.builder_session_id, "ruleset").await?;
-        if ruleset_answer.is_some_and(|answer| matches!(answer.get("candidate_id"), None | Some(Json::Null)))
-        {
-            required.retain(|step| !matches!(*step, "setting" | "plan" | "participants"));
-        }
-        // `_guided_contribution_object` for each of the three Contribution steps: `None` without a
-        // Ruleset (each call reads the answers again, as Python's does).
-        for _ in 0..3 {
-            self.no_interview_contribution(bind.builder_session_id).await?;
-        }
-        let (operation_id, campaign_id, display_name, turn_id, session_id) = (
-            bind.operation_id.to_owned(),
-            bind.campaign_id.to_owned(),
-            bind.display_name.to_owned(),
-            bind.turn_id.to_owned(),
-            bind.builder_session_id.to_owned(),
-        );
-        let package_lock = bind.package_lock.clone();
-        self.call(move |store| {
-            store.bind_guided_campaign_basis(&BindBasis {
-                operation_id: &operation_id,
-                semantic_payload: &semantic_payload,
-                payload_sha256: &payload_sha256,
-                campaign_id: &campaign_id,
-                display_name: &display_name,
-                package_lock: &package_lock,
-                turn_id: &turn_id,
-                builder_session_id: &session_id,
-                required_interview_steps: &required,
-            })
-        })
-        .await
-    }
-
-    /// `AuthorityOwner.begin_campaign_construction`: the input checks, the semantic payload and
-    /// replay prelookup, then the store's begin under the campaign's work and owner lane.
-    pub async fn begin_campaign_construction(
-        &self,
-        operation_id: &str,
-        campaign_id: &str,
-        lane: &str,
-        expected_revision: i64,
-        canonical_input: &Json,
-    ) -> StoreResult<CampaignConstructionBegun> {
-        let invalid = || rejected("Campaign construction input is invalid", "construction_input_invalid");
-        if validate_authority_identity(operation_id, "Campaign operation identity", false).is_err()
-            || validate_authority_identity(campaign_id, "Campaign identity", false).is_err()
-            || !matches!(lane, "quick_start" | "customize")
-            || expected_revision < 0
-        {
-            return Err(invalid());
-        }
-        let captured = owned_payload(canonical_input).map_err(|_| invalid())?;
-        if !canonical_payload_is_safe(&Json::Object(captured.clone())) {
-            return Err(rejected(
-                "Campaign construction input contains a reserved canonical channel",
-                "unsafe_canonical_payload",
-            ));
-        }
-        let (semantic_payload, payload_sha256) = operation_payload(
-            operation_id,
-            "begin_campaign_construction",
-            vec![
-                ("campaign_id", Json::from(campaign_id)),
-                ("lane", Json::from(lane)),
-                ("canonical_input", Json::Object(captured.clone())),
-            ],
-        );
-        let (id, sha) = (operation_id.to_owned(), payload_sha256.clone());
-        match self
-            .call(move |store| store.campaign_operation_hit(&id, "begin_campaign_construction", &sha))
-            .await?
-        {
-            Some(OperationResult::Begun(existing)) => return Ok(existing),
-            Some(_) => {
-                return Err(coded("IdempotencyConflict", "Campaign operation result kind does not match"))
-            }
-            None => {}
-        }
-        let owned_campaign = campaign_id.to_owned();
-        let _work = self
-            .lanes()
-            .work
-            .begin(&owned_campaign, || {
-                let campaign_id = owned_campaign.clone();
-                async move { self.call(move |store| store.campaign_lifecycle(&campaign_id)).await }
-            })
-            .await?;
-        let _lane = self.lanes().owner.acquire(campaign_id).await;
-        let (operation_id, campaign_id, lane) =
-            (operation_id.to_owned(), campaign_id.to_owned(), lane.to_owned());
-        self.call(move |store| {
-            store.begin_campaign_construction(&BeginConstruction {
-                operation_id: &operation_id,
-                semantic_payload: &semantic_payload,
-                payload_sha256: &payload_sha256,
-                campaign_id: &campaign_id,
-                lane: &lane,
-                expected_revision,
-                canonical_input: &captured,
-            })
-        })
-        .await
     }
 }

@@ -3,7 +3,7 @@
 Run with the snapshot's own interpreter, from the repository root, after
 `generate_guided_draft_runs.py` (its new profile is the base):
 
-    .venv/Scripts/python.exe -B crates/sylvia-store/tests/vectors/generate_guided_finalize_runs.py
+    .venv/Scripts/python.exe -B crates/sylvia-app/tests/vectors/generate_guided_finalize_runs.py
 
 It takes a No Ruleset Draft through its Interview, the Ready to Begin message, the binding and the
 begin, as `handle_start_guided_campaign` does, then finalizes it: identity refusals, an empty

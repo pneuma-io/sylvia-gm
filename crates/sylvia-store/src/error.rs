@@ -16,7 +16,7 @@ pub fn schema_identity(message: &str) -> StoreError {
 }
 
 /// The `CodedError` of one of Python's domain exception classes, from lane 1's constructors.
-pub(crate) fn authority_coded(error_type: &'static str, message: &str) -> CodedError {
+pub fn authority_coded(error_type: &'static str, message: &str) -> CodedError {
     sylvia_domain::DomainError::authority(error_type, message)
         .rejection()
         .expect("an authority error is always a rejection")

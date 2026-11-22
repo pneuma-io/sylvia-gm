@@ -59,6 +59,7 @@ regex.workspace = true
 sha2.workspace = true
 sylvia-domain.workspace = true
 sylvia-store.workspace = true
+sylvia-app.workspace = true
 sylvia-provider.workspace = true
 sylvia-agent.workspace = true
 ed25519-dalek.workspace = true

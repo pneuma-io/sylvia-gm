@@ -41,17 +41,16 @@ pub async fn handle_create_guided_campaign_draft(
     let start = crate::chat_start::chat_start_for(ctx, "builder", &provider_id, &model_id, params).await?;
     let replayed = crate::chat_start::session_exists(ctx, &builder_session_id).await?;
     let display_name = required(params, "display_name")?;
-    let draft = ctx
-        .store
-        .create_guided_campaign_draft(
-            &operation_id,
-            &display_name,
-            &builder_session_id,
-            &provider_id,
-            &model_id,
-        )
-        .await
-        .map_err(store_error)?;
+    let draft = sylvia_app::authority::guided::create_guided_campaign_draft(
+        &ctx.store,
+        &operation_id,
+        &display_name,
+        &builder_session_id,
+        &provider_id,
+        &model_id,
+    )
+    .await
+    .map_err(store_error)?;
     if !replayed {
         crate::chat_start::apply_chat_start(ctx, &draft.builder_session_id, &start).await?;
     }
@@ -74,9 +73,9 @@ pub async fn handle_advance_guided_campaign_draft(
     let expected_construction_revision = required_nonnegative_int(params, "expected_construction_revision")?;
     let current_step = required(params, "current_step")?;
     let visible_answer = required(params, "visible_answer")?;
-    let draft = ctx
-        .store
-        .advance_guided_campaign_draft(&sylvia_store::guided_advance::AdvanceAnswer {
+    let draft = sylvia_app::authority::guided::advance_guided_campaign_draft(
+        &ctx.store,
+        &sylvia_app::authority::guided::AdvanceAnswer {
             operation_id: &operation_id,
             campaign_id: &campaign_id,
             builder_session_id: &builder_session_id,
@@ -84,9 +83,10 @@ pub async fn handle_advance_guided_campaign_draft(
             current_step: &current_step,
             visible_answer: &visible_answer,
             answer,
-        })
-        .await
-        .map_err(store_error)?;
+        },
+    )
+    .await
+    .map_err(store_error)?;
     Ok(guided_draft_value(&draft))
 }
 
@@ -234,7 +234,7 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
     }
     let display_name = required(params, "display_name")?;
     let package_candidate_id = candidate_id.as_str().map(str::to_owned);
-    match ctx.store.campaign_construction_basis(&campaign_id).await {
+    match sylvia_app::authority::guided::campaign_construction_basis(&ctx.store, &campaign_id).await {
         Ok(existing) => {
             if existing.builder_session_id != builder_session_id
                 || existing.display_name != display_name
@@ -278,9 +278,9 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
         )
         .await
         .map_err(store_error)?;
-    let confirmation = ctx
-        .store
-        .bind_guided_campaign_basis(&sylvia_store::guided_start::BindRequest {
+    let confirmation = sylvia_app::authority::guided::bind_guided_campaign_basis(
+        &ctx.store,
+        &sylvia_app::authority::guided::BindRequest {
             operation_id: &format!("{operation_id}-bind"),
             campaign_id: &campaign_id,
             display_name: &display_name,
@@ -288,23 +288,23 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
             turn_id: &format!("turn-construction-{digest}"),
             builder_session_id: &builder_session_id,
             package_candidate_id: package_candidate_id.as_deref(),
-        })
-        .await
-        .map_err(store_error)?;
+        },
+    )
+    .await
+    .map_err(store_error)?;
     if package_candidate_id.is_none() {
         seed_campaign_plan(&ctx.storage_root, &campaign_id, &no_ruleset_plan(&display_name, &premise))?;
     }
-    let begun = ctx
-        .store
-        .begin_campaign_construction(
-            &format!("{operation_id}-begin"),
-            &campaign_id,
-            if premise.is_empty() { "quick_start" } else { "customize" },
-            confirmation.resulting_revision,
-            &Json::Object(canonical_input),
-        )
-        .await
-        .map_err(store_error)?;
+    let begun = sylvia_app::authority::guided::begin_campaign_construction(
+        &ctx.store,
+        &format!("{operation_id}-begin"),
+        &campaign_id,
+        if premise.is_empty() { "quick_start" } else { "customize" },
+        confirmation.resulting_revision,
+        &Json::Object(canonical_input),
+    )
+    .await
+    .map_err(store_error)?;
     Ok(result_value(&campaign_id, &builder_session_id, begun.resulting_revision))
 }
 
