@@ -165,11 +165,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_claude_native.py:480` | `collect_answer` | Dump::DEFAULT | `"collected", tuple(records), answer=json.loads(json.dumps(rows[index]["message"])),` | |
 | `provider/_claude_runtime.py:401` | `ClaudeConnection.write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | |
 | `provider/_codex_rpc.py:294` | `CodexConnection._write` | Dump::DEFAULT + allow_nan= | `process.stdin.write(json.dumps(message, ensure_ascii=True, allow_nan=False) + "\n")` | |
-| `provider/_context_fit.py:85` | `_canonical_request_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( {"messages": messages, "tools": tools or [], "options": dict(options)}, sort_keys=True, separators=(",", ":"), ensure_ascii=Fals...` | |
-| `provider/_context_fit.py:97` | `_canonical_value_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | |
+| `provider/_context_fit.py:85` | `_canonical_request_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( {"messages": messages, "tools": tools or [], "options": dict(options)}, sort_keys=True, separators=(",", ":"), ensure_ascii=Fals...` | `sylvia-provider` context_fit_vectors |
+| `provider/_context_fit.py:97` | `_canonical_value_bytes` | Dump::CANONICAL + allow_nan= | `return json.dumps( value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, ).encode("utf-8")` | `sylvia-provider` context_fit_vectors |
 | `provider/_gemini.py:228` | `GeminiProvider._parse` | Dump::DEFAULT | `arguments=json.dumps(fn.get("args", {})),` | |
 | `provider/_hooks.py:443` | `DumpHook._atomic_write` | Dump::INDENT2 + default= | `tmp_path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")` | |
-| `provider/_token_estimate.py:13` | `_size` | Dump::CANONICAL | `return len(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))` | |
+| `provider/_token_estimate.py:13` | `_size` | Dump::CANONICAL | `return len(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))` | `sylvia-provider` context_fit_vectors |
 | `session/_prompt_assembler.py:451` | `PromptAssembler.build_character` | Dump::DEFAULT.sorted(true) + default= | `state_payload = json.dumps( {"characters": characters_dict, "scene_tags": sorted(tags)}, sort_keys=True, default=str, )` | |
 | `session/_prompt_assembler.py:746` | `PromptAssembler.build_history_with_indices._msg_len` | Dump::DEFAULT + default= | `return len(json.dumps(content, default=str))` | |
 | `session/_prompt_assembler.py:859` | `PromptAssembler.assemble` | Dump::DEFAULT.sorted(true) + default= | `context_hash_input = json.dumps( { "campaign": campaign, }, sort_keys=True, default=str, )` | |

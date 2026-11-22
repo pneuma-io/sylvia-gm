@@ -758,6 +758,19 @@ impl Provider for OpenAICompatProvider {
         Some(&self.model_info)
     }
 
+    fn hooks(&self) -> Option<&HookManager> {
+        Some(&self.hooks)
+    }
+
+    fn request_representation(
+        &self,
+        messages: &[Json],
+        tools: Option<&[Json]>,
+        options: &JsonMap,
+    ) -> Option<ProviderResult<JsonMap>> {
+        Some(Ok(self.provider_request_representation(messages, tools, options)))
+    }
+
     fn generate(&self, request: ProviderRequest) -> BoxFuture<'_, ProviderResult<ProviderResponse>> {
         Box::pin(self.generate_inner(request))
     }

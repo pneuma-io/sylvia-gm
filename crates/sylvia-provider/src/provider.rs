@@ -6,6 +6,7 @@
 //! counterpart of `aclose()`). The GM loop consumes it chunk by chunk.
 
 use crate::error::ProviderResult;
+use crate::hooks::HookManager;
 use crate::types::{ModelInfo, ProviderResponse, ProviderStreamChunk};
 use futures_util::{Stream, StreamExt};
 use std::future::Future;
@@ -60,6 +61,60 @@ pub trait Provider: Send + Sync {
     fn release_idle(&self) -> BoxFuture<'_, ()> {
         Box::pin(async {})
     }
+
+    // Optional capabilities. Python finds these by attribute (`getattr(provider, name, None)`),
+    // some one level down and some by walking Sylvia's wrappers through `_provider`
+    // ([`capability`]). Each default says the provider has no such attribute.
+
+    /// `provider.hooks`. A transport returns its own manager; a Sylvia wrapper returns its
+    /// wrapped provider's, since Python's wrappers share `provider.hooks`. `None` stands for a
+    /// fresh manager nobody fires (Python's `Provider()` default).
+    fn hooks(&self) -> Option<&HookManager> {
+        None
+    }
+
+    /// `_provider`: the provider a Sylvia wrapper wraps. `None` for every transport.
+    fn wrapped(&self) -> Option<&dyn Provider> {
+        None
+    }
+
+    /// `provider_request_representation(messages, tools, options)`: the exact client request
+    /// object, built without sending it. `None` when the provider has no such method.
+    fn request_representation(
+        &self,
+        _messages: &[Json],
+        _tools: Option<&[Json]>,
+        _options: &JsonMap,
+    ) -> Option<ProviderResult<JsonMap>> {
+        None
+    }
+
+    /// `record_context_fit(context)`. Returns whether the provider has the method (only
+    /// Sylvia's wrappers do); one that has it has acted on `context`.
+    fn record_context_fit(&self, _context: &JsonMap) -> bool {
+        false
+    }
+
+    /// `set_audit_context(context)`. Returns whether the provider has the method.
+    fn set_audit_context(&self, _context: &JsonMap) -> bool {
+        false
+    }
+}
+
+/// `_provider_capability(provider, name)`: the first provider in the wrapper chain, from
+/// `provider` down through [`Provider::wrapped`], for which `has` gives a result.
+pub fn capability<'a, T>(
+    provider: &'a dyn Provider,
+    mut has: impl FnMut(&'a dyn Provider) -> Option<T>,
+) -> Option<T> {
+    let mut current = Some(provider);
+    while let Some(candidate) = current {
+        if let Some(found) = has(candidate) {
+            return Some(found);
+        }
+        current = candidate.wrapped();
+    }
+    None
 }
 
 /// One call `FakeProvider` saw.

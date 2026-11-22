@@ -238,8 +238,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:424` | `_provider_profile_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{display_name.casefold()}\n{base_url}".encode()).hexdigest()[:16]` | |
 | `provider/_admin_audit.py:94` | `_serialization_projection` | hashlib.sha256 | `"sha256": hashlib.sha256(encoded).hexdigest(),` | |
 | `provider/_claude_install.py:350` | `ClaudeInstaller._install` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | |
-| `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | |
+| `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | `sylvia-provider` context_fit_vectors |
+| `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | `sylvia-provider` context_fit_vectors |
 | `provider/_request_metadata.py:33` | `opencode_request_headers` | hashlib.sha256 | `digest = hashlib.sha256(session_id.encode("utf-8")).hexdigest()` | |
 | `session/_prompt_assembler.py:232` | `PromptAssembler.__init__` | hashlib.sha256 | `self._stable_base_hash = hashlib.sha256(self._stable_base.encode()).hexdigest()` | |
 | `session/_prompt_assembler.py:456` | `PromptAssembler.build_character` | hashlib.sha256 | `current_hash = hashlib.sha256(state_payload.encode()).hexdigest()` | |
