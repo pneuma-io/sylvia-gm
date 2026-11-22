@@ -106,6 +106,10 @@ bytes = "1"
 # Desktop update (lane 5): verifying the Ed25519 signature on a release manifest, as Python does
 # with `cryptography`. Verification only; no signing or key generation in the product.
 ed25519-dalek = "2"
+# Lane 4: the HTTP client for provider APIs. HTTP/1.1 only (httpx without h2), rustls with the
+# bundled webpki roots (like certifi), a cookie jar (httpx keeps one per client). Proxies come
+# from Sylvia's own port of httpx's environment rules, not reqwest's.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls-webpki-roots", "cookies"] }
 
 [workspace.lints.rust]
 unsafe_code = "deny"
