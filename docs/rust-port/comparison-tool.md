@@ -144,6 +144,13 @@ header. A session adds its own under `rules`:
   `rules: ignore_headers_row_8 dropped N header(s) from M model request(s)` whenever it drops
   any. Never list a header row 8 does not name, and never use it as a blanket header ignore: a
   new header difference must still show, and goes to the manager as a new row first.
+- `header_name_case_row_NEXT`: `true` for differences row NEXT (header name case). The Rust
+  client writes request header names in lowercase (hyper's HTTP/1.1 writer), and Python writes
+  them as given; HTTP names are case-insensitive (RFC 9110 §5.1). Every `model_requests`
+  entry's header *names* are lowercased on both recordings. Values and order are still
+  compared exactly. `check` and `diff` print
+  `rules: header_name_case_row_NEXT compared N header name(s) in M model request(s) without case`
+  whenever it changes any.
 
 Local diagnostics aggregates matching outcomes per wall-clock minute, so two error replies
 share one `diagnostic_id` only when both land in the same minute. A run that crosses a minute

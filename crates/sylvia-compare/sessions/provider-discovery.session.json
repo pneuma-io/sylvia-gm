@@ -1,0 +1,37 @@
+{
+  "name": "provider-discovery",
+  "description": "Discover a saved connection's models from the stand-in's /models (all, searched, paged, none found), refuse bad paging before any request, refuse a wrong key and discover an unsaved connection, then shut down.",
+  "standin": true,
+  "summarise_tables": ["^package_", "^packages$"],
+  "steps": [
+    {"method": "save_provider_settings", "expect_ok": true, "params": {
+      "provider_id": "standin", "preset_id": "custom", "display_name": "Stand-in",
+      "base_url": "${standin_url}", "credential": "${standin_key}",
+      "model_id": "${standin_model}", "model_name": "Stand-in Narrator",
+      "context_window": 4000000, "max_output_tokens": 4096, "transport": "chat_completions"
+    }},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin"}},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin", "query": "NARR", "offset": 0, "limit": 1}},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin", "query": "absent"}},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin", "offset": 1}},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin", "offset": -1}},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin", "limit": 0}},
+    {"method": "discover_provider_models", "params": {"provider_id": "standin", "credential": "sk-session-wrong"}},
+    {"method": "discover_provider_models", "params": {
+      "preset_id": "custom", "base_url": "${standin_url}", "credential": "${standin_key}",
+      "headers": {"X-Example": "disposable"}
+    }},
+    {"method": "discover_provider_models", "params": {"preset_id": "custom", "base_url": "${standin_url}"}},
+    {"method": "provider_settings"},
+    {"method": "shutdown"}
+  ],
+  "rules": {
+    "ignore_keys": ["diagnostic_id"],
+    "scrub": [
+      {"pattern": "data: [A-Za-z0-9+/=]{40,}", "with": "data: <protected credential>"}
+    ],
+    "volatile_files": ["^diagnostics/"],
+    "ignore_headers_row_8": ["User-Agent", "Accept-Encoding", "Connection", "X-Stainless-*"],
+    "header_name_case_row_NEXT": true
+  }
+}

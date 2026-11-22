@@ -293,3 +293,69 @@ async fn cookies_are_kept_between_requests() {
     assert!(seen[0].headers().iter().all(|(name, _)| name != "cookie"));
     assert!(seen[1].headers().contains(&("cookie".into(), "__cf_bm=abc".into())), "{:?}", seen[1].headers());
 }
+
+fn wire_cases() -> Vec<Value> {
+    let vectors: Value = serde_json::from_str(include_str!("vectors/wire_header_vectors.json")).unwrap();
+    vectors["cases"].as_array().unwrap().clone()
+}
+
+fn wire_request(case: &Value, url: Option<String>) -> sylvia_provider::http::HttpRequest {
+    let request = &case["request"];
+    sylvia_provider::http::HttpRequest {
+        method: request["method"].as_str().unwrap().into(),
+        url: url.unwrap_or_else(|| request["url"].as_str().unwrap().into()),
+        headers: request["headers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|pair| (pair[0].as_str().unwrap().into(), pair[1].as_str().unwrap().into()))
+            .collect(),
+        body: request["body"].as_str().unwrap().as_bytes().to_vec(),
+    }
+}
+
+/// `wire_headers` against httpx's own order (`tests/vectors/generate_wire_header_vectors.py`).
+#[test]
+fn wire_headers_follow_httpx_order() {
+    for case in wire_cases() {
+        let actual: Vec<Value> = sylvia_provider::net::wire_headers(&wire_request(&case, None))
+            .into_iter()
+            .map(|(name, value)| serde_json::json!([name, value]))
+            .collect();
+        assert_eq!(Value::Array(actual), case["wire"], "case {}", case["name"]);
+    }
+}
+
+/// Over a socket, reqwest and hyper keep that order and add nothing; names go out lowercase.
+#[tokio::test]
+async fn the_wire_keeps_the_header_order() {
+    use sylvia_provider::http::HttpTransport;
+    let cases: Vec<Value> = wire_cases()
+        .into_iter()
+        .filter(|case| {
+            let host = case["request"]["headers"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|pair| pair[0].as_str().unwrap().eq_ignore_ascii_case("host"));
+            !host && case["request"]["url"].as_str().unwrap().starts_with("http://h")
+        })
+        .collect();
+    assert!(cases.len() >= 8, "{} cases", cases.len());
+    let server = Server::start(cases.iter().map(|_| reply("200 OK", &[], "{}")).collect());
+    let shared = transport(Vec::new());
+    for case in &cases {
+        let original = case["request"]["url"].as_str().unwrap();
+        let path = &original[original.find("://").unwrap() + 3..];
+        let path = &path[path.find('/').unwrap_or(path.len())..];
+        let request = wire_request(case, Some(format!("http://127.0.0.1:{}{path}", server.port)));
+        let expected: Vec<(String, String)> = sylvia_provider::net::wire_headers(&request)
+            .into_iter()
+            .map(|(name, value)| (name.to_ascii_lowercase(), value))
+            .collect();
+        let mut response = shared.send(request).await.expect("sent");
+        let _ = response.read_all().await;
+        let seen = server.seen();
+        assert_eq!(seen.last().unwrap().headers(), expected, "case {}", case["name"]);
+    }
+}

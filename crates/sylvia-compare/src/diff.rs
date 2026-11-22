@@ -9,7 +9,9 @@
 //!   `<name:1>`, `<name:2>` in order of first appearance, so two runs still have to agree on
 //!   which identifier appears where, just not on its spelling. An alias can be limited to the
 //!   values of named keys, so it cannot hide a wrong hash somewhere else;
-//! - `volatile_files`: data-folder files whose size and content vary (logs).
+//! - `volatile_files`: data-folder files whose size and content vary (logs);
+//! - `ignore_headers_row_8` and `header_name_case_row_NEXT`: the two that cover agreed Rust
+//!   differences (`differences.md` rows 8 and NEXT) in model requests' headers.
 //!
 //! Anything not covered by a rule must match exactly.
 
@@ -38,6 +40,12 @@ pub struct Rules {
     /// compared case-insensitively, a trailing `*` a prefix. Only the names row 8 declares
     /// belong here; never a blanket header ignore.
     pub ignore_headers_row_8: Vec<String>,
+    /// Differences row NEXT (header name case): the Rust client writes request header names in
+    /// lowercase, Python writes them as given, and HTTP names are case-insensitive (RFC 9110
+    /// §5.1). When set, each `model_requests` entry's header *names* are lowercased on both
+    /// sides; values and order are still compared exactly.
+    #[serde(rename = "header_name_case_row_NEXT")]
+    pub header_name_case_row_next: bool,
 }
 
 /// One `scrub` rule.
@@ -97,6 +105,7 @@ impl Rules {
             }],
             volatile_files: Vec::new(),
             ignore_headers_row_8: Vec::new(),
+            header_name_case_row_next: false,
         }
     }
 
@@ -109,6 +118,7 @@ impl Rules {
         self.alias.extend(other.alias);
         self.volatile_files.extend(other.volatile_files);
         self.ignore_headers_row_8.extend(other.ignore_headers_row_8);
+        self.header_name_case_row_next |= other.header_name_case_row_next;
         self
     }
 }
@@ -208,6 +218,47 @@ pub fn drop_row_8_headers(recording: &mut Json, rules: &Rules) -> Result<Dropped
     Ok(dropped)
 }
 
+/// What `header_name_case_row_NEXT` changed in one recording.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct FoldedNames {
+    /// Header names that were not already lowercase.
+    pub headers: usize,
+    /// Model requests holding at least one.
+    pub requests: usize,
+}
+
+/// Lowercase each model request's header names when `header_name_case_row_NEXT` is set, and
+/// count the names that changed.
+pub fn fold_header_names(recording: &mut Json, rules: &Rules) -> FoldedNames {
+    let mut folded = FoldedNames::default();
+    if !rules.header_name_case_row_next {
+        return folded;
+    }
+    let Some(requests) = recording.get_mut("model_requests").and_then(Json::as_array_mut) else {
+        return folded;
+    };
+    for request in requests {
+        let Some(headers) = request.get_mut("headers").and_then(Json::as_array_mut) else { continue };
+        let mut changed = 0;
+        for header in headers {
+            if let Some(name) = header.get_mut(0) {
+                if let Some(text) = name.as_str() {
+                    let lower = text.to_ascii_lowercase();
+                    if lower != text {
+                        changed += 1;
+                        *name = Json::String(lower);
+                    }
+                }
+            }
+        }
+        if changed > 0 {
+            folded.headers += changed;
+            folded.requests += 1;
+        }
+    }
+    folded
+}
+
 /// Apply `rules` to a recording. Aliases are numbered in document order.
 pub fn normalise(recording: &Json, rules: &Rules) -> Result<Json, String> {
     let compiled = compile(rules)?;
@@ -215,6 +266,7 @@ pub fn normalise(recording: &Json, rules: &Rules) -> Result<Json, String> {
     let mut counts = vec![0usize; compiled.alias.len()];
     let mut recording = recording.clone();
     drop_row_8_headers(&mut recording, rules)?;
+    fold_header_names(&mut recording, rules);
     // A volatile file keeps its path (it must still exist) and loses everything else.
     if let Some(files) = recording.get_mut("files").and_then(Json::as_array_mut) {
         for file in files {
@@ -476,6 +528,43 @@ mod tests {
             compare(&normalise(&recording, &rules).unwrap(), &normalise(&other, &rules).unwrap(), 10).len(),
             1
         );
+    }
+
+    #[test]
+    fn header_name_case_folds_names_only() {
+        let recording = json!({"model_requests": [
+            {"method": "GET", "headers": [["Host", "h"], ["Accept", "*/*"], ["Authorization", null]]},
+            {"method": "GET", "headers": [["host", "h"]]},
+        ]});
+        let lower = json!({"model_requests": [
+            {"method": "GET", "headers": [["host", "h"], ["accept", "*/*"], ["authorization", null]]},
+            {"method": "GET", "headers": [["host", "h"]]},
+        ]});
+        let off = Rules::default();
+        assert_eq!(
+            compare(&normalise(&recording, &off).unwrap(), &normalise(&lower, &off).unwrap(), 10).len(),
+            3
+        );
+        let on = Rules { header_name_case_row_next: true, ..Rules::default() };
+        assert_eq!(fold_header_names(&mut recording.clone(), &on), FoldedNames { headers: 3, requests: 1 });
+        assert!(
+            compare(&normalise(&recording, &on).unwrap(), &normalise(&lower, &on).unwrap(), 10).is_empty()
+        );
+        // Values and order still count.
+        let mut value = lower.clone();
+        value["model_requests"][0]["headers"][1][1] = json!("application/json");
+        assert_eq!(
+            compare(&normalise(&recording, &on).unwrap(), &normalise(&value, &on).unwrap(), 10).len(),
+            1
+        );
+        let mut order = lower.clone();
+        order["model_requests"][0]["headers"].as_array_mut().unwrap().swap(0, 1);
+        assert!(
+            !compare(&normalise(&recording, &on).unwrap(), &normalise(&order, &on).unwrap(), 10).is_empty()
+        );
+        // The session key is the row's name.
+        let parsed: Rules = serde_json::from_value(json!({"header_name_case_row_NEXT": true})).unwrap();
+        assert!(parsed.header_name_case_row_next);
     }
 
     #[test]
