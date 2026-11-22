@@ -39,7 +39,10 @@ pub fn gm_context_privacy() -> &'static str {
 
 /// `_model_gm_narration_block(provider)`: the narration reminder for the models that need it.
 pub fn model_gm_narration_block(provider: &dyn Provider) -> Option<&'static str> {
-    provider.model_info().filter(|model| uses_gm_narration_hint(model)).map(|_| text("gm_model_narration_block"))
+    provider
+        .model_info()
+        .filter(|model| uses_gm_narration_hint(model))
+        .map(|_| text("gm_model_narration_block"))
 }
 
 /// A `{"role": "system", "content": ...}` message.
@@ -77,7 +80,8 @@ pub fn campaign_opening_task_message(opening_footing: &Json) -> JsonMap {
 /// player wrote an out-of-character part.
 pub fn player_turn_text(content: &JsonMap) -> String {
     let in_character = content.get("text").and_then(Json::as_str).unwrap_or("");
-    let Some(out_of_character) = content.get("ooc_text").and_then(Json::as_str).filter(|text| !text.is_empty())
+    let Some(out_of_character) =
+        content.get("ooc_text").and_then(Json::as_str).filter(|text| !text.is_empty())
     else {
         return in_character.to_owned();
     };

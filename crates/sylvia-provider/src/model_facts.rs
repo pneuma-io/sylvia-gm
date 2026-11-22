@@ -70,7 +70,8 @@ pub fn facts(route: &str, model_id: &str) -> ModelFacts {
 /// the GM narration reminder. The canonical id must be exactly `chatgpt-subscription/<wire id>`.
 pub fn uses_gm_narration_hint(model: &crate::types::ModelInfo) -> bool {
     let wire_id = model.wire_model_id();
-    model.id == format!("chatgpt-subscription/{wire_id}") && facts(&model.provider_key, wire_id).gm_narration_hint
+    model.id == format!("chatgpt-subscription/{wire_id}")
+        && facts(&model.provider_key, wire_id).gm_narration_hint
 }
 
 /// `documented_openai_id(model_id)`.

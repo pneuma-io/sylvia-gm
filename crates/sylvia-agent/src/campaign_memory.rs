@@ -72,7 +72,8 @@ pub fn select_with(
             KnowledgeReference {
                 result,
                 identity: text_or(item, "record_id", &Json::String(String::new())),
-                body: String::from_utf8(pyjson::canonical_bytes(&Json::Object(item.clone()))).expect("UTF-8 JSON"),
+                body: String::from_utf8(pyjson::canonical_bytes(&Json::Object(item.clone())))
+                    .expect("UTF-8 JSON"),
             }
         })
         .collect();
@@ -107,7 +108,8 @@ pub fn select_with(
             continue;
         }
         let record = &records[index];
-        let size = pyjson::canonical_bytes(&Json::Object(record.clone())).len() + usize::from(!selected.is_empty());
+        let size =
+            pyjson::canonical_bytes(&Json::Object(record.clone())).len() + usize::from(!selected.is_empty());
         if selected.len() < MAX_MEMORY_RECORDS && used_bytes + size <= MAX_MEMORY_BYTES {
             selected.push(record.clone());
             used_bytes += size;

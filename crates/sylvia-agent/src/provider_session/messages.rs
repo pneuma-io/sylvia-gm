@@ -10,8 +10,9 @@ use super::context::{
     ProviderSessionAdapter, SessionProviderInput,
 };
 use super::texts::{
-    campaign_opening_task_message, context_contract_update_message, dm_system_prompt, gm_system_contract_version,
-    model_gm_narration_block, player_turn_text, response_format_contract_message, system,
+    campaign_opening_task_message, context_contract_update_message, dm_system_prompt,
+    gm_system_contract_version, model_gm_narration_block, player_turn_text, response_format_contract_message,
+    system,
 };
 use crate::campaign_memory::KnowledgeReference;
 use serde_json::{json, Value as Json};
@@ -131,7 +132,11 @@ impl ProviderSessionAdapter {
             let owner = Json::Object(owner.clone());
             selected.retain(|message| {
                 !(message.kind() == SessionMessageKind::Evidence
-                    && message.content().get("kind").map_or_else(String::new, py_str).starts_with("provider_")
+                    && message
+                        .content()
+                        .get("kind")
+                        .map_or_else(String::new, py_str)
+                        .starts_with("provider_")
                     && message.content().get("context_owner") != Some(&owner))
             });
         }
@@ -145,11 +150,16 @@ impl ProviderSessionAdapter {
                 (content.get("basis_message_id"), content.get("response_id"))
             {
                 let requirement = content.get("requirement").cloned().unwrap_or_else(|| json!({}));
-                final_references.insert(basis.clone(), json!({"response_id": response_id, "requirement": requirement}));
+                final_references
+                    .insert(basis.clone(), json!({"response_id": response_id, "requirement": requirement}));
             }
         }
-        let last_dialogue_sequence =
-            selected.iter().filter(|message| is_dialogue(message)).map(|message| message.sequence()).max().unwrap_or(0);
+        let last_dialogue_sequence = selected
+            .iter()
+            .filter(|message| is_dialogue(message))
+            .map(|message| message.sequence())
+            .max()
+            .unwrap_or(0);
         let response_message = selected
             .iter()
             .rev()
@@ -161,19 +171,22 @@ impl ProviderSessionAdapter {
             })
             .copied();
         let opening_request = response_message.is_none()
-            && selected
-                .iter()
-                .any(|message| message.kind() == SessionMessageKind::Evidence && kind_of(message) == Some("campaign_start"))
+            && selected.iter().any(|message| {
+                message.kind() == SessionMessageKind::Evidence && kind_of(message) == Some("campaign_start")
+            })
             && !selected.iter().any(|message| is_dialogue(message));
         let persisted_contracts: Vec<Option<&Json>> = selected
             .iter()
             .filter(|message| {
-                message.kind() == SessionMessageKind::Evidence && kind_of(message) == Some("gm_system_contract")
+                message.kind() == SessionMessageKind::Evidence
+                    && kind_of(message) == Some("gm_system_contract")
             })
             .map(|message| message.content().get("contract"))
             .collect();
         if persisted_contracts.len() > 1
-            || persisted_contracts.iter().any(|contract| !matches!(contract, Some(Json::String(text)) if !text.is_empty()))
+            || persisted_contracts
+                .iter()
+                .any(|contract| !matches!(contract, Some(Json::String(text)) if !text.is_empty()))
         {
             return Err(coded(
                 "gm_system_contract_invalid",
@@ -230,7 +243,9 @@ impl ProviderSessionAdapter {
             if response_message.is_some() {
                 for row in &player_actions {
                     let Some(id) = row.get("action_id") else {
-                        return Err(CodedError::new("internal_error", "'action_id'").with_error_type("KeyError"));
+                        return Err(
+                            CodedError::new("internal_error", "'action_id'").with_error_type("KeyError")
+                        );
                     };
                     push_unique(&mut action_ids, id.clone());
                 }
@@ -261,7 +276,9 @@ impl ProviderSessionAdapter {
             None => None,
         };
         let guide_message = guide.filter(|guide| !guide.is_empty()).map(|guide| {
-            system(format!("SYLVIA_GM_RULESET_OPERATING_GUIDE (trusted package-owned instructions):\n{guide}"))
+            system(format!(
+                "SYLVIA_GM_RULESET_OPERATING_GUIDE (trusted package-owned instructions):\n{guide}"
+            ))
         });
         let latest_selected_dialogue = selected.iter().rev().find(|message| is_dialogue(message)).copied();
         let current_user_message_id: Option<&str> = match response_message {
@@ -279,7 +296,8 @@ impl ProviderSessionAdapter {
         let first_player_action = response_message.is_none()
             && current_user_message_id.is_some()
             && !selected.iter().any(|message| {
-                message.kind() == SessionMessageKind::User && Some(message.message_id()) != current_user_message_id
+                message.kind() == SessionMessageKind::User
+                    && Some(message.message_id()) != current_user_message_id
             });
         let mut fresh_context = None;
         if campaign_id.is_some() && dm {
@@ -288,7 +306,8 @@ impl ProviderSessionAdapter {
             messages.push(explainers);
             fresh_context = Some(fresh);
         }
-        let resume_basis_message_id: Option<&str> = input.basis_message_id.as_deref().or(current_user_message_id);
+        let resume_basis_message_id: Option<&str> =
+            input.basis_message_id.as_deref().or(current_user_message_id);
 
         type Key = (String, String);
         let mut tool_calls_by_inference: Vec<(Key, i64, JsonMap)> = Vec::new();
@@ -298,10 +317,11 @@ impl ProviderSessionAdapter {
         let mut held_narration_messages: Vec<(i64, JsonMap)> = Vec::new();
         let mut gm_boundary_draft_messages: Vec<(i64, JsonMap)> = Vec::new();
         let mut public_participant_segments: Vec<(String, i64, Vec<JsonMap>)> = Vec::new();
-        let drop_key = |calls: &mut Vec<(Key, i64, JsonMap)>, results: &mut Vec<(Key, i64, Vec<JsonMap>)>, key: &Key| {
-            calls.retain(|(existing, _, _)| existing != key);
-            results.retain(|(existing, _, _)| existing != key);
-        };
+        let drop_key =
+            |calls: &mut Vec<(Key, i64, JsonMap)>, results: &mut Vec<(Key, i64, Vec<JsonMap>)>, key: &Key| {
+                calls.retain(|(existing, _, _)| existing != key);
+                results.retain(|(existing, _, _)| existing != key);
+            };
         for message in &selected {
             if message.kind() != SessionMessageKind::Evidence {
                 continue;
@@ -343,7 +363,8 @@ impl ProviderSessionAdapter {
                     if !current {
                         continue;
                     }
-                    let (_, narration) = held_narration(content, "Persisted GM-boundary draft evidence is invalid")?;
+                    let (_, narration) =
+                        held_narration(content, "Persisted GM-boundary draft evidence is invalid")?;
                     if looks_like_private_deliberation(narration) {
                         continue;
                     }
@@ -361,7 +382,9 @@ impl ProviderSessionAdapter {
                     let assistant = assistant_of(content);
                     let tool_calls = assistant.and_then(|assistant| assistant.get("tool_calls"));
                     let invalid = tool_calls_by_inference.iter().any(|(existing, _, _)| *existing == key)
-                        || assistant.is_none_or(|assistant| assistant.get("role").and_then(Json::as_str) != Some("assistant"))
+                        || assistant.is_none_or(|assistant| {
+                            assistant.get("role").and_then(Json::as_str) != Some("assistant")
+                        })
                         || !matches!(tool_calls, Some(Json::Array(calls)) if calls.iter().all(Json::is_object));
                     if invalid {
                         if !current {
@@ -369,13 +392,20 @@ impl ProviderSessionAdapter {
                             drop_key(&mut tool_calls_by_inference, &mut tool_results_by_inference, &key);
                             continue;
                         }
-                        return Err(coded("provider_tool_evidence_invalid", "Persisted provider tool-call evidence is invalid"));
+                        return Err(coded(
+                            "provider_tool_evidence_invalid",
+                            "Persisted provider tool-call evidence is invalid",
+                        ));
                     }
                     let mut normalized = assistant.cloned().unwrap_or_default();
                     if let Some(Json::Object(requirement)) = content.get("native_continuation") {
                         native_requirements.insert(key.clone(), Json::Object(requirement.clone()));
                     }
-                    if normalized.get("content").and_then(Json::as_str).is_some_and(looks_like_private_deliberation) {
+                    if normalized
+                        .get("content")
+                        .and_then(Json::as_str)
+                        .is_some_and(looks_like_private_deliberation)
+                    {
                         normalized.insert("content".into(), Json::Null);
                     }
                     if !invalid_historical.contains(&key) {
@@ -410,9 +440,13 @@ impl ProviderSessionAdapter {
                 _ => {}
             }
         }
-        let mut resumed_segments: Vec<(i64, Vec<JsonMap>)> =
-            held_narration_messages.into_iter().map(|(sequence, assistant)| (sequence, vec![assistant])).collect();
-        resumed_segments.extend(gm_boundary_draft_messages.into_iter().map(|(sequence, message)| (sequence, vec![message])));
+        let mut resumed_segments: Vec<(i64, Vec<JsonMap>)> = held_narration_messages
+            .into_iter()
+            .map(|(sequence, assistant)| (sequence, vec![assistant]))
+            .collect();
+        resumed_segments.extend(
+            gm_boundary_draft_messages.into_iter().map(|(sequence, message)| (sequence, vec![message])),
+        );
         let mut completed_tool_segments: Vec<(String, i64, Vec<JsonMap>)> = Vec::new();
         for (basis, sequence, segment) in public_participant_segments {
             if Some(basis.as_str()) == resume_basis_message_id {
@@ -422,7 +456,8 @@ impl ProviderSessionAdapter {
             }
         }
         for (key, call_sequence, call_assistant) in &tool_calls_by_inference {
-            let Some((_, result_sequence, results)) = tool_results_by_inference.iter().find(|(existing, _, _)| existing == key)
+            let Some((_, result_sequence, results)) =
+                tool_results_by_inference.iter().find(|(existing, _, _)| existing == key)
             else {
                 continue;
             };
@@ -448,7 +483,9 @@ impl ProviderSessionAdapter {
             let Some(call_ids) = representable_calls(raw_calls) else { continue };
             let result_ids: Vec<&str> = results
                 .iter()
-                .filter_map(|result| result.get("tool_call_id").and_then(Json::as_str).filter(|id| !id.is_empty()))
+                .filter_map(|result| {
+                    result.get("tool_call_id").and_then(Json::as_str).filter(|id| !id.is_empty())
+                })
                 .collect();
             let unique: HashSet<&str> = result_ids.iter().copied().collect();
             if result_ids.len() != results.len()
@@ -472,7 +509,9 @@ impl ProviderSessionAdapter {
         let mut recent_dialogue: Vec<JsonMap> = Vec::new();
         let mut narration_by_attempt: HashMap<String, Vec<String>> = HashMap::new();
         for record in &canonical_narration {
-            if let (Some(Json::String(attempt_id)), Some(Json::String(text))) = (record.get("attempt_id"), record.get("text")) {
+            if let (Some(Json::String(attempt_id)), Some(Json::String(text))) =
+                (record.get("attempt_id"), record.get("text"))
+            {
                 if !attempt_id.is_empty() && !text.is_empty() {
                     narration_by_attempt.entry(attempt_id.clone()).or_default().push(text.clone());
                 }
@@ -483,8 +522,10 @@ impl ProviderSessionAdapter {
             .copied()
             .filter(|message| Some(message.message_id()) != current_user_message_id && is_dialogue(message))
             .collect();
-        let has_session_talk = historical_dialogue.iter().any(|message| message.kind() == SessionMessageKind::Talk);
-        let recent_history_ids: HashSet<&str> = historical_dialogue.iter().map(|message| message.message_id()).collect();
+        let has_session_talk =
+            historical_dialogue.iter().any(|message| message.kind() == SessionMessageKind::Talk);
+        let recent_history_ids: HashSet<&str> =
+            historical_dialogue.iter().map(|message| message.message_id()).collect();
         let historical_basis_ids: Vec<&str> = selected
             .iter()
             .filter(|message| {
@@ -498,7 +539,9 @@ impl ProviderSessionAdapter {
         let mut tool_text_responses: HashMap<String, HashSet<String>> = HashMap::new();
         completed_tool_segments.sort_by_key(|(_, sequence, _)| *sequence);
         for (basis_id, _, segment) in &completed_tool_segments {
-            if !(recent_history_ids.contains(basis_id.as_str()) || historical_basis_ids.contains(&basis_id.as_str())) {
+            if !(recent_history_ids.contains(basis_id.as_str())
+                || historical_basis_ids.contains(&basis_id.as_str()))
+            {
                 continue;
             }
             historical_tools_by_basis.entry(basis_id.clone()).or_default().extend(segment.iter().cloned());
@@ -512,7 +555,9 @@ impl ProviderSessionAdapter {
                     let Some(function) = call.get("function").and_then(Json::as_object) else { continue };
                     let arguments = function.get("arguments").map_or_else(String::new, py_str);
                     let Ok(Json::Object(arguments)) = pyjson::loads(&arguments) else { continue };
-                    if let Some(Json::String(revised)) = arguments.get(super::tools::CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT) {
+                    if let Some(Json::String(revised)) =
+                        arguments.get(super::tools::CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT)
+                    {
                         if !revised.is_empty() {
                             tool_text_responses.entry(basis_id.clone()).or_default().insert(revised.clone());
                         }
@@ -522,7 +567,10 @@ impl ProviderSessionAdapter {
             for tool_message in &segment[1..] {
                 let text = tool_message.get("content").map_or_else(|| "{}".to_owned(), py_str);
                 let Ok(Json::Object(result)) = pyjson::loads(&text) else { continue };
-                if !matches!(result.get("status").and_then(Json::as_str), Some("campaign_file_updated" | "campaign_file_unchanged")) {
+                if !matches!(
+                    result.get("status").and_then(Json::as_str),
+                    Some("campaign_file_updated" | "campaign_file_unchanged")
+                ) {
                     continue;
                 }
                 if let Some(Json::String(accepted)) = result.get("player_facing_response") {
@@ -570,7 +618,8 @@ impl ProviderSessionAdapter {
                         }
                         recent_dialogue.push(entry);
                         if user {
-                            recent_dialogue.extend(historical_tools_by_basis.get(id).cloned().unwrap_or_default());
+                            recent_dialogue
+                                .extend(historical_tools_by_basis.get(id).cloned().unwrap_or_default());
                         }
                     } else if !skip && message.kind() == SessionMessageKind::User {
                         let parts = content
@@ -582,7 +631,8 @@ impl ProviderSessionAdapter {
                         if !parts.is_empty() {
                             let narration = parts.concat();
                             recent_dialogue.push(json_message("user", &text));
-                            recent_dialogue.extend(historical_tools_by_basis.get(id).cloned().unwrap_or_default());
+                            recent_dialogue
+                                .extend(historical_tools_by_basis.get(id).cloned().unwrap_or_default());
                             if !in_both(id, &narration) {
                                 let mut entry = json_message("assistant", &narration);
                                 if let Some(reference) = final_references.get(id) {
@@ -620,7 +670,9 @@ impl ProviderSessionAdapter {
                     "SYLVIA_GM_LIFECYCLE_EVENT (application-owned, not player speech):\n{}",
                     pyjson::dumps(&event, Dump::CANONICAL)
                 )));
-            } else if message.kind() == SessionMessageKind::Evidence && kind_of(message) == Some("ready_to_begin_reference") {
+            } else if message.kind() == SessionMessageKind::Evidence
+                && kind_of(message) == Some("ready_to_begin_reference")
+            {
                 if !opening_request {
                     continue;
                 }
@@ -630,7 +682,8 @@ impl ProviderSessionAdapter {
                     return Err(rejected("Ready to Begin reference is malformed"));
                 };
                 let source = reads.session_context(source_session_id).await?;
-                let source_message = source.messages.iter().find(|item| item.message_id() == source_message_id);
+                let source_message =
+                    source.messages.iter().find(|item| item.message_id() == source_message_id);
                 let ready = source_message.filter(|item| {
                     item.kind() == SessionMessageKind::User
                         && item.content().get("interview_step").and_then(Json::as_str) == Some("ready")
@@ -639,7 +692,8 @@ impl ProviderSessionAdapter {
                 let Some(ready) = ready else {
                     return Err(rejected("Ready to Begin source input is unavailable"));
                 };
-                opening_task = Some(campaign_opening_task_message(&self.opening_footing_payload(input).await?));
+                opening_task =
+                    Some(campaign_opening_task_message(&self.opening_footing_payload(input).await?));
                 ready_user = Some(json_message("user", &py_str(&ready.content()["text"])));
             } else if message.kind() == SessionMessageKind::Steering {
                 let text = content.get("text").map_or_else(String::new, py_str);
@@ -651,10 +705,14 @@ impl ProviderSessionAdapter {
         }
         messages.extend(lifecycle_controls);
         messages.extend(steering_messages);
-        let has_assistant = recent_dialogue.iter().any(|message| message.get("role").and_then(Json::as_str) == Some("assistant"));
+        let has_assistant = recent_dialogue
+            .iter()
+            .any(|message| message.get("role").and_then(Json::as_str) == Some("assistant"));
         messages.extend(recent_dialogue);
         if !has_assistant {
-            if let Some(Json::String(latest)) = canonical_narration.last().and_then(|record| record.get("text")) {
+            if let Some(Json::String(latest)) =
+                canonical_narration.last().and_then(|record| record.get("text"))
+            {
                 if !latest.is_empty() {
                     messages.push(json_message("assistant", latest));
                 }

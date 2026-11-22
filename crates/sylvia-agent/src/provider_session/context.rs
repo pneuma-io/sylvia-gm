@@ -23,35 +23,7 @@ const MAX_SETTING_SOURCE_EXCERPT_CHARS: usize = 2_000;
 /// `package_reads.DEFAULT_MAXIMUM_BYTES`, `package_text_file`'s default.
 pub const DEFAULT_MAXIMUM_BYTES: i64 = 64 * 1024;
 
-/// `_context_ledger.MODE_ENV`, `LEGACY_MODE`, `LEDGER_MODE`.
-pub const MODE_ENV: &str = "SYLVIA_GM_CONTEXT_MODE";
-pub const LEGACY_MODE: &str = "legacy";
-pub const LEDGER_MODE: &str = "ledger";
-
-/// `gm_route(transport, provider_key)`: the transport, or a named connection.
-pub fn gm_route(transport: Option<&str>, provider_key: Option<&str>) -> String {
-    match (provider_key.unwrap_or(""), transport.unwrap_or("")) {
-        ("anthropic", "anthropic_messages") => "anthropic_api".into(),
-        (_, transport) => transport.into(),
-    }
-}
-
-/// `context_mode(environ, transport=..., provider_key=...)`: `SYLVIA_GM_CONTEXT_MODE` decides for
-/// every route; otherwise the route's shipped default.
-pub fn context_mode(environment: &Environment, transport: Option<&str>, provider_key: Option<&str>) -> String {
-    let setting = environment
-        .get(MODE_ENV)
-        .and_then(Result::ok)
-        .map(|value| pystr::casefold(pystr::strip(value)))
-        .filter(|value| value == LEGACY_MODE || value == LEDGER_MODE);
-    if let Some(setting) = setting {
-        return setting;
-    }
-    match gm_route(transport, provider_key).as_str() {
-        "claude_code" | "codex_app_server" | "anthropic_api" => LEDGER_MODE.into(),
-        _ => LEGACY_MODE.into(),
-    }
-}
+pub use sylvia_provider::context_mode::{context_mode, gm_route, LEDGER_MODE, LEGACY_MODE, MODE_ENV};
 
 /// `SessionProviderInput`: what one provider request is assembled from.
 #[derive(Clone)]
@@ -87,7 +59,10 @@ pub(crate) fn rejected(message: &str) -> CodedError {
 
 /// Whether an error is a Python `CommandRejected` (or a subclass of it).
 pub(crate) fn is_command_rejected(error: &CodedError) -> bool {
-    matches!(error.error_type, None | Some("CommandRejected" | "MechanicsRejected" | "PortableRecoveryFailure"))
+    matches!(
+        error.error_type,
+        None | Some("CommandRejected" | "MechanicsRejected" | "PortableRecoveryFailure")
+    )
 }
 
 impl ProviderSessionAdapter {
@@ -153,7 +128,10 @@ impl ProviderSessionAdapter {
     }
 
     /// `_gm_context_owner(provider_input)`.
-    pub(crate) async fn gm_context_owner(&self, input: &SessionProviderInput) -> CodedResult<Option<JsonMap>> {
+    pub(crate) async fn gm_context_owner(
+        &self,
+        input: &SessionProviderInput,
+    ) -> CodedResult<Option<JsonMap>> {
         let Some(campaign_id) = input.session.campaign_id() else { return Ok(None) };
         let Some(mut declared) = self.reads.model_context_owner(campaign_id).await? else { return Ok(None) };
         declared.insert("session_id".into(), input.session.session_id().into());
@@ -162,18 +140,24 @@ impl ProviderSessionAdapter {
 
     /// `_participant_prompt_payloads(provider_input)`: only the roster identity needed to
     /// retrieve exact Character Files.
-    pub(crate) async fn participant_prompt_payloads(&self, input: &SessionProviderInput) -> CodedResult<Vec<JsonMap>> {
+    pub(crate) async fn participant_prompt_payloads(
+        &self,
+        input: &SessionProviderInput,
+    ) -> CodedResult<Vec<JsonMap>> {
         let Some(campaign_id) = input.session.campaign_id() else { return Ok(Vec::new()) };
         let snapshot = self.reads.snapshot(campaign_id).await?;
         let participants = &snapshot.state.participants;
-        let party_roles = persisted_selected_party_roles(self.reads.as_ref(), campaign_id, participants).await?;
+        let party_roles =
+            persisted_selected_party_roles(self.reads.as_ref(), campaign_id, participants).await?;
         let mut projected = Vec::new();
         for participant in participants {
             let data = participant.data();
             let participant_id = participant.participant_id();
             let role = match &party_roles {
                 None => data.get("party_role").cloned().unwrap_or(Json::Null),
-                Some(roles) => roles.get(participant_id).map_or(Json::Null, |role| Json::String(role.clone())),
+                Some(roles) => {
+                    roles.get(participant_id).map_or(Json::Null, |role| Json::String(role.clone()))
+                }
             };
             let mut facts = JsonMap::new();
             for (key, value) in [
@@ -301,7 +285,10 @@ pub(crate) async fn persisted_selected_party_roles(
 }
 
 /// `_canonical_player_narration(owner, campaign_id)`: the stable prose archive.
-pub(crate) async fn canonical_player_narration(reads: &dyn OpeningReads, campaign_id: &str) -> CodedResult<Vec<JsonMap>> {
+pub(crate) async fn canonical_player_narration(
+    reads: &dyn OpeningReads,
+    campaign_id: &str,
+) -> CodedResult<Vec<JsonMap>> {
     let replay = reads.canonical_replay(campaign_id, 0).await?;
     let mut narration = Vec::new();
     for event in &replay.canonical {
@@ -330,15 +317,18 @@ fn iterated(value: Option<&Json>) -> CodedResult<Vec<Json>> {
         Some(Json::Array(items)) => Ok(items.clone()),
         Some(Json::String(text)) => Ok(text.chars().map(|c| Json::String(c.to_string())).collect()),
         Some(Json::Object(map)) => Ok(map.keys().map(|key| Json::String(key.clone())).collect()),
-        Some(other) => Err(CodedError::new("internal_error", format!(
-            "'{}' object is not iterable",
-            match other {
-                Json::Null => "NoneType",
-                Json::Bool(_) => "bool",
-                Json::Number(number) if number.is_f64() => "float",
-                _ => "int",
-            }
-        ))
+        Some(other) => Err(CodedError::new(
+            "internal_error",
+            format!(
+                "'{}' object is not iterable",
+                match other {
+                    Json::Null => "NoneType",
+                    Json::Bool(_) => "bool",
+                    Json::Number(number) if number.is_f64() => "float",
+                    _ => "int",
+                }
+            ),
+        )
         .with_error_type("TypeError")),
     }
 }
@@ -374,7 +364,8 @@ pub(crate) async fn saved_action_sequence_results(
         let content = message.content();
         if message.kind() != SessionMessageKind::Evidence
             || content.get("kind").and_then(Json::as_str) != Some("provider_tool_results")
-            || content.get("basis_message_id").cloned().unwrap_or(Json::Null) != basis_id.clone().map_or(Json::Null, Json::String)
+            || content.get("basis_message_id").cloned().unwrap_or(Json::Null)
+                != basis_id.clone().map_or(Json::Null, Json::String)
         {
             continue;
         }
@@ -396,7 +387,9 @@ pub(crate) async fn saved_action_sequence_results(
     }
     if results.is_empty() {
         if let Some(basis_id) = &basis_id {
-            for mut result in reads.action_sequence_response_results(input.session.session_id(), basis_id).await? {
+            for mut result in
+                reads.action_sequence_response_results(input.session.session_id(), basis_id).await?
+            {
                 result.insert("provider_execution_stopped".into(), true.into());
                 results.push(result);
             }
@@ -413,7 +406,15 @@ pub(crate) fn splitlines(text: &str) -> Vec<&str> {
     while let Some((index, character)) = characters.next() {
         let boundary = matches!(
             character,
-            '\n' | '\r' | '\u{0b}' | '\u{0c}' | '\u{1c}' | '\u{1d}' | '\u{1e}' | '\u{85}' | '\u{2028}' | '\u{2029}'
+            '\n' | '\r'
+                | '\u{0b}'
+                | '\u{0c}'
+                | '\u{1c}'
+                | '\u{1d}'
+                | '\u{1e}'
+                | '\u{85}'
+                | '\u{2028}'
+                | '\u{2029}'
         );
         if !boundary {
             continue;
@@ -504,10 +505,9 @@ impl ProviderSessionAdapter {
             .find(|act| current_act_id.is_some_and(|id| act.get("id").and_then(Json::as_str) == Some(id)))
             .or_else(|| acts.first());
         let objective_ids: std::collections::HashSet<&str> = match plan.get("objectives") {
-            Some(Json::Array(items)) => items
-                .iter()
-                .filter_map(|item| item.as_object()?.get("id")?.as_str())
-                .collect(),
+            Some(Json::Array(items)) => {
+                items.iter().filter_map(|item| item.as_object()?.get("id")?.as_str()).collect()
+            }
             _ => std::collections::HashSet::new(),
         };
         let prepared_acts: Vec<Json> = current_act
@@ -559,7 +559,8 @@ impl ProviderSessionAdapter {
         for key in ["id", "title", "premise", "tone", "intended_player_experience", "gm_guidance"] {
             plan_preparation.insert(key.into(), get(key));
         }
-        plan_preparation.insert("boundaries".into(), plan.get("boundaries").cloned().unwrap_or_else(|| json!([])));
+        plan_preparation
+            .insert("boundaries".into(), plan.get("boundaries").cloned().unwrap_or_else(|| json!([])));
         plan_preparation.insert("prepared_acts".into(), Json::Array(prepared_acts));
         plan_preparation.insert(
             "additional_material_available_via".into(),
@@ -584,7 +585,8 @@ impl ProviderSessionAdapter {
         }
         if plan.is_empty() {
             if let Some(text) = &self.campaign_plan_text {
-                plan_preparation.insert("legacy_markdown".into(), text.chars().take(16_000).collect::<String>().into());
+                plan_preparation
+                    .insert("legacy_markdown".into(), text.chars().take(16_000).collect::<String>().into());
             }
         }
 
@@ -607,12 +609,14 @@ impl ProviderSessionAdapter {
             truthy_str(current_scene.get("location_id")),
             truthy_str(current_scene.get("summary")),
         ];
-        let (current_facts, memory_selection) = campaign_memory::select_with(&continuity.facts, &queries, rank);
+        let (current_facts, memory_selection) =
+            campaign_memory::select_with(&continuity.facts, &queries, rank);
         let mut player_known = Vec::new();
         let mut gm_private_facts = Vec::new();
         let mut character_knowledge: JsonMap = JsonMap::new();
         let mut know = |identity: &str, entry: Json| {
-            let list = character_knowledge.entry(identity.to_owned()).or_insert_with(|| Json::Array(Vec::new()));
+            let list =
+                character_knowledge.entry(identity.to_owned()).or_insert_with(|| Json::Array(Vec::new()));
             if let Json::Array(items) = list {
                 items.push(entry);
             }
@@ -639,7 +643,9 @@ impl ProviderSessionAdapter {
 
         let knowledge = match &self.campaign_knowledge {
             Some(knowledge) => knowledge.clone(),
-            None if !plan.is_empty() => self.reads.campaign_knowledge_catalog(input.session.session_id()).await?,
+            None if !plan.is_empty() => {
+                self.reads.campaign_knowledge_catalog(input.session.session_id()).await?
+            }
             None => {
                 let mut fallback = JsonMap::new();
                 fallback.insert("secrets".into(), plan.get("secrets").cloned().unwrap_or_else(|| json!([])));
@@ -691,7 +697,9 @@ impl ProviderSessionAdapter {
         if include_opening_direction {
             let setting_binding = plan.get("bindings").and_then(|bindings| bindings.get("campaign_setting"));
             let starting_location = plan.get("starting_location");
-            if let (Some(Json::Object(binding)), Some(Json::Object(location))) = (setting_binding, starting_location) {
+            if let (Some(Json::Object(binding)), Some(Json::Object(location))) =
+                (setting_binding, starting_location)
+            {
                 if let Some(Json::String(path)) = location.get("path") {
                     // `str(setting_binding["id"])`: a missing key is Python's `KeyError`.
                     let field = |key: &str| {
@@ -700,23 +708,31 @@ impl ProviderSessionAdapter {
                         })
                     };
                     let (id, version, sha256) = (field("id")?, field("version")?, field("content_sha256")?);
-                    let source =
-                        self.reads.package_text_file(&id, &version, &sha256, path, DEFAULT_MAXIMUM_BYTES).await?;
-                    let (excerpt, complete, selection) =
-                        match bounded_markdown_section(&source, "Overview", MAX_SETTING_SOURCE_EXCERPT_CHARS) {
-                            None => {
-                                let (excerpt, complete) =
-                                    bounded_reference_excerpt(&source, MAX_SETTING_SOURCE_EXCERPT_CHARS);
-                                (excerpt, complete, None)
-                            }
-                            Some((excerpt, section_complete)) => (
-                                excerpt,
-                                false,
-                                Some(json!({"kind": "markdown_section", "heading": "Overview", "complete": section_complete})),
+                    let source = self
+                        .reads
+                        .package_text_file(&id, &version, &sha256, path, DEFAULT_MAXIMUM_BYTES)
+                        .await?;
+                    let (excerpt, complete, selection) = match bounded_markdown_section(
+                        &source,
+                        "Overview",
+                        MAX_SETTING_SOURCE_EXCERPT_CHARS,
+                    ) {
+                        None => {
+                            let (excerpt, complete) =
+                                bounded_reference_excerpt(&source, MAX_SETTING_SOURCE_EXCERPT_CHARS);
+                            (excerpt, complete, None)
+                        }
+                        Some((excerpt, section_complete)) => (
+                            excerpt,
+                            false,
+                            Some(
+                                json!({"kind": "markdown_section", "heading": "Overview", "complete": section_complete}),
                             ),
-                        };
-                    let content_complete =
-                        selection.as_ref().map_or(complete, |selection| selection["complete"].as_bool() == Some(true));
+                        ),
+                    };
+                    let content_complete = selection
+                        .as_ref()
+                        .map_or(complete, |selection| selection["complete"].as_bool() == Some(true));
                     let mut entry = JsonMap::new();
                     entry.insert("package".into(), Json::Object(binding.clone()));
                     entry.insert("path".into(), path.clone().into());
@@ -733,7 +749,10 @@ impl ProviderSessionAdapter {
                         )
                         .into(),
                     );
-                    entry.insert("reference".into(), json!({"source": "campaign_setting", "path": format!("{path}#overview")}));
+                    entry.insert(
+                        "reference".into(),
+                        json!({"source": "campaign_setting", "path": format!("{path}#overview")}),
+                    );
                     entry.insert("additional_sections_discoverable".into(), true.into());
                     if let Some(selection) = selection {
                         entry.insert("selection".into(), selection);
@@ -800,12 +819,16 @@ impl ProviderSessionAdapter {
         payload.insert("campaign_plan_preparation".into(), Json::Object(plan_preparation));
         payload.insert(
             "participants".into(),
-            Json::Array(self.participant_prompt_payloads(input).await?.into_iter().map(Json::Object).collect()),
+            Json::Array(
+                self.participant_prompt_payloads(input).await?.into_iter().map(Json::Object).collect(),
+            ),
         );
         let mut revealed_ids: Vec<&String> = reveals
             .iter()
             .filter(|(_, audiences)| {
-                audiences.as_array().is_some_and(|items| items.iter().any(|item| item.as_str() == Some("player")))
+                audiences
+                    .as_array()
+                    .is_some_and(|items| items.iter().any(|item| item.as_str() == Some("player")))
             })
             .map(|(key, _)| key)
             .collect();

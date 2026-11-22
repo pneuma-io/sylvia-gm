@@ -15,17 +15,20 @@ use sylvia_agent::provider_session::context::{ProviderSessionAdapter, SessionPro
 use sylvia_agent::provider_session::reads::OpeningReads;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
-    CampaignConstructionBasis, CampaignContinuityView, CampaignDisplaySnapshot, CampaignSnapshot, CampaignState,
-    CanonicalReplay, LifecycleState, ModelDecisionBoundary, PackageLock, Participant, ParticipantFields, TurnStatus,
-    WriterRole,
+    CampaignConstructionBasis, CampaignContinuityView, CampaignDisplaySnapshot, CampaignSnapshot,
+    CampaignState, CanonicalReplay, LifecycleState, ModelDecisionBoundary, PackageLock, Participant,
+    ParticipantFields, TurnStatus, WriterRole,
 };
-use sylvia_domain::session::{SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus};
+use sylvia_domain::session::{
+    SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
+};
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::types::{ModelInfo, ProviderResponse};
 use sylvia_provider::{BoxFuture, ChunkStream, Provider, ProviderRequest, ProviderResult};
 
 fn vectors() -> J {
-    serde_json::from_str(include_str!("vectors/opening_messages_vectors.json")).expect("vector file is valid JSON")
+    serde_json::from_str(include_str!("vectors/opening_messages_vectors.json"))
+        .expect("vector file is valid JSON")
 }
 
 fn text(value: &J) -> String {
@@ -50,7 +53,12 @@ fn session_record(value: &J) -> SessionRecord {
         status: SessionStatus::parse(value["status"].as_str().unwrap()).unwrap(),
         parent_session_id: opt(&value["parent_session_id"]),
         selected_skill: opt(&value["selected_skill"]),
-        scope: value["scope"].as_array().unwrap().iter().map(|item| item.as_str().unwrap().to_owned()).collect(),
+        scope: value["scope"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|item| item.as_str().unwrap().to_owned())
+            .collect(),
         reasoning_effort: opt(&value["reasoning_effort"]),
         reasoning_effort_once: opt(&value["reasoning_effort_once"]),
     })
@@ -193,8 +201,9 @@ impl Recorded {
         assert!(!reads.is_empty(), "Rust made an extra read: {name} {args}");
         let read = reads.remove(0);
         let mut recorded_args = read["args"].as_array().cloned().unwrap_or_default();
-        recorded_args.extend(read["kwargs"].as_object().into_iter().flat_map(|kwargs| kwargs.values().cloned()));
-        if read["name"] != J::from(name) || J::Array(recorded_args.clone()) != args {
+        recorded_args
+            .extend(read["kwargs"].as_object().into_iter().flat_map(|kwargs| kwargs.values().cloned()));
+        if read["name"].as_str() != Some(name) || J::Array(recorded_args.clone()) != args {
             self.failures.lock().unwrap().push(format!(
                 "read differs: Python {}({}), Rust {name}({args})",
                 read["name"],
@@ -213,7 +222,10 @@ impl OpeningReads for Recorded {
     fn session_context<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<SessionContext>> {
         ready(session_context(&self.next("session_context", serde_json::json!([session_id]))))
     }
-    fn model_context_owner<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<JsonMap>>> {
+    fn model_context_owner<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<JsonMap>>> {
         ready(self.next("model_context_owner", serde_json::json!([campaign_id])).as_object().cloned())
     }
     fn player_action_context<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Vec<JsonMap>>> {
@@ -233,7 +245,8 @@ impl OpeningReads for Recorded {
         session_id: &'a str,
         basis_message_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Vec<JsonMap>>> {
-        let result = self.next("action_sequence_response_results", serde_json::json!([session_id, basis_message_id]));
+        let result =
+            self.next("action_sequence_response_results", serde_json::json!([session_id, basis_message_id]));
         ready(result.as_array().unwrap().iter().map(map).collect())
     }
     fn canonical_replay<'a>(
@@ -244,9 +257,16 @@ impl OpeningReads for Recorded {
         let result = self.next("canonical_replay", serde_json::json!([campaign_id, acknowledged_sequence]));
         empty_history(&result, "canonical");
         empty_history(&result, "provisional");
-        ready(CanonicalReplay { canonical: Vec::new(), provisional: Vec::new(), high_water: result["high_water"].as_i64().unwrap() })
+        ready(CanonicalReplay {
+            canonical: Vec::new(),
+            provisional: Vec::new(),
+            high_water: result["high_water"].as_i64().unwrap(),
+        })
     }
-    fn ruleset_gm_operating_guide<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
+    fn ruleset_gm_operating_guide<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<String>>> {
         ready(opt(&self.next("ruleset_gm_operating_guide", serde_json::json!([campaign_id]))))
     }
     fn model_context_snapshot<'a>(
@@ -303,7 +323,13 @@ impl Provider for ModelOnly {
 
 fn model(value: &J) -> ModelInfo {
     let get = |key: &str| value[key].as_str().unwrap();
-    let mut model = ModelInfo::new(get("id"), get("name"), get("provider_name"), get("provider_key"), get("provider_mode"));
+    let mut model = ModelInfo::new(
+        get("id"),
+        get("name"),
+        get("provider_name"),
+        get("provider_key"),
+        get("provider_mode"),
+    );
     model.transport = get("transport").into();
     model.provider_model_id = get("provider_model_id").into();
     model
@@ -353,7 +379,11 @@ fn opening_messages_match_python() {
             .expect("the assembly succeeds");
         let failures = reads.failures.lock().unwrap().clone();
         assert!(failures.is_empty(), "{}: {}", case["name"], failures.join("\n"));
-        assert!(reads.reads.lock().unwrap().is_empty(), "{}: Rust made fewer reads than Python", case["name"]);
+        assert!(
+            reads.reads.lock().unwrap().is_empty(),
+            "{}: Rust made fewer reads than Python",
+            case["name"]
+        );
         let actual = J::Array(messages.into_iter().map(J::Object).collect());
         let expected = &case["messages"];
         if text(&actual) != text(expected) {

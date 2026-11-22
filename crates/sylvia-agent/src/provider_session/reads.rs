@@ -7,7 +7,8 @@
 
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
-    CampaignConstructionBasis, CampaignDisplaySnapshot, CampaignSnapshot, CanonicalReplay, ModelDecisionBoundary,
+    CampaignConstructionBasis, CampaignDisplaySnapshot, CampaignSnapshot, CanonicalReplay,
+    ModelDecisionBoundary,
 };
 use sylvia_domain::session::SessionContext;
 use sylvia_provider::BoxFuture;
@@ -18,7 +19,8 @@ pub trait OpeningReads: Send + Sync {
     fn session_context<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<SessionContext>>;
 
     /// `model_context_owner(campaign_id)`: the GM context owner a package declares, if any.
-    fn model_context_owner<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<JsonMap>>>;
+    fn model_context_owner<'a>(&'a self, campaign_id: &'a str)
+        -> BoxFuture<'a, CodedResult<Option<JsonMap>>>;
 
     /// `player_action_context(campaign_id)`.
     fn player_action_context<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Vec<JsonMap>>>;
@@ -45,7 +47,10 @@ pub trait OpeningReads: Send + Sync {
     ) -> BoxFuture<'a, CodedResult<CanonicalReplay>>;
 
     /// `ruleset_gm_operating_guide(campaign_id)`.
-    fn ruleset_gm_operating_guide<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>>;
+    fn ruleset_gm_operating_guide<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<String>>>;
 
     /// `model_context_snapshot(campaign_id)`.
     fn model_context_snapshot<'a>(
