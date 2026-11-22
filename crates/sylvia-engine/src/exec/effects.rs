@@ -584,7 +584,8 @@ fn handle_nested_call(
         (_, _) => Combat::own(ctx.combat_state()),
     };
     let budget = ctx.budget;
-    let choice = if ctx.nested_mode == NestedMode::Package { ctx.choice } else { None };
+    // The package's `extras` (its choice control) pass on; a procedure's context never holds one.
+    let choice = ctx.choice;
     let procedure = ctx.procedure_executor.clone();
     let mode = ctx.nested_mode;
     let result = execute_tool(

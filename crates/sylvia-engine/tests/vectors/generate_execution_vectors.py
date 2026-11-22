@@ -629,6 +629,9 @@ COMBAT_STATE[f"{NAMESPACE}.combat"] = {"round": 2, "turn_index": 0, "order": [
 COMBAT_STATE[f"{NAMESPACE}.entities"]["orc"]["init_mod"] = 2
 COMBAT_STATE[f"{NAMESPACE}.entities"]["elf"]["init_mod"] = 7
 COMBAT_STATE[f"{NAMESPACE}.entities"]["elf"]["down"] = True
+COMBAT_STATE[f"{NAMESPACE}.entities"]["orc"]["long"] = "x" * 200
+COMBAT_STATE[f"{NAMESPACE}.entities"]["elf"]["long"] = "\u00e9" * 201
+COMBAT_STATE[f"{NAMESPACE}.entities"]["box"]["long"] = "   "
 COMBAT_STATE[f"{NAMESPACE}.entities"]["_campaign"] = {"flags": {"lit": True, "off": 0}}
 COMBAT_STATE[f"{NAMESPACE}.state"]["party"] = ["orc", "elf", {"entity_id": "box"}, {"id": "ghost"}, 5]
 
@@ -651,6 +654,14 @@ def procedure_tools(effects, procedures=None) -> dict:
                                                        {"log": {"message": "outer {combat}"}}]},
         "on_inner": {"trigger": "on_inner", "steps": [{"require": {"condition": "combat.round >= 2", "error": "inner saw a stale combat"}},
                                                        {"advance_time": "1 round"}, {"log": {"message": "inner {combat}"}}]},
+        "on_peek": {"trigger": "on_peek", "steps": [{"set": {"field": "_narrative_combat", "value": "combat"}}]},
+        "on_quiet": {"trigger": "on_quiet", "steps": [{"set": {"field": "_narrative_zero", "value": "0"}},
+                                                       {"set": {"field": "_narrative_empty", "value": "''"}},
+                                                       {"set": {"field": "_narrative_off", "value": "false"}},
+                                                       {"set": {"field": "_narrative_on", "value": "1.5"}}]},
+        "on_fail_empty": {"trigger": "on_fail_empty", "steps": [{"require": {"condition": "false", "error": ""}}]},
+        "on_target_id": {"trigger": "on_target_id", "steps": [{"log": {"message": "{target.name} {target.hp}"}},
+                                                               {"set": {"field": "_narrative_hp", "value": "target.hp"}}]},
         "on_tick": {"trigger": "on_tick", "steps": [{"call": "ticker"}, {"advance_time": "1 round"}]},
         "on_choose": {"trigger": "on_choose", "steps": [choose]},
         "on_choose_call": {"trigger": "on_choose_call", "steps": [{"call": "chooser", "params": {"target": "{target}"}}]},
@@ -684,6 +695,27 @@ def procedure_targeted() -> list[dict]:
         cases.append(item)
 
     control = {"choice_id": "c1", "option_id": "flee", "expected_request": REQUEST, "prior_answers": []}
+    for state in (None, "combat", "bare"):
+        for name, context in (("on_peek", {}), ("on_quiet", {}), ("on_fail_empty", {}), ("on_missing", {}),
+                              ("on_target_id", {"target": "orc"}), ("on_target_id", {"target": "ghost"}),
+                              ("on_target_id", {"target": "elf", "actor": "orc"}), ("on_target_id", {"entity": "orc"})):
+            case([{"trigger": name, "context": context, "store_as": "_r"}], state=state)
+    for party, body in ((["orc"], {"modifier_field": "init_mod", "modifier_minimum": 2, "modifier_maximum": 2}),
+                        (["elf"], {"modifier_field": "init_mod", "modifier_minimum": 2, "modifier_maximum": 2}),
+                        (["elf"], {"required_truthy_field": "conditions"}), (["orc"], {"required_truthy_field": "conditions"}),
+                        (["elf"], {"required_truthy_field": "speed"}), (["box"], {"required_truthy_field": "name"}),
+                        (["elf"], {"modifier_field": "speed"}), (["orc", "elf"], {"modifier_field": "position.band"}),
+                        (["orc"], {"label_field": "long"}), (["elf"], {"label_field": "long"}), (["box"], {"label_field": "long"}),
+                        (["orc", "elf"], {"modifier_field": "hp", "modifier_minimum": 5, "modifier_maximum": 7})):
+        case([{"set": {"field": "_p", "value": party}}, {"initiative": {"combatants": "_p", **body}, "store_as": "_order"}],
+             state="combat")
+    for body in ({"skip_field": "max_hp", "skip_equals": "7.0"}, {"skip_field": "max_hp", "skip_equals": "9.0"},
+                 {"skip_field": "init_mod", "skip_equals": "true"}, {"skip_field": "position.band", "skip_equals": "'close'"},
+                 {"skip_field": "missing"}, {"skip_field": "missing", "skip_equals": "none"}):
+        case([{"advance_initiative": body, "store_as": "_actor"}], state="combat")
+    for body in ("1 rounds\n", "1 rounds\n\n", "1 r\u00e9und", "1\u00a0round", "\u00a02 rounds\u2003", "1.5 rounds", "1. rounds",
+                 ".5 rounds", "1.25 minutes", "1_0 rounds", "\u0661\u0662 rounds", "1 \u0661rounds"):
+        case([{"advance_time": body}], state="combat")
     for state in (None, "combat", "bare"):
         case([{"trigger": "on_outer", "store_as": "_r"}, {"set": {"field": "_combat", "value": "combat"}}], state=state)
         case([{"trigger": "on_tick", "store_as": "_r"}, {"set": {"field": "_combat", "value": "combat"}}], state=state)
