@@ -167,9 +167,51 @@ def record(case: dict) -> dict:
     return out
 
 
+def base_case() -> dict:
+    """One admissible GM-owned legacy actor with a valid observation, persona and offers."""
+    east = {"name": "East", "game": {"hand": [1, 2]}, "persona": "Calm", "control": "gm",
+            "actions": [{"id": "a1", "label": "Play 1", "operation": "play", "arguments": {"tile": 1}}]}
+    declared = {**copy.deepcopy(LEGACY), **ISOLATED}
+    return {"campaign_id": "camp-1", "revision": 3,
+            "state": {f"{NS}.game": {"active": "east", "owner": "gm", "side": "north", "eligible": ["east"]},
+                      f"{NS}.entities": {"east": east}, f"{NS}.public": {"view": {"table": [1]}}},
+            "participants": [], "package_lock": [{"package_id": NS, "version": "1.0.0", "sha256": "a" * 64, "role": "primary"}],
+            "declared": declared, "turn_id": "turn-7"}
+
+
+def targeted() -> list[dict]:
+    cases = []
+    # Eligible actor sets of 128 and 129 distinct actors.
+    for count in (128, 129):
+        case = base_case()
+        ids = [f"actor{index:03d}" for index in range(count)]
+        case["state"][f"{NS}.entities"] = {identity: {"name": identity} for identity in ids}
+        case["state"][f"{NS}.game"]["eligible"] = ids
+        case["declared"] = {**copy.deepcopy(SIDE), **ISOLATED}
+        cases.append(case)
+    east = lambda case: case["state"][f"{NS}.entities"]["east"]
+    # Personas at the 8,192-byte bound, in ASCII and in two-byte characters.
+    for persona in ("x" * 8192, "x" * 8193, "é" * 4096, "é" * 4097):
+        case = base_case()
+        east(case)["persona"] = persona
+        cases.append(case)
+    # 256 and 257 offered actions.
+    for count in (256, 257):
+        case = base_case()
+        east(case)["actions"] = [{"id": f"a{index}", "label": f"Pass {index}", "operation": "pass", "arguments": {}}
+                                 for index in range(count)]
+        cases.append(case)
+    # An envelope under 128 KiB as UTF-8 that escaped ASCII would put over it, and one over it.
+    for size in (40000, 70000):
+        case = base_case()
+        east(case)["game"] = {"text": "é" * size}
+        cases.append(case)
+    return cases
+
+
 def main() -> int:
     rng = random.Random(4812)
-    cases = []
+    cases = [{**case, **record(case), "tools": TOOLS} for case in targeted()]
     while len(cases) < 3000:
         case = random_case(rng)
         cases.append({**case, **record(case), "tools": TOOLS})

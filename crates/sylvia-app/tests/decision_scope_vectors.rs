@@ -5,11 +5,12 @@
 use serde_json::{json, Value as Json};
 use sylvia_app::actor_decisions::{project_actor_decision, public_actor_observation, ActorDecisionRequest};
 use sylvia_app::decision_scope::{
-    player_viewer_ids, project_campaign_preparation_scope, project_model_decision_scope, project_player_control_scope,
+    player_viewer_ids, project_campaign_preparation_scope, project_model_decision_scope,
+    project_player_control_scope,
 };
 use sylvia_domain::authority::{
-    CampaignState, LifecycleState, ModelDecisionBoundary, PackageLock, PackageLockEntry, PackageRole, Participant,
-    ParticipantFields, WriterRole,
+    CampaignState, LifecycleState, ModelDecisionBoundary, PackageLock, PackageLockEntry, PackageRole,
+    Participant, ParticipantFields, WriterRole,
 };
 use sylvia_domain::error::DomainError;
 
@@ -110,7 +111,8 @@ fn optional<T>(result: Result<Option<T>, DomainError>, show: impl Fn(&T) -> Json
 
 #[test]
 fn decision_scopes_project_as_python() {
-    let vectors: Json = serde_json::from_str(include_str!("vectors/decision_scope_vectors.json")).expect("valid JSON");
+    let vectors: Json =
+        serde_json::from_str(include_str!("vectors/decision_scope_vectors.json")).expect("valid JSON");
     let cases = vectors["cases"].as_array().unwrap();
     assert!(cases.len() >= 3000);
     let mut failures = Vec::new();
@@ -134,11 +136,17 @@ fn decision_scopes_project_as_python() {
             "decision": optional(project_actor_decision(&snapshot, boundary.as_ref(), declared, "turn-7", tools), decision_json),
         });
         for key in ["scope", "preparation", "control", "viewers", "public", "decision"] {
-            let (a, w) = (serde_json::to_string(&actual[key]).unwrap(), serde_json::to_string(&case[key]).unwrap());
+            let (a, w) =
+                (serde_json::to_string(&actual[key]).unwrap(), serde_json::to_string(&case[key]).unwrap());
             if a != w {
                 failures.push(format!("case {index} {key}\n  python {w}\n  rust   {a}"));
             }
         }
     }
-    assert!(failures.is_empty(), "{} differ, first: {:#?}", failures.len(), &failures[..failures.len().min(5)]);
+    assert!(
+        failures.is_empty(),
+        "{} differ, first: {:#?}",
+        failures.len(),
+        &failures[..failures.len().min(5)]
+    );
 }

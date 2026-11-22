@@ -14,7 +14,11 @@ use sylvia_domain::pyops::{py_eq, py_str};
 /// `DecisionScopeProjectionError`: a validated declaration could not be projected from
 /// authoritative state (a `ValueError` subclass).
 fn projection_error(message: &str) -> DomainError {
-    DomainError::Diagnosed { error_type: "DecisionScopeProjectionError", message: message.into(), diagnostics: Vec::new() }
+    DomainError::Diagnosed {
+        error_type: "DecisionScopeProjectionError",
+        message: message.into(),
+        diagnostics: Vec::new(),
+    }
 }
 
 /// `declared[key]` of a validated declaration.
@@ -62,7 +66,11 @@ fn actor_name(actor_id: &str, actor_state: &JsonMap, participants: &[Participant
 }
 
 /// `_actor_projection(actor_id, entities, participants)`.
-fn actor_projection(actor_id: &str, entities: &JsonMap, participants: &[Participant]) -> DomainResult<ModelDecisionActor> {
+fn actor_projection(
+    actor_id: &str,
+    entities: &JsonMap,
+    participants: &[Participant],
+) -> DomainResult<ModelDecisionActor> {
     let Some(Json::Object(actor_state)) = entities.get(actor_id) else {
         return Err(projection_error("Ruleset eligible actor state is unavailable"));
     };
@@ -83,7 +91,10 @@ fn owner_of(text: &str) -> Option<ModelDecisionOwner> {
 }
 
 /// `_project_side_scope(snapshot, declared)`.
-fn project_side_scope(snapshot: &CampaignState, declared: &JsonMap) -> DomainResult<Option<ModelDecisionBoundary>> {
+fn project_side_scope(
+    snapshot: &CampaignState,
+    declared: &JsonMap,
+) -> DomainResult<Option<ModelDecisionBoundary>> {
     let owner_value = state_reference(&snapshot.state, field(declared, "decision_owner"));
     let Some(owner) = owner_of(&py_str(&owner_value)) else {
         return Err(projection_error("Ruleset decision owner is invalid"));
@@ -99,7 +110,8 @@ fn project_side_scope(snapshot: &CampaignState, declared: &JsonMap) -> DomainRes
     let eligible_value = state_reference(&snapshot.state, field(declared, "eligible_actors"));
     let eligible: Vec<&str> = match &eligible_value {
         Json::Array(items) if items.len() <= 128 => {
-            let texts: Vec<&str> = items.iter().filter_map(Json::as_str).filter(|item| !item.is_empty()).collect();
+            let texts: Vec<&str> =
+                items.iter().filter_map(Json::as_str).filter(|item| !item.is_empty()).collect();
             let unique: std::collections::HashSet<&str> = texts.iter().copied().collect();
             if texts.len() != items.len() || unique.len() != texts.len() {
                 return Err(projection_error("Ruleset eligible actor set is invalid"));
@@ -121,7 +133,8 @@ fn project_side_scope(snapshot: &CampaignState, declared: &JsonMap) -> DomainRes
         Json::String(focused) if eligible.contains(&focused.as_str()) => Some(focused.clone()),
         _ => return Err(projection_error("Ruleset focused actor is not eligible")),
     };
-    let actor_id = focused_actor.clone().or_else(|| eligible_actors.first().map(|actor| actor.actor_id.clone()));
+    let actor_id =
+        focused_actor.clone().or_else(|| eligible_actors.first().map(|actor| actor.actor_id.clone()));
     let selected = eligible_actors.iter().find(|item| Some(&item.actor_id) == actor_id.as_ref());
     Ok(Some(ModelDecisionBoundary {
         owner,
@@ -139,7 +152,10 @@ fn project_side_scope(snapshot: &CampaignState, declared: &JsonMap) -> DomainRes
 /// `value in control["player_values"]`, with Python's equality.
 fn is_player_value(value: Option<&Json>, control: &JsonMap) -> bool {
     let value = value.unwrap_or(&Json::Null);
-    control.get("player_values").and_then(Json::as_array).is_some_and(|values| values.iter().any(|item| py_eq(item, value)))
+    control
+        .get("player_values")
+        .and_then(Json::as_array)
+        .is_some_and(|values| values.iter().any(|item| py_eq(item, value)))
 }
 
 /// `participant.data.get(str(control["field"]))`.
@@ -148,7 +164,10 @@ fn control_value<'p>(participant: &'p Participant, control: &JsonMap) -> Option<
 }
 
 /// `_project_legacy_actor_boundary(snapshot, declared)`.
-fn project_legacy_actor_boundary(snapshot: &CampaignState, declared: &JsonMap) -> DomainResult<Option<ModelDecisionBoundary>> {
+fn project_legacy_actor_boundary(
+    snapshot: &CampaignState,
+    declared: &JsonMap,
+) -> DomainResult<Option<ModelDecisionBoundary>> {
     let actor_id = match state_reference(&snapshot.state, field(declared, "active_actor")) {
         Json::String(actor_id) if !actor_id.is_empty() => actor_id,
         _ => return Ok(None),
@@ -164,19 +183,22 @@ fn project_legacy_actor_boundary(snapshot: &CampaignState, declared: &JsonMap) -
     } else {
         Json::String(actor_id.clone())
     };
-    let participant = snapshot
-        .participants
-        .iter()
-        .find(|item| participant_id.as_str() == Some(item.participant_id()));
+    let participant =
+        snapshot.participants.iter().find(|item| participant_id.as_str() == Some(item.participant_id()));
     let default_owner = py_str(field(declared, "default_owner"));
     let Some(mut owner) = owner_of(&default_owner) else {
         return Err(DomainError::Value(format!("'{default_owner}' is not a valid ModelDecisionOwner")));
     };
-    if participant.is_some_and(|participant| is_player_value(control_value(participant, &control), &control)) {
+    if participant.is_some_and(|participant| is_player_value(control_value(participant, &control), &control))
+    {
         owner = ModelDecisionOwner::Player;
     }
     let name = actor_name(&actor_id, &actor_state, &snapshot.participants);
-    let actor = ModelDecisionActor { actor_id: actor_id.clone(), actor_name: name.clone(), actor_state: actor_state.clone() };
+    let actor = ModelDecisionActor {
+        actor_id: actor_id.clone(),
+        actor_name: name.clone(),
+        actor_state: actor_state.clone(),
+    };
     Ok(Some(ModelDecisionBoundary {
         owner,
         actor_id: Some(actor_id.clone()),
@@ -192,7 +214,10 @@ fn project_legacy_actor_boundary(snapshot: &CampaignState, declared: &JsonMap) -
 
 /// `project_campaign_preparation_scope(snapshot, declared)`: pending package-owned character
 /// events, before ordinary play decisions.
-pub fn project_campaign_preparation_scope(snapshot: &CampaignState, declared: &JsonMap) -> DomainResult<Option<ModelDecisionBoundary>> {
+pub fn project_campaign_preparation_scope(
+    snapshot: &CampaignState,
+    declared: &JsonMap,
+) -> DomainResult<Option<ModelDecisionBoundary>> {
     let Some(Json::Object(preparation)) = declared.get("preparation") else { return Ok(None) };
     let actor_reference = field(declared, "actor_entities");
     let Json::Object(entities) = state_reference(&snapshot.state, actor_reference) else { return Ok(None) };
@@ -240,7 +265,10 @@ pub fn project_campaign_preparation_scope(snapshot: &CampaignState, declared: &J
 
 /// `project_model_decision_scope(snapshot, declared)`: the preparation scope, the side scope or
 /// its legacy actor form.
-pub fn project_model_decision_scope(snapshot: &CampaignState, declared: &JsonMap) -> DomainResult<Option<ModelDecisionBoundary>> {
+pub fn project_model_decision_scope(
+    snapshot: &CampaignState,
+    declared: &JsonMap,
+) -> DomainResult<Option<ModelDecisionBoundary>> {
     if let Some(preparation) = project_campaign_preparation_scope(snapshot, declared)? {
         return Ok(Some(preparation));
     }
@@ -273,10 +301,18 @@ pub fn project_player_control_scope(snapshot: &CampaignState, declared: &JsonMap
         scope.insert("available".into(), Json::Bool(player_owned));
         scope.insert(
             "focused_actor_id".into(),
-            if player_owned { boundary.focused_actor_id.map_or(Json::Null, Json::String) } else { Json::Null },
+            if player_owned {
+                boundary.focused_actor_id.map_or(Json::Null, Json::String)
+            } else {
+                Json::Null
+            },
         );
         let actors = if player_owned {
-            boundary.eligible_actors.iter().map(|actor| actor_entry(&actor.actor_id, &actor.actor_name)).collect()
+            boundary
+                .eligible_actors
+                .iter()
+                .map(|actor| actor_entry(&actor.actor_id, &actor.actor_name))
+                .collect()
         } else {
             Vec::new()
         };
@@ -291,7 +327,10 @@ pub fn project_player_control_scope(snapshot: &CampaignState, declared: &JsonMap
             .iter()
             .filter(|participant| is_player_value(control_value(participant, control), control))
             .map(|participant| {
-                let name = participant.data().get("name").map_or_else(|| participant.participant_id().to_owned(), py_str);
+                let name = participant
+                    .data()
+                    .get("name")
+                    .map_or_else(|| participant.participant_id().to_owned(), py_str);
                 actor_entry(participant.participant_id(), &name)
             })
             .collect();
@@ -307,8 +346,12 @@ pub fn project_player_control_scope(snapshot: &CampaignState, declared: &JsonMap
 }
 
 /// `player_viewer_ids(snapshot, declared)`: the player's participants, whoever's turn it is.
-pub fn player_viewer_ids(snapshot: &CampaignState, declared: Option<&JsonMap>) -> std::collections::BTreeSet<String> {
-    let Some(Json::Object(control)) = declared.and_then(|declared| declared.get("participant_control")) else {
+pub fn player_viewer_ids(
+    snapshot: &CampaignState,
+    declared: Option<&JsonMap>,
+) -> std::collections::BTreeSet<String> {
+    let Some(Json::Object(control)) = declared.and_then(|declared| declared.get("participant_control"))
+    else {
         return Default::default();
     };
     snapshot
