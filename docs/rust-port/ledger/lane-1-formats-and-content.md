@@ -16,7 +16,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/builder_session_migration.py` | 136 | `sylvia-app::builder_session_migration` | pending | |
 | `src/sylvia_gm/application/builder_source_selection.py` | 123 | `sylvia-app::builder_source_selection` | pending | |
 | `src/sylvia_gm/application/bundled_campaign_plans.py` | 271 | `sylvia-app::bundled_campaign_plans` | pending | |
-| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`). `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` wait on `plan_snapshot.py`, `bundled_campaign_content_catalog` on `bundled_campaign_plans.py` |
+| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`); `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` in `plan_snapshot_vectors`. `bundled_campaign_content_catalog` waits on `bundled_campaign_plans.py` |
 | `src/sylvia_gm/application/bundled_starter_characters.py` | 150 | `sylvia-app::bundled_starter_characters` | pending | |
 | `src/sylvia_gm/application/campaign_library_selection.py` | 668 | `sylvia-app::campaign_library_selection` | pending | |
 | `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | pending | |
@@ -34,10 +34,10 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | ported | `package_library_vectors`: installs through a recording store (repository archives under 1 MB and two SRD-carrying ones, and archives built from the small Ruleset source), predicates, admissions, surfaces, rebinds and migrations. `PackageStorePort` is implemented for `sylvia_store::AuthorityStore` |
 | `src/sylvia_gm/application/package_materialization.py` | 260 | `sylvia-app::package_materialization` | ported | `bundled_vectors` (every bundled archive byte for byte, synthetic drafts); ZIP bytes through `package_archive::zipfile_write` |
 | `src/sylvia_gm/application/plan_bundle.py` | 164 | `sylvia-app::plan_bundle` | pending | |
-| `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | pending | |
-| `src/sylvia_gm/application/plan_snapshot.py` | 113 | `sylvia-app::plan_snapshot` | pending | |
-| `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | pending | |
-| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads; the rest of `plan_spatial_admission.py` waits on lane 2's `tactical_grid` and `spatial` |
+| `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | ported | `plan_admission_vectors`. Uses lane 2's `resolve_surface_source` and lane 1's `network_graph` projection |
+| `src/sylvia_gm/application/plan_snapshot.py` | 113 | `sylvia-app::plan_snapshot` | in progress | `plan_snapshot_vectors`, with the `lru_cache` of snapshot facts. `retained_plan_snapshot` takes a `PlanSnapshotOwner`; its `AuthorityStore` impl waits on lane 3's `export_package_candidate` |
+| `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | ported | `plan_admission_vectors`. Uses lane 2's `resolve_surface_source` and `admit_spatial_scene`; `_plan_state` is `plan_state_admission::plan_state` |
+| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads |
 | `src/sylvia_gm/application/ready_campaigns.py` | 504 | `sylvia-app::ready_campaigns` | pending | |
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
 | `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | ported | `character_profile_vectors` (storage scripts: links, tampering, delete and retry) |

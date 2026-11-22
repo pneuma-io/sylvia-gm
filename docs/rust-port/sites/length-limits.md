@@ -42,8 +42,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/library_sources.py:77` | `LibrarySourceReader.files` | len() against a limit | `if len(paths) > _MAX_TOTAL_PATHS:` | |
 | `application/library_sources.py:160` | `LibrarySourceReader._package_index` | len() against a limit | `if len(candidate.package_lock.entries) > _MAX_PACKAGES:` | |
 | `application/plan_bundle.py:84` | `_read_bundle` | len() against a limit | `if len(data) > PLAN_BUNDLE_BYTE_LIMIT:` | |
-| `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` | |
-| `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` | |
+| `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` |  `sylvia-app` plan_admission_vectors |
+| `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` |  `sylvia-app` plan_snapshot_vectors |
 | `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` |  `sylvia-app` plan_state_vectors |
 | `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
 | `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |

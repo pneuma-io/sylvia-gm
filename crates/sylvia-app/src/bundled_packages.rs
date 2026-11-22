@@ -6,19 +6,19 @@
 //! the source-checkout layout. Archives are materialized once per [`BundledPackages`], as
 //! Python's `lru_cache` keeps them for the process.
 //!
-//! Not yet here: `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` (they need
-//! `plan_snapshot`) and `bundled_campaign_content_catalog` (it needs `bundled_campaign_plans`).
+//! Not yet here: `bundled_campaign_content_catalog` (it needs `bundled_campaign_plans`).
 
 use crate::package_materialization::{
     materialize_package_archive, MaterializedPackageArchive, NormalizedPackageDraft,
 };
+use crate::plan_snapshot::{admitted_snapshot_facts, validate_plan_snapshot, PLAN_SNAPSHOT_FILENAME};
 use serde_json::json;
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{pyjson, pystr, Json, JsonMap};
-use sylvia_domain::campaign_plan::PackageBinding;
+use sylvia_domain::campaign_plan::{PackageBinding, ValidatedCampaignPlan};
 use sylvia_domain::error::{DomainError, DomainResult};
 use sylvia_domain::interview_contribution::{parse_interview_contribution_bytes, InterviewContribution};
 use sylvia_domain::package_library::{
@@ -116,6 +116,13 @@ fn read_json(path: &Path) -> DomainResult<Json> {
     let text =
         String::from_utf8(bytes).map_err(|_| DomainError::value("A bundled package file is not UTF-8"))?;
     pyjson::loads(&text).map_err(|error| DomainError::value(error.to_string()))
+}
+
+/// `Path.read_text(encoding="utf-8")`: a strict decode with universal newlines.
+fn read_text(path: &Path) -> DomainResult<String> {
+    let text = String::from_utf8(read(path)?)
+        .map_err(|_| DomainError::value("A bundled package file is not UTF-8"))?;
+    Ok(text.replace("\r\n", "\n").replace('\r', "\n"))
 }
 
 fn json_object(value: Json) -> DomainResult<JsonMap> {
@@ -490,6 +497,32 @@ impl BundledPackages {
             return Ok(None);
         }
         parse_interview_contribution_bytes(&read(&path)?, "campaign_plan").map(Some)
+    }
+
+    /// `bundled_rift_archive_for_closure(expected)`: resolve only an exact available Rift closure;
+    /// never replace an unknown saved pin.
+    pub fn bundled_rift_archive_for_closure(&self, expected: &Json) -> DomainResult<Option<Vec<u8>>> {
+        let Json::String(expected) = expected else { return Ok(None) };
+        if *expected == self.bundled_rift_authority()?.closure_sha256 {
+            return self.bundled_rift_archive().map(Some);
+        }
+        let path = self.rift_plan_root()?.join(PLAN_SNAPSHOT_FILENAME);
+        let retained = match std::fs::read(&path) {
+            Ok(bytes) => bytes,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(_) => read(&path)?,
+        };
+        Ok((admitted_snapshot_facts(&retained)?.closure_sha256 == *expected).then_some(retained))
+    }
+
+    /// `bundled_rift_campaign_plan()`: validate retained Rift against its owned snapshot,
+    /// independent of the base world.
+    pub fn bundled_rift_campaign_plan(&self) -> DomainResult<ValidatedCampaignPlan> {
+        let root = self.rift_plan_root()?;
+        let snapshot = read(&root.join(PLAN_SNAPSHOT_FILENAME))?;
+        let plan = pyjson::loads(&read_text(&root.join("plan.json"))?)
+            .map_err(|error| DomainError::value(error.to_string()))?;
+        validate_plan_snapshot(&snapshot, &plan, &read_text(&root.join("plan.md"))?)
     }
 
     /// `bundled_rift_source_catalog(query)`: bounded virtual source paths for Campaign Plan Builder.

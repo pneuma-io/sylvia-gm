@@ -491,8 +491,11 @@ impl Inflater {
         Self { inner: Decompress::new(false), unconsumed_tail: Vec::new(), eof: false }
     }
 
+    /// CPython's `zlib_error`: zlib's own message, or its fixed text for `Z_DATA_ERROR`. flate2's
+    /// `Display` adds a prefix of its own, so the message is read directly.
     fn zlib_error(error: flate2::DecompressError) -> ZipError {
-        ZipError::Zlib(format!("Error -3 while decompressing data: {error}"))
+        let message = error.message().unwrap_or("invalid input data");
+        ZipError::Zlib(format!("Error -3 while decompressing data: {message}"))
     }
 
     /// `decompress(data, max_length)`.
