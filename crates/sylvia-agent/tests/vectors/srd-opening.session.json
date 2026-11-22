@@ -1,0 +1,212 @@
+{
+ "name": "srd-opening",
+ "description": "Build an SRD Lite campaign (Severed Lands, The Rift Awakening, Mara as open-adventurer) through the guided interview and finalize it, for the opening preflight trace.",
+ "standin": true,
+ "summarise_tables": [
+  "^package_",
+  "^packages$"
+ ],
+ "steps": [
+  {
+   "method": "save_provider_settings",
+   "expect_ok": true,
+   "params": {
+    "provider_id": "standin",
+    "preset_id": "custom",
+    "display_name": "Stand-in",
+    "base_url": "${standin_url}",
+    "credential": "${standin_key}",
+    "model_id": "${standin_model}",
+    "model_name": "Stand-in Narrator",
+    "context_window": 4000000,
+    "max_output_tokens": 4096,
+    "transport": "chat_completions"
+   }
+  },
+  {
+   "method": "provider_settings"
+  },
+  {
+   "method": "model_choices",
+   "expect_ok": true,
+   "save": {
+    "provider_id": "/result/0/provider_id",
+    "model_id": "/result/0/model_id"
+   }
+  },
+  {
+   "method": "create_guided_campaign_draft",
+   "expect_ok": true,
+   "params": {
+    "operation_id": "storm-draft",
+    "display_name": "Storm Courier",
+    "provider_id": "${provider_id}",
+    "model_id": "${model_id}"
+   },
+   "save": {
+    "campaign_id": "/result/campaign_id",
+    "builder_session_id": "/result/builder_session_id"
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-ruleset",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 0,
+    "current_step": "ruleset",
+    "visible_answer": "D&D 5e SRD 5.2.1",
+    "answer": {
+     "candidate_id": "sylvia.srd-lite.bg3"
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-setting",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 1,
+    "current_step": "setting",
+    "visible_answer": "Severed Lands",
+    "answer": {
+     "setting_id": "pneuma.severed-lands"
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-plan",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 2,
+    "current_step": "plan",
+    "visible_answer": "The Rift Awakening",
+    "answer": {
+     "plan_id": "the-rift-awakening"
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-name",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 3,
+    "current_step": "name",
+    "visible_answer": "Rift Probe",
+    "answer": {
+     "display_name": "Rift Probe"
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-participants",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 4,
+    "current_step": "participants",
+    "visible_answer": "Mara; 0 companions",
+    "answer": {
+     "archetype_id": "mara",
+     "companion_ids": []
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-boundaries_preferences",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 5,
+    "current_step": "boundaries_preferences",
+    "visible_answer": "Boundaries: None; Preferences: None",
+    "answer": {
+     "boundaries": "",
+     "preferences": ""
+    }
+   }
+  },
+  {
+   "method": "advance_guided_campaign_draft",
+   "params": {
+    "operation_id": "rift-specific_requests",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "expected_construction_revision": 6,
+    "current_step": "specific_requests",
+    "visible_answer": "No additional requests",
+    "answer": {
+     "no_additional_requests": true,
+     "requests": ""
+    }
+   }
+  },
+  {
+   "method": "start_guided_campaign",
+   "timeout_s": 600,
+   "params": {
+    "operation_id": "rift-start",
+    "campaign_id": "${campaign_id}",
+    "builder_session_id": "${builder_session_id}",
+    "display_name": "Rift Probe",
+    "candidate_id": "sylvia.srd-lite.bg3",
+    "premise": "",
+    "setting_id": "pneuma.severed-lands",
+    "plan_id": "the-rift-awakening",
+    "player_character_id": "open-adventurer",
+    "companion_ids": [],
+    "construction_intent": {
+     "boundaries": "",
+     "preferences": "",
+     "specific_requests": "",
+     "contributions": {}
+    }
+   }
+  },
+  {
+   "method": "finalize_campaign_construction",
+   "timeout_s": 600,
+   "params": {
+    "campaign_id": "${campaign_id}",
+    "dm_provider_id": "${provider_id}",
+    "dm_model_id": "${model_id}"
+   }
+  },
+  {
+   "method": "shutdown"
+  }
+ ],
+ "rules": {
+  "ignore_keys": [
+   "elapsed_ms",
+   "quiet_ms"
+  ],
+  "alias": [
+   {
+    "name": "inference",
+    "pattern": "inference-[0-9a-f]{32}",
+    "keys": [
+     "message_id",
+     "inference_id"
+    ]
+   }
+  ],
+  "scrub": [
+   {
+    "pattern": "data: [A-Za-z0-9+/=]{40,}",
+    "with": "data: <protected credential>"
+   }
+  ],
+  "volatile_files": [
+   "^diagnostics/"
+  ]
+ }
+}
