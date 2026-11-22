@@ -11544,5 +11544,511 @@
   ],
   "shared": true,
   "registered": 1
+ },
+ "narration_hint": [
+  {
+   "id": "chatgpt-subscription/gpt-6.1-sol",
+   "provider_key": "chatgpt_subscription",
+   "hint": true
+  },
+  {
+   "id": "chatgpt-subscription/gpt-6-sol",
+   "provider_key": "chatgpt_subscription",
+   "hint": true
+  },
+  {
+   "id": "chatgpt-subscription/gpt-5.6-sol",
+   "provider_key": "chatgpt_subscription",
+   "hint": true
+  },
+  {
+   "id": "chatgpt-subscription/other",
+   "provider_key": "chatgpt_subscription",
+   "provider_model_id": "gpt-6-sol",
+   "hint": false
+  },
+  {
+   "id": "chatgpt-subscription/gpt-6-sol",
+   "provider_key": "openai",
+   "hint": false
+  },
+  {
+   "id": "openai/gpt-6-sol",
+   "provider_key": "chatgpt_subscription",
+   "hint": false
+  },
+  {
+   "id": "chatgpt-subscription/gpt-4o",
+   "provider_key": "chatgpt_subscription",
+   "hint": false
+  },
+  {
+   "id": "standin/standin-narrator",
+   "provider_key": "standin",
+   "hint": false
+  },
+  {
+   "id": "gpt-6-sol",
+   "provider_key": "chatgpt_subscription",
+   "hint": false
+  }
+ ],
+ "context_mode": {
+  "continue_record_text": "SYLVIA_GM_CONTINUE (application invocation, not player speech): Continue the response to the saved Sylvia conversation, using the committed tool results above.",
+  "defaults": {
+   "claude_code": "ledger",
+   "codex_app_server": "ledger",
+   "anthropic_api": "ledger"
+  },
+  "cases": [
+   {
+    "setting": null,
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": null,
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "ledger",
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "ledger",
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "  LEDGER ",
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "ledger",
+    "setting_mode": "ledger"
+   },
+   {
+    "setting": "legacy",
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "legacy",
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "Legacy",
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "legacy",
+    "setting_mode": "legacy"
+   },
+   {
+    "setting": "fast",
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "fast",
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": null,
+    "provider_key": null,
+    "route": "",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "chat_completions",
+    "provider_key": "openai",
+    "route": "chat_completions",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "responses",
+    "provider_key": "openai",
+    "route": "responses",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "claude_code",
+    "provider_key": null,
+    "route": "claude_code",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "codex_app_server",
+    "provider_key": "chatgpt_subscription",
+    "route": "codex_app_server",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "anthropic_messages",
+    "provider_key": "anthropic",
+    "route": "anthropic_api",
+    "mode": "ledger",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "anthropic_messages",
+    "provider_key": "openrouter",
+    "route": "anthropic_messages",
+    "mode": "legacy",
+    "setting_mode": null
+   },
+   {
+    "setting": "",
+    "transport": "gemini_generate_content",
+    "provider_key": "google",
+    "route": "gemini_generate_content",
+    "mode": "legacy",
+    "setting_mode": null
+   }
+  ]
  }
 }

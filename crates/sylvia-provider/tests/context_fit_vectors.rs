@@ -446,3 +446,56 @@ async fn token_estimates_match_python() {
     assert_eq!(estimate["shared"], json!(true));
     assert_eq!(fake.hooks.hooks().len() as u64, estimate["registered"].as_u64().unwrap());
 }
+
+#[test]
+fn the_gm_narration_hint_matches_python() {
+    let vectors = vectors();
+    for case in vectors["narration_hint"].as_array().unwrap() {
+        let mut model = ModelInfo::new(
+            case["id"].as_str().unwrap(),
+            "Model A",
+            "Test",
+            case["provider_key"].as_str().unwrap(),
+            "byok",
+        );
+        if let Some(wire) = case.get("provider_model_id").and_then(J::as_str) {
+            model.provider_model_id = wire.into();
+        }
+        let actual = sylvia_provider::model_facts::uses_gm_narration_hint(&model);
+        assert_eq!(actual, case["hint"].as_bool().unwrap(), "{case}");
+    }
+}
+
+#[test]
+fn the_context_mode_matches_python() {
+    use sylvia_provider::config::env::Environment;
+    use sylvia_provider::context_mode::*;
+    let vectors = vectors();
+    let section = &vectors["context_mode"];
+    assert_eq!(CONTINUE_RECORD_TEXT, section["continue_record_text"].as_str().unwrap());
+    let defaults: Vec<(String, String)> = section["defaults"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(route, mode)| (route.clone(), mode.as_str().unwrap().to_owned()))
+        .collect();
+    let ours: Vec<(String, String)> = DEFAULT_CONTEXT_MODE_BY_TRANSPORT
+        .iter()
+        .map(|(route, mode)| ((*route).to_owned(), (*mode).to_owned()))
+        .collect();
+    assert_eq!(ours, defaults);
+    for case in section["cases"].as_array().unwrap() {
+        let environment = match case["setting"].as_str() {
+            Some(setting) => Environment::of(&[(MODE_ENV, setting)]),
+            None => Environment::default(),
+        };
+        let (transport, provider_key) = (case["transport"].as_str(), case["provider_key"].as_str());
+        assert_eq!(gm_route(transport, provider_key), case["route"].as_str().unwrap(), "{case}");
+        assert_eq!(
+            context_mode(&environment, transport, provider_key),
+            case["mode"].as_str().unwrap(),
+            "{case}"
+        );
+        assert_eq!(context_mode_setting(&environment).as_deref(), case["setting_mode"].as_str(), "{case}");
+    }
+}

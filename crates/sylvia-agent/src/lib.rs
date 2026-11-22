@@ -7,10 +7,12 @@
 //!
 //! - [`provider_resolver`] holds `agent/_provider_resolver.py`.
 //! - [`stateless_mcp`] holds `ModelMechanicsTool` from `agent/_stateless_mcp.py`.
+//! - [`campaign_memory`] holds `agent/_campaign_memory.py`.
 //! - [`argument_contracts`] holds the projection half of `agent/_argument_contracts.py`.
 //! - [`provider_session`] holds parts of `agent/_provider_session.py`.
 
 pub mod argument_contracts;
+pub mod campaign_memory;
 pub mod provider_resolver;
 pub mod provider_session;
 pub mod stateless_mcp;

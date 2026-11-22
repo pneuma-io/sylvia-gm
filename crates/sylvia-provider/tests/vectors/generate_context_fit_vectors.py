@@ -408,6 +408,47 @@ def estimate_cases() -> dict[str, Any]:
     }
 
 
+def context_mode_cases() -> dict[str, Any]:
+    """`_context_ledger`'s mode constants and `context_mode` for routes and settings."""
+    from sylvia_gm.agent import _context_ledger as ledger
+
+    routes = [(None, None), ("chat_completions", "openai"), ("responses", "openai"),
+              ("claude_code", None), ("codex_app_server", "chatgpt_subscription"),
+              ("anthropic_messages", "anthropic"), ("anthropic_messages", "openrouter"),
+              ("gemini_generate_content", "google")]
+    settings = [None, "ledger", "  LEDGER ", "legacy", "Legacy", "fast", ""]
+    cases = []
+    for setting in settings:
+        environ = {} if setting is None else {ledger.MODE_ENV: setting}
+        for transport, provider_key in routes:
+            cases.append({"setting": setting, "transport": transport, "provider_key": provider_key,
+                          "route": ledger.gm_route(transport, provider_key),
+                          "mode": ledger.context_mode(environ, transport=transport,
+                                                      provider_key=provider_key),
+                          "setting_mode": ledger.context_mode_setting(environ)})
+    return {"continue_record_text": ledger.CONTINUE_RECORD_TEXT,
+            "defaults": dict(ledger.DEFAULT_CONTEXT_MODE_BY_TRANSPORT), "cases": cases}
+
+
+def narration_hint_cases() -> list[dict[str, Any]]:
+    """`uses_gm_narration_hint` for the routes and ids that do and do not carry the hint."""
+    from sylvia_gm.provider._model_facts import uses_gm_narration_hint
+
+    specs = [
+        {"id": "chatgpt-subscription/gpt-6.1-sol", "provider_key": "chatgpt_subscription"},
+        {"id": "chatgpt-subscription/gpt-6-sol", "provider_key": "chatgpt_subscription"},
+        {"id": "chatgpt-subscription/gpt-5.6-sol", "provider_key": "chatgpt_subscription"},
+        {"id": "chatgpt-subscription/other", "provider_key": "chatgpt_subscription",
+         "provider_model_id": "gpt-6-sol"},
+        {"id": "chatgpt-subscription/gpt-6-sol", "provider_key": "openai"},
+        {"id": "openai/gpt-6-sol", "provider_key": "chatgpt_subscription"},
+        {"id": "chatgpt-subscription/gpt-4o", "provider_key": "chatgpt_subscription"},
+        {"id": "standin/standin-narrator", "provider_key": "standin"},
+        {"id": "gpt-6-sol", "provider_key": "chatgpt_subscription"},
+    ]
+    return [{**spec, "hint": uses_gm_narration_hint(model(base(**spec)))} for spec in specs]
+
+
 async def all_fits() -> list[dict[str, object]]:
     return [await run_fit(case) for case in fit_cases()]
 
@@ -418,6 +459,8 @@ def main() -> None:
         "options": option_cases(),
         "bind": bind_cases(),
         "estimate": estimate_cases(),
+        "narration_hint": narration_hint_cases(),
+        "context_mode": context_mode_cases(),
     }
     text = json.dumps(document, ensure_ascii=False, indent=1, allow_nan=False) + "\n"
     OUTPUT.write_text(text, encoding="utf-8", newline="\n")
