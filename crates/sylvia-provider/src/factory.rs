@@ -1,10 +1,12 @@
 //! `provider/_factory.py`: `ProviderFactory.create(config)`, the provider for one model.
 //!
-//! Chat Completions builds an [`OpenAICompatProvider`] over its own HTTP client, as each Python
-//! provider builds its own `AsyncOpenAI` client (its own connection pool and cookie jar). The
-//! other transports (Responses, Anthropic Messages, Gemini, and the Claude and ChatGPT runtimes)
-//! pass Python's checks and then answer `rust_port_pending` until their adapters are ported.
+//! Chat Completions and Responses build an [`OpenAICompatProvider`], and Anthropic Messages an
+//! [`AnthropicProvider`] (lane 5), each over its own HTTP client, as each Python provider builds
+//! its own SDK client (its own connection pool and cookie jar). The other transports (Gemini,
+//! and the Claude and ChatGPT runtimes) pass Python's checks and then answer `rust_port_pending`
+//! until their adapters are ported.
 
+use crate::anthropic::{AnthropicEnvironment, AnthropicProvider};
 use crate::http::HttpTransport;
 use crate::openai_compat::{BuildError, OpenAICompatProvider, SdkEnvironment};
 use crate::provider::Provider;
@@ -34,12 +36,19 @@ pub type ClientBuilder = dyn Fn(&TimeoutConfig) -> Result<Arc<dyn HttpTransport>
 pub struct DefaultProviderFactory {
     client: Arc<ClientBuilder>,
     environment: SdkEnvironment,
+    anthropic: AnthropicEnvironment,
 }
 
 impl DefaultProviderFactory {
     /// A factory whose providers use clients from `client` and the SDK environment given.
     pub fn new(client: Arc<ClientBuilder>, environment: SdkEnvironment) -> Self {
-        Self { client, environment }
+        Self { client, environment, anthropic: AnthropicEnvironment::default() }
+    }
+
+    /// The same factory with the environment its Anthropic providers read.
+    pub fn with_anthropic_environment(mut self, anthropic: AnthropicEnvironment) -> Self {
+        self.anthropic = anthropic;
+        self
     }
 
     /// The product's factory: a network client per provider, configured from the process
@@ -50,6 +59,7 @@ impl DefaultProviderFactory {
             Ok(Arc::new(crate::net::NetworkTransport::new(settings)?) as Arc<dyn HttpTransport>)
         });
         Self::new(client, SdkEnvironment::from_process())
+            .with_anthropic_environment(AnthropicEnvironment::from_process())
     }
 }
 
@@ -59,14 +69,66 @@ fn pending(transport: &str) -> CodedError {
 
 impl ProviderFactory for DefaultProviderFactory {
     fn create(&self, config: ProviderConfig) -> Result<Arc<dyn Provider>, CodedError> {
-        Ok(Arc::new(self.build(config)?))
+        Ok(match self.build(config)? {
+            BuiltProvider::OpenAICompat(provider) => Arc::new(provider),
+            BuiltProvider::Anthropic(provider) => Arc::new(provider),
+        })
+    }
+}
+
+/// A provider [`DefaultProviderFactory::build`] made, with its own type.
+pub enum BuiltProvider {
+    /// Chat Completions or Responses.
+    OpenAICompat(OpenAICompatProvider),
+    /// Anthropic Messages.
+    Anthropic(AnthropicProvider),
+}
+
+impl BuiltProvider {
+    /// `model_info`.
+    pub fn model(&self) -> &ModelInfo {
+        match self {
+            Self::OpenAICompat(provider) => provider.model(),
+            Self::Anthropic(provider) => provider.model(),
+        }
+    }
+
+    /// The configured base URL.
+    pub fn base_url(&self) -> &str {
+        match self {
+            Self::OpenAICompat(provider) => provider.base_url(),
+            Self::Anthropic(provider) => provider.base_url(),
+        }
+    }
+
+    /// `_retry_config`.
+    pub fn retry_config(&self) -> &RetryConfig {
+        match self {
+            Self::OpenAICompat(provider) => provider.retry_config(),
+            Self::Anthropic(provider) => provider.retry_config(),
+        }
+    }
+
+    /// The timeouts the HTTP client was built with.
+    pub fn timeout_config(&self) -> &TimeoutConfig {
+        match self {
+            Self::OpenAICompat(provider) => provider.timeout_config(),
+            Self::Anthropic(provider) => provider.timeout_config(),
+        }
+    }
+
+    /// `_default_headers`, in their configured order.
+    pub fn default_headers(&self) -> &[(String, String)] {
+        match self {
+            Self::OpenAICompat(provider) => provider.default_headers(),
+            Self::Anthropic(provider) => provider.default_headers(),
+        }
     }
 }
 
 impl DefaultProviderFactory {
-    /// `ProviderFactory.create(config)` with the built provider's own type. Every transport
-    /// whose adapter is ported builds an [`OpenAICompatProvider`] (Chat Completions and Responses, so far).
-    pub fn build(&self, config: ProviderConfig) -> Result<OpenAICompatProvider, CodedError> {
+    /// `ProviderFactory.create(config)` with the built provider's own type.
+    pub fn build(&self, config: ProviderConfig) -> Result<BuiltProvider, CodedError> {
         let model_info = config.models.first().cloned().unwrap_or_else(|| {
             let id = if config.default_model.is_empty() { "unknown" } else { &config.default_model };
             let mut model = ModelInfo::new(id, "Unknown", &config.provider_key, &config.provider_key, "byok");
@@ -119,9 +181,34 @@ impl DefaultProviderFactory {
                     BuildError::Value(message) => value_error(message),
                     BuildError::InvalidUrl(message) => internal("InvalidURL", message),
                 })?;
-                Ok(provider)
+                Ok(BuiltProvider::OpenAICompat(provider))
             }
-            transport::GEMINI_GENERATE_CONTENT | transport::ANTHROPIC_MESSAGES => Err(pending(wire)),
+            // Python also passes `timeout=config.timeout`, which the provider stores and never
+            // reads.
+            transport::ANTHROPIC_MESSAGES => {
+                let timeouts = TimeoutConfig::default();
+                let client = (self.client)(&timeouts).map_err(|error| match error {
+                    ProxyError::Value(message) => value_error(message),
+                    ProxyError::Internal(message) => internal("InvalidURL", message),
+                })?;
+                let provider = AnthropicProvider::new(
+                    &base_url,
+                    &config.api_key,
+                    model_info,
+                    retry_config,
+                    Some(timeouts),
+                    config.max_tokens,
+                    config.default_headers.clone(),
+                    self.anthropic.clone(),
+                    client,
+                )
+                .map_err(|error| match error {
+                    BuildError::Value(message) => value_error(message),
+                    BuildError::InvalidUrl(message) => internal("InvalidURL", message),
+                })?;
+                Ok(BuiltProvider::Anthropic(provider))
+            }
+            transport::GEMINI_GENERATE_CONTENT => Err(pending(wire)),
             other => Err(value_error(format!(
                 "Unknown transport '{other}'. Supported: chat_completions, responses, anthropic_messages"
             ))),

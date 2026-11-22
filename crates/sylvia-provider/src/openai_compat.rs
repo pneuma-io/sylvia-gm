@@ -499,7 +499,7 @@ impl CallFailure {
 
 /// The SDK's reading of a successful non-streaming body: JSON when the content type says so
 /// (a parse failure raises), JSON if it happens to parse otherwise, else the text itself.
-fn sdk_completion_data(response: &HttpResponse, body: &[u8]) -> Result<Json, Incidental> {
+pub(crate) fn sdk_completion_data(response: &HttpResponse, body: &[u8]) -> Result<Json, Incidental> {
     let content_type = response.header("content-type").unwrap_or("*");
     let content_type = content_type.split(';').next().unwrap_or("");
     let text = String::from_utf8_lossy(body);

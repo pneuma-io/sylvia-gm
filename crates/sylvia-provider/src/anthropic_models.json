@@ -1,0 +1,1632 @@
+{
+ "anthropic": "0.122.0",
+ "pydantic": "2.13.4",
+ "python": "3.12.11",
+ "message": {
+  "model": "message.Message"
+ },
+ "stream_event": {
+  "union": {
+   "message_start": "raw_message_start_event.RawMessageStartEvent",
+   "message_delta": "raw_message_delta_event.RawMessageDeltaEvent",
+   "message_stop": "raw_message_stop_event.RawMessageStopEvent",
+   "content_block_start": "raw_content_block_start_event.RawContentBlockStartEvent",
+   "content_block_delta": "raw_content_block_delta_event.RawContentBlockDeltaEvent",
+   "content_block_stop": "raw_content_block_stop_event.RawContentBlockStopEvent"
+  },
+  "first": "raw_message_start_event.RawMessageStartEvent"
+ },
+ "content_block": {
+  "union": {
+   "text": "text_block.TextBlock",
+   "thinking": "thinking_block.ThinkingBlock",
+   "redacted_thinking": "redacted_thinking_block.RedactedThinkingBlock",
+   "tool_use": "tool_use_block.ToolUseBlock",
+   "server_tool_use": "server_tool_use_block.ServerToolUseBlock",
+   "web_search_tool_result": "web_search_tool_result_block.WebSearchToolResultBlock",
+   "web_fetch_tool_result": "web_fetch_tool_result_block.WebFetchToolResultBlock",
+   "code_execution_tool_result": "code_execution_tool_result_block.CodeExecutionToolResultBlock",
+   "bash_code_execution_tool_result": "bash_code_execution_tool_result_block.BashCodeExecutionToolResultBlock",
+   "text_editor_code_execution_tool_result": "text_editor_code_execution_tool_result_block.TextEditorCodeExecutionToolResultBlock",
+   "tool_search_tool_result": "tool_search_tool_result_block.ToolSearchToolResultBlock",
+   "container_upload": "container_upload_block.ContainerUploadBlock"
+  },
+  "first": "text_block.TextBlock"
+ },
+ "models": {
+  "base64_pdf_source.Base64PDFSource": [
+   [
+    "data",
+    "data",
+    "any",
+    null
+   ],
+   [
+    "media_type",
+    "media_type",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "bash_code_execution_output_block.BashCodeExecutionOutputBlock": [
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "bash_code_execution_result_block.BashCodeExecutionResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "model": "bash_code_execution_output_block.BashCodeExecutionOutputBlock"
+     }
+    },
+    null
+   ],
+   [
+    "return_code",
+    "return_code",
+    "any",
+    null
+   ],
+   [
+    "stderr",
+    "stderr",
+    "any",
+    null
+   ],
+   [
+    "stdout",
+    "stdout",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "bash_code_execution_tool_result_block.BashCodeExecutionToolResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "union": {
+      "bash_code_execution_tool_result_error": "bash_code_execution_tool_result_error.BashCodeExecutionToolResultError",
+      "bash_code_execution_result": "bash_code_execution_result_block.BashCodeExecutionResultBlock"
+     },
+     "first": "bash_code_execution_tool_result_error.BashCodeExecutionToolResultError"
+    },
+    null
+   ],
+   [
+    "tool_use_id",
+    "tool_use_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "bash_code_execution_tool_result_error.BashCodeExecutionToolResultError": [
+   [
+    "error_code",
+    "error_code",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "cache_creation.CacheCreation": [
+   [
+    "ephemeral_1h_input_tokens",
+    "ephemeral_1h_input_tokens",
+    "any",
+    null
+   ],
+   [
+    "ephemeral_5m_input_tokens",
+    "ephemeral_5m_input_tokens",
+    "any",
+    null
+   ]
+  ],
+  "citation_char_location.CitationCharLocation": [
+   [
+    "cited_text",
+    "cited_text",
+    "any",
+    null
+   ],
+   [
+    "document_index",
+    "document_index",
+    "any",
+    null
+   ],
+   [
+    "document_title",
+    "document_title",
+    "any",
+    null
+   ],
+   [
+    "end_char_index",
+    "end_char_index",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "start_char_index",
+    "start_char_index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "citation_content_block_location.CitationContentBlockLocation": [
+   [
+    "cited_text",
+    "cited_text",
+    "any",
+    null
+   ],
+   [
+    "document_index",
+    "document_index",
+    "any",
+    null
+   ],
+   [
+    "document_title",
+    "document_title",
+    "any",
+    null
+   ],
+   [
+    "end_block_index",
+    "end_block_index",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "start_block_index",
+    "start_block_index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "citation_page_location.CitationPageLocation": [
+   [
+    "cited_text",
+    "cited_text",
+    "any",
+    null
+   ],
+   [
+    "document_index",
+    "document_index",
+    "any",
+    null
+   ],
+   [
+    "document_title",
+    "document_title",
+    "any",
+    null
+   ],
+   [
+    "end_page_number",
+    "end_page_number",
+    "any",
+    null
+   ],
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "start_page_number",
+    "start_page_number",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "citations_config.CitationsConfig": [
+   [
+    "enabled",
+    "enabled",
+    "any",
+    null
+   ]
+  ],
+  "citations_delta.CitationsDelta": [
+   [
+    "citation",
+    "citation",
+    {
+     "union": {
+      "char_location": "citation_char_location.CitationCharLocation",
+      "page_location": "citation_page_location.CitationPageLocation",
+      "content_block_location": "citation_content_block_location.CitationContentBlockLocation",
+      "web_search_result_location": "citations_web_search_result_location.CitationsWebSearchResultLocation",
+      "search_result_location": "citations_search_result_location.CitationsSearchResultLocation"
+     },
+     "first": "citation_char_location.CitationCharLocation"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "citations_search_result_location.CitationsSearchResultLocation": [
+   [
+    "cited_text",
+    "cited_text",
+    "any",
+    null
+   ],
+   [
+    "end_block_index",
+    "end_block_index",
+    "any",
+    null
+   ],
+   [
+    "search_result_index",
+    "search_result_index",
+    "any",
+    null
+   ],
+   [
+    "source",
+    "source",
+    "any",
+    null
+   ],
+   [
+    "start_block_index",
+    "start_block_index",
+    "any",
+    null
+   ],
+   [
+    "title",
+    "title",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "citations_web_search_result_location.CitationsWebSearchResultLocation": [
+   [
+    "cited_text",
+    "cited_text",
+    "any",
+    null
+   ],
+   [
+    "encrypted_index",
+    "encrypted_index",
+    "any",
+    null
+   ],
+   [
+    "title",
+    "title",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "code_execution_output_block.CodeExecutionOutputBlock": [
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "code_execution_result_block.CodeExecutionResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "model": "code_execution_output_block.CodeExecutionOutputBlock"
+     }
+    },
+    null
+   ],
+   [
+    "return_code",
+    "return_code",
+    "any",
+    null
+   ],
+   [
+    "stderr",
+    "stderr",
+    "any",
+    null
+   ],
+   [
+    "stdout",
+    "stdout",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "code_execution_tool_result_block.CodeExecutionToolResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "union": {
+      "code_execution_tool_result_error": "code_execution_tool_result_error.CodeExecutionToolResultError",
+      "code_execution_result": "code_execution_result_block.CodeExecutionResultBlock",
+      "encrypted_code_execution_result": "encrypted_code_execution_result_block.EncryptedCodeExecutionResultBlock"
+     },
+     "first": "code_execution_tool_result_error.CodeExecutionToolResultError"
+    },
+    null
+   ],
+   [
+    "tool_use_id",
+    "tool_use_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "code_execution_tool_result_error.CodeExecutionToolResultError": [
+   [
+    "error_code",
+    "error_code",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "container.Container": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "expires_at",
+    "expires_at",
+    "any",
+    null
+   ]
+  ],
+  "container_upload_block.ContainerUploadBlock": [
+   [
+    "file_id",
+    "file_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "direct_caller.DirectCaller": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "document_block.DocumentBlock": [
+   [
+    "citations",
+    "citations",
+    {
+     "model": "citations_config.CitationsConfig"
+    },
+    null
+   ],
+   [
+    "source",
+    "source",
+    {
+     "union": {
+      "base64": "base64_pdf_source.Base64PDFSource",
+      "text": "plain_text_source.PlainTextSource"
+     },
+     "first": "base64_pdf_source.Base64PDFSource"
+    },
+    null
+   ],
+   [
+    "title",
+    "title",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "encrypted_code_execution_result_block.EncryptedCodeExecutionResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "model": "code_execution_output_block.CodeExecutionOutputBlock"
+     }
+    },
+    null
+   ],
+   [
+    "encrypted_stdout",
+    "encrypted_stdout",
+    "any",
+    null
+   ],
+   [
+    "return_code",
+    "return_code",
+    "any",
+    null
+   ],
+   [
+    "stderr",
+    "stderr",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "input_json_delta.InputJSONDelta": [
+   [
+    "partial_json",
+    "partial_json",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "message.Message": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "container",
+    "container",
+    {
+     "model": "container.Container"
+    },
+    null
+   ],
+   [
+    "content",
+    "content",
+    {
+     "list": {
+      "union": {
+       "text": "text_block.TextBlock",
+       "thinking": "thinking_block.ThinkingBlock",
+       "redacted_thinking": "redacted_thinking_block.RedactedThinkingBlock",
+       "tool_use": "tool_use_block.ToolUseBlock",
+       "server_tool_use": "server_tool_use_block.ServerToolUseBlock",
+       "web_search_tool_result": "web_search_tool_result_block.WebSearchToolResultBlock",
+       "web_fetch_tool_result": "web_fetch_tool_result_block.WebFetchToolResultBlock",
+       "code_execution_tool_result": "code_execution_tool_result_block.CodeExecutionToolResultBlock",
+       "bash_code_execution_tool_result": "bash_code_execution_tool_result_block.BashCodeExecutionToolResultBlock",
+       "text_editor_code_execution_tool_result": "text_editor_code_execution_tool_result_block.TextEditorCodeExecutionToolResultBlock",
+       "tool_search_tool_result": "tool_search_tool_result_block.ToolSearchToolResultBlock",
+       "container_upload": "container_upload_block.ContainerUploadBlock"
+      },
+      "first": "text_block.TextBlock"
+     }
+    },
+    null
+   ],
+   [
+    "model",
+    "model",
+    {
+     "either": [
+      "any",
+      "any"
+     ]
+    },
+    null
+   ],
+   [
+    "role",
+    "role",
+    "any",
+    null
+   ],
+   [
+    "stop_details",
+    "stop_details",
+    {
+     "model": "refusal_stop_details.RefusalStopDetails"
+    },
+    null
+   ],
+   [
+    "stop_reason",
+    "stop_reason",
+    "any",
+    null
+   ],
+   [
+    "stop_sequence",
+    "stop_sequence",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "usage",
+    "usage",
+    {
+     "model": "usage.Usage"
+    },
+    null
+   ]
+  ],
+  "message_delta_usage.MessageDeltaUsage": [
+   [
+    "cache_creation_input_tokens",
+    "cache_creation_input_tokens",
+    "any",
+    null
+   ],
+   [
+    "cache_read_input_tokens",
+    "cache_read_input_tokens",
+    "any",
+    null
+   ],
+   [
+    "input_tokens",
+    "input_tokens",
+    "any",
+    null
+   ],
+   [
+    "output_tokens",
+    "output_tokens",
+    "any",
+    null
+   ],
+   [
+    "output_tokens_details",
+    "output_tokens_details",
+    {
+     "model": "output_tokens_details.OutputTokensDetails"
+    },
+    null
+   ],
+   [
+    "server_tool_use",
+    "server_tool_use",
+    {
+     "model": "server_tool_usage.ServerToolUsage"
+    },
+    null
+   ]
+  ],
+  "output_tokens_details.OutputTokensDetails": [
+   [
+    "thinking_tokens",
+    "thinking_tokens",
+    "any",
+    null
+   ]
+  ],
+  "plain_text_source.PlainTextSource": [
+   [
+    "data",
+    "data",
+    "any",
+    null
+   ],
+   [
+    "media_type",
+    "media_type",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "raw_content_block_delta_event.RawContentBlockDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    {
+     "union": {
+      "text_delta": "text_delta.TextDelta",
+      "input_json_delta": "input_json_delta.InputJSONDelta",
+      "citations_delta": "citations_delta.CitationsDelta",
+      "thinking_delta": "thinking_delta.ThinkingDelta",
+      "signature_delta": "signature_delta.SignatureDelta"
+     },
+     "first": "text_delta.TextDelta"
+    },
+    null
+   ],
+   [
+    "index",
+    "index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "raw_content_block_start_event.RawContentBlockStartEvent": [
+   [
+    "content_block",
+    "content_block",
+    {
+     "union": {
+      "text": "text_block.TextBlock",
+      "thinking": "thinking_block.ThinkingBlock",
+      "redacted_thinking": "redacted_thinking_block.RedactedThinkingBlock",
+      "tool_use": "tool_use_block.ToolUseBlock",
+      "server_tool_use": "server_tool_use_block.ServerToolUseBlock",
+      "web_search_tool_result": "web_search_tool_result_block.WebSearchToolResultBlock",
+      "web_fetch_tool_result": "web_fetch_tool_result_block.WebFetchToolResultBlock",
+      "code_execution_tool_result": "code_execution_tool_result_block.CodeExecutionToolResultBlock",
+      "bash_code_execution_tool_result": "bash_code_execution_tool_result_block.BashCodeExecutionToolResultBlock",
+      "text_editor_code_execution_tool_result": "text_editor_code_execution_tool_result_block.TextEditorCodeExecutionToolResultBlock",
+      "tool_search_tool_result": "tool_search_tool_result_block.ToolSearchToolResultBlock",
+      "container_upload": "container_upload_block.ContainerUploadBlock"
+     },
+     "first": "text_block.TextBlock"
+    },
+    null
+   ],
+   [
+    "index",
+    "index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "raw_content_block_stop_event.RawContentBlockStopEvent": [
+   [
+    "index",
+    "index",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "raw_message_delta_event.Delta": [
+   [
+    "container",
+    "container",
+    {
+     "model": "container.Container"
+    },
+    null
+   ],
+   [
+    "stop_details",
+    "stop_details",
+    {
+     "model": "refusal_stop_details.RefusalStopDetails"
+    },
+    null
+   ],
+   [
+    "stop_reason",
+    "stop_reason",
+    "any",
+    null
+   ],
+   [
+    "stop_sequence",
+    "stop_sequence",
+    "any",
+    null
+   ]
+  ],
+  "raw_message_delta_event.RawMessageDeltaEvent": [
+   [
+    "delta",
+    "delta",
+    {
+     "model": "raw_message_delta_event.Delta"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "usage",
+    "usage",
+    {
+     "model": "message_delta_usage.MessageDeltaUsage"
+    },
+    null
+   ]
+  ],
+  "raw_message_start_event.RawMessageStartEvent": [
+   [
+    "message",
+    "message",
+    {
+     "model": "message.Message"
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "raw_message_stop_event.RawMessageStopEvent": [
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "redacted_thinking_block.RedactedThinkingBlock": [
+   [
+    "data",
+    "data",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "refusal_stop_details.RefusalStopDetails": [
+   [
+    "category",
+    "category",
+    "any",
+    null
+   ],
+   [
+    "explanation",
+    "explanation",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "server_tool_caller.ServerToolCaller": [
+   [
+    "tool_id",
+    "tool_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "server_tool_caller_20260120.ServerToolCaller20260120": [
+   [
+    "tool_id",
+    "tool_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "server_tool_usage.ServerToolUsage": [
+   [
+    "web_fetch_requests",
+    "web_fetch_requests",
+    "any",
+    null
+   ],
+   [
+    "web_search_requests",
+    "web_search_requests",
+    "any",
+    null
+   ]
+  ],
+  "server_tool_use_block.ServerToolUseBlock": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "direct_caller.DirectCaller",
+      "code_execution_20250825": "server_tool_caller.ServerToolCaller",
+      "code_execution_20260120": "server_tool_caller_20260120.ServerToolCaller20260120"
+     },
+     "first": "direct_caller.DirectCaller"
+    },
+    null
+   ],
+   [
+    "input",
+    "input",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "signature_delta.SignatureDelta": [
+   [
+    "signature",
+    "signature",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_block.TextBlock": [
+   [
+    "citations",
+    "citations",
+    {
+     "list": {
+      "union": {
+       "char_location": "citation_char_location.CitationCharLocation",
+       "page_location": "citation_page_location.CitationPageLocation",
+       "content_block_location": "citation_content_block_location.CitationContentBlockLocation",
+       "web_search_result_location": "citations_web_search_result_location.CitationsWebSearchResultLocation",
+       "search_result_location": "citations_search_result_location.CitationsSearchResultLocation"
+      },
+      "first": "citation_char_location.CitationCharLocation"
+     }
+    },
+    null
+   ],
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_delta.TextDelta": [
+   [
+    "text",
+    "text",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_editor_code_execution_create_result_block.TextEditorCodeExecutionCreateResultBlock": [
+   [
+    "is_file_update",
+    "is_file_update",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_editor_code_execution_str_replace_result_block.TextEditorCodeExecutionStrReplaceResultBlock": [
+   [
+    "lines",
+    "lines",
+    {
+     "list": "any"
+    },
+    null
+   ],
+   [
+    "new_lines",
+    "new_lines",
+    "any",
+    null
+   ],
+   [
+    "new_start",
+    "new_start",
+    "any",
+    null
+   ],
+   [
+    "old_lines",
+    "old_lines",
+    "any",
+    null
+   ],
+   [
+    "old_start",
+    "old_start",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_editor_code_execution_tool_result_block.TextEditorCodeExecutionToolResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "union": {
+      "text_editor_code_execution_tool_result_error": "text_editor_code_execution_tool_result_error.TextEditorCodeExecutionToolResultError",
+      "text_editor_code_execution_view_result": "text_editor_code_execution_view_result_block.TextEditorCodeExecutionViewResultBlock",
+      "text_editor_code_execution_create_result": "text_editor_code_execution_create_result_block.TextEditorCodeExecutionCreateResultBlock",
+      "text_editor_code_execution_str_replace_result": "text_editor_code_execution_str_replace_result_block.TextEditorCodeExecutionStrReplaceResultBlock"
+     },
+     "first": "text_editor_code_execution_tool_result_error.TextEditorCodeExecutionToolResultError"
+    },
+    null
+   ],
+   [
+    "tool_use_id",
+    "tool_use_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_editor_code_execution_tool_result_error.TextEditorCodeExecutionToolResultError": [
+   [
+    "error_code",
+    "error_code",
+    "any",
+    null
+   ],
+   [
+    "error_message",
+    "error_message",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "text_editor_code_execution_view_result_block.TextEditorCodeExecutionViewResultBlock": [
+   [
+    "content",
+    "content",
+    "any",
+    null
+   ],
+   [
+    "file_type",
+    "file_type",
+    "any",
+    null
+   ],
+   [
+    "num_lines",
+    "num_lines",
+    "any",
+    null
+   ],
+   [
+    "start_line",
+    "start_line",
+    "any",
+    null
+   ],
+   [
+    "total_lines",
+    "total_lines",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "thinking_block.ThinkingBlock": [
+   [
+    "signature",
+    "signature",
+    "any",
+    null
+   ],
+   [
+    "thinking",
+    "thinking",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "thinking_delta.ThinkingDelta": [
+   [
+    "thinking",
+    "thinking",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_reference_block.ToolReferenceBlock": [
+   [
+    "tool_name",
+    "tool_name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_search_tool_result_block.ToolSearchToolResultBlock": [
+   [
+    "content",
+    "content",
+    {
+     "union": {
+      "tool_search_tool_result_error": "tool_search_tool_result_error.ToolSearchToolResultError",
+      "tool_search_tool_search_result": "tool_search_tool_search_result_block.ToolSearchToolSearchResultBlock"
+     },
+     "first": "tool_search_tool_result_error.ToolSearchToolResultError"
+    },
+    null
+   ],
+   [
+    "tool_use_id",
+    "tool_use_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_search_tool_result_error.ToolSearchToolResultError": [
+   [
+    "error_code",
+    "error_code",
+    "any",
+    null
+   ],
+   [
+    "error_message",
+    "error_message",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_search_tool_search_result_block.ToolSearchToolSearchResultBlock": [
+   [
+    "tool_references",
+    "tool_references",
+    {
+     "list": {
+      "model": "tool_reference_block.ToolReferenceBlock"
+     }
+    },
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "tool_use_block.ToolUseBlock": [
+   [
+    "id",
+    "id",
+    "any",
+    null
+   ],
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "direct_caller.DirectCaller",
+      "code_execution_20250825": "server_tool_caller.ServerToolCaller",
+      "code_execution_20260120": "server_tool_caller_20260120.ServerToolCaller20260120"
+     },
+     "first": "direct_caller.DirectCaller"
+    },
+    null
+   ],
+   [
+    "input",
+    "input",
+    {
+     "dict": "any"
+    },
+    null
+   ],
+   [
+    "name",
+    "name",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "usage.Usage": [
+   [
+    "cache_creation",
+    "cache_creation",
+    {
+     "model": "cache_creation.CacheCreation"
+    },
+    null
+   ],
+   [
+    "cache_creation_input_tokens",
+    "cache_creation_input_tokens",
+    "any",
+    null
+   ],
+   [
+    "cache_read_input_tokens",
+    "cache_read_input_tokens",
+    "any",
+    null
+   ],
+   [
+    "inference_geo",
+    "inference_geo",
+    "any",
+    null
+   ],
+   [
+    "input_tokens",
+    "input_tokens",
+    "any",
+    null
+   ],
+   [
+    "output_tokens",
+    "output_tokens",
+    "any",
+    null
+   ],
+   [
+    "output_tokens_details",
+    "output_tokens_details",
+    {
+     "model": "output_tokens_details.OutputTokensDetails"
+    },
+    null
+   ],
+   [
+    "server_tool_use",
+    "server_tool_use",
+    {
+     "model": "server_tool_usage.ServerToolUsage"
+    },
+    null
+   ],
+   [
+    "service_tier",
+    "service_tier",
+    "any",
+    null
+   ]
+  ],
+  "web_fetch_block.WebFetchBlock": [
+   [
+    "content",
+    "content",
+    {
+     "model": "document_block.DocumentBlock"
+    },
+    null
+   ],
+   [
+    "retrieved_at",
+    "retrieved_at",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "web_fetch_tool_result_block.WebFetchToolResultBlock": [
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "direct_caller.DirectCaller",
+      "code_execution_20250825": "server_tool_caller.ServerToolCaller",
+      "code_execution_20260120": "server_tool_caller_20260120.ServerToolCaller20260120"
+     },
+     "first": "direct_caller.DirectCaller"
+    },
+    null
+   ],
+   [
+    "content",
+    "content",
+    {
+     "union": {
+      "web_fetch_tool_result_error": "web_fetch_tool_result_error_block.WebFetchToolResultErrorBlock",
+      "web_fetch_result": "web_fetch_block.WebFetchBlock"
+     },
+     "first": "web_fetch_tool_result_error_block.WebFetchToolResultErrorBlock"
+    },
+    null
+   ],
+   [
+    "tool_use_id",
+    "tool_use_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "web_fetch_tool_result_error_block.WebFetchToolResultErrorBlock": [
+   [
+    "error_code",
+    "error_code",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "web_search_result_block.WebSearchResultBlock": [
+   [
+    "encrypted_content",
+    "encrypted_content",
+    "any",
+    null
+   ],
+   [
+    "page_age",
+    "page_age",
+    "any",
+    null
+   ],
+   [
+    "title",
+    "title",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ],
+   [
+    "url",
+    "url",
+    "any",
+    null
+   ]
+  ],
+  "web_search_tool_result_block.WebSearchToolResultBlock": [
+   [
+    "caller",
+    "caller",
+    {
+     "union": {
+      "direct": "direct_caller.DirectCaller",
+      "code_execution_20250825": "server_tool_caller.ServerToolCaller",
+      "code_execution_20260120": "server_tool_caller_20260120.ServerToolCaller20260120"
+     },
+     "first": "direct_caller.DirectCaller"
+    },
+    null
+   ],
+   [
+    "content",
+    "content",
+    {
+     "either": [
+      {
+       "model": "web_search_tool_result_error.WebSearchToolResultError"
+      },
+      {
+       "list": {
+        "model": "web_search_result_block.WebSearchResultBlock"
+       }
+      }
+     ]
+    },
+    null
+   ],
+   [
+    "tool_use_id",
+    "tool_use_id",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ],
+  "web_search_tool_result_error.WebSearchToolResultError": [
+   [
+    "error_code",
+    "error_code",
+    "any",
+    null
+   ],
+   [
+    "type",
+    "type",
+    "any",
+    null
+   ]
+  ]
+ }
+}

@@ -5,7 +5,7 @@
 
 use serde_json::{json, Value as J};
 use std::sync::Arc;
-use sylvia_provider::factory::{ClientBuilder, DefaultProviderFactory, PORT_PENDING};
+use sylvia_provider::factory::{BuiltProvider, ClientBuilder, DefaultProviderFactory, PORT_PENDING};
 use sylvia_provider::http::{HttpTransport, ScriptedTransport};
 use sylvia_provider::openai_compat::SdkEnvironment;
 use sylvia_provider::types::{ModelInfo, ProviderConfig, RetryConfig, TimeoutConfig};
@@ -90,6 +90,9 @@ fn the_factory_builds_what_python_builds() {
     for case in vectors()["cases"].as_array().unwrap() {
         let built = factory.build(config(&case["config"]));
         let actual = match (&built, case.get("value")) {
+            // Python's stand-in records only the kind of an Anthropic provider; its own vectors
+            // (`anthropic_vectors.rs`) check what it sends.
+            (Ok(BuiltProvider::Anthropic(_)), Some(_)) => json!({"value": {"kind": "AnthropicProvider"}}),
             (Ok(provider), Some(expected)) => {
                 let model = provider.model();
                 json!({"value": {
@@ -104,9 +107,9 @@ fn the_factory_builds_what_python_builds() {
                 }})
             }
             // A transport whose adapter is not ported answers `rust_port_pending` where Python
-            // built its provider: one of the native providers (Responses is ported).
+            // built its provider: one of the native providers (Responses and Anthropic are ported).
             (Err(error), Some(expected)) if error.code == PORT_PENDING => {
-                let native = ["ClaudeProvider", "ChatGPTProvider", "GeminiProvider", "AnthropicProvider"];
+                let native = ["ClaudeProvider", "ChatGPTProvider", "GeminiProvider"];
                 if native.contains(&expected["kind"].as_str().unwrap_or("")) {
                     json!({"value": expected})
                 } else {
