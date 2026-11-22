@@ -7,6 +7,9 @@
 use crate::dispatch::DispatchContext;
 use std::path::PathBuf;
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_provider::config::discovery::{
+    detect_local_providers, discover_provider_models, network_clients, Discover,
+};
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::config::protection::PlatformSeal;
 use sylvia_provider::config::provider_settings::{
@@ -16,6 +19,7 @@ use sylvia_provider::config::provider_writes::{
     remove_provider_settings, save_provider_settings, set_chat_defaults_settings, set_default_model_settings,
     SaveProvider,
 };
+use sylvia_provider::config::validation::{validate_provider_model, Validate};
 use sylvia_provider::config::{data_from_json, default_config_path, reply_json, ConfigFailure, Data};
 use sylvia_provider::pyobj::py_str;
 use sylvia_provider::reasoning::{reasoning_values, select_reasoning, suggested_from_data, Advertised};
@@ -83,6 +87,61 @@ pub async fn handle_model_choices(ctx: &DispatchContext, _params: &JsonMap) -> C
 pub async fn handle_provider_settings(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
     let path = config_path(ctx);
     reply(&with_sources(|sources| provider_settings(sources, &path))?)
+}
+
+/// `handle_detect_local_providers`: probe the fixed loopback presets.
+pub async fn handle_detect_local_providers(_ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    reply(&detect_local_providers(network_clients().as_ref()).await.map_err(config_error)?)
+}
+
+/// `handle_discover_provider_models`: one provider's model catalogue, searched and paged.
+pub async fn handle_discover_provider_models(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let default_config = default_config_path();
+    let env = Environment::current();
+    let sources = ConfigSources { default_config: &default_config, seal: &PlatformSeal, env: &env };
+    let mut request = Discover {
+        provider_id: param(params, "provider_id")?,
+        preset_id: param(params, "preset_id")?,
+        base_url: param(params, "base_url")?,
+        credential: param(params, "credential")?,
+        headers: param(params, "headers")?,
+        query: param(params, "query")?,
+        ..Discover::default()
+    };
+    // `params.get("offset", 0)` and `params.get("limit", 100)`: only a missing key takes the default.
+    if params.contains_key("offset") {
+        request.offset = param(params, "offset")?;
+    }
+    if params.contains_key("limit") {
+        request.limit = param(params, "limit")?;
+    }
+    let path = config_path(ctx);
+    let found =
+        discover_provider_models(sources, &path, &request, network_clients().as_ref(), &now_isoformat)
+            .await
+            .map_err(config_error)?;
+    reply(&found)
+}
+
+/// `handle_validate_provider_model`: one bounded agent-compatibility probe.
+pub async fn handle_validate_provider_model(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let default_config = default_config_path();
+    let env = Environment::current();
+    let sources = ConfigSources { default_config: &default_config, seal: &PlatformSeal, env: &env };
+    let request = Validate {
+        provider_id: param(params, "provider_id")?,
+        preset_id: param(params, "preset_id")?,
+        base_url: param(params, "base_url")?,
+        credential: param(params, "credential")?,
+        model_id: param(params, "model_id")?,
+        transport: param(params, "transport")?,
+        headers: param(params, "headers")?,
+    };
+    let path = config_path(ctx);
+    let report = validate_provider_model(sources, &path, &request, network_clients().as_ref())
+        .await
+        .map_err(config_error)?;
+    reply(&report)
 }
 
 /// `handle_save_provider_settings`: save one model, then reload the provider resolver.

@@ -9,11 +9,16 @@
 //! exact schema identity check. The stored-content verifiers and transaction families follow.
 
 pub mod actions;
+pub mod archive_validation;
 pub mod authority;
 pub mod backup;
+pub mod builder_launch_migration;
+pub mod builder_sources;
+pub mod campaign_archive;
 pub mod campaigns;
 pub mod continuity;
 pub mod error;
+pub mod export;
 pub mod f5;
 pub mod guided;
 pub mod guided_advance;
@@ -22,12 +27,16 @@ pub mod guided_start;
 pub mod handle;
 pub mod lanes;
 pub mod launch;
+pub mod lifecycle;
 pub mod owner_lock;
 mod owner_sessions;
 pub mod package_reads;
 pub mod packages;
 mod participant_history;
+pub mod private_records;
+pub mod purge;
 pub mod pytext;
+pub mod recovery;
 pub mod safe_file;
 pub mod schema;
 pub mod sequel;

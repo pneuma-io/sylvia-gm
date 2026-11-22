@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!-- Test binaries only (build.rs): common controls 6, which has the task dialog. The packaged
-     helper executable's real manifest belongs to packaging. -->
+<!-- Test binaries only (build.rs): common controls 6, which has the task dialog. The
+     executables embed sylvia-gm-owner.manifest instead. -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
   <dependency>
     <dependentAssembly>

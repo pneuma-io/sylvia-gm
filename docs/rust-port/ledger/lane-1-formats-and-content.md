@@ -16,7 +16,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/builder_session_migration.py` | 136 | `sylvia-app::builder_session_migration` | pending | |
 | `src/sylvia_gm/application/builder_source_selection.py` | 123 | `sylvia-app::builder_source_selection` | pending | |
 | `src/sylvia_gm/application/bundled_campaign_plans.py` | 271 | `sylvia-app::bundled_campaign_plans` | pending | |
-| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`). `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` wait on `plan_snapshot.py`, `bundled_campaign_content_catalog` on `bundled_campaign_plans.py` |
+| `src/sylvia_gm/application/bundled_packages.py` | 510 | `sylvia-app::bundled_packages` | in progress | Archives, versions, Rift authority, participant declaration, interview questions and Builder sources ported (`bundled_vectors`); `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` in `plan_snapshot_vectors`. `bundled_campaign_content_catalog` waits on `bundled_campaign_plans.py` |
 | `src/sylvia_gm/application/bundled_starter_characters.py` | 150 | `sylvia-app::bundled_starter_characters` | pending | |
 | `src/sylvia_gm/application/campaign_library_selection.py` | 668 | `sylvia-app::campaign_library_selection` | pending | |
 | `src/sylvia_gm/application/campaign_plan_sources.py` | 192 | `sylvia-app::campaign_plan_sources` | pending | |
@@ -27,17 +27,17 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/compatible_character_copy.py` | 171 | `sylvia-app::compatible_character_copy` | pending | |
 | `src/sylvia_gm/application/import_repair.py` | 621 | `sylvia-app::import_repair` | pending | |
 | `src/sylvia_gm/application/import_repair_sessions.py` | 147 | `sylvia-app::import_repair_sessions` | pending | |
-| `src/sylvia_gm/application/initial_character_state.py` | 532 | `sylvia-app::initial_character_state` | pending | |
+| `src/sylvia_gm/application/initial_character_state.py` | 532 | `sylvia-app::initial_character_state` | in progress | `validate_initial_character_contract` and `initial_character_input_schema` ported (`package_library_vectors` contracts). The materialize and verify functions (`materialize_initial_character_state`, `verify_initial_character_state`, `initialize_campaign_character_state`, `verify_placed_character`) wait on lane 2's effect executor, through `prepare_character_rules` and `verify_character_rules` |
 | `src/sylvia_gm/application/interview_content.py` | 152 | `sylvia-app::interview_content` | in progress | `resolve_interview_content`: the Ruleset-only and installed-Setting paths are exact (`interview_content_vectors`). These branches answer `rust_port_pending`: a Plan selection stops at `bundled_campaign_plans.bundled_plan` (waits on `plan_snapshot`, that is lane 2's `tactical_grid`); installing the bundled Rift closure stops at `install_package_archive` (waits on lane 2's `package_runtime`); a bundled Setting stops at `bundled_campaign_plans.bundled_setting_snapshot` (waits on `plan_snapshot`). The owner reads are the `InterviewOwner` trait, for lane 3's store to implement |
-| `src/sylvia_gm/application/library_sources.py` | 223 | `sylvia-app::library_sources` | pending | |
+| `src/sylvia_gm/application/library_sources.py` | 223 | `sylvia-app::library_sources` | ported | `LibrarySourceReader` over the `LibraryOwner` trait (`library_source_vectors`), implemented for `AuthorityStore` with lane 3's synchronous reads |
 | `src/sylvia_gm/application/network_graph.py` | 433 | `sylvia-app::network_graph` | ported | `app_leaves_vectors` |
-| `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | pending | |
+| `src/sylvia_gm/application/package_library.py` | 271 | `sylvia-app::package_library` | ported | `package_library_vectors`: installs through a recording store (repository archives under 1 MB and two SRD-carrying ones, and archives built from the small Ruleset source), predicates, admissions, surfaces, rebinds and migrations. `PackageStorePort` is implemented for `sylvia_store::AuthorityStore` |
 | `src/sylvia_gm/application/package_materialization.py` | 260 | `sylvia-app::package_materialization` | ported | `bundled_vectors` (every bundled archive byte for byte, synthetic drafts); ZIP bytes through `package_archive::zipfile_write` |
 | `src/sylvia_gm/application/plan_bundle.py` | 164 | `sylvia-app::plan_bundle` | pending | |
-| `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | pending | |
-| `src/sylvia_gm/application/plan_snapshot.py` | 113 | `sylvia-app::plan_snapshot` | pending | |
-| `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | pending | |
-| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads; the rest of `plan_spatial_admission.py` waits on lane 2's `tactical_grid` and `spatial` |
+| `src/sylvia_gm/application/plan_network_admission.py` | 109 | `sylvia-app::plan_network_admission` | ported | `plan_admission_vectors`. Uses lane 2's `resolve_surface_source` and lane 1's `network_graph` projection |
+| `src/sylvia_gm/application/plan_snapshot.py` | 113 | `sylvia-app::plan_snapshot` | in progress | `plan_snapshot_vectors`, with the `lru_cache` of snapshot facts. `retained_plan_snapshot` takes a `PlanSnapshotOwner`; its `AuthorityStore` impl waits on lane 3's `export_package_candidate` |
+| `src/sylvia_gm/application/plan_spatial_admission.py` | 161 | `sylvia-app::plan_spatial_admission` | ported | `plan_admission_vectors`. Uses lane 2's `resolve_surface_source` and `admit_spatial_scene`; `_plan_state` is `plan_state_admission::plan_state` |
+| `src/sylvia_gm/application/plan_state_admission.py` | 124 | `sylvia-app::plan_state_admission` | ported | `plan_state_vectors`. Also holds `plan_spatial_admission._plan_state`, which it reads |
 | `src/sylvia_gm/application/ready_campaigns.py` | 504 | `sylvia-app::ready_campaigns` | pending | |
 | `src/sylvia_gm/application/reference_text.py` | 93 | `sylvia-app::reference_text` | pending | |
 | `src/sylvia_gm/application/reusable_library_deletion.py` | 88 | `sylvia-app::reusable_library_deletion` | ported | `character_profile_vectors` (storage scripts: links, tampering, delete and retry) |
@@ -49,7 +49,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/application/srd_lite_character_compatibility.py` | 61 | `sylvia-app::srd_lite_character_compatibility` | ported | `srd_lite_compat_vectors` (the bundled player declaration stands in for the lost 0.3.0 one) |
 | `src/sylvia_gm/application/srd_lite_weapon_set_migration.py` | 58 | `sylvia-app::srd_lite_weapon_set_migration` | ported | `app_leaves_vectors` |
 | `src/sylvia_gm/builder/__init__.py` | 46 | - | ported | Re-exports only: `PathGuardrail` and `GuardrailBlockedError` are `sylvia-app::path_guardrail`, `build_builder_system_prompt` is `sylvia-app::builder_prompts`; `BuilderLoopError`, `BuilderRunner` and `BuilderTurnResult` are lazy re-exports of lane 4's `agent/_runner.py`; the interview extractor re-exports are dropped with the retired files |
-| `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::builder` | pending | |
+| `src/sylvia_gm/builder/_campaign_plan_materializer.py` | 149 | `sylvia-app::campaign_plan_materializer` | ported | `campaign_plan_materializer_vectors` (every shipped Plan, materialized and published, and targeted drafts; one file for Windows and Linux); differences row 2 |
 | `src/sylvia_gm/builder/_guardrail.py` | 123 | `sylvia-app::path_guardrail` | ported | `guardrail_vectors`, one file per platform (`Path.resolve` differs); Windows and Linux vectors both checked |
 | `src/sylvia_gm/builder/_interview_extractor.py` | 347 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/builder/_interview_manifest.py` | 57 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
@@ -103,7 +103,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/domain/session.py` | 499 | `sylvia-domain::session` | ported | Validated records keep private fields behind `new` (or `validated()` for the evidence records) |
 | `src/sylvia_gm/domain/starting_state.py` | 89 | `sylvia-domain::starting_state` | ported |  |
 | `src/sylvia_gm/domain/state_ownership.py` | 23 | `sylvia-domain::state_ownership` | ported | Replaces lane 3's marked private copy |
-| `src/sylvia_gm/infrastructure/package_archive.py` | 365 | `sylvia-domain::package_archive` | ported | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. CPython's `zipfile` read path is ported in `package_archive/zipfile.rs`. `archive_vectors` |
+| `src/sylvia_gm/infrastructure/package_archive.py` | 365 | `sylvia-domain::package_archive` | ported | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. CPython's `zipfile` read path is ported in `package_archive/zipfile.rs`. `archive_vectors`. Lane 3's #370 (reviewed by lane 1) adds the `ZipSource` positioned-read seam (a byte slice, or a `File` through std's `FileExt`, so archives stream from disk as CPython reads them) and five central-directory fields plus the archive comment, proven by `zip_info_vectors` and slice-versus-file agreement over 201 archives |
 | `src/sylvia_gm/infrastructure/zip_bounds.py` | 97 | `sylvia-domain::package_archive` | ported | Moved from lane 3 on 21 Nov 2026: pure archive reading and admission, no database. `package_archive/zip_bounds.rs`; `archive_vectors` |
 | `src/sylvia_gm/planning/__init__.py` | 52 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/planning/_campaign_bible.py` | 178 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |

@@ -310,6 +310,170 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
     Ok(result_value(&campaign_id, &builder_session_id, begun.resulting_revision))
 }
 
+/// The reply of the lifecycle commands: `_json_value(CampaignLifecycleResult)`, the dataclass
+/// fields in declaration order.
+fn lifecycle_value(result: &sylvia_domain::authority::CampaignLifecycleResult) -> Json {
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), result.campaign_id.as_str().into());
+    value.insert("lifecycle".into(), result.lifecycle.as_str().into());
+    value.insert("writer".into(), result.writer.as_str().into());
+    value.insert("resulting_revision".into(), result.resulting_revision.into());
+    value.insert("session_id".into(), result.session_id.clone().into());
+    Json::Object(value)
+}
+
+/// `handle_rename_campaign`: `ctx.bus.rename_campaign(...)`.
+pub async fn handle_rename_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let display_name = required(params, "display_name")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let result = sylvia_app::authority::lifecycle::rename_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        &display_name,
+        expected_revision,
+    )
+    .await
+    .map_err(store_error)?;
+    Ok(lifecycle_value(&result))
+}
+
+/// `handle_archive_campaign`: `ctx.bus.archive_campaign(...)`.
+pub async fn handle_archive_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let designated_session_id = optional_text(params, "designated_session_id")?;
+    let result = sylvia_app::authority::lifecycle::archive_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+        designated_session_id.as_deref(),
+    )
+    .await
+    .map_err(store_error)?;
+    Ok(lifecycle_value(&result))
+}
+
+/// `handle_restore_archived_campaign`: `ctx.bus.restore_archived_campaign(...)`, whose session
+/// parameter is `session_id`.
+pub async fn handle_restore_archived_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let session_id = optional_text(params, "session_id")?;
+    let result = sylvia_app::authority::lifecycle::restore_archived_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+        session_id.as_deref(),
+    )
+    .await
+    .map_err(store_error)?;
+    Ok(lifecycle_value(&result))
+}
+
+/// `handle_trash_campaign`: `ctx.bus.trash_campaign(...)`.
+pub async fn handle_trash_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let designated_session_id = optional_text(params, "designated_session_id")?;
+    let result = sylvia_app::authority::lifecycle::trash_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+        designated_session_id.as_deref(),
+    )
+    .await
+    .map_err(store_error)?;
+    Ok(lifecycle_value(&result))
+}
+
+/// `handle_restore_trashed_campaign`: `ctx.bus.restore_trashed_campaign(...)`.
+pub async fn handle_restore_trashed_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let result = sylvia_app::authority::lifecycle::restore_trashed_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+    )
+    .await
+    .map_err(store_error)?;
+    Ok(lifecycle_value(&result))
+}
+
+/// `handle_purge_campaign`: `application_owner.purge_campaign(...)` with the Builder sources'
+/// filesystem half: the campaign workspace's sources are quarantined after the store's preflight,
+/// restored if the purge fails, and deleted once it commits (or, for a replay, the quarantine
+/// this exact earlier purge left).
+pub async fn handle_purge_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_store::builder_sources::{
+        finalize_builder_source_purge, finalize_existing_builder_source_purge,
+        restore_builder_sources_after_failed_purge, stage_builder_sources_for_purge, BuilderSourcePurgeStage,
+    };
+    let campaign_id = required(params, "campaign_id")?;
+    let operation_id = required(params, "operation_id")?;
+    let workspace = ctx.storage_root.join("campaigns").join(&campaign_id);
+    let stage: std::sync::Arc<std::sync::Mutex<Option<BuilderSourcePurgeStage>>> = Default::default();
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let confirmation = required(params, "confirmation")?;
+    let mut prepare = {
+        let (stage, workspace, campaign_id, operation_id) =
+            (std::sync::Arc::clone(&stage), workspace.clone(), campaign_id.clone(), operation_id.clone());
+        move || {
+            let staged = stage_builder_sources_for_purge(&workspace, &campaign_id, &operation_id)?;
+            *stage.lock().unwrap_or_else(std::sync::PoisonError::into_inner) = Some(staged);
+            Ok(())
+        }
+    };
+    let mut rollback = {
+        let stage = std::sync::Arc::clone(&stage);
+        move || match stage.lock().unwrap_or_else(std::sync::PoisonError::into_inner).as_ref() {
+            Some(staged) => restore_builder_sources_after_failed_purge(staged),
+            None => Ok(()),
+        }
+    };
+    let result = sylvia_app::authority::lifecycle::purge_campaign(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+        &confirmation,
+        Some(&mut prepare),
+        Some(&mut rollback),
+    )
+    .await
+    .map_err(store_error)?;
+    let staged = stage.lock().unwrap_or_else(std::sync::PoisonError::into_inner).clone();
+    match staged {
+        None => finalize_existing_builder_source_purge(&workspace, &campaign_id, &operation_id),
+        Some(staged) => finalize_builder_source_purge(&staged),
+    }
+    .map_err(store_error)?;
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), result.campaign_id.as_str().into());
+    value.insert("resulting_revision".into(), result.resulting_revision.into());
+    Ok(Json::Object(value))
+}
+
+/// `_optional_text(payload, key)`: absent or `null` is `None`; anything else must be a
+/// nonempty string.
+fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
+    match params.get(key) {
+        None | Some(Json::Null) => Ok(None),
+        Some(_) => required(params, key).map(Some),
+    }
+}
+
 /// `_required_nonnegative_int(payload, key)`: an integer, not a bool, at least zero. An integer
 /// beyond 64 bits, which Python would take, is refused as a declared limit.
 fn required_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<i64> {
@@ -490,5 +654,274 @@ mod tests {
         let recorded = &reply[0]["sessions"][0]["model_guidance"];
         let decision = sylvia_domain::model_capability::model_guidance_from_payload(recorded).unwrap();
         assert_eq!(model_guidance_value(&decision).to_string(), recorded.to_string());
+    }
+
+    /// The parameters Python's handler reads for one of lane 3's lifecycle runs.
+    fn lifecycle_params(run: &Json) -> JsonMap {
+        let mut params = JsonMap::new();
+        for key in [
+            "operation_id",
+            "campaign_id",
+            "expected_revision",
+            "display_name",
+            "designated_session_id",
+            "session_id",
+        ] {
+            if let Some(value) = run.get(key) {
+                params.insert(key.into(), value.clone());
+            }
+        }
+        params
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn lifecycle_commands_answer_as_pythons_runs() {
+        // Lane 3's Python run of the five lifecycle operations (`generate_lifecycle_runs.py`),
+        // through the owner's dispatch: each reply in Python's dataclass order, or Python's
+        // refusal. The handler refuses an empty identity and a negative revision itself, as
+        // Python's `_required_text` and `_required_nonnegative_int` do. Runs that need a commit
+        // fault or held campaign work are proven by `sylvia-app/tests/lifecycle.rs` instead.
+        let record = read_json("crates/sylvia-app/tests/vectors/lifecycle/lifecycle_runs.json");
+        let folder = std::env::temp_dir().join(format!("sylvia-owner-lifecycle-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&folder);
+        std::fs::create_dir_all(&folder).unwrap();
+        let database = folder.join("authority.sqlite3");
+        let mut bytes = Vec::new();
+        flate2::read::GzDecoder::new(
+            std::fs::File::open(workspace("crates/sylvia-app/tests/vectors/lifecycle/seed.sqlite3.gz"))
+                .unwrap(),
+        )
+        .read_to_end(&mut bytes)
+        .unwrap();
+        std::fs::write(&database, bytes).unwrap();
+        let path = database.clone();
+        let (store, thread) = sylvia_store::StoreHandle::spawn(move || {
+            sylvia_store::AuthorityStore::open_for_application_owner(&path, None)
+        })
+        .unwrap();
+        let context = crate::dispatch::DispatchContext {
+            owner_id: "lifecycle-test".into(),
+            storage_root: folder.clone(),
+            handshake_verified: true,
+            method: String::new(),
+            gm_system_prompt: None,
+            store,
+            providers: None,
+            session_loop: None,
+            bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+                sylvia_app::bundled_packages::BundledSources::from_repository_root(
+                    &crate::util::source_root(),
+                ),
+            )),
+            record_provider_warning: std::sync::Arc::new(|_: &str| {}),
+        };
+        let mut answered = 0;
+        for run in record["runs"].as_array().unwrap() {
+            if run.get("fault").is_some() || run.get("busy").is_some() {
+                continue;
+            }
+            let method = run["op"].as_str().unwrap();
+            let label = format!("{method} {}", run["operation_id"]);
+            let reply = crate::dispatch::dispatch(&context, method, &lifecycle_params(run)).await;
+            let want = &run["outcome"];
+            let protocol = if run["operation_id"] == "" {
+                Some("operation_id must be a nonempty string")
+            } else if run["expected_revision"].as_i64().is_some_and(|revision| revision < 0) {
+                Some("expected_revision must be a nonnegative integer")
+            } else {
+                None
+            };
+            match (reply, protocol) {
+                (Err(crate::dispatch::Failure::Rejected(error)), Some(message)) => {
+                    assert_eq!(
+                        (error.error_type, error.message.as_str()),
+                        (Some("OwnerProtocolError"), message),
+                        "{label}"
+                    );
+                }
+                (Ok(value), None) => assert_eq!(value.to_string(), want["ok"].to_string(), "{label}"),
+                (Err(crate::dispatch::Failure::Rejected(error)), None) => {
+                    assert_eq!(error.error_type, want["error"].as_str(), "{label}: type");
+                    assert_eq!(error.code, want["code"].as_str().unwrap(), "{label}: code");
+                    assert_eq!(error.message, want["message"].as_str().unwrap(), "{label}: message");
+                }
+                (other, _) => panic!("{label}: Rust {other:?}, Python {want}"),
+            }
+            answered += 1;
+        }
+        assert_eq!(answered, 43);
+        // Python's `_optional_text`: present means a nonempty string.
+        for (method, key, value) in [
+            ("archive_campaign", "designated_session_id", Json::from("")),
+            ("trash_campaign", "designated_session_id", Json::from(5)),
+            ("restore_archived_campaign", "session_id", Json::from(false)),
+        ] {
+            let mut params = JsonMap::new();
+            params.insert("operation_id".into(), "life-x".into());
+            params.insert("campaign_id".into(), "campaign-story".into());
+            params.insert("expected_revision".into(), 0.into());
+            params.insert(key.into(), value);
+            let Err(crate::dispatch::Failure::Rejected(error)) =
+                crate::dispatch::dispatch(&context, method, &params).await
+            else {
+                panic!("{method} must refuse {key}")
+            };
+            assert_eq!(error.message, format!("{key} must be a nonempty string"));
+        }
+        drop(context);
+        tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+        let _ = std::fs::remove_dir_all(folder);
+    }
+
+    /// Every entry under `campaigns/`, relative, with each file's SHA-256: the generator's `tree`.
+    fn workspace_tree(root: &std::path::Path) -> Json {
+        fn walk(root: &std::path::Path, folder: &std::path::Path, entries: &mut Vec<(String, Json)>) {
+            for entry in std::fs::read_dir(folder).unwrap() {
+                let path = entry.unwrap().path();
+                let relative = path.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/");
+                if path.is_dir() {
+                    entries.push((relative.clone(), serde_json::json!([relative, "dir", null])));
+                    walk(root, &path, entries);
+                } else {
+                    let digest = sylvia_base::hash::sha256_hex(std::fs::read(&path).unwrap());
+                    entries.push((relative.clone(), serde_json::json!([relative, "file", digest])));
+                }
+            }
+        }
+        let mut entries = Vec::new();
+        if root.join("campaigns").exists() {
+            walk(root, &root.join("campaigns"), &mut entries);
+        }
+        entries.sort_by(|left, right| left.0.cmp(&right.0));
+        Json::Array(entries.into_iter().map(|(_, entry)| entry).collect())
+    }
+
+    /// Every table's rows, sorted, for comparing a database with Python's exactly.
+    fn table_rows(path: &std::path::Path) -> std::collections::BTreeMap<String, Vec<String>> {
+        let connection = rusqlite::Connection::open(path).unwrap();
+        let tables: Vec<String> = connection
+            .prepare("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
+            .unwrap()
+            .query_map([], |row| row.get(0))
+            .unwrap()
+            .collect::<Result<_, _>>()
+            .unwrap();
+        tables
+            .into_iter()
+            .map(|table| {
+                let mut statement = connection.prepare(&format!("SELECT * FROM \"{table}\"")).unwrap();
+                let width = statement.column_count();
+                let mut rows: Vec<String> = statement
+                    .query_map([], |row| {
+                        let values: Vec<rusqlite::types::Value> =
+                            (0..width).map(|index| row.get(index)).collect::<Result<_, _>>()?;
+                        Ok(format!("{values:?}"))
+                    })
+                    .unwrap()
+                    .collect::<Result<_, _>>()
+                    .unwrap();
+                rows.sort();
+                (table, rows)
+            })
+            .collect()
+    }
+
+    fn gunzip_to(relative: &str, target: &std::path::Path) {
+        let mut bytes = Vec::new();
+        flate2::read::GzDecoder::new(std::fs::File::open(workspace(relative)).unwrap())
+            .read_to_end(&mut bytes)
+            .unwrap();
+        std::fs::write(target, bytes).unwrap();
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn purges_answer_and_leave_the_workspace_as_pythons_handler_does() {
+        // Lane 3's Python run of `handle_purge_campaign` (`generate_purge_runs.py`): the owner's
+        // purge with the Builder sources' quarantine, restore and finalize, and `trash_campaign`,
+        // through the owner's dispatch. Each reply, the campaign workspace after each step, and
+        // the database afterwards must be Python's.
+        let record = read_json("crates/sylvia-app/tests/vectors/purge/purge_runs.json");
+        let folder = std::env::temp_dir().join(format!("sylvia-owner-purge-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&folder);
+        std::fs::create_dir_all(&folder).unwrap();
+        let database = folder.join("authority.sqlite3");
+        gunzip_to("crates/sylvia-app/tests/vectors/purge/seed.sqlite3.gz", &database);
+        let armed: std::sync::Arc<std::sync::Mutex<Option<String>>> = Default::default();
+        let seam = |name: &'static str| {
+            let armed = std::sync::Arc::clone(&armed);
+            Box::new(move || -> sylvia_store::StoreResult<()> {
+                if armed.lock().unwrap().as_deref() == Some(name) {
+                    return Err(sylvia_store::StoreError::Other(format!("{name} lifecycle commit fault")));
+                }
+                Ok(())
+            }) as Box<dyn Fn() -> sylvia_store::StoreResult<()> + Send>
+        };
+        let faults = sylvia_store::store::Faults {
+            before_lifecycle_commit: Some(seam("before")),
+            after_lifecycle_commit: Some(seam("after")),
+            ..sylvia_store::store::Faults::default()
+        };
+        let path = database.clone();
+        let (store, thread) = sylvia_store::StoreHandle::spawn(move || {
+            let mut store = sylvia_store::AuthorityStore::open_for_application_owner(&path, None)?;
+            store.set_faults(faults);
+            Ok(store)
+        })
+        .unwrap();
+        let context = crate::dispatch::DispatchContext {
+            owner_id: "purge-test".into(),
+            storage_root: folder.clone(),
+            handshake_verified: true,
+            method: String::new(),
+            gm_system_prompt: None,
+            store,
+            providers: None,
+            session_loop: None,
+            bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+                sylvia_app::bundled_packages::BundledSources::from_repository_root(
+                    &crate::util::source_root(),
+                ),
+            )),
+            record_provider_warning: std::sync::Arc::new(|_: &str| {}),
+        };
+        for (index, run) in record["runs"].as_array().unwrap().iter().enumerate() {
+            let method = run["op"].as_str().unwrap();
+            let label = format!("#{index} {method}");
+            let want = &run["outcome"];
+            if method == "write" {
+                let path = folder.join(run["path"].as_str().unwrap());
+                std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+                std::fs::write(&path, run["text"].as_str().unwrap().as_bytes()).unwrap();
+            } else {
+                *armed.lock().unwrap() = run["fault"].as_str().map(str::to_owned);
+                let params = run["params"].as_object().unwrap().clone();
+                let reply = crate::dispatch::dispatch(&context, method, &params).await;
+                *armed.lock().unwrap() = None;
+                match reply {
+                    Ok(value) => assert_eq!(value.to_string(), want["ok"].to_string(), "{label}"),
+                    // The generator's own fault class, from a commit seam: the owner's internal error.
+                    Err(crate::dispatch::Failure::Internal { .. }) => {
+                        assert_eq!(want["error"], "Fault", "{label}")
+                    }
+                    Err(crate::dispatch::Failure::Rejected(error)) => {
+                        assert_eq!(error.error_type, want["error"].as_str(), "{label}: type");
+                        assert_eq!(
+                            error.code,
+                            want["code"].as_str().unwrap_or("command_rejected"),
+                            "{label}: code"
+                        );
+                        assert_eq!(error.message, want["message"].as_str().unwrap(), "{label}: message");
+                    }
+                    Err(other) => panic!("{label}: Rust {other:?}, Python {want}"),
+                }
+            }
+            assert_eq!(workspace_tree(&folder), run["tree"], "{label}: the campaign workspace");
+        }
+        drop(context);
+        tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+        let python = folder.join("python.sqlite3");
+        gunzip_to("crates/sylvia-app/tests/vectors/purge/purge_runs.sqlite3.gz", &python);
+        assert_eq!(table_rows(&database), table_rows(&python), "the database differs from Python's");
+        let _ = std::fs::remove_dir_all(folder);
     }
 }

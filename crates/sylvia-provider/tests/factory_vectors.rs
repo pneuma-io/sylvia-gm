@@ -104,12 +104,10 @@ fn the_factory_builds_what_python_builds() {
                 }})
             }
             // A transport whose adapter is not ported answers `rust_port_pending` where Python
-            // built its provider: one of the native providers, or Responses.
+            // built its provider: one of the native providers (Responses is ported).
             (Err(error), Some(expected)) if error.code == PORT_PENDING => {
                 let native = ["ClaudeProvider", "ChatGPTProvider", "GeminiProvider", "AnthropicProvider"];
-                let responses =
-                    expected["kind"] == "OpenAICompatProvider" && expected["model_transport"] == "responses";
-                if native.contains(&expected["kind"].as_str().unwrap_or("")) || responses {
+                if native.contains(&expected["kind"].as_str().unwrap_or("")) {
                     json!({"value": expected})
                 } else {
                     json!({"pending": error.message})

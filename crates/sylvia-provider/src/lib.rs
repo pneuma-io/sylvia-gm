@@ -46,6 +46,7 @@ pub mod request_metadata;
 /// `urllib.parse`, now shared in `sylvia_base`.
 pub use sylvia_base::pyurl;
 pub mod reply;
+pub mod responses;
 pub mod retry;
 pub mod routes;
 pub mod speed;

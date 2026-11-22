@@ -1,0 +1,109 @@
+{
+ "preparation_intent_argument": {
+  "type": "string",
+  "enum": [
+   "unresolved_action",
+   "await_player_choice"
+  ],
+  "description": "Declare what remains of the exact current player request after this preparation succeeds. Use unresolved_action if an attack or other action was declared and still needs resolution; omission has that same meaning. Use await_player_choice only when the request ends at preparation, such as establishing Initiative before the player chooses an action. Never use it to abandon an already-declared action or invent the player's next choice. This is provider-only control, not a Ruleset or Campaign State field."
+ },
+ "campaign_file_revised_narration_argument": {
+  "type": "array",
+  "minItems": 1,
+  "items": {
+   "oneOf": [
+    {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "const": "narration"
+      },
+      "text": {
+       "type": "string",
+       "minLength": 1,
+       "description": "Scene description, actions and speech attribution. Keep NPC spoken words in separate npc_utterance blocks."
+      }
+     },
+     "required": [
+      "kind",
+      "text"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "const": "npc_utterance"
+      },
+      "speaker_id": {
+       "type": "string",
+       "minLength": 1,
+       "description": "Exact current Campaign Entity or visible non-player participant ID, or an entity_id this same update records in entities. Record a named NPC as an entity and use its ID. Use anonymous only for a speaker without an ID."
+      },
+      "speaker_name": {
+       "type": "string",
+       "minLength": 1,
+       "maxLength": 80,
+       "description": "With speaker_id anonymous: the name or short description the player knows this speaker by, as the narration calls them. It labels the speech box."
+      },
+      "spoken_words": {
+       "type": "string",
+       "minLength": 1,
+       "description": "Only the words this NPC says aloud, without enclosing quotation marks. No actions, gestures, speaker names or 'she says' attribution. End this utterance when narration interrupts, then resume speech in a new npc_utterance block, even for the same speaker."
+      }
+     },
+     "required": [
+      "kind",
+      "speaker_id",
+      "spoken_words"
+     ],
+     "additionalProperties": false
+    },
+    {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "const": "ooc"
+      },
+      "text": {
+       "type": "string",
+       "minLength": 1
+      }
+     },
+     "required": [
+      "kind",
+      "text"
+     ],
+     "additionalProperties": false
+    }
+   ]
+  },
+  "description": "One complete ordered response. Put scene prose in narration blocks, each NPC's spoken words only in npc_utterance.spoken_words, and any OOC reply in a separate ooc block. NPC dialogue uses an exact current Campaign Entity or visible non-player participant speaker_id, an entity_id this same update records, or the anonymous sentinel with a speaker_name. Use one narration block for a response without dialogue. Sylvia holds the response until this Campaign File disposition succeeds. The collections and response must describe the same post-action truth. If an earlier response is already held, return its complete corrected replacement or an exact copy when it is already right; never return an edit note."
+ },
+ "arguments_tool": {
+  "type": "function",
+  "function": {
+   "name": "read_tool_arguments",
+   "description": "READ-ONLY: return the exact inputs one choice of a tool accepts, for a tool whose schema keeps them in one object field (for example a spell's own casting inputs). Call it before using that choice for the first time in this conversation.",
+   "parameters": {
+    "type": "object",
+    "properties": {
+     "tool": {
+      "type": "string",
+      "description": "The tool's name as listed."
+     },
+     "value": {
+      "type": "string",
+      "description": "The selected choice, for example the spell."
+     }
+    },
+    "required": [
+     "tool",
+     "value"
+    ],
+    "additionalProperties": false
+   }
+  }
+ }
+}

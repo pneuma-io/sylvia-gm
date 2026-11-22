@@ -27,7 +27,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/import_repair.py:55` | `<module>` | re.compile; plain | `_PLAN_ID_PATTERN = re.compile(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}")` | |
 | `application/import_repair.py:274` | `stage_repair_copy` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_sha256) is None:` | |
 | `application/import_repair_sessions.py:91` | `start_import_repair_chat` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", repair_id) is None:` | |
-| `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` | |
+| `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` |  `sylvia-app` package_library_vectors |
 | `application/plan_bundle.py:119` | `_read_bundle` | re.fullmatch; plain | `or re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", identity) is None` | |
 | `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` | |
 | `application/reusable_participants.py:584` | `delete_reusable_participant` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_content_sha256) is None:` | |
@@ -163,10 +163,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/ruleless_play.py:141` | `<module>` | re.compile; plain | `re.compile( r"\b(?:attack\s+rolls?\|to-hit\|bonus\s+actions?\|spell\s+slots?" r"\|experience\s+points\|\d+\s*XP\|level(?:s\|ed)?\s+up)\b", re.IGNOR...` | |
 | `application/ruleless_play.py:149` | `<module>` | re.compile; NEEDS fancy-regex: lookahead | `re.compile( r"\b(?:with\|at\|has\|have\|gains?\|grants?\|roll\s+with)\s+(?:dis)?advantage\b" r"(?!\s+(?:of\|over\|to\|in)\b)", re.IGNORECASE, ),` | |
 | `application/ruleless_play.py:158` | `<module>` | re.compile; plain | `_NEGATION = re.compile(r"\b(?:no\|not\|never\|without\|nor\|instead\s+of)\b\|n't\b", re.IGNORECASE)` | |
-| `infrastructure/campaign_archive.py:815` | `_valid_provenance_name` | re.fullmatch; plain | `return isinstance(value, str) and re.fullmatch(r"[a-z0-9][a-z0-9_]{0,127}", value) is not None` | |
-| `infrastructure/campaign_archive.py:819` | `_valid_sha256` | re.fullmatch; plain | `return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None` | |
-| `infrastructure/campaign_archive.py:1001` | `_safe_member_name` | re.match; plain | `return not bool(re.match(r"^[A-Za-z]:", name))` | |
-| `infrastructure/campaign_archive.py:2610` | `validate_campaign_archive` | re.fullmatch; plain | `if any(not re.fullmatch(r"blobs/[0-9a-f]{64}", name) for name in blob_names):` | |
+| `infrastructure/campaign_archive.py:815` | `_valid_provenance_name` | re.fullmatch; plain | `return isinstance(value, str) and re.fullmatch(r"[a-z0-9][a-z0-9_]{0,127}", value) is not None` | `sylvia-store` campaign_archive |
+| `infrastructure/campaign_archive.py:819` | `_valid_sha256` | re.fullmatch; plain | `return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None` | `sylvia-store` campaign_archive |
+| `infrastructure/campaign_archive.py:1001` | `_safe_member_name` | re.match; plain | `return not bool(re.match(r"^[A-Za-z]:", name))` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2610` | `validate_campaign_archive` | re.fullmatch; plain | `if any(not re.fullmatch(r"blobs/[0-9a-f]{64}", name) for name in blob_names):` | `sylvia-store` archive_validation |
 | `infrastructure/safe_file.py:95` | `<module>` | re.compile; plain | `_MOUNTINFO_ESCAPE = re.compile(r"\\([0-7]{3})")` | |
 
 ## Lane 4: Providers and agents
@@ -180,7 +180,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_character_reuse_tool.py:55` | `reuse_character_copy_tool.copy` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", params["expected_content_sha256"]) is None` | |
 | `agent/_participant_file_tool.py:33` | `participant_file_tool.use_file` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", params["expected_version"]) is None` | |
 | `agent/_participant_file_tool.py:78` | `participant_file_tool` | JSON Schema pattern; plain | `"expected_version": {"type": "string", "pattern": "^[0-9a-f]{64}$"},` | |
-| `agent/_provider_session.py:411` | `_package_tool_alias` | re.sub; plain | `slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"` | |
+| `agent/_provider_session.py:411` | `_package_tool_alias` | re.sub; plain | `slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_session.py:894` | `_normalize_state_references.key` | re.sub; plain | `return re.sub(r"[\s_-]+", "_", re.sub(r"['’]", "", value.casefold())).strip("_")` | |
 | `agent/_provider_session.py:1290` | `_speaker_names_overlap.contains` | re.search; pattern built at run time, check by hand | `return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None` | |
 | `agent/_provider_session.py:2369` | `ProviderSessionAdapter._relevant_character_files_message` | re.search; pattern built at run time, check by hand | `if re.search( rf"(?<!\w){re.escape(alias)}(?!\w)", current_player_text, flags=re.IGNORECASE, )` | |

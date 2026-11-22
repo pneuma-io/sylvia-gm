@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 34 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 43 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -81,9 +81,9 @@ Ported: 34 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_gui
 | `admin_full_audit_record` | `providers.handle_admin_full_audit_record` | yes | no | |
 | `export_admin_full_audit` | `providers.handle_export_admin_full_audit` | no | no | |
 | `set_admin_full_audit` | `providers.handle_set_admin_full_audit` | yes | no | |
-| `detect_local_providers` | `providers.handle_detect_local_providers` | yes | no | |
-| `discover_provider_models` | `providers.handle_discover_provider_models` | yes | no | |
-| `validate_provider_model` | `providers.handle_validate_provider_model` | yes | no | |
+| `detect_local_providers` | `providers.handle_detect_local_providers` | yes | yes | none yet; lane 4's `discovery_vectors` (Python MockTransport exchanges) |
+| `discover_provider_models` | `providers.handle_discover_provider_models` | yes | yes | none yet; lane 4's `discovery_vectors` (Python MockTransport exchanges) |
+| `validate_provider_model` | `providers.handle_validate_provider_model` | yes | yes | none yet; lane 4's `validation_vectors` (Python's streamed probe bodies) |
 | `save_provider_settings` | `providers.handle_save_provider_settings` | yes | yes | `provider-settings` |
 | `remove_provider_settings` | `providers.handle_remove_provider_settings` | yes | yes | `provider-settings` |
 | `set_default_model` | `providers.handle_set_default_model` | yes | yes | `provider-settings` |
@@ -134,12 +134,12 @@ Ported: 34 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_gui
 | `complete_turn` | `actions.handle_complete_turn` | no | no | |
 | `stop_agent_session` | `sessions.handle_stop_agent_session` | yes | no | |
 | `resume_agent_session` | `sessions.handle_resume_agent_session` | yes | no | |
-| `rename_campaign` | `campaigns.handle_rename_campaign` | yes | no | |
-| `archive_campaign` | `campaigns.handle_archive_campaign` | yes | no | |
-| `restore_archived_campaign` | `campaigns.handle_restore_archived_campaign` | yes | no | |
-| `trash_campaign` | `campaigns.handle_trash_campaign` | yes | no | |
-| `restore_trashed_campaign` | `campaigns.handle_restore_trashed_campaign` | yes | no | |
-| `purge_campaign` | `campaigns.handle_purge_campaign` | yes | no | |
+| `rename_campaign` | `campaigns.handle_rename_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
+| `archive_campaign` | `campaigns.handle_archive_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
+| `restore_archived_campaign` | `campaigns.handle_restore_archived_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
+| `trash_campaign` | `campaigns.handle_trash_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
+| `restore_trashed_campaign` | `campaigns.handle_restore_trashed_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
+| `purge_campaign` | `campaigns.handle_purge_campaign` | yes | yes | paired run through owner dispatch (lane 3's Python run of `handle_purge_campaign`, `commands/campaigns.rs`); launch reconciliation by `tests/purge_reconcile.rs` |
 | `backup_database` | `campaigns.handle_backup_database` | no | no | |
 | `export_campaign_plan_file` | `campaigns.handle_export_campaign_plan_file` | no | no | |
 | `export_package_candidate` | `packages.handle_export_package_candidate` | no | no | |

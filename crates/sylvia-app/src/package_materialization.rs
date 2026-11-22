@@ -66,9 +66,47 @@ fn value(message: &str) -> DomainError {
     DomainError::value(message)
 }
 
+/// The two fields `snapshot_record` reads from its `primary` and `settings`: Python passes either
+/// manifests or lock entries.
+pub trait SnapshotIdentity {
+    fn package_id(&self) -> &str;
+    fn version(&self) -> &str;
+}
+
+impl SnapshotIdentity for PackageManifest {
+    fn package_id(&self) -> &str {
+        &self.package_id
+    }
+    fn version(&self) -> &str {
+        &self.version
+    }
+}
+
+impl SnapshotIdentity for sylvia_domain::authority::PackageLockEntry {
+    fn package_id(&self) -> &str {
+        sylvia_domain::authority::PackageLockEntry::package_id(self)
+    }
+    fn version(&self) -> &str {
+        sylvia_domain::authority::PackageLockEntry::version(self)
+    }
+}
+
+impl<T: SnapshotIdentity> SnapshotIdentity for &T {
+    fn package_id(&self) -> &str {
+        (**self).package_id()
+    }
+    fn version(&self) -> &str {
+        (**self).version()
+    }
+}
+
 /// `snapshot_record(record, primary=..., settings=...)`: remove derived claims and normalize
 /// legacy ownership for an editable owned copy.
-pub fn snapshot_record(record: &JsonMap, primary: &PackageManifest, settings: &[PackageManifest]) -> JsonMap {
+pub fn snapshot_record<P: SnapshotIdentity, S: SnapshotIdentity>(
+    record: &JsonMap,
+    primary: &P,
+    settings: &[S],
+) -> JsonMap {
     let strip_hash = |dependency: &Json| -> Json {
         Json::Object(
             dependency
@@ -90,8 +128,8 @@ pub fn snapshot_record(record: &JsonMap, primary: &PackageManifest, settings: &[
         return result;
     }
     let identity = result["id"].as_str().unwrap_or_default().to_owned();
-    let setting_ids: Vec<&str> = settings.iter().map(|item| item.package_id.as_str()).collect();
-    let kind = if identity == primary.package_id {
+    let setting_ids: Vec<&str> = settings.iter().map(|item| item.package_id()).collect();
+    let kind = if identity == primary.package_id() {
         "ruleset"
     } else if setting_ids.contains(&identity.as_str()) {
         "campaign_setting"
@@ -107,12 +145,12 @@ pub fn snapshot_record(record: &JsonMap, primary: &PackageManifest, settings: &[
         .map(strip_hash)
         .collect();
     if setting_ids.contains(&identity.as_str()) {
-        dependencies.retain(|dependency| !py_eq(&dependency["id"], &Json::from(primary.package_id.as_str())));
+        dependencies.retain(|dependency| !py_eq(&dependency["id"], &Json::from(primary.package_id())));
         dependencies.push(json!({
             "namespace": "ruleset_snapshot",
             "kind": "ruleset_snapshot",
-            "id": primary.package_id,
-            "version": primary.version,
+            "id": primary.package_id(),
+            "version": primary.version(),
         }));
     }
     result.insert("dependencies".into(), Json::Array(dependencies));

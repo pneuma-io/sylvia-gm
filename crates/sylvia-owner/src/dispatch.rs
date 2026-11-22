@@ -149,11 +149,28 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "create_guided_campaign_draft" => {
             commands::campaigns::handle_create_guided_campaign_draft(context, params).await
         }
+        "rename_campaign" => commands::campaigns::handle_rename_campaign(context, params).await,
+        "archive_campaign" => commands::campaigns::handle_archive_campaign(context, params).await,
+        "restore_archived_campaign" => {
+            commands::campaigns::handle_restore_archived_campaign(context, params).await
+        }
+        "trash_campaign" => commands::campaigns::handle_trash_campaign(context, params).await,
+        "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
+        "restore_trashed_campaign" => {
+            commands::campaigns::handle_restore_trashed_campaign(context, params).await
+        }
         "builder_chat_index" => commands::builder::handle_builder_chat_index(context, params).await,
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,
         "provider_settings" => commands::providers::handle_provider_settings(context, params).await,
+        "detect_local_providers" => commands::providers::handle_detect_local_providers(context, params).await,
+        "discover_provider_models" => {
+            commands::providers::handle_discover_provider_models(context, params).await
+        }
+        "validate_provider_model" => {
+            commands::providers::handle_validate_provider_model(context, params).await
+        }
         "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
         "remove_provider_settings" => {
             commands::providers::handle_remove_provider_settings(context, params).await
