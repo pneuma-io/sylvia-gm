@@ -135,8 +135,13 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/builder_source_ingestion.py:160` | `_source_identity` | hashlib.sha256 | `identity = hashlib.sha256( media_type.encode("utf-8") + b"\x00" + bytes.fromhex(content_sha256) ).hexdigest()[:24]` | |
 | `infrastructure/builder_source_ingestion.py:218` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256( b"\x00".join( item[2].encode("ascii") for item in sorted(extracted_sources, key=lambda row: row[0]) ) ).hexdigest(...` | |
 | `infrastructure/builder_source_ingestion.py:225` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256(batch_id.encode("utf-8")).hexdigest()[:24]` | |
+<<<<<<< HEAD
 | `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | `sylvia-app` purge |
 | `infrastructure/campaign_archive.py:724` | `source_authority_schema_claim_sha256` | hashlib.sha256 | `return hashlib.sha256(_json_bytes(preimage)).hexdigest()` | |
+=======
+| `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
+| `infrastructure/campaign_archive.py:724` | `source_authority_schema_claim_sha256` | hashlib.sha256 | `return hashlib.sha256(_json_bytes(preimage)).hexdigest()` | `sylvia-store` campaign_archive |
+>>>>>>> pr-360
 | `infrastructure/campaign_archive.py:1550` | `_validate_manifest_derived_package_graph.closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
 | `infrastructure/campaign_archive.py:1696` | `_stream_member_digest` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `infrastructure/campaign_archive.py:1830` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | |
@@ -208,7 +213,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_reasoning.py:39` | `<module>` | hashlib.sha256 | `MIGRATION_11_SHA256 = hashlib.sha256(MIGRATION_11_SQL.encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_recovery.py:35` | `<module>` | hashlib.sha256 | `RECOVERY_EXTENSION_SHA256 = hashlib.sha256( RECOVERY_EXTENSION_SQL.strip().encode("utf-8") ).hexdigest()` | yes |
 | `infrastructure/sqlite_recovery.py:252` | `semantic_payload` | hashlib.sha256 | `return encoded.decode("utf-8"), hashlib.sha256(encoded).hexdigest()` | |
-| `infrastructure/sqlite_recovery.py:350` | `verify_recovery_receipts` | hashlib.sha256 | `or hashlib.sha256(payload_json.encode("utf-8")).hexdigest() != payload_sha256` | |
+| `infrastructure/sqlite_recovery.py:350` | `verify_recovery_receipts` | hashlib.sha256 | `or hashlib.sha256(payload_json.encode("utf-8")).hexdigest() != payload_sha256` | `sylvia-store` stored_authority (`recovered`) |
 | `infrastructure/sqlite_recovery.py:491` | `_blob_chunk_rows` | hashlib.sha256 | `"chunk_sha256": hashlib.sha256(chunk).hexdigest(),` | |
 | `infrastructure/sqlite_recovery.py:543` | `_staging_chunk_rows` | hashlib.sha256 | `"chunk_sha256": hashlib.sha256(chunk).hexdigest(),` | |
 | `infrastructure/sqlite_session.py:908` | `rename_builder_chat` | hashlib.sha256 | `message_id="builder-title-user-" + hashlib.sha256(session_id.encode()).hexdigest()[:24],` | |
