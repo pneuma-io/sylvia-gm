@@ -306,6 +306,16 @@ impl HttpxUrl {
         out
     }
 
+    /// `netloc`: the host (bracketed when it holds `:`) and the port, without userinfo. This is
+    /// the `Host` header httpx writes.
+    pub fn netloc(&self) -> String {
+        let host = if self.host.contains(':') { format!("[{}]", self.host) } else { self.host.clone() };
+        match self.port {
+            Some(port) => format!("{host}:{port}"),
+            None => host,
+        }
+    }
+
     /// `raw_path`: the path (`/` when empty) and the query.
     pub fn raw_path(&self) -> String {
         let mut path = if self.path.is_empty() { "/".to_owned() } else { self.path.clone() };

@@ -4,9 +4,10 @@
 //!
 //! Python opens a short-lived `httpx.Client(timeout=..., follow_redirects=False)` for each step.
 //! Here each step asks a [`ClientFor`] for its client, so tests replay recorded exchanges through
-//! the scripted transport. The headers compared with Python are the ones Sylvia sets; the HTTP
-//! client's own (`Host`, `Accept`, `Accept-Encoding`, `Connection`, `User-Agent`) follow
-//! differences row 8.
+//! the scripted transport. The headers compared with Python are the ones Sylvia sets. The HTTP
+//! client's own follow differences row 8: `Host` and `Accept` go first as httpx writes them
+//! ([`crate::net::wire_headers`]); `Accept-Encoding`, `Connection` and httpx's `User-Agent` are
+//! not sent.
 
 use super::loader::{load_config, provider_credentials};
 use super::presets::{presets, Preset};
@@ -116,8 +117,8 @@ pub(super) async fn fetch(
             vec![("User-Agent".into(), crate::openai_compat::sylvia_user_agent())]
         };
     headers.extend_from_slice(request_headers);
-    if body.is_some() {
-        headers.push(("Content-Type".into(), "application/json".into()));
+    if let Some(body) = &body {
+        crate::net::json_content_headers(&mut headers, body.len());
     }
     let request = HttpRequest { method: method.into(), url, headers, body: body.unwrap_or_default() };
     let mut response = client.send(request).await.map_err(|_: TransportError| Fetch::Http)?;

@@ -1,0 +1,601 @@
+{
+ "httpx": "0.28.1",
+ "cases": [
+  {
+   "name": "discovery",
+   "request": {
+    "method": "GET",
+    "url": "http://127.0.0.1:5000/v1/models",
+    "headers": [
+     [
+      "User-Agent",
+      "SylviaGM/0.4.1"
+     ],
+     [
+      "Authorization",
+      "Bearer k"
+     ],
+     [
+      "X-Example",
+      "d"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "127.0.0.1:5000"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "User-Agent",
+     "SylviaGM/0.4.1"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "X-Example",
+     "d"
+    ]
+   ]
+  },
+  {
+   "name": "no_headers",
+   "request": {
+    "method": "GET",
+    "url": "https://api.example.test/v1/models",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "api.example.test"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "default_port",
+   "request": {
+    "method": "GET",
+    "url": "https://api.example.test:443/v1/models",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "api.example.test"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "other_port",
+   "request": {
+    "method": "GET",
+    "url": "http://H.Example:8080/x",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h.example:8080"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "ipv6",
+   "request": {
+    "method": "GET",
+    "url": "http://[::1]:8080/x",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "[::1]:8080"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "userinfo",
+   "request": {
+    "method": "GET",
+    "url": "http://user:pass@h:81/x",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h:81"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "accept_given",
+   "request": {
+    "method": "GET",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "Authorization",
+      "Bearer k"
+     ],
+     [
+      "Accept",
+      "application/json"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ]
+   ]
+  },
+  {
+   "name": "accept_lowercase",
+   "request": {
+    "method": "GET",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "accept",
+      "text/plain"
+     ],
+     [
+      "X-A",
+      "1"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "accept",
+     "text/plain"
+    ],
+    [
+     "X-A",
+     "1"
+    ]
+   ]
+  },
+  {
+   "name": "agent_given_later",
+   "request": {
+    "method": "GET",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "Authorization",
+      "Bearer k"
+     ],
+     [
+      "User-Agent",
+      "Mine"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "User-Agent",
+     "Mine"
+    ]
+   ]
+  },
+  {
+   "name": "host_given",
+   "request": {
+    "method": "GET",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "X-A",
+      "1"
+     ],
+     [
+      "Host",
+      "other"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "X-A",
+     "1"
+    ],
+    [
+     "Host",
+     "other"
+    ]
+   ]
+  },
+  {
+   "name": "duplicates",
+   "request": {
+    "method": "GET",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "X-A",
+      "1"
+     ],
+     [
+      "x-a",
+      "2"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "X-A",
+     "1"
+    ],
+    [
+     "x-a",
+     "2"
+    ]
+   ]
+  },
+  {
+   "name": "json_post",
+   "request": {
+    "method": "POST",
+    "url": "http://h:11434/api/show",
+    "headers": [
+     [
+      "User-Agent",
+      "SylviaGM/0.4.1"
+     ],
+     [
+      "Content-Length",
+      "32"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ]
+    ],
+    "body": "{\"model\":\"qwen\",\"verbose\":false}"
+   },
+   "wire": [
+    [
+     "Host",
+     "h:11434"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "User-Agent",
+     "SylviaGM/0.4.1"
+    ],
+    [
+     "Content-Length",
+     "32"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ]
+   ]
+  },
+  {
+   "name": "json_post_private",
+   "request": {
+    "method": "POST",
+    "url": "http://h/v1/chat/completions",
+    "headers": [
+     [
+      "User-Agent",
+      "SylviaGM/0.4.1"
+     ],
+     [
+      "Authorization",
+      "Bearer k"
+     ],
+     [
+      "X-Example",
+      "d"
+     ],
+     [
+      "Content-Length",
+      "41"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ]
+    ],
+    "body": "{\"model\":\"m\",\"messages\":[],\"stream\":true}"
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "User-Agent",
+     "SylviaGM/0.4.1"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "X-Example",
+     "d"
+    ],
+    [
+     "Content-Length",
+     "41"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ]
+   ]
+  },
+  {
+   "name": "sdk_post",
+   "request": {
+    "method": "POST",
+    "url": "http://h/v1/chat/completions",
+    "headers": [
+     [
+      "Authorization",
+      "Bearer k"
+     ],
+     [
+      "Accept",
+      "application/json"
+     ],
+     [
+      "Content-Type",
+      "application/json"
+     ],
+     [
+      "User-Agent",
+      "SylviaGM/0.4.1"
+     ]
+    ],
+    "body": "{\"model\":\"m\"}"
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ],
+    [
+     "Accept",
+     "application/json"
+    ],
+    [
+     "Content-Type",
+     "application/json"
+    ],
+    [
+     "User-Agent",
+     "SylviaGM/0.4.1"
+    ],
+    [
+     "Content-Length",
+     "13"
+    ]
+   ]
+  },
+  {
+   "name": "empty_post",
+   "request": {
+    "method": "POST",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "Authorization",
+      "Bearer k"
+     ]
+    ],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Content-Length",
+     "0"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "Authorization",
+     "Bearer k"
+    ]
+   ]
+  },
+  {
+   "name": "empty_put",
+   "request": {
+    "method": "PUT",
+    "url": "http://h/x",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Content-Length",
+     "0"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "empty_patch",
+   "request": {
+    "method": "PATCH",
+    "url": "http://h/x",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Content-Length",
+     "0"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "empty_delete",
+   "request": {
+    "method": "DELETE",
+    "url": "http://h/x",
+    "headers": [],
+    "body": ""
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ]
+   ]
+  },
+  {
+   "name": "content_length_given",
+   "request": {
+    "method": "POST",
+    "url": "http://h/x",
+    "headers": [
+     [
+      "Content-Length",
+      "2"
+     ],
+     [
+      "X-A",
+      "1"
+     ]
+    ],
+    "body": "{}"
+   },
+   "wire": [
+    [
+     "Host",
+     "h"
+    ],
+    [
+     "Accept",
+     "*/*"
+    ],
+    [
+     "Content-Length",
+     "2"
+    ],
+    [
+     "X-A",
+     "1"
+    ]
+   ]
+  }
+ ]
+}

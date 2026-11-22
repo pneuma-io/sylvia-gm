@@ -616,7 +616,7 @@ async fn probe(
             vec![("User-Agent".into(), crate::openai_compat::sylvia_user_agent())]
         };
     request_headers.extend_from_slice(headers);
-    request_headers.push(("Content-Type".into(), "application/json".into()));
+    crate::net::json_content_headers(&mut request_headers, body.len());
     let request = HttpRequest { method: "POST".into(), url, headers: request_headers, body };
     let Ok(mut response) = client.send(request).await else { return Probe::Early };
     if matches!(response.status, 401 | 403) {
