@@ -20,7 +20,7 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/agent/_builder_session.py` | 2,709 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_builder_source_tool.py` | 75 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_builder_title.py` | 64 | `sylvia-agent` | pending | |
-| `src/sylvia_gm/agent/_campaign_memory.py` | 97 | `sylvia-agent` | in progress | `campaign_memory::select_with` (P3), with the ranking given: lane 3's `sylvia_app::knowledge_search::rank_references` once it lands. Proven so far only on openings without facts (`tests/opening_messages_vectors.rs`); the ranking vectors come with it. |
+| `src/sylvia_gm/agent/_campaign_memory.py` | 97 | `sylvia-agent` | ported | `campaign_memory::select_with` (P3), ranked by lane 3's `knowledge_search::rank_references` through `sylvia_owner::preflight::rank_references` (P4). Vectors: `sylvia-owner` `tests/campaign_memory_vectors.rs` (real facts and queries, the record and byte bounds) and `sylvia-agent` `tests/opening_messages_vectors.rs` |
 | `src/sylvia_gm/agent/_character_draft_tool.py` | 99 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_character_profile_tools.py` | 350 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/agent/_character_reuse_tool.py` | 106 | `sylvia-agent` | pending | |

@@ -11,15 +11,17 @@
 //! the preflight answers `rust_port_pending`.
 
 use crate::dispatch::Failure;
+use crate::owner_reads::OwnerReads;
 use crate::services::ProviderResolver;
 use futures_util::future::BoxFuture;
 use serde_json::{json, Value as Json};
 use std::sync::Arc;
-use sylvia_agent::campaign_memory::RankReferences;
+use sylvia_agent::campaign_memory::{KnowledgeReference, RankReferences};
 use sylvia_agent::provider_session::context::{ProviderSessionAdapter, SessionProviderInput, LEDGER_MODE};
 use sylvia_agent::provider_session::reads::OpeningReads;
 use sylvia_agent::provider_session::tools::provider_tools;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
+use sylvia_app::knowledge_search;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{CodedError, CodedResult, JsonMap};
 use sylvia_domain::authority::{CampaignIndexEntry, WriterRole};
@@ -85,8 +87,8 @@ fn domain(error: sylvia_domain::error::DomainError) -> CodedError {
 
 /// `_preflight_guided_start(...)`: assemble and measure the mandatory opening request.
 ///
-/// `rank` is `application/knowledge_search.rank_references` (lane 3's port) and `environment`
-/// the process environment the context mode is read from.
+/// `rank` is [`rank_references`] (lane 3's ranker) and `environment` the process environment
+/// the context mode is read from.
 pub async fn preflight_guided_start(
     reads: Arc<dyn PreflightReads>,
     resolver: &dyn ProviderResolver,
@@ -214,4 +216,53 @@ pub async fn preflight_guided_start(
     // A refusal here is Python's `TokenLimitError`, the owner's provider-error reply.
     preflight_provider.admit_request(&messages, Some(&tools), &options)?;
     Ok(())
+}
+
+/// The owner's reads, as the preflight takes them: lane 3's [`OwnerReads`] already answers
+/// `OpeningReads`, and its preflight reads are plain methods, so this is delegation only.
+impl PreflightReads for OwnerReads {
+    fn campaign_index(&self) -> BoxFuture<'_, CodedResult<Vec<CampaignIndexEntry>>> {
+        Box::pin(OwnerReads::campaign_index(self))
+    }
+
+    fn admin_full_audit_enabled(&self) -> BoxFuture<'_, CodedResult<bool>> {
+        let enabled = OwnerReads::admin_full_audit_enabled(self);
+        Box::pin(async move { Ok(enabled) })
+    }
+
+    /// The owner's `record_admin_full_audit`. Its only failure is a malformed payload, which
+    /// the audit wrapper never builds, so a failure is dropped like an absent record.
+    fn admin_full_audit_sink(&self) -> AuditSink {
+        let reads = self.clone();
+        Arc::new(move |payload| {
+            let _ = reads.record_admin_full_audit(payload);
+        })
+    }
+
+    fn campaign_knowledge_catalog_for_plan<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        plan: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        Box::pin(OwnerReads::campaign_knowledge_catalog_for_plan(self, campaign_id, plan))
+    }
+
+    fn catalog<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Vec<ModelMechanicsTool>>> {
+        Box::pin(OwnerReads::catalog(self, campaign_id))
+    }
+}
+
+/// `application/knowledge_search.rank_references` for the request assembly's memory selection:
+/// lane 3's ranker over the same references. Its `KeyError` for a reference missing a field is
+/// Python's internal fault.
+pub fn rank_references(query: &str, references: &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> {
+    let candidates: Vec<knowledge_search::KnowledgeReference> = references
+        .iter()
+        .map(|reference| knowledge_search::KnowledgeReference {
+            result: reference.result.clone(),
+            identity: reference.identity.clone(),
+            body: reference.body.clone(),
+        })
+        .collect();
+    knowledge_search::rank_references(query, &candidates).map_err(domain)
 }
