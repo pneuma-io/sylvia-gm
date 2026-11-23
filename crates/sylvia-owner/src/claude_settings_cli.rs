@@ -5,7 +5,7 @@
 //! The arguments follow the `argparse` parser Python builds: the same options, prefixes of long
 //! options (`allow_abbrev`), `--option=value`, the order errors are found in, and the exact
 //! error texts, usage and help. The program name in them is `sylvia-gm-owner claude-settings`
-//! where Python prints `claude_settings.py` (differences row NEXT), and the usage is wrapped for
+//! where Python prints `claude_settings.py` (differences row 51), and the usage is wrapped for
 //! 80 columns, which Python uses when `COLUMNS` is unset. The actions, their output (`json.dumps
 //! (result, indent=2)` on stdout, progress and messages on stderr) and the exit codes (0, 1 for
 //! a refused action or a failed install, 2 for a usage error) are Python's.
