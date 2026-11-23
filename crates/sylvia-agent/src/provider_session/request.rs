@@ -16,9 +16,13 @@ use super::tools::package_tool_alias;
 use crate::native_continuation::{attach_chat_metadata, requires_reasoning_with_tools};
 use crate::provider_turn::state::ToolCallAssembly;
 use crate::provider_turn::{TurnFailure, TurnResult};
-use crate::request_data::{application_data_after_history, application_data_guidance, player_message_guidance};
+use crate::request_data::{
+    application_data_after_history, application_data_guidance, player_message_guidance,
+};
 use crate::session_loop::ProviderControl;
-use crate::working_context::{CheckpointBridge, WorkingContextOptions, WorkingContextProvider, CHECKPOINT_KIND};
+use crate::working_context::{
+    CheckpointBridge, WorkingContextOptions, WorkingContextProvider, CHECKPOINT_KIND,
+};
 use futures_util::StreamExt;
 use indexmap::IndexMap;
 use std::collections::HashSet;
@@ -51,7 +55,8 @@ fn key_error(key: &str) -> CodedError {
 /// player-visible prose.
 pub fn contains_serialized_tool_call(text: &str) -> bool {
     let folded = pystr::casefold(text);
-    folded.contains("]<]minimax[>[<tool_call") || (folded.contains("<tool_call") && folded.contains("<invoke name="))
+    folded.contains("]<]minimax[>[<tool_call")
+        || (folded.contains("<tool_call") && folded.contains("<invoke name="))
 }
 
 /// `_forced_single_tool_call_from_json(text, aliases)`: an exact JSON object a provider sent
@@ -82,13 +87,17 @@ pub fn native_content_for_text_operation(
 ) -> CodedResult<Option<Vec<JsonMap>>> {
     let Some(blocks) = blocks else { return Ok(None) };
     let kind = |block: &JsonMap| block.get("type").and_then(Json::as_str).map(str::to_owned);
-    let text_blocks: Vec<&JsonMap> = blocks.iter().filter(|block| kind(block).as_deref() == Some("text")).collect();
+    let text_blocks: Vec<&JsonMap> =
+        blocks.iter().filter(|block| kind(block).as_deref() == Some("text")).collect();
     let joined: String =
         text_blocks.iter().map(|block| block.get("text").map_or_else(String::new, py_str)).collect();
     if text_blocks.is_empty() || joined != text {
         return Ok(None);
     }
-    if blocks.iter().any(|block| !matches!(kind(block).as_deref(), Some("thinking" | "redacted_thinking" | "text"))) {
+    if blocks
+        .iter()
+        .any(|block| !matches!(kind(block).as_deref(), Some("thinking" | "redacted_thinking" | "text")))
+    {
         return Ok(None);
     }
     let arguments = pyjson::loads(&assembly.arguments)?;
@@ -124,7 +133,15 @@ pub fn legacy_tool_exchange(
 ) -> CodedResult<Vec<JsonMap>> {
     let result_by_id: IndexMap<String, &JsonMap> = results
         .iter()
-        .map(|result| Ok((pyjson::dumps(result.get("tool_call_id").ok_or_else(|| key_error("tool_call_id"))?, Dump::WIRE), result)))
+        .map(|result| {
+            Ok((
+                pyjson::dumps(
+                    result.get("tool_call_id").ok_or_else(|| key_error("tool_call_id"))?,
+                    Dump::WIRE,
+                ),
+                result,
+            ))
+        })
         .collect::<CodedResult<_>>()?;
     let mut kept_calls = Vec::new();
     let mut names_by_id: IndexMap<String, Option<String>> = IndexMap::new();
@@ -178,7 +195,8 @@ pub fn legacy_tool_exchange(
     }
     let mut replayed = vec![message];
     for result in results {
-        let id = pyjson::dumps(result.get("tool_call_id").ok_or_else(|| key_error("tool_call_id"))?, Dump::WIRE);
+        let id =
+            pyjson::dumps(result.get("tool_call_id").ok_or_else(|| key_error("tool_call_id"))?, Dump::WIRE);
         match names_by_id.get(&id) {
             None => replayed.push(result.clone()),
             Some(None) => {}
@@ -267,7 +285,10 @@ impl RoundStream {
         }
     }
 
-    fn item(&mut self, item: Option<ProviderResult<ProviderStreamChunk>>) -> TurnResult<Option<ProviderStreamChunk>> {
+    fn item(
+        &mut self,
+        item: Option<ProviderResult<ProviderStreamChunk>>,
+    ) -> TurnResult<Option<ProviderStreamChunk>> {
         match item {
             None => Ok(None),
             Some(Ok(chunk)) => {
@@ -292,10 +313,9 @@ impl RoundStream {
         }
         let kind = write.payload.get("kind").and_then(Json::as_str).unwrap_or("");
         let identity = match kind {
-            CHECKPOINT_KIND => format!(
-                "context-{}",
-                write.payload.get("checkpoint_id").map_or_else(String::new, py_str)
-            ),
+            CHECKPOINT_KIND => {
+                format!("context-{}", write.payload.get("checkpoint_id").map_or_else(String::new, py_str))
+            }
             // The context ledger's journal and native records come with it (L4).
             other => {
                 return Err(TurnFailure::Coded(CodedError::new(
@@ -324,11 +344,15 @@ impl ProviderSessionAdapter {
         let content = |message: &JsonMap| message.get("content").map_or_else(String::new, py_str);
         let system = |message: &JsonMap| message.get("role").and_then(Json::as_str) == Some("system");
         let declared = messages.iter().any(|message| {
-            system(message) && content(message).starts_with("SYLVIA_GM_CURRENT_PLAYER_MESSAGE (application-owned control,")
+            system(message)
+                && content(message)
+                    .starts_with("SYLVIA_GM_CURRENT_PLAYER_MESSAGE (application-owned control,")
         });
         let mut selected: Vec<JsonMap> = messages
             .into_iter()
-            .filter(|message| !(system(message) && content(message).starts_with("SYLVIA_GM_CURRENT_PLAYER_MESSAGE ")))
+            .filter(|message| {
+                !(system(message) && content(message).starts_with("SYLVIA_GM_CURRENT_PLAYER_MESSAGE "))
+            })
             .collect();
         let guidance = |text: &str| {
             let mut message = JsonMap::new();
@@ -336,13 +360,18 @@ impl ProviderSessionAdapter {
             message.insert("content".into(), text.into());
             message
         };
-        if !selected.iter().any(|message| message.get("content").and_then(Json::as_str) == Some(application_data_guidance())) {
+        if !selected
+            .iter()
+            .any(|message| message.get("content").and_then(Json::as_str) == Some(application_data_guidance()))
+        {
             let at = 1.min(selected.len());
             selected.insert(at, guidance(application_data_guidance()));
         }
         let at = 2.min(selected.len());
         selected.insert(at, guidance(player_message_guidance()));
-        if declared && selected.iter().any(|message| content(message).starts_with("SYLVIA_CONTINUATION_NOTE ")) {
+        if declared
+            && selected.iter().any(|message| content(message).starts_with("SYLVIA_CONTINUATION_NOTE "))
+        {
             // Keep the exact input intact while identifying it after host data is reordered.
             let current = selected
                 .iter()
@@ -386,7 +415,8 @@ impl ProviderSessionAdapter {
         let resend_reasoning = requires_reasoning_with_tools(model, has_tools);
         let transport = model.map(|model| model.transport.as_str());
         let session = input.session.fields();
-        let chat_transport = matches!(transport, Some("chat_completions" | "responses" | "gemini_generate_content"));
+        let chat_transport =
+            matches!(transport, Some("chat_completions" | "responses" | "gemini_generate_content"));
         let mut prepared = Vec::new();
         for original in messages {
             let mut message = original;
@@ -399,15 +429,20 @@ impl ProviderSessionAdapter {
                 prepared.push(message);
                 continue;
             };
-            let requirement = reference.get("requirement").cloned().unwrap_or_else(|| Json::Object(JsonMap::new()));
+            let requirement =
+                reference.get("requirement").cloned().unwrap_or_else(|| Json::Object(JsonMap::new()));
             let required = |flag: &str| {
                 requirement.get(flag) == Some(&Json::Bool(true))
-                    && requirement.get("provider_id").and_then(Json::as_str) == Some(session.provider_id.as_str())
+                    && requirement.get("provider_id").and_then(Json::as_str)
+                        == Some(session.provider_id.as_str())
                     && requirement.get("model_id").and_then(Json::as_str) == Some(session.model_id.as_str())
             };
             let chat_metadata_required = chat_transport && required("chat_completion_required");
             let tool_calls = message.get("tool_calls").is_some_and(truthy);
-            if resend_reasoning || chat_metadata_required || (tool_calls && transport == Some("anthropic_messages")) {
+            if resend_reasoning
+                || chat_metadata_required
+                || (tool_calls && transport == Some("anthropic_messages"))
+            {
                 let response_id = reference.get("response_id").ok_or_else(|| key_error("response_id"))?;
                 let native = self
                     .turn_owner()?
@@ -440,7 +475,10 @@ impl ProviderSessionAdapter {
                         .and_then(|native| native.get("chat_completion_metadata"))
                         .and_then(Json::as_object)
                         .is_some_and(|metadata| metadata.get("reasoning_fields").is_some_and(truthy));
-                    let saved_reasoning = native.as_ref().and_then(|native| native.get("reasoning_content")).and_then(Json::as_str);
+                    let saved_reasoning = native
+                        .as_ref()
+                        .and_then(|native| native.get("reasoning_content"))
+                        .and_then(Json::as_str);
                     if native_fields {
                     } else if let Some(reasoning) = saved_reasoning {
                         message.insert("reasoning_content".into(), reasoning.into());
@@ -506,8 +544,15 @@ impl ProviderSessionAdapter {
 
     /// `_legacy_alias_replacements(current)`: earlier declared aliases remapped or retired, once
     /// per immutable lock.
-    async fn legacy_alias_replacements(&self, current: &PackageLockRecord) -> CodedResult<IndexMap<String, Option<String>>> {
-        if let Some(changes) = self.legacy_alias_changes.lock().unwrap_or_else(std::sync::PoisonError::into_inner).get(&current.lock_id)
+    async fn legacy_alias_replacements(
+        &self,
+        current: &PackageLockRecord,
+    ) -> CodedResult<IndexMap<String, Option<String>>> {
+        if let Some(changes) = self
+            .legacy_alias_changes
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .get(&current.lock_id)
         {
             return Ok(changes.clone());
         }
@@ -520,7 +565,8 @@ impl ProviderSessionAdapter {
         let mut prior_pins: Vec<PackageLockEntry> = Vec::new();
         let mut predecessor = current.predecessor_lock_id.clone();
         while let Some(lock_id) = predecessor {
-            let prior = lineage.iter().find(|lock| lock.lock_id == lock_id).ok_or_else(|| key_error(&lock_id))?;
+            let prior =
+                lineage.iter().find(|lock| lock.lock_id == lock_id).ok_or_else(|| key_error(&lock_id))?;
             for pin in prior.package_lock.entries() {
                 if !prior_pins.contains(pin) {
                     prior_pins.push(pin.clone());
@@ -559,11 +605,17 @@ impl ProviderSessionAdapter {
 
     /// `_legacy_adopted_history(messages, campaign_id)`: saved exchanges whose aliases a newer
     /// lock retired or remapped, replayed under the current names.
-    pub async fn legacy_adopted_history(&self, messages: Vec<JsonMap>, campaign_id: &str) -> CodedResult<Vec<JsonMap>> {
+    pub async fn legacy_adopted_history(
+        &self,
+        messages: Vec<JsonMap>,
+        campaign_id: &str,
+    ) -> CodedResult<Vec<JsonMap>> {
         let pending: Vec<(usize, Vec<Json>)> = messages
             .iter()
             .enumerate()
-            .filter(|(_, message)| message.contains_key("_native_reference") && message.get("tool_calls").is_some_and(truthy))
+            .filter(|(_, message)| {
+                message.contains_key("_native_reference") && message.get("tool_calls").is_some_and(truthy)
+            })
             .map(|(index, message)| (index, message["tool_calls"].as_array().cloned().unwrap_or_default()))
             .collect();
         if pending.is_empty() {
@@ -577,7 +629,10 @@ impl ProviderSessionAdapter {
         let mut projected = messages.clone();
         for (index, calls) in pending.iter().rev() {
             let renamed = calls.iter().any(|call| {
-                call.get("function").and_then(|f| f.get("name")).and_then(Json::as_str).is_some_and(|name| changes.contains_key(name))
+                call.get("function")
+                    .and_then(|f| f.get("name"))
+                    .and_then(Json::as_str)
+                    .is_some_and(|name| changes.contains_key(name))
             });
             if !renamed {
                 continue;
@@ -589,8 +644,10 @@ impl ProviderSessionAdapter {
                 .filter(|result| result.get("role").and_then(Json::as_str) == Some("tool"))
                 .map(|result| pyjson::dumps(result.get("tool_call_id").unwrap_or(&Json::Null), Dump::WIRE))
                 .collect();
-            let call_ids: HashSet<String> =
-                calls.iter().map(|call| call.get("id").map_or_else(|| "null".into(), |id| pyjson::dumps(id, Dump::WIRE))).collect();
+            let call_ids: HashSet<String> = calls
+                .iter()
+                .map(|call| call.get("id").map_or_else(|| "null".into(), |id| pyjson::dumps(id, Dump::WIRE)))
+                .collect();
             if results.len() == calls.len() && result_ids == call_ids {
                 let replayed = legacy_tool_exchange(&messages[*index], calls, results, &changes)?;
                 projected.splice(*index..end, replayed);
@@ -614,7 +671,8 @@ impl ProviderSessionAdapter {
         history_allowed: bool,
     ) -> TurnResult<RoundStream> {
         let session_id = input.session.session_id().to_owned();
-        let previous = self.working.lock().unwrap_or_else(std::sync::PoisonError::into_inner).get(&session_id).cloned();
+        let previous =
+            self.working.lock().unwrap_or_else(std::sync::PoisonError::into_inner).get(&session_id).cloned();
         let records = match &previous {
             Some(previous) => previous.records(),
             None => input.history.messages.iter().map(|message| message.content().clone()).collect(),
@@ -657,7 +715,8 @@ impl ProviderSessionAdapter {
         let continuation_input = input.clone();
         let failed = Arc::clone(&rejection);
         options.prepare_continuation = Some(Arc::new(move |selected: Vec<JsonMap>, has_tools: bool| {
-            let (adapter, input, failed) = (Arc::clone(&adapter), continuation_input.clone(), Arc::clone(&failed));
+            let (adapter, input, failed) =
+                (Arc::clone(&adapter), continuation_input.clone(), Arc::clone(&failed));
             Box::pin(async move {
                 let prepared = match adapter.request_messages(selected) {
                     Ok(requested) => adapter.attach_native_continuation(requested, &input, has_tools).await,
@@ -671,7 +730,10 @@ impl ProviderSessionAdapter {
         }));
         let working = Arc::new(WorkingContextProvider::new(Arc::clone(&self.provider), options));
         working.set_history_retrieval_enabled(history_allowed);
-        self.working.lock().unwrap_or_else(std::sync::PoisonError::into_inner).insert(session_id.clone(), Arc::clone(&working));
+        self.working
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .insert(session_id.clone(), Arc::clone(&working));
         let request = self.round_request(messages, tools, tool_choice);
         let (sender, chunks) = mpsc::unbounded_channel();
         let progress = Arc::clone(&control);
@@ -697,11 +759,24 @@ impl ProviderSessionAdapter {
                 }
             }))
         })?;
-        Ok(RoundStream { adapter: Arc::clone(self), session_id, control, bridge: Some(bridge), chunks, task, rejection })
+        Ok(RoundStream {
+            adapter: Arc::clone(self),
+            session_id,
+            control,
+            bridge: Some(bridge),
+            chunks,
+            task,
+            rejection,
+        })
     }
 
     /// The round's provider request (`consume`'s `output_budget` and call arguments).
-    fn round_request(&self, messages: Vec<JsonMap>, tools: Vec<JsonMap>, tool_choice: Option<&str>) -> ProviderRequest {
+    fn round_request(
+        &self,
+        messages: Vec<JsonMap>,
+        tools: Vec<JsonMap>,
+        tool_choice: Option<&str>,
+    ) -> ProviderRequest {
         let model = self.provider.model_info();
         let transport = model.map(|model| model.transport.as_str());
         let limit = match model {
@@ -710,7 +785,11 @@ impl ProviderSessionAdapter {
         };
         let mut budget = JsonMap::new();
         if let Some(limit) = limit {
-            let key = if transport.unwrap_or("chat_completions") == "responses" { "max_output_tokens" } else { "max_tokens" };
+            let key = if transport.unwrap_or("chat_completions") == "responses" {
+                "max_output_tokens"
+            } else {
+                "max_tokens"
+            };
             budget.insert(key.into(), limit.into());
         }
         if transport == Some("anthropic_messages")

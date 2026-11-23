@@ -396,19 +396,26 @@ pub async fn stream_provider_round(
     events: &mut dyn super::TurnEvents,
 ) -> super::TurnResult<()> {
     use crate::provider_session::control_texts::{
-        campaign_file_disposition_message, campaign_file_updated_narration_message, campaign_preparation_message,
-        gm_decision_control_message, player_boundary_narration_message,
+        campaign_file_disposition_message, campaign_file_updated_narration_message,
+        campaign_preparation_message, gm_decision_control_message, player_boundary_narration_message,
     };
-    use crate::provider_session::request::{forced_single_tool_call_from_json, native_content_for_text_operation};
+    use crate::provider_session::request::{
+        forced_single_tool_call_from_json, native_content_for_text_operation,
+    };
     use crate::provider_session::texts::{gm_text, system};
     use crate::session_loop::ProviderEvent;
     use sylvia_base::pyjson::{self, Dump};
 
     if !state.locals.pending_narration_facts.get()?.is_empty() {
-        let facts = Json::Array(state.locals.pending_narration_facts.value()?.into_iter().map(Json::Object).collect());
+        let facts = Json::Array(
+            state.locals.pending_narration_facts.value()?.into_iter().map(Json::Object).collect(),
+        );
         let data = pyjson::dumps(&facts, Dump::CANONICAL);
-        let provisional =
-            if d::provisional_tool_prose_needs_review(state)? { gm_text("narration_facts_provisional") } else { "" };
+        let provisional = if d::provisional_tool_prose_needs_review(state)? {
+            gm_text("narration_facts_provisional")
+        } else {
+            ""
+        };
         let content = format!(
             "{}{data}{}{provisional}{}",
             gm_text("narration_facts_prefix"),
@@ -485,10 +492,9 @@ pub async fn stream_provider_round(
             state.locals.native_chat_metadata.set(Some(metadata.clone()));
         }
         if let Some(content) = &chunk.anthropic_content {
-            state
-                .locals
-                .native_assistant_content
-                .set(Some(content.iter().map(|block| block.as_object().cloned().unwrap_or_default()).collect()));
+            state.locals.native_assistant_content.set(Some(
+                content.iter().map(|block| block.as_object().cloned().unwrap_or_default()).collect(),
+            ));
         }
         if !chunk.reasoning_content.is_empty() {
             state.locals.assistant_reasoning.get_mut()?.push(chunk.reasoning_content.clone());
@@ -522,7 +528,8 @@ pub async fn stream_provider_round(
         native.insert("chat_completion_metadata".into(), Json::Object(metadata));
     }
     if let Some(content) = state.locals.native_assistant_content.value()? {
-        native.insert("anthropic_content".into(), Json::Array(content.into_iter().map(Json::Object).collect()));
+        native
+            .insert("anthropic_content".into(), Json::Array(content.into_iter().map(Json::Object).collect()));
     }
     if !state.locals.assistant_reasoning.get()?.is_empty() {
         native.insert("reasoning_content".into(), state.locals.assistant_reasoning.get()?.concat().into());
@@ -536,12 +543,14 @@ pub async fn stream_provider_round(
     }
     if state.locals.assemblies.get()?.is_empty() && *state.locals.provider_tool_call_required.get()? {
         let encoded = state.locals.assistant_text.get()?.concat();
-        let normalized = forced_single_tool_call_from_json(&encoded, state.locals.aliases.get()?, || adapter.uuid_hex());
+        let normalized =
+            forced_single_tool_call_from_json(&encoded, state.locals.aliases.get()?, || adapter.uuid_hex());
         // `loader_text_call` answers only for Sylvia's tool loader, which serves ledger mode
         // alone, so a legacy round never has one.
         if let Some(normalized) = normalized {
             let native_content = state.locals.native_assistant_content.value()?;
-            let normalized_native = native_content_for_text_operation(native_content.as_ref(), &encoded, &normalized)?;
+            let normalized_native =
+                native_content_for_text_operation(native_content.as_ref(), &encoded, &normalized)?;
             if native_content.is_none() || normalized_native.is_some() {
                 state.locals.native_assistant_content.set(normalized_native);
                 state.locals.assemblies.get_mut()?.insert(0, normalized.clone());
@@ -557,7 +566,10 @@ pub async fn stream_provider_round(
                 );
                 payload.insert("tool_name".into(), normalized.name.as_str().into());
                 events
-                    .emit(ProviderEvent::Evidence { message_id: format!("{inference_id}-forced-tool-json-normalized"), payload })
+                    .emit(ProviderEvent::Evidence {
+                        message_id: format!("{inference_id}-forced-tool-json-normalized"),
+                        payload,
+                    })
                     .await?;
             }
         }

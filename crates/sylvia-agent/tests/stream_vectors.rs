@@ -36,7 +36,8 @@ fn chunk(value: &J) -> ProviderStreamChunk {
         content: text("content"),
         reasoning_content: text("reasoning_content"),
         tool_call_delta: (!value["tool_call_delta"].is_null()).then(|| value["tool_call_delta"].clone()),
-        finish_reason: (!value["finish_reason"].is_null()).then(|| PyValue::from_json(value["finish_reason"].clone())),
+        finish_reason: (!value["finish_reason"].is_null())
+            .then(|| PyValue::from_json(value["finish_reason"].clone())),
         anthropic_content: value["anthropic_content"].as_array().cloned(),
         chat_completion_metadata: value["chat_completion_metadata"].as_object().cloned(),
         provider_reported_reasoning_effort: opt("provider_reported_reasoning_effort"),
@@ -132,7 +133,11 @@ async fn stream_round_matches_python() {
         let events = case["events"].as_array().unwrap();
         let owner = Arc::new(Recorded::new(events));
         let ids: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(
-            events.iter().filter(|event| event["event"] == "uuid").map(|event| event["hex"].as_str().unwrap().to_owned()).collect(),
+            events
+                .iter()
+                .filter(|event| event["event"] == "uuid")
+                .map(|event| event["hex"].as_str().unwrap().to_owned())
+                .collect(),
         ));
         let provider = Arc::new(Scripted {
             model: model(&case["model"]),
@@ -180,9 +185,14 @@ async fn stream_round_matches_python() {
         }
         let mut state = turn_state::load(&case["before"]);
         let mut collected = Collected(Vec::new());
-        let outcome =
-            stream_provider_round(&adapter, &mut state, &provider_input, case["turn_id"].as_str().unwrap(), &mut collected)
-                .await;
+        let outcome = stream_provider_round(
+            &adapter,
+            &mut state,
+            &provider_input,
+            case["turn_id"].as_str().unwrap(),
+            &mut collected,
+        )
+        .await;
         match (outcome, case.get("raised")) {
             (Ok(()), None) => {}
             (Err(TurnFailure::Coded(error)), Some(raised)) => {
@@ -200,10 +210,21 @@ async fn stream_round_matches_python() {
                 serde_json::json!({"messages": event["messages"], "tools": event["tools"], "timeout": event["timeout"], "options": event["options"]})
             })
             .collect();
-        assert_eq!(text(&J::Array(provider.requests.lock().unwrap().clone())), text(&J::Array(sent)), "{name}: the request");
-        let emitted: Vec<J> =
-            events.iter().filter(|event| event["event"] == "phase_event").map(|event| event["value"].clone()).collect();
+        assert_eq!(
+            text(&J::Array(provider.requests.lock().unwrap().clone())),
+            text(&J::Array(sent)),
+            "{name}: the request"
+        );
+        let emitted: Vec<J> = events
+            .iter()
+            .filter(|event| event["event"] == "phase_event")
+            .map(|event| event["value"].clone())
+            .collect();
         assert_eq!(text(&J::Array(collected.0)), text(&J::Array(emitted)), "{name}: the events");
-        turn_state::compare(&name, &turn_state::dump(&state), &turn_state::expected_after(&case["before"], &case["after"]));
+        turn_state::compare(
+            &name,
+            &turn_state::dump(&state),
+            &turn_state::expected_after(&case["before"], &case["after"]),
+        );
     }
 }

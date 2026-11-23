@@ -47,9 +47,11 @@ pub struct ProviderSessionAdapter {
     pub(crate) timeout: f64,
     /// `self._working_contexts`: the latest working context of each session, whose
     /// continuation notes the next round starts from.
-    pub(crate) working: std::sync::Mutex<HashMap<String, Arc<crate::working_context::WorkingContextProvider>>>,
+    pub(crate) working:
+        std::sync::Mutex<HashMap<String, Arc<crate::working_context::WorkingContextProvider>>>,
     /// `self._legacy_alias_changes`: each immutable lock's retired or remapped aliases.
-    pub(crate) legacy_alias_changes: std::sync::Mutex<HashMap<String, indexmap::IndexMap<String, Option<String>>>>,
+    pub(crate) legacy_alias_changes:
+        std::sync::Mutex<HashMap<String, indexmap::IndexMap<String, Option<String>>>>,
 }
 
 /// The ranker a turn's adapter keeps ([`RankReferences`], owned).

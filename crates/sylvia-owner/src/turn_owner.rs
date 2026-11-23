@@ -70,7 +70,9 @@ impl TurnOwner for OwnerReads {
         version: &'a str,
         sha256: &'a str,
     ) -> BoxFuture<'a, CodedResult<JsonMap>> {
-        Box::pin(async move { self.store().package_record(package_id, version, sha256).await.map_err(store_error) })
+        Box::pin(async move {
+            self.store().package_record(package_id, version, sha256).await.map_err(store_error)
+        })
     }
 
     fn package_lock_lineage<'a>(
@@ -79,7 +81,10 @@ impl TurnOwner for OwnerReads {
     ) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>> {
         Box::pin(async move {
             let campaign_id = campaign_id.to_owned();
-            self.store().call(move |store| store.package_lock_lineage(&campaign_id)).await.map_err(store_error)
+            self.store()
+                .call(move |store| store.package_lock_lineage(&campaign_id))
+                .await
+                .map_err(store_error)
         })
     }
 
@@ -91,7 +96,10 @@ impl TurnOwner for OwnerReads {
         content: &'a JsonMap,
     ) -> BoxFuture<'a, CodedResult<SessionMessage>> {
         Box::pin(async move {
-            self.store().append_agent_message(session_id, message_id, kind, content).await.map_err(store_error)
+            self.store()
+                .append_agent_message(session_id, message_id, kind, content)
+                .await
+                .map_err(store_error)
         })
     }
 }

@@ -485,8 +485,10 @@ impl TurnOwner for Recorded {
         provider_id: &'a str,
         model_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<J>>> {
-        let result =
-            self.next("provider_continuation", serde_json::json!([session_id, response_id, provider_id, model_id]));
+        let result = self.next(
+            "provider_continuation",
+            serde_json::json!([session_id, response_id, provider_id, model_id]),
+        );
         ready((!result.is_null()).then_some(result))
     }
     fn package_record<'a>(
@@ -498,7 +500,10 @@ impl TurnOwner for Recorded {
         let result = self.next_result("package_record", serde_json::json!([package_id, version, sha256]));
         Box::pin(async move { result.map(|value| map(&value)) })
     }
-    fn package_lock_lineage<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>> {
+    fn package_lock_lineage<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>> {
         let result = self.next("package_lock_lineage", serde_json::json!([campaign_id]));
         ready(result.as_array().unwrap().iter().map(lock_record).collect())
     }
@@ -509,8 +514,10 @@ impl TurnOwner for Recorded {
         kind: SessionMessageKind,
         content: &'a JsonMap,
     ) -> BoxFuture<'a, CodedResult<SessionMessage>> {
-        let result =
-            self.next("append_agent_message", serde_json::json!([session_id, message_id, kind.as_str(), content]));
+        let result = self.next(
+            "append_agent_message",
+            serde_json::json!([session_id, message_id, kind.as_str(), content]),
+        );
         ready(session_message(&result))
     }
 }

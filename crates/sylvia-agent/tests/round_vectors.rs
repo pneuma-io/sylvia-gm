@@ -148,7 +148,11 @@ async fn round_preparation_matches_python() {
         }
         owner.check(&name);
         assert!(ids.lock().unwrap().is_empty(), "{name}: Rust drew fewer uuid4 values than Python");
-        turn_state::compare(&name, &turn_state::dump(&state), &turn_state::expected_after(&case["before"], &case["after"]));
+        turn_state::compare(
+            &name,
+            &turn_state::dump(&state),
+            &turn_state::expected_after(&case["before"], &case["after"]),
+        );
         let audits: Vec<J> = events
             .iter()
             .filter(|event| event["event"] == "audit_context")

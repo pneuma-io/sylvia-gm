@@ -126,8 +126,10 @@ pub trait TurnOwner: OpeningReads {
     ) -> BoxFuture<'a, CodedResult<JsonMap>>;
 
     /// `package_lock_lineage(campaign_id)`: every lock the campaign has had, oldest first.
-    fn package_lock_lineage<'a>(&'a self, campaign_id: &'a str)
-        -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>>;
+    fn package_lock_lineage<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>>;
 
     /// `append_agent_message(session_id=..., message_id=..., kind=..., content=...)`.
     fn append_agent_message<'a>(

@@ -28,9 +28,12 @@ fn python_equal(a: &Json, b: &Json) -> bool {
         _ => None,
     };
     match (a, b) {
-        (Json::Array(a), Json::Array(b)) => a.len() == b.len() && a.iter().zip(b).all(|(a, b)| python_equal(a, b)),
+        (Json::Array(a), Json::Array(b)) => {
+            a.len() == b.len() && a.iter().zip(b).all(|(a, b)| python_equal(a, b))
+        }
         (Json::Object(a), Json::Object(b)) => {
-            a.len() == b.len() && a.iter().all(|(key, value)| b.get(key).is_some_and(|other| python_equal(value, other)))
+            a.len() == b.len()
+                && a.iter().all(|(key, value)| b.get(key).is_some_and(|other| python_equal(value, other)))
         }
         (Json::String(a), Json::String(b)) => a == b,
         (Json::Null, Json::Null) => true,
@@ -57,7 +60,11 @@ fn function_of(call: &Json) -> JsonMap {
 
 /// `attach_chat_metadata(message, metadata, required=False)`: private chat extensions attached
 /// to the same saved tool identities only.
-pub fn attach_chat_metadata(message: &JsonMap, metadata: Option<&Json>, required: bool) -> CodedResult<JsonMap> {
+pub fn attach_chat_metadata(
+    message: &JsonMap,
+    metadata: Option<&Json>,
+    required: bool,
+) -> CodedResult<JsonMap> {
     let Some(metadata) = metadata.filter(|metadata| !metadata.is_null()) else {
         if required {
             return Err(CodedError::new(
@@ -97,8 +104,10 @@ pub fn attach_chat_metadata(message: &JsonMap, metadata: Option<&Json>, required
         if !items.iter().all(Json::is_object) {
             return Err(mismatch("Native Responses metadata is invalid"));
         }
-        let native: Vec<&Json> =
-            items.iter().filter(|item| item.get("type").and_then(Json::as_str) == Some("function_call")).collect();
+        let native: Vec<&Json> = items
+            .iter()
+            .filter(|item| item.get("type").and_then(Json::as_str) == Some("function_call"))
+            .collect();
         let matches = native.len() == calls.len()
             && native.iter().zip(calls).all(|(native, call)| {
                 let function = function_of(call);
@@ -118,21 +127,24 @@ pub fn attach_chat_metadata(message: &JsonMap, metadata: Option<&Json>, required
     }
     if let Some(parts) = metadata.get("gemini_parts").filter(|parts| !parts.is_null()) {
         let ids = metadata.get("gemini_call_ids");
-        let call_ids: Option<Vec<Json>> =
-            calls.as_array().map(|calls| calls.iter().map(|call| call.get("id").cloned().unwrap_or(Json::Null)).collect());
+        let call_ids: Option<Vec<Json>> = calls
+            .as_array()
+            .map(|calls| calls.iter().map(|call| call.get("id").cloned().unwrap_or(Json::Null)).collect());
         let valid = parts.as_array().is_some_and(|parts| parts.iter().all(Json::is_object))
             && ids.and_then(Json::as_array).is_some_and(|ids| call_ids.as_ref() == Some(ids));
         if !valid {
             return Err(mismatch("Native Gemini metadata does not match this exchange"));
         }
         let calls = calls.as_array().cloned().unwrap_or_default();
-        let native: Vec<&Json> = parts.as_array().into_iter().flatten().filter_map(|part| part.get("functionCall")).collect();
+        let native: Vec<&Json> =
+            parts.as_array().into_iter().flatten().filter_map(|part| part.get("functionCall")).collect();
         let differs = native.len() != calls.len()
             || native.iter().zip(&calls).any(|(native, call)| {
                 let function = function_of(call);
                 let arguments = loads(function.get("arguments"), "{}");
                 let native_args = native.get("args").cloned().unwrap_or_else(|| Json::Object(JsonMap::new()));
-                native.get("name") != function.get("name") || arguments.is_none_or(|arguments| !python_equal(&native_args, &arguments))
+                native.get("name") != function.get("name")
+                    || arguments.is_none_or(|arguments| !python_equal(&native_args, &arguments))
             });
         if differs {
             return Err(mismatch("Native Gemini arguments do not match this exchange"));
@@ -157,7 +169,9 @@ pub fn attach_chat_metadata(message: &JsonMap, metadata: Option<&Json>, required
             .iter()
             .map(|call| {
                 let mut call = call.as_object().cloned().unwrap_or_default();
-                if let Some(extra) = call.get("id").and_then(Json::as_str).and_then(|id| extras.get(id)).cloned() {
+                if let Some(extra) =
+                    call.get("id").and_then(Json::as_str).and_then(|id| extras.get(id)).cloned()
+                {
                     call.insert("extra_content".into(), extra);
                 }
                 Json::Object(call)

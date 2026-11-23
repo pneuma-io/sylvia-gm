@@ -49,7 +49,11 @@ fn tool(name: &str) -> ModelMechanicsTool {
 fn text_helpers_match_python() {
     let vectors = vectors();
     for case in vectors["serialized"].as_array().unwrap() {
-        assert_eq!(J::Bool(contains_serialized_tool_call(case["text"].as_str().unwrap())), case["result"], "{case}");
+        assert_eq!(
+            J::Bool(contains_serialized_tool_call(case["text"].as_str().unwrap())),
+            case["result"],
+            "{case}"
+        );
     }
     for case in vectors["forced"].as_array().unwrap() {
         let aliases: IndexMap<String, ModelMechanicsTool> = case["aliases"]
@@ -69,10 +73,13 @@ fn text_helpers_match_python() {
         assert_eq!(text(&result), text(&case["result"]), "{case}");
         assert_eq!(J::from(drawn), case["ids_drawn"], "{case}");
     }
-    let assembly = ToolCallAssembly { call_id: "call-1".into(), name: "tool_a".into(), arguments: "{\"x\":1}".into() };
+    let assembly =
+        ToolCallAssembly { call_id: "call-1".into(), name: "tool_a".into(), arguments: "{\"x\":1}".into() };
     for case in vectors["native_text"].as_array().unwrap() {
         let blocks = case["blocks"].as_array().map(|_| maps(&case["blocks"]));
-        let result = native_content_for_text_operation(blocks.as_ref(), case["text"].as_str().unwrap(), &assembly).unwrap();
+        let result =
+            native_content_for_text_operation(blocks.as_ref(), case["text"].as_str().unwrap(), &assembly)
+                .unwrap();
         assert_eq!(text(&result.map_or(J::Null, maps_json)), text(&case["result"]), "{case}");
     }
     for case in vectors["legacy_exchange"].as_array().unwrap() {
@@ -92,8 +99,12 @@ fn text_helpers_match_python() {
         assert_eq!(text(&maps_json(result)), text(&case["result"]), "{case}");
     }
     for case in vectors["chat_metadata"].as_array().unwrap() {
-        let result = attach_chat_metadata(&map(&case["message"]), Some(&case["metadata"]), case["required"].as_bool().unwrap())
-            .map(J::Object);
+        let result = attach_chat_metadata(
+            &map(&case["message"]),
+            Some(&case["metadata"]),
+            case["required"].as_bool().unwrap(),
+        )
+        .map(J::Object);
         assert_eq!(text(&outcome(result)), text(&case["outcome"]), "{case}");
     }
 }
@@ -175,7 +186,11 @@ async fn native_continuation_matches_python() {
         let owner = Arc::new(Recorded::new(case["calls"].as_array().unwrap()));
         let adapter = adapter(&case["model"], Arc::clone(&owner));
         let result = adapter
-            .attach_native_continuation(maps(&case["messages"]), &provider_input(), case["has_tools"].as_bool().unwrap())
+            .attach_native_continuation(
+                maps(&case["messages"]),
+                &provider_input(),
+                case["has_tools"].as_bool().unwrap(),
+            )
             .await;
         assert_eq!(text(&coded_outcome(result)), text(&case["outcome"]), "{name}");
         owner.check(name);
