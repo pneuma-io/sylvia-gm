@@ -68,7 +68,7 @@ impl ReferenceOwner for AuthorityStore {
 }
 
 /// [`LibraryOwner`] with the owner's errors read back as domain errors, for a Plan validator.
-struct DomainOwner<'a, O>(&'a O);
+pub(crate) struct DomainOwner<'a, O>(pub(crate) &'a O);
 
 impl<O: ReferenceOwner> LibraryOwner for DomainOwner<'_, O> {
     type Error = DomainError;
