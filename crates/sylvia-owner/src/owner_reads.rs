@@ -203,35 +203,51 @@ impl OpeningReads for OwnerReads {
 mod tests {
     use super::*;
     use std::io::Read;
-    use sylvia_app::authority::content_reads::CatalogTool;
-    use sylvia_app::player_actions::PlayerControls;
-    use sylvia_domain::authority::ModelToolBehavior;
 
-    #[test]
-    fn a_catalog_tool_projects_its_model_fields_and_keeps_the_defaults() {
-        let mut schema = JsonMap::new();
-        schema.insert("type".into(), "object".into());
-        let tool = CatalogTool {
-            package_id: "pkg".into(),
-            package_version: "1.0.0".into(),
-            package_sha256: "a".repeat(64),
-            name: "roll".into(),
-            capability: "dice".into(),
-            input_schema: schema.clone(),
-            description: "Roll the dice.".into(),
-            model_behavior: ModelToolBehavior::RequiredRulesetDecision,
-            model_behavior_state_predicates: Vec::new(),
-            player_controls: PlayerControls::default(),
-            decision_title: "Roll".into(),
-            permanently_refused: false,
-        };
-        let projected = model_tool(tool);
-        let mut want = ModelMechanicsTool::new("pkg", "1.0.0", "a".repeat(64), "roll", "dice", schema);
-        want.description = "Roll the dice.".into();
-        want.model_behavior = ModelToolBehavior::RequiredRulesetDecision;
+    /// A real catalog tool (Riichi's, from the participant profile) projected for the model: the
+    /// fields the provider projection reads carry over, and the rest keep their defaults.
+    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+    async fn a_catalog_tool_projects_its_model_fields_and_keeps_the_defaults() {
+        let folder = std::env::temp_dir().join(format!("sylvia-owner-tool-{}", std::process::id()));
+        if let Err(error) = std::fs::remove_dir_all(&folder) {
+            assert_eq!(
+                error.kind(),
+                std::io::ErrorKind::NotFound,
+                "cannot clear the old work folder {}: {error}",
+                folder.display()
+            );
+        }
+        std::fs::create_dir_all(&folder).unwrap();
+        let database = folder.join("authority.sqlite3");
+        let source = crate::util::source_root()
+            .join("crates/sylvia-store/tests/vectors/stored_authority/cast.sqlite3.gz");
+        let mut bytes = Vec::new();
+        flate2::read::GzDecoder::new(std::fs::File::open(source).unwrap()).read_to_end(&mut bytes).unwrap();
+        std::fs::write(&database, bytes).unwrap();
+        let path = database.clone();
+        let (store, thread) =
+            StoreHandle::spawn(move || sylvia_store::AuthorityStore::open_for_application_owner(&path, None))
+                .unwrap();
+        let tools =
+            sylvia_app::authority::content_reads::catalog(&store, "campaign-table", false).await.unwrap();
+        let tool = tools.into_iter().next().expect("Riichi's DM campaign admits its tools");
+        let projected = model_tool(tool.clone());
+        let mut want = ModelMechanicsTool::new(
+            tool.package_id.clone(),
+            tool.package_version.clone(),
+            tool.package_sha256.clone(),
+            tool.name.clone(),
+            tool.capability.clone(),
+            tool.input_schema.clone(),
+        );
+        want.description = tool.description.clone();
+        want.model_behavior = tool.model_behavior;
         assert_eq!(projected, want);
         assert_eq!(projected.category, "mechanic");
         assert_eq!(projected.parameter_derivations, None);
+        drop(store);
+        tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+        let _ = std::fs::remove_dir_all(folder);
     }
 
     /// Every `OpeningReads` method answers exactly what the read it wraps answers (those are proven

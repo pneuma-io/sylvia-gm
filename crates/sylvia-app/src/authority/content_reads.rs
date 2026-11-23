@@ -5,10 +5,14 @@
 //! `_exact_setting_knowledge` and `_campaign_secret_catalog`), and `model_context_owner` (with
 //! `_decision_scope_declaration`).
 //!
-//! `catalog` is exact up to building each tool. A tool is built by `_package_tool` through lane
-//! 2's tool materialization (`materialize_package_mechanic` and the `package_tool_*` readers),
-//! not ported yet: a catalog that would hold an admitted tool is refused as
-//! [`StoreError::NotPorted`] until it is. A campaign that is not active has none, as in Python.
+//! `catalog` builds each admitted tool with `_package_tool`, through lane 2's materialization
+//! (`materialize_package_mechanic`, the `package_tool_*` readers and the player-action checker
+//! and previewer). A campaign that is not active has none, as in Python.
+//!
+//! Python's owner keeps every built tool (`_tools`) and the last 16 runtimes it read
+//! (`_runtime_payloads`). Building an exact package identity's tool is deterministic, so here
+//! each catalog builds its tools again; lane 2's 16-entry parse cache keeps that from parsing
+//! a runtime twice. Nothing a caller sees differs.
 
 use crate::package_library::{declaration_admitted, dependency_only_manifest_rebind};
 use crate::player_actions::PlayerControls;
@@ -75,9 +79,9 @@ pub async fn ruleset_gm_operating_guide(
         .await
 }
 
-/// `CatalogTool`: one exact package-bound mechanic, as the model and the player see it. Lane 2's
-/// materialization adds the executable parts (`execute`, `check_player_action`,
-/// `preview_player_action`) when it lands.
+/// `CatalogTool`: one exact package-bound mechanic, with what the model and the player see of it
+/// and the executable parts lane 2 materializes (`execute`, `check_player_action`,
+/// `preview_player_action`), which compare by identity as Python's callables do.
 #[derive(Debug, Clone, PartialEq)]
 pub struct CatalogTool {
     pub package_id: String,
@@ -86,10 +90,13 @@ pub struct CatalogTool {
     pub name: String,
     pub capability: String,
     pub input_schema: JsonMap,
+    pub execute: crate::package_mechanic::PackageMechanic,
     pub description: String,
     pub model_behavior: ModelToolBehavior,
     pub model_behavior_state_predicates: Vec<StatePredicate>,
     pub player_controls: PlayerControls,
+    pub check_player_action: Option<crate::package_mechanic::PlayerActionChecker>,
+    pub preview_player_action: Option<crate::package_mechanic::PlayerActionPreviewer>,
     pub decision_title: String,
     pub permanently_refused: bool,
 }
@@ -138,6 +145,7 @@ pub(super) fn catalog_on(
         .iter()
         .flat_map(|entry| entry.capabilities().iter().cloned())
         .collect();
+    let mut available = Vec::new();
     for (entry, declaration) in &basis.declarations {
         let character_update = declaration.input_schema.contains_key("x-sylvia-gm-character-update");
         if character_update && !include_character_updates {
@@ -155,23 +163,133 @@ pub(super) fn catalog_on(
         {
             continue;
         }
-        // `_package_tool`: a package without runtime bytes builds no tool, so the declaration
-        // adds nothing; any other builds one through lane 2's materialization.
-        let runtime = store.package_file_bytes(
-            entry.package_id(),
-            entry.version(),
-            entry.sha256(),
-            crate::package_runtime::PACKAGE_RUNTIME_PATH,
-            crate::package_runtime::PACKAGE_RUNTIME_BYTE_LIMIT as i64,
-        )?;
-        if runtime.is_none() {
-            continue;
+        let Some(tool) = package_tool(store, entry, declaration)? else { continue };
+        if !tool.permanently_refused
+            && tool.capability == declaration.capability
+            && entry.capabilities().contains(&tool.capability)
+        {
+            let behavior = if include_unexposed
+                || crate::package_library::state_predicates_match(
+                    &tool.model_behavior_state_predicates,
+                    &basis.state,
+                ) {
+                tool.model_behavior
+            } else {
+                ModelToolBehavior::Optional
+            };
+            available.push(CatalogTool { model_behavior: behavior, ..tool });
         }
-        return Err(StoreError::NotPorted(
-            "a catalog tool (lane 2: materialize_package_mechanic and the package_tool_* readers)",
-        ));
     }
-    Ok(Vec::new())
+    available.sort_by(|left, right| {
+        (&left.package_id, &left.package_version, &left.package_sha256, &left.name).cmp(&(
+            &right.package_id,
+            &right.package_version,
+            &right.package_sha256,
+            &right.name,
+        ))
+    });
+    Ok(available)
+}
+
+/// A lane 2 failure Python lets through: its class and message.
+fn uncaught(class: &'static str, message: String) -> StoreError {
+    DomainError::uncaught(class, message).into()
+}
+
+/// `_package_tool(package, declaration)`: the exact package's tool, or `None` when the package
+/// has no runtime or its runtime refuses the tool (`except PackageRuntimeError: return None`).
+/// `package_tool_permanently_refused` is read after that `try`, so its refusal escapes as
+/// Python's `PackageRuntimeError`, a `ValueError`.
+fn package_tool(
+    store: &AuthorityStore,
+    entry: &sylvia_domain::authority::PackageLockEntry,
+    declaration: &sylvia_domain::package_library::ToolDeclaration,
+) -> StoreResult<Option<CatalogTool>> {
+    use crate::package_mechanic::{
+        materialize_package_mechanic, materialize_player_action_checker, materialize_player_action_previewer,
+    };
+    use crate::package_runtime::{
+        package_tool_decision_title, package_tool_description, package_tool_model_behavior,
+        package_tool_permanently_refused, package_tool_player_controls, PackageRuntimeFailure,
+    };
+    let Some(runtime) = store.package_file_bytes(
+        entry.package_id(),
+        entry.version(),
+        entry.sha256(),
+        crate::package_runtime::PACKAGE_RUNTIME_PATH,
+        crate::package_runtime::PACKAGE_RUNTIME_BYTE_LIMIT as i64,
+    )?
+    else {
+        return Ok(None);
+    };
+    let package_id = entry.package_id();
+    let built = (|| -> Result<_, PackageRuntimeFailure> {
+        let mechanic =
+            materialize_package_mechanic(package_id, entry.version(), entry.sha256(), declaration, &runtime)?;
+        let description = package_tool_description(package_id, declaration, &runtime)?;
+        let (model_behavior, predicates) = package_tool_model_behavior(package_id, declaration, &runtime)?;
+        let decision_title = package_tool_decision_title(package_id, declaration, &runtime)?;
+        let player_controls = package_tool_player_controls(package_id, declaration, &runtime)?;
+        let checker = materialize_player_action_checker(package_id, declaration, &runtime)?;
+        let previewer = materialize_player_action_previewer(package_id, declaration, &runtime)?;
+        Ok((
+            mechanic,
+            description,
+            model_behavior,
+            predicates,
+            decision_title,
+            player_controls,
+            checker,
+            previewer,
+        ))
+    })();
+    let (
+        execute,
+        description,
+        model_behavior,
+        predicates,
+        decision_title,
+        player_controls,
+        checker,
+        previewer,
+    ) = match built {
+        Ok(parts) => parts,
+        Err(PackageRuntimeFailure::Rejected(_)) => return Ok(None),
+        Err(PackageRuntimeFailure::Uncaught { class, message }) => return Err(uncaught(class, message)),
+    };
+    let input_schema = declaration.input_schema.clone();
+    // `validate_parameters({}, _schema_without_required(captured_schema))`.
+    let mut without_required = input_schema.clone();
+    without_required.insert("required".into(), Json::Array(Vec::new()));
+    sylvia_domain::schema_admission::validate_parameters(&JsonMap::new(), &without_required)?;
+    let permanently_refused = match package_tool_permanently_refused(package_id, declaration, &runtime) {
+        Ok(refused) => refused,
+        Err(PackageRuntimeFailure::Rejected(error)) => {
+            return Err(sylvia_base::CodedError::new("command_rejected", error.message)
+                .with_error_type("PackageRuntimeError")
+                .into())
+        }
+        Err(PackageRuntimeFailure::Uncaught { class, message }) => return Err(uncaught(class, message)),
+    };
+    let tool = CatalogTool {
+        package_id: package_id.to_owned(),
+        package_version: entry.version().to_owned(),
+        package_sha256: entry.sha256().to_owned(),
+        name: declaration.name.clone(),
+        capability: declaration.capability.clone(),
+        input_schema,
+        execute,
+        description,
+        model_behavior,
+        model_behavior_state_predicates: predicates,
+        player_controls,
+        check_player_action: Some(checker),
+        preview_player_action: Some(previewer),
+        decision_title,
+        permanently_refused,
+    };
+    tool.validate()?;
+    Ok(Some(tool))
 }
 
 /// `_active_dm_context(session_id)`: one active campaign-bound DM session.

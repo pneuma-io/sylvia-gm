@@ -13,10 +13,209 @@
    "base": "cast",
    "read": "catalog",
    "campaign_id": "campaign-table",
+   "include_unexposed": false,
    "outcome": {
     "ok": [
-     "start_game",
-     "take_action"
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "start_game",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "match_format": {
+         "enum": [
+          "east_only",
+          "east_south"
+         ],
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        },
+        "player": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice",
+         "x-sylvia-gm-reference": "participant"
+        }
+       },
+       "required": [
+        "player",
+        "match_format"
+       ],
+       "type": "object"
+      },
+      "description": "Start an East-only or East\u2013South four-player match with red fives.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "on_request",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     },
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "take_action",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "choice": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        }
+       },
+       "required": [
+        "choice"
+       ],
+       "type": "object"
+      },
+      "description": "Choose a current action ID using the acting seat's permitted information.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "automatic",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [
+        {
+         "condition": "choice in state.choice_ids",
+         "reason": "This move is no longer available."
+        }
+       ],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     }
+    ]
+   }
+  },
+  {
+   "base": "cast",
+   "read": "catalog",
+   "campaign_id": "campaign-table",
+   "include_unexposed": true,
+   "outcome": {
+    "ok": [
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "start_game",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "match_format": {
+         "enum": [
+          "east_only",
+          "east_south"
+         ],
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        },
+        "player": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice",
+         "x-sylvia-gm-reference": "participant"
+        }
+       },
+       "required": [
+        "player",
+        "match_format"
+       ],
+       "type": "object"
+      },
+      "description": "Start an East-only or East\u2013South four-player match with red fives.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "on_request",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     },
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "take_action",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "choice": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        }
+       },
+       "required": [
+        "choice"
+       ],
+       "type": "object"
+      },
+      "description": "Choose a current action ID using the acting seat's permitted information.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "automatic",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [
+        {
+         "condition": "choice in state.choice_ids",
+         "reason": "This move is no longer available."
+        }
+       ],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     }
     ]
    }
   },
@@ -46,8 +245,114 @@
    "base": "cast",
    "read": "catalog",
    "campaign_id": "campaign-workshop",
+   "include_unexposed": false,
    "outcome": {
     "ok": []
+   }
+  },
+  {
+   "base": "cast",
+   "read": "catalog",
+   "campaign_id": "campaign-workshop",
+   "include_unexposed": true,
+   "outcome": {
+    "ok": [
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "start_game",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "match_format": {
+         "enum": [
+          "east_only",
+          "east_south"
+         ],
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        },
+        "player": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice",
+         "x-sylvia-gm-reference": "participant"
+        }
+       },
+       "required": [
+        "player",
+        "match_format"
+       ],
+       "type": "object"
+      },
+      "description": "Start an East-only or East\u2013South four-player match with red fives.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "on_request",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     },
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "take_action",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "choice": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        }
+       },
+       "required": [
+        "choice"
+       ],
+       "type": "object"
+      },
+      "description": "Choose a current action ID using the acting seat's permitted information.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "automatic",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [
+        {
+         "condition": "choice in state.choice_ids",
+         "reason": "This move is no longer available."
+        }
+       ],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     }
+    ]
    }
   },
   {
@@ -668,6 +973,16 @@
    "base": "campaigns",
    "read": "catalog",
    "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -692,6 +1007,16 @@
    "base": "campaigns",
    "read": "catalog",
    "campaign_id": "campaign-a1",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-a1",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -716,6 +1041,16 @@
    "base": "campaigns",
    "read": "catalog",
    "campaign_id": "campaign-a2",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-a2",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -740,6 +1075,16 @@
    "base": "campaigns",
    "read": "catalog",
    "campaign_id": "campaign-b",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-b",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -764,6 +1109,16 @@
    "base": "campaigns",
    "read": "catalog",
    "campaign_id": "campaign-clockwork",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "campaign-clockwork",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -788,6 +1143,16 @@
    "base": "campaigns",
    "read": "catalog",
    "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "catalog",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -1895,6 +2260,16 @@
    "base": "session_pages",
    "read": "catalog",
    "campaign_id": "campaign-build",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "catalog",
+   "campaign_id": "campaign-build",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -1919,6 +2294,16 @@
    "base": "session_pages",
    "read": "catalog",
    "campaign_id": "campaign-story",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "catalog",
+   "campaign_id": "campaign-story",
+   "include_unexposed": true,
    "outcome": {
     "ok": []
    }
@@ -2370,6 +2755,966 @@
       "id": "synthetic.actions",
       "version": "1.0.0",
       "content_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": "Run Riichi Mahjong through start_game and take_action. Use the named player and three isolated NPC decision contexts. The host dispatches NPC choices from that seat's permitted observations. Keep your continuous campaign context and narrate only their committed public results. Resolve the player's currently declared action through the offered IDs, then stop at the next player decision. Never inspect the wall, NPC hands or NPC thinking. The table, legal actions, scores and saved match state belong to the engine. Use ordinary gameplay/OOC transitions and preserve the table during conversation. There is no adventuring rules layer. Tile labels m, p and s mean characters, circles and bamboo; red fives are marked explicitly."
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "catalog",
+   "campaign_id": "campaign-table",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": [
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "start_game",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "match_format": {
+         "enum": [
+          "east_only",
+          "east_south"
+         ],
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        },
+        "player": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice",
+         "x-sylvia-gm-reference": "participant"
+        }
+       },
+       "required": [
+        "player",
+        "match_format"
+       ],
+       "type": "object"
+      },
+      "description": "Start an East-only or East\u2013South four-player match with red fives.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "on_request",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     },
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "take_action",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "choice": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        }
+       },
+       "required": [
+        "choice"
+       ],
+       "type": "object"
+      },
+      "description": "Choose a current action ID using the acting seat's permitted information.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "automatic",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [
+        {
+         "condition": "choice in state.choice_ids",
+         "reason": "This move is no longer available."
+        }
+       ],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     }
+    ]
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "catalog",
+   "campaign_id": "campaign-table",
+   "include_unexposed": true,
+   "outcome": {
+    "ok": [
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "start_game",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "match_format": {
+         "enum": [
+          "east_only",
+          "east_south"
+         ],
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        },
+        "player": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice",
+         "x-sylvia-gm-reference": "participant"
+        }
+       },
+       "required": [
+        "player",
+        "match_format"
+       ],
+       "type": "object"
+      },
+      "description": "Start an East-only or East\u2013South four-player match with red fives.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "on_request",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     },
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "take_action",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "choice": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        }
+       },
+       "required": [
+        "choice"
+       ],
+       "type": "object"
+      },
+      "description": "Choose a current action ID using the acting seat's permitted information.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "automatic",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [
+        {
+         "condition": "choice in state.choice_ids",
+         "reason": "This move is no longer available."
+        }
+       ],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     }
+    ]
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": {
+     "kind": "gm",
+     "campaign_id": "campaign-table",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "ruleset_gm_operating_guide",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": "Run Riichi Mahjong through start_game and take_action. Use the named player and three isolated NPC decision contexts. The host dispatches NPC choices from that seat's permitted observations. Keep your continuous campaign context and narrate only their committed public results. Resolve the player's currently declared action through the offered IDs, then stop at the next player decision. Never inspect the wall, NPC hands or NPC thinking. The table, legal actions, scores and saved match state belong to the engine. Use ordinary gameplay/OOC transitions and preserve the table during conversation. There is no adventuring rules layer. Tile labels m, p and s mean characters, circles and bamboo; red fives are marked explicitly."
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "catalog",
+   "campaign_id": "campaign-workshop",
+   "include_unexposed": false,
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "catalog",
+   "campaign_id": "campaign-workshop",
+   "include_unexposed": true,
+   "outcome": {
+    "ok": [
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "start_game",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "match_format": {
+         "enum": [
+          "east_only",
+          "east_south"
+         ],
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        },
+        "player": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice",
+         "x-sylvia-gm-reference": "participant"
+        }
+       },
+       "required": [
+        "player",
+        "match_format"
+       ],
+       "type": "object"
+      },
+      "description": "Start an East-only or East\u2013South four-player match with red fives.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "on_request",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     },
+     {
+      "package_id": "pneuma.riichi-mahjong",
+      "package_version": "0.1.1",
+      "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+      "name": "take_action",
+      "capability": "pneuma.riichi-mahjong.play",
+      "input_schema": {
+       "additionalProperties": false,
+       "properties": {
+        "choice": {
+         "type": "string",
+         "x-sylvia-gm-input-source": "choice"
+        }
+       },
+       "required": [
+        "choice"
+       ],
+       "type": "object"
+      },
+      "description": "Choose a current action ID using the acting seat's permitted information.",
+      "model_behavior": "resolves_player_intent",
+      "model_behavior_state_predicates": [],
+      "player_controls": {
+       "confirmation": "none",
+       "response": "automatic",
+       "preview": null,
+       "actor_parameter": null,
+       "checks": [
+        {
+         "condition": "choice in state.choice_ids",
+         "reason": "This move is no longer available."
+        }
+       ],
+       "queries": [],
+       "calculations": [],
+       "map_preview": null,
+       "available": true,
+       "preflight": [],
+       "preflight_path": null
+      },
+      "decision_title": "",
+      "permanently_refused": false,
+      "checks_player_action": true,
+      "previews_player_action": true
+     }
+    ]
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "model_context_owner",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": {
+     "kind": "gm",
+     "campaign_id": "campaign-workshop",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_locked_pneuma.riichi-mahjong",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-mahjong",
+      "version": "0.1.1",
+      "content_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-table",
+   "case": "binding_locked_pneuma.riichi-club",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-club",
+      "version": "0.1.1",
+      "content_sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "empty",
+   "plan": {},
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "secrets",
+   "plan": {
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "secrets_not_a_list",
+   "plan": {
+    "secrets": "one secret"
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "setting_reference_unavailable",
+   "plan": {
+    "secrets": [
+     {
+      "id": "fact-1",
+      "setting_fact_id": "fact-1"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan references unavailable Campaign Setting knowledge"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_invalid",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "x",
+      "version": 1
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is invalid"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_not_a_mapping",
+   "plan": {
+    "bindings": {
+     "campaign_setting": "x"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_stale",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.unknown-setting",
+      "version": "1.0.0",
+      "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+     }
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Setting knowledge binding is stale"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_locked_pneuma.riichi-mahjong",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-mahjong",
+      "version": "0.1.1",
+      "content_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf"
+     }
+    },
+    "secrets": [
+     "The lighthouse keeper is the smuggler.",
+     {
+      "id": "secret-1",
+      "fact": "The vault opens at dawn.",
+      "known_by": [
+       "npc-mara"
+      ],
+      "reveal": {
+       "when": "act-2"
+      }
+     },
+     5,
+     {
+      "fact": "no identity"
+     },
+     {
+      "id": 7,
+      "fact": "numeric identity"
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "secrets": [
+      {
+       "id": "legacy-secret-0",
+       "fact": "The lighthouse keeper is the smuggler.",
+       "known_by": [],
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true,
+       "reveal": null
+      },
+      {
+       "id": "secret-1",
+       "fact": "The vault opens at dawn.",
+       "known_by": [
+        "npc-mara"
+       ],
+       "reveal": {
+        "when": "act-2"
+       },
+       "source": "campaign_plan",
+       "source_path": null,
+       "selected_by_plan": true
+      }
+     ],
+     "private_setting_references": []
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_knowledge_catalog_for_plan",
+   "campaign_id": "campaign-workshop",
+   "case": "binding_locked_pneuma.riichi-club",
+   "plan": {
+    "bindings": {
+     "campaign_setting": {
+      "id": "pneuma.riichi-club",
+      "version": "0.1.1",
+      "content_sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415"
      }
     },
     "secrets": [
