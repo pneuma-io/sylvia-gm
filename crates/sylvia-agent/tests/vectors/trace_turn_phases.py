@@ -14,6 +14,16 @@ For each call of a traced phase it logs:
 - `phase_end`: the turn locals after the phase, or the exception it raised, and what it
   returned when that is not `None`.
 
+A real call of a generator phase is relayed: each event is logged and passed to the session
+loop as Python's own consumer would take it, with owner calls unlogged while the loop handles
+it, and after an action the loop's answer is logged (`action_handled`: the rejection it wrote
+back, or null). The phase then resumes as it would untraced. Variants are consumed here, their
+events never reaching the loop.
+
+The provider input's narrative writer, knowledge searcher and reference reader are logged as
+`callback` rows (which one, its arguments and result, or what it raised), their own owner calls
+unlogged: the Rust test answers each from its row.
+
 A traced function may also be one of the tool batch's helpers (T3a), whose arguments after the
 state vary: the provider input when there is one, any other positional argument and the
 keyword arguments (`turn_id`, a refusal's `error`) are passed through as given.
@@ -28,6 +38,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import inspect
 import json
 import os
 import random
@@ -53,6 +64,9 @@ from sylvia_gm.domain.authority import (  # noqa: E402
 )
 
 OVERRIDES: dict[str, object] = {}
+#: Phases whose traces log the provider input's callbacks (T3b's batch); earlier traces keep
+#: their rows unchanged.
+BATCH_PHASES = {"prepare_tool_batch", "execute_tool_batch"}
 ACTIVE = {"value": False}
 
 
@@ -327,7 +341,10 @@ EXTRA_TOOLS = [
 ]
 
 # Each variant: turn locals to set (`set`), owner reads to answer (`answer`), tools to add to the
-# current catalog (`tools`), or a cancelled control (`cancelled`).
+# current catalog (`tools`), a cancelled control (`cancelled`), or the round's calls replaced
+# (`calls`: each a name, `None` for the first real call's, and argument text, `None` for its own;
+# a `drop` list removes those argument keys, an `add` object sets some). Only the variant named
+# as calling the narrative writer reaches it.
 VARIANTS: dict[str, list[dict[str, object]]] = {
     "prepare_round_catalog": [
         {"name": "participant OOC only", "set": {"participant_ooc_only": True}},
@@ -396,6 +413,40 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
                                      "text": "Who goes?"})}},
         {"name": "no blocks", "set": {"selected_raw_blocks": None, "ooc_ack_required": True}},
     ],
+    "execute_tool_batch": [
+        {"name": "an unknown tool", "calls": [{"name": "no_such_tool", "arguments": "{}"}]},
+        {"name": "invalid JSON", "calls": [{"name": None, "arguments": '{"state_change": '}]},
+        {"name": "arguments not an object", "calls": [{"name": None, "arguments": "[1, 2]"}]},
+        {"name": "two calls of the first tool",
+         "calls": [{"name": None, "arguments": None}, {"name": None, "arguments": None}]},
+        {"name": "a history read", "calls": [{"name": "read_session_history",
+                                               "arguments": '{"query": "rain"}'}]},
+        {"name": "a contract read without contract tools",
+         "calls": [{"name": "read_tool_arguments", "arguments": '{"tool": "x", "value": "y"}'}]},
+        {"name": "a reference read", "calls": [{"name": "read_campaign_reference", "arguments":
+                                                '{"source": "campaign_state", "path": "scene"}'}]},
+        {"name": "a reference read without a path", "calls": [{"name": "read_campaign_reference",
+                                                                "arguments": '{"source": 3}'}]},
+        {"name": "a knowledge search", "calls": [{"name": "search_campaign_knowledge",
+                                                  "arguments": '{"query": "notice", "limit": 2}'}]},
+        {"name": "a knowledge search with a bad limit",
+         "calls": [{"name": "search_campaign_knowledge",
+                    "arguments": '{"query": "notice", "limit": true}'}]},
+        {"name": "a missing argument", "calls": [{"name": None, "arguments": None,
+                                                  "drop": ["actor", "state_change"]}]},
+        {"name": "a preparation scope the tool does not declare",
+         "calls": [{"name": None, "arguments": None,
+                    "add": {"player_intent_after_preparation": "unresolved_action"}}]},
+        # These two reach the Campaign File path's later checks; the first calls the real
+        # narrative writer, which commits or refuses the recorded change.
+        {"name": "an update that records a change",
+         "calls": [{"name": None, "arguments": None,
+                    "add": {"state_change": "changed",
+                            "memories": [{"text": "The notice is signed by the Quarterkeeper."}]}}]},
+        {"name": "an unchanged review after an attempted change",
+         "set": {"campaign_file_mutation_attempted": True},
+         "calls": [{"name": None, "arguments": None}]},
+    ],
     "prepare_provider_round": [
         {"name": "player boundary", "tools": True, "answer": {
             "campaign_preparation_boundary": boundary("player"),
@@ -439,6 +490,22 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
         setattr(state.decisions, key, value)
     if variant.get("tools"):
         state.current_catalog = (*state.current_catalog, *EXTRA_TOOLS)
+    if "calls" in variant:
+        real = state.ordered[0]
+        calls = []
+        for index, call in enumerate(variant["calls"]):  # type: ignore[union-attr]
+            arguments = call["arguments"] if call["arguments"] is not None else real.arguments
+            if call.get("drop") or call.get("add"):
+                values = json.loads(arguments or "{}")
+                for key in call.get("drop", ()):
+                    values.pop(key, None)
+                values.update(call.get("add", {}))
+                arguments = json.dumps(values)
+            calls.append(_provider_turn_phases._ToolCallAssembly(  # noqa: SLF001
+                call_id=f"{real.call_id}-variant-{index}",
+                name=call["name"] if call["name"] is not None else real.name,
+                arguments=arguments))
+        state.ordered = calls
     supplier = getattr(provider_input, "catalog_supplier", None)
     if variant.get("catalog_tools") and supplier is not None:
         provider_input = dataclasses.replace(
@@ -472,6 +539,39 @@ def lock_with_entry(lock: object) -> object:
     return PackageLock((entry,))
 
 
+def logged_callbacks(provider_input: object) -> object:
+    """The provider input with its writer, searcher and reader logged as `callback` rows."""
+
+    def wrapped(name: str, function: object) -> object:
+        def call(*arguments: object) -> object:
+            was_active = ACTIVE["value"]
+            ACTIVE["value"] = False
+            try:
+                result = function(*arguments)  # type: ignore[operator]
+            except BaseException as error:
+                ACTIVE["value"] = was_active
+                log({"event": "callback", "name": name, "arguments": plain(list(arguments)),
+                     "raised": {"class": type(error).__name__, "message": str(error),
+                                "code": getattr(error, "code", None),
+                                **({"field_paths": list(error.field_paths),
+                                    "validation_issues": [
+                                        issue.as_payload() for issue in error.validation_issues],
+                                    "state_changed": error.state_changed,
+                                    "refusal_reasons": list(error.refusal_reasons)}
+                                   if hasattr(error, "validation_issues") else {})}})
+                raise
+            ACTIVE["value"] = was_active
+            log({"event": "callback", "name": name, "arguments": plain(list(arguments)),
+                 "result": plain(result)})
+            return result
+        return call
+
+    changes = {name: wrapped(name, getattr(provider_input, name))
+               for name in ("narrative_writer", "knowledge_searcher", "reference_reader")
+               if getattr(provider_input, name, None) is not None}
+    return dataclasses.replace(provider_input, **changes) if changes else provider_input
+
+
 def traced_call(function, self, state, args, kwargs, variant):  # type: ignore[no-untyped-def]
     provider_input = args[0] if args else None
     turn_id = kwargs.get("turn_id")
@@ -482,6 +582,9 @@ def traced_call(function, self, state, args, kwargs, variant):  # type: ignore[n
             log({"event": "catalog", "request_id": request_id, "result": plain(result)})
             return result
         provider_input = dataclasses.replace(provider_input, catalog_supplier=logged)
+        args = (provider_input, *args[1:])
+    if provider_input is not None and BATCH_PHASES.intersection(PHASES):
+        provider_input = logged_callbacks(provider_input)
         args = (provider_input, *args[1:])
     provider = self._provider  # noqa: SLF001
     self._provider = AuditedProvider(provider)  # noqa: SLF001
@@ -517,15 +620,69 @@ def traced_call(function, self, state, args, kwargs, variant):  # type: ignore[n
     return result
 
 
+def traced_relay(function, self, state, args, kwargs):  # type: ignore[no-untyped-def]
+    """A real call of a generator phase, its events passed on as they come."""
+    from sylvia_gm.agent._session_loop import ProviderEventKind
+
+    provider_input = args[0] if args else None
+    supplier = getattr(provider_input, "catalog_supplier", None)
+    if supplier is not None:
+        def logged(request_id: str) -> object:
+            result = supplier(request_id)
+            log({"event": "catalog", "request_id": request_id, "result": plain(result)})
+            return result
+        provider_input = dataclasses.replace(provider_input, catalog_supplier=logged)
+        args = (provider_input, *args[1:])
+    if provider_input is not None and BATCH_PHASES.intersection(PHASES):
+        provider_input = logged_callbacks(provider_input)
+        args = (provider_input, *args[1:])
+    provider = self._provider  # noqa: SLF001
+    self._provider = AuditedProvider(provider)  # noqa: SLF001
+    log({"event": "phase_start", "phase": function.__name__, "variant": None,
+         "turn_id": kwargs.get("turn_id"), "adapter": getattr(self, "_trace_adapter", None),
+         "model": plain(getattr(provider, "model_info", None)),
+         "input": dump_input(provider_input) if provider_input is not None else None,
+         "state": dump_state(state)})
+    ACTIVE["value"] = True
+    try:
+        for event in function(self, state, *args, **kwargs):
+            log({"event": "phase_event", "value": plain(event)})
+            ACTIVE["value"] = False
+            yield event
+            ACTIVE["value"] = True
+            if event.kind is ProviderEventKind.ACTION:
+                feedback = event.action_feedback
+                log({"event": "action_handled",
+                     "rejection": plain(feedback.rejection) if feedback is not None else None})
+    except BaseException as error:
+        ACTIVE["value"] = False
+        log({"event": "phase_end", "raised": {"class": type(error).__name__,
+                                             "message": str(error),
+                                             "code": getattr(error, "code", None)},
+             "state": dump_state(state)})
+        raise
+    finally:
+        ACTIVE["value"] = False
+        self._provider = provider  # noqa: SLF001
+    log({"event": "phase_end", "state": dump_state(state)})
+
+
 def wrap(name: str) -> None:
     function = getattr(_provider_turn_phases, name)
 
-    def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
-        before = copy_state(state)
-        result = traced_call(function, self, state, args, kwargs, None)
-        for variant in VARIANTS.get(name, []):
-            run_variant(function, self, before, args, kwargs, variant)
-        return result
+    if inspect.isgeneratorfunction(function):
+        def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
+            before = copy_state(state)
+            yield from traced_relay(function, self, state, args, kwargs)
+            for variant in VARIANTS.get(name, []):
+                run_variant(function, self, before, args, kwargs, variant)
+    else:
+        def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
+            before = copy_state(state)
+            result = traced_call(function, self, state, args, kwargs, None)
+            for variant in VARIANTS.get(name, []):
+                run_variant(function, self, before, args, kwargs, variant)
+            return result
 
     traced.__name__ = name
     setattr(_provider_turn_phases, name, traced)

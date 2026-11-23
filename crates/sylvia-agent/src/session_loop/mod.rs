@@ -110,8 +110,13 @@ pub type KnowledgeSearcher = Arc<
 /// `reference_reader(source, path)`.
 pub type ReferenceReader =
     Arc<dyn Fn(String, String) -> BoxFuture<'static, CodedResult<JsonMap>> + Send + Sync>;
-/// `narrative_writer(parameters)`.
-pub type NarrativeWriter = Arc<dyn Fn(JsonMap) -> BoxFuture<'static, CodedResult<JsonMap>> + Send + Sync>;
+/// `narrative_writer(parameters)`. A refusal keeps its class and a `MechanicsRejected`'s fields,
+/// which the Campaign File rejection reports.
+pub type NarrativeWriter = Arc<
+    dyn Fn(JsonMap) -> BoxFuture<'static, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>
+        + Send
+        + Sync,
+>;
 
 /// `SessionProviderInput`: what one provider turn is run from. Build with
 /// [`SessionProviderInput::new`]; the optional parts take the dataclass's defaults.

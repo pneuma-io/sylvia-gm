@@ -181,8 +181,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_participant_file_tool.py:33` | `participant_file_tool.use_file` | re.fullmatch; plain | `or re.fullmatch(r"[0-9a-f]{64}", params["expected_version"]) is None` | |
 | `agent/_participant_file_tool.py:78` | `participant_file_tool` | JSON Schema pattern; plain | `"expected_version": {"type": "string", "pattern": "^[0-9a-f]{64}$"},` | |
 | `agent/_provider_session.py:411` | `_package_tool_alias` | re.sub; plain | `slug = re.sub(r"[^A-Za-z0-9_]", "_", name).strip("_") or "tool"` | `sylvia-agent` tool_projection_vectors |
-| `agent/_provider_session.py:894` | `_normalize_state_references.key` | re.sub; plain | `return re.sub(r"[\s_-]+", "_", re.sub(r"['’]", "", value.casefold())).strip("_")` | |
-| `agent/_provider_session.py:1290` | `_speaker_names_overlap.contains` | re.search; pattern built at run time, check by hand | `return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None` | |
+| `agent/_provider_session.py:894` | `_normalize_state_references.key` | re.sub; plain | `return re.sub(r"[\s_-]+", "_", re.sub(r"['’]", "", value.casefold())).strip("_")` || `sylvia-agent` tool_batch_vectors |
+| `agent/_provider_session.py:1290` | `_speaker_names_overlap.contains` | re.search; pattern built at run time, check by hand | `return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None` || `sylvia-agent` tool_batch_vectors |
 | `agent/_provider_session.py:2369` | `ProviderSessionAdapter._relevant_character_files_message` | re.search; pattern built at run time, check by hand | `if re.search( rf"(?<!\w){re.escape(alias)}(?!\w)", current_player_text, flags=re.IGNORECASE, )` | |
 | `agent/_ruleset_test_runner.py:50` | `_failure_message` | re.fullmatch; plain | `if isinstance(code, str) and re.fullmatch(r"[a-z][a-z0-9_]{0,79}", code):` | |
 | `agent/_runner.py:2015` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"^'''(?:json)?\s*", "", clean)` | |

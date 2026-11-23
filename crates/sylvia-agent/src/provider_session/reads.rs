@@ -113,6 +113,34 @@ pub trait TurnOwner: OpeningReads {
     /// arguments, in its key order (`kind`, `privacy`, then the arguments).
     fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()>;
 
+    /// `campaign_panels(campaign_id)`: the campaign's current panels and player controls.
+    fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `action_sequence(session_id=..., sequence_id=...)`: a saved action sequence, as read.
+    fn action_sequence<'a>(
+        &'a self,
+        session_id: &'a str,
+        sequence_id: &'a Json,
+    ) -> BoxFuture<'a, CodedResult<Json>>;
+
+    /// `_compose_action_sequence_from_agent(campaign_id=..., session_id=..., sequence_id=...,
+    /// expected_revision=..., expected_version=..., steps=...)`.
+    fn compose_action_sequence_from_agent<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        session_id: &'a str,
+        arguments: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<Json>>;
+
+    /// `_execute_action_sequence_from_agent(campaign_id=..., session_id=..., sequence_id=...,
+    /// expected_version=..., confirmation=...)`.
+    fn execute_action_sequence_from_agent<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        session_id: &'a str,
+        arguments: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<Json>>;
+
     /// `provider_continuation(session_id, response_id, provider_id=..., model_id=...)`: one
     /// selected provider exchange's private continuation, as stored.
     fn provider_continuation<'a>(

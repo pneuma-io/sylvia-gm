@@ -31,5 +31,20 @@
   "tool_correction": "SYLVIA_GM_TOOL_CORRECTION: One or more preceding calls were rejected. Read each structured tool result, preserve every successful result, and address only the rejected operation. That may require corrected arguments or a different currently exposed operation when the result says the original is unavailable or unsuitable. Do not narrate an uncommitted outcome. Correct every reported issue against the currently exposed schema instead of patching only one symptom. ",
   "tool_correction_held": "Sylvia already holds the exact player-facing response. Do not repeat it in the corrected tool arguments. ",
   "tool_correction_count": "This is correction {state.rejected_tool_corrections_used} of {state.max_rejected_tool_corrections}."
+ },
+ "batch_instructions": {
+  "superseded_by_catalog_refresh": "Only one state-changing operation may execute from one catalog snapshot. Continue as the same GM and choose the next operation from the freshly discovered tool surface.",
+  "provider_tool_arguments_not_object": "Call the tool again with a JSON object.",
+  "fixed_tool_argument_unavailable": "Choose from each field's allowed_values and retry the call once.",
+  "derivation_rejected": "Correct the selected participant or operation fields and retry once.",
+  "state_reference_rejected": "Correct the state reference from current Campaign State and retry.",
+  "campaign_file_update_must_be_only_tool": "A final Campaign File update must be the only tool call in its assistant message. Let any reference or Ruleset call finish first, then make one Campaign File update the final tool action. After it succeeds, narrate the admitted outcome.",
+  "campaign_preparation_pending": "Resolve queued starting choices first. Until then, return only OOC questions with an unchanged Campaign File; no story, rewards or act progress.",
+  "campaign_file_empty_collections": "Omit collections that have no items. If the decided outcome changes no durable Campaign File truth, send only the required complete narration; otherwise resubmit every lasting change as a non-empty collection.",
+  "campaign_file_unchanged_after_rejected_update": "The decided outcome already led you to attempt durable Campaign File changes. An empty review cannot retract those facts. Correct the rejected non-empty update; otherwise Sylvia must fail the turn without releasing narration."
+ },
+ "sequence_stops": {
+  "stopped": "SYLVIA_ACTION_SEQUENCE_STOP (trusted application instruction): The executable sequence stopped at an authoritative boundary. Preserve its saved committed action IDs and pending intentions. Do not execute, replace, or resume the remaining intentions in this exchange. Resolve only a currently required decision/Ruleset consequence; describe committed outcomes together through the ordinary final Campaign File disposition. Wait for fresh player direction before a further sequence execution.",
+  "undelivered": "SYLVIA_ACTION_SEQUENCE_STOP (trusted application instruction): Execution did not return a confirmed reply. The saved queue and committed receipts were recovered by reading. Do not submit execution again in this exchange, infer an uncommitted outcome, or spend costs again. Describe only the saved outcomes, preserve remaining intentions, and wait for fresh player direction."
  }
 }

@@ -192,9 +192,9 @@ pub fn turns(value: &J) -> Vec<(String, TurnStatus)> {
         .collect()
 }
 
-fn empty_history(value: &J, key: &str) {
-    assert!(value[key].as_array().is_none_or(Vec::is_empty), "{key} are not read");
-}
+/// A snapshot's action, mutation or consequence history: no ported phase reads them, so they are
+/// built empty whatever was recorded (a phase that starts reading them must parse them first).
+fn empty_history(_value: &J, _key: &str) {}
 
 pub fn canonical_event(value: &J) -> CanonicalEvent {
     CanonicalEvent {
@@ -495,9 +495,53 @@ impl TurnOwner for Recorded {
         Ok(())
     }
     fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()> {
-        let result = self.next("record_mechanics_diagnostic", serde_json::json!([diagnostic]));
+        // Python passes the fields as keywords; the payload adds its two constant keys.
+        assert_eq!(diagnostic["kind"], "mechanics_rejection");
+        assert_eq!(diagnostic["privacy"], "safe_metadata_only");
+        let fields: Vec<J> = diagnostic
+            .iter()
+            .filter(|(key, _)| !matches!(key.as_str(), "kind" | "privacy"))
+            .map(|(_, v)| v.clone())
+            .collect();
+        let result = self.next("record_mechanics_diagnostic", J::Array(fields));
         assert!(result.is_null(), "the recorder returns None");
         Ok(())
+    }
+    fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        let result = self.next_result("campaign_panels", serde_json::json!([campaign_id]));
+        Box::pin(async move { result.map(|value| map(&value)) })
+    }
+    fn action_sequence<'a>(
+        &'a self,
+        session_id: &'a str,
+        sequence_id: &'a J,
+    ) -> BoxFuture<'a, CodedResult<J>> {
+        let result = self.next_result("action_sequence", serde_json::json!([session_id, sequence_id]));
+        Box::pin(async move { result })
+    }
+    fn compose_action_sequence_from_agent<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        session_id: &'a str,
+        arguments: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<J>> {
+        let result = self.next_result(
+            "_compose_action_sequence_from_agent",
+            serde_json::json!([campaign_id, session_id, arguments]),
+        );
+        Box::pin(async move { result })
+    }
+    fn execute_action_sequence_from_agent<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        session_id: &'a str,
+        arguments: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<J>> {
+        let result = self.next_result(
+            "_execute_action_sequence_from_agent",
+            serde_json::json!([campaign_id, session_id, arguments]),
+        );
+        Box::pin(async move { result })
     }
     fn provider_continuation<'a>(
         &'a self,

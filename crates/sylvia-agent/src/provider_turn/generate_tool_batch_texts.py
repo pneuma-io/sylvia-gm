@@ -12,6 +12,12 @@ Every text is read back from the Python source with `ast`, never retyped:
   and results in `_provider_turn_phases.py`. A text with a conditional part is split at it (the
   part's own key names its condition); an f-string is a template whose `{expression}` the Rust
   side fills with the same value.
+- `batch_instructions`: the `instruction` of each refusal or result `execute_tool_batch` writes,
+  keyed by the result's `code` (or its `status` when it has none; `derivation_rejected` and
+  `state_reference_rejected` for the two whose code is the error's);
+- `sequence_stops`: `execute_action_sequence_call`'s two `SYLVIA_ACTION_SEQUENCE_STOP` controls,
+  `stopped` (a sequence that paused, failed or went stale) then `undelivered` (no confirmed
+  reply), in source order.
 
 Reference tooling for the port; retired with the Python source.
 """
@@ -113,6 +119,40 @@ def instructions() -> dict[str, str]:
     }
 
 
+def by_code(name: str) -> dict[str, str]:
+    """Each dict literal in `name` with a constant `instruction`, keyed by its code or status."""
+    found: dict[str, str] = {}
+    for node in ast.walk(function(AGENT / "_provider_turn_phases.py", name)):
+        if not isinstance(node, ast.Dict):
+            continue
+        entries = {item.value: value for item, value in zip(node.keys, node.values)
+                   if isinstance(item, ast.Constant)}
+        if "instruction" not in entries or not isinstance(entries["instruction"], ast.Constant):
+            continue
+        label = entries.get("code", entries.get("status"))
+        if isinstance(label, ast.Constant):
+            key = label.value
+        else:
+            # The two refusals whose code is the error's: a derivation (it gives the reason)
+            # and a state reference.
+            key = "derivation_rejected" if "reason" in entries else "state_reference_rejected"
+        assert key not in found, key
+        found[key] = const(entries["instruction"])
+    return found
+
+
+def sequence_stops() -> dict[str, str]:
+    contents = [const(value) for node in ast.walk(
+        function(AGENT / "_provider_turn_phases.py", "execute_action_sequence_call"))
+        if isinstance(node, ast.Dict)
+        for item, value in zip(node.keys, node.values)
+        if isinstance(item, ast.Constant) and item.value == "content"]
+    assert len(contents) == 2 and all(text.startswith("SYLVIA_ACTION_SEQUENCE_STOP") for text in contents)
+    first, second = contents
+    assert "stopped at an authoritative boundary" in first and "did not return a confirmed" in second
+    return {"stopped": first, "undelivered": second}
+
+
 def safe_error_reasons() -> dict[str, str]:
     reasons = ast.literal_eval(assigned(function(AGENT / "_stateless_mcp.py", "_safe_error"),
                                         "reasons"))
@@ -121,7 +161,8 @@ def safe_error_reasons() -> dict[str, str]:
 
 
 def main() -> None:
-    texts = {"safe_error_reasons": safe_error_reasons(), "instructions": instructions()}
+    texts = {"safe_error_reasons": safe_error_reasons(), "instructions": instructions(),
+             "batch_instructions": by_code("execute_tool_batch"), "sequence_stops": sequence_stops()}
     OUTPUT.write_bytes((json.dumps(texts, indent=1, ensure_ascii=False) + "\n").encode())
     print(f"wrote {OUTPUT.name}")
 

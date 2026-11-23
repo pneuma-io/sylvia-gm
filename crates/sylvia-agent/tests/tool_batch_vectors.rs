@@ -215,3 +215,82 @@ async fn helpers_match_python() {
         turn_state::compare(name, &turn_state::dump(&state), &case["after"]);
     }
 }
+
+fn ordered(value: &J) -> String {
+    serde_json::to_string(value).expect("serialisable")
+}
+
+#[test]
+fn arguments_match_python() {
+    use sylvia_agent::provider_session::arguments::{
+        derive_mechanics_parameters, missing_required_arguments, normalize_state_references, DerivationError,
+    };
+    use sylvia_agent::provider_session::campaign_file::speaker_names_overlap;
+    let vectors = vectors();
+    let cases = &vectors["arguments"];
+    for case in cases["normalize"].as_array().expect("normalize cases") {
+        let name = case["name"].as_str().unwrap();
+        let outcome = normalize_state_references(
+            case["parameters"].as_object().unwrap(),
+            case["schema"].as_object().unwrap(),
+            case["state"].as_object().unwrap(),
+        );
+        let actual = match outcome {
+            Ok(value) => serde_json::json!({"ok": value}),
+            Err(error) => {
+                serde_json::json!({"raised": {"class": error.error_type, "message": error.message}})
+            }
+        };
+        match case["expected"].get("raised") {
+            Some(raised) => {
+                assert_eq!(actual["raised"]["class"], raised["class"], "{name}");
+                assert_eq!(actual["raised"]["message"], raised["message"], "{name}");
+            }
+            None => assert_eq!(ordered(&actual), ordered(&case["expected"]), "{name}"),
+        }
+    }
+    for case in cases["derive"].as_array().expect("derive cases") {
+        let name = case["name"].as_str().unwrap();
+        let participants: Vec<_> =
+            case["participants"].as_array().unwrap().iter().map(common::participant).collect();
+        let outcome = derive_mechanics_parameters(
+            case["parameters"].as_object().unwrap(),
+            case["derivations"].as_object().unwrap(),
+            &participants,
+        );
+        match (outcome, case["expected"].get("raised")) {
+            (Ok(value), None) => {
+                assert_eq!(ordered(&J::Object(value)), ordered(&case["expected"]["ok"]), "{name}")
+            }
+            (Err(DerivationError::Rejected { code, message, field_paths }), Some(raised)) => {
+                assert_eq!(J::from(code), raised["code"], "{name}");
+                assert_eq!(J::from(message), raised["message"], "{name}");
+                assert_eq!(
+                    field_paths.map(J::from),
+                    raised.get("field_paths").cloned(),
+                    "{name}: the MechanicsRejected fields"
+                );
+                let class =
+                    if raised.get("field_paths").is_some() { "MechanicsRejected" } else { "CommandRejected" };
+                assert_eq!(raised["class"], class, "{name}");
+            }
+            (Err(DerivationError::Fault(error)), Some(raised)) => {
+                assert_eq!(J::from(error.error_type), raised["class"], "{name}");
+                assert_eq!(J::from(error.message), raised["message"], "{name}");
+            }
+            (outcome, raised) => panic!("{name}: got {outcome:?}, Python {raised:?}"),
+        }
+    }
+    for case in cases["missing"].as_array().expect("missing cases") {
+        let missing = missing_required_arguments(
+            case["parameters"].as_object().unwrap(),
+            case["schema"].as_object().unwrap(),
+        );
+        assert_eq!(J::from(missing), case["expected"], "{case}");
+    }
+    for case in cases["overlap"].as_array().expect("overlap cases") {
+        let overlap =
+            speaker_names_overlap(case["first"].as_str().unwrap(), case["second"].as_str().unwrap());
+        assert_eq!(J::Bool(overlap), case["expected"], "{case}");
+    }
+}

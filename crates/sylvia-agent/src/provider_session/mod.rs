@@ -8,12 +8,16 @@
 //! - [`request`]: one provider round's request (`_stream_round` and what it calls).
 //! - [`texts`]: the GM request's fixed texts and the small messages built from them.
 //! - [`control_texts`]: the turn's application-owned control messages.
+//! - [`arguments`]: a mechanic call's derived, normalized and missing arguments.
 //! - [`campaign_file`]: the Campaign File and response-block helpers the tool batch uses.
+//! - [`narration_facts`]: the exact facts a GM narrates from after committed work.
 
+pub mod arguments;
 pub mod campaign_file;
 pub mod context;
 pub mod control_texts;
 pub mod messages;
+pub mod narration_facts;
 pub mod reads;
 pub mod request;
 pub mod tagged;
