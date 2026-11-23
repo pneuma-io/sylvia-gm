@@ -60,6 +60,14 @@ impl ProviderActionFeedback {
     }
 }
 
+/// Two channels are equal when they hold the same rejection (a channel equals itself), so tests
+/// can compare emitted events.
+impl PartialEq for ProviderActionFeedback {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0) || self.rejection() == other.rejection()
+    }
+}
+
 /// `_mechanics_rejection_feedback(error)`: the exact bounded correction facts a GM needs after
 /// mechanics reject. `code` and `reason` are the error's `code` and `str(error)`.
 pub fn mechanics_rejection_feedback(code: &str, reason: &str, details: &MechanicsDetails) -> JsonMap {
@@ -106,7 +114,7 @@ pub fn mechanics_rejection_feedback(code: &str, reason: &str, details: &Mechanic
 }
 
 /// `ProviderEvent`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ProviderEvent {
     /// `private_reasoning(text, response_id=None)`.
     PrivateReasoning { text: String, response_id: Option<String> },

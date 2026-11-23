@@ -3,15 +3,19 @@
 //! - [`events`] holds `ProviderEvent`, `ProviderEventKind`, `ProviderActionFeedback` and
 //!   `_mechanics_rejection_feedback`.
 //! - [`control`] holds `ProviderControl`.
+//! - [`provider`] holds `SessionProvider`, the provider turn the loop runs, with its event sink
+//!   and error.
 //! - This module holds `SessionInputKind`, `SessionRunRequest`, `SessionProviderInput` and the
 //!   run results.
 
 pub mod control;
 pub mod events;
+pub mod provider;
 
 use crate::stateless_mcp::ModelMechanicsTool;
 pub use control::ProviderControl;
 pub use events::{mechanics_rejection_feedback, ProviderActionFeedback, ProviderEvent, ProviderEventKind};
+pub use provider::{SessionEvents, SessionFailure, SessionProvider, SessionProviderError};
 use std::sync::Arc;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
