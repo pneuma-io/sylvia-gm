@@ -340,7 +340,7 @@ fn project_objectives(value: Option<&Json>) -> Result<Vec<Json>, TacticalGridErr
             continue;
         }
         // `status not in {...}` hashes the status. The owner's state is frozen, so the types are
-        // the frozen ones (differences row NEXT: a literal source is thawed).
+        // the frozen ones (differences row 50: a literal source is thawed).
         let status = &item["status"];
         match status {
             Json::Object(_) => return Err(type_error("unhashable type: 'FrozenJsonDict'".into())),
