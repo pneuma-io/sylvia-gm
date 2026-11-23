@@ -12,6 +12,7 @@ pub mod history;
 pub mod mode;
 pub mod prompt;
 pub mod question_answers;
+pub mod runner;
 pub mod skills;
 pub mod title;
 pub mod tools;

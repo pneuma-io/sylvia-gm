@@ -70,7 +70,7 @@ Note for the agent-layer work: `TokenUsage` counts are `PyValue` (Python keeps a
 | `src/sylvia_gm/session/__init__.py` | 57 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/session/_context.py` | 302 | `sylvia-agent` | pending | Its `StateAPI` import is type-checking only and is dropped (no live caller in the 0.4.1 snapshot). |
 | `src/sylvia_gm/session/_context_compressor.py` | 508 | `sylvia-agent` | pending | |
-| `src/sylvia_gm/session/_divergence.py` | 235 | `sylvia-agent` | pending | |
+| `src/sylvia_gm/session/_divergence.py` | 235 | `sylvia-agent` | retired | Reached only from `_runner.py`'s DM_SESSION branches (`analyze`/`handle_divergence` at 728 and 1137; `interpret_resume_choice` from `_handle_pause_response`, whose pause flag is never set), retired with the runner's DM path (B2b, manager-approved); `session/__init__.py` only re-exports it. |
 | `src/sylvia_gm/session/_history.py` | 8 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/session/_narrative_scanner.py` | 234 | `sylvia-agent` | pending | |
 | `src/sylvia_gm/session/_npc_dialogue.py` | 210 | `sylvia-agent` | pending | Its `StateAPI` import is type-checking only and is dropped (no live caller in the 0.4.1 snapshot). |
