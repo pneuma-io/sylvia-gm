@@ -3,12 +3,16 @@
 //!
 //! The mechanic runs one admitted tool against an in-memory copy of the package's state roots
 //! (`sylvia_engine::exec::MemoryStateBridge`) and returns a `MechanicOutcome`; it never touches
-//! storage. Spatial effects (`spatial_query`, `spatial_mutation`, `shot_effect`, `aoe`) answer
-//! [`MechanicFailure::PortPending`] until lane 2's spatial effect handlers land. Without them
+//! storage. `materialize_player_action_checker` and `materialize_player_action_previewer`
+//! check and preview a player's direct action on copied state, the previewer through the
+//! player-known scene boundary. Spatial effects (`spatial_query`, `spatial_mutation`,
+//! `shot_effect`, `aoe`) and the player controls' spatial queries, preflight path and map
+//! preview answer `PortPending` until lane 2's spatial effect handlers land. Without them
 //! no spatial engine is ever opened, so the bridge's spatial private variables, evidence and
 //! shot presentation are empty, and the result carries none of them, as in Python.
 
 use crate::package_runtime::{parse_runtime, validate_runtime_declaration, PackageRuntimeFailure};
+use crate::player_actions::PlayerControls;
 use crate::result_cards::{project_activity_label, project_result_card};
 use std::cell::Cell;
 use std::collections::HashMap;
@@ -22,10 +26,13 @@ use sylvia_engine::dice::Dice;
 use sylvia_engine::exec::bridge::{json_safe, mutable_json, nested_get};
 use sylvia_engine::exec::context::{deep_copy, ChoiceControl, NestedMode, ProcedureExecutor};
 use sylvia_engine::exec::procedures::ExecProcedure;
+use sylvia_engine::exec::tool::{prepare_tool_context, Prepared};
+use sylvia_engine::exec::ExecutionContext;
 use sylvia_engine::exec::{
     execute_tool, Combat, ExecError, ExecTool, MemoryStateBridge, StateBridge, ToolHost,
 };
 use sylvia_engine::expr::value::{Dict, Value};
+use sylvia_engine::expr::ExecutionBudget;
 use sylvia_engine::ruleset::runtime_tables::RuntimeTables;
 
 /// Why one mechanic execution produced no outcome.
@@ -508,5 +515,517 @@ impl PackageMechanic {
             consequences,
             choice: None,
         })
+    }
+}
+
+// ── Player-action checks and previews ──────────────────────────────────────────────────────
+
+/// Code the port has not reached yet, named (`not yet ported: ...`): a player check or preview
+/// that reaches a spatial query, effect or projection. The owner answers `rust_port_pending`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PortPending(pub String);
+
+/// How a check or preview stopped: a Ruleset refusal Python returns as its reason, code not
+/// yet ported, or any other exception, which Python's catch-all turns into the generic reason
+/// (a check) or no preview.
+enum ControlError {
+    Rejected(String),
+    PortPending(String),
+    Other,
+}
+
+impl From<ExecError> for ControlError {
+    fn from(error: ExecError) -> Self {
+        match error {
+            ExecError::PortPending(message) => Self::PortPending(message),
+            _ => Self::Other,
+        }
+    }
+}
+
+type Control<T> = Result<T, ControlError>;
+
+/// `AuthorityMemoryStateBridge(..., player_spatial_view=True)`: entity, participant and combat
+/// reads pass through the player-known scene boundary (`player_known_spatial_value`). Python
+/// projects the combat state afresh on every read; it is read here once, and every top-level
+/// call gets its own copy, so no write reaches it, as none reaches Python's fresh projection.
+struct PlayerViewBridge {
+    inner: MemoryStateBridge,
+    combat: Dict,
+}
+
+/// `player_known_spatial_value(value)` over an execution value.
+fn player_known(value: &Value) -> Result<Value, ExecError> {
+    Ok(match value {
+        Value::Dict(map) => {
+            let format_is_one = match map.get("format") {
+                Some(Value::Int(1) | Value::Bool(true)) => true,
+                Some(Value::Float(number)) => *number == 1.0,
+                _ => false,
+            };
+            if format_is_one
+                && ["map", "entities", "geometry", "zones", "terrain"]
+                    .iter()
+                    .all(|key| map.contains_key(*key))
+            {
+                let scene = crate::tactical_grid::player_known_spatial_scene(&json_safe(value)?, true)
+                    .map_err(|error| {
+                        let class = match &error {
+                            sylvia_engine::spatial::SpatialError::Validation(_) => "SpatialValidationError",
+                            sylvia_engine::spatial::SpatialError::Uncaught { error_type, .. } => error_type,
+                        };
+                        ExecError::Python { class, message: error.to_string() }
+                    })?;
+                Value::from_json(&Json::Object(scene))
+            } else {
+                let mut projected = Dict::new();
+                for (key, child) in map.iter() {
+                    projected.insert(key.clone(), player_known(child)?);
+                }
+                Value::dict(projected)
+            }
+        }
+        Value::List(items) | Value::Tuple(items) => {
+            Value::list(items.iter().map(player_known).collect::<Result<_, _>>()?)
+        }
+        other => other.clone(),
+    })
+}
+
+impl PlayerViewBridge {
+    fn new(inner: MemoryStateBridge) -> Result<Self, ExecError> {
+        let Value::Dict(combat) = player_known(&Value::dict(inner.combat().clone()))? else {
+            unreachable!("a dict projects to a dict")
+        };
+        Ok(Self { inner, combat: (*combat).clone() })
+    }
+}
+
+impl StateBridge for PlayerViewBridge {
+    fn entity_exists(&self, entity_id: &str) -> bool {
+        self.inner.entity_exists(entity_id)
+    }
+    fn get_entity(&self, entity_id: &str) -> Result<Value, ExecError> {
+        player_known(&self.inner.get_entity(entity_id)?)
+    }
+    fn participant_exists(&self, participant_id: &str) -> bool {
+        self.inner.participant_exists(participant_id)
+    }
+    fn get_participant(&self, participant_id: &str) -> Result<Value, ExecError> {
+        player_known(&self.inner.get_participant(participant_id)?)
+    }
+    fn get_position(&self, entity_id: &str) -> Option<Value> {
+        self.inner.get_position(entity_id)
+    }
+    /// `deepcopy(_nested_get(self.get_entity(entity_id), field_path))`.
+    fn read_field(&self, entity_id: &str, field_path: &str) -> Result<Value, ExecError> {
+        Ok(deep_copy(&nested_get(&self.get_entity(entity_id)?, field_path)))
+    }
+    fn write_field(&mut self, entity_id: &str, field_path: &str, value: Value) -> Result<(), ExecError> {
+        self.inner.write_field(entity_id, field_path, value)
+    }
+    /// `modify_field` reads through the player view, as Python's `self.read_field` does.
+    fn modify_field(&mut self, entity_id: &str, field_path: &str, delta: i64) -> Result<i64, ExecError> {
+        let current = match self.read_field(entity_id, field_path)? {
+            Value::None => Value::Int(0),
+            other => other,
+        };
+        let replacement = match current {
+            Value::Int(current) => match current.checked_add(delta) {
+                Some(sum) => Value::Int(sum),
+                None => return Err(ExecError::value_error(sylvia_base::pystr::INT_RANGE_MESSAGE)),
+            },
+            Value::Float(current) => Value::Float(current + delta as f64),
+            _ => return Err(ExecError::package_runtime("Runtime numeric mutation targeted a non-number")),
+        };
+        self.write_field(entity_id, field_path, replacement.clone())?;
+        match replacement {
+            Value::Int(value) => Ok(value),
+            Value::Float(value) => sylvia_engine::exec::error::float_to_int(value),
+            _ => unreachable!("a number"),
+        }
+    }
+    fn create_entity(&mut self, entity_id: &Value, value: &Value) -> Result<(), ExecError> {
+        self.inner.create_entity(entity_id, value)
+    }
+    fn write_participant_field(
+        &mut self,
+        participant_id: &str,
+        field_path: &str,
+        value: Value,
+    ) -> Result<(), ExecError> {
+        self.inner.write_participant_field(participant_id, field_path, value)
+    }
+    fn combat_mut(&mut self) -> &mut Dict {
+        &mut self.combat
+    }
+    fn combat(&self) -> &Dict {
+        &self.combat
+    }
+}
+
+/// `evaluate_condition(expression, context)`.
+fn condition_holds(expression: &str, ctx: &ExecutionContext<'_>) -> Control<bool> {
+    ctx.with_eval(|eval| sylvia_engine::expr::evaluate_condition(expression, eval))
+        .map_err(|_| ControlError::Other)
+}
+
+fn text<'j>(map: &'j JsonMap, key: &str) -> Control<&'j str> {
+    map.get(key).and_then(Json::as_str).ok_or(ControlError::Other)
+}
+
+/// `_prepare_player_control_values(policy, context, bridge)`: the declared physical queries and
+/// local scalar calculations, without effects or dice. The physical queries are spatial and are
+/// not yet ported.
+fn prepare_player_control_values(policy: &PlayerControls, ctx: &mut ExecutionContext<'_>) -> Control<()> {
+    if let Some(query) = policy.queries.first() {
+        if ctx.vars.contains_key(text(query, "store_as")?) {
+            // "Player query would replace a bound variable".
+            return Err(ControlError::Other);
+        }
+        return Err(ControlError::PortPending(
+            "not yet ported: the player controls' spatial queries (lane 2's spatial effect handlers)".into(),
+        ));
+    }
+    for calculation in &policy.calculations {
+        let Some(Json::Object(body)) = calculation.get("set") else { return Err(ControlError::Other) };
+        let (name, expression) = (text(body, "field")?, text(body, "value")?);
+        if ctx.vars.contains_key(name) {
+            // "Player calculation would replace a bound variable".
+            return Err(ControlError::Other);
+        }
+        let condition = match calculation.get("condition") {
+            None => "true",
+            Some(Json::String(condition)) => condition.as_str(),
+            Some(_) => return Err(ControlError::Other),
+        };
+        let mut value = Value::None;
+        if condition_holds(condition, ctx)? {
+            value = ctx
+                .with_eval(|eval| sylvia_engine::expr::evaluate_expression(expression, eval))
+                .map_err(|_| ControlError::Other)?;
+            let scalar = match &value {
+                Value::None | Value::Bool(_) | Value::Int(_) | Value::Str(_) => true,
+                Value::Float(number) => number.is_finite(),
+                _ => false,
+            };
+            if !scalar {
+                // "Player calculation did not return a scalar".
+                return Err(ControlError::Other);
+            }
+        }
+        ctx.vars.insert(name.to_owned(), value);
+    }
+    Ok(())
+}
+
+/// `_player_preflight(runtime, policy, parameters, bridge)`: the policy's deterministic owners
+/// on the disposable bridge, without rolls, relocation, commit or choices; their scalar results.
+/// Only the player view projects a preflight path, which is spatial and not yet ported.
+fn player_preflight(
+    host: &PackageHost,
+    policy: &PlayerControls,
+    parameters: &Dict,
+    bridge: &mut (dyn StateBridge + 'static),
+    player_view: bool,
+) -> Control<Dict> {
+    let budget = ExecutionBudget { preflight_only: true, ..ExecutionBudget::default() };
+    let mut dice = Dice::new();
+    let mut scalars = Dict::new();
+    for name in &policy.preflight {
+        // `runtime.tools[name]`.
+        let target = host.tool(name).ok_or(ControlError::Other)?;
+        let names: Vec<String> = target.parameters.iter().map(|parameter| parameter.name.to_str()).collect();
+        let values: Dict = parameters
+            .iter()
+            .filter(|(key, _)| names.contains(key))
+            .map(|(key, value)| (key.clone(), value.clone()))
+            .collect();
+        // `combat_state=bridge.combat_state`: the live dict, or the player view's fresh projection.
+        let combat = if player_view { Combat::own(bridge.combat().clone()) } else { Combat::Bridge };
+        let result = execute_tool(
+            name,
+            &values,
+            host,
+            Some(&mut *bridge),
+            combat,
+            Some(&budget),
+            &mut dice,
+            None,
+            None,
+            NestedMode::Preflight,
+        )?;
+        if !result.success {
+            // Authored refusals are preserved; unexpected runtime failures stay private.
+            if let (Some("precondition"), Some(error)) = (result.failure_kind.as_deref(), &result.error) {
+                return match DomainError::ruleset_precondition_rejected(error, &result.failure_reasons) {
+                    Ok(error) => Err(ControlError::Rejected(error.message().to_owned())),
+                    Err(_) => Err(ControlError::Other),
+                };
+            }
+            return Err(ControlError::Other);
+        }
+        for (key, value) in &result.context {
+            if matches!(value, Value::None | Value::Str(_) | Value::Bool(_) | Value::Int(_) | Value::Float(_))
+            {
+                scalars.insert(key.clone(), value.clone());
+            }
+        }
+    }
+    if policy.preflight_path.is_some() && player_view {
+        return Err(ControlError::PortPending(
+            "not yet ported: the player controls' preflight path preview (lane 2's spatial effect handlers)"
+                .into(),
+        ));
+    }
+    Ok(scalars)
+}
+
+struct ControlInner {
+    package_id: String,
+    tool_name: String,
+    runtime: Arc<RuntimeTables>,
+    policy: PlayerControls,
+    host: OnceLock<Arc<PackageHost>>,
+}
+
+impl ControlInner {
+    fn new(
+        package_id: &str,
+        declaration: &ToolDeclaration,
+        runtime_bytes: &[u8],
+    ) -> Result<Self, PackageRuntimeFailure> {
+        let runtime = parse_runtime(package_id, runtime_bytes)?;
+        let metadata = crate::package_runtime::tool_metadata_of(&runtime, &declaration.name)?;
+        let policy = crate::player_actions::parse_player_controls(metadata.get("player_controls"));
+        Ok(Self {
+            package_id: package_id.to_owned(),
+            tool_name: declaration.name.clone(),
+            runtime,
+            policy,
+            host: OnceLock::new(),
+        })
+    }
+
+    fn host(&self) -> Arc<PackageHost> {
+        self.host.get_or_init(|| PackageHost::shared(&self.runtime)).clone()
+    }
+
+    fn fmt(&self, name: &str, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct(name)
+            .field("package_id", &self.package_id)
+            .field("tool_name", &self.tool_name)
+            .finish()
+    }
+}
+
+/// `materialize_player_action_checker(...)`'s closure: player prerequisites on copied state,
+/// without effects or raw context output. Cloning shares it; equality is identity.
+#[derive(Clone)]
+pub struct PlayerActionChecker(Arc<ControlInner>);
+
+/// `materialize_player_action_previewer(...)`'s closure: the declared calculations with
+/// player-known geometry, without revealing hidden detours. Cloning shares it; equality is
+/// identity.
+#[derive(Clone)]
+pub struct PlayerActionPreviewer(Arc<ControlInner>);
+
+impl std::fmt::Debug for PlayerActionChecker {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt("PlayerActionChecker", formatter)
+    }
+}
+
+impl std::fmt::Debug for PlayerActionPreviewer {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt("PlayerActionPreviewer", formatter)
+    }
+}
+
+impl PartialEq for PlayerActionChecker {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+impl PartialEq for PlayerActionPreviewer {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+
+/// `materialize_player_action_checker(package_id=..., declaration=..., runtime_bytes=...)`.
+/// Python reads the tool without checking the declaration, so an undeclared tool is its
+/// `KeyError`.
+pub fn materialize_player_action_checker(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<PlayerActionChecker, PackageRuntimeFailure> {
+    Ok(PlayerActionChecker(Arc::new(ControlInner::new(package_id, declaration, runtime_bytes)?)))
+}
+
+/// `materialize_player_action_previewer(package_id=..., declaration=..., runtime_bytes=...)`.
+pub fn materialize_player_action_previewer(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<PlayerActionPreviewer, PackageRuntimeFailure> {
+    Ok(PlayerActionPreviewer(Arc::new(ControlInner::new(package_id, declaration, runtime_bytes)?)))
+}
+
+impl PlayerActionChecker {
+    /// `check(parameters, state, participants)`: `None` when the action is available, or the
+    /// reason it is not.
+    pub fn check(
+        &self,
+        parameters: &JsonMap,
+        state: &JsonMap,
+        participants: &JsonMap,
+    ) -> Result<Option<String>, PortPending> {
+        if !self.0.policy.available {
+            return Ok(Some("This Ruleset's player controls are unavailable".into()));
+        }
+        match self.run(parameters, state, participants) {
+            Ok(reason) => Ok(reason),
+            Err(ControlError::Rejected(reason)) => Ok(Some(reason)),
+            Err(ControlError::PortPending(message)) => Err(PortPending(message)),
+            // An invalid expression or missing state cannot enable a control or expose its inputs.
+            Err(ControlError::Other) => Ok(Some("This action's availability could not be determined".into())),
+        }
+    }
+
+    fn run(&self, parameters: &JsonMap, state: &JsonMap, participants: &JsonMap) -> Control<Option<String>> {
+        let inner = &*self.0;
+        let host = inner.host();
+        let tool = host.tool(&inner.tool_name).ok_or(ControlError::Other)?;
+        let mut bridge =
+            MemoryStateBridge::new(&inner.package_id, &dict_of(state), Some(&dict_of(participants)))?;
+        let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
+        let budget = ExecutionBudget::default();
+        let mut dice = Dice::new();
+        {
+            let prepared = prepare_tool_context(
+                &inner.tool_name,
+                &bound,
+                &*host,
+                Some(&mut bridge),
+                Combat::Bridge,
+                &budget,
+                &mut dice,
+                None,
+                None,
+                NestedMode::Preflight,
+            )?;
+            let mut ctx = match prepared {
+                Prepared::Result(_) => {
+                    return Ok(Some("This action's prerequisites are not currently met".into()))
+                }
+                Prepared::Context(ctx) => ctx,
+            };
+            prepare_player_control_values(&inner.policy, &mut ctx)?;
+            for item in &inner.policy.checks {
+                if !condition_holds(text(item, "condition")?, &ctx)? {
+                    return Ok(Some(text(item, "reason")?.to_owned()));
+                }
+            }
+        }
+        let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
+        player_preflight(&host, &inner.policy, &bound, &mut bridge, false)?;
+        Ok(None)
+    }
+}
+
+/// A preview's public value as card JSON. Preflight scalars may be non-finite floats, which
+/// JSON cannot hold and `_scalar` refuses; an empty object stands for them, which every card
+/// path refuses in the same way.
+fn card_value(value: &Value) -> Json {
+    json_safe(value).unwrap_or_else(|_| Json::Object(JsonMap::new()))
+}
+
+impl PlayerActionPreviewer {
+    /// `preview(parameters, state, participants)`: `{"preview": card, "map_preview": ...}`, or
+    /// `None` when there is nothing to preview or the selection cannot be previewed.
+    pub fn preview(
+        &self,
+        parameters: &JsonMap,
+        state: &JsonMap,
+        participants: &JsonMap,
+    ) -> Result<Option<JsonMap>, PortPending> {
+        let policy = &self.0.policy;
+        if !policy.available
+            || (policy.map_preview.is_none() && policy.preview.is_none() && policy.preflight_path.is_none())
+        {
+            return Ok(None);
+        }
+        match self.run(parameters, state, participants) {
+            Ok(preview) => Ok(preview),
+            Err(ControlError::PortPending(message)) => Err(PortPending(message)),
+            // Selection changes and unsupported declarations cannot expose a private exception.
+            Err(_) => Ok(None),
+        }
+    }
+
+    fn run(&self, parameters: &JsonMap, state: &JsonMap, participants: &JsonMap) -> Control<Option<JsonMap>> {
+        let inner = &*self.0;
+        let policy = &inner.policy;
+        let host = inner.host();
+        let tool = host.tool(&inner.tool_name).ok_or(ControlError::Other)?;
+        let memory =
+            MemoryStateBridge::new(&inner.package_id, &dict_of(state), Some(&dict_of(participants)))?;
+        let mut bridge = PlayerViewBridge::new(memory)?;
+        let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
+        let budget = ExecutionBudget::default();
+        let mut dice = Dice::new();
+        let calculated: Vec<(String, Value)> = {
+            let combat = Combat::own(bridge.combat().clone());
+            let prepared = prepare_tool_context(
+                &inner.tool_name,
+                &bound,
+                &*host,
+                Some(&mut bridge),
+                combat,
+                &budget,
+                &mut dice,
+                None,
+                None,
+                NestedMode::Preflight,
+            )?;
+            let mut ctx = match prepared {
+                Prepared::Result(_) => return Ok(None),
+                Prepared::Context(ctx) => ctx,
+            };
+            prepare_player_control_values(policy, &mut ctx)?;
+            let mut calculated = Vec::new();
+            for calculation in &policy.calculations {
+                let Some(Json::Object(body)) = calculation.get("set") else {
+                    return Err(ControlError::Other);
+                };
+                let name = text(body, "field")?;
+                calculated.push((name.to_owned(), ctx.vars.get(name).cloned().unwrap_or(Value::None)));
+            }
+            calculated
+        };
+        let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
+        let preflight = player_preflight(&host, policy, &bound, &mut bridge, true)?;
+        if policy.map_preview.is_some() {
+            return Err(ControlError::PortPending(
+                "not yet ported: the player controls' map preview (lane 2's spatial effect handlers)".into(),
+            ));
+        }
+        let mut public_context = JsonMap::new();
+        for (key, value) in preflight.iter() {
+            public_context.insert(key.clone(), card_value(value));
+        }
+        for (key, value) in &calculated {
+            public_context.insert(key.clone(), card_value(value));
+        }
+        let declaration = policy.preview.clone().map(Json::Object);
+        let card = project_result_card(declaration.as_ref(), parameters, &public_context);
+        let mut preview = JsonMap::new();
+        preview.insert("preview".into(), card.map_or(Json::Null, Json::Object));
+        preview.insert("map_preview".into(), Json::Null);
+        Ok(Some(preview))
     }
 }
