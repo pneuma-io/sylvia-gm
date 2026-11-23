@@ -74,13 +74,19 @@ async fn tool_listings_match_python() {
         if let Some(raised) = case.get("raised") {
             let error = result.expect_err(&format!("{name}: Python raised {raised}"));
             assert_eq!(error.message, raised["message"].as_str().unwrap(), "{name}");
-            // The code is the innermost exception's: an exception group holds the `MCPError`.
+            // Python's refusal is an `MCPError` inside two exception groups: not an
+            // `AuthorityError`, so the owner answers it as an internal fault.
             let mut inner = raised;
             while let Some(J::Array(held)) = inner.get("exceptions") {
                 assert_eq!(held.len(), 1, "{name}");
                 inner = &held[0];
             }
-            assert_eq!(J::from(error.code.as_str()), inner["code"], "{name}");
+            let python_internal = raised["class"] == "ExceptionGroup" && inner["class"] == "MCPError";
+            if python_internal {
+                assert_eq!(error.code, "internal_error", "{name}");
+            } else {
+                assert_eq!(J::from(error.code.as_str()), raised["code"], "{name}");
+            }
             assert_eq!(
                 error.error_type.unwrap_or("CommandRejected"),
                 raised["class"].as_str().unwrap(),

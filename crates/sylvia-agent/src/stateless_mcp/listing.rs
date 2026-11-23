@@ -9,8 +9,11 @@
 //! carries it ([`wire_input_schema`]). The server turns an `AuthorityError` into an
 //! `MCPError` (its message, the code in `data`), and the SDK's in-process client hands that to
 //! the caller inside two `ExceptionGroup`s (anyio's task groups): the caller sees the class
-//! `ExceptionGroup` and the message `unhandled errors in a TaskGroup (1 sub-exception)`, and the
-//! Rust error keeps the authority's code as its code.
+//! `ExceptionGroup` and the message `unhandled errors in a TaskGroup (1 sub-exception)`. That is
+//! no `AuthorityError`, so nothing turns it into a tool result, a Full Audit record or a coded
+//! reply: the owner answers its fixed `internal_error` text and local diagnostics records
+//! `error_code` `internal_error` with `error_type` `ExceptionGroup`. The Rust error is that
+//! internal fault: code `internal_error`, class `ExceptionGroup`, Python's message.
 //!
 //! Only the legacy listing is ported: the fixed list (`fixed_tool_list`, the context ledger's
 //! catalog) answers `rust_port_pending` until `_fixed_tool_projection.py` is (L4).
@@ -328,12 +331,13 @@ fn is_command_rejected(error: &CodedError) -> bool {
 /// `str()` of the exception group the in-process client raises around one `MCPError`.
 pub const LISTING_REFUSAL_MESSAGE: &str = "unhandled errors in a TaskGroup (1 sub-exception)";
 
-/// The server handler's `except AuthorityError: raise MCPError(...)`, as the client raises it.
-fn mcp_error(error: CodedError) -> CodedError {
+/// The server handler's `except AuthorityError: raise MCPError(...)`, as the client raises it:
+/// an internal fault (`sylvia_owner::dispatch::Failure::Internal`), not a refusal.
+pub fn listing_refusal(error: CodedError) -> CodedError {
     if error.code == PORT_PENDING || !super::is_authority_error(&error) {
         return error;
     }
-    CodedError::new(error.code, LISTING_REFUSAL_MESSAGE).with_error_type("ExceptionGroup")
+    CodedError::new("internal_error", LISTING_REFUSAL_MESSAGE).with_error_type("ExceptionGroup")
 }
 
 /// `build_stateless_mcp_server(owner)`'s `list_tools` for one request, as the client converts it.
@@ -478,7 +482,7 @@ pub async fn list_tools_with_discovery(
         ));
     }
     let basis = owner.snapshot(campaign_id).await?;
-    let mut tools = server_list_tools(owner, campaign_id, session_id).await.map_err(mcp_error)?;
+    let mut tools = server_list_tools(owner, campaign_id, session_id).await.map_err(listing_refusal)?;
     for tool in &mut tools {
         tool.input_schema = wire_input_schema(std::mem::take(&mut tool.input_schema))?;
     }

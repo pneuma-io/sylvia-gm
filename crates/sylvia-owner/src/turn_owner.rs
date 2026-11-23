@@ -191,3 +191,23 @@ impl TurnOwner for OwnerReads {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::dispatch::Failure;
+    use sylvia_agent::stateless_mcp::listing::listing_refusal;
+    use sylvia_base::CodedError;
+
+    /// A listing the MCP server refuses reaches Python's owner as an `ExceptionGroup`, which
+    /// its `except AuthorityError` does not catch: the fixed `internal_error` reply, with
+    /// `ExceptionGroup` in local diagnostics.
+    #[test]
+    fn a_refused_listing_is_an_internal_fault() {
+        let refused =
+            CodedError::new("probe_code", "Campaign is transitioning").with_error_type("CommandRejected");
+        assert_eq!(
+            Failure::from(listing_refusal(refused)),
+            Failure::Internal { error_type: "ExceptionGroup" }
+        );
+    }
+}
