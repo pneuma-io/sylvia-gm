@@ -20,6 +20,7 @@ pub mod error;
 pub mod hash;
 pub mod pybase64;
 pub mod pyjson;
+pub mod pyre;
 pub mod pystr;
 pub mod pyurl;
 pub mod pyyaml;

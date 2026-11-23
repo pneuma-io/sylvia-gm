@@ -8,7 +8,8 @@ Run with the snapshot's own interpreter, from the repository root, after
 Each case copies a base profile (`riichi`: a new profile with the bundled Riichi closure;
 `story`: the session-page profile with a played DM campaign, an action, its state and its
 namespace owner; `cast`: the Riichi profile with validated participants and an adaptation, for
-`verify_f5_campaign_authority`), applies its SQL through a second connection with foreign keys off, as damage
+`verify_f5_campaign_authority`; `recovered`: a new profile into which Python's owner recovered
+the story campaign from its own portable export, for `verify_recovery_receipts`), applies its SQL through a second connection with foreign keys off, as damage
 would arrive (CHECK constraints off), and opens the profile with `_open_for_application_owner`, which runs the startup
 verifiers; on the `cast` base it also calls `verify_f5_campaign_authority` directly. It writes `stored_authority/stored_authority_runs.json`; `tests/stored_authority.rs`
 replays every case on the Rust store. Reference tooling only.
@@ -235,6 +236,63 @@ def cast_base(folder: Path) -> bytes:
     return path.read_bytes()
 
 
+def recovered_base(folder: Path) -> bytes:
+    """A new profile into which Python's owner recovered the story campaign from the portable
+    archive it exported (written as `stored_authority/recovered.sqlite3.gz`)."""
+    from sylvia_gm.application.authority import AuthorityOwner
+
+    source = folder / "recovered-source" / "authority.sqlite3"
+    source.parent.mkdir()
+    source.write_bytes(gzip.decompress(BASES["story"].read_bytes()))
+    archive = folder / "story.sylvia-gm-campaign"
+    with AuthorityOwner.open(source, "stored-authority-export") as owner:
+        owner.export_campaign("export-1", "campaign-story", archive)
+    path = folder / "recovered" / "authority.sqlite3"
+    path.parent.mkdir()
+    with AuthorityOwner.open(path, "stored-authority-recover") as owner:
+        owner.prepare_new_campaign_storage()
+        owner.recover_campaign(recovery_id="recovery-1", source=archive)
+    connection = sqlite3.connect(path)
+    connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    connection.close()
+    return path.read_bytes()
+
+
+def receipt_payload_sql(connection: sqlite3.Connection, change) -> list[str]:  # noqa: ANN001
+    """SQL replacing `recovery-1`'s semantic payload with `change(payload)`, canonical, with its
+    SHA-256 recomputed, so the damage reaches the checks after the hash."""
+    import hashlib
+
+    from sylvia_gm.domain.package_library import canonical_json_bytes
+
+    row = connection.execute(
+        "SELECT semantic_payload_json FROM campaign_recovery_receipts WHERE recovery_id = 'recovery-1'").fetchone()
+    encoded = canonical_json_bytes(change(json.loads(row[0])))
+    value = encoded.decode("utf-8").replace("'", "''")
+    return [f"UPDATE campaign_recovery_receipts SET semantic_payload_json = '{value}', "
+            f"semantic_payload_sha256 = '{hashlib.sha256(encoded).hexdigest()}' WHERE recovery_id = 'recovery-1'"]
+
+
+def receipt_result_sql(result_text: str) -> list[str]:
+    value = result_text.replace("'", "''")
+    return [f"UPDATE campaign_recovery_receipts SET result_json = '{value}' WHERE recovery_id = 'recovery-1'"]
+
+
+def provenance(change):  # noqa: ANN001, ANN201
+    """A change to the payload's `migration_provenance`."""
+    def apply(payload: dict) -> dict:
+        return {**payload, "migration_provenance": change(payload["migration_provenance"])}
+    return apply
+
+
+def with_purge_extension(value: dict) -> dict:
+    from sylvia_gm.infrastructure import campaign_archive
+
+    names = campaign_archive.SCHEMA_EXTENSION_FIELDS
+    extensions = [*value["schema_extensions"], dict(zip(names, campaign_archive.PURGE_SCHEMA_EXTENSION_PROVENANCE))]
+    return {**value, "schema_extensions": sorted(extensions, key=lambda item: item["extension_name"])}
+
+
 def adaptation_sql(connection: sqlite3.Connection, **changes: object) -> list[str]:
     """SQL changing `adapt-1`'s columns, with its payload SHA-256 recomputed as Python's store
     would write it, so the damage reaches the checks after the hash."""
@@ -401,6 +459,88 @@ F5_CASES: list[dict[str, object]] = [
      "computed": [lambda connection: history_sql(connection, before="Aki")]},
     {"name": "f5_history_other_participant", "base": "cast", "sql": [],
      "computed": [lambda connection: history_sql(connection, participant_id="bo")]},
+]
+
+RECEIPT = "campaign_recovery_receipts WHERE recovery_id = 'recovery-1'"
+STORY_RESULT = ('{"campaign_id":"campaign-story","captured_revision":8,"archive_sha256":"%s","byte_count":%s}')
+
+# `sqlite_recovery.verify_recovery_receipts`, on the `recovered` base.
+RECOVERY_CASES: list[dict[str, object]] = [
+    {"name": "recovered_untouched", "base": "recovered", "sql": []},
+    {"name": "receipt_recovery_id_padded", "base": "recovered", "sql": [
+        f"UPDATE {RECEIPT.split(' WHERE ')[0]} SET recovery_id = ' recovery-1'"]},
+    {"name": "receipt_archive_sha_uppercase", "base": "recovered", "sql": [
+        f"UPDATE campaign_recovery_receipts SET archive_sha256 = upper(archive_sha256)"]},
+    {"name": "receipt_archive_sha_other", "base": "recovered", "sql": [
+        f"UPDATE campaign_recovery_receipts SET archive_sha256 = '{'a' * 64}'"]},
+    {"name": "receipt_payload_sha_other", "base": "recovered", "sql": [
+        f"UPDATE campaign_recovery_receipts SET semantic_payload_sha256 = '{'b' * 64}'"]},
+    {"name": "receipt_payload_not_canonical", "base": "recovered", "sql": [
+        "UPDATE campaign_recovery_receipts SET semantic_payload_json = replace(semantic_payload_json, ':', ': ')"]},
+    {"name": "receipt_payload_not_json", "base": "recovered", "sql": [
+        "UPDATE campaign_recovery_receipts SET semantic_payload_json = 'x'"]},
+    {"name": "receipt_payload_format_version", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, lambda payload: {**payload, "format_version": 2})]},
+    {"name": "receipt_payload_operation_kind", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(
+         connection, lambda payload: {**payload, "operation_kind": "export_campaign"})]},
+    {"name": "receipt_payload_revision_other", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, lambda payload: {**payload, "captured_revision": 7})]},
+    {"name": "receipt_payload_revision_float", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, lambda payload: {**payload, "captured_revision": 8.0})]},
+    {"name": "receipt_payload_revision_true", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, lambda payload: {**payload, "format_version": True})]},
+    {"name": "receipt_payload_extra_member", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, lambda payload: {**payload, "note": "x"})]},
+    {"name": "receipt_payload_schema_claim_other", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(
+         connection, lambda payload: {**payload, "source_authority_schema_identity_sha256": "c" * 64})]},
+    {"name": "receipt_payload_schema_version_11", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(
+         connection, lambda payload: {**payload, "source_authority_schema_version": 11})]},
+    {"name": "receipt_provenance_without_extensions", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(
+         connection, provenance(lambda value: {**value, "schema_extensions": []}))]},
+    {"name": "receipt_provenance_with_purge_extension", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, provenance(with_purge_extension))]},
+    {"name": "receipt_provenance_reordered_members", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, provenance(
+         lambda value: {**value, "schema_migrations": [
+             {"sql_sha256": item["sql_sha256"], "applied_name": item["applied_name"], "version": item["version"]}
+             for item in value["schema_migrations"]]}))]},
+    {"name": "receipt_provenance_version_true", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, provenance(
+         lambda value: {**value, "schema_migrations": [
+             {**item, "version": True} if item["version"] == 1 else item
+             for item in value["schema_migrations"]]}))]},
+    {"name": "receipt_provenance_migration_missing", "base": "recovered", "sql": [],
+     "computed": [lambda connection: receipt_payload_sql(connection, provenance(
+         lambda value: {**value, "schema_migrations": value["schema_migrations"][:-1]}))]},
+    {"name": "receipt_result_not_json", "base": "recovered", "sql": receipt_result_sql("x")},
+    {"name": "receipt_result_list", "base": "recovered", "sql": receipt_result_sql("[]")},
+    {"name": "receipt_result_member_missing", "base": "recovered", "sql": receipt_result_sql(
+        '{"campaign_id":"campaign-story"}')},
+    {"name": "receipt_result_revision_text", "base": "recovered", "sql": [], "computed": [
+        lambda connection: receipt_result_sql(STORY_RESULT.replace('"captured_revision":8', '"captured_revision":"8"') % (
+            connection.execute(f"SELECT archive_sha256 FROM {RECEIPT}").fetchone()[0],
+            connection.execute(f"SELECT archive_byte_count FROM {RECEIPT}").fetchone()[0]))]},
+    {"name": "receipt_result_revision_nan", "base": "recovered", "sql": [], "computed": [
+        lambda connection: receipt_result_sql(STORY_RESULT.replace('"captured_revision":8', '"captured_revision":NaN') % (
+            connection.execute(f"SELECT archive_sha256 FROM {RECEIPT}").fetchone()[0],
+            connection.execute(f"SELECT archive_byte_count FROM {RECEIPT}").fetchone()[0]))]},
+    {"name": "receipt_result_reordered", "base": "recovered", "sql": [], "computed": [
+        lambda connection: receipt_result_sql(
+            '{"captured_revision":8,"campaign_id":"campaign-story","archive_sha256":"%s","byte_count":%s}' % (
+                connection.execute(f"SELECT archive_sha256 FROM {RECEIPT}").fetchone()[0],
+                connection.execute(f"SELECT archive_byte_count FROM {RECEIPT}").fetchone()[0]))]},
+    {"name": "receipt_row_revision_other", "base": "recovered", "sql": [
+        "UPDATE campaign_recovery_receipts SET captured_revision = 9"]},
+    {"name": "receipt_row_byte_count_text", "base": "recovered", "sql": [
+        "UPDATE campaign_recovery_receipts SET archive_byte_count = CAST(archive_byte_count AS TEXT) || ' '"]},
+    {"name": "receipt_row_byte_count_word", "base": "recovered", "sql": [
+        "UPDATE campaign_recovery_receipts SET archive_byte_count = 'many'"]},
+    {"name": "receipt_campaign_other", "base": "recovered", "sql": [
+        "UPDATE campaign_recovery_receipts SET campaign_id = 'campaign-other'"]},
 ]
 
 CASES: list[dict[str, object]] = [
@@ -831,6 +971,7 @@ CASES: list[dict[str, object]] = [
     {"name": "failed_marker_origin_list", "base": "failed", "sql": [], "markers": [
         lambda marker: edited(marker, origin=[])]},
     *F5_CASES,
+    *RECOVERY_CASES,
 ]
 
 
@@ -871,6 +1012,8 @@ def main() -> None:
         bases["failed"] = failed_base(Path(scratch))
         (OUT / "failed.sqlite3.gz").write_bytes(gzip.compress(bases["failed"], mtime=0))
         bases["cast"] = cast_base(Path(scratch))
+        bases["recovered"] = recovered_base(Path(scratch))
+        (OUT / "recovered.sqlite3.gz").write_bytes(gzip.compress(bases["recovered"], mtime=0))
         (OUT / "cast.sqlite3.gz").write_bytes(gzip.compress(bases["cast"], mtime=0))
         for name, kinds in LIFECYCLE_BASES.items():
             bases[name] = lifecycle_base(Path(scratch), name, kinds)

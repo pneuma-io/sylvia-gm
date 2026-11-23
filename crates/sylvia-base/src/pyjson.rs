@@ -14,6 +14,8 @@
 //! [`loads`] refuses text Python refuses with Python's `JSONDecodeError` text, located as
 //! CPython's scanner locates it (`decode_error`).
 //!
+//! [`loads_bytes`] reads `bytes` as `json.loads` does, through `detect_encoding`.
+//!
 //! [`loads_hooked`] reads as `json.loads(text, object_pairs_hook=..., parse_constant=...)` with
 //! hooks that refuse duplicate keys and the `NaN`/`Infinity` literals, reporting the first failure
 //! in CPython's scan order ([`HookFailure`]).
@@ -26,9 +28,11 @@
 //! - JSON nested 128 or more arrays or objects deep is rejected by [`loads`] (`serde_json`'s
 //!   recursion limit; 127 levels read); Python reads roughly a thousand, its interpreter stack.
 
+mod bytes;
 mod decode_error;
 
-pub use decode_error::{loads_hooked, HookFailure, HookPolicy, Hooked, JsonDecodeError};
+pub use bytes::{detect_encoding, loads_bytes};
+pub use decode_error::{loads_hooked, raw_decode, HookFailure, HookPolicy, Hooked, JsonDecodeError};
 
 use crate::{CodedError, Json};
 use std::fmt::Write as _;

@@ -161,7 +161,10 @@ pub(crate) fn execute_effect(
         "register_initiative_trigger" => time::handle_register_initiative_trigger(&body, ctx),
         "clock_create" => time::handle_clock_create(&body, ctx),
         "clock_tick" => time::handle_clock_tick(&body, ctx),
-        other => Err(ExecError::effect(other, "This effect is not yet ported to Rust")),
+        // `spatial_query`, `spatial_mutation`, `shot_effect` and `aoe`: lane 2's C3.
+        other => Err(ExecError::port_pending(format_args!(
+            "the '{other}' effect (lane 2's spatial effect handlers)"
+        ))),
     };
     result.map_err(|error| error.in_effect(&effect_type))
 }
@@ -572,12 +575,21 @@ fn handle_nested_call(
         return Err(ExecError::effect("call", "Nested tool name is required"));
     }
     let resolved = resolve_params(&params, ctx);
-    let resolved = match ctx.nested_mode {
-        NestedMode::Package => host.nested_parameters(&tool_name, resolved, ctx.state_bridge.as_deref())?,
-        NestedMode::Procedure => resolved,
-    };
     let store_as = effect.get("store_as").cloned().unwrap_or(Value::None);
     ctx.budget.enter_call().map_err(|error| ExecError::effect("call", error.message))?;
+    // The package's nested executor binds state parameters inside the call, after `enter_call`.
+    let resolved = match ctx.nested_mode {
+        NestedMode::Package => {
+            match host.nested_parameters(&tool_name, resolved, ctx.state_bridge.as_deref()) {
+                Ok(resolved) => resolved,
+                Err(error) => {
+                    ctx.budget.leave_call().map_err(ExecError::from)?;
+                    return Err(error);
+                }
+            }
+        }
+        NestedMode::Procedure => resolved,
+    };
     // The package's nested executor passes the bridge's combat state; a procedure's passes a copy.
     let combat = match (ctx.nested_mode, &ctx.combat) {
         (NestedMode::Package, Combat::Bridge) => Combat::Bridge,

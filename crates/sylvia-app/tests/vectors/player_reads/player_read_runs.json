@@ -1,0 +1,3319 @@
+{
+ "python": "3.12.11",
+ "phases": [
+  {
+   "database": "actions",
+   "runs": [
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 0,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 1,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "I ring the bell. The sea answers."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-1",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 2,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "I dive. The sea answers."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-2",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 3,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "action_id": "action-1",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 4,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "dexterity",
+           "dc": 12
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 5,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 6,
+         "event_type": "state_mutation",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "key": "last",
+          "namespace": "synthetic.actions.checks"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 7,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "kind": "check_rolled",
+          "total": 15
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 8,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "resulting_revision": 6,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 9,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "action_id": "action-2",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 10,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "strength",
+           "dc": 18
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 11,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "result": {
+           "success": false
+          },
+          "status": "failed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 12,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 8,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 13,
+         "event_type": "action_failed",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "resulting_revision": 9,
+          "status": "failed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 14,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "action_id": "action-3",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 15,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 16,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 17,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 9,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 18,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "resulting_revision": 10,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 19,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "The tide turns."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-3",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 20,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "action_id": "action-4",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 21,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 22,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 23,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 10,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": "dm-1",
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 7,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 8,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "resulting_revision": 6,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 9,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "action_id": "action-2",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 10,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "strength",
+           "dc": 18
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 11,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "result": {
+           "success": false
+          },
+          "status": "failed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 12,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 8,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 13,
+         "event_type": "action_failed",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "resulting_revision": 9,
+          "status": "failed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 14,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "action_id": "action-3",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 15,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 16,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 17,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 9,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 18,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "resulting_revision": 10,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 19,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "The tide turns."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-3",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 20,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "action_id": "action-4",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 21,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 22,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 23,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 10,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": "dm-1",
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 23,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 24,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": -1,
+     "outcome": {
+      "error": "ValueError",
+      "code": null,
+      "message": "Acknowledged canonical sequence cannot be negative"
+     }
+    },
+    {
+     "read": "player_action_context",
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-4",
+        "turn_id": "turn-2",
+        "revision": 11,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 10,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": "dm-1",
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_ids": [
+       "action-3",
+       "missing",
+       5
+      ]
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-3",
+        "turn_id": "turn-2",
+        "revision": 10,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 9,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_ids": "action-3"
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": 9
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-2",
+        "turn_id": "turn-2",
+        "revision": 9,
+        "status": "failed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 8,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "strength",
+         "dc": 18
+        },
+        "result": {
+         "success": false
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": true
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": 9.0,
+      "player_action_id": "action-4"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-4",
+        "turn_id": "turn-2",
+        "revision": 11,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 10,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": "dm-1",
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_id": "action-2"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-2",
+        "turn_id": "turn-2",
+        "revision": 9,
+        "status": "failed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 8,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "strength",
+         "dc": 18
+        },
+        "result": {
+         "success": false
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {},
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": "response-queue",
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": "other",
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "missing-session",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "builder-1",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    }
+   ]
+  },
+  {
+   "database": "responses",
+   "runs": [
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 0,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 1,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "I ring the bell. The sea answers."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-1",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 2,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "I dive. The sea answers."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-2",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 3,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "action_id": "action-1",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 4,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "dexterity",
+           "dc": 12
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 5,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 6,
+         "event_type": "state_mutation",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "key": "last",
+          "namespace": "synthetic.actions.checks"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 7,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "kind": "check_rolled",
+          "total": 15
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 8,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "resulting_revision": 6,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 9,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "action_id": "action-2",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 10,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "strength",
+           "dc": 18
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 11,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "result": {
+           "success": false
+          },
+          "status": "failed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 12,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 8,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 13,
+         "event_type": "action_failed",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "resulting_revision": 9,
+          "status": "failed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 14,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "action_id": "action-3",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 15,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 16,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 17,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 9,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 18,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "resulting_revision": 10,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 19,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "The tide turns."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-3",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 20,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "action_id": "action-4",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 21,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 22,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 23,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 10,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": "dm-1",
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 7,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 8,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "resulting_revision": 6,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 9,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "action_id": "action-2",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 10,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "strength",
+           "dc": 18
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 11,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "result": {
+           "success": false
+          },
+          "status": "failed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 12,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 8,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 13,
+         "event_type": "action_failed",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "resulting_revision": 9,
+          "status": "failed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 14,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "action_id": "action-3",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 15,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 16,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 17,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 9,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 18,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "resulting_revision": 10,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 19,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "The tide turns."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-3",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 20,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "action_id": "action-4",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 21,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 22,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 23,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 10,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": "dm-1",
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 23,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 24,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": -1,
+     "outcome": {
+      "error": "ValueError",
+      "code": null,
+      "message": "Acknowledged canonical sequence cannot be negative"
+     }
+    },
+    {
+     "read": "player_action_context",
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_ids": [
+       "action-3",
+       "missing",
+       5
+      ]
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-3",
+        "turn_id": "turn-2",
+        "revision": 10,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 9,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_ids": "action-3"
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": 9
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-2",
+        "turn_id": "turn-2",
+        "revision": 9,
+        "status": "failed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 8,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "strength",
+         "dc": 18
+        },
+        "result": {
+         "success": false
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": true
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": 9.0,
+      "player_action_id": "action-4"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-4",
+        "turn_id": "turn-2",
+        "revision": 11,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 10,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": "dm-1",
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_id": "action-2"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-2",
+        "turn_id": "turn-2",
+        "revision": 9,
+        "status": "failed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 8,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "strength",
+         "dc": 18
+        },
+        "result": {
+         "success": false
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {},
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": "response-queue",
+     "outcome": {
+      "ok": [
+       {
+        "campaign_id": "campaign-story",
+        "kind": "action_sequence",
+        "narration_attempt_id": "att-seq-1",
+        "narration_basis_message_id": "response-queue",
+        "sequence_id": "seq-1",
+        "session_id": "dm-1",
+        "status": "completed",
+        "steps": [
+         {
+          "execution": {
+           "expected_revision": 10,
+           "selection": {},
+           "source": {
+            "action_id": "action-1",
+            "button_index": 0,
+            "kind": "result_card"
+           }
+          },
+          "operation_id": "action-4"
+         }
+        ],
+        "version": 1,
+        "committed_action_ids": [
+         "action-4"
+        ],
+        "provider_execution_stopped": false
+       }
+      ]
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": [
+       {
+        "campaign_id": "campaign-story",
+        "kind": "action_sequence",
+        "narration_attempt_id": "att-seq-1",
+        "narration_basis_message_id": "response-queue",
+        "sequence_id": "seq-1",
+        "session_id": "dm-1",
+        "status": "completed",
+        "steps": [
+         {
+          "execution": {
+           "expected_revision": 10,
+           "selection": {},
+           "source": {
+            "action_id": "action-1",
+            "button_index": 0,
+            "kind": "result_card"
+           }
+          },
+          "operation_id": "action-4"
+         }
+        ],
+        "version": 1,
+        "committed_action_ids": [
+         "action-4"
+        ],
+        "provider_execution_stopped": false
+       }
+      ]
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": "other",
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "missing-session",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "builder-1",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    }
+   ]
+  },
+  {
+   "database": "mismatch",
+   "runs": [
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 0,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 1,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "I ring the bell. The sea answers."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-1",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 2,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "I dive. The sea answers."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-2",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 3,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "action_id": "action-1",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 4,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "dexterity",
+           "dc": 12
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 5,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "result": {
+           "success": true,
+           "total": 15
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 6,
+         "event_type": "state_mutation",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "key": "last",
+          "namespace": "synthetic.actions.checks"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 7,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "kind": "check_rolled",
+          "total": 15
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 8,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "resulting_revision": 6,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 9,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "action_id": "action-2",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 10,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "strength",
+           "dc": 18
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 11,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "result": {
+           "success": false
+          },
+          "status": "failed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 12,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 8,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 13,
+         "event_type": "action_failed",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "resulting_revision": 9,
+          "status": "failed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 14,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "action_id": "action-3",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 15,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 16,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 17,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 9,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 18,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "resulting_revision": 10,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 19,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "The tide turns."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-3",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 20,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "action_id": "action-4",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 21,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 22,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 23,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 10,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": "dm-1",
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 7,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 8,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-1",
+         "safe_payload": {
+          "resulting_revision": 6,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 9,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "action_id": "action-2",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 10,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "strength",
+           "dc": 18
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 11,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "result": {
+           "success": false
+          },
+          "status": "failed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 12,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 8,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 13,
+         "event_type": "action_failed",
+         "turn_id": "turn-2",
+         "action_id": "action-2",
+         "safe_payload": {
+          "resulting_revision": 9,
+          "status": "failed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 14,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "action_id": "action-3",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 15,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 16,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 17,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 9,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": null,
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 18,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-3",
+         "safe_payload": {
+          "resulting_revision": 10,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 19,
+         "event_type": "talk",
+         "turn_id": "turn-2",
+         "action_id": null,
+         "safe_payload": {
+          "text": "The tide turns."
+         },
+         "visibility": "player_safe",
+         "attempt_id": "att-3",
+         "attempt_ordinal": 0
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 20,
+         "event_type": "action_declared",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "action_id": "action-4",
+          "writer": "dm"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 21,
+         "event_type": "tool_call",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "package_id": "synthetic.actions",
+          "package_sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+          "package_version": "1.0.0",
+          "parameters": {
+           "ability": "wisdom",
+           "dc": 10
+          },
+          "tool_name": "roll_check"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 22,
+         "event_type": "tool_result",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "result": {
+           "spatial_evidence": {
+            "kept": false
+           },
+           "success": true,
+           "total": 12
+          },
+          "status": "committed"
+         },
+         "visibility": "player_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 23,
+         "event_type": "consequence",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "kind": "sylvia_player_action",
+          "origin": {
+           "button_index": 0,
+           "control": "result_card",
+           "expected_revision": 10,
+           "policy": {
+            "confirmation": "none",
+            "response": "on_request"
+           },
+           "selection": {},
+           "session_id": "dm-1",
+           "source_action_id": "action-1"
+          }
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        },
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 23,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [
+        {
+         "__class__": "CanonicalEvent",
+         "sequence": 24,
+         "event_type": "action_committed",
+         "turn_id": "turn-2",
+         "action_id": "action-4",
+         "safe_payload": {
+          "resulting_revision": 11,
+          "status": "committed"
+         },
+         "visibility": "internal_safe",
+         "attempt_id": null,
+         "attempt_ordinal": null
+        }
+       ],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": 24,
+     "outcome": {
+      "ok": {
+       "__class__": "CanonicalReplay",
+       "canonical": [],
+       "provisional": [],
+       "high_water": 24
+      }
+     }
+    },
+    {
+     "read": "canonical_replay",
+     "acknowledged_sequence": -1,
+     "outcome": {
+      "error": "ValueError",
+      "code": null,
+      "message": "Acknowledged canonical sequence cannot be negative"
+     }
+    },
+    {
+     "read": "player_action_context",
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Saved sequence action identity is inconsistent"
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_ids": [
+       "action-3",
+       "missing",
+       5
+      ]
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-3",
+        "turn_id": "turn-2",
+        "revision": 10,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 9,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_ids": "action-3"
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": 9
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-2",
+        "turn_id": "turn-2",
+        "revision": 9,
+        "status": "failed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 8,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "strength",
+         "dc": 18
+        },
+        "result": {
+         "success": false
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": true
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "canonical_start_sequence": 9.0,
+      "player_action_id": "action-4"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-4",
+        "turn_id": "turn-2",
+        "revision": 11,
+        "status": "committed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 10,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": "dm-1",
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "wisdom",
+         "dc": 10
+        },
+        "result": {
+         "success": true,
+         "total": 12
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {
+      "player_action_id": "action-2"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "action_id": "action-2",
+        "turn_id": "turn-2",
+        "revision": 9,
+        "status": "failed",
+        "origin": {
+         "button_index": 0,
+         "control": "result_card",
+         "expected_revision": 8,
+         "policy": {
+          "confirmation": "none",
+          "response": "on_request"
+         },
+         "selection": {},
+         "session_id": null,
+         "source_action_id": "action-1"
+        },
+        "package_id": "synthetic.actions",
+        "tool_name": "roll_check",
+        "parameters": {
+         "ability": "strength",
+         "dc": 18
+        },
+        "result": {
+         "success": false
+        }
+       }
+      ]
+     }
+    },
+    {
+     "read": "player_action_response_context",
+     "basis": {},
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": "response-queue",
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Saved sequence action identity is inconsistent"
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": null,
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Saved sequence action identity is inconsistent"
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "dm-1",
+     "basis_message_id": "other",
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "missing-session",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "read": "action_sequence_response_results",
+     "session_id": "builder-1",
+     "basis_message_id": null,
+     "outcome": {
+      "ok": []
+     }
+    }
+   ]
+  }
+ ],
+ "provisional": {
+  "pending_tools": [
+   [
+    [
+     "campaign-story",
+     "action-live"
+    ],
+    {
+     "__class__": "PlayerProjection",
+     "kind": "pending_tool",
+     "sequence": null,
+     "text": null,
+     "safe_payload": {
+      "package_id": "synthetic.actions",
+      "tool_name": "roll_check",
+      "parameters": {
+       "dc": 10
+      }
+     },
+     "collapsed_by_default": true,
+     "provisional": true,
+     "action_id": "action-live",
+     "attempt_id": null
+    }
+   ],
+   [
+    [
+     "campaign-build",
+     "action-far"
+    ],
+    {
+     "__class__": "PlayerProjection",
+     "kind": "pending_tool",
+     "sequence": null,
+     "text": null,
+     "safe_payload": {
+      "package_id": "synthetic.actions",
+      "tool_name": "roll_check",
+      "parameters": {
+       "dc": 10
+      }
+     },
+     "collapsed_by_default": true,
+     "provisional": true,
+     "action_id": "action-live",
+     "attempt_id": null
+    }
+   ]
+  ],
+  "attempts": [
+   [
+    [
+     "campaign-story",
+     "session-0"
+    ],
+    {
+     "campaign_id": "campaign-story",
+     "attempt_id": "att-think",
+     "turn_id": "turn-2",
+     "last_action_id": null,
+     "channel": "safe_think",
+     "buffer": "Weighing the tide.",
+     "terminal": false
+    }
+   ],
+   [
+    [
+     "campaign-story",
+     "session-1"
+    ],
+    {
+     "campaign_id": "campaign-story",
+     "attempt_id": "att-talk",
+     "turn_id": "turn-2",
+     "last_action_id": "action-4",
+     "channel": "talk",
+     "buffer": "The gulls scatter.",
+     "terminal": false
+    }
+   ],
+   [
+    [
+     "campaign-story",
+     "session-2"
+    ],
+    {
+     "campaign_id": "campaign-story",
+     "attempt_id": "att-done",
+     "turn_id": "turn-2",
+     "last_action_id": null,
+     "channel": "talk",
+     "buffer": "Finished.",
+     "terminal": true
+    }
+   ],
+   [
+    [
+     "campaign-story",
+     "session-3"
+    ],
+    {
+     "campaign_id": "campaign-story",
+     "attempt_id": "att-empty",
+     "turn_id": "turn-2",
+     "last_action_id": null,
+     "channel": "talk",
+     "buffer": "",
+     "terminal": false
+    }
+   ],
+   [
+    [
+     "campaign-build",
+     "session-4"
+    ],
+    {
+     "campaign_id": "campaign-build",
+     "attempt_id": "att-other",
+     "turn_id": "turn-b",
+     "last_action_id": null,
+     "channel": "talk",
+     "buffer": "Elsewhere.",
+     "terminal": false
+    }
+   ]
+  ],
+  "outcome": {
+   "ok": {
+    "__class__": "CanonicalReplay",
+    "canonical": [],
+    "provisional": [
+     {
+      "__class__": "PlayerProjection",
+      "kind": "pending_tool",
+      "sequence": null,
+      "text": null,
+      "safe_payload": {
+       "package_id": "synthetic.actions",
+       "tool_name": "roll_check",
+       "parameters": {
+        "dc": 10
+       }
+      },
+      "collapsed_by_default": true,
+      "provisional": true,
+      "action_id": "action-live",
+      "attempt_id": null
+     },
+     {
+      "__class__": "PlayerProjection",
+      "kind": "think",
+      "sequence": null,
+      "text": "Weighing the tide.",
+      "safe_payload": {
+       "text": "Weighing the tide."
+      },
+      "collapsed_by_default": true,
+      "provisional": true,
+      "action_id": null,
+      "attempt_id": "att-think"
+     },
+     {
+      "__class__": "PlayerProjection",
+      "kind": "talk",
+      "sequence": null,
+      "text": "The gulls scatter.",
+      "safe_payload": {
+       "text": "The gulls scatter."
+      },
+      "collapsed_by_default": false,
+      "provisional": true,
+      "action_id": null,
+      "attempt_id": "att-talk"
+     }
+    ],
+    "high_water": 24
+   }
+  }
+ }
+}

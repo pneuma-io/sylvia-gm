@@ -279,12 +279,55 @@ pub mod transport {
     pub const CLAUDE_CODE: &str = "claude_code";
 }
 
+/// The context figures an account runtime rewrites on its `ModelInfo` after construction
+/// (`_claude.py`'s `_apply_runtime_window`, `_chatgpt.py`'s `_observe_context_window`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContextFigures {
+    pub context_window: Option<i64>,
+    pub context_window_source: String,
+    pub runtime_context_window: Option<i64>,
+    pub runtime_context_source: String,
+    pub runtime_context_observed_at: Option<String>,
+    pub context_observed_at: Option<String>,
+    pub configured_runtime_mismatch: bool,
+}
+
+/// A runtime's live context figures, shared by every clone of its `ModelInfo`.
+///
+/// Python's wrappers, runner and prompt assembler hold the runtime's one `ModelInfo` object, so
+/// a window the runtime observes is what the next request plans within. Here every clone of
+/// that `ModelInfo` shares this cell. Only a runtime creates one
+/// ([`ModelInfo::share_live_context`]) and writes it ([`LiveContext::update`]).
+#[derive(Clone)]
+pub struct LiveContext(std::sync::Arc<std::sync::Mutex<ContextFigures>>);
+
+impl LiveContext {
+    /// The current figures.
+    pub fn get(&self) -> ContextFigures {
+        self.0.lock().expect("live context lock").clone()
+    }
+
+    /// Rewrite the figures as one change: readers only ever see whole figures.
+    pub fn update(&self, change: impl FnOnce(&mut ContextFigures)) {
+        change(&mut self.0.lock().expect("live context lock"));
+    }
+}
+
+impl std::fmt::Debug for LiveContext {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.get().fmt(formatter)
+    }
+}
+
 /// `ModelInfo`: what the registry knows about one model.
 ///
 /// Build with [`ModelInfo::new`] and set fields, then call [`ModelInfo::post_init`] where Python
 /// constructs the dataclass (it runs `__post_init__`). `transport` stays a string as in Python,
 /// which does not check it; the known values are in [`transport`].
-#[derive(Debug, Clone, PartialEq)]
+///
+/// `Debug` and `PartialEq` go by the current figures, as the dataclass's `__repr__` and `__eq__`
+/// read its fields.
+#[derive(Clone)]
 pub struct ModelInfo {
     pub id: String,
     pub name: String,
@@ -294,17 +337,31 @@ pub struct ModelInfo {
     pub recommended: bool,
     pub premium: bool,
     /// Effective context capacity used for request admission (derived, may be `None`).
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub context_window: Option<i64>,
     pub declared_context_window: Option<i64>,
     pub declared_context_source: String,
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub runtime_context_window: Option<i64>,
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub runtime_context_source: String,
     pub configured_context_window: Option<i64>,
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub context_window_source: String,
     pub declared_context_observed_at: Option<String>,
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub runtime_context_observed_at: Option<String>,
     pub configured_context_observed_at: Option<String>,
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub context_observed_at: Option<String>,
+    /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
+    /// observed figure.
     pub configured_runtime_mismatch: bool,
     pub configured_declared_mismatch: bool,
     /// Sylvia's completion allowance; `None` for runtime-managed output.
@@ -325,6 +382,8 @@ pub struct ModelInfo {
     pub speed_options: Option<Vec<SpeedOption>>,
     pub speed_control: Option<String>,
     pub speed_source: String,
+    /// A runtime's live figures; `None` for configured and catalog models.
+    pub live: Option<LiveContext>,
 }
 
 impl ModelInfo {
@@ -372,6 +431,7 @@ impl ModelInfo {
             speed_options: None,
             speed_control: None,
             speed_source: unknown(),
+            live: None,
         }
     }
 
@@ -389,6 +449,72 @@ impl ModelInfo {
         self
     }
 
+    /// Share this model's context figures with every clone of it, from their values now: a
+    /// runtime calls it once at construction and writes through the returned cell.
+    pub fn share_live_context(&mut self) -> LiveContext {
+        if let Some(live) = &self.live {
+            return live.clone();
+        }
+        let live = LiveContext(std::sync::Arc::new(std::sync::Mutex::new(self.stored_figures())));
+        self.live = Some(live.clone());
+        live
+    }
+
+    fn stored_figures(&self) -> ContextFigures {
+        ContextFigures {
+            context_window: self.context_window,
+            context_window_source: self.context_window_source.clone(),
+            runtime_context_window: self.runtime_context_window,
+            runtime_context_source: self.runtime_context_source.clone(),
+            runtime_context_observed_at: self.runtime_context_observed_at.clone(),
+            context_observed_at: self.context_observed_at.clone(),
+            configured_runtime_mismatch: self.configured_runtime_mismatch,
+        }
+    }
+
+    /// One consistent snapshot of the context figures: the runtime's live ones, else the fields.
+    pub fn context_figures(&self) -> ContextFigures {
+        match &self.live {
+            Some(live) => live.get(),
+            None => self.stored_figures(),
+        }
+    }
+
+    /// `context_window`, as it is now.
+    pub fn context_window(&self) -> Option<i64> {
+        self.context_figures().context_window
+    }
+
+    /// `context_window_source`, as it is now.
+    pub fn context_window_source(&self) -> String {
+        self.context_figures().context_window_source
+    }
+
+    /// `runtime_context_window`, as it is now.
+    pub fn runtime_context_window(&self) -> Option<i64> {
+        self.context_figures().runtime_context_window
+    }
+
+    /// `runtime_context_source`, as it is now.
+    pub fn runtime_context_source(&self) -> String {
+        self.context_figures().runtime_context_source
+    }
+
+    /// `runtime_context_observed_at`, as it is now.
+    pub fn runtime_context_observed_at(&self) -> Option<String> {
+        self.context_figures().runtime_context_observed_at
+    }
+
+    /// `context_observed_at`, as it is now.
+    pub fn context_observed_at(&self) -> Option<String> {
+        self.context_figures().context_observed_at
+    }
+
+    /// `configured_runtime_mismatch`, as it is now.
+    pub fn configured_runtime_mismatch(&self) -> bool {
+        self.context_figures().configured_runtime_mismatch
+    }
+
     /// `wire_model_id`: the upstream identifier, without changing the canonical id.
     pub fn wire_model_id(&self) -> &str {
         if !self.provider_model_id.is_empty() {
@@ -398,6 +524,82 @@ impl ModelInfo {
             Some((_, rest)) => rest,
             None => &self.id,
         }
+    }
+}
+
+impl PartialEq for ModelInfo {
+    fn eq(&self, other: &Self) -> bool {
+        self.context_figures() == other.context_figures()
+            && self.id == other.id
+            && self.name == other.name
+            && self.provider_name == other.provider_name
+            && self.provider_key == other.provider_key
+            && self.provider_mode == other.provider_mode
+            && self.recommended == other.recommended
+            && self.premium == other.premium
+            && self.declared_context_window == other.declared_context_window
+            && self.declared_context_source == other.declared_context_source
+            && self.configured_context_window == other.configured_context_window
+            && self.declared_context_observed_at == other.declared_context_observed_at
+            && self.configured_context_observed_at == other.configured_context_observed_at
+            && self.configured_declared_mismatch == other.configured_declared_mismatch
+            && self.max_output_tokens == other.max_output_tokens
+            && self.builder_output_tokens == other.builder_output_tokens
+            && self.cost_per_1k_tokens == other.cost_per_1k_tokens
+            && self.transport == other.transport
+            && self.provider_model_id == other.provider_model_id
+            && self.supports_streaming == other.supports_streaming
+            && self.supports_tools == other.supports_tools
+            && self.supported_reasoning_efforts == other.supported_reasoning_efforts
+            && self.default_reasoning_effort == other.default_reasoning_effort
+            && self.reasoning_control == other.reasoning_control
+            && self.reasoning_source == other.reasoning_source
+            && self.speed_options == other.speed_options
+            && self.speed_control == other.speed_control
+            && self.speed_source == other.speed_source
+    }
+}
+
+impl std::fmt::Debug for ModelInfo {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let figures = self.context_figures();
+        formatter
+            .debug_struct("ModelInfo")
+            .field("id", &self.id)
+            .field("name", &self.name)
+            .field("provider_name", &self.provider_name)
+            .field("provider_key", &self.provider_key)
+            .field("provider_mode", &self.provider_mode)
+            .field("recommended", &self.recommended)
+            .field("premium", &self.premium)
+            .field("context_window", &figures.context_window)
+            .field("declared_context_window", &self.declared_context_window)
+            .field("declared_context_source", &self.declared_context_source)
+            .field("runtime_context_window", &figures.runtime_context_window)
+            .field("runtime_context_source", &figures.runtime_context_source)
+            .field("configured_context_window", &self.configured_context_window)
+            .field("context_window_source", &figures.context_window_source)
+            .field("declared_context_observed_at", &self.declared_context_observed_at)
+            .field("runtime_context_observed_at", &figures.runtime_context_observed_at)
+            .field("configured_context_observed_at", &self.configured_context_observed_at)
+            .field("context_observed_at", &figures.context_observed_at)
+            .field("configured_runtime_mismatch", &figures.configured_runtime_mismatch)
+            .field("configured_declared_mismatch", &self.configured_declared_mismatch)
+            .field("max_output_tokens", &self.max_output_tokens)
+            .field("builder_output_tokens", &self.builder_output_tokens)
+            .field("cost_per_1k_tokens", &self.cost_per_1k_tokens)
+            .field("transport", &self.transport)
+            .field("provider_model_id", &self.provider_model_id)
+            .field("supports_streaming", &self.supports_streaming)
+            .field("supports_tools", &self.supports_tools)
+            .field("supported_reasoning_efforts", &self.supported_reasoning_efforts)
+            .field("default_reasoning_effort", &self.default_reasoning_effort)
+            .field("reasoning_control", &self.reasoning_control)
+            .field("reasoning_source", &self.reasoning_source)
+            .field("speed_options", &self.speed_options)
+            .field("speed_control", &self.speed_control)
+            .field("speed_source", &self.speed_source)
+            .finish()
     }
 }
 
@@ -523,5 +725,75 @@ impl std::fmt::Debug for ProviderConfig {
             .field("max_tokens", &self.max_tokens)
             .field("retry_config", &self.retry_config)
             .finish_non_exhaustive()
+    }
+}
+
+#[cfg(test)]
+mod live_context_tests {
+    use super::*;
+
+    fn model() -> ModelInfo {
+        let mut model = ModelInfo::new(
+            "claude_runtime/claude-opus-5-5",
+            "Opus",
+            "Claude",
+            "claude_runtime",
+            "subscription",
+        );
+        model.context_window = Some(200_000);
+        model.context_window_source = "model_catalog".into();
+        model
+    }
+
+    #[test]
+    fn a_clone_sees_what_the_runtime_writes() {
+        let mut runtime = model();
+        let live = runtime.share_live_context();
+        let held = runtime.clone();
+        assert_eq!(held.context_window(), Some(200_000));
+        live.update(|figures| {
+            figures.context_window = Some(1_000_000);
+            figures.context_window_source = "runtime_reported".into();
+            figures.runtime_context_window = Some(1_000_000);
+            figures.runtime_context_source = "runtime_reported".into();
+            figures.runtime_context_observed_at = Some("2026-11-23T09:30:00+00:00".into());
+            figures.context_observed_at = Some("2026-11-23T09:30:00+00:00".into());
+            figures.configured_runtime_mismatch = true;
+        });
+        for holder in [&runtime, &held] {
+            assert_eq!(holder.context_window(), Some(1_000_000));
+            assert_eq!(holder.runtime_context_window(), Some(1_000_000));
+            assert_eq!(holder.context_window_source(), "runtime_reported");
+            assert!(holder.configured_runtime_mismatch());
+            assert_eq!(holder.context_figures(), live.get());
+        }
+        // A second share is the same cell.
+        assert_eq!(runtime.share_live_context().get(), live.get());
+    }
+
+    #[test]
+    fn equality_and_debug_read_the_current_figures() {
+        let mut runtime = model();
+        let live = runtime.share_live_context();
+        let mut plain = model();
+        assert_eq!(runtime, plain);
+        live.update(|figures| figures.context_window = Some(5));
+        assert_ne!(runtime, plain);
+        plain.context_window = Some(5);
+        assert_eq!(runtime, plain);
+        let shown = format!("{runtime:?}");
+        assert!(shown.contains("context_window: Some(5)"), "{shown}");
+        assert!(!shown.contains("live"), "{shown}");
+        assert_eq!(shown, format!("{plain:?}"));
+    }
+
+    #[test]
+    fn an_info_without_a_live_cell_is_a_plain_value() {
+        let mut plain = model();
+        let copy = plain.clone();
+        plain.context_window = Some(7);
+        assert_eq!(plain.context_window(), Some(7));
+        assert_eq!(copy.context_window(), Some(200_000));
+        assert!(plain.live.is_none());
     }
 }

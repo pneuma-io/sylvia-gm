@@ -606,6 +606,26 @@ pub struct MechanicContext {
     pub choice_resolution: Option<MechanicsChoiceResolution>,
 }
 
+/// `application/authority.ActionCommand`: one requested mechanic execution.
+///
+/// Plain data, as Python's frozen dataclass has no `__post_init__`; the owner's
+/// `_execute_action` checks it (a bool or negative `expected_revision` is refused there).
+#[derive(Debug, Clone, PartialEq)]
+pub struct ActionCommand {
+    pub campaign_id: String,
+    pub action_id: String,
+    pub idempotency_key: String,
+    pub owner_id: String,
+    pub writer: WriterRole,
+    pub expected_revision: i64,
+    pub turn_id: String,
+    pub package_id: String,
+    pub tool_name: String,
+    pub parameters: JsonMap,
+    /// `initiating_session_id`, `None` by default.
+    pub initiating_session_id: Option<String>,
+}
+
 /// What one mechanic returns (`MechanicOutcome`).
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct MechanicOutcome {

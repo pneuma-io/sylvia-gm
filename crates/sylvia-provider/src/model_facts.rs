@@ -66,6 +66,14 @@ pub fn facts(route: &str, model_id: &str) -> ModelFacts {
     table::FACTS.iter().find(|((r, m), _)| *r == route && *m == model_id).map_or(UNKNOWN, |(_, facts)| *facts)
 }
 
+/// `uses_gm_narration_hint(model)`: a ChatGPT-subscription route whose model the facts mark for
+/// the GM narration reminder. The canonical id must be exactly `chatgpt-subscription/<wire id>`.
+pub fn uses_gm_narration_hint(model: &crate::types::ModelInfo) -> bool {
+    let wire_id = model.wire_model_id();
+    model.id == format!("chatgpt-subscription/{wire_id}")
+        && facts(&model.provider_key, wire_id).gm_narration_hint
+}
+
 /// `documented_openai_id(model_id)`.
 pub fn documented_openai_id(model_id: &str) -> &str {
     table::OPENAI_ALIASES.iter().find(|(alias, _)| *alias == model_id).map_or(model_id, |(_, target)| target)

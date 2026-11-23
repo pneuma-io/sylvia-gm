@@ -16,7 +16,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/bundled_campaign_plans.py:116` | `read_plan_catalogue` | len() against a limit | `if not isinstance(rows, list) or not 1 <= len(rows) <= 256:` | |
+| `application/bundled_campaign_plans.py:116` | `read_plan_catalogue` | len() against a limit | `if not isinstance(rows, list) or not 1 <= len(rows) <= 256:` |  `sylvia-app` plan_catalogue_vectors |
 | `application/bundled_starter_characters.py:117` | `bundled_starter_participants` | len() against a limit | `if len(_ROSTERS) >= 32:` | |
 | `application/campaign_library_selection.py:640` | `plan_with_interview_intent` | len() against a limit | `if not isinstance(value, str) or len(value) > 131_072:` | |
 | `application/character_card_import.py:128` | `_png_json` | len() against a limit | `if len(encoded) > 350000:` | |
@@ -38,27 +38,27 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/import_repair.py:383` | `_read_draft_files` | len() against a limit | `if total > _EXPANDED_BYTE_LIMIT or len(files) >= _MEMBER_COUNT_LIMIT:` | |
 | `application/import_repair.py:391` | `_package_drafts` | len() against a limit | `if manifest_bytes is None or len(manifest_bytes) > _MANIFEST_LIMIT:` | |
 | `application/initial_character_state.py:106` | `_calculation_contract` | len() against a limit | `or len(calculations) > _MAX_CALCULATIONS` |  `sylvia-app` package_library_vectors |
-| `application/library_sources.py:60` | `LibrarySourceReader.candidates` | len() against a limit | `if len(results) > _MAX_CANDIDATES:` | |
-| `application/library_sources.py:77` | `LibrarySourceReader.files` | len() against a limit | `if len(paths) > _MAX_TOTAL_PATHS:` | |
-| `application/library_sources.py:160` | `LibrarySourceReader._package_index` | len() against a limit | `if len(candidate.package_lock.entries) > _MAX_PACKAGES:` | |
+| `application/library_sources.py:60` | `LibrarySourceReader.candidates` | len() against a limit | `if len(results) > _MAX_CANDIDATES:` |  `sylvia-app` library_source_vectors |
+| `application/library_sources.py:77` | `LibrarySourceReader.files` | len() against a limit | `if len(paths) > _MAX_TOTAL_PATHS:` |  `sylvia-app` library_source_vectors |
+| `application/library_sources.py:160` | `LibrarySourceReader._package_index` | len() against a limit | `if len(candidate.package_lock.entries) > _MAX_PACKAGES:` |  `sylvia-app` library_source_vectors |
 | `application/plan_bundle.py:84` | `_read_bundle` | len() against a limit | `if len(data) > PLAN_BUNDLE_BYTE_LIMIT:` | |
-| `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` | |
-| `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` | |
+| `application/plan_network_admission.py:32` | `_reveal_records` | len() against a limit | `or len(identity.encode("utf-8")) > 128):` |  `sylvia-app` plan_admission_vectors |
+| `application/plan_snapshot.py:61` | `validate_plan_snapshot` | len() against a limit | `if not isinstance(package_snapshot, bytes) or not 0 < len(package_snapshot) <= ( PLAN_SNAPSHOT_BYTE_LIMIT ):` |  `sylvia-app` plan_snapshot_vectors |
 | `application/plan_state_admission.py:66` | `_matches` | len() against a limit | `if len(matches) >= 8192:` |  `sylvia-app` plan_state_vectors |
-| `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
-| `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
-| `application/reusable_participants.py:264` | `parse_setting_character` | len() against a limit | `or len(source.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` | |
-| `application/reusable_participants.py:267` | `parse_setting_character` | len() against a limit | `or len(character_id) > 160` | |
-| `application/reusable_participants.py:337` | `parse_setting_character` | len() against a limit | `or len(summary) > 500` | |
-| `application/reusable_participants.py:377` | `parse_setting_character` | len() against a limit | `if not isinstance(name, str) or not name or name != name.strip() or len(name) > 160:` | |
-| `application/reusable_participants.py:397` | `parse_setting_character` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` | |
-| `application/reusable_participants.py:438` | `validate_reusable_participant_draft` | len() against a limit | `or len(summary) > 500` | |
-| `application/reusable_participants.py:455` | `validate_reusable_participant_draft` | len() against a limit | `if not isinstance(name, str) or name != name.strip() or not name or len(name) > 160:` | |
-| `application/reusable_participants.py:736` | `load_reusable_participant` | len() against a limit | `or len(str(record["summary"])) > 500` | |
-| `application/reusable_participants.py:777` | `compatible_reusable_participants` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PARTICIPANTS:` | |
-| `application/reusable_plans.py:310` | `save_reusable_rift_plan` | len() against a limit | `or len(title) > 160` | |
-| `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` | |
-| `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` | |
+| `application/reusable_participants.py:228` | `_validated_payload` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:241` | `_validated_authored_profile` | len() against a limit | `or len(value.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:264` | `parse_setting_character` | len() against a limit | `or len(source.encode("utf-8")) > _MAX_PARTICIPANT_BYTES` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:267` | `parse_setting_character` | len() against a limit | `or len(character_id) > 160` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:337` | `parse_setting_character` | len() against a limit | `or len(summary) > 500` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:377` | `parse_setting_character` | len() against a limit | `if not isinstance(name, str) or not name or name != name.strip() or len(name) > 160:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:397` | `parse_setting_character` | len() against a limit | `if len(encoded) > _MAX_PARTICIPANT_BYTES:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:438` | `validate_reusable_participant_draft` | len() against a limit | `or len(summary) > 500` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:455` | `validate_reusable_participant_draft` | len() against a limit | `if not isinstance(name, str) or name != name.strip() or not name or len(name) > 160:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:736` | `load_reusable_participant` | len() against a limit | `or len(str(record["summary"])) > 500` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:777` | `compatible_reusable_participants` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PARTICIPANTS:` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_plans.py:310` | `save_reusable_rift_plan` | len() against a limit | `or len(title) > 160` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:441` | `load_reusable_campaign_plan` | len() against a limit | `if len(package_snapshot) > PLAN_SNAPSHOT_BYTE_LIMIT:` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:515` | `reusable_campaign_plan_catalog` | len() against a limit | `if len(directories) > _MAX_LIBRARY_PLANS:` |  `sylvia-app` reusable_plan_vectors |
 | `application/schema_admission.py:86` | `validate_json_schema` | len() against a limit | `or not 1 <= len(branches) <= 256` | `sylvia-domain` schema_admission_vectors |
 | `application/setting_character_requirements.py:76` | `parse_setting_character_requirements` | len() against a limit | `if not encoded or len(encoded) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
 | `application/setting_character_requirements.py:145` | `validate_setting_character_data` | len() against a limit | `if len(canonical_json_bytes(captured)) > _BYTE_LIMIT:` |  `sylvia-app` app_leaves_vectors |
@@ -246,11 +246,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/campaign_sequels.py:63` | `preview` | len() against a limit | `if len(rows) >= MAX_ADVENTURES:` | |
 | `infrastructure/builder_source_ingestion.py:174` | `ingest_builder_sources` | len() against a limit | `if not 1 <= len(source_paths) <= MAX_SOURCE_FILES:` | |
 | `infrastructure/campaign_archive.py:2975` | `_discover_recovery_manifest` | len() against a limit | `len(info.filename.encode("utf-8")) > RECOVERY_MAX_MEMBER_NAME_BYTES for info in infos` | |
-| `infrastructure/private_records_archive.py:43` | `validate_rows` | len() against a limit | `if len(result) >= MAX_ROWS or not isinstance(row, Mapping) or set(row) != set(FIELDS):` | |
-| `infrastructure/private_records_archive.py:83` | `encode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(output) + len(line) > MAX_BYTES:` | |
-| `infrastructure/private_records_archive.py:91` | `decode` | len() against a limit | `if len(data) > MAX_BYTES or (data and not data.endswith(b"\n")):` | |
-| `infrastructure/private_records_archive.py:95` | `decode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(rows) >= MAX_ROWS:` | |
-| `infrastructure/sqlite_authority.py:1737` | `SQLiteAuthorityStore._write_export_blob` | len() against a limit | `or len(data) > campaign_archive.STREAM_CHUNK_BYTES` | |
+| `infrastructure/private_records_archive.py:43` | `validate_rows` | len() against a limit | `if len(result) >= MAX_ROWS or not isinstance(row, Mapping) or set(row) != set(FIELDS):` | `sylvia-store` export_capture |
+| `infrastructure/private_records_archive.py:83` | `encode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(output) + len(line) > MAX_BYTES:` | `sylvia-store` export_capture |
+| `infrastructure/private_records_archive.py:91` | `decode` | len() against a limit | `if len(data) > MAX_BYTES or (data and not data.endswith(b"\n")):` | `sylvia-store` archive_validation |
+| `infrastructure/private_records_archive.py:95` | `decode` | len() against a limit | `if len(line) > MAX_ROW_BYTES or len(rows) >= MAX_ROWS:` | `sylvia-store` archive_validation |
+| `infrastructure/sqlite_authority.py:1737` | `SQLiteAuthorityStore._write_export_blob` | len() against a limit | `or len(data) > campaign_archive.STREAM_CHUNK_BYTES` | `sylvia-store` export_writer |
 | `infrastructure/sqlite_authority.py:7403` | `SQLiteAuthorityStore.commit_campaign_continuity_batch` | len() against a limit | `if len(admitted) > 64:` | |
 | `infrastructure/sqlite_authority.py:12867` | `SQLiteAuthorityStore.consume_package_blob` | len() against a limit | `or len(data) > PACKAGE_CHUNK_LIMIT` | |
 | `infrastructure/sqlite_authority.py:13435` | `SQLiteAuthorityStore.advance_mechanics_choice` | len() against a limit | `if (len(pending.prior_answers) >= 63 or answer.request != pending.choice` | |
@@ -285,7 +285,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_stateless_mcp.py:1005` | `_campaign_file_updates` | len() against a limit | `if len(updates) > 64:` | |
 | `agent/_tool_loader.py:258` | `_summary` | len() against a limit | `if len(description) <= SUMMARY_LIMIT:` | |
 | `agent/_tool_loader.py:275` | `definitions_record` | len() against a limit | `if len(text) <= INLINE_LIMIT:` | |
-| `agent/_working_context.py:118` | `_valid_checkpoint` | len() against a limit | `and 0 < len(record["summary"]) <= _SUMMARY_LIMIT` | |
+| `agent/_working_context.py:118` | `_valid_checkpoint` | len() against a limit | `and 0 < len(record["summary"]) <= _SUMMARY_LIMIT` | `sylvia-agent` working_context_vectors |
 | `application/character_chat.py:133` | `_decode` | len() against a limit | `if not isinstance(raw_messages, list) or len(raw_messages) > MAX_MESSAGES:` | |
 | `application/character_chat.py:202` | `_read` | len() against a limit | `if len(data) > MAX_FILE_BYTES:` | |
 | `application/character_chat.py:215` | `_write` | len() against a limit | `if len(data) > MAX_FILE_BYTES:` | |
@@ -310,8 +310,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:1301` | `discover_provider_models` | len() against a limit | `if len(search) > 256:` | |
 | `config/provider_settings.py:2126` | `set_session_speed_settings` | len() against a limit | `or len(session_id) > 512` | |
 | `config/provider_settings.py:2163` | `set_session_model_once_settings` | len() against a limit | `or len(session_id) > 512` | |
-| `provider/_claude_install.py:175` | `verify_manifest` | len() against a limit | `primary = {(fields[11] if len(fields) > 11 else fields[2]).upper() for fields in valid}` | |
-| `provider/_claude_runtime.py:379` | `ClaudeConnection._read` | len() against a limit | `if len(line.encode("utf-8")) > MAX_FRAME_BYTES or not line.endswith("\n"):` | |
+| `provider/_claude_install.py:175` | `verify_manifest` | len() against a limit | `primary = {(fields[11] if len(fields) > 11 else fields[2]).upper() for fields in valid}` | `sylvia-provider` install_vectors |
+| `provider/_claude_runtime.py:379` | `ClaudeConnection._read` | len() against a limit | `if len(line.encode("utf-8")) > MAX_FRAME_BYTES or not line.endswith("\n"):` | `sylvia-provider` runtime_process |
 | `provider/_lifecycle.py:38` | `LifecycleTiming.record` | len() against a limit | `if len(self._spans) < 24:` | |
 | `provider/_openai_compat.py:644` | `_responses_service_tier` | len() against a limit | `if isinstance(value, str) and 0 < len(value) <= 32 and value.isascii():` | |
 | `provider/_openai_compat.py:855` | `OpenAICompatProvider._response_continuation_options` | len() against a limit | `and len(context_id) <= 256):` || yes |

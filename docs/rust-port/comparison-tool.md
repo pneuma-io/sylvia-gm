@@ -132,6 +132,25 @@ header. A session adds its own under `rules`:
   folder still holds the raw data; never commit a work folder.
 - `volatile_files`: files that must exist but whose content is not compared.
 - `ignore_pointers`: exact JSON pointers into the recording, for the rare single value.
+- `ignore_headers_row_8`: the one rule that covers a Rust difference rather than a Python run
+  difference, because `differences.md` row 8 agrees it: the HTTP client's own request headers
+  (Python's OpenAI SDK and httpx send `User-Agent: AsyncOpenAI/Python ...` or `python-httpx/...`,
+  `Accept-Encoding`, `Connection` and `X-Stainless-*`; the Rust client sends
+  `User-Agent: SylviaGM/<version>` and none of the others). List exactly row 8's names:
+  `"ignore_headers_row_8": ["User-Agent", "Accept-Encoding", "Connection", "X-Stainless-*"]`.
+  Each listed name is dropped, name and value, from every `model_requests` entry's `headers`
+  on both recordings; names compare case-insensitively and a trailing `*` is a prefix. Every
+  other header is still compared, in order. `check` and `diff` print
+  `rules: ignore_headers_row_8 dropped N header(s) from M model request(s)` whenever it drops
+  any. Never list a header row 8 does not name, and never use it as a blanket header ignore: a
+  new header difference must still show, and goes to the manager as a new row first.
+- `header_name_case_row_40`: `true` for differences row 40 (header name case). The Rust
+  client writes request header names in lowercase (hyper's HTTP/1.1 writer), and Python writes
+  them as given; HTTP names are case-insensitive (RFC 9110 §5.1). Every `model_requests`
+  entry's header *names* are lowercased on both recordings. Values and order are still
+  compared exactly. `check` and `diff` print
+  `rules: header_name_case_row_40 compared N header name(s) in M model request(s) without case`
+  whenever it changes any.
 
 Local diagnostics aggregates matching outcomes per wall-clock minute, so two error replies
 share one `diagnostic_id` only when both land in the same minute. A run that crosses a minute

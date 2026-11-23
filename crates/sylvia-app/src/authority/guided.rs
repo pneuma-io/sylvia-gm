@@ -198,7 +198,7 @@ pub struct FinalizeConstruction<'a> {
 }
 
 /// The work `_campaign_work(campaign_id)` registers, held while the operation runs.
-async fn campaign_work(
+pub(crate) async fn campaign_work(
     store: &StoreHandle,
     campaign_id: &str,
 ) -> StoreResult<sylvia_store::work::CampaignWorkGuard> {

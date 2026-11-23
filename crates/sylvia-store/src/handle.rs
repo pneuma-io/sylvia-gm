@@ -20,6 +20,7 @@ pub const STORE_STOPPED: &str = "SQLite authority store thread has stopped";
 pub struct StoreHandle {
     jobs: mpsc::Sender<Job>,
     lanes: OwnerLanes,
+    narration: std::sync::Arc<crate::narration::NarrationState>,
 }
 
 /// Joins the store thread; returned once by [`StoreHandle::spawn`].
@@ -58,7 +59,9 @@ impl StoreHandle {
             .map_err(StoreError::from)?;
         match opened_receiver.recv() {
             Ok(Ok(())) => {
-                Ok((Self { jobs, lanes: OwnerLanes::default() }, StoreThread { thread: Some(thread) }))
+                let handle =
+                    Self { jobs, lanes: OwnerLanes::default(), narration: std::sync::Arc::default() };
+                Ok((handle, StoreThread { thread: Some(thread) }))
             }
             Ok(Err(error)) => {
                 let _ = thread.join();
@@ -69,6 +72,12 @@ impl StoreHandle {
                 Err(StoreError::Other(STORE_STOPPED.into()))
             }
         }
+    }
+
+    /// The owner's live narration and admin audit state (`AuthorityOwner._narration_lock` and
+    /// what it guards), shared by every clone.
+    pub fn narration(&self) -> &crate::narration::NarrationState {
+        &self.narration
     }
 
     /// The owner's lane registries: `AuthorityOwner._lanes` and `SessionApplication._lanes`.

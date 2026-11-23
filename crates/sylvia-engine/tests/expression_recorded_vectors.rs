@@ -57,6 +57,7 @@ fn every_recorded_evaluation_replays_as_python() {
             ruleset_config: &ruleset,
             definitions: &definitions,
             budget: budget.as_ref(),
+            required_inputs: false,
         };
         let actual = match evaluate_expression(text, &ctx) {
             Ok(value) => json!({"result": tagged::encode(&value)}),

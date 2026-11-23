@@ -139,6 +139,11 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             CodedError::new(PORT_PENDING, format!("The Rust owner does not answer {method} yet.")).into()
         );
     }
+    // Its preflight's provider errors keep Python's provider-error reply, so it answers a
+    // `Failure` itself.
+    if method == "finalize_campaign_construction" {
+        return commands::campaigns::handle_finalize_campaign_construction(context, params).await;
+    }
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
@@ -155,6 +160,12 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::campaigns::handle_restore_archived_campaign(context, params).await
         }
         "trash_campaign" => commands::campaigns::handle_trash_campaign(context, params).await,
+        "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
+        "export_campaign" | "export_campaign_file" => {
+            commands::campaigns::handle_export_campaign(context, params).await
+        }
+        "recover_campaign" => commands::campaigns::handle_recover_campaign(context, params).await,
+        "recover_campaign_file" => commands::campaigns::handle_recover_campaign_file(context, params).await,
         "restore_trashed_campaign" => {
             commands::campaigns::handle_restore_trashed_campaign(context, params).await
         }
@@ -163,6 +174,13 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,
         "provider_settings" => commands::providers::handle_provider_settings(context, params).await,
+        "detect_local_providers" => commands::providers::handle_detect_local_providers(context, params).await,
+        "discover_provider_models" => {
+            commands::providers::handle_discover_provider_models(context, params).await
+        }
+        "validate_provider_model" => {
+            commands::providers::handle_validate_provider_model(context, params).await
+        }
         "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
         "remove_provider_settings" => {
             commands::providers::handle_remove_provider_settings(context, params).await

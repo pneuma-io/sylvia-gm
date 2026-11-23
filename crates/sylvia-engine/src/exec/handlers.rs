@@ -700,6 +700,21 @@ fn private_name(name: &str) -> bool {
     name.len() > 1 && name.starts_with('_') && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
+thread_local! {
+    static IDENTITY_SHUFFLE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Vector tooling only: run `body` with `shuffle` leaving its collection in order, as the
+/// generators replace Python's `SystemRandom.shuffle`, so outcomes that store a shuffled
+/// collection compare exactly. Nothing in the product calls it.
+#[doc(hidden)]
+pub fn with_identity_shuffle_for_vectors<R>(body: impl FnOnce() -> R) -> R {
+    let previous = IDENTITY_SHUFFLE.with(|flag| flag.replace(true));
+    let result = body();
+    IDENTITY_SHUFFLE.with(|flag| flag.set(previous));
+    result
+}
+
 /// `_handle_shuffle`: an unguessable permutation (OS randomness, as in Python), kept as state.
 pub(crate) fn handle_shuffle(
     body: &Value,
@@ -719,7 +734,9 @@ pub(crate) fn handle_shuffle(
         .map(super::context::deep_copy)
         .collect();
     // `secrets.SystemRandom().shuffle(values)`: OS randomness, as in Python.
-    crate::pyrandom::PyRandom::from_entropy().shuffle(&mut values);
+    if !IDENTITY_SHUFFLE.with(std::cell::Cell::get) {
+        crate::pyrandom::PyRandom::from_entropy().shuffle(&mut values);
+    }
     ctx.vars.insert(destination, Value::list(values));
     ctx.budget.private_random_sampled.set(true);
     Ok(())

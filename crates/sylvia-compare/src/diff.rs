@@ -9,7 +9,9 @@
 //!   `<name:1>`, `<name:2>` in order of first appearance, so two runs still have to agree on
 //!   which identifier appears where, just not on its spelling. An alias can be limited to the
 //!   values of named keys, so it cannot hide a wrong hash somewhere else;
-//! - `volatile_files`: data-folder files whose size and content vary (logs).
+//! - `volatile_files`: data-folder files whose size and content vary (logs);
+//! - `ignore_headers_row_8` and `header_name_case_row_40`: the two that cover agreed Rust
+//!   differences (`differences.md` rows 8 and 40) in model requests' headers.
 //!
 //! Anything not covered by a rule must match exactly.
 
@@ -33,6 +35,17 @@ pub struct Rules {
     pub alias: Vec<Alias>,
     /// Regular expressions for data-folder paths whose size and content are not compared.
     pub volatile_files: Vec<String>,
+    /// Model-request header names that differences row 8 lets differ (the HTTP client's own
+    /// headers): dropped from each `model_requests` entry's `headers` on both sides, name
+    /// compared case-insensitively, a trailing `*` a prefix. Only the names row 8 declares
+    /// belong here; never a blanket header ignore.
+    pub ignore_headers_row_8: Vec<String>,
+    /// Differences row 40 (header name case): the Rust client writes request header names in
+    /// lowercase, Python writes them as given, and HTTP names are case-insensitive (RFC 9110
+    /// §5.1). When set, each `model_requests` entry's header *names* are lowercased on both
+    /// sides; values and order are still compared exactly.
+    #[serde(rename = "header_name_case_row_40")]
+    pub header_name_case_row_next: bool,
 }
 
 /// One `scrub` rule.
@@ -91,6 +104,8 @@ impl Rules {
                 keys: vec!["diagnostic_id".into(), "id".into(), "session".into()],
             }],
             volatile_files: Vec::new(),
+            ignore_headers_row_8: Vec::new(),
+            header_name_case_row_next: false,
         }
     }
 
@@ -102,6 +117,8 @@ impl Rules {
         self.scrub.extend(other.scrub);
         self.alias.extend(other.alias);
         self.volatile_files.extend(other.volatile_files);
+        self.ignore_headers_row_8.extend(other.ignore_headers_row_8);
+        self.header_name_case_row_next |= other.header_name_case_row_next;
         self
     }
 }
@@ -144,12 +161,112 @@ pub fn scrub(recording: &Json, rules: &Rules) -> Result<Json, String> {
     normalise(recording, &Rules { scrub: rules.scrub.clone(), ..Rules::default() })
 }
 
+/// What `ignore_headers_row_8` dropped from one recording.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct DroppedHeaders {
+    /// Headers dropped.
+    pub headers: usize,
+    /// Model requests that lost at least one.
+    pub requests: usize,
+}
+
+fn header_matches(names: &[String], header: &str) -> bool {
+    names.iter().any(|name| match name.strip_suffix('*') {
+        Some(prefix) => header
+            .as_bytes()
+            .get(..prefix.len())
+            .is_some_and(|start| start.eq_ignore_ascii_case(prefix.as_bytes())),
+        None => header.eq_ignore_ascii_case(name),
+    })
+}
+
+/// Check `ignore_headers_row_8`'s names: non-empty, with `*` only as the last character.
+fn check_header_names(names: &[String]) -> Result<(), String> {
+    for name in names {
+        let body = name.strip_suffix('*').unwrap_or(name);
+        if body.is_empty() || body.contains('*') {
+            return Err(format!(
+                "bad ignore_headers_row_8 name {name:?}: a header name, optionally ending in *"
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// Drop `ignore_headers_row_8`'s headers from each model request, and count them.
+pub fn drop_row_8_headers(recording: &mut Json, rules: &Rules) -> Result<DroppedHeaders, String> {
+    check_header_names(&rules.ignore_headers_row_8)?;
+    let mut dropped = DroppedHeaders::default();
+    if rules.ignore_headers_row_8.is_empty() {
+        return Ok(dropped);
+    }
+    let Some(requests) = recording.get_mut("model_requests").and_then(Json::as_array_mut) else {
+        return Ok(dropped);
+    };
+    for request in requests {
+        let Some(headers) = request.get_mut("headers").and_then(Json::as_array_mut) else { continue };
+        let before = headers.len();
+        headers.retain(|header| {
+            let name = header.get(0).and_then(Json::as_str).unwrap_or("");
+            !header_matches(&rules.ignore_headers_row_8, name)
+        });
+        if headers.len() < before {
+            dropped.headers += before - headers.len();
+            dropped.requests += 1;
+        }
+    }
+    Ok(dropped)
+}
+
+/// What `header_name_case_row_40` changed in one recording.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct FoldedNames {
+    /// Header names that were not already lowercase.
+    pub headers: usize,
+    /// Model requests holding at least one.
+    pub requests: usize,
+}
+
+/// Lowercase each model request's header names when `header_name_case_row_40` is set, and
+/// count the names that changed.
+pub fn fold_header_names(recording: &mut Json, rules: &Rules) -> FoldedNames {
+    let mut folded = FoldedNames::default();
+    if !rules.header_name_case_row_next {
+        return folded;
+    }
+    let Some(requests) = recording.get_mut("model_requests").and_then(Json::as_array_mut) else {
+        return folded;
+    };
+    for request in requests {
+        let Some(headers) = request.get_mut("headers").and_then(Json::as_array_mut) else { continue };
+        let mut changed = 0;
+        for header in headers {
+            if let Some(name) = header.get_mut(0) {
+                if let Some(text) = name.as_str() {
+                    let lower = text.to_ascii_lowercase();
+                    if lower != text {
+                        changed += 1;
+                        *name = Json::String(lower);
+                    }
+                }
+            }
+        }
+        if changed > 0 {
+            folded.headers += changed;
+            folded.requests += 1;
+        }
+    }
+    folded
+}
+
 /// Apply `rules` to a recording. Aliases are numbered in document order.
 pub fn normalise(recording: &Json, rules: &Rules) -> Result<Json, String> {
     let compiled = compile(rules)?;
     let mut seen: HashMap<(usize, String), usize> = HashMap::new();
     let mut counts = vec![0usize; compiled.alias.len()];
     let mut recording = recording.clone();
+    drop_row_8_headers(&mut recording, rules)?;
+    fold_header_names(&mut recording, rules);
     // A volatile file keeps its path (it must still exist) and loses everything else.
     if let Some(files) = recording.get_mut("files").and_then(Json::as_array_mut) {
         for file in files {
@@ -375,6 +492,87 @@ mod tests {
             compare(&normal(json!({"content_hash": hex})), &normal(json!({"content_hash": other})), 10).len(),
             1
         );
+    }
+
+    #[test]
+    fn row_8_headers_are_dropped_by_exact_name_or_prefix_and_counted() {
+        let request = |headers: Json| json!({"method": "POST", "headers": headers});
+        let mut recording = json!({"model_requests": [
+            request(json!([["Host", "h"], ["user-agent", "python-httpx/0.28.1"], ["Accept-Encoding", "gzip"],
+                           ["X-Stainless-Lang", "python"], ["x-stainless-retry-count", "0"], ["Content-Type", "application/json"]])),
+            request(json!([["Host", "h"], ["User-Agent", "SylviaGM/0.4.1"]])),
+            request(json!([["Host", "h"], ["X-Stainless", "no dash: not the prefix"], ["Connectionless", "kept"]])),
+        ]});
+        let rules = Rules {
+            ignore_headers_row_8: vec![
+                "User-Agent".into(),
+                "Accept-Encoding".into(),
+                "Connection".into(),
+                "X-Stainless-*".into(),
+            ],
+            ..Rules::default()
+        };
+        let dropped = drop_row_8_headers(&mut recording, &rules).unwrap();
+        assert_eq!(dropped, DroppedHeaders { headers: 5, requests: 2 });
+        assert_eq!(
+            recording["model_requests"][0]["headers"],
+            json!([["Host", "h"], ["Content-Type", "application/json"]])
+        );
+        assert_eq!(recording["model_requests"][1]["headers"], json!([["Host", "h"]]));
+        // Exact names are whole names, and a prefix ends where its * is.
+        assert_eq!(recording["model_requests"][2]["headers"].as_array().unwrap().len(), 3);
+        // Every other header is still compared: a changed one still differs.
+        let mut other = recording.clone();
+        other["model_requests"][0]["headers"][1][1] = json!("text/plain");
+        assert_eq!(
+            compare(&normalise(&recording, &rules).unwrap(), &normalise(&other, &rules).unwrap(), 10).len(),
+            1
+        );
+    }
+
+    #[test]
+    fn header_name_case_folds_names_only() {
+        let recording = json!({"model_requests": [
+            {"method": "GET", "headers": [["Host", "h"], ["Accept", "*/*"], ["Authorization", null]]},
+            {"method": "GET", "headers": [["host", "h"]]},
+        ]});
+        let lower = json!({"model_requests": [
+            {"method": "GET", "headers": [["host", "h"], ["accept", "*/*"], ["authorization", null]]},
+            {"method": "GET", "headers": [["host", "h"]]},
+        ]});
+        let off = Rules::default();
+        assert_eq!(
+            compare(&normalise(&recording, &off).unwrap(), &normalise(&lower, &off).unwrap(), 10).len(),
+            3
+        );
+        let on = Rules { header_name_case_row_next: true, ..Rules::default() };
+        assert_eq!(fold_header_names(&mut recording.clone(), &on), FoldedNames { headers: 3, requests: 1 });
+        assert!(
+            compare(&normalise(&recording, &on).unwrap(), &normalise(&lower, &on).unwrap(), 10).is_empty()
+        );
+        // Values and order still count.
+        let mut value = lower.clone();
+        value["model_requests"][0]["headers"][1][1] = json!("application/json");
+        assert_eq!(
+            compare(&normalise(&recording, &on).unwrap(), &normalise(&value, &on).unwrap(), 10).len(),
+            1
+        );
+        let mut order = lower.clone();
+        order["model_requests"][0]["headers"].as_array_mut().unwrap().swap(0, 1);
+        assert!(
+            !compare(&normalise(&recording, &on).unwrap(), &normalise(&order, &on).unwrap(), 10).is_empty()
+        );
+        // The session key is the row's name.
+        let parsed: Rules = serde_json::from_value(json!({"header_name_case_row_40": true})).unwrap();
+        assert!(parsed.header_name_case_row_next);
+    }
+
+    #[test]
+    fn row_8_header_names_must_be_names() {
+        for bad in ["", "*", "X-*-Lang", "**"] {
+            let rules = Rules { ignore_headers_row_8: vec![bad.into()], ..Rules::default() };
+            assert!(drop_row_8_headers(&mut json!({}), &rules).is_err(), "{bad:?}");
+        }
     }
 
     #[test]

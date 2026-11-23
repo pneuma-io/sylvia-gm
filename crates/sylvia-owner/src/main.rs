@@ -27,8 +27,7 @@ fn main() {
             }
             // The speech worker takes the model folder; the runtime is the owner's own build.
             Some("--dictation-worker") => {
-                let mut runtime = sylvia_owner::dictation::Absent::default();
-                std::process::exit(sylvia_owner::dictation::worker::main(&arguments[2..], &mut runtime));
+                std::process::exit(dictation_worker(&arguments[2..]));
             }
             _ => {}
         }
@@ -44,6 +43,23 @@ fn main() {
         .build()
         .expect("the owner runtime starts");
     let code = runtime.block_on(sylvia_owner::run(BufReader::new(stdin()), stdout()));
+    // Python's `atexit` hooks, last registered first: a pending Claude sign-in is cancelled
+    // (registered when it started), then the kept Claude Code processes close (registered at
+    // import), each removing its private files.
+    sylvia_provider::config::claude_settings::cancel_all();
+    sylvia_provider::claude_kept::close_all();
     // The stdin reader thread may still be blocked in a read; exit without waiting for it.
     std::process::exit(code);
+}
+
+/// The speech worker on the shipped libraries (Windows, the `dictation` feature), else the
+/// build without the speech runtime.
+fn dictation_worker(arguments: &[std::ffi::OsString]) -> i32 {
+    #[cfg(all(windows, feature = "dictation"))]
+    if let Some(folder) = sylvia_owner::dictation::speech::SpeechRuntime::natives() {
+        let mut runtime = sylvia_owner::dictation::speech::SpeechRuntime::new(&folder);
+        return sylvia_owner::dictation::worker::main(arguments, &mut runtime);
+    }
+    let mut runtime = sylvia_owner::dictation::Absent::default();
+    sylvia_owner::dictation::worker::main(arguments, &mut runtime)
 }

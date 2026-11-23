@@ -9,7 +9,7 @@
 //! result card. Python caches parsed runtimes; the cache never changes a result, so there is
 //! none here.
 
-use crate::player_actions::parse_player_controls;
+use crate::player_actions::{parse_player_controls, PlayerControls};
 use crate::result_card_admission::{validate_activity_label, validate_result_card_declaration};
 use std::collections::HashSet;
 use sylvia_base::pyyaml::{self, Constructor, Data, Hooks, Loader, NodeId, NodeKind, Value, YamlError};
@@ -127,14 +127,16 @@ fn unique_keys_flatten(constructor: &mut Constructor, node: NodeId) -> Result<()
 }
 
 /// `yaml.load(text, Loader=_UniqueRuntimeLoader)` with `_load_runtime`'s exception handling.
-fn load_yaml(runtime_bytes: &[u8]) -> Outcome<Data> {
+/// `yaml.load(text, Loader=_UniqueRuntimeLoader if authoring else _BoundedRuntimeLoader)`: both
+/// check the node graph first; only the authoring loader refuses duplicate keys.
+fn load_yaml(runtime_bytes: &[u8], authoring: bool) -> Outcome<Data> {
     const INVALID: &str = "Package runtime YAML is invalid";
     let Ok(text) = std::str::from_utf8(runtime_bytes) else {
         return reject(INVALID);
     };
     let hooks = Hooks {
         construct_document: Some(bounded_document),
-        flatten_mapping: Some(unique_keys_flatten),
+        flatten_mapping: if authoring { Some(unique_keys_flatten) } else { None },
         ..Hooks::default()
     };
     let loaded = match pyyaml::load(text, Loader::C, hooks) {
@@ -590,38 +592,41 @@ fn shape_error(message: &str, error: ContentShapeError) -> PackageRuntimeFailure
 
 // ── The whole check ────────────────────────────────────────────────────────────────────────
 
-/// `_load_runtime(package_id=..., runtime_bytes=..., authoring=True)`.
-fn load_runtime(package_id: &str, runtime_bytes: &[u8]) -> Outcome<RuntimeTables> {
+/// `_load_runtime(package_id=..., runtime_bytes=..., authoring=...)`. The execution load
+/// (`authoring=False`) skips the content schema and the authoring shape checks.
+fn load_runtime(package_id: &str, runtime_bytes: &[u8], authoring: bool) -> Outcome<RuntimeTables> {
     if runtime_bytes.len() > PACKAGE_RUNTIME_BYTE_LIMIT {
         return reject("Package runtime exceeds the byte limit");
     }
-    let raw = load_yaml(runtime_bytes)?;
+    let raw = load_yaml(runtime_bytes, authoring)?;
     let Data::Dict(raw_pairs) = &raw else {
         return reject("Package runtime must be an object");
     };
     validate_shape(&raw)?;
-    validate_content_shape("package_runtime", &json_of(&raw), Some(PACKAGE_RUNTIME_PATH))
-        .map_err(|error| shape_error("Package runtime fields are invalid", error))?;
-    let executable_errors = runtime_authoring_shape_errors(&raw)?;
-    if !executable_errors.is_empty() {
-        let diagnostics = executable_errors
-            .into_iter()
-            .map(|(path, message)| RulesetDiagnostic {
-                code: "runtime_effect_field_invalid".into(),
-                phase: "runtime".into(),
-                message,
-                file: Some(PACKAGE_RUNTIME_PATH.into()),
-                path: Some(path),
-                package_id: None,
-                item_id: None,
-                expected: None,
-                actual: None,
-                guidance: Some("Read the package_runtime executable definition for this field.".into()),
-            })
-            .collect();
-        return Err(
-            PackageRuntimeError::with("Package runtime effect fields are invalid", diagnostics).into()
-        );
+    if authoring {
+        validate_content_shape("package_runtime", &json_of(&raw), Some(PACKAGE_RUNTIME_PATH))
+            .map_err(|error| shape_error("Package runtime fields are invalid", error))?;
+        let executable_errors = runtime_authoring_shape_errors(&raw)?;
+        if !executable_errors.is_empty() {
+            let diagnostics = executable_errors
+                .into_iter()
+                .map(|(path, message)| RulesetDiagnostic {
+                    code: "runtime_effect_field_invalid".into(),
+                    phase: "runtime".into(),
+                    message,
+                    file: Some(PACKAGE_RUNTIME_PATH.into()),
+                    path: Some(path),
+                    package_id: None,
+                    item_id: None,
+                    expected: None,
+                    actual: None,
+                    guidance: Some("Read the package_runtime executable definition for this field.".into()),
+                })
+                .collect();
+            return Err(
+                PackageRuntimeError::with("Package runtime effect fields are invalid", diagnostics).into()
+            );
+        }
     }
     if !validate_parameter_declarations(raw_pairs)?.is_empty() {
         return reject("Package runtime parameter declarations are invalid");
@@ -681,7 +686,7 @@ pub fn validate_package_runtime(
     declarations: &[ToolDeclaration],
     runtime_bytes: &[u8],
 ) -> Result<(), PackageRuntimeFailure> {
-    let runtime = load_runtime(package_id, runtime_bytes)?;
+    let runtime = load_runtime(package_id, runtime_bytes, true)?;
     let declared: Vec<&str> = declarations.iter().map(|declaration| declaration.name.as_str()).collect();
     let unique: HashSet<&str> = declared.iter().copied().collect();
     if unique.len() != declarations.len() {
@@ -724,3 +729,217 @@ pub fn validate_package_runtime(
     }
     Ok(())
 }
+
+/// `_parse_runtime(package_id=..., runtime_bytes=...)`, the execution parse.
+///
+/// Python keeps the 16 most recently used parsed runtimes in the process, by their exact bytes,
+/// and reuses an authoring parse of the same bytes. An authoring parse that succeeds has no
+/// duplicate keys, so the execution parse of those bytes builds the same data: neither the cache
+/// nor the reuse can change a result. This keeps the same bound, keyed by the package id and the
+/// bytes' SHA-256, so a catalog's helpers parse a runtime once.
+pub(crate) fn parse_runtime(
+    package_id: &str,
+    runtime_bytes: &[u8],
+) -> Outcome<std::sync::Arc<RuntimeTables>> {
+    use std::sync::{Arc, Mutex, OnceLock};
+    type Key = (String, [u8; 32]);
+    type Entries = Vec<(Key, Arc<RuntimeTables>)>;
+    static PARSED: OnceLock<Mutex<Entries>> = OnceLock::new();
+    let parsed = PARSED.get_or_init(|| Mutex::new(Vec::new()));
+    let key = (package_id.to_owned(), sylvia_base::hash::sha256(runtime_bytes));
+    {
+        let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some(index) = entries.iter().position(|(known, _)| *known == key) {
+            let entry = entries.remove(index);
+            let runtime = entry.1.clone();
+            entries.push(entry);
+            return Ok(runtime);
+        }
+    }
+    // A failed parse is not kept, as Python keeps only parsed runtimes.
+    let runtime = Arc::new(load_runtime(package_id, runtime_bytes, false)?);
+    let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    entries.retain(|(known, _)| *known != key);
+    entries.push((key, runtime.clone()));
+    while entries.len() > PARSED_RUNTIME_LIMIT {
+        entries.remove(0);
+    }
+    Ok(runtime)
+}
+
+/// `_PARSED_RUNTIMES`' bound: at most this many parsed runtimes stay in the process.
+const PARSED_RUNTIME_LIMIT: usize = 16;
+
+/// `package_model_decision_boundary(package_id=..., runtime_bytes=...)`: the validated
+/// Ruleset-owned active-actor control projection, `model_decision_scope or
+/// model_decision_boundary`, as mutable JSON. An empty scope falls back to the boundary, and a
+/// value that is not an object counts as absent.
+pub fn package_model_decision_boundary(
+    package_id: &str,
+    runtime_bytes: &[u8],
+) -> Result<Option<JsonMap>, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let declared = |name: &str| {
+        runtime.ruleset.iter().find_map(|(key, value)| match (key, value) {
+            (Data::Str(key), Data::Dict(_)) if key == name => Some(value),
+            _ => None,
+        })
+    };
+    let chosen = match declared("model_decision_scope") {
+        Some(Data::Dict(pairs)) if !pairs.is_empty() => declared("model_decision_scope"),
+        _ => declared("model_decision_boundary"),
+    };
+    Ok(chosen.map(|value| match json_of(value) {
+        Json::Object(map) => map,
+        _ => unreachable!("an object"),
+    }))
+}
+
+/// `_validate_runtime_declaration(runtime, declaration)`: the runtime has the declared tool and
+/// its parameters agree with the declared schema.
+pub(crate) fn validate_runtime_declaration<'r>(
+    runtime: &'r RuntimeTables,
+    declaration: &ToolDeclaration,
+) -> Outcome<&'r ToolDef> {
+    match runtime.tool(&declaration.name) {
+        Some(tool) if schemas_agree(runtime_parameter_schema(tool)?, declaration)? => Ok(tool),
+        _ => reject("Package runtime tool does not match its manifest declaration"),
+    }
+}
+
+/// `runtime.tools[name]`: an undeclared tool is Python's `KeyError`.
+fn runtime_tool<'r>(runtime: &'r RuntimeTables, name: &str) -> Outcome<&'r ToolDef> {
+    runtime
+        .tool(name)
+        .ok_or_else(|| PackageRuntimeFailure::Uncaught { class: "KeyError", message: format!("'{name}'") })
+}
+
+/// `tool.metadata`, which Python reads with `.get`: anything but a mapping is its `AttributeError`.
+fn tool_metadata(tool: &ToolDef) -> Outcome<JsonMap> {
+    match json_of(&tool.metadata) {
+        Json::Object(map) => Ok(map),
+        _ => Err(PackageRuntimeFailure::Uncaught {
+            class: "AttributeError",
+            message: format!(
+                "'{}' object has no attribute 'get'",
+                sylvia_engine::ruleset::pydata::type_name(&tool.metadata)
+            ),
+        }),
+    }
+}
+
+/// `package_tool_permanently_refused(...)`: the tool is in the runtime's literal-false refusal set.
+pub fn package_tool_permanently_refused(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<bool, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    Ok(runtime
+        .permanently_refused
+        .iter()
+        .any(|name| matches!(name, Data::Str(text) if *text == declaration.name)))
+}
+
+/// `package_tool_description(...)`: the package-authored model-facing purpose,
+/// `str(description).strip()`.
+pub fn package_tool_description(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<String, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let tool = validate_runtime_declaration(&runtime, declaration)?;
+    let text = sylvia_domain::pyops::py_str(&json_of(&tool.description));
+    Ok(sylvia_base::pystr::strip(&text).to_owned())
+}
+
+/// `package_tool_model_behavior(...)`: the Ruleset-authored model behavior and its state
+/// predicates. A malformed declaration is the `PackageRuntimeError` Python raises.
+pub fn package_tool_model_behavior(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<
+    (sylvia_domain::authority::ModelToolBehavior, Vec<sylvia_domain::package_library::StatePredicate>),
+    PackageRuntimeFailure,
+> {
+    use sylvia_domain::pyops::{py_str, py_truthy};
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let tool = validate_runtime_declaration(&runtime, declaration)?;
+    let metadata = tool_metadata(tool)?;
+    let unsupported = || reject("Package runtime model behavior is unsupported");
+    let mut raw = metadata.get("model_behavior").cloned().unwrap_or_else(|| Json::from("optional"));
+    let mut raw_predicates = Json::Array(Vec::new());
+    if let Json::Object(map) = &raw {
+        raw_predicates = map.get("state_predicates").cloned().unwrap_or_else(|| Json::Array(Vec::new()));
+        raw = map.get("kind").cloned().unwrap_or(Json::Null);
+    }
+    let Json::String(kind) = &raw else { return unsupported() };
+    let Json::Array(items) = &raw_predicates else { return unsupported() };
+    let Some(behavior) = sylvia_domain::authority::ModelToolBehavior::parse(kind) else {
+        return unsupported();
+    };
+    let mut predicates = Vec::new();
+    for item in items {
+        let Json::Object(predicate) = item else { continue };
+        let (Some(namespace), Some(key), Some(equals)) =
+            (predicate.get("namespace"), predicate.get("key"), predicate.get("equals"))
+        else {
+            return unsupported();
+        };
+        predicates.push(sylvia_domain::package_library::StatePredicate {
+            namespace: py_str(namespace),
+            key: py_str(key),
+            equals: equals.clone(),
+            negated: predicate.get("negated").is_some_and(py_truthy),
+        });
+    }
+    Ok((behavior, predicates))
+}
+
+/// `package_tool_decision_title(...)`: an authored result-card title of 1 to 256 characters,
+/// stripped, or "".
+pub fn package_tool_decision_title(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<String, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let tool = validate_runtime_declaration(&runtime, declaration)?;
+    let metadata = tool_metadata(tool)?;
+    let title = match metadata.get("result_card") {
+        Some(Json::Object(card)) => card.get("title"),
+        _ => None,
+    };
+    Ok(match title {
+        Some(Json::String(title)) if (1..=256).contains(&title.chars().count()) => {
+            sylvia_base::pystr::strip(title).to_owned()
+        }
+        _ => String::new(),
+    })
+}
+
+/// `package_tool_player_controls(...)`: the direct-input policy from the same bytes. Python reads
+/// the tool without checking the declaration, so an undeclared tool is its `KeyError`.
+pub fn package_tool_player_controls(
+    package_id: &str,
+    declaration: &ToolDeclaration,
+    runtime_bytes: &[u8],
+) -> Result<PlayerControls, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let metadata = tool_metadata(runtime_tool(&runtime, &declaration.name)?)?;
+    Ok(parse_player_controls(metadata.get("player_controls")))
+}
+
+/// A `PackageRuntimeError(message)`.
+pub(crate) fn rejection(message: &str) -> PackageRuntimeFailure {
+    PackageRuntimeError::new(message).into()
+}
+
+/// `runtime.tools[name].metadata`, read with `.get`.
+pub(crate) fn tool_metadata_of(runtime: &RuntimeTables, name: &str) -> Outcome<JsonMap> {
+    tool_metadata(runtime_tool(runtime, name)?)
+}
+
+pub use crate::package_mechanic::{materialize_package_mechanic, MechanicFailure, PackageMechanic};

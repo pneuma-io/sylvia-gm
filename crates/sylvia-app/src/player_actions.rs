@@ -258,3 +258,66 @@ pub fn parse_player_controls(value: Option<&Json>) -> PlayerControls {
         preflight_path: preflight_path.map(object),
     }
 }
+
+// Ported by lane 3, for lane 2's review (the manager's split, 23 Nov 2026): the saved-outcome
+// readers the GM response context needs.
+
+/// `player_action_origins(snapshot)`: each action's saved owner marker origin, by action, the
+/// last marker of an action winning as a later dict entry does.
+pub fn player_action_origins(
+    snapshot: &sylvia_domain::authority::CampaignSnapshot,
+) -> Vec<(String, JsonMap)> {
+    let mut origins: Vec<(String, JsonMap)> = Vec::new();
+    for record in &snapshot.consequences {
+        let marker = record.payload.get("kind")
+            == Some(&Json::from(sylvia_domain::player_actions::PLAYER_ACTION_ORIGIN));
+        if let (true, Some(Json::Object(origin))) = (marker, record.payload.get("origin")) {
+            match origins.iter_mut().find(|(action_id, _)| *action_id == record.action_id) {
+                Some(entry) => entry.1 = origin.clone(),
+                None => origins.push((record.action_id.clone(), origin.clone())),
+            }
+        }
+    }
+    origins
+}
+
+/// `player_action_records(snapshot)`: every action with a saved origin, in snapshot order, as
+/// its saved outcome (its result without `spatial_evidence`).
+pub fn player_action_records(snapshot: &sylvia_domain::authority::CampaignSnapshot) -> Vec<JsonMap> {
+    let origins = player_action_origins(snapshot);
+    snapshot
+        .actions
+        .iter()
+        .filter_map(|action| {
+            let (_, origin) = origins.iter().find(|(action_id, _)| *action_id == action.action_id)?;
+            let mut record = JsonMap::new();
+            record.insert("action_id".into(), action.action_id.as_str().into());
+            record.insert("turn_id".into(), action.turn_id.as_str().into());
+            record.insert("revision".into(), action.resulting_revision.into());
+            record.insert("status".into(), action.status.as_str().into());
+            record.insert("origin".into(), Json::Object(origin.clone()));
+            record.insert("package_id".into(), action.package_id.as_str().into());
+            record.insert("tool_name".into(), action.tool_name.as_str().into());
+            record.insert("parameters".into(), Json::Object(action.parameters.clone()));
+            let result: JsonMap = action
+                .result
+                .iter()
+                .filter(|(key, _)| *key != "spatial_evidence")
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect();
+            record.insert("result".into(), Json::Object(result));
+            Some(record)
+        })
+        .collect()
+}
+
+/// `player_action_request_matches(stored, request)`: every requested item equals the stored
+/// origin's, as Python compares (`1 == 1.0 == True`); a missing stored item is `None`, so it
+/// matches only a `None` request.
+pub fn player_action_request_matches(stored: Option<&JsonMap>, request: &JsonMap) -> bool {
+    stored.is_some_and(|stored| {
+        request
+            .iter()
+            .all(|(key, value)| sylvia_domain::pyops::py_eq(stored.get(key).unwrap_or(&Json::Null), value))
+    })
+}

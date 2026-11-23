@@ -5,20 +5,18 @@
 //! Here the caller names them in [`BundledSources`]; [`BundledSources::from_repository_root`] is
 //! the source-checkout layout. Archives are materialized once per [`BundledPackages`], as
 //! Python's `lru_cache` keeps them for the process.
-//!
-//! Not yet here: `bundled_rift_archive_for_closure` and `bundled_rift_campaign_plan` (they need
-//! `plan_snapshot`) and `bundled_campaign_content_catalog` (it needs `bundled_campaign_plans`).
 
 use crate::package_materialization::{
     materialize_package_archive, MaterializedPackageArchive, NormalizedPackageDraft,
 };
+use crate::plan_snapshot::{admitted_snapshot_facts, validate_plan_snapshot, PLAN_SNAPSHOT_FILENAME};
 use serde_json::json;
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{pyjson, pystr, Json, JsonMap};
-use sylvia_domain::campaign_plan::PackageBinding;
+use sylvia_domain::campaign_plan::{PackageBinding, ValidatedCampaignPlan};
 use sylvia_domain::error::{DomainError, DomainResult};
 use sylvia_domain::interview_contribution::{parse_interview_contribution_bytes, InterviewContribution};
 use sylvia_domain::package_library::{
@@ -70,6 +68,8 @@ pub struct BundledSources {
     pub riichi_archive: PathBuf,
     /// `sylvia_gm/campaign/the-rift-awakening.json`, the shipped Rift party template.
     pub rift_party_template: PathBuf,
+    /// `campaign-plans`, the bundled Campaign Plan collection (`bundled_plans_root()`).
+    pub campaign_plans_root: PathBuf,
 }
 
 impl BundledSources {
@@ -88,6 +88,7 @@ impl BundledSources {
                 .join("sylvia_gm")
                 .join("campaign")
                 .join("the-rift-awakening.json"),
+            campaign_plans_root: root.join("campaign-plans"),
         }
     }
 }
@@ -116,6 +117,13 @@ fn read_json(path: &Path) -> DomainResult<Json> {
     let text =
         String::from_utf8(bytes).map_err(|_| DomainError::value("A bundled package file is not UTF-8"))?;
     pyjson::loads(&text).map_err(|error| DomainError::value(error.to_string()))
+}
+
+/// `Path.read_text(encoding="utf-8")`: a strict decode with universal newlines.
+fn read_text(path: &Path) -> DomainResult<String> {
+    let text = String::from_utf8(read(path)?)
+        .map_err(|_| DomainError::value("A bundled package file is not UTF-8"))?;
+    Ok(text.replace("\r\n", "\n").replace('\r', "\n"))
 }
 
 fn json_object(value: Json) -> DomainResult<JsonMap> {
@@ -227,16 +235,27 @@ fn payload<'a>(draft: &'a NormalizedPackageDraft, path: &str) -> Option<&'a Vec<
 
 /// The bundled packages from one set of sources.
 pub struct BundledPackages {
-    sources: BundledSources,
+    pub(crate) sources: BundledSources,
     srd: OnceLock<MaterializedPackageArchive>,
     rift: OnceLock<MaterializedPackageArchive>,
     authority: OnceLock<BundledRiftAuthority>,
+    /// `_bundled_campaign_content_catalog`'s `lru_cache`.
+    content_catalog: OnceLock<Vec<JsonMap>>,
+    /// `bundled_campaign_plans`' caches (Python's `lru_cache`s).
+    pub(crate) plan_caches: crate::bundled_campaign_plans::PlanCaches,
 }
 
 impl BundledPackages {
     /// The bundled packages at `sources`. Nothing is read until a function needs it.
     pub fn new(sources: BundledSources) -> Self {
-        Self { sources, srd: OnceLock::new(), rift: OnceLock::new(), authority: OnceLock::new() }
+        Self {
+            sources,
+            srd: OnceLock::new(),
+            rift: OnceLock::new(),
+            authority: OnceLock::new(),
+            content_catalog: OnceLock::new(),
+            plan_caches: Default::default(),
+        }
     }
 
     fn srd_root(&self) -> DomainResult<&Path> {
@@ -332,7 +351,7 @@ impl BundledPackages {
     }
 
     /// `_rift_drafts()`: the trusted Rift Setting with its contained Ruleset snapshot.
-    fn rift_drafts(
+    pub(crate) fn rift_drafts(
         &self,
     ) -> DomainResult<(NormalizedPackageDraft, NormalizedPackageDraft, NormalizedPackageDraft)> {
         let (ruleset, reference) = self.srd_drafts()?;
@@ -490,6 +509,59 @@ impl BundledPackages {
             return Ok(None);
         }
         parse_interview_contribution_bytes(&read(&path)?, "campaign_plan").map(Some)
+    }
+
+    /// `bundled_rift_archive_for_closure(expected)`: resolve only an exact available Rift closure;
+    /// never replace an unknown saved pin.
+    pub fn bundled_rift_archive_for_closure(&self, expected: &Json) -> DomainResult<Option<Vec<u8>>> {
+        let Json::String(expected) = expected else { return Ok(None) };
+        if *expected == self.bundled_rift_authority()?.closure_sha256 {
+            return self.bundled_rift_archive().map(Some);
+        }
+        let path = self.rift_plan_root()?.join(PLAN_SNAPSHOT_FILENAME);
+        let retained = match std::fs::read(&path) {
+            Ok(bytes) => bytes,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(_) => read(&path)?,
+        };
+        Ok((admitted_snapshot_facts(&retained)?.closure_sha256 == *expected).then_some(retained))
+    }
+
+    /// `bundled_rift_campaign_plan()`: validate retained Rift against its owned snapshot,
+    /// independent of the base world.
+    pub fn bundled_rift_campaign_plan(&self) -> DomainResult<ValidatedCampaignPlan> {
+        let root = self.rift_plan_root()?;
+        let snapshot = read(&root.join(PLAN_SNAPSHOT_FILENAME))?;
+        let plan = pyjson::loads(&read_text(&root.join("plan.json"))?)
+            .map_err(|error| DomainError::value(error.to_string()))?;
+        validate_plan_snapshot(&snapshot, &plan, &read_text(&root.join("plan.md"))?)
+    }
+
+    /// `bundled_campaign_content_catalog()`: caller-owned choices from the bundled content: the
+    /// SRD Ruleset, the Severed Lands Setting, then `bundled_plan_catalog()`. Validated once, as
+    /// Python's `lru_cache` keeps a success; a failure is raised again on the next call.
+    pub fn bundled_campaign_content_catalog(&self) -> DomainResult<Vec<JsonMap>> {
+        if let Some(rows) = self.content_catalog.get() {
+            return Ok(rows.clone());
+        }
+        let ruleset = self.srd()?.manifests.iter().find(|item| item.package_id == SRD_PACKAGE_ID).cloned();
+        let ruleset = ruleset.ok_or_else(|| DomainError::uncaught("StopIteration", ""))?;
+        let setting =
+            self.rift()?.manifests.iter().find(|item| item.package_id == SEVERED_LANDS_PACKAGE_ID).cloned();
+        let setting = setting.ok_or_else(|| DomainError::uncaught("StopIteration", ""))?;
+        let row = |kind: &str, id: &str, version: &str, title: &str| -> JsonMap {
+            let Json::Object(row) = json!({"kind": kind, "id": id, "version": version, "title": title})
+            else {
+                unreachable!("an object")
+            };
+            row
+        };
+        let mut rows = vec![
+            row("ruleset", &ruleset.package_id, &ruleset.version, "D&D 5e SRD 5.2.1"),
+            row("campaign_setting", &setting.package_id, &setting.version, "Severed Lands"),
+        ];
+        rows.extend(self.bundled_plan_catalog()?);
+        Ok(self.content_catalog.get_or_init(|| rows).clone())
     }
 
     /// `bundled_rift_source_catalog(query)`: bounded virtual source paths for Campaign Plan Builder.

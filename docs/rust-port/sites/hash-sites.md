@@ -16,8 +16,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `application/builder_references.py:176` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` | |
-| `application/builder_references.py:241` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` | |
+| `application/builder_references.py:176` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` |  `sylvia-app` builder_reference_vectors |
+| `application/builder_references.py:241` | `capture_content_references` | hashlib.sha256 | `suffix = hashlib.sha256(archive).hexdigest()[:24]` |  `sylvia-app` builder_reference_vectors |
 | `application/builder_references.py:353` | `with_character_examples` | hashlib.sha256 | `"content_sha256": hashlib.sha256(canonical_json_bytes(draft)).hexdigest(),` | |
 | `application/bundled_packages.py:210` | `_srd_drafts` | hashlib.sha256 | `if item.byte_count != len(value) or item.sha256 != hashlib.sha256(value).hexdigest():` |  `sylvia-app` bundled_vectors |
 | `application/bundled_starter_characters.py:89` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(source.encode()).hexdigest(),` | |
@@ -53,18 +53,18 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/ready_campaigns.py:331` | `start_ready_campaign` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode()).hexdigest()[:24]` | |
 | `application/ready_campaigns.py:380` | `_start_ready_campaign` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode()).hexdigest()[:24]` | |
 | `application/ready_campaigns.py:395` | `_start_ready_campaign` | hashlib.sha256 | `campaign_suffix = hashlib.sha256(campaign_id.encode()).hexdigest()[:24]` | |
-| `application/reusable_participants.py:365` | `parse_setting_character` | hashlib.sha256 | `"source_content_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),` | |
-| `application/reusable_participants.py:405` | `parse_setting_character` | hashlib.sha256 | `content_sha256=hashlib.sha256(encoded).hexdigest(),` | |
-| `application/reusable_participants.py:516` | `save_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` | |
-| `application/reusable_participants.py:517` | `save_reusable_participant` | hashlib.sha256 | `operation_suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `application/reusable_participants.py:727` | `load_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` | |
-| `application/reusable_plans.py:202` | `_save_validated_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256( canonical_json_bytes(validated.payload) + validated.readable_markdown.encode("utf-8") + contribution_bytes + (b"" ...` | |
-| `application/reusable_plans.py:208` | `_save_validated_campaign_plan` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `application/reusable_plans.py:223` | `_save_validated_campaign_plan` | hashlib.sha256 | `"source_plan_content_sha256": hashlib.sha256( canonical_json_bytes(source_payload) ).hexdigest(),` | |
-| `application/reusable_plans.py:230` | `_save_validated_campaign_plan` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(package_snapshot).hexdigest()` | |
-| `application/reusable_plans.py:314` | `save_reusable_rift_plan` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `application/reusable_plans.py:443` | `load_reusable_campaign_plan` | hashlib.sha256 | `if hashlib.sha256(package_snapshot).hexdigest() != record["package_snapshot_sha256"]:` | |
-| `application/reusable_plans.py:483` | `load_reusable_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256( canonical_json_bytes(validated.payload) + validated.readable_markdown.encode("utf-8") + (b"" if contribution is No...` | |
+| `application/reusable_participants.py:365` | `parse_setting_character` | hashlib.sha256 | `"source_content_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:405` | `parse_setting_character` | hashlib.sha256 | `content_sha256=hashlib.sha256(encoded).hexdigest(),` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:516` | `save_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:517` | `save_reusable_participant` | hashlib.sha256 | `operation_suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_participants.py:727` | `load_reusable_participant` | hashlib.sha256 | `content_sha256 = hashlib.sha256(canonical_json_bytes(identity)).hexdigest()` |  `sylvia-app` reusable_participant_vectors |
+| `application/reusable_plans.py:202` | `_save_validated_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256( canonical_json_bytes(validated.payload) + validated.readable_markdown.encode("utf-8") + contribution_bytes + (b"" ...` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:208` | `_save_validated_campaign_plan` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:223` | `_save_validated_campaign_plan` | hashlib.sha256 | `"source_plan_content_sha256": hashlib.sha256( canonical_json_bytes(source_payload) ).hexdigest(),` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:230` | `_save_validated_campaign_plan` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(package_snapshot).hexdigest()` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:314` | `save_reusable_rift_plan` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:443` | `load_reusable_campaign_plan` | hashlib.sha256 | `if hashlib.sha256(package_snapshot).hexdigest() != record["package_snapshot_sha256"]:` |  `sylvia-app` reusable_plan_vectors |
+| `application/reusable_plans.py:483` | `load_reusable_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256( canonical_json_bytes(validated.payload) + validated.readable_markdown.encode("utf-8") + (b"" if contribution is No...` |  `sylvia-app` reusable_plan_vectors |
 | `builder/_package_materializer.py:340` | `ruleset_install_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{session_id}\0{closure}".encode()).hexdigest()` |  `sylvia-app` package_materializer_vectors |
 | `builder/_ruleset_source.py:613` | `compile_ruleset_source` | hashlib.sha256 | `source_sha = hashlib.sha256(source_bytes).hexdigest()` |  `sylvia-app` ruleset_source_vectors |
 | `builder/_setting_materializer.py:36` | `_world_draft` | hashlib.sha256 | `source_sha = hashlib.sha256( canonical_json_bytes( {path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())} ) ).hexdigest()` | |
@@ -124,8 +124,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:5479` | `AuthorityOwner.export_package_candidate` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `application/authority.py:6044` | `AuthorityOwner.read_campaign_reference` | hashlib.sha256 | `"content_sha256": hashlib.sha256(content_bytes).hexdigest(),` | |
 | `application/authority.py:7379` | `AuthorityOwner._player_action_in_owned_work` | hashlib.sha256 | `confirmation_token = hashlib.sha256(canonical_json_bytes({ "operation_id": operation_id, "origin": origin, "parameters": confirmation_parameters, "...` | |
-| `application/authority.py:8098` | `AuthorityOwner.purge_campaign` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | |
-| `application/authority.py:8173` | `AuthorityOwner.campaign_purge_receipt_exists` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | |
+| `application/authority.py:8098` | `AuthorityOwner.purge_campaign` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | `sylvia-app` purge |
+| `application/authority.py:8173` | `AuthorityOwner.campaign_purge_receipt_exists` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | `sylvia-app` purge (reconcile) |
 | `application/authority.py:8224` | `AuthorityOwner._lifecycle_operation` | hashlib.sha256 | `payload_sha256 = hashlib.sha256(canonical_json_bytes(semantic_payload)).hexdigest()` | `sylvia-app` lifecycle |
 | `application/authority.py:9922` | `_semantic_hash` | hashlib.sha256 | `return hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
 | `application/campaign_rules_update.py:103` | `_offer_bundled_update` | hashlib.sha256 | `install_id="bundled-update-" + hashlib.sha256(raw).hexdigest(),` | |
@@ -135,18 +135,18 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/builder_source_ingestion.py:160` | `_source_identity` | hashlib.sha256 | `identity = hashlib.sha256( media_type.encode("utf-8") + b"\x00" + bytes.fromhex(content_sha256) ).hexdigest()[:24]` | |
 | `infrastructure/builder_source_ingestion.py:218` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256( b"\x00".join( item[2].encode("ascii") for item in sorted(extracted_sources, key=lambda row: row[0]) ) ).hexdigest(...` | |
 | `infrastructure/builder_source_ingestion.py:225` | `ingest_builder_sources` | hashlib.sha256 | `batch_identity = hashlib.sha256(batch_id.encode("utf-8")).hexdigest()[:24]` | |
-| `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
-| `infrastructure/campaign_archive.py:724` | `source_authority_schema_claim_sha256` | hashlib.sha256 | `return hashlib.sha256(_json_bytes(preimage)).hexdigest()` | |
-| `infrastructure/campaign_archive.py:1550` | `_validate_manifest_derived_package_graph.closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
-| `infrastructure/campaign_archive.py:1696` | `_stream_member_digest` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/campaign_archive.py:1830` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | |
-| `infrastructure/campaign_archive.py:1833` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | |
-| `infrastructure/campaign_archive.py:2050` | `_record_manifest_summary` | hashlib.sha256 | `canonical_sha256=hashlib.sha256(canonical.encode("utf-8")).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2224` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2267` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(package_record)).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2272` | `_record_authority_summary` | hashlib.sha256 | `report_sha256=hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | |
-| `infrastructure/campaign_archive.py:2325` | `_scan_authority_member` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/campaign_archive.py:2471` | `_validate_streamed_authority.streamed_closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | |
+| `infrastructure/builder_source_ingestion.py:329` | `_purge_operation_name` | hashlib.sha256 | `return "purge-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | `sylvia-app` purge |
+| `infrastructure/campaign_archive.py:724` | `source_authority_schema_claim_sha256` | hashlib.sha256 | `return hashlib.sha256(_json_bytes(preimage)).hexdigest()` | `sylvia-store` campaign_archive |
+| `infrastructure/campaign_archive.py:1550` | `_validate_manifest_derived_package_graph.closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | not needed: `_validate_manifest_derived_package_graph` has no product caller (retired) |
+| `infrastructure/campaign_archive.py:1696` | `_stream_member_digest` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:1830` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:1833` | `_AuthorityScanSummary` | hashlib.sha256 | `default_factory=lambda: {table: hashlib.sha256() for table in _PACKAGE_RELATION_TABLES}` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2050` | `_record_manifest_summary` | hashlib.sha256 | `canonical_sha256=hashlib.sha256(canonical.encode("utf-8")).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2224` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2267` | `_record_authority_summary` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(package_record)).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2272` | `_record_authority_summary` | hashlib.sha256 | `report_sha256=hashlib.sha256(report_json.encode("utf-8")).hexdigest(),` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2325` | `_scan_authority_member` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` archive_validation |
+| `infrastructure/campaign_archive.py:2471` | `_validate_streamed_authority.streamed_closure_digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(representation)).hexdigest()` | `sylvia-store` archive_validation |
 | `infrastructure/campaign_archive.py:3095` | `stage_campaign_archive` | hashlib.sha256 | `digest = hashlib.sha256()` | |
 | `infrastructure/launch_handshake.py:84` | `LaunchHandshake.issue` | hmac.new | `response = hmac.new(secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest()` | yes |
 | `infrastructure/launch_handshake.py:107` | `LaunchHandshake.verify` | hmac.compare_digest | `if not hmac.compare_digest( hmac.new(sealed.secret, _HANDSHAKE_TRANSCRIPT, hashlib.sha256).hexdigest(), response_hex, ):` | yes |
@@ -160,11 +160,11 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_authority.py:598` | `<module>` | hashlib.sha256 | `_MIGRATION_5_SHA256 = hashlib.sha256(_MIGRATION_5.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:607` | `<module>` | hashlib.sha256 | `_MIGRATION_8_SHA256 = hashlib.sha256(_MIGRATION_8.strip().encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_authority.py:944` | `_stored_action_hash` | hashlib.sha256 | `return hashlib.sha256(encoded.encode("utf-8")).hexdigest()` | |
-| `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | |
-| `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | |
-| `infrastructure/sqlite_authority.py:1586` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:1715` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `infrastructure/sqlite_authority.py:1738` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `or str(row["chunk_sha256"]) != hashlib.sha256(data).hexdigest()` | |
+| `infrastructure/sqlite_authority.py:1493` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.authority_bytes).hexdigest(),` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1513` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `"sha256": hashlib.sha256(capture.private_bytes).hexdigest(),` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1586` | `SQLiteAuthorityStore.export_campaign` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1715` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-store` export_writer |
+| `infrastructure/sqlite_authority.py:1738` | `SQLiteAuthorityStore._write_export_blob` | hashlib.sha256 | `or str(row["chunk_sha256"]) != hashlib.sha256(data).hexdigest()` | `sylvia-store` export_writer |
 | `infrastructure/sqlite_authority.py:4165` | `SQLiteAuthorityStore._verify_construction_authority` | hashlib.sha256 | `or hashlib.sha256(canonical_json_bytes(payload)).hexdigest()` | |
 | `infrastructure/sqlite_authority.py:4460` | `SQLiteAuthorityStore._verify_construction_authority` | hashlib.sha256 | `representation_sha256 = hashlib.sha256( canonical_json_bytes( { "canonical_input": canonical_input, "canonical_plan": canonical_plan, } ) ).hexdige...` | |
 | `infrastructure/sqlite_authority.py:5675` | `SQLiteAuthorityStore._verify_session_identities` | hashlib.sha256 | `if hashlib.sha256(_dump(plan.content).encode("utf-8")).hexdigest() != (` | |
@@ -208,7 +208,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `infrastructure/sqlite_reasoning.py:39` | `<module>` | hashlib.sha256 | `MIGRATION_11_SHA256 = hashlib.sha256(MIGRATION_11_SQL.encode("utf-8")).hexdigest()` | yes |
 | `infrastructure/sqlite_recovery.py:35` | `<module>` | hashlib.sha256 | `RECOVERY_EXTENSION_SHA256 = hashlib.sha256( RECOVERY_EXTENSION_SQL.strip().encode("utf-8") ).hexdigest()` | yes |
 | `infrastructure/sqlite_recovery.py:252` | `semantic_payload` | hashlib.sha256 | `return encoded.decode("utf-8"), hashlib.sha256(encoded).hexdigest()` | |
-| `infrastructure/sqlite_recovery.py:350` | `verify_recovery_receipts` | hashlib.sha256 | `or hashlib.sha256(payload_json.encode("utf-8")).hexdigest() != payload_sha256` | |
+| `infrastructure/sqlite_recovery.py:350` | `verify_recovery_receipts` | hashlib.sha256 | `or hashlib.sha256(payload_json.encode("utf-8")).hexdigest() != payload_sha256` | `sylvia-store` stored_authority (`recovered`) |
 | `infrastructure/sqlite_recovery.py:491` | `_blob_chunk_rows` | hashlib.sha256 | `"chunk_sha256": hashlib.sha256(chunk).hexdigest(),` | |
 | `infrastructure/sqlite_recovery.py:543` | `_staging_chunk_rows` | hashlib.sha256 | `"chunk_sha256": hashlib.sha256(chunk).hexdigest(),` | |
 | `infrastructure/sqlite_session.py:908` | `rename_builder_chat` | hashlib.sha256 | `message_id="builder-title-user-" + hashlib.sha256(session_id.encode()).hexdigest()[:24],` | |
@@ -227,19 +227,19 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_context_ledger.py:436` | `host_seal` | hashlib.sha256 | `digest = hashlib.sha256(b"sylvia-gm-host-record-seal/v1\x00" + session_id.encode("utf-8"))` | |
 | `agent/_context_ledger.py:491` | `_sha` | hashlib.sha256 | `return hashlib.sha256(text.encode("utf-8")).hexdigest()` | |
 | `agent/_inference_identity.py:18` | `inference_context_id` | hashlib.sha256 | `return "sylvia-" + hashlib.sha256(encoded).hexdigest()` | |
-| `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | |
+| `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_turn_phases.py:387` | `retry_repeated_response` | hashlib.sha256 | `"response_sha256": hashlib.sha256(state.narration.encode("utf-8")).hexdigest(),` | |
 | `agent/_stateless_mcp.py:2359` | `StatelessMcpMechanics.commit_campaign_file` | hashlib.sha256 | `update_id = f"campaign-file-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |
 | `agent/_stateless_mcp.py:2497` | `StatelessMcpMechanics.commit_narrative_state` | hashlib.sha256 | `update_id = f"narrative-{hashlib.sha256(identity_payload).hexdigest()[:32]}"` | |
-| `agent/_working_context.py:89` | `durable_tool_result` | hashlib.sha256 | `result["content_sha256"] = hashlib.sha256(content.encode("utf-8")).hexdigest()` | |
-| `agent/_working_context.py:177` | `_groups` | hashlib.sha256 | `groups.append(_Group(bundle, [hashlib.sha256(k.encode()).hexdigest() for k in keys]))` | |
+| `agent/_working_context.py:89` | `durable_tool_result` | hashlib.sha256 | `result["content_sha256"] = hashlib.sha256(content.encode("utf-8")).hexdigest()` | `sylvia-agent` working_context_vectors |
+| `agent/_working_context.py:177` | `_groups` | hashlib.sha256 | `groups.append(_Group(bundle, [hashlib.sha256(k.encode()).hexdigest() for k in keys]))` | `sylvia-agent` working_context_vectors |
 | `application/character_chat.py:398` | `create_chat` | hashlib.sha256 | `chat_id = "character-chat-" + hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` | |
 | `application/character_chat.py:636` | `send_message` | hashlib.sha256 | `operation = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()` | |
 | `config/provider_settings.py:424` | `_provider_profile_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{display_name.casefold()}\n{base_url}".encode()).hexdigest()[:16]` | |
-| `provider/_admin_audit.py:94` | `_serialization_projection` | hashlib.sha256 | `"sha256": hashlib.sha256(encoded).hexdigest(),` | |
-| `provider/_claude_install.py:350` | `ClaudeInstaller._install` | hashlib.sha256 | `digest = hashlib.sha256()` | |
-| `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | |
-| `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | |
+| `provider/_admin_audit.py:94` | `_serialization_projection` | hashlib.sha256 | `"sha256": hashlib.sha256(encoded).hexdigest(),` | `sylvia-provider` admin_audit_vectors |
+| `provider/_claude_install.py:350` | `ClaudeInstaller._install` | hashlib.sha256 | `digest = hashlib.sha256()` | `sylvia-provider` install_vectors |
+| `provider/_context_fit.py:160` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(b"").hexdigest(),` | `sylvia-provider` context_fit_vectors |
+| `provider/_context_fit.py:270` | `ContextFittingProvider._admit` | hashlib.sha256 | `request_sha256=hashlib.sha256(request_bytes).hexdigest(),` | `sylvia-provider` context_fit_vectors |
 | `provider/_request_metadata.py:33` | `opencode_request_headers` | hashlib.sha256 | `digest = hashlib.sha256(session_id.encode("utf-8")).hexdigest()` | |
 | `session/_prompt_assembler.py:232` | `PromptAssembler.__init__` | hashlib.sha256 | `self._stable_base_hash = hashlib.sha256(self._stable_base.encode()).hexdigest()` | |
 | `session/_prompt_assembler.py:456` | `PromptAssembler.build_character` | hashlib.sha256 | `current_hash = hashlib.sha256(state_payload.encode()).hexdigest()` | |

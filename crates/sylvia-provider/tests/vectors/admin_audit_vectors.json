@@ -1,0 +1,2558 @@
+{
+ "cases": [
+  {
+   "name": "context_fit_endpoint_0",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "http://127.0.0.1:8080/v1",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "http://127.0.0.1:8080/v1",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_1",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "https://api.example.test/v1?key=secret#frag",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "https://api.example.test/v1",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_2",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "http://[::1]:8080/v1/",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "http://[::1]:8080/v1/",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_3",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "https://host",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "https://host",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_4",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "https://user:pw@host:9/x",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "https://host:9/x",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_5",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "relative/path",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_6",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_7",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": null,
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_8",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "https://host:443/v1",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "https://host:443/v1",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_endpoint_9",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "https://HOST.Example/v1",
+   "operation": "context_fit",
+   "context": {
+    "request_id": "r-1",
+    "nested": {
+     "a": [
+      1
+     ]
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "https://host.example/v1",
+      "selection_mode": "session"
+     },
+     "correlation": {
+      "request_id": "r-1",
+      "nested": {
+       "a": [
+        1
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "context_fit_no_model",
+   "operation": "context_fit",
+   "context": {},
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "unavailable",
+      "model_id": "test/model-a",
+      "wire_model_id": "unavailable",
+      "transport": "unavailable",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "correlation": {}
+    }
+   ]
+  },
+  {
+   "name": "context_fit_no_base_url",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "context_fit",
+   "context": {},
+   "records": [
+    {
+     "kind": "provider_context_fit",
+     "session_id": "session-1",
+     "role": "dm",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "correlation": {}
+    }
+   ]
+  },
+  {
+   "name": "generate_plain",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "base_url": "http://h/v1",
+   "operation": "generate",
+   "options": {
+    "max_tokens": 50
+   },
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "http://h/v1",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0,
+      "max_tokens": 50
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 162,
+      "sha256": "3191515fe8c9f5a7df5ecb3e26a7b7f0290c9e6fc6fc0822a00f77e3e6e47b12",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 0,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": null,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_reported",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "response": {
+    "content": "ok",
+    "usage": {
+     "prompt_tokens": 10,
+     "completion_tokens": 2,
+     "total_tokens": 12,
+     "reasoning_tokens": 1
+    },
+    "usage_reported": true,
+    "cache_usage": {
+     "cache_read_tokens": 4,
+     "total_prompt_tokens": 10
+    },
+    "tool_calls": [
+     {
+      "id": "c1",
+      "name": "roll",
+      "arguments": "{}"
+     }
+    ],
+    "model": "m",
+    "finish_reason": "tool_calls",
+    "chat_completion_metadata": {
+     "x": 1
+    }
+   },
+   "audit_context": {
+    "request_id": "r-2"
+   },
+   "retry_attempt": 2,
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {
+      "request_id": "r-2"
+     }
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 2,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {
+      "request_id": "r-2"
+     }
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [
+       {
+        "id": "c1",
+        "name": "roll",
+        "arguments": "{}"
+       }
+      ],
+      "usage": {
+       "prompt_tokens": 10,
+       "completion_tokens": 2,
+       "total_tokens": 12,
+       "reasoning_tokens": 1
+      },
+      "usage_reported": true,
+      "model": "m",
+      "finish_reason": "tool_calls",
+      "cache_usage": {
+       "cache_read_tokens": 4,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 10
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": {
+       "x": 1
+      },
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "provider_returned",
+      "precision": "authoritative_count",
+      "source": "provider_reported_completed_request",
+      "scope": "completed_request_only",
+      "input_tokens": 10,
+      "output_tokens": 2,
+      "total_tokens": 12,
+      "cached_tokens": 4,
+      "cache_write_tokens": null,
+      "reasoning_tokens": 1
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_counts_unreported",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "response": {
+    "content": "ok",
+    "usage": {
+     "prompt_tokens": 3
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 3,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": null,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "provider_returned",
+      "precision": "authoritative_count",
+      "source": "provider_reported_completed_request",
+      "scope": "completed_request_only",
+      "input_tokens": 3,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_counts_zero",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "response": {
+    "content": "ok",
+    "usage": {
+     "prompt_tokens": 0,
+     "completion_tokens": 0
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 0,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": null,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_reported_false",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "response": {
+    "content": "ok",
+    "usage": {
+     "prompt_tokens": 9
+    },
+    "usage_reported": false
+   },
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 9,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": false,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_failure",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "fail": true,
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_error",
+     "exchange_id": "<exchange:1>",
+     "error_type": "ProviderConnectionError",
+     "duration_ms": 0
+    }
+   ]
+  },
+  {
+   "name": "generate_runtime_chatgpt",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "provider_key": "chatgpt_subscription",
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_runtime_exchange",
+     "input_stage": "codex_app_server_boundary",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "codex_app_server_boundary",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 0,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": null,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_runtime_claude",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "provider_key": "claude_runtime",
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_runtime_exchange",
+     "input_stage": "claude_code_boundary",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "claude_code_boundary",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 0,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": null,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "generate_no_tools",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "tools": null,
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 100,
+      "sha256": "3c71713bfc27f7cf4ac76a7b54ed802e66f03dde90319a294d50ce28ceca8e92",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [],
+      "usage": {
+       "prompt_tokens": 0,
+       "completion_tokens": 0,
+       "total_tokens": 0,
+       "reasoning_tokens": null
+      },
+      "usage_reported": null,
+      "model": "",
+      "finish_reason": "stop",
+      "cache_usage": {
+       "cache_read_tokens": null,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 0
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": "unavailable"
+    }
+   ]
+  },
+  {
+   "name": "stream_complete",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "stream",
+   "chunks": [
+    {
+     "content": "Hel",
+     "reasoning_content": "think"
+    },
+    {
+     "content": "lo",
+     "tool_call_delta": {
+      "index": 0,
+      "id": "c1",
+      "name": "roll"
+     }
+    },
+    {
+     "content": "",
+     "finish_reason": "stop",
+     "provider_reported_reasoning_effort": "high",
+     "provider_reported_service_tier": "priority"
+    }
+   ],
+   "response": {
+    "content": "ok",
+    "usage": {
+     "prompt_tokens": 10,
+     "completion_tokens": 2,
+     "total_tokens": 12,
+     "reasoning_tokens": 1
+    },
+    "usage_reported": true,
+    "cache_usage": {
+     "cache_read_tokens": 4,
+     "total_prompt_tokens": 10
+    },
+    "tool_calls": [
+     {
+      "id": "c1",
+      "name": "roll",
+      "arguments": "{}"
+     }
+    ],
+    "model": "m",
+    "finish_reason": "tool_calls",
+    "chat_completion_metadata": {
+     "x": 1
+    }
+   },
+   "retry_attempt": 1,
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": true,
+      "timeout": 30.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 145,
+      "sha256": "d87ef3e7dbdf180a02b5e1bd345a0f2e6ffd358cf7627f06531442bad17e90d3",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 1,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "<exchange:1>",
+     "status": "completed",
+     "duration_ms": 0,
+     "chunks": [
+      {
+       "content": "Hel",
+       "reasoning_content": "think",
+       "tool_call_delta": null,
+       "finish_reason": null,
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": null,
+       "provider_reported_service_tier": null
+      },
+      {
+       "content": "lo",
+       "reasoning_content": "",
+       "tool_call_delta": {
+        "index": 0,
+        "id": "c1",
+        "name": "roll"
+       },
+       "finish_reason": null,
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": null,
+       "provider_reported_service_tier": null
+      },
+      {
+       "content": "",
+       "reasoning_content": "",
+       "tool_call_delta": null,
+       "finish_reason": "stop",
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": "high",
+       "provider_reported_service_tier": "priority"
+      }
+     ],
+     "assembled_response": {
+      "content": "Hello",
+      "reasoning_content": "think",
+      "tool_call_deltas": [
+       {
+        "index": 0,
+        "id": "c1",
+        "name": "roll"
+       }
+      ],
+      "finish_reason": "stop",
+      "provider_reported_reasoning_effort": "high",
+      "provider_reported_service_tier": "priority"
+     },
+     "usage": {
+      "availability": "provider_returned",
+      "precision": "authoritative_count",
+      "source": "provider_reported_completed_request",
+      "scope": "completed_request_only",
+      "input_tokens": 10,
+      "output_tokens": 2,
+      "total_tokens": 12,
+      "cached_tokens": 4,
+      "cache_write_tokens": null,
+      "reasoning_tokens": 1
+     },
+     "retry_count": 1
+    }
+   ]
+  },
+  {
+   "name": "stream_no_response",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "stream",
+   "chunks": [
+    {
+     "content": "Hel",
+     "reasoning_content": "think"
+    },
+    {
+     "content": "lo",
+     "tool_call_delta": {
+      "index": 0,
+      "id": "c1",
+      "name": "roll"
+     }
+    },
+    {
+     "content": "",
+     "finish_reason": "stop",
+     "provider_reported_reasoning_effort": "high",
+     "provider_reported_service_tier": "priority"
+    }
+   ],
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": true,
+      "timeout": 30.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 145,
+      "sha256": "d87ef3e7dbdf180a02b5e1bd345a0f2e6ffd358cf7627f06531442bad17e90d3",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "<exchange:1>",
+     "status": "completed",
+     "duration_ms": 0,
+     "chunks": [
+      {
+       "content": "Hel",
+       "reasoning_content": "think",
+       "tool_call_delta": null,
+       "finish_reason": null,
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": null,
+       "provider_reported_service_tier": null
+      },
+      {
+       "content": "lo",
+       "reasoning_content": "",
+       "tool_call_delta": {
+        "index": 0,
+        "id": "c1",
+        "name": "roll"
+       },
+       "finish_reason": null,
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": null,
+       "provider_reported_service_tier": null
+      },
+      {
+       "content": "",
+       "reasoning_content": "",
+       "tool_call_delta": null,
+       "finish_reason": "stop",
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": "high",
+       "provider_reported_service_tier": "priority"
+      }
+     ],
+     "assembled_response": {
+      "content": "Hello",
+      "reasoning_content": "think",
+      "tool_call_deltas": [
+       {
+        "index": 0,
+        "id": "c1",
+        "name": "roll"
+       }
+      ],
+      "finish_reason": "stop",
+      "provider_reported_reasoning_effort": "high",
+      "provider_reported_service_tier": "priority"
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": 0
+    }
+   ]
+  },
+  {
+   "name": "stream_failure",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "stream",
+   "chunks": [
+    {
+     "content": "Hel",
+     "reasoning_content": "think"
+    },
+    {
+     "content": "lo",
+     "tool_call_delta": {
+      "index": 0,
+      "id": "c1",
+      "name": "roll"
+     }
+    }
+   ],
+   "fail": true,
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": true,
+      "timeout": 30.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 145,
+      "sha256": "d87ef3e7dbdf180a02b5e1bd345a0f2e6ffd358cf7627f06531442bad17e90d3",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "<exchange:1>",
+     "status": "failed",
+     "duration_ms": 0,
+     "chunks": [
+      {
+       "content": "Hel",
+       "reasoning_content": "think",
+       "tool_call_delta": null,
+       "finish_reason": null,
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": null,
+       "provider_reported_service_tier": null
+      },
+      {
+       "content": "lo",
+       "reasoning_content": "",
+       "tool_call_delta": {
+        "index": 0,
+        "id": "c1",
+        "name": "roll"
+       },
+       "finish_reason": null,
+       "anthropic_content": null,
+       "chat_completion_metadata": null,
+       "provider_reported_reasoning_effort": null,
+       "provider_reported_service_tier": null
+      },
+      {
+       "error_type": "TokenLimitError"
+      }
+     ],
+     "assembled_response": {
+      "content": "Hello",
+      "reasoning_content": "think",
+      "tool_call_deltas": [
+       {
+        "index": 0,
+        "id": "c1",
+        "name": "roll"
+       }
+      ],
+      "finish_reason": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": 0
+    }
+   ]
+  },
+  {
+   "name": "stream_empty",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "stream",
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": true,
+      "timeout": 30.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 145,
+      "sha256": "d87ef3e7dbdf180a02b5e1bd345a0f2e6ffd358cf7627f06531442bad17e90d3",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_stream_response",
+     "exchange_id": "<exchange:1>",
+     "status": "completed",
+     "duration_ms": 0,
+     "chunks": [],
+     "assembled_response": {
+      "content": "",
+      "reasoning_content": "",
+      "tool_call_deltas": [],
+      "finish_reason": null,
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "not_returned",
+      "precision": "unavailable",
+      "source": "unavailable",
+      "scope": "unavailable",
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "cached_tokens": null,
+      "cache_write_tokens": null,
+      "reasoning_tokens": null
+     },
+     "retry_count": 0
+    }
+   ]
+  },
+  {
+   "name": "late_usage",
+   "model": {
+    "id": "test/model-a",
+    "name": "Model A",
+    "provider_name": "Test",
+    "provider_key": "test",
+    "provider_mode": "byok",
+    "provider_model_id": "model-a-wire"
+   },
+   "operation": "generate",
+   "late": true,
+   "response": {
+    "content": "ok",
+    "usage": {
+     "prompt_tokens": 10,
+     "completion_tokens": 2,
+     "total_tokens": 12,
+     "reasoning_tokens": 1
+    },
+    "usage_reported": true,
+    "cache_usage": {
+     "cache_read_tokens": 4,
+     "total_prompt_tokens": 10
+    },
+    "tool_calls": [
+     {
+      "id": "c1",
+      "name": "roll",
+      "arguments": "{}"
+     }
+    ],
+    "model": "m",
+    "finish_reason": "tool_calls",
+    "chat_completion_metadata": {
+     "x": 1
+    }
+   },
+   "records": [
+    {
+     "kind": "provider_request",
+     "input_stage": "application_provider_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "started_at_utc": "<time>",
+     "provider": {
+      "provider_id": "test",
+      "provider_name": "Test",
+      "model_id": "test/model-a",
+      "wire_model_id": "model-a-wire",
+      "transport": "chat_completions",
+      "endpoint": "unavailable",
+      "selection_mode": "session"
+     },
+     "messages": [
+      {
+       "role": "user",
+       "content": "Hola"
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "roll"
+       }
+      }
+     ],
+     "options": {
+      "stream": false,
+      "timeout": 60.0
+     },
+     "serialization": {
+      "layer": "neutral_application_request",
+      "encoding": "canonical_json_utf8",
+      "bytes": 146,
+      "sha256": "3d8980001fb877850e71d3cff7961be8b2d1699c5de964ddd295126f0eb8dc4b",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_wire_request",
+     "input_stage": "provider_specific_wire_request",
+     "exchange_id": "<exchange:1>",
+     "session_id": "session-1",
+     "role": "dm",
+     "retry_attempt": 0,
+     "request": {
+      "model": "m",
+      "messages": []
+     },
+     "serialization": {
+      "layer": "provider_client_request_representation",
+      "encoding": "canonical_json_utf8",
+      "bytes": 27,
+      "sha256": "f34244885bc2912271e20676d163d76ed27f7e800f4f1a07a39a95dd44c3c496",
+      "claim_boundary": "sylvia_owned_representation"
+     },
+     "correlation": {}
+    },
+    {
+     "kind": "provider_response",
+     "exchange_id": "<exchange:1>",
+     "duration_ms": 0,
+     "response": {
+      "content": "ok",
+      "reasoning_content": null,
+      "tool_calls": [
+       {
+        "id": "c1",
+        "name": "roll",
+        "arguments": "{}"
+       }
+      ],
+      "usage": {
+       "prompt_tokens": 10,
+       "completion_tokens": 2,
+       "total_tokens": 12,
+       "reasoning_tokens": 1
+      },
+      "usage_reported": true,
+      "model": "m",
+      "finish_reason": "tool_calls",
+      "cache_usage": {
+       "cache_read_tokens": 4,
+       "cache_write_tokens": null,
+       "cache_miss_tokens": null,
+       "total_prompt_tokens": 10
+      },
+      "anthropic_content": null,
+      "chat_completion_metadata": {
+       "x": 1
+      },
+      "provider_reported_reasoning_effort": null,
+      "provider_reported_service_tier": null
+     },
+     "usage": {
+      "availability": "provider_returned",
+      "precision": "authoritative_count",
+      "source": "provider_reported_completed_request",
+      "scope": "completed_request_only",
+      "input_tokens": 10,
+      "output_tokens": 2,
+      "total_tokens": 12,
+      "cached_tokens": 4,
+      "cache_write_tokens": null,
+      "reasoning_tokens": 1
+     },
+     "retry_count": "unavailable"
+    },
+    {
+     "kind": "provider_late_usage",
+     "exchange_id": "<exchange:2>",
+     "usage": {
+      "availability": "provider_returned",
+      "precision": "authoritative_count",
+      "source": "provider_reported_completed_request",
+      "scope": "completed_request_only",
+      "input_tokens": 10,
+      "output_tokens": 2,
+      "total_tokens": 12,
+      "cached_tokens": 4,
+      "cache_write_tokens": null,
+      "reasoning_tokens": 1
+     }
+    }
+   ]
+  }
+ ],
+ "usage": [
+  {
+   "response": null,
+   "usage": {
+    "availability": "not_returned",
+    "precision": "unavailable",
+    "source": "unavailable",
+    "scope": "unavailable",
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {},
+   "usage": {
+    "availability": "not_returned",
+    "precision": "unavailable",
+    "source": "unavailable",
+    "scope": "unavailable",
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {
+    "usage": {
+     "prompt_tokens": 5
+    }
+   },
+   "usage": {
+    "availability": "provider_returned",
+    "precision": "authoritative_count",
+    "source": "provider_reported_completed_request",
+    "scope": "completed_request_only",
+    "input_tokens": 5,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {
+    "usage": {
+     "reasoning_tokens": 0
+    }
+   },
+   "usage": {
+    "availability": "not_returned",
+    "precision": "unavailable",
+    "source": "unavailable",
+    "scope": "unavailable",
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {
+    "usage": {
+     "reasoning_tokens": 3
+    }
+   },
+   "usage": {
+    "availability": "provider_returned",
+    "precision": "authoritative_count",
+    "source": "provider_reported_completed_request",
+    "scope": "completed_request_only",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": 3
+   }
+  },
+  {
+   "response": {
+    "usage_reported": true
+   },
+   "usage": {
+    "availability": "provider_returned",
+    "precision": "authoritative_count",
+    "source": "provider_reported_completed_request",
+    "scope": "completed_request_only",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {
+    "usage_reported": false,
+    "usage": {
+     "total_tokens": 9
+    }
+   },
+   "usage": {
+    "availability": "not_returned",
+    "precision": "unavailable",
+    "source": "unavailable",
+    "scope": "unavailable",
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {
+    "cache_usage": {
+     "cache_read_tokens": 0,
+     "cache_write_tokens": 7
+    }
+   },
+   "usage": {
+    "availability": "not_returned",
+    "precision": "unavailable",
+    "source": "unavailable",
+    "scope": "unavailable",
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "cached_tokens": 0,
+    "cache_write_tokens": 7,
+    "reasoning_tokens": null
+   }
+  },
+  {
+   "response": {
+    "usage": {
+     "prompt_tokens": "12"
+    }
+   },
+   "usage": {
+    "availability": "provider_returned",
+    "precision": "authoritative_count",
+    "source": "provider_reported_completed_request",
+    "scope": "completed_request_only",
+    "input_tokens": "12",
+    "output_tokens": 0,
+    "total_tokens": 0,
+    "cached_tokens": null,
+    "cache_write_tokens": null,
+    "reasoning_tokens": null
+   }
+  }
+ ]
+}

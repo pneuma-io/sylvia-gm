@@ -5,6 +5,7 @@
 //! the agent layer, which is its only caller.
 
 use crate::error::ProviderResult;
+use crate::hooks::HookManager;
 use crate::provider::{BoxFuture, ChunkStream, Provider, ProviderRequest};
 use crate::pyobj::py_str;
 use crate::types::{ModelInfo, ProviderResponse};
@@ -124,5 +125,37 @@ impl Provider for SessionBoundRequestMetadataProvider {
 
     fn release_idle(&self) -> BoxFuture<'_, ()> {
         self.provider.release_idle()
+    }
+
+    fn hooks(&self) -> Option<&HookManager> {
+        self.provider.hooks()
+    }
+
+    fn wrapped(&self) -> Option<&dyn Provider> {
+        Some(self.provider.as_ref())
+    }
+
+    fn base_url(&self) -> Option<&str> {
+        self.provider.base_url()
+    }
+
+    /// `provider_request_representation`: the wrapped provider's, with the same per-request
+    /// headers, or the neutral `{"messages", "tools", "options"}` when it has none (one level,
+    /// as Python's `getattr`).
+    fn request_representation(
+        &self,
+        messages: &[Json],
+        tools: Option<&[Json]>,
+        options: &JsonMap,
+    ) -> Option<ProviderResult<JsonMap>> {
+        let options = with_protocol_headers(options, &self.headers);
+        if let Some(value) = self.provider.request_representation(messages, tools, &options) {
+            return Some(value);
+        }
+        let mut neutral = JsonMap::new();
+        neutral.insert("messages".into(), Json::Array(messages.to_vec()));
+        neutral.insert("tools".into(), Json::Array(tools.map(<[Json]>::to_vec).unwrap_or_default()));
+        neutral.insert("options".into(), Json::Object(options));
+        Some(Ok(neutral))
     }
 }

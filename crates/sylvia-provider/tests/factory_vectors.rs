@@ -5,7 +5,7 @@
 
 use serde_json::{json, Value as J};
 use std::sync::Arc;
-use sylvia_provider::factory::{ClientBuilder, DefaultProviderFactory, PORT_PENDING};
+use sylvia_provider::factory::{BuiltProvider, ClientBuilder, DefaultProviderFactory, PORT_PENDING};
 use sylvia_provider::http::{HttpTransport, ScriptedTransport};
 use sylvia_provider::openai_compat::SdkEnvironment;
 use sylvia_provider::types::{ModelInfo, ProviderConfig, RetryConfig, TimeoutConfig};
@@ -90,7 +90,12 @@ fn the_factory_builds_what_python_builds() {
     for case in vectors()["cases"].as_array().unwrap() {
         let built = factory.build(config(&case["config"]));
         let actual = match (&built, case.get("value")) {
-            (Ok(provider), Some(expected)) => {
+            // Python's stand-in records only the kind of an Anthropic or Gemini provider; their own
+            // vectors (`anthropic_vectors.rs`, `gemini_vectors.rs`) check what they send.
+            (Ok(BuiltProvider::Anthropic(_)), Some(_)) => json!({"value": {"kind": "AnthropicProvider"}}),
+            (Ok(BuiltProvider::Gemini(_)), Some(_)) => json!({"value": {"kind": "GeminiProvider"}}),
+            (Ok(BuiltProvider::Claude(_)), Some(_)) => json!({"value": {"kind": "ClaudeProvider"}}),
+            (Ok(BuiltProvider::OpenAICompat(provider)), Some(expected)) => {
                 let model = provider.model();
                 json!({"value": {
                     "kind": "OpenAICompatProvider",
@@ -104,12 +109,9 @@ fn the_factory_builds_what_python_builds() {
                 }})
             }
             // A transport whose adapter is not ported answers `rust_port_pending` where Python
-            // built its provider: one of the native providers, or Responses.
+            // built its provider: the ChatGPT runtime.
             (Err(error), Some(expected)) if error.code == PORT_PENDING => {
-                let native = ["ClaudeProvider", "ChatGPTProvider", "GeminiProvider", "AnthropicProvider"];
-                let responses =
-                    expected["kind"] == "OpenAICompatProvider" && expected["model_transport"] == "responses";
-                if native.contains(&expected["kind"].as_str().unwrap_or("")) || responses {
+                if expected["kind"] == "ChatGPTProvider" {
                     json!({"value": expected})
                 } else {
                     json!({"pending": error.message})

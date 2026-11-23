@@ -22,7 +22,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_profiles.py:134` | `validate_character_profile` | .isspace() | `if any(character.isspace() for character in uri):` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:132` | `_folded_portable_name` | unicodedata.normalize | `if unicodedata.normalize("NFC", name) != name:` | |
 | `application/import_repair.py:134` | `_folded_portable_name` | .casefold() | `return name.casefold()` | |
-| `application/library_sources.py:41` | `LibrarySourceReader.candidates` | .casefold() | `folded = query.casefold()` | |
+| `application/library_sources.py:41` | `LibrarySourceReader.candidates` | .casefold() | `folded = query.casefold()` |  `sylvia-app` library_source_vectors |
 | `application/package_materialization.py:161` | `materialize_package_archive` | .casefold() | `folded = path.casefold()` |  `sylvia-app` bundled_vectors |
 | `builder/_package_materializer.py:176` | `_read_payloads` | .casefold() | `normalized = relative.casefold()` |  `sylvia-app` package_materializer_vectors |
 | `builder/_package_record_edits.py:193` | `apply_package_record_edits` | .casefold() | `if len({name.casefold() for name in expected_paths}) != len(expected_paths):` |  `sylvia-app` package_record_edit_vectors |
@@ -54,10 +54,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/authority.py:5872` | `AuthorityOwner.search_campaign_knowledge` | .casefold() | `if Path(path).suffix.casefold() not in {` | |
 | `application/authority.py:5967` | `AuthorityOwner.search_campaign_knowledge` | .casefold() | `heading_key = heading.casefold().rstrip("s")` | |
 | `application/authority.py:6501` | `AuthorityOwner.read_campaign_reference` | .casefold() | `selected_heading.casefold().rstrip("s") if selected_heading is not None else ""` | |
-| `application/knowledge_search.py:101` | `knowledge_terms` | .casefold() | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | |
+| `application/knowledge_search.py:101` | `knowledge_terms` | .casefold() | `words = re.findall(r"[^\W_]+(?:['’][^\W_]+)?", value.casefold())` | `sylvia-app` knowledge_search (`sylvia_base::pystr::casefold`) |
 | `infrastructure/builder_source_ingestion.py:143` | `_extract_source` | .casefold() | `extension = path.suffix.casefold()` | |
-| `infrastructure/campaign_archive.py:2587` | `validate_campaign_archive` | .casefold() | `casefold_aliases = [name.casefold() for name in names]` | |
-| `infrastructure/campaign_archive.py:2588` | `validate_campaign_archive` | unicodedata.normalize | `nfc_aliases = [unicodedata.normalize("NFC", name).casefold() for name in names]` | |
+| `infrastructure/campaign_archive.py:2587` | `validate_campaign_archive` | .casefold() | `casefold_aliases = [name.casefold() for name in names]` | `sylvia-store` archive_validation (`alias_case`, `alias_sharp_s`, `alias_long_s`) |
+| `infrastructure/campaign_archive.py:2588` | `validate_campaign_archive` | unicodedata.normalize | `nfc_aliases = [unicodedata.normalize("NFC", name).casefold() for name in names]` | `sylvia-store` archive_validation (`alias_nfc`, `no_alias_distinct`) |
 | `infrastructure/package_archive.py:146` | `_normalized_name` | unicodedata.normalize | `normalized = unicodedata.normalize("NFC", name)` | `sylvia-domain` archive_vectors |
 | `infrastructure/package_archive.py:149` | `_normalized_name` | .casefold() | `return normalized.casefold()` | `sylvia-domain` archive_vectors |
 

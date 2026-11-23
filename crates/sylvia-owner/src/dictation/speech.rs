@@ -134,3 +134,50 @@ impl Model for Speech {
         })))
     }
 }
+
+/// The owner's speech runtime: capture on cpal, the model on the shipped libraries, the model
+/// download on the urllib-faithful client. The natives are beside the owner executable, or in
+/// `SYLVIA_DICTATION_NATIVE_DIR` for a development owner (the desktop passes it through only
+/// under its Rust owner switch).
+pub struct SpeechRuntime {
+    sound: super::capture::CpalSound,
+    factory: SpeechFactory,
+    fetch: super::download::UrllibFetch,
+}
+
+impl SpeechRuntime {
+    /// The runtime for natives in `folder`.
+    pub fn new(folder: &Path) -> Self {
+        Self {
+            sound: super::capture::CpalSound::default(),
+            factory: SpeechFactory::new(folder),
+            fetch: super::download::UrllibFetch::default(),
+        }
+    }
+
+    /// Where the natives are: `SYLVIA_DICTATION_NATIVE_DIR`, else the executable's folder.
+    pub fn natives() -> Option<PathBuf> {
+        if let Some(folder) = std::env::var_os("SYLVIA_DICTATION_NATIVE_DIR") {
+            return Some(PathBuf::from(folder));
+        }
+        std::env::current_exe().ok()?.parent().map(Path::to_path_buf)
+    }
+}
+
+impl super::Runtime for SpeechRuntime {
+    fn sound(&mut self) -> Option<&mut dyn super::Sound> {
+        Some(&mut self.sound)
+    }
+    fn languages(&self) -> Option<&'static [&'static str]> {
+        Some(&LANGUAGE_CODES)
+    }
+    fn model_factory(&mut self) -> &mut dyn ModelFactory {
+        &mut self.factory
+    }
+    fn fetch(&mut self) -> &mut dyn super::Fetch {
+        &mut self.fetch
+    }
+    fn disk_free(&mut self, path: &Path) -> std::io::Result<u64> {
+        crate::desktop_update::storage::disk_free(path)
+    }
+}

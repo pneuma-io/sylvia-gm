@@ -1,0 +1,383 @@
+{
+ "python": "3.12.11",
+ "states": [
+  {
+   "name": "committed",
+   "base": "purged",
+   "journals": [
+    {
+     "campaign": "campaign-story",
+     "operation": "purge-1",
+     "sources": {
+      "notes.md": "# Notes\n"
+     }
+    }
+   ],
+   "files": [],
+   "before": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-54ae743731d5a555d08a371e",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-54ae743731d5a555d08a371e/purge.json",
+     "file",
+     "ae18a4ca0820210833163a5bd2ab068b8f13be462639a2d0b76cd765dcb5b6c6"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-54ae743731d5a555d08a371e/sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-54ae743731d5a555d08a371e/sources/notes.md",
+     "file",
+     "365d0b84ae63c2afc293dedd2b00bdf0dc8d6ef70c9297d90f9e5682ab0d72ee"
+    ]
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "after": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "live",
+   "base": "seed",
+   "journals": [
+    {
+     "campaign": "campaign-story",
+     "operation": "purge-9",
+     "sources": {
+      "a.txt": "a",
+      "maps/b.txt": "b"
+     }
+    }
+   ],
+   "files": [],
+   "before": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-cff1ef8fbf78377b03d95809",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-cff1ef8fbf78377b03d95809/purge.json",
+     "file",
+     "39b1dcb0e26971b104abbf60f38709894fee74d014be31a6f71bd981858f86dc"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-cff1ef8fbf78377b03d95809/sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-cff1ef8fbf78377b03d95809/sources/a.txt",
+     "file",
+     "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-cff1ef8fbf78377b03d95809/sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-cff1ef8fbf78377b03d95809/sources/maps/b.txt",
+     "file",
+     "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d"
+    ]
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "after": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/a.txt",
+     "file",
+     "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/maps/b.txt",
+     "file",
+     "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d"
+    ]
+   ]
+  },
+  {
+   "name": "abandoned_temporary",
+   "base": "seed",
+   "journals": [],
+   "files": [
+    "campaigns/campaign-story/.builder-sources-purge-pending/.purge-0123456789abcdef01234567-x.tmp/purge.json"
+   ],
+   "before": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/.purge-0123456789abcdef01234567-x.tmp",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/.purge-0123456789abcdef01234567-x.tmp/purge.json",
+     "file",
+     "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    ]
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "after": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending",
+     "dir",
+     null
+    ]
+   ]
+  },
+  {
+   "name": "wrong_campaign",
+   "base": "purged",
+   "journals": [
+    {
+     "campaign": "campaign-build",
+     "operation": "purge-3",
+     "sources": {},
+     "marker": "campaign-story"
+    }
+   ],
+   "files": [],
+   "before": [
+    [
+     "campaigns/campaign-build",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-build/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-build/.builder-sources-purge-pending/purge-7327a3da35f72622c361f6ce",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-build/.builder-sources-purge-pending/purge-7327a3da35f72622c361f6ce/purge.json",
+     "file",
+     "0e9978f629e58b67762ce7d4192dd750a8747fc41402909d8902fd1986262c70"
+    ]
+   ],
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Builder source purge marker names the wrong campaign"
+   },
+   "after": [
+    [
+     "campaigns/campaign-build",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-build/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-build/.builder-sources-purge-pending/purge-7327a3da35f72622c361f6ce",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-build/.builder-sources-purge-pending/purge-7327a3da35f72622c361f6ce/purge.json",
+     "file",
+     "0e9978f629e58b67762ce7d4192dd750a8747fc41402909d8902fd1986262c70"
+    ]
+   ]
+  },
+  {
+   "name": "no_receipt_not_live",
+   "base": "purged",
+   "journals": [
+    {
+     "campaign": "campaign-story",
+     "operation": "purge-7",
+     "sources": {
+      "b.txt": "b"
+     }
+    }
+   ],
+   "files": [],
+   "before": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d/purge.json",
+     "file",
+     "4e023ae74e8451d36c08a3a0ed4fbadbc98580aa1ca32539e9144a49dcec17ce"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d/sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d/sources/b.txt",
+     "file",
+     "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d"
+    ]
+   ],
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Builder source purge outcome cannot be reconciled"
+   },
+   "after": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d/purge.json",
+     "file",
+     "4e023ae74e8451d36c08a3a0ed4fbadbc98580aa1ca32539e9144a49dcec17ce"
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d/sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources-purge-pending/purge-d1ce888a152201892837cb2d/sources/b.txt",
+     "file",
+     "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d"
+    ]
+   ]
+  },
+  {
+   "name": "nothing_pending",
+   "base": "seed",
+   "journals": [],
+   "files": [
+    "campaigns/campaign-story/.builder-sources/notes.md"
+   ],
+   "before": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    ]
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "after": [
+    [
+     "campaigns/campaign-story",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources",
+     "dir",
+     null
+    ],
+    [
+     "campaigns/campaign-story/.builder-sources/notes.md",
+     "file",
+     "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    ]
+   ]
+  }
+ ]
+}

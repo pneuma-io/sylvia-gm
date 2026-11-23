@@ -3437,6 +3437,385 @@
     "error": "ValueError",
     "message": "Participant adaptation provenance does not match"
    }
+  },
+  {
+   "name": "recovered_untouched",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "receipt_recovery_id_padded",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET recovery_id = ' recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_archive_sha_uppercase",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET archive_sha256 = upper(archive_sha256)"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_archive_sha_other",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET archive_sha256 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_sha_other",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_sha256 = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_not_canonical",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = replace(semantic_payload_json, ':', ': ')"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_not_json",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = 'x'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_format_version",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":2,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '6cb58aad614aa6b7f67ddc77e292fa37e9ece572c71f8a3dff176b9162012e52' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_operation_kind",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"export_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '5708cd89b8bc41322eaad1d3ea9583ee405c0c5fd4d2cae60650a70500020d9d' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_revision_other",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":7,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '4916999b2bb79e460afcd5962c0d428a66a5fce8f0abf7551832de8565593ead' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_revision_float",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8.0,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '36a692cc2f891a152ac99518331790b94dc859855c9be6ee4d392d256c346925' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_revision_true",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":true,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = 'ca8dc89813782d849f78bfecabb33f05fa60ad35c57736f6301c85981f3f19ca' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_extra_member",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"note\":\"x\",\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '4ff3f8abd7c27d0a3571434636038e84dceacf14f710425b250acfa9badccacb' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_schema_claim_other",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '38b65caad6bb80713cb750472618b556f481c7f7d6192c802b1b2b18642ddee1' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_payload_schema_version_11",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":11}', semantic_payload_sha256 = '5112efe075c033e0a185bc55894d7e7861b50bf95c6175145eea3088994899c3' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_provenance_without_extensions",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '141280ab7310656ec7c96635e42f7d37f8d9ee91ae1bc50fbc5bdb4064b8cccc' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_provenance_with_purge_extension",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_campaign_purge_v1\",\"extension_sha256\":\"1de84ac0fe9870ee106630aad69f12281322121cbc549f5f396192f0a384cd3b\",\"predecessor_migration_name\":\"f5_portable_campaign_recovery_v1\",\"predecessor_sql_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\"},{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '3fb0d230f9bfb64467420cdacca9d689ae17c521e1bb51d89ac4dc8f38b7237e' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "receipt_provenance_reordered_members",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = 'cc2f49495ef8b91bab7022bea17617c4ea741f8aab5a287c8a005d0d2778005c' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "receipt_provenance_version_true",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":true},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11},{\"applied_name\":\"session_reasoning_preferences\",\"sql_sha256\":\"d1e89bcbf082d1046e7eec8326e9bc2ba3217b1c2439bcc0667c8201ebb6ca28\",\"version\":12}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '22a4e2e0825c9e5e2b071fced48759d141346660c269e62ee0ed9d221c9cea6b' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "receipt_provenance_migration_missing",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET semantic_payload_json = '{\"archive_byte_count\":31589,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"campaign_id\":\"campaign-story\",\"captured_revision\":8,\"format_id\":\"sylvia-gm-campaign-export\",\"format_version\":1,\"migration_provenance\":{\"schema_extensions\":[{\"extension_name\":\"f5_portable_campaign_recovery_v1\",\"extension_sha256\":\"d871df794682ae39c1d10cecf3378e471c02108ae9784782d4ac3c4693d77b61\",\"predecessor_migration_name\":\"f5_reversible_lifecycle_v3\",\"predecessor_sql_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\"},{\"extension_name\":\"f5_probe_01_stable_campaign_identity\",\"extension_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\",\"predecessor_migration_name\":\"f5_campaign_lifecycle_recovery\",\"predecessor_sql_sha256\":\"49d01f74743bd178ab23848c4493dda234bf51a26ad7115236c2356714c48802\"},{\"extension_name\":\"f5_reversible_lifecycle_v3\",\"extension_sha256\":\"a05b1892abf39629612602f2f07be62048e7a0d6ecd46e337039e89b30266a06\",\"predecessor_migration_name\":\"f5_probe_01_stable_campaign_identity\",\"predecessor_sql_sha256\":\"0c252567c25ccbb3f2b81eb4a3f54e4fdc4e009220eac0e6d61f2f045cb1a7b4\"}],\"schema_migrations\":[{\"applied_name\":\"f1_neutral_authority\",\"sql_sha256\":\"6c416e59e5d38a3018845a8cb320b24e3bff74a169377735db048c01d4bff8d1\",\"version\":1},{\"applied_name\":\"f2_provisional_event_protocol\",\"sql_sha256\":\"71e1c58545c1f8ce9f8bca24810987648a35c4779bbcdeecff947c8181b1b193\",\"version\":2},{\"applied_name\":\"f3_sqlite_package_library\",\"sql_sha256\":\"58e3af1675b8232a8ef83211f8fe49161ec464a04bbae065db436a909d70ea3f\",\"version\":3},{\"applied_name\":\"f4_builder_dm_sessions\",\"sql_sha256\":\"e0f2766f3f18d160493f4008ac920b79d0079c6475e6f59a970f05615b73e9fb\",\"version\":4},{\"applied_name\":\"f5_campaign_lifecycle_recovery\",\"sql_sha256\":\"ed0c1f6770b9ffe2b1b2c0f3c1b1b4edf1666b0af23f337f46742ec103fd2483\",\"version\":5},{\"applied_name\":\"f7_relational_state_namespace_ownership\",\"sql_sha256\":\"91c930b8b45fde6f03936318c4c0866dc46f9a88c3321d2fd4cef8800643eae6\",\"version\":6},{\"applied_name\":\"mechanics_choice_reservations\",\"sql_sha256\":\"5a15dae72c9a64f4ea22cd80b81ab15a3c71c23ec4e9ed57503da30eff873d53\",\"version\":7},{\"applied_name\":\"standalone_builder_chats\",\"sql_sha256\":\"70c67e3d1c0b8c9371f8a67f924eea3975aa23dab4e47f07488541983c7538d0\",\"version\":8},{\"applied_name\":\"campaign_state_continuity\",\"sql_sha256\":\"6b4c74ea0d67ea324b496f076a16c8976b3b8921c8ec7eed2aa6056497308bee\",\"version\":9},{\"applied_name\":\"unbound_draft_lifecycle\",\"sql_sha256\":\"3c5c44a28eea815f08e4cc126bad75b551f00602dc1965b891aa5cc06c14ce1f\",\"version\":10},{\"applied_name\":\"private_provider_records\",\"sql_sha256\":\"4fe61f98e20ef40b346e3304942b216fdeb52a5decb383607aec6a44e397cf34\",\"version\":11}]},\"operation_id\":\"recovery-1\",\"operation_kind\":\"recover_campaign\",\"product_generation\":\"alpha\",\"product_id\":\"sylvia-gm\",\"source_authority_schema_identity_sha256\":\"6aaad9fbd21b8f6ba29d309917739f847e4c8e157ab6e59189ea842fed688dc8\",\"source_authority_schema_version\":12}', semantic_payload_sha256 = '72a99d26a5f378290515399420c2b10e82390a5aab48525cdbdf92ac7702768e' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_result_not_json",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET result_json = 'x' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Recovery receipt result is corrupt"
+   }
+  },
+  {
+   "name": "receipt_result_list",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET result_json = '[]' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Recovery receipt result is corrupt"
+   }
+  },
+  {
+   "name": "receipt_result_member_missing",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET result_json = '{\"campaign_id\":\"campaign-story\"}' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Recovery receipt result is corrupt"
+   }
+  },
+  {
+   "name": "receipt_result_revision_text",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET result_json = '{\"campaign_id\":\"campaign-story\",\"captured_revision\":\"8\",\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"byte_count\":31589}' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_result_revision_nan",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET result_json = '{\"campaign_id\":\"campaign-story\",\"captured_revision\":NaN,\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"byte_count\":31589}' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Recovery receipt result is corrupt"
+   }
+  },
+  {
+   "name": "receipt_result_reordered",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET result_json = '{\"captured_revision\":8,\"campaign_id\":\"campaign-story\",\"archive_sha256\":\"80498d20f094ccddba661478488be9d021cd94b3b5a72401b03b5032551d9273\",\"byte_count\":31589}' WHERE recovery_id = 'recovery-1'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_row_revision_other",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET captured_revision = 9"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_row_byte_count_text",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET archive_byte_count = CAST(archive_byte_count AS TEXT) || ' '"
+   ],
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "name": "receipt_row_byte_count_word",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET archive_byte_count = 'many'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Authority stored recovery receipt integrity is invalid"
+   }
+  },
+  {
+   "name": "receipt_campaign_other",
+   "base": "recovered",
+   "sql": [
+    "PRAGMA ignore_check_constraints = ON",
+    "UPDATE campaign_recovery_receipts SET campaign_id = 'campaign-other'"
+   ],
+   "outcome": {
+    "error": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "Saved campaign records failed an integrity check"
+   }
   }
  ]
 }

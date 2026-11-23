@@ -93,6 +93,25 @@ pub fn loads_hooked(text: &str, policy: HookPolicy) -> Result<Hooked, HookFailur
     Ok(Hooked { value, non_finite: non_finite > 0 })
 }
 
+/// `json.JSONDecoder().raw_decode(text)`: the value at the very start of `text` (no leading
+/// whitespace is skipped, and no byte-order mark is checked) and the code-point index after it.
+/// Trailing text is left alone. No hooks are in force, as for a plain decoder.
+pub fn raw_decode(text: &str) -> Result<(Hooked, usize), HookFailure> {
+    let s: Vec<char> = text.chars().collect();
+    let decode = |msg: &'static str, pos: usize| HookFailure::Decode(decode_error(&s, msg, pos));
+    let mut parser = Parser { s: &s, policy: HookPolicy::default(), unsupported: None };
+    let (value, end, non_finite) = match parser.scan_once(0, 0) {
+        Ok(found) => found,
+        Err(Failure::Stop(position)) => return Err(decode("Expecting value", position)),
+        Err(Failure::Error(msg, position)) => return Err(decode(msg, position)),
+        Err(Failure::Hook(failure)) => return Err(failure),
+    };
+    if let Some(reason) = parser.unsupported {
+        return Err(HookFailure::Unsupported(CodedError::rejected(format!("Invalid JSON: {reason}"))));
+    }
+    Ok((Hooked { value, non_finite: non_finite > 0 }, end))
+}
+
 /// The first error CPython's plain `json.loads` reports for `text`: its message and position.
 pub(super) fn first_error(text: &str) -> Option<(&'static str, usize)> {
     match loads_hooked(text, HookPolicy::default()) {

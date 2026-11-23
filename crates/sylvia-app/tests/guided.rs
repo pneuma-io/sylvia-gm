@@ -18,7 +18,15 @@ use sylvia_store::{AuthorityStore, StoreHandle, StoreResult};
 /// A fresh, empty folder under Cargo's per-test temporary root.
 fn work_folder(name: &str) -> std::path::PathBuf {
     let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join(name);
-    let _ = std::fs::remove_dir_all(&folder);
+    // A folder left by an earlier run must go, or its files would look like this run's.
+    if let Err(error) = std::fs::remove_dir_all(&folder) {
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::NotFound,
+            "cannot clear the old work folder {}: {error}",
+            folder.display()
+        );
+    }
     std::fs::create_dir_all(&folder).expect("work folder");
     folder
 }
