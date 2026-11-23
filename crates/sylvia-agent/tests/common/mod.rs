@@ -12,10 +12,11 @@ use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
-    CampaignConstructionBasis, CampaignContinuityView, CampaignDisplaySnapshot, CampaignSnapshot,
-    CampaignState, CanonicalEvent, CanonicalEventType, CanonicalReplay, EventVisibility, LifecycleState,
-    ModelDecisionActor, ModelDecisionBoundary, ModelDecisionOwner, ModelToolBehavior, PackageDependency,
-    PackageLock, PackageLockEntry, PackageRole, Participant, ParticipantFields, TurnStatus, WriterRole,
+    CampaignConstructionBasis, CampaignContinuityRecord, CampaignContinuityView, CampaignDisplaySnapshot,
+    CampaignSnapshot, CampaignState, CanonicalEvent, CanonicalEventType, CanonicalReplay, EventVisibility,
+    LifecycleState, ModelDecisionActor, ModelDecisionBoundary, ModelDecisionOwner, ModelToolBehavior,
+    PackageDependency, PackageLock, PackageLockEntry, PackageRole, Participant, ParticipantFields,
+    TurnStatus, WriterRole,
 };
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
 use sylvia_domain::session::{
@@ -156,13 +157,28 @@ pub fn campaign_state(value: &J) -> CampaignState {
 }
 
 pub fn continuity(value: &J) -> CampaignContinuityView {
-    assert!(value["records"].as_array().is_none_or(Vec::is_empty), "records are not read");
     CampaignContinuityView {
         current_scene: value["current_scene"].as_object().cloned(),
         facts: maps(&value["facts"]),
         reveals: map(&value["reveals"]),
         plan_progress: maps(&value["plan_progress"]),
-        records: Vec::new(),
+        records: value["records"]
+            .as_array()
+            .map(|records| records.iter().map(continuity_record).collect())
+            .unwrap_or_default(),
+    }
+}
+
+pub fn continuity_record(value: &J) -> CampaignContinuityRecord {
+    CampaignContinuityRecord {
+        entry_id: value["entry_id"].as_str().unwrap().into(),
+        record_id: value["record_id"].as_str().unwrap().into(),
+        kind: value["kind"].as_str().unwrap().into(),
+        status: value["status"].as_str().unwrap().into(),
+        payload: map(&value["payload"]),
+        basis_message_ids: strings(&value["basis_message_ids"]),
+        admitted_revision: value["admitted_revision"].as_i64().unwrap(),
+        operation_id: opt(&value["operation_id"]),
     }
 }
 
@@ -475,6 +491,11 @@ impl TurnOwner for Recorded {
     }
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()> {
         let result = self.next("record_admin_full_audit", serde_json::json!([payload]));
+        assert!(result.is_null(), "the recorder returns None");
+        Ok(())
+    }
+    fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()> {
+        let result = self.next("record_mechanics_diagnostic", serde_json::json!([diagnostic]));
         assert!(result.is_null(), "the recorder returns None");
         Ok(())
     }

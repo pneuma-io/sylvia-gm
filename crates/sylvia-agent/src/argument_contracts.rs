@@ -5,15 +5,15 @@
 //! selector input can use (version 1). The model is shown only the selector, the common inputs
 //! and one object field; the selected value's own inputs are read with `read_tool_arguments`.
 //!
-//! Ported so far: the declaration ([`argument_contract`]), the envelope the model is shown
-//! ([`envelope_schema`]) and the read tool's definition ([`arguments_tool`]). The read itself
-//! (`selected_schema`, `read_tool_arguments`) and the call flattening (`unwrap_arguments`) belong
-//! to the turn loop and come with it.
+//! All of it: the declaration ([`argument_contract`]), the envelope the model is shown
+//! ([`envelope_schema`]), the read tool ([`arguments_tool`], [`read_tool_arguments`] over
+//! [`selected_schema`]) and the call flattening ([`unwrap_arguments`]).
 
 use serde_json::{json, Value as Json};
 use std::collections::{BTreeMap, BTreeSet};
 use sylvia_base::pystr::{repr, repr_json};
 use sylvia_base::{CodedError, CodedResult, JsonMap};
+use sylvia_domain::content::schema::{TypeChecker, Validator};
 
 /// `CONTRACT_KEY`.
 pub const CONTRACT_KEY: &str = "x-sylvia-gm-argument-contracts";
@@ -244,4 +244,204 @@ pub fn envelope_schema(schema: &JsonMap, contract: &ArgumentContract) -> CodedRe
 /// `copy.deepcopy(ARGUMENTS_TOOL)`, from the exported guidance data.
 pub fn arguments_tool() -> Json {
     crate::provider_session::tools::guidance()["arguments_tool"].clone()
+}
+
+fn key_error(key: &str) -> CodedError {
+    CodedError::rejected(repr(key)).with_error_type("KeyError")
+}
+
+/// `_inline(value, definitions)`: a copy with each sole `{"$ref": "#/$defs/<key>"}` replaced by
+/// its definition, inlined in turn.
+fn inline(value: &Json, definitions: &JsonMap) -> CodedResult<Json> {
+    Ok(match value {
+        Json::Object(map) => {
+            if let (1, Some(key)) =
+                (map.len(), map.get("$ref").and_then(Json::as_str).and_then(|r| r.strip_prefix("#/$defs/")))
+            {
+                return inline(definitions.get(key).ok_or_else(|| key_error(key))?, definitions);
+            }
+            Json::Object(
+                map.iter()
+                    .map(|(key, item)| Ok((key.clone(), inline(item, definitions)?)))
+                    .collect::<CodedResult<_>>()?,
+            )
+        }
+        Json::Array(items) => {
+            Json::Array(items.iter().map(|item| inline(item, definitions)).collect::<CodedResult<_>>()?)
+        }
+        other => other.clone(),
+    })
+}
+
+/// `selected_schema(schema, contract, value)`: the exact object schema of the selected value's
+/// inputs, or `None` for an unknown value.
+pub fn selected_schema(
+    schema: &JsonMap,
+    contract: &ArgumentContract,
+    value: &Json,
+) -> CodedResult<Option<JsonMap>> {
+    let Some(names) = contract.selected(value) else {
+        return Ok(None);
+    };
+    let Some(Json::Object(properties)) = schema.get("properties") else {
+        return Err(key_error("properties"));
+    };
+    let empty = JsonMap::new();
+    let definitions = match schema.get("$defs") {
+        Some(Json::Object(definitions)) => definitions,
+        _ => &empty,
+    };
+    let mut selected = JsonMap::new();
+    // `sorted(names)`: a BTreeSet iterates in code point order, as Python sorts strings.
+    for name in names {
+        if let Some(child) = properties.get(name) {
+            selected.insert(name.clone(), inline(child, definitions)?);
+        }
+    }
+    let mut required = Vec::new();
+    for name in iterated(schema.get("required"))? {
+        match &name {
+            Json::String(text) if names.contains(text) => required.push(name),
+            Json::Array(_) | Json::Object(_) => {
+                return Err(type_error(format!("unhashable type: '{}'", type_name(&name))))
+            }
+            _ => {}
+        }
+    }
+    let mut result = JsonMap::new();
+    result.insert("type".into(), json!("object"));
+    result.insert("properties".into(), Json::Object(selected));
+    result.insert("required".into(), Json::Array(required));
+    result.insert("additionalProperties".into(), Json::Bool(false));
+    Ok(Some(result))
+}
+
+fn issue(path: String, kind: &str) -> JsonMap {
+    let mut issue = JsonMap::new();
+    issue.insert("path".into(), Json::String(path));
+    issue.insert("kind".into(), Json::String(kind.into()));
+    issue
+}
+
+/// `unwrap_arguments(arguments, schema, contract)`: flatten one call, checking the contract
+/// field against the selected contract. Returns the flat arguments and the issues found.
+///
+/// Common inputs stay at the top level. The selected value's inputs may be at the top level or
+/// inside the contract field. Inside the field, an input the tool does not have, one that
+/// belongs at the top level, a duplicate, or a selected input whose value its schema refuses
+/// is an issue (`required` errors are left to the missing-input check). Any other input
+/// reaches the existing checks unchanged.
+pub fn unwrap_arguments(
+    arguments: &JsonMap,
+    schema: &JsonMap,
+    contract: &ArgumentContract,
+) -> CodedResult<(JsonMap, Vec<JsonMap>)> {
+    let mut flat = arguments.clone();
+    let nested = match flat.shift_remove(&contract.field) {
+        None | Some(Json::Null) => return Ok((flat, Vec::new())),
+        Some(Json::Object(nested)) => nested,
+        Some(_) => return Ok((flat, vec![issue(contract.field.clone(), "not_an_object")])),
+    };
+    let Some(Json::Object(properties)) = schema.get("properties") else {
+        return Err(key_error("properties"));
+    };
+    let mut issues = Vec::new();
+    let sorted: BTreeSet<&String> = nested.keys().collect();
+    for name in sorted {
+        let path = format!("{}.{name}", contract.field);
+        if flat.contains_key(name) {
+            issues.push(issue(path, "duplicate_input"));
+        } else if contract.common.contains(name) || *name == contract.selector {
+            issues.push(issue(path, "belongs_at_top_level"));
+        } else if !properties.contains_key(name) {
+            issues.push(issue(path, "unknown_input"));
+        }
+    }
+    let selector_value = flat.get(&contract.selector).cloned().unwrap_or(Json::Null);
+    let allowed = contract.selected(&selector_value).filter(|allowed| !allowed.is_empty());
+    if let (true, Some(allowed)) = (issues.is_empty(), allowed) {
+        let selected = Json::Object(selected_schema(schema, contract, &selector_value)?.unwrap_or_default());
+        let values = Json::Object(
+            nested
+                .iter()
+                .filter(|(name, _)| allowed.contains(*name))
+                .map(|(name, value)| (name.clone(), value.clone()))
+                .collect(),
+        );
+        let validator = Validator::new(&selected, TypeChecker::Draft202012).map_err(|error| {
+            CodedError::new("internal_error", error.message()).with_error_type(error.python_class())
+        })?;
+        for error in validator.iter_errors(&values) {
+            if error.keyword == Some("required") {
+                continue; // required inputs are reported by the existing missing-input check
+            }
+            let path = std::iter::once(contract.field.clone())
+                .chain(error.path.iter().map(ToString::to_string))
+                .collect::<Vec<_>>()
+                .join(".");
+            let mut found = issue(path, "invalid_value");
+            found.insert("detail".into(), Json::String(error.message().chars().take(300).collect()));
+            issues.push(found);
+        }
+    }
+    for (name, value) in nested {
+        flat.insert(name, value);
+    }
+    Ok((flat, issues))
+}
+
+/// One round tool that keeps a selected value's inputs behind an argument contract: its listed
+/// name, then its model schema and the contract.
+pub type ContractTool = (String, (JsonMap, ArgumentContract));
+
+/// `read_tool_arguments(parameters, tools)`: answer one read from the round's contract tools,
+/// keyed (in the round's order) by the listed tool name.
+pub fn read_tool_arguments(parameters: &Json, tools: &[ContractTool]) -> CodedResult<JsonMap> {
+    let mut result = JsonMap::new();
+    result.insert("status".into(), json!("rejected"));
+    let Json::Object(parameters) = parameters else {
+        result.insert("code".into(), json!("provider_tool_arguments_not_object"));
+        return Ok(result);
+    };
+    let name = parameters.get("tool");
+    let value = parameters.get("value").cloned().unwrap_or(Json::Null);
+    let entry = name.and_then(Json::as_str).and_then(|name| {
+        // A model may name the tool as listed, by its operation, or with the prefix its
+        // transport adds (Claude Code shows Sylvia's tools as mcp__sylvia__<name>).
+        let bare = if name.starts_with("mcp__") { name.rsplit("__").next().unwrap_or(name) } else { name };
+        let suffix = format!("_{bare}");
+        tools
+            .iter()
+            .find(|(listed, _)| listed == bare)
+            .or_else(|| tools.iter().find(|(listed, _)| listed.ends_with(&suffix)))
+            .map(|(_, entry)| entry)
+    });
+    let Some((schema, contract)) = entry else {
+        result.insert("code".into(), json!("argument_contract_tool_unavailable"));
+        let available: BTreeSet<&String> = tools.iter().map(|(listed, _)| listed).collect();
+        result.insert("available_tools".into(), json!(available));
+        return Ok(result);
+    };
+    let Some(selected) = selected_schema(schema, contract, &value)? else {
+        result.insert("code".into(), json!("argument_contract_value_unknown"));
+        result.insert(
+            "instruction".into(),
+            Json::String(format!("Choose a {} the tool lists.", contract.selector)),
+        );
+        return Ok(result);
+    };
+    let mut result = JsonMap::new();
+    result.insert("status".into(), json!("ok"));
+    result.insert("tool".into(), name.cloned().unwrap_or(Json::Null));
+    result.insert(contract.selector.clone(), json!(contract.canonical(&value)));
+    result.insert("arguments_field".into(), Json::String(contract.field.clone()));
+    result.insert("arguments".into(), Json::Object(selected));
+    result.insert(
+        "instruction".into(),
+        Json::String(format!(
+            "Pass these inside {} (or at the top level); keep the tool's own listed inputs at the top level.",
+            contract.field
+        )),
+    );
+    Ok(result)
 }

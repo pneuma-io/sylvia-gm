@@ -107,6 +107,12 @@ pub trait TurnOwner: OpeningReads {
     /// `record_admin_full_audit(payload)`: kept only while Admin Full Audit is on.
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()>;
 
+    /// `record_mechanics_diagnostic(session_id=..., turn_id=..., action_id=..., tool_name=...,
+    /// rejection_code=..., validation_field_paths=..., state_changed=...)`: bounded
+    /// metadata-only mechanics evidence. `diagnostic` is the payload Python builds from those
+    /// arguments, in its key order (`kind`, `privacy`, then the arguments).
+    fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()>;
+
     /// `provider_continuation(session_id, response_id, provider_id=..., model_id=...)`: one
     /// selected provider exchange's private continuation, as stored.
     fn provider_continuation<'a>(

@@ -52,7 +52,14 @@ pub struct ProviderSessionAdapter {
     /// `self._legacy_alias_changes`: each immutable lock's retired or remapped aliases.
     pub(crate) legacy_alias_changes:
         std::sync::Mutex<HashMap<String, indexmap::IndexMap<String, Option<String>>>>,
+    /// `self._owner_id`: the application owner a turn's commands name.
+    pub(crate) owner_id: String,
+    /// `self._record_warning`: where a content-free provider warning goes, if anywhere.
+    pub(crate) record_warning: Option<Arc<WarningFn>>,
 }
+
+/// A content-free provider warning recorder (`record_warning`).
+pub type WarningFn = dyn Fn(&str) + Send + Sync;
 
 /// The ranker a turn's adapter keeps ([`RankReferences`], owned).
 pub type RankFn =
@@ -127,7 +134,45 @@ impl ProviderSessionAdapter {
             timeout,
             working: std::sync::Mutex::default(),
             legacy_alias_changes: std::sync::Mutex::default(),
+            owner_id: owner_id.to_owned(),
+            record_warning: None,
         })
+    }
+
+    /// `self._owner_id`: the application owner a turn's commands name.
+    pub fn owner_id(&self) -> &str {
+        &self.owner_id
+    }
+
+    /// `record_warning=...`: where content-free provider warnings go.
+    #[must_use]
+    pub fn with_record_warning(mut self, record_warning: Arc<WarningFn>) -> Self {
+        self.record_warning = Some(record_warning);
+        self
+    }
+
+    /// `_filter_private_deliberation(text)`: drop only the lines that read as private
+    /// deliberation and record a content-free warning; `""` when nothing else remains.
+    pub fn filter_private_deliberation(&self, text: &str) -> String {
+        let lines = pystr::splitlines_keepends(text);
+        let kept: Vec<&str> = lines
+            .iter()
+            .copied()
+            .filter(|line| !crate::provider_turn::decisions::is_private_deliberation_line(line))
+            .collect();
+        if kept.len() == lines.len() {
+            return text.to_owned();
+        }
+        match &self.record_warning {
+            Some(record) => record("provider_private_deliberation"),
+            None => sylvia_provider::log::warning("Discarded provider private deliberation from narration"),
+        }
+        let remaining = kept.concat();
+        if pystr::strip(&remaining).is_empty() {
+            String::new()
+        } else {
+            remaining
+        }
     }
 
     /// The adapter for GM turns: the owner's turn calls, and the ranker its campaign memory

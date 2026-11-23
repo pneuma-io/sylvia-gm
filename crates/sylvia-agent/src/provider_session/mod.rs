@@ -8,7 +8,9 @@
 //! - [`request`]: one provider round's request (`_stream_round` and what it calls).
 //! - [`texts`]: the GM request's fixed texts and the small messages built from them.
 //! - [`control_texts`]: the turn's application-owned control messages.
+//! - [`campaign_file`]: the Campaign File and response-block helpers the tool batch uses.
 
+pub mod campaign_file;
 pub mod context;
 pub mod control_texts;
 pub mod messages;

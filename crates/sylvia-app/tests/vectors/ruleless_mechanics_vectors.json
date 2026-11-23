@@ -1,0 +1,1518 @@
+{
+ "cases": [
+  {
+   "blocks": null,
+   "text": "Roll a d20.",
+   "findings": [
+    "dice notation",
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation",
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation, a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "She rolls 2d6 and grins.",
+   "findings": [
+    "dice notation"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "The d20-shaped die",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "A word like add20 or d100x",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "Roll for initiative!",
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "rolling to see if it works",
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Roll your dexterity save now.",
+   "findings": [
+    "a request to roll",
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll",
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll, a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Make a quick check of the windows.",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "Make a Perception check.",
+   "findings": [
+    "a check or saving throw",
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw",
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw, a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "attempt a DC 15 save",
+   "findings": [
+    "a difficulty number"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a difficulty number"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a difficulty number. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "give me an opposed check",
+   "findings": [
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "make a save of your progress",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "make a hard save on it",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "a Stealth check",
+   "findings": [
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "saving throws are hard",
+   "findings": [
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "a wisdom saving throw",
+   "findings": [
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "a luck roll",
+   "findings": [
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Beat DC12 to pass",
+   "findings": [
+    "a difficulty number"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a difficulty number"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a difficulty number. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "difficulty class",
+   "findings": [
+    "a difficulty number"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a difficulty number"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a difficulty number. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "target number 7",
+   "findings": [
+    "a difficulty number"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a difficulty number"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a difficulty number. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "armour class",
+   "findings": [
+    "a numeric defence statistic"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a numeric defence statistic"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a numeric defence statistic. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "AC 15",
+   "findings": [
+    "a numeric defence statistic"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a numeric defence statistic"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a numeric defence statistic. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "AC15",
+   "findings": [
+    "a numeric defence statistic"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a numeric defence statistic"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a numeric defence statistic. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "You have 12 hit points.",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "health point",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "HP is low",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "The hp bar",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "takes 7 fire damage",
+   "findings": [
+    "numeric damage"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric damage"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric damage. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "takes 7 points of damage",
+   "findings": [
+    "numeric damage"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric damage"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric damage. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "a storm damages the roof",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "initiative order",
+   "findings": [
+    "turn order"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "turn order"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: turn order. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "rolled initiative",
+   "findings": [
+    "turn order"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "turn order"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: turn order. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "combat rounds",
+   "findings": [
+    "turn order"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "turn order"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: turn order. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "round 3 of combat",
+   "findings": [
+    "turn order"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "turn order"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: turn order. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "attack rolls",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "to-hit",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "a bonus action",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "spell slots",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "experience points",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "300 XP",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "you level up",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "you leveled up",
+   "findings": [
+    "an action economy term"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "an action economy term"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: an action economy term. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "with advantage",
+   "findings": [
+    "a mechanical advantage"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a mechanical advantage"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a mechanical advantage. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "has disadvantage",
+   "findings": [
+    "a mechanical advantage"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a mechanical advantage"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a mechanical advantage. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "with advantage of numbers",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "gains advantage over them",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "roll with advantage",
+   "findings": [
+    "a mechanical advantage"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a mechanical advantage"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a mechanical advantage. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "an advantage to us",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "She gambles with dice in the tavern.",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "Nothing mechanical here.",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "ROLL A D20",
+   "findings": [
+    "dice notation",
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation",
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation, a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Make a Perceptıon check",
+   "findings": [
+    "a check or saving throw",
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw",
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw, a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Make a PERCEPTİON check",
+   "findings": [
+    "a check or saving throw",
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw",
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw, a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Roll ſor initiative",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "Make a sKill check",
+   "findings": [
+    "a check or saving throw",
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw",
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw, a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "café roll for",
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "éhit points",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "x́AC 15",
+   "findings": [
+    "a numeric defence statistic"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a numeric defence statistic"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a numeric defence statistic. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Roll a ١d20",
+   "findings": [
+    "dice notation"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Roll a １d20",
+   "findings": [
+    "dice notation"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Roll a 1d20́",
+   "findings": [
+    "dice notation"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "hit points",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "hit\u001cpoints",
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "Kill check",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "make a ſave",
+   "findings": [
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": null,
+   "text": "",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": "   ",
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": null,
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "We don't roll for anything here."
+    }
+   ],
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "We don't roll for anything here."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "There is no saving throw in this campaign."
+    }
+   ],
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "There is no saving throw in this campaign."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "Instead of a Perception check, I'll describe it."
+    }
+   ],
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "Instead of a Perception check, I'll describe it."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a check or saving throw"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "Without dice, roll for nothing."
+    }
+   ],
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "Without dice, roll for nothing."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "No rolls. Make a Stealth check anyway, you said? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx make a stealth check"
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a check or saving throw",
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw",
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw, a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "No rolls. Make a Stealth check anyway, you said? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx make a stealth check"
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a check or saving throw",
+    "a request to make a check"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a check or saving throw",
+     "a request to make a check"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a check or saving throw, a request to make a check. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "never ask for hit points"
+    }
+   ],
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "never ask for hit points"
+    }
+   ],
+   "text": null,
+   "findings": [
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "Roll for initiative, not literally."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "Roll for initiative, not literally."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "No dice here at all, friend: roll for it in prose."
+    }
+   ],
+   "text": null,
+   "findings": [],
+   "rejection": null
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "No dice here at all, friend: roll for it in prose."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "ooc",
+     "text": "Not this time, my friend: roll a d20? No."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "dice notation"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "Not this time, my friend: roll a d20? No."
+    }
+   ],
+   "text": null,
+   "findings": [
+    "dice notation",
+    "a request to roll"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation",
+     "a request to roll"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation, a request to roll. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [
+    {
+     "kind": "narration",
+     "text": "You step inside."
+    },
+    {
+     "kind": "npc_dialogue",
+     "speaker_id": "e-1",
+     "spoken_words": "Roll a d20, stranger."
+    },
+    {
+     "kind": "npc_utterance",
+     "spoken_words": "You have 3 hit points left."
+    },
+    {
+     "kind": "ooc",
+     "text": "No dice: no d20 here."
+    },
+    {
+     "kind": "narration",
+     "text": 7
+    },
+    {
+     "kind": "narration",
+     "spoken_words": "takes 4 damage",
+     "text": "calm"
+    }
+   ],
+   "text": "ignored when blocks are given: roll a d20",
+   "findings": [
+    "dice notation",
+    "a request to roll",
+    "numeric health"
+   ],
+   "rejection": {
+    "status": "rejected",
+    "code": "ruleless_mechanics_in_response",
+    "field_paths": [
+     "revised_player_facing_response"
+    ],
+    "findings": [
+     "dice notation",
+     "a request to roll",
+     "numeric health"
+    ],
+    "state_changed": false,
+    "instruction": "This campaign has No Ruleset, so the response must not use game mechanics. The held response contains mechanical language: dice notation, a request to roll, numeric health. Rewrite the complete response as story prose with the same decided outcome, resolving any uncertainty by GM judgment. Do not ask the player to roll or make a check, and do not give dice, difficulty numbers, numeric health or damage, turn order or other game statistics. Resubmit the complete Campaign File update, with the same durable changes and the rewritten response in revised_player_facing_response."
+   }
+  },
+  {
+   "blocks": [],
+   "text": "Roll a d20.",
+   "findings": [],
+   "rejection": null
+  }
+ ]
+}

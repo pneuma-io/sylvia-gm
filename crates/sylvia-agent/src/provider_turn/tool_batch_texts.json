@@ -1,0 +1,35 @@
+{
+ "safe_error_reasons": {
+  "mechanics_validation_failed": "The operation did not satisfy its declared parameters or current rules state.",
+  "stale_revision": "Campaign state changed before the operation could be admitted.",
+  "wrong_owner": "The operation did not originate from the current campaign authority.",
+  "wrong_writer": "The current session is not allowed to perform this operation.",
+  "idempotency_conflict": "The operation identity conflicts with an earlier request.",
+  "mcp_tool_unavailable": "The selected operation is no longer available.",
+  "spell_unavailable": "This spell is not part of this Ruleset's castable spells: it is excluded or not yet available. validation.issues allowed_values lists the spells castable in this campaign now. Choose one of those, or tell the player this spell is unavailable; do not retry it.",
+  "campaign_knowledge_limit_invalid": "Search parameter 'limit' must be an integer from 1 to 8. Retry with limit=5.",
+  "campaign_knowledge_offset_invalid": "Search parameter 'offset' must be a nonnegative integer within the current results. Begin at offset=0, then follow next_offset using the same query and limit.",
+  "campaign_knowledge_metadata_too_large": "Search metadata exceeds the reply byte bound. Refine the query and sources.",
+  "campaign_knowledge_result_too_large": "An exact reference exceeds the reply byte bound. Refine the query and sources; this error does not mean that the source is absent.",
+  "campaign_knowledge_search_invalid": "Use a nonempty query of at most 500 characters and distinct sources from the tool schema.",
+  "campaign_reference_too_large": "This Campaign State read exceeds its byte bound; facts may still be present. Use search_campaign_knowledge with sources=['campaign_state'] and limit=5, then read_campaign_reference with source='campaign_state' and an exact returned path. Do not repeat the oversized whole-state read."
+ },
+ "instructions": {
+  "unavailable_tool_one_list": "This provider tool cannot be called at this step. Do not call it again in this correction. Choose one exact provider_tool_name from available_operations only when its operation fits the current Ruleset state. If an engine transition is marked required, call that transition first.",
+  "unavailable_tool_absent": "This provider tool is absent from the current request and cannot be called. Do not call it again in this correction. Choose one exact provider_tool_name from available_operations only when its operation fits the current Ruleset state. If an engine transition is marked required, call that transition first.",
+  "selected_arguments_invalid": "Use only the inputs selected_arguments lists for this {contract.selector}, inside {contract.field}, keep the tool's own inputs at the top level, and retry once.",
+  "tool_arguments_invalid_json": "The streamed tool arguments were not a complete JSON object. Call the same tool again with the full valid JSON object from its first character; do not continue the partial text.",
+  "missing_required_arguments": "Retry this tool with every required argument.",
+  "revised_narration_invalid": "revised_player_facing_response must be one complete non-empty ordered response-block list with no serialized tool call. npc_utterance blocks require speaker_id and spoken_words; speaker_id must be anonymous, an exact current participant or Campaign Entity ID, or an entity_id admitted by this same update; an anonymous speaker may add a short single-line speaker_name; narration and ooc blocks use text. Put actions and attribution in separate narration blocks; start a new utterance when that NPC resumes speaking. OOC input requires an ooc acknowledgement block. Correct the complete Campaign File disposition and retry.",
+  "campaign_file_rejection": "Rebuild the rejected state arguments against the currently exposed tool schema. validation.issues identifies each path, problem kind, expected type, direct parent, and allowed values or size bound when the schema declares one. It never echoes submitted values. Correct every listed issue rather than patching one symptom. The state_change declaration and supplied non-empty state collections must agree.",
+  "campaign_file_rejection_held": " Sylvia already holds the exact player-facing response from this rejected call. If its layout needs correction, supply a complete replacement in revised_player_facing_response, preserving the decided outcome and separating narration from spoken words. Otherwise omit that field to keep the held response.",
+  "duplicate_collections": "Campaign File authority found every supplied collection to be already current, so those collections must be omitted. Review the complete held response before retrying. If it introduces any new lasting clue, direction, discovery, relationship, commitment, or scene change, submit those actual changes. Otherwise remove unsupported new material from the response and send only the complete concise response with no state collections. Do not resubmit an unchanged scene merely because the prose mentions it.",
+  "unchanged_settled": "Campaign File review is settled without a database write. Sylvia will now deliver the settled player-facing response.",
+  "unchanged_unsettled": "Campaign File review is settled without a database write. Now return only the complete in-world GM response for the reviewed outcome.",
+  "updated_settled": "Campaign File review is settled at this admitted revision. Sylvia will now deliver the settled player-facing response.",
+  "updated_unsettled": "Campaign File update is settled at this admitted revision. Now return only the complete in-world GM response for the admitted outcome.",
+  "tool_correction": "SYLVIA_GM_TOOL_CORRECTION: One or more preceding calls were rejected. Read each structured tool result, preserve every successful result, and address only the rejected operation. That may require corrected arguments or a different currently exposed operation when the result says the original is unavailable or unsuitable. Do not narrate an uncommitted outcome. Correct every reported issue against the currently exposed schema instead of patching only one symptom. ",
+  "tool_correction_held": "Sylvia already holds the exact player-facing response. Do not repeat it in the corrected tool arguments. ",
+  "tool_correction_count": "This is correction {state.rejected_tool_corrections_used} of {state.max_rejected_tool_corrections}."
+ }
+}

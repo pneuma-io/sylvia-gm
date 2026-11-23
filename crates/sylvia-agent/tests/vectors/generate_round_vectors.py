@@ -15,8 +15,9 @@ and the stand-in model, tracing `prepare_round_catalog` and `prepare_provider_ro
 provider input, the turn locals before, everything the phase drew or read in order (`uuid4`
 values, the catalog supplier's results, owner calls with results, audit contexts) and the turn
 locals the phase changed, or the error. Times and durations are replaced by fixed values, and
-`uuid4` is seeded, so two runs write identical bytes. Reference tooling only;
-retired with the Python source.
+`uuid4` is seeded, so two runs write identical bytes. `--session NAME` (repeatable) records
+other sessions instead; `generate_check_vectors.py` uses `record` and `cases` for T3a's
+helpers. Reference tooling only; retired with the Python source.
 """
 
 from __future__ import annotations
@@ -40,7 +41,7 @@ DURATION = re.compile(r'"(elapsed_ms|quiet_ms)": \d+')
 PHASES = "prepare_round_catalog,prepare_provider_round"
 
 
-def record(phases: str) -> list[dict[str, object]]:
+def record(phases: str, session: Path = SESSION) -> list[dict[str, object]]:
     TRACE.unlink(missing_ok=True)
     compare = ROOT / "target" / "debug" / ("sylvia-compare.exe" if sys.platform == "win32"
                                           else "sylvia-compare")
@@ -51,7 +52,7 @@ def record(phases: str) -> list[dict[str, object]]:
            "PYTHONHASHSEED": "0"}
     with tempfile.TemporaryDirectory() as folder:
         subprocess.run(
-            [str(compare), "record", "--session", str(SESSION), "--out", str(Path(folder) / "out"),
+            [str(compare), "record", "--session", str(session), "--out", str(Path(folder) / "out"),
              "--owner", sys.executable, "--arg", "-B", "--arg", str(HERE / "trace_turn_phases.py")],
             check=True, cwd=ROOT, env=env,
         )
@@ -78,6 +79,8 @@ def cases(rows: list[dict[str, object]]) -> list[dict[str, object]]:
                 for group in after}  # type: ignore[union-attr]
             if "raised" in row:
                 current["raised"] = row["raised"]
+            if "returned" in row:
+                current["returned"] = row["returned"]
             result.append(current)
             current = None
         elif current is not None:
@@ -91,9 +94,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--phases", default=PHASES)
     parser.add_argument("--output", default=OUTPUT.name)
+    parser.add_argument("--session", action="append",
+                        help="a session name (repeatable); ruleless-turn by default")
     arguments = parser.parse_args()
     output = HERE / arguments.output
-    found = cases(record(arguments.phases))
+    sessions = [ROOT / "crates/sylvia-compare/sessions" / f"{name}.session.json"
+                for name in arguments.session or ["ruleless-turn"]]
+    found = [case for session in sessions for case in cases(record(arguments.phases, session))]
     text = json.dumps({"cases": found}, ensure_ascii=False, indent=1, allow_nan=False) + "\n"
     text = TIME.sub("2026-01-01T00:00:00+00:00", text)
     text = DURATION.sub(lambda match: f'"{match.group(1)}": 0', text)

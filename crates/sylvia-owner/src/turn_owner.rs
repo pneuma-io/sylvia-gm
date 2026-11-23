@@ -8,7 +8,7 @@ use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_app::authority::turn_reads;
-use sylvia_base::{CodedResult, Json, JsonMap};
+use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
@@ -44,6 +44,14 @@ impl TurnOwner for OwnerReads {
 
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()> {
         OwnerReads::record_admin_full_audit(self, Json::Object(payload))
+    }
+
+    fn record_mechanics_diagnostic(&self, _diagnostic: JsonMap) -> CodedResult<()> {
+        // Lane 3 keeps the diagnostics beside the Full Audit trace in `NarrationState`.
+        Err(CodedError::new(
+            crate::dispatch::PORT_PENDING,
+            "The Rust owner does not answer AuthorityOwner.record_mechanics_diagnostic yet.",
+        ))
     }
 
     fn provider_continuation<'a>(
