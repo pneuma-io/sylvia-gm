@@ -87,7 +87,7 @@ pub(crate) fn read_state(connection: &Connection, campaign_id: &str) -> StoreRes
     Ok(state)
 }
 
-fn participant(row: &Named<'_>, has_f5: bool) -> StoreResult<Participant> {
+pub(crate) fn participant(row: &Named<'_>, has_f5: bool) -> StoreResult<Participant> {
     let f5_text = |column: &str| -> StoreResult<Option<String>> {
         if has_f5 {
             row.optional_text(column)
