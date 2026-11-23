@@ -151,7 +151,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `provider/_anthropic.py:388` | `AnthropicMessagesTransport.parse_response` | Dump::DEFAULT | `arguments=json.dumps( block.get("input", {}) if isinstance(block, dict) else getattr(block, "input", {}) ),` | `sylvia-provider` anthropic_vectors |
 | `provider/_anthropic.py:491` | `AnthropicMessagesTransport.parse_stream_chunk` | Dump::WIRE.sorted(true) | `"arguments": json.dumps( initial_input, sort_keys=True, separators=(",", ":"), )` | `sylvia-provider` anthropic_vectors |
 | `provider/_chatgpt.py:319` | `_in_place_answer` | Dump::DEFAULT.ascii(false) | `result = raw if isinstance(raw, str) else json.dumps(raw, ensure_ascii=False)` || `sylvia-provider` chatgpt_rules_vectors |
-| `provider/_chatgpt.py:1313` | `ChatGPTProvider._attempt` | Dump::DEFAULT + allow_nan= | `arguments = json.dumps( params.get("arguments"), ensure_ascii=True, allow_nan=False )` | |
+| `provider/_chatgpt.py:1313` | `ChatGPTProvider._attempt` | Dump::DEFAULT + allow_nan= | `arguments = json.dumps( params.get("arguments"), ensure_ascii=True, allow_nan=False )` | `sylvia-provider` chatgpt_provider_vectors |
 | `provider/_claude.py:131` | `prepare_request` | Dump::DEFAULT + allow_nan= | `history = json.loads(json.dumps(request["messages"], allow_nan=False))` | `sylvia-provider` claude_vectors |
 | `provider/_claude.py:203` | `_replay_record` | Dump::DEFAULT | `add(str(saved["type"]), {"message": json.loads(json.dumps(saved["message"]))})` | `sylvia-provider` claude_vectors |
 | `provider/_claude.py:322` | `_native_projection` | Dump::DEFAULT | `add("user", {"message": json.loads(json.dumps(answer))})` | `sylvia-provider` claude_vectors |

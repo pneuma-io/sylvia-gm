@@ -5,7 +5,7 @@
 
 use serde_json::{json, Value as J};
 use std::sync::Arc;
-use sylvia_provider::factory::{BuiltProvider, ClientBuilder, DefaultProviderFactory, PORT_PENDING};
+use sylvia_provider::factory::{BuiltProvider, ClientBuilder, DefaultProviderFactory};
 use sylvia_provider::http::{HttpTransport, ScriptedTransport};
 use sylvia_provider::openai_compat::SdkEnvironment;
 use sylvia_provider::types::{ModelInfo, ProviderConfig, RetryConfig, TimeoutConfig};
@@ -95,6 +95,7 @@ fn the_factory_builds_what_python_builds() {
             (Ok(BuiltProvider::Anthropic(_)), Some(_)) => json!({"value": {"kind": "AnthropicProvider"}}),
             (Ok(BuiltProvider::Gemini(_)), Some(_)) => json!({"value": {"kind": "GeminiProvider"}}),
             (Ok(BuiltProvider::Claude(_)), Some(_)) => json!({"value": {"kind": "ClaudeProvider"}}),
+            (Ok(BuiltProvider::ChatGPT(_)), Some(_)) => json!({"value": {"kind": "ChatGPTProvider"}}),
             (Ok(BuiltProvider::OpenAICompat(provider)), Some(expected)) => {
                 let model = provider.model();
                 json!({"value": {
@@ -107,15 +108,6 @@ fn the_factory_builds_what_python_builds() {
                     "timeouts": timeouts(provider.timeout_config(), &expected["timeouts"]),
                     "default_headers": provider.default_headers().iter().map(|(n, v)| json!([n, v])).collect::<Vec<_>>(),
                 }})
-            }
-            // A transport whose adapter is not ported answers `rust_port_pending` where Python
-            // built its provider: the ChatGPT runtime.
-            (Err(error), Some(expected)) if error.code == PORT_PENDING => {
-                if expected["kind"] == "ChatGPTProvider" {
-                    json!({"value": expected})
-                } else {
-                    json!({"pending": error.message})
-                }
             }
             // Differences row 12: a non-ASCII host is refused when the provider is built, where
             // httpx would have IDNA-encoded it on the first request.

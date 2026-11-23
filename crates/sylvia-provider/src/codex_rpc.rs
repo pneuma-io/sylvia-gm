@@ -413,7 +413,9 @@ struct Inner {
 
 /// `CodexConnection`: RPC calls one at a time, with notifications and failures drained
 /// independently. Unexpected server requests are denied; only the Sylvia tools named in
-/// `dynamic_tools` are forwarded to the provider, which keeps their execution.
+/// `dynamic_tools` are forwarded to the provider, which keeps their execution. A clone is a
+/// handle to the same child.
+#[derive(Clone)]
 pub struct CodexConnection {
     inner: Arc<Inner>,
 }
@@ -634,6 +636,11 @@ impl CodexConnection {
     /// `set_lifecycle_observer(observer)`.
     pub fn set_lifecycle_observer(&self, observer: LifecycleObserver) {
         *self.inner.observer.lock().expect("observer lock") = Some(observer);
+    }
+
+    /// `_check_stopped()`: `CodexCancelledError` once a stop was requested.
+    pub fn check_stopped(&self) -> Result<(), CodexError> {
+        self.inner.check_stopped()
     }
 
     /// `request_stop()`: fence this connection and wake its pending call.

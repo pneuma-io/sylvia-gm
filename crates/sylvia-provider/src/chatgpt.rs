@@ -426,7 +426,7 @@ impl KeptThread {
             && py_eq(&Json::Array(items[..held.len()].to_vec()), &Json::Array(held.clone()))
     }
 
-    fn stop_timer(&self) {
+    pub(crate) fn stop_timer(&self) {
         if let Some(timer) = self.timer.lock().expect("timer lock").take() {
             timer.cancel();
         }
