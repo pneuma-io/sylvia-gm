@@ -189,4 +189,12 @@ pub trait TurnOwner: OpeningReads {
     /// `campaign_narrative_options(session_id)`: the Campaign File note types one DM session
     /// may write, and their choices.
     fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `session_activity_basis(session_id, attempt_id=None)`: the saved attempt facts the
+    /// activity indicator reads, without the conversation.
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<sylvia_domain::session::SessionActivityBasis>>;
 }

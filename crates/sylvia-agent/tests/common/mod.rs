@@ -20,6 +20,7 @@ use sylvia_domain::authority::{
     TurnStatus, WriterRole,
 };
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::session::SessionActivityBasis;
 use sylvia_domain::session::{
     SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
 };
@@ -609,6 +610,20 @@ impl TurnOwner for Recorded {
     fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
         let result = self.next_result("campaign_narrative_options", serde_json::json!([session_id]));
         Box::pin(async move { result.map(|value| map(&value)) })
+    }
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<SessionActivityBasis>> {
+        let result = self.next("session_activity_basis", serde_json::json!([session_id, attempt_id]));
+        let message = |value: &J| (!value.is_null()).then(|| session_message(value));
+        ready(SessionActivityBasis {
+            session: session_record(&result["session"]),
+            accepted: message(&result["accepted"]),
+            terminal: message(&result["terminal"]),
+            has_compaction: result["has_compaction"].as_bool().unwrap(),
+        })
     }
 }
 

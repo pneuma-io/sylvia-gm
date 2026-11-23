@@ -8,6 +8,7 @@
 //! - This module holds `SessionInputKind`, `SessionRunRequest`, `SessionProviderInput` and the
 //!   run results.
 
+pub mod campaign;
 pub mod control;
 pub mod events;
 pub mod provider;
