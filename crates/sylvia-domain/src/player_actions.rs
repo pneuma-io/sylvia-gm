@@ -36,17 +36,18 @@ fn keys_are(object: &JsonMap, keys: &[&str]) -> bool {
 pub fn player_control_origin(
     source: &Json,
     expected_revision: i64,
-    selection: Option<&JsonMap>,
+    selection: &Json,
     session_id: Option<&str>,
 ) -> DomainResult<JsonMap> {
     let Json::Object(source) = source else {
         return Err(DomainError::command_rejected("Player control source is invalid"));
     };
-    // `selection or {}`: an empty selection is replaced by an equal empty one.
-    let selection = selection.cloned().unwrap_or_default();
+    // `selection or {}`: Python's `None` is `Json::Null`; any falsy selection becomes `{}`, and a
+    // truthy one (a list or text included) is kept as it is.
+    let selection = if crate::pyops::py_truthy(selection) { selection.clone() } else { Json::Object(JsonMap::new()) };
     let mut origin = JsonMap::new();
     origin.insert("expected_revision".into(), json!(expected_revision));
-    origin.insert("selection".into(), Json::Object(selection));
+    origin.insert("selection".into(), selection);
     origin.insert("session_id".into(), session_id.map_or(Json::Null, |id| json!(id)));
     let kind = source.get("kind");
     let is_kind = |name: &str| matches!(kind, Some(Json::String(text)) if text == name);
@@ -152,7 +153,7 @@ pub fn valid_player_action_consequence(payload: &JsonMap, expected_revision: i64
         }
         _ => return false,
     };
-    let Ok(mut expected) = player_control_origin(&source, expected_revision, Some(selection), session_id)
+    let Ok(mut expected) = player_control_origin(&source, expected_revision, &Json::Object(selection.clone()), session_id)
     else {
         return false;
     };

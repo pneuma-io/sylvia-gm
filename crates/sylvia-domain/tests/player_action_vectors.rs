@@ -24,7 +24,7 @@ fn control_origins_match_python() {
     let cases = vectors["origins"].as_array().unwrap();
     assert!(cases.len() > 400);
     for case in cases {
-        let selection = case["selection"].as_object();
+        let selection = &case["selection"];
         let session_id = case["session_id"].as_str();
         let revision = case["expected_revision"].as_i64().unwrap();
         let actual = match player_control_origin(&case["source"], revision, selection, session_id) {
