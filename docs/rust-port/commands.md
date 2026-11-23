@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 51 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 52 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -71,7 +71,7 @@ Ported: 51 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `inspect_package_candidate` | `packages.handle_inspect_package_candidate` | yes | no | |
 | `package_candidate_text` | `packages.handle_package_candidate_text` | yes | no | |
 | `compare_package_candidates` | `packages.handle_compare_package_candidates` | yes | no | |
-| `campaign_party_options` | `campaigns.handle_campaign_party_options` | yes | no | |
+| `campaign_party_options` | `campaigns.handle_campaign_party_options` | yes | yes | `srd-mechanics-turn` (step 2), over lane 1's `selection_vectors` |
 | `model_choices` | `providers.handle_model_choices` | yes | yes | `startup` |
 | `provider_settings` | `providers.handle_provider_settings` | yes | yes | `startup` |
 | `open_provider_setup` | `providers.handle_open_provider_setup` | yes | no | |

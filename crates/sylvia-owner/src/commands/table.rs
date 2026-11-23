@@ -79,7 +79,7 @@ pub const REGISTRY: &[Command] = &[
     pending("inspect_package_candidate", "packages", true, true),
     pending("package_candidate_text", "packages", true, true),
     pending("compare_package_candidates", "packages", true, true),
-    pending("campaign_party_options", "campaigns", true, true),
+    ported("campaign_party_options", "campaigns", true, true),
     ported("model_choices", "providers", true, true),
     ported("provider_settings", "providers", true, true),
     pending("open_provider_setup", "providers", true, true),

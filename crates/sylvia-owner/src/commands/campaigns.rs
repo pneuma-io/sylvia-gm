@@ -194,6 +194,33 @@ fn no_ruleset_plan(display_name: &str, premise: &str) -> String {
 /// `handle_start_guided_campaign` for a Draft with no Ruleset or an installed one. A saved
 /// Campaign Plan (`plan_id`) needs lane 1's library selection and party materialisation, so it is
 /// refused as not yet ported.
+/// `handle_campaign_party_options`: a saved Plan's party choices, revalidated through lane 1's
+/// library selection (`resolve_campaign_library_selection(...).party_options()`) in one store
+/// call.
+pub async fn handle_campaign_party_options(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let ruleset_selection = required(params, "ruleset_selection")?;
+    let setting_id = required(params, "setting_id")?;
+    let plan_id = required(params, "plan_id")?;
+    let bundled = std::sync::Arc::clone(&ctx.bundled);
+    let storage_root = ctx.storage_root.clone();
+    let options = ctx
+        .store
+        .call(move |store| {
+            let selection = sylvia_app::campaign_library_selection::resolve_campaign_library_selection(
+                store,
+                &bundled,
+                &storage_root,
+                &ruleset_selection,
+                &setting_id,
+                &plan_id,
+            )?;
+            selection.party_options(&bundled).map_err(sylvia_store::StoreError::from)
+        })
+        .await
+        .map_err(store_error)?;
+    Ok(Json::Object(options))
+}
+
 pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let operation_id = required(params, "operation_id")?;
     let campaign_id = required(params, "campaign_id")?;
