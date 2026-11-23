@@ -3,6 +3,7 @@
 //! in-memory state bridge (`AuthorityMemoryStateBridge`). A mechanic reads an in-memory view of
 //! state and returns proposed changes; nothing here touches storage.
 
+pub mod aoe;
 pub mod bridge;
 pub mod context;
 pub mod effects;
@@ -10,6 +11,7 @@ pub mod error;
 pub mod handlers;
 pub mod procedures;
 pub mod shape;
+pub mod shot_effects;
 pub mod spatial_bridge;
 pub mod template;
 pub mod time;

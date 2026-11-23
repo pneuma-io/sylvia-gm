@@ -163,7 +163,9 @@ pub(crate) fn execute_effect(
         "clock_tick" => time::handle_clock_tick(&body, ctx),
         "spatial_query" => handle_spatial_query(&body, effect_map, ctx),
         "spatial_mutation" => handle_spatial_mutation(&body, effect_map, ctx),
-        // `shot_effect` and `aoe`: lane 2's C3b.
+        "shot_effect" => handle_shot_effect(&body, ctx),
+        "aoe" => super::aoe::handle_aoe(&body, effect_map, ctx, host),
+        // Every handler is ported; an unknown name never reaches here (`VALID_EFFECT_KEYS`).
         other => Err(ExecError::port_pending(format_args!(
             "the '{other}' effect (lane 2's spatial effect handlers)"
         ))),
@@ -642,6 +644,16 @@ fn handle_spatial_query(
     ctx.vars.insert(store_as.clone(), result);
     ctx.state_bridge.as_deref_mut().expect("checked above").register_spatial_private_variable(&store_as);
     Ok(())
+}
+
+/// `_handle_shot_effect`: a cosmetic shot, which never undoes mechanics when its presentation
+/// fails.
+fn handle_shot_effect(body: &Value, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecError> {
+    if !ctx.state_bridge.as_deref().is_some_and(|bridge| bridge.supports_spatial()) {
+        return Ok(());
+    }
+    let resolved = resolve_spatial_input(body, ctx);
+    ctx.state_bridge.as_deref_mut().expect("checked above").record_shot_effect(&resolved)
 }
 
 /// `_handle_spatial_mutation`: one neutral exact-object patch through the package-local bridge.

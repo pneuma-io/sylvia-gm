@@ -54,8 +54,8 @@ RECORDING_ENV = "SYLVIA_MECHANIC_RECORDING"
 FIXTURE = "tests/fixtures/rulesets/signal-and-static"
 SRD = "rulesets/srd-lite"
 RIICHI = "rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package"
-# The effects the port refuses by name until its C3b.
-SPATIAL = ("shot_effect", "aoe")
+# The effects the port refuses by name: none since C3b.
+SPATIAL: tuple[str, ...] = ()
 INLINE_LIMIT = 4096
 RECORDED_TESTS = [
     "tests/test_srd_lite_foundation.py", "tests/test_srd_action_budget.py",
@@ -451,6 +451,21 @@ def scene_vars() -> list:
             {"set": {"field": "_rows_ref", "value": [{"label": "R", "value": {"path": "context._roll"}}]}}]
 
 
+def arena_scene() -> dict:
+    """The S3a query scene with public displays, for shot presentation."""
+    sys.path.insert(0, str(ROOT / "crates/sylvia-engine/tests/vectors"))
+    from generate_spatial_scene_vectors import QUERY_SCENE
+
+    scene = copy.deepcopy(QUERY_SCENE)
+    shown = {"orc": "Orc", "elf": "Elf", "cart": "Cart"}
+    for item in scene["entities"]:
+        if item["id"] in shown:
+            item["metadata"] = {**item["metadata"], "player": {"label": shown[item["id"]], "kind": "creature"}}
+    scene["geometry"][0]["metadata"] = {"player": {"label": "Wall", "kind": "wall"}}
+    scene["zones"][0]["metadata"] = {"player": {"label": "Pool", "kind": "hazard"}}
+    return scene
+
+
 def targeted() -> list[dict]:
     sys.path.insert(0, str(ROOT / "crates/sylvia-engine/tests/vectors"))
     from generate_spatial_scene_vectors import QUERIES, QUERY_SCENE
@@ -481,10 +496,19 @@ def targeted() -> list[dict]:
     state = {
         f"{package_id}.state": {"counter": 1, "items": ["a", "b", "c"], "mode": "duel", "active_actor": "orc",
                                 "entities": ["orc"], "resources": {"charge": 3}, "stress": 0,
-                                "scene": copy.deepcopy(QUERY_SCENE), "plain": {"map": 1}},
+                                "scene": copy.deepcopy(QUERY_SCENE), "plain": {"map": 1}, "arena": arena_scene()},
         f"{package_id}.entities": {
             "orc": {"hp": 5, "max_hp": 9, "name": "Orc", "conditions": ["prone"], "id": "orc"},
             "elf": {"hp": 7, "max_hp": 7, "name": "Elf", "conditions": []},
+            "g1": {"hp": 4, "kind": "hostile", "position": {"x": 1, "y": 1}},
+            "g2": {"hp": 9, "kind": "hostile", "position": {"x": 2, "y": 1}},
+            "g3": {"hp": 2, "kind": "ally", "position": {"x": 3, "y": 2.7}},
+            "g4": {"hp": 6, "kind": "hostile", "position": {"x": "4", "y": 1}},
+            "g5": {"hp": 6, "kind": "hostile", "position": {"x": "far", "y": 1}},
+            "b1": {"hp": 3, "kind": "hostile", "position": {"band": "near"}},
+            "b2": {"hp": 8, "kind": "ally", "position": {"band": "FAR"}},
+            "b3": {"hp": 1, "kind": "hostile", "position": {}},
+            "bx": {"hp": 1, "position": {"band": 5}},
         },
         f"{package_id}.combat": {"round": 2, "turn_index": 0, "leader": "orc"},
     }
@@ -705,17 +729,86 @@ def targeted() -> list[dict]:
             "destination": [1, 1], "delay_ms": 0, "miss": False, "contacts": []}
     case("shot effect", synthetic("shoot", [{"shot_effect": shot}]), "shoot", target)
     case("aoe", synthetic("blast", [{"aoe": {"shape": "sphere", "size": 10}, "do": []}]), "blast", target)
-    # Code not yet ported passes through every layer: an `aoe` (C3b) inside a nested call, a
-    # procedure, a loop and a conditional.
-    blast = {"aoe": {"shape": "sphere", "size": 10}, "do": []}
-    case("pending nested", synthetic("outer", [{"call": "inner", "params": {}}],
-                                     extra={"inner": {"description": "Inner.", "parameters": [], "effects": [blast]}}),
-         "outer", target)
-    case("pending procedure", synthetic("hit", [{"trigger": "on_blast"}],
-                                        procedures={"on_blast": {"trigger": "on_blast", "steps": [blast]}}), "hit", target)
-    case("pending for_each", synthetic("look", [{"set": {"field": "_xs", "value": [1, 2]}},
-                                                {"for_each": {"collection": "_xs", "as": "_i", "do": [blast]}}]), "look", target)
-    case("pending conditional", synthetic("look", [{"condition": "true", "on_true": [blast]}]), "look", target)
+    # Shots (C3b): the arena shows the orc, the elf, the cart, the wall and the pool.
+    snap = {"spatial_query": {"scene": "state.arena", "operation": "snapshot"}, "store_as": "_snap"}
+
+    def shot(**changes):
+        body = {"scene": "state.arena", "snapshot": "{_snap}", "source_id": "orc", "target_id": "elf",
+                "origin": [5.5, 5.5, 1], "destination": [12, 10, 1], "delay_ms": 0, "miss": False,
+                "contacts": [{"kind": "entity", "id": "elf", "point": [11.5, 9.6, 1], "cue": "character"}]}
+        body.update(changes)
+        return {"shot_effect": {key: value for key, value in body.items() if value is not ...}}
+
+    style = {"color": "#a1b2c3", "width": 3, "travel_ms": 100, "impact_ms": 61.5,
+             "fire_sound": {"waveform": "sine", "frequency": 440, "end_frequency": 220.5, "duration_ms": 50, "volume": 0.5},
+             "cues": {"cover": {"color": "#000000", "sound": None},
+                      "stop": {"sound": {"waveform": "noise", "frequency": 40, "end_frequency": 12000, "duration_ms": 10, "volume": 1}}}}
+    shots = {
+        "hit": shot(), "styled": shot(style=style), "no contacts": shot(contacts=[]),
+        "miss": shot(miss=True, contacts=[]), "miss past the wall": shot(origin=[1, 1, 1], miss=True, contacts=[]),
+        "miss from close": shot(origin=[11.6, 10, 1], miss=True, contacts=[]),
+        "zone target": shot(target_id="pool", target_kind="zone", contacts=[]),
+        "zone with contacts": shot(target_id="pool", target_kind="zone"),
+        "hidden source": shot(source_id="ghost"), "unknown target": shot(target_id="nobody"),
+        "bad target kind": shot(target_kind="geometry"), "outside bounds": shot(destination=[99, 10, 1]),
+        "delay too long": shot(delay_ms=60001), "delay float": shot(delay_ms=12.5), "miss not bool": shot(miss=1),
+        "style none": shot(style=None), "bad color": shot(style={"color": "red"}), "bad width": shot(style={"width": 9}),
+        "bad cue": shot(style={"cues": {"glow": {}}}), "bad sound": shot(style={"fire_sound": {"waveform": "square"}}),
+        "contact hidden": shot(contacts=[{"kind": "entity", "id": "ghost", "point": [14, 3, 1], "cue": "stop"}]),
+        "contact bad cue": shot(contacts=[{"kind": "geometry", "id": "wall.b", "point": [2.5, 5, 1], "cue": "boom"}]),
+        "contact cover": shot(contacts=[{"kind": "geometry", "id": "wall.b", "point": [2.5, 5, 1], "cue": "cover"}]),
+        "miss with contacts": shot(miss=True), "unknown snapshot": shot(snapshot={"snapshot_id": "nope"}),
+        "snapshot missing": shot(snapshot="none"), "other scene": shot(scene="state.scene"),
+    }
+    for label, effect in shots.items():
+        case(f"shot {label}", synthetic("fire", [snap, effect]), "fire", target)
+    case("shot without a snapshot query", synthetic("fire", [shot()]), "fire", target)
+    case("shots over the limit", synthetic("fire", [snap, {"set": {"field": "_xs", "value": list(range(257))}},
+                                                    {"for_each": {"collection": "_xs", "as": "_i", "do": [shot()]}}]), "fire", target)
+    # Areas (C3b): grid squares or distance bands, from the declared entity parameters.
+    def blast_tool(spec, *, do=None, entities=("g1", "g2", "g3", "g4", "g5"), extra_params=()):
+        params = [{"name": f"e{index}", "type": "string", "resolve": "entity"} for index in range(len(entities))]
+        values = {f"e{index}": entity for index, entity in enumerate(entities)}
+        effects = [{"aoe": spec, "do": do if do is not None else [{"list_push": {"list": "_hit", "value": "_aoe_target"}}]}]
+        return synthetic("blast", effects, parameters=[*params, *extra_params]), values
+
+    for label, spec in {
+        "grid sphere": {"shape": "sphere", "size": 10, "origin": "g1"},
+        "grid cube": {"shape": "cube", "size": 10, "origin": "g1"},
+        "grid cone": {"shape": "cone", "size": 15, "origin": "g1"},
+        "grid line": {"shape": "line", "size": 20, "origin": "g1"},
+        "grid band size": {"shape": "sphere", "size": "near", "origin": "g1"},
+        "grid unknown shape": {"shape": "star", "size": 10, "origin": "g1"},
+        "grid float size": {"shape": "Sphere", "size": 7.9, "origin": "g1"},
+        "grid filter": {"shape": "sphere", "size": 30, "origin": "g1", "filter": "kind == 'hostile' and hp > 3"},
+        "grid bad filter": {"shape": "sphere", "size": 30, "origin": "g1", "filter": "nope("},
+        "grid unknown origin": {"shape": "sphere", "size": 30, "origin": "ghost"},
+        "grid self without attacker": {"shape": "sphere", "size": 30},
+    }.items():
+        doc, values = blast_tool(spec)
+        case(f"aoe {label}", doc, "blast", values)
+    for label, spec in {
+        "band burst": {"shape": "burst", "size": "near", "origin": "b1"},
+        "band cone": {"shape": "cone", "size": 2, "origin": "b1"},
+        "band line": {"shape": "LINE", "size": "far", "origin": "b3"},
+        "band filter": {"shape": "burst", "size": 3, "origin": "b1", "filter": "kind == 'ally'"},
+        "band bool size": {"shape": "burst", "size": True, "origin": "b3"},
+    }.items():
+        doc, values = blast_tool(spec, entities=("b1", "b2", "b3", "g1"))
+        case(f"aoe {label}", doc, "blast", values)
+    doc, values = blast_tool({"shape": "burst", "size": 2, "origin": "bx"}, entities=("bx", "b1"))
+    case("aoe band not text", doc, "blast", values)
+    doc, values = blast_tool({"shape": "sphere", "size": 30},
+                             extra_params=({"name": "attacker", "type": "string", "resolve": "entity"},))
+    case("aoe self is the attacker", doc, "blast", {**values, "attacker": "g2"})
+    doc, values = blast_tool({"shape": "sphere", "size": 30, "origin": "g1"}, do=[{"set": {"field": "_last", "value": "_aoe_target"}},
+                                                                             {"apply_damage": {"target": "_aoe_target", "amount": 1}}])
+    case("aoe damages each target", doc, "blast", values)
+    doc, values = blast_tool({"aoe": {"shape": "sphere", "size": 30, "origin": "g1"}, "as": "_victim"},
+                             do=[{"list_push": {"list": "_hit", "value": "_victim"}}])
+    case("aoe nested spec and loop name", doc, "blast", values)
+    doc, values = blast_tool({"shape": "sphere", "size": 30, "origin": "g1"}, do="not a list")
+    case("aoe sub-effects not a list", doc, "blast", values)
     # Choices.
     choose = {"request_choice": {"choice_id": "c1", "prompt": "Choose for {target.name}", "options": CHOICE_OPTIONS},
               "store_as": "_choice"}

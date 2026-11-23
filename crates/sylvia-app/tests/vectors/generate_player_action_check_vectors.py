@@ -140,16 +140,6 @@ def install_patches() -> None:
 
     mechanic.install_patches()
 
-    # A preview's preflight path and map preview are projected after their engines open.
-    def path(*_args, **_kwargs):
-        raise mechanic.PortPending("preflight_path")
-
-    def map_preview(*_args, **_kwargs):
-        raise mechanic.PortPending("map_preview")
-
-    pr.project_preflight_path = path
-    pr.project_spatial_preview = map_preview
-
 
 def run(case: dict) -> dict:
     """Materialize and call one checker or previewer as `AuthorityOwner` does."""
@@ -355,6 +345,47 @@ def targeted() -> list[dict]:
     case("preflight missing", {"preview": card, "preflight": ["absent"]}, extra=extra)
     case("preflight path", {"preview": card, "preflight": ["helper"],
                             "preflight_path": {"scene": "state.scene", "route": "_route", "cost": "_cost"}}, extra=extra)
+    # Path and map previews (C3b), on the query scene with public displays.
+    from generate_package_mechanic_vectors import arena_scene
+
+    arena = arena_scene()
+    arena_state = {**state, f"{package_id}.state": {**state[f"{package_id}.state"], "arena": arena}}
+    route_query = {"spatial_query": {"scene": "state.arena", "operation": "circle_route", "query": {
+        "map_id": "keep", "moving_entity_id": "orc", "destination": [7, 4, 0], "moving_radius": 0.5,
+        "circles": [{"entity_id": "elf", "radius": 0.5, "blocking": True}], "max_tests": 100,
+        "metadata_filter": {"key": "", "value": "", "missing_matches": False}}}, "store_as": "_route"}
+    router = {"description": "Router.", "parameters": [target],
+              "effects": [route_query, {"set": {"field": "_cost", "value": "_route.distance"}}]}
+    routes = {"router": router}
+    path_card = {"version": 1, "title": "Move", "summary": [{"label": "Cost", "value": {"path": "context._cost"}}]}
+    preflight_path = {"scene": "state.arena", "route": "_route", "cost": "_cost"}
+    case("path preview", {"preview": path_card, "preflight": ["router"], "preflight_path": preflight_path},
+         extra=routes, state_value=arena_state)
+    blocked = {"router": {**router, "effects": [route_query, {"set": {"field": "_cost", "value": -1}}]}}
+    case("path preview negative cost", {"preflight": ["router"], "preflight_path": preflight_path}, extra=blocked,
+         state_value=arena_state)
+    unrouted = {"router": {**router, "effects": [{"set": {"field": "_route", "value": {"found": False}}},
+                                                 {"set": {"field": "_cost", "value": 1}}]}}
+    case("path preview without a route", {"preflight": ["router"], "preflight_path": preflight_path}, extra=unrouted,
+         state_value=arena_state)
+    arena_path = {"store_as": "_walk", "spatial_query": {"scene": "state.arena", "operation": "path", "query": {
+        "map_id": "keep", "start": [5, 5], "goal": [15, 10], "allow_diagonal": True, "corner_policy": "forbid_cutting",
+        "include_entities": True, "moving_entity_id": "orc", "max_steps": 1000}}}
+    arena_ray = {"store_as": "_sight", "spatial_query": {"scene": "state.arena", "operation": "ray", "query": {
+        "map_id": "keep", "origin": [1, 1, 1], "destination": [12, 10, 1], "include": ["entities", "geometry"],
+        "max_intersections": 8}}}
+    arena_exposure = {"store_as": "_seen", "spatial_query": {"scene": "state.arena", "operation": "exposure", "query": {
+        "map_id": "keep", "observer": {"point": [1, 1, 1.5]}, "target": {"entity_id": "elf"},
+        "samples": {"horizontal": 3, "vertical": 2}, "include": ["geometry"]}}}
+    arena_zones = {"store_as": "_zones", "spatial_query": {"scene": "state.arena", "operation": "crossed_zones", "query": {
+        "map_id": "keep", "path": [[0, 0, 0], [15, 10, 0.2]], "max_crossings": 10}}}
+    case("map preview path", {"queries": [arena_path], "map_preview": {"path": "_walk"}}, state_value=arena_state)
+    case("map preview path and zones", {"queries": [arena_path, arena_zones],
+                                        "map_preview": {"path": "_walk", "crossed_zones": "_zones"}}, state_value=arena_state)
+    case("map preview ray and exposure", {"queries": [arena_ray, arena_exposure],
+                                          "map_preview": {"ray": "_sight", "exposure": "_seen"}}, state_value=arena_state)
+    case("map preview mixed maps", {"queries": [arena_ray, {**query, "store_as": "_other"}],
+                                    "map_preview": {"ray": "_sight", "path": "_other"}}, state_value=arena_state)
     case("preflight path missing scene", {"preview": card, "preflight": ["helper"],
                                           "preflight_path": {"scene": "state.absent", "route": "_route", "cost": "_cost"}}, extra=extra)
     case("preflight big float", {"preview": {"version": 1, "title": "Big", "summary": [

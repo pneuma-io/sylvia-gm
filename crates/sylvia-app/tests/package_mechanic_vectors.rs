@@ -208,28 +208,3 @@ fn package_mechanics_run_as_python() {
         &failures[..failures.len().min(6)]
     );
 }
-
-/// `PortPending` passes through a procedure and a nested `call` as `Suspended` does: the targeted
-/// `pending` cases reach an effect not yet ported (`aoe`) only inside one, and Python's catch-alls
-/// there would otherwise turn the refusal into a failed action.
-#[test]
-fn port_pending_passes_through_procedures_and_nested_calls() {
-    let vectors: Json =
-        serde_json::from_str(include_str!("vectors/package_mechanic_vectors.json")).expect("valid JSON");
-    let catalog: Json =
-        serde_json::from_str(include_str!("vectors/catalog_tool_vectors.json")).expect("valid JSON");
-    let runtimes = Runtimes {
-        documents: vectors["documents"].as_object().unwrap(),
-        riichi: hex(catalog["riichi"]["runtime_hex"].as_str().unwrap()),
-        root: Path::new(env!("CARGO_MANIFEST_DIR")).join("../.."),
-    };
-    for name in ["pending nested", "pending procedure", "pending for_each", "pending conditional"] {
-        let case = vectors["cases"].as_array().unwrap().iter().find(|c| c["name"] == name).expect(name);
-        assert_eq!(case["pending"], "aoe", "{name}: Python reaches the effect");
-        let actual = record(case, &runtimes);
-        assert_eq!(
-            actual["pending"], "not yet ported: the 'aoe' effect (lane 2's spatial effect handlers)",
-            "{name}: {actual}"
-        );
-    }
-}

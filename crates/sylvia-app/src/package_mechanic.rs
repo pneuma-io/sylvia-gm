@@ -451,6 +451,9 @@ impl PackageMechanic {
                 Json::Array(evidence.iter().cloned().map(Json::Object).collect()),
             );
         }
+        if let Some(presentation) = bridge.spatial().shot_presentation() {
+            safe_result.insert("shot_effects".into(), Json::Object(presentation));
+        }
         let metadata = match crate::package_runtime::tool_metadata_of(&inner.runtime, name) {
             Ok(metadata) => metadata,
             Err(PackageRuntimeFailure::Uncaught { class, message }) => {
@@ -736,14 +739,20 @@ impl StateBridge for PlayerViewBridge {
     fn register_spatial_aggregate(&mut self, name: &str, source: &Value) {
         self.inner.spatial_mut().register_aggregate(name, source);
     }
+
+    fn record_shot_effect(&mut self, request: &Value) -> Result<(), ExecError> {
+        let mut spatial = std::mem::take(self.inner.spatial_mut());
+        let result = spatial.record_shot(request, |path| self.player_scene(path));
+        *self.inner.spatial_mut() = spatial;
+        result
+    }
 }
 
 impl PlayerViewBridge {
-    /// `bridge._spatial_engine(scene_path)` alone: open (or advance) the scene's engine.
-    fn open_scene(&mut self, scene_path: &str) -> Result<(), ExecError> {
+    /// `bridge._spatial_engine(scene_path).snapshot.as_payload()`.
+    fn scene_snapshot(&mut self, scene_path: &str) -> Result<JsonMap, ExecError> {
         let scene = self.player_scene(scene_path)?;
-        self.inner.spatial_mut().engine(scene_path, &scene)?;
-        Ok(())
+        Ok(self.inner.spatial_mut().engine(scene_path, &scene)?.snapshot().as_payload())
     }
 
     /// `_spatial_engine(scene_path)`'s read in the player view: the scene read through the
@@ -847,10 +856,15 @@ fn player_preflight(
     parameters: &Dict,
     bridge: &mut (dyn StateBridge + 'static),
     player_view: bool,
-) -> Control<Dict> {
+) -> Control<(Dict, Value)> {
     let budget = ExecutionBudget { preflight_only: true, ..ExecutionBudget::default() };
     let mut dice = Dice::new();
     let mut scalars = Dict::new();
+    let mut selected_route = Value::None;
+    let route_name = match &policy.preflight_path {
+        Some(path) => Some(text(path, "route")?.to_owned()),
+        None => None,
+    };
     for name in &policy.preflight {
         // `runtime.tools[name]`.
         let target = host.tool(name).ok_or(ControlError::Other)?;
@@ -890,9 +904,12 @@ fn player_preflight(
                 scalars.insert(key.clone(), value.clone());
             }
         }
+        if let Some(route) = route_name.as_ref().and_then(|name| result.context.get(name)) {
+            selected_route = route.clone();
+        }
     }
     let _ = player_view;
-    Ok(scalars)
+    Ok((scalars, selected_route))
 }
 
 struct ControlInner {
@@ -1092,7 +1109,7 @@ impl PlayerActionPreviewer {
         let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
         let budget = ExecutionBudget::default();
         let mut dice = Dice::new();
-        let calculated: Vec<(String, Value)> = {
+        let calculated: (Vec<(String, Value)>, JsonMap, JsonMap) = {
             let combat = Combat::own(bridge.combat().clone());
             let prepared = prepare_tool_context(
                 &inner.tool_name,
@@ -1110,7 +1127,7 @@ impl PlayerActionPreviewer {
                 Prepared::Result(_) => return Ok(None),
                 Prepared::Context(ctx) => ctx,
             };
-            prepare_player_control_values(policy, &mut ctx)?;
+            let queries = prepare_player_control_values(policy, &mut ctx)?;
             let mut calculated = Vec::new();
             for calculation in &policy.calculations {
                 let Some(Json::Object(body)) = calculation.get("set") else {
@@ -1119,28 +1136,51 @@ impl PlayerActionPreviewer {
                 let name = text(body, "field")?;
                 calculated.push((name.to_owned(), ctx.vars.get(name).cloned().unwrap_or(Value::None)));
             }
-            calculated
+            // The query results a map preview draws (`prepared.vars`).
+            let mut results = JsonMap::new();
+            for name in queries.keys() {
+                let value = ctx.vars.get(name).cloned().unwrap_or(Value::None);
+                results.insert(name.clone(), json_safe(&value).map_err(|_| ControlError::Other)?);
+            }
+            (calculated, queries, results)
         };
+        let (calculated, queries, results) = calculated;
         let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
-        let preflight = player_preflight(&host, policy, &bound, &mut bridge, true)?;
-        // Python opens the scenes' engines before projecting a path or map preview, which
-        // lane 2's C3b ports with `spatial_preview.py`.
+        let (preflight, selected_route) = player_preflight(&host, policy, &bound, &mut bridge, true)?;
+        let mut map_preview = Json::Null;
         if let Some(path) = &policy.preflight_path {
-            bridge.open_scene(text(path, "scene")?)?;
-            return Err(ControlError::PortPending(
-                "not yet ported: the player controls' preflight path preview (lane 2's spatial effect handlers)".into(),
-            ));
+            // `project_preflight_path(route, scalars.get(cost), scene)`, its scene's engine first.
+            let cost = preflight.get(text(path, "cost")?).cloned().unwrap_or(Value::None);
+            let scene = bridge.scene_snapshot(text(path, "scene")?)?;
+            let route = match &selected_route {
+                Value::Dict(_) => Some(json_safe(&selected_route).map_err(|_| ControlError::Other)?),
+                _ => None,
+            };
+            let cost = match &cost {
+                Value::Int(_) | Value::Float(_) => json_safe(&cost).ok(),
+                _ => None,
+            };
+            let projected = crate::spatial_preview::project_preflight_path(
+                route.as_ref().and_then(Json::as_object),
+                cost.as_ref(),
+                &scene,
+            )
+            .map_err(|_| ControlError::Other)?;
+            map_preview = Json::Object(projected);
         }
-        if policy.map_preview.is_some() {
+        if let Some(declaration) = &policy.map_preview {
+            let mut scenes = JsonMap::new();
             for item in &policy.queries {
                 let Some(Json::Object(body)) = item.get("spatial_query") else {
                     return Err(ControlError::Other);
                 };
-                bridge.open_scene(text(body, "scene")?)?;
+                let scene = bridge.scene_snapshot(text(body, "scene")?)?;
+                scenes.insert(text(item, "store_as")?.to_owned(), Json::Object(scene));
             }
-            return Err(ControlError::PortPending(
-                "not yet ported: the player controls' map preview (lane 2's spatial effect handlers)".into(),
-            ));
+            let projected =
+                crate::spatial_preview::project_spatial_preview(declaration, &results, &queries, &scenes)
+                    .map_err(|_| ControlError::Other)?;
+            map_preview = Json::Object(projected);
         }
         let mut public_context = JsonMap::new();
         for (key, value) in preflight.iter() {
@@ -1153,7 +1193,7 @@ impl PlayerActionPreviewer {
         let card = project_result_card(declaration.as_ref(), parameters, &public_context);
         let mut preview = JsonMap::new();
         preview.insert("preview".into(), card.map_or(Json::Null, Json::Object));
-        preview.insert("map_preview".into(), Json::Null);
+        preview.insert("map_preview".into(), map_preview);
         Ok(Some(preview))
     }
 }
