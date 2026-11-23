@@ -12,9 +12,11 @@
 //! (`resolve_interview_content`, on the store as its `ReferenceOwner`) and required starting
 //! state is checked with its `plan_state_admission`.
 //!
+//! The binding takes a saved-library Start's participants and initial state, with the rest of
+//! `_validate_campaign_inputs` (lane 1, with lane 3's agreement).
+//!
 //! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently: finalizing a
-//! construction that is not a guided Interview, and binding participants or initial state (only
-//! a saved-library Start supplies them).
+//! construction that is not a guided Interview.
 //!
 //! Python's owner never gives its `AuthorityOwner` a model capability registry, so guidance is
 //! assessed against the empty one (`EMPTY_MODEL_CAPABILITY_REGISTRY`).
@@ -29,7 +31,8 @@ use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
     canonical_payload_is_safe, owned_payload, validate_authority_identity, CampaignConfirmation,
     CampaignConstructionBasis, CampaignConstructionBegun, CampaignConstructionCompleted, CampaignRecord,
-    GuidedCampaignDraft, LifecycleState, PackageLock, PackageRole, WriterRole,
+    GuidedCampaignDraft, LifecycleState, PackageLock, PackageRole, Participant, ParticipantValidationStatus,
+    StateValue, WriterRole,
 };
 use sylvia_domain::campaign_plan::{
     validate_campaign_plan, CampaignPlanExpectations, CAMPAIGN_PLAN_FORMAT_VERSION,
@@ -43,12 +46,14 @@ use sylvia_domain::model_capability::{
 };
 use sylvia_domain::package_library::{campaign_setting_entries, canonical_json_bytes, PackageLockRecord};
 use sylvia_domain::pyops::py_eq;
+use sylvia_domain::schema_admission::validate_json_value;
 use sylvia_domain::session::{
     builder_dm_handoff_payload_sha256, campaign_plan_payload_sha256, BuilderDMHandoff,
     BuilderDMHandoffRequest, BuilderEvidence, CampaignPlan, CampaignPlanRequest, EvidenceSourceKind,
     PlanAcceptanceStatus, PlanValidationOutcome, SessionMessageKind, SessionRecord, SessionRecordFields,
     SessionStatus,
 };
+use sylvia_domain::DomainError;
 use sylvia_store::campaigns::current_lock_record;
 use sylvia_store::guided_advance::AdvanceDraft;
 use sylvia_store::guided_finalize::GuidedStartCommit;
@@ -182,6 +187,120 @@ pub struct BindRequest<'a> {
     pub turn_id: &'a str,
     pub builder_session_id: &'a str,
     pub package_candidate_id: Option<&'a str>,
+    /// A saved-library Start's participants; empty otherwise.
+    pub participants: &'a [Participant],
+    /// A saved-library Start's initial state; empty otherwise.
+    pub initial_state: &'a [StateValue],
+}
+
+/// `AuthorityOwner._validate_campaign_inputs(captured)`, in one store call: the primary Ruleset
+/// is active, each participant has its exact package, kind and schema proof (or is an admitted
+/// format-1 participant), state keys are unique and nothing uses a reserved canonical channel.
+fn validate_campaign_inputs(
+    store: &sylvia_store::AuthorityStore,
+    package_lock: &PackageLock,
+    participants: &[Participant],
+    initial_state: &[StateValue],
+) -> StoreResult<()> {
+    for entry in package_lock.entries() {
+        if entry.role() == PackageRole::Primary {
+            require_active_ruleset(entry.package_id())?;
+        }
+    }
+    let campaign_schema_is_active = store.campaign_schema_is_active()?;
+    let legacy_participants_are_admitted =
+        store.legacy_participants_are_admitted(package_lock, participants)?;
+    let packages: Vec<(&str, &str, &str)> = package_lock
+        .entries()
+        .iter()
+        .map(|entry| (entry.package_id(), entry.version(), entry.sha256()))
+        .collect();
+    let mut participant_ids: BTreeSet<&str> = BTreeSet::new();
+    for participant in participants {
+        if !participant_ids.insert(participant.participant_id()) {
+            return Err(DomainError::value("Participant identities must be unique within a campaign").into());
+        }
+        if participant.validation_status() == ParticipantValidationStatus::Validated {
+            let Some(package_sha256) = participant.package_sha256() else {
+                return Err(rejected(
+                    "Validated participant package proof is incomplete",
+                    "command_rejected",
+                ));
+            };
+            let identity = (participant.package_id(), participant.package_version(), package_sha256);
+            if !packages.contains(&identity) {
+                return Err(rejected(
+                    "Participant exact package identity must be pinned by the campaign lock",
+                    "participant_package_unlocked",
+                ));
+            }
+            let declarations = store.exact_participant_declarations(identity.0, identity.1, identity.2)?;
+            let Some(declaration) = declarations.iter().find(|item| item.kind == participant.kind()) else {
+                return Err(rejected(
+                    "Participant package does not declare its artifact kind",
+                    "participant_schema_unavailable",
+                ));
+            };
+            if participant.schema_id() != Some(declaration.schema_id.as_str())
+                || participant.schema_sha256() != Some(declaration.schema_sha256.as_str())
+            {
+                return Err(rejected(
+                    "Participant exact schema identity does not match its package declaration",
+                    "participant_schema_mismatch",
+                ));
+            }
+            validate_json_value(
+                &Json::Object(participant.data().clone()),
+                &declaration.schema,
+                &format!("Participant {}", participant.participant_id()),
+            )?;
+            if !store.participant_adaptation_is_admitted(participant)? {
+                return Err(rejected(
+                    "Cross-schema participant reuse requires a durable adaptation operation",
+                    "participant_adaptation_required",
+                ));
+            }
+        } else if campaign_schema_is_active && !legacy_participants_are_admitted {
+            return Err(rejected(
+                "New v5 participants require exact validated package and schema proof",
+                "participant_exact_proof_required",
+            ));
+        } else if !packages.iter().any(|(id, version, _)| {
+            *id == participant.package_id() && *version == participant.package_version()
+        }) {
+            return Err(
+                DomainError::value("Participant package context must be locked by the campaign").into()
+            );
+        }
+    }
+    let state_keys: BTreeSet<(&str, &str)> =
+        initial_state.iter().map(|item| (item.namespace(), item.key())).collect();
+    if state_keys.len() != initial_state.len() {
+        return Err(DomainError::value("Initial state keys must be unique").into());
+    }
+    if participants
+        .iter()
+        .any(|participant| !canonical_payload_is_safe(&Json::Object(participant.data().clone())))
+    {
+        return Err(rejected(
+            "Participant data contains a reserved canonical channel",
+            "unsafe_canonical_payload",
+        ));
+    }
+    let unsafe_state = initial_state.iter().any(|item| {
+        let mut inner = JsonMap::new();
+        inner.insert(item.key().to_owned(), item.value().clone());
+        let mut outer = JsonMap::new();
+        outer.insert(item.namespace().to_owned(), Json::Object(inner));
+        !canonical_payload_is_safe(&Json::Object(outer))
+    });
+    if unsafe_state {
+        return Err(rejected(
+            "Initial state contains a reserved canonical channel",
+            "unsafe_canonical_payload",
+        ));
+    }
+    Ok(())
 }
 
 /// `AuthorityOwner.finalize_campaign_construction`'s arguments.
@@ -592,8 +711,8 @@ pub async fn campaign_construction_basis(
 
 /// `AuthorityOwner.bind_guided_campaign_basis`: the binding checks under the campaign's work,
 /// the semantic payload, the replay prelookup, the campaign inputs, the required Interview steps
-/// (with each Contribution the selected content declares), then the store's binding.
-/// Participants and initial state, which only a saved-library Start supplies, are not ported.
+/// (with each Contribution the selected content declares), then the store's binding, with a
+/// saved-library Start's participants and initial state.
 pub async fn bind_guided_campaign_basis(
     store: &StoreHandle,
     bundled: &Arc<BundledPackages>,
@@ -641,6 +760,27 @@ pub async fn bind_guided_campaign_basis(
         ("turn_id", Json::from(bind.turn_id)),
         ("builder_session", Json::Object(builder)),
     ];
+    if !bind.participants.is_empty() {
+        let mut participants: Vec<&Participant> = bind.participants.iter().collect();
+        participants.sort_by(|left, right| left.participant_id().cmp(right.participant_id()));
+        let payloads = participants.into_iter().map(super::actions::participant_context).collect();
+        values.push(("participants", Json::Array(payloads)));
+    }
+    if !bind.initial_state.is_empty() {
+        let mut state: Vec<&StateValue> = bind.initial_state.iter().collect();
+        state.sort_by(|left, right| (left.namespace(), left.key()).cmp(&(right.namespace(), right.key())));
+        let payloads = state
+            .into_iter()
+            .map(|item| {
+                let mut row = JsonMap::new();
+                row.insert("namespace".into(), item.namespace().into());
+                row.insert("key".into(), item.key().into());
+                row.insert("value".into(), item.value().clone());
+                Json::Object(row)
+            })
+            .collect();
+        values.push(("initial_state", Json::Array(payloads)));
+    }
     if let Some(candidate) = bind.package_candidate_id {
         values.push(("package_candidate_id", Json::from(candidate)));
     }
@@ -655,13 +795,11 @@ pub async fn bind_guided_campaign_basis(
         Some(_) => return Err(coded("IdempotencyConflict", "Campaign operation result kind does not match")),
         None => {}
     }
-    // `_validate_campaign_inputs`: the primary Ruleset must be active. With no participants and
-    // no initial state its other checks read and refuse nothing.
-    for entry in bind.package_lock.entries() {
-        if entry.role() == PackageRole::Primary {
-            require_active_ruleset(entry.package_id())?;
-        }
-    }
+    let (package_lock, participants, initial_state) =
+        (bind.package_lock.clone(), bind.participants.to_vec(), bind.initial_state.to_vec());
+    store
+        .call(move |store| validate_campaign_inputs(store, &package_lock, &participants, &initial_state))
+        .await?;
     let mut required: Vec<&str> = REQUIRED_INTERVIEW_STEPS.to_vec();
     let ruleset_answer = guided_answer_value(store, bind.builder_session_id, "ruleset").await?;
     if bind.package_lock.entries().is_empty()
@@ -682,6 +820,7 @@ pub async fn bind_guided_campaign_basis(
         bind.builder_session_id.to_owned(),
     );
     let package_lock = bind.package_lock.clone();
+    let (participants, initial_state) = (bind.participants.to_vec(), bind.initial_state.to_vec());
     store
         .call(move |store| {
             store.bind_guided_campaign_basis(&BindBasis {
@@ -693,6 +832,8 @@ pub async fn bind_guided_campaign_basis(
                 package_lock: &package_lock,
                 turn_id: &turn_id,
                 builder_session_id: &session_id,
+                participants: &participants,
+                initial_state: &initial_state,
                 required_interview_steps: &required,
             })
         })
