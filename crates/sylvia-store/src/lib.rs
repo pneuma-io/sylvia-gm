@@ -57,6 +57,7 @@ pub mod stored;
 mod stored_campaigns;
 mod stored_construction;
 pub mod stored_sessions;
+pub mod tool_cache;
 mod verify;
 pub mod work;
 
