@@ -189,4 +189,13 @@ pub trait TurnOwner: OpeningReads {
     /// `campaign_narrative_options(session_id)`: the Campaign File note types one DM session
     /// may write, and their choices.
     fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `execute_action(command)`: one mechanic executed by the owner, refused in Python's class.
+    fn execute_action<'a>(
+        &'a self,
+        command: &'a sylvia_domain::authority::ActionCommand,
+    ) -> BoxFuture<
+        'a,
+        Result<sylvia_app::authority::actions::ActionExecution, crate::stateless_mcp::AuthorityFailure>,
+    >;
 }
