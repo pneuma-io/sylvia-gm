@@ -200,7 +200,7 @@ fn uncaught(class: &'static str, message: String) -> StoreError {
 /// has no runtime or its runtime refuses the tool (`except PackageRuntimeError: return None`).
 /// `package_tool_permanently_refused` is read after that `try`, so its refusal escapes as
 /// Python's `PackageRuntimeError`, a `ValueError`.
-fn package_tool(
+pub(super) fn package_tool(
     store: &AuthorityStore,
     entry: &sylvia_domain::authority::PackageLockEntry,
     declaration: &sylvia_domain::package_library::ToolDeclaration,

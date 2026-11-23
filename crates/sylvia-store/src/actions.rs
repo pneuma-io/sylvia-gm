@@ -181,12 +181,22 @@ fn package_uses_content_declarations(
     Ok(matches!(manifest.get("content_declarations"), Some(Json::String(_))))
 }
 
+/// The package a mechanic acts as, for `owner_for_mutation`.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct MutationActor<'a> {
+    pub campaign_id: &'a str,
+    pub package_id: &'a str,
+    pub package_version: &'a str,
+    pub package_sha256: &'a str,
+}
+
 /// `sqlite_state_ownership.owner_for_mutation`: the existing owner, or one new actor claim.
-fn owner_for_mutation(
+pub(crate) fn owner_for_mutation(
     connection: &Connection,
-    command: &CommitAction,
+    actor: &MutationActor<'_>,
     namespace: &str,
 ) -> StoreResult<(String, bool)> {
+    let command = actor;
     let existing = one_row(
         connection,
         "SELECT owner_package_id FROM campaign_state_namespace_owners WHERE campaign_id = ? AND namespace = ?",
@@ -198,31 +208,31 @@ fn owner_for_mutation(
             Value::Null => None,
             value => Some(py_str(value)),
         };
-        let ids = current_package_ids(connection, &command.campaign_id)?;
+        let ids = current_package_ids(connection, command.campaign_id)?;
         if !owner_matches_package_lock(ids.iter().map(String::as_str), namespace, recorded.as_deref())
-            || recorded.as_deref() != Some(command.package_id.as_str())
+            || recorded.as_deref() != Some(command.package_id)
         {
             return Err(failed());
         }
-        return Ok((command.package_id.clone(), false));
+        return Ok((command.package_id.to_owned(), false));
     }
-    let ids = current_package_ids(connection, &command.campaign_id)?;
+    let ids = current_package_ids(connection, command.campaign_id)?;
     let matches: Vec<&String> = ids
         .iter()
         .filter(|id| namespace == id.as_str() || namespace.starts_with(&format!("{id}.")))
         .collect();
-    let single_actor = matches.len() == 1 && matches[0] == &command.package_id;
+    let single_actor = matches.len() == 1 && matches[0].as_str() == command.package_id;
     if !single_actor
         && (package_uses_content_declarations(
             connection,
-            &command.package_id,
-            &command.package_version,
-            &command.package_sha256,
+            command.package_id,
+            command.package_version,
+            command.package_sha256,
         )? || !matches.is_empty())
     {
         return Err(failed());
     }
-    Ok((command.package_id.clone(), true))
+    Ok((command.package_id.to_owned(), true))
 }
 
 fn object(pairs: Vec<(&str, Json)>) -> Json {
@@ -318,7 +328,13 @@ impl AuthorityStore {
         }
 
         for mutation in &command.outcome.mutations {
-            let (owner, is_new) = owner_for_mutation(connection, command, &mutation.namespace)?;
+            let actor = MutationActor {
+                campaign_id: &command.campaign_id,
+                package_id: &command.package_id,
+                package_version: &command.package_version,
+                package_sha256: &command.package_sha256,
+            };
+            let (owner, is_new) = owner_for_mutation(connection, &actor, &mutation.namespace)?;
             if is_new {
                 connection.execute(
                     "INSERT INTO campaign_state_namespace_owners (campaign_id, namespace, owner_package_id) \

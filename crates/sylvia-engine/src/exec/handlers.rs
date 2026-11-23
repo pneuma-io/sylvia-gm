@@ -718,6 +718,18 @@ pub fn with_identity_shuffle_for_vectors<R>(body: impl FnOnce() -> R) -> R {
     result
 }
 
+#[cfg(feature = "vector-hooks")]
+static IDENTITY_SHUFFLE_EVERYWHERE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// Vector tooling only: every thread's `shuffle` leaves its collection in order until this is
+/// set back to `false`, for code that runs a mechanic on another thread (the owner's store
+/// thread). Set it only in a test binary of its own, and reset it when the test ends.
+#[cfg(feature = "vector-hooks")]
+#[doc(hidden)]
+pub fn set_identity_shuffle_everywhere_for_vectors(enabled: bool) {
+    IDENTITY_SHUFFLE_EVERYWHERE.store(enabled, std::sync::atomic::Ordering::Relaxed);
+}
+
 /// `_handle_shuffle`: an unguessable permutation (OS randomness, as in Python), kept as state.
 pub(crate) fn handle_shuffle(
     body: &Value,
@@ -738,7 +750,8 @@ pub(crate) fn handle_shuffle(
         .collect();
     // `secrets.SystemRandom().shuffle(values)`: OS randomness, as in Python.
     #[cfg(feature = "vector-hooks")]
-    let identity = IDENTITY_SHUFFLE.with(std::cell::Cell::get);
+    let identity = IDENTITY_SHUFFLE.with(std::cell::Cell::get)
+        || IDENTITY_SHUFFLE_EVERYWHERE.load(std::sync::atomic::Ordering::Relaxed);
     #[cfg(not(feature = "vector-hooks"))]
     let identity = false;
     if !identity {
