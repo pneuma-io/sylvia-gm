@@ -104,7 +104,7 @@ impl AdmittedSpatialQuery {
 }
 
 /// The scene's bounds, as `_inside` reads them.
-fn scene_bounds(scene: &JsonMap) -> Bounds {
+pub(super) fn scene_bounds(scene: &JsonMap) -> Bounds {
     let bounds = &scene["map"]["bounds"];
     let read = |key: &str| {
         let values = floats(bounds[key].as_array().expect("admitted bounds"));
@@ -114,7 +114,7 @@ fn scene_bounds(scene: &JsonMap) -> Bounds {
 }
 
 /// `_grid_cell_counts(map)`.
-fn grid_cell_counts(scene: &JsonMap) -> [i64; 2] {
+pub(super) fn grid_cell_counts(scene: &JsonMap) -> [i64; 2] {
     let bounds = scene_bounds(scene);
     let size = float(&scene["map"]["grid"]["cell_size"]);
     [0, 1].map(|index| ((bounds.upper[index] - bounds.lower[index]) / size).ceil() as i64)
