@@ -150,8 +150,12 @@ fn guided_start_selection_input(payload: &JsonMap) -> Json {
 
 /// `_seed_campaign_plan(storage_root, campaign_id, text)`: create `campaign-plan.md` once, never
 /// overwriting a plan the Builder has customised since.
-fn seed_campaign_plan(storage_root: &std::path::Path, campaign_id: &str, text: &str) -> CodedResult<()> {
-    use std::io::Write;
+fn seed_campaign_plan(
+    storage_root: &std::path::Path,
+    campaign_id: &str,
+    text: &str,
+    structured_plan: Option<&JsonMap>,
+) -> CodedResult<()> {
     let encoded = text.as_bytes();
     if encoded.is_empty() || encoded.len() > MAX_CAMPAIGN_PLAN_BYTES {
         return Err(rejected("Campaign plan file exceeds the usability limit"));
@@ -166,8 +170,31 @@ fn seed_campaign_plan(storage_root: &std::path::Path, campaign_id: &str, text: &
         if !target.is_file() {
             return Err(rejected("Campaign plan path is not a regular file"));
         }
+    } else {
+        write_new_plan(&folder, &target, encoded)?;
+    }
+    let Some(structured_plan) = structured_plan else {
+        return Ok(());
+    };
+    let structured_target = target.with_extension("json");
+    let structured_bytes =
+        sylvia_domain::package_library::canonical_json_bytes(&Json::Object(structured_plan.clone()));
+    if structured_bytes.len() > MAX_CAMPAIGN_PLAN_BYTES {
+        return Err(rejected("Structured Campaign Plan exceeds the usability limit"));
+    }
+    if structured_target.exists() {
+        if !structured_target.is_file() {
+            return Err(rejected("Structured Campaign Plan path is not a regular file"));
+        }
         return Ok(());
     }
+    std::fs::write(&structured_target, structured_bytes)
+        .map_err(|_| rejected("Structured Campaign Plan could not be created"))
+}
+
+/// The atomic write of a new `campaign-plan.md`.
+fn write_new_plan(folder: &std::path::Path, target: &std::path::Path, encoded: &[u8]) -> CodedResult<()> {
+    use std::io::Write;
     let nonce =
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(0, |time| time.as_nanos());
     let temporary = folder.join(format!(".campaign-plan-{}-{nonce}.tmp", std::process::id()));
@@ -177,7 +204,7 @@ fn seed_campaign_plan(storage_root: &std::path::Path, campaign_id: &str, text: &
         file.flush()?;
         file.sync_all()?;
         drop(file);
-        std::fs::rename(&temporary, &target)
+        std::fs::rename(&temporary, target)
     })();
     if written.is_err() {
         let _ = std::fs::remove_file(&temporary);
@@ -199,9 +226,6 @@ fn no_ruleset_plan(display_name: &str, premise: &str) -> String {
     )
 }
 
-/// `handle_start_guided_campaign` for a Draft with no Ruleset or an installed one. A saved
-/// Campaign Plan (`plan_id`) needs lane 1's library selection and party materialisation, so it is
-/// refused as not yet ported.
 /// `handle_campaign_party_options`: a saved Plan's party choices, revalidated through lane 1's
 /// library selection (`resolve_campaign_library_selection(...).party_options()`) in one store
 /// call.
@@ -229,42 +253,182 @@ pub async fn handle_campaign_party_options(ctx: &DispatchContext, params: &JsonM
     Ok(Json::Object(options))
 }
 
+/// What a saved-Plan Start resolves in one store call: the library selection (lane 1's
+/// `resolve_campaign_library_selection`), the candidate's lock and the materialized party.
+struct SavedPlanStart {
+    candidate_id: String,
+    package_lock: sylvia_domain::authority::PackageLock,
+    plan_id: String,
+    plan_content_sha256: String,
+    setting_id: String,
+    participants: Vec<sylvia_domain::authority::Participant>,
+    initial_state: Vec<sylvia_domain::authority::StateValue>,
+    selected_party: Vec<Json>,
+    selected_plan: sylvia_domain::campaign_plan::ValidatedCampaignPlan,
+    companion_ids: Json,
+    intent: JsonMap,
+}
+
+/// `premise` as Python reads it: absent, or bounded text.
+fn start_premise(params: &JsonMap) -> CodedResult<String> {
+    match params.get("premise") {
+        None => Ok(String::new()),
+        Some(Json::String(text)) if text.chars().count() <= MAX_USER_TEXT_CHARS => Ok(text.clone()),
+        Some(_) => Err(protocol("premise must be a bounded string")),
+    }
+}
+
+/// The saved-Plan half of `handle_start_guided_campaign`, in Python's order inside one store call
+/// (the selection borrows the store): the selection, the candidate's lock, the premise, the
+/// companions, the construction intent, then the party (a party template's, or the library's
+/// with the Plan and the player's instructions).
+fn saved_plan_start(
+    store: &sylvia_store::AuthorityStore,
+    bundled: &sylvia_app::bundled_packages::BundledPackages,
+    storage_root: &std::path::Path,
+    operation_id: &str,
+    params: &JsonMap,
+) -> sylvia_store::StoreResult<CodedResult<SavedPlanStart>> {
+    use sylvia_app::campaign_library_selection as library;
+    let (candidate, setting_id, plan_id) =
+        match (required(params, "candidate_id"), required(params, "setting_id"), required(params, "plan_id"))
+        {
+            (Ok(candidate), Ok(setting_id), Ok(plan_id)) => (candidate, setting_id, plan_id),
+            (Err(error), _, _) | (_, Err(error), _) | (_, _, Err(error)) => return Ok(Err(error)),
+        };
+    let selection = library::resolve_campaign_library_selection(
+        store,
+        bundled,
+        storage_root,
+        &candidate,
+        &setting_id,
+        &plan_id,
+    )?;
+    let candidate_id = selection.candidate.candidate_id().to_owned();
+    let package_lock = store.package_candidate(&candidate_id)?.package_lock().clone();
+    if let Err(error) = start_premise(params) {
+        return Ok(Err(error));
+    }
+    let empty = Json::Array(Vec::new());
+    let raw_companions = params.get("companion_ids").unwrap_or(&empty);
+    let companions: Option<Vec<String>> = match raw_companions {
+        Json::Array(items) if items.len() <= 64 => items
+            .iter()
+            .map(|item| item.as_str().filter(|text| !text.is_empty()).map(str::to_owned))
+            .collect(),
+        _ => None,
+    };
+    let Some(companion_ids) = companions else {
+        return Ok(Err(protocol("companion_ids must contain bounded character identities")));
+    };
+    // `params.get("construction_intent") or {}`.
+    let intent = match params.get("construction_intent") {
+        Some(value) if truthy(Some(value)) => match value {
+            Json::Object(map) => map.clone(),
+            _ => return Ok(Err(protocol("construction_intent must be an object"))),
+        },
+        _ => JsonMap::new(),
+    };
+    let player_character_id = match required(params, "player_character_id") {
+        Ok(id) => id,
+        Err(error) => return Ok(Err(error)),
+    };
+    let (participants, initial_state, selected_party, selected_plan) = if selection.party_template.is_some() {
+        library::materialize_template_party(
+            store,
+            bundled,
+            &selection,
+            operation_id,
+            &player_character_id,
+            &companion_ids,
+            &intent,
+        )?
+    } else {
+        let (participants, initial_state, selected_party) = library::materialize_library_party(
+            store,
+            &selection,
+            operation_id,
+            &player_character_id,
+            &companion_ids,
+        )?;
+        let plan = library::plan_with_interview_intent(&selection, &intent, None)?;
+        (participants, initial_state, selected_party, plan)
+    };
+    Ok(Ok(SavedPlanStart {
+        candidate_id,
+        package_lock,
+        plan_id: selection.plan.artifact_id.clone(),
+        plan_content_sha256: selection.plan.content_sha256.clone(),
+        setting_id: selection.sources.setting.package_id.clone(),
+        participants,
+        initial_state,
+        selected_party,
+        selected_plan,
+        companion_ids: raw_companions.clone(),
+        intent,
+    }))
+}
+
+/// `handle_start_guided_campaign`: a Draft with no Ruleset, an installed one, or a saved Campaign
+/// Plan (`plan_id`: lane 1's library selection and party, bound with its participants and initial
+/// state, and seeded with the Plan's Markdown and structured Plan).
 pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let operation_id = required(params, "operation_id")?;
     let campaign_id = required(params, "campaign_id")?;
     let builder_session_id = required(params, "builder_session_id")?;
-    let candidate_id = params.get("candidate_id").cloned().unwrap_or(Json::Null);
-    if !matches!(params.get("plan_id"), None | Some(Json::Null)) {
-        required(params, "candidate_id")?;
-        required(params, "setting_id")?;
-        required(params, "plan_id")?;
-        return Err(sylvia_base::CodedError::new(
-            crate::dispatch::PORT_PENDING,
-            "not yet ported: a saved Campaign Plan Start (lane 1's guided binding with participants)",
-        ));
-    }
-    let package_lock = match &candidate_id {
-        Json::Null => sylvia_domain::authority::PackageLock::new(Vec::new())
-            .map_err(|error| sylvia_base::CodedError::new("internal_error", error.to_string()))?,
-        Json::String(id) if !id.is_empty() => {
-            let id = id.clone();
-            let candidate =
-                ctx.store.call(move |store| store.package_candidate(&id)).await.map_err(store_error)?;
-            candidate.package_lock().clone()
-        }
-        _ => return Err(protocol("candidate_id must be a nonempty string or null")),
+    let mut candidate_id = params.get("candidate_id").cloned().unwrap_or(Json::Null);
+    let saved = if matches!(params.get("plan_id"), None | Some(Json::Null)) {
+        None
+    } else {
+        let (bundled, storage_root, operation, request) = (
+            std::sync::Arc::clone(&ctx.bundled),
+            ctx.storage_root.clone(),
+            operation_id.clone(),
+            params.clone(),
+        );
+        let start = ctx
+            .store
+            .call(move |store| saved_plan_start(store, &bundled, &storage_root, &operation, &request))
+            .await
+            .map_err(store_error)??;
+        candidate_id = Json::String(start.candidate_id.clone());
+        Some(start)
     };
-    let premise = match params.get("premise") {
-        None => String::new(),
-        Some(Json::String(text)) if text.chars().count() <= MAX_USER_TEXT_CHARS => text.clone(),
-        Some(_) => return Err(protocol("premise must be a bounded string")),
+    let package_lock = match (&saved, &candidate_id) {
+        (Some(start), _) => start.package_lock.clone(),
+        (None, candidate_id) => match candidate_id {
+            Json::Null => sylvia_domain::authority::PackageLock::new(Vec::new())
+                .map_err(|error| sylvia_base::CodedError::new("internal_error", error.to_string()))?,
+            Json::String(id) if !id.is_empty() => {
+                let id = id.clone();
+                let candidate =
+                    ctx.store.call(move |store| store.package_candidate(&id)).await.map_err(store_error)?;
+                candidate.package_lock().clone()
+            }
+            _ => return Err(protocol("candidate_id must be a nonempty string or null")),
+        },
     };
+    let premise = start_premise(params)?;
     let premise = sylvia_base::pystr::strip(&premise).to_owned();
     let mut canonical_input = JsonMap::new();
     if !premise.is_empty() {
         canonical_input.insert("premise".into(), premise.as_str().into());
     }
-    if truthy(params.get("player_character_id")) || truthy(params.get("companion_ids")) {
+    if let Some(start) = &saved {
+        let mut player_character = JsonMap::new();
+        player_character.insert("archetype_id".into(), params["player_character_id"].clone());
+        canonical_input.insert("plan_id".into(), start.plan_id.as_str().into());
+        canonical_input.insert("plan_content_sha256".into(), start.plan_content_sha256.as_str().into());
+        canonical_input.insert("setting_id".into(), start.setting_id.as_str().into());
+        canonical_input.insert("player_character".into(), Json::Object(player_character));
+        canonical_input.insert("companion_ids".into(), start.companion_ids.clone());
+        canonical_input.insert(
+            "starting_party_policy".into(),
+            start.selected_plan.payload.get("starting_party").cloned().unwrap_or(Json::Null),
+        );
+        canonical_input.insert("selected_party".into(), Json::Array(start.selected_party.clone()));
+        canonical_input.insert("construction_intent".into(), Json::Object(start.intent.clone()));
+    } else if truthy(params.get("player_character_id")) || truthy(params.get("companion_ids")) {
         return Err(rejected("Selected characters require a concrete Campaign Plan"));
     }
     let display_name = required(params, "display_name")?;
@@ -324,14 +488,17 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
             turn_id: &format!("turn-construction-{digest}"),
             builder_session_id: &builder_session_id,
             package_candidate_id: package_candidate_id.as_deref(),
-            participants: &[],
-            initial_state: &[],
+            participants: saved.as_ref().map_or(&[], |start| start.participants.as_slice()),
+            initial_state: saved.as_ref().map_or(&[], |start| start.initial_state.as_slice()),
         },
     )
     .await
     .map_err(store_error)?;
-    if package_candidate_id.is_none() {
-        seed_campaign_plan(&ctx.storage_root, &campaign_id, &no_ruleset_plan(&display_name, &premise))?;
+    if let Some(start) = &saved {
+        let plan = &start.selected_plan;
+        seed_campaign_plan(&ctx.storage_root, &campaign_id, &plan.readable_markdown, Some(&plan.payload))?;
+    } else if package_candidate_id.is_none() {
+        seed_campaign_plan(&ctx.storage_root, &campaign_id, &no_ruleset_plan(&display_name, &premise), None)?;
     }
     let begun = sylvia_app::authority::guided::begin_campaign_construction(
         &ctx.store,
