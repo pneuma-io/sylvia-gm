@@ -18,8 +18,16 @@ pub async fn handle_handshake_status(ctx: &DispatchContext, _params: &JsonMap) -
 }
 
 /// A store failure as a handler's error: a rejection Python's owner catches keeps its code,
-/// message and class; anything else is the owner's internal error.
+/// message and class; behaviour the port has not reached yet (`StoreError::NotPorted`) answers
+/// `rust_port_pending`, as every unported branch does; anything else is the owner's internal
+/// error.
 pub(crate) fn store_error(error: sylvia_store::StoreError) -> sylvia_base::CodedError {
+    if let sylvia_store::StoreError::NotPorted(what) = &error {
+        return sylvia_base::CodedError::new(
+            crate::dispatch::PORT_PENDING,
+            format!("not yet ported: {what}"),
+        );
+    }
     error.rejection().unwrap_or_else(|| sylvia_base::CodedError::new("internal_error", error.to_string()))
 }
 
@@ -231,10 +239,9 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
         required(params, "setting_id")?;
         required(params, "plan_id")?;
         return Err(sylvia_base::CodedError::new(
-            "internal_error",
-            "not yet ported: a saved Campaign Plan Start (lane 1's resolve_campaign_library_selection)",
-        )
-        .with_error_type("RuntimeError"));
+            crate::dispatch::PORT_PENDING,
+            "not yet ported: a saved Campaign Plan Start (lane 1's guided binding with participants)",
+        ));
     }
     let package_lock = match &candidate_id {
         Json::Null => sylvia_domain::authority::PackageLock::new(Vec::new())
