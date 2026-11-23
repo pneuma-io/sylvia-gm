@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 50 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 51 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -33,7 +33,7 @@ Ported: 50 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_gui
 | --- | --- | --- | --- | --- |
 | `handshake_status` | `campaigns.handle_handshake_status` | no | yes | `local-services` |
 | `campaign_index` | `campaigns.handle_campaign_index` | yes | yes | `startup`, `ruleless-turn` |
-| `campaign_creation_catalog` | `campaigns.handle_campaign_creation_catalog` | yes | no | |
+| `campaign_creation_catalog` | `campaigns.handle_campaign_creation_catalog` | yes | yes | `startup` |
 | `ready_campaign_catalog` | `campaigns.handle_ready_campaign_catalog` | yes | no | |
 | `customize_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | no | |
 | `start_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | no | |
