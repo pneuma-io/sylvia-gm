@@ -103,7 +103,14 @@ fn me() -> PathBuf {
 
 fn folder(name: &str) -> PathBuf {
     let path = std::env::temp_dir().join(format!("sylvia-runtime-{}-{name}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&path);
+    if let Err(error) = std::fs::remove_dir_all(&path) {
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::NotFound,
+            "cannot clear the old work folder {}: {error}",
+            path.display()
+        );
+    }
     std::fs::create_dir_all(&path).expect("folder");
     path
 }
