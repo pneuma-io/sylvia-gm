@@ -121,7 +121,7 @@ pub async fn catalog(
 
 /// `_catalog(campaign_id, include_character_updates=..., include_unexposed=...)` past its
 /// transition check.
-fn catalog_on(
+pub(super) fn catalog_on(
     store: &AuthorityStore,
     campaign_id: &str,
     include_character_updates: bool,
@@ -189,7 +189,7 @@ fn active_dm_context(store: &AuthorityStore, session_id: &str) -> StoreResult<Se
 
 /// `_optional_dm_structured_plan(session_id)`: the DM context and its structured plan, empty
 /// when there is no accepted one.
-fn optional_dm_structured_plan(
+pub(super) fn optional_dm_structured_plan(
     store: &AuthorityStore,
     session_id: &str,
 ) -> StoreResult<(SessionContext, JsonMap)> {
@@ -212,7 +212,11 @@ fn contains(seen: &[Json], value: &Json) -> bool {
 
 /// `_retained_preparation(campaign_id, plan)`: during an accepted sequel, the earlier adventures'
 /// structure, objectives and secrets stay usable.
-fn retained_preparation(store: &AuthorityStore, campaign_id: &str, plan: &JsonMap) -> StoreResult<JsonMap> {
+pub(super) fn retained_preparation(
+    store: &AuthorityStore,
+    campaign_id: &str,
+    plan: &JsonMap,
+) -> StoreResult<JsonMap> {
     let Some(current) = store.accepted_campaign_plan(campaign_id)? else { return Ok(plan.clone()) };
     let sequel = matches!(current.content().get("sequel"), Some(Json::Object(_)));
     let current_plan = current.content().get("campaign_plan").cloned().unwrap_or(Json::Null);
@@ -360,7 +364,7 @@ fn campaign_setting_knowledge(
 
 /// `_campaign_secret_catalog(campaign_id, plan)`: the plan's inline secrets merged with the exact
 /// Setting facts it references, then the remaining Setting facts by identity.
-fn campaign_secret_catalog(
+pub(super) fn campaign_secret_catalog(
     store: &AuthorityStore,
     campaign_id: &str,
     plan: &JsonMap,
